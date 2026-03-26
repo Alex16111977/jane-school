@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masterplan | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/englisch.css">
+    <style>
+        /* Masterplan specific styles */
+        .mp-schedule {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .mp-time-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .mp-time-block:last-child { border-bottom: none; }
+        .mp-time {
+            min-width: 110px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            padding-top: 0.15rem;
+            white-space: nowrap;
+        }
+        .mp-time-label {
+            font-size: 1.2rem;
+            margin-right: 0.4rem;
+        }
+        .mp-time-desc {
+            flex: 1;
+        }
+        .mp-time-desc strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--color-text);
+            margin-bottom: 0.15rem;
+        }
+        .mp-time-desc p {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+        .mp-time-break {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 0.5rem 0.8rem;
+            margin: 0.3rem 0;
+        }
+        .mp-time-break strong {
+            color: var(--color-text-muted) !important;
+            font-weight: 500;
+        }
+
+        /* Subject badges in weekly plan */
+        .mp-day-subjects {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .mp-subject-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .mp-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            min-width: 50px;
+            text-align: center;
+        }
+        .mp-badge-mathe { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .mp-badge-deutsch { background: rgba(52,152,219,0.2); color: #3498db; }
+        .mp-badge-englisch { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .mp-badge-all { background: rgba(241,196,15,0.2); color: #f1c40f; }
+
+        .mp-subject-text {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Tips grid */
+        .mp-tips {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .mp-tip {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-start;
+        }
+        .mp-tip-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .mp-tip strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--color-text);
+            margin-bottom: 0.2rem;
+        }
+        .mp-tip p {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+
+        /* After-school compact plan */
+        .mp-compact-plan {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+        .mp-compact-day {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.7rem 0.8rem;
+        }
+        .mp-compact-day-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--color-accent);
+            margin-bottom: 0.3rem;
+        }
+        .mp-compact-day-star .mp-compact-day-name { color: #f1c40f; }
+        .mp-compact-day-rest {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+        .mp-compact-day-rest .mp-compact-day-name { color: #2ecc71; }
+
+        @media (max-width: 600px) {
+            .mp-tips { grid-template-columns: 1fr; }
+            .mp-compact-plan { grid-template-columns: 1fr; }
+            .mp-time { min-width: 90px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.55)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <div class="page-header">
+            <a href="index.html" class="back-link">&larr; Назад</a>
+            <h1 class="hero-title-glow">Masterplan</h1>
+            <p class="page-subtitle">Все 3 предмета &mdash; один план до ZP 10</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="tagesplan">Tagesplan</button>
+            <button class="tab" data-tab="woche1">Woche 1</button>
+            <button class="tab" data-tab="woche2">Woche 2</button>
+            <button class="tab" data-tab="schulzeit">Schulzeit</button>
+            <button class="tab" data-tab="tipps">Tipps</button>
+        </div>
+
+        <!-- Tab: Tagesplan -->
+        <div class="tab-content active" id="tab-tagesplan">
+            <div class="zp-notes">
+
+                <section class="note-section">
+                    <h2>Tagesstruktur &mdash; Osterferien</h2>
+                    <p class="eng-note-small">~3,5 часа учёбы + много свободного времени. Smart lernen!</p>
+
+                    <div class="eng-trio">
+                        <div class="eng-trio-item">
+                            <span>&#x1F4D0;</span>
+                            <strong>Mathe</strong>
+                            <p>1,5 Stunden</p>
+                        </div>
+                        <div class="eng-trio-item">
+                            <span>&#x1F1E9;&#x1F1EA;</span>
+                            <strong>Deutsch</strong>
+                            <p>1 Stunde</p>
+                        </div>
+                        <div class="eng-trio-item">
+                            <span>&#x1F1EC;&#x1F1E7;</span>
+                            <strong>Englisch</strong>
+                            <p>1 Stunde</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="note-section">
+                    <h2>&#x23F0; Расписание дня</h2>
+
+                    <div class="mp-schedule">
+                        <div class="mp-time-block">
+                            <div class="mp-time"><span class="mp-time-label">&#x2600;&#xFE0F;</span> 10:00&ndash;11:30</div>
+                            <div class="mp-time-desc">
+                                <strong>&#x1F4D0; MATHE (Hauptfach!)</strong>
+                                <p>Самый сложный предмет &mdash; учим утром, когда голова свежая</p>
+                            </div>
+                        </div>
+
+                        <div class="mp-time-block mp-time-break">
+                            <div class="mp-time">&#x2615; 11:30&ndash;12:00</div>
+                            <div class="mp-time-desc">
+                                <strong>Pause</strong>
+                                <p>Перекус, телефон, отдых</p>
+                            </div>
+                        </div>
+
+                        <div class="mp-time-block">
+                            <div class="mp-time"><span class="mp-time-label">&#x1F4D6;</span> 12:00&ndash;13:00</div>
+                            <div class="mp-time-desc">
+                                <strong>&#x1F1E9;&#x1F1EA; DEUTSCH</strong>
+                                <p>Тексты, анализ, Aufgabentypen</p>
+                            </div>
+                        </div>
+
+                        <div class="mp-time-block mp-time-break">
+                            <div class="mp-time">&#x1F35D; 13:00&ndash;15:00</div>
+                            <div class="mp-time-desc">
+                                <strong>Gro&szlig;e Pause</strong>
+                                <p>Обед, прогулка, отдых, гулять с друзьями</p>
+                            </div>
+                        </div>
+
+                        <div class="mp-time-block">
+                            <div class="mp-time"><span class="mp-time-label">&#x1F1EC;&#x1F1E7;</span> 15:00&ndash;16:00</div>
+                            <div class="mp-time-desc">
+                                <strong>&#x1F1EC;&#x1F1E7; ENGLISCH</strong>
+                                <p>Listening, Reading, Writing</p>
+                            </div>
+                        </div>
+
+                        <div class="mp-time-block mp-time-break">
+                            <div class="mp-time">&#x2B50; ab 16:00</div>
+                            <div class="mp-time-desc">
+                                <strong>Komplett frei!</strong>
+                                <p>Всё &mdash; ты свободен! Netflix, друзья, отдых</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="note-section">
+                    <div class="eng-congrats">
+                        <h3>3,5 Stunden smart = besser als 6 Stunden Stress</h3>
+                        <p>Тебе 15 &mdash; не нужно учиться по 6&ndash;8 часов. Мозг лучше работает с перерывами!</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Tab: Woche 1 -->
+        <div class="tab-content" id="tab-woche1">
+            <div class="zp-notes">
+
+                <section class="note-section">
+                    <div class="lernplan-week">
+                        <div class="lernplan-week-header">
+                            <span class="lernplan-week-badge">Woche 1</span>
+                            <h3>Osterferien &mdash; Intensivphase</h3>
+                            <p class="eng-note-small">Каждый день 3 предмета по расписанию</p>
+                        </div>
+                        <div class="lernplan-days">
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mo</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Br&uuml;che + Prozent</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Leseverstehen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Listening</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Di</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Gleichungen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Informierenden Text schreiben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Vocabulary</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mi</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Funktionen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Analyse &uuml;ben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Reading</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Do</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Pythagoras + Fl&auml;che</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Text zusammenfassen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Writing</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-star">Fr</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">&#x2B50; Komplexe Aufgaben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">&#x2B50; Thema Medien &amp; Kultur</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">&#x2B50; Ganzer Test</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Sa</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Alle</span><span class="mp-subject-text">&#x1F504; Fehler verbessern (alle F&auml;cher)</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-rest">So</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Frei</span><span class="mp-subject-text">Leichte Wiederholung oder komplett frei</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Tab: Woche 2 -->
+        <div class="tab-content" id="tab-woche2">
+            <div class="zp-notes">
+
+                <section class="note-section">
+                    <div class="lernplan-week">
+                        <div class="lernplan-week-header">
+                            <span class="lernplan-week-badge">Woche 2</span>
+                            <h3>Osterferien &mdash; Vertiefung</h3>
+                            <p class="eng-note-small">Сложнее задания + пробный экзамен в пятницу</p>
+                        </div>
+                        <div class="lernplan-days">
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mo</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Volumen (K&ouml;rper)</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Textvergleich</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Listening</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Di</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Funktionen (schwer)</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Analyse schreiben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Vocabulary</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mi</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Wahrscheinlichkeit</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Leseverstehen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Reading</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Do</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Gemischte Aufgaben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Aufgabentyp 4b</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Writing</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-star">Fr</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">&#x2B50;</span><span class="mp-subject-text"><strong>GANZE Probepr&uuml;fung</strong> (abwechselnd Fach)</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Sa</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Alle</span><span class="mp-subject-text">&#x1F50D; Fehleranalyse &mdash; Was muss besser werden?</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-rest">So</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Frei</span><span class="mp-subject-text">Pause + Motivation tanken</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Tab: Schulzeit -->
+        <div class="tab-content" id="tab-schulzeit">
+            <div class="zp-notes">
+
+                <section class="note-section">
+                    <div class="lernplan-week lernplan-week-regular">
+                        <div class="lernplan-week-header">
+                            <span class="lernplan-week-badge lernplan-badge-green">Jede Woche</span>
+                            <h3>Nach den Ferien bis zur Pr&uuml;fung</h3>
+                            <p class="eng-note-small">2&ndash;3 часа в день &mdash; реалистично во время школы</p>
+                        </div>
+                        <div class="lernplan-days">
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mo</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">1 Thema &uuml;ben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Listening / Reading</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Di</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Analyse / Schreiben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Aufgaben rechnen</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Mi</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-englisch">Engl</span><span class="mp-subject-text">Writing &uuml;ben</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Leseverstehen</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Do</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-mathe">Mathe</span><span class="mp-subject-text">Schwache Themen wiederholen</span></div>
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-deutsch">Deutsch</span><span class="mp-subject-text">Argumentation &uuml;ben</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-star">Fr</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">&#x2B50;</span><span class="mp-subject-text"><strong>Alte Pr&uuml;fung komplett</strong> (abwechselnd Fach)</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name">Sa</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Alle</span><span class="mp-subject-text">Fehler der Woche wiederholen</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lernplan-day">
+                                <div class="lernplan-day-name lernplan-day-rest">So</div>
+                                <div class="lernplan-day-content">
+                                    <div class="mp-day-subjects">
+                                        <div class="mp-subject-row"><span class="mp-badge mp-badge-all">Frei</span><span class="mp-subject-text">Komplett frei &mdash; Erholung ist wichtig!</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Tab: Tipps -->
+        <div class="tab-content" id="tab-tipps">
+            <div class="zp-notes">
+
+                <section class="note-section">
+                    <h2>Super Tipps f&uuml;r den Masterplan</h2>
+
+                    <div class="mp-tips">
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4A1;</span>
+                            <div>
+                                <strong>Каждый день понемногу</strong>
+                                <p>Лучше 3,5 часа каждый день, чем 8 часов раз в неделю</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4F1;</span>
+                            <div>
+                                <strong>Телефон убери</strong>
+                                <p>Handy beim Lernen weg &mdash; в другую комнату или на авиарежим</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x23F0;</span>
+                            <div>
+                                <strong>Timer stellen</strong>
+                                <p>Ставь таймер на 25 мин работа + 5 мин перерыв (Pomodoro)</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4DD;</span>
+                            <div>
+                                <strong>Fehlerliste f&uuml;hren</strong>
+                                <p>Записывай каждую ошибку &mdash; перед экзаменом перечитай</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4DA;</span>
+                            <div>
+                                <strong>Alte Pr&uuml;fungen l&ouml;sen</strong>
+                                <p>Это лучшая подготовка! Реши все из книги</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F9D8;</span>
+                            <div>
+                                <strong>Не стрессуй</strong>
+                                <p>Ты НЕ опоздал. Если начнёшь сейчас &mdash; Quali будет!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="note-section">
+                    <h2>&#x1F9E0; Wissenschaftlich bewiesen</h2>
+                    <p class="eng-note-small">Советы от нейробиологов и психологов &mdash; проверено наукой!</p>
+
+                    <div class="mp-tips">
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F373;</span>
+                            <div>
+                                <strong>Завтрак &mdash; топливо для мозга</strong>
+                                <p>Овсянка, яйца, йогурт &mdash; углеводы + белок. Ученики, которые завтракают, лучше сдают тесты</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4A4;</span>
+                            <div>
+                                <strong>Сон = память</strong>
+                                <p>Хороший сон КАЖДУЮ ночь, не только перед экзаменом. Не учись ночью &mdash; это неэффективно!</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F504;</span>
+                            <div>
+                                <strong>Интервальное повторение</strong>
+                                <p>Лучше 1 час 10 дней подряд, чем 10 часов за 1 день. Мозгу нужно время на запоминание</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x2753;</span>
+                            <div>
+                                <strong>Тестируй себя</strong>
+                                <p>Решай пробные тесты, задавай себе вопросы &mdash; самотестирование один из лучших методов</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F468;&#x200D;&#x1F3EB;</span>
+                            <div>
+                                <strong>Объясни другому</strong>
+                                <p>&laquo;Эффект протеже&raquo; &mdash; если можешь объяснить тему другу, значит ты реально её понял</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F3B5;</span>
+                            <div>
+                                <strong>Тишина &gt; музыка</strong>
+                                <p>Исследования: учёба в тишине &mdash; лучше запоминание. Музыка отвлекает, особенно интровертов</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F333;</span>
+                            <div>
+                                <strong>Прогулка на свежем воздухе</strong>
+                                <p>15 минут прогулки = больше кислорода для мозга. После прогулки концентрация выше</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F96C;</span>
+                            <div>
+                                <strong>Еда для мозга</strong>
+                                <p>Рыба, орехи, ягоды, тёмный шоколад, брокколи, авокадо &mdash; улучшают память и настроение</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x2600;&#xFE0F;</span>
+                            <div>
+                                <strong>Учись утром</strong>
+                                <p>Мозг отдохнул и свеж. Начинай и заканчивай в одно время каждый день &mdash; создай привычку</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F3AF;</span>
+                            <div>
+                                <strong>Знай формат экзамена</strong>
+                                <p>ZP 10 = конкретные типы заданий. Готовься именно к ним, а не ко всему подряд</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F0CF;</span>
+                            <div>
+                                <strong>Флэш-карты и mind maps</strong>
+                                <p>Карточки, ассоциативные карты, работа в группе, запись на диктофон &mdash; пробуй разные методы</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F381;</span>
+                            <div>
+                                <strong>Награди себя!</strong>
+                                <p>После экзамена &mdash; обязательно сделай себе подарок. Ты это заслужил!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>&#x1F4AA; Продвинутые лайфхаки</h2>
+                    <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:1rem;">Из исследований по тайм-менеджменту и продуктивности</p>
+
+                    <div class="mp-tips">
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F345;</span>
+                            <div>
+                                <strong>Техника Pomodoro</strong>
+                                <p>25 минут учёба &rarr; 5 минут отдых. После 4 подходов &mdash; большой перерыв 15&ndash;30 мин. Помогает начать и не забыть про отдых</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F4CD;</span>
+                            <div>
+                                <strong>Отдельное место для учёбы</strong>
+                                <p>Не учись в кровати или на диване! Выдели тихое место без отвлечений &mdash; мозг быстрее включится в работу</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F500;</span>
+                            <div>
+                                <strong>Чередуй форматы</strong>
+                                <p>Один день &mdash; учебник и конспект, другой &mdash; видео и тесты. Пересказывай, рисуй схемы &mdash; разные типы памяти работают лучше вместе</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F3A7;</span>
+                            <div>
+                                <strong>Аудиоформат</strong>
+                                <p>Запиши ответы на диктофон и слушай по дороге на учёбу. Проговаривай темы вслух &mdash; как будто объясняешь другу</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F3C3;</span>
+                            <div>
+                                <strong>Двигайся!</strong>
+                                <p>Учи стоя, ходи по комнате, меняй позу. Движение стимулирует мозг и помогает бороться с сонливостью</p>
+                            </div>
+                        </div>
+                        <div class="mp-tip">
+                            <span class="mp-tip-icon">&#x1F6A6;</span>
+                            <div>
+                                <strong>Раздели темы на 3 группы</strong>
+                                <p>&#x1F7E2; Обязательно знать &mdash; &#x1F7E1; Хорошо бы знать &mdash; &#x1F534; Можно пропустить. Начинай с зелёной группы!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="note-section">
+                    <h2>Schnell-Links zu den F&auml;chern</h2>
+                    <div class="subjects" style="justify-content: flex-start; max-width: 100%;">
+                        <a href="mathe.html" class="subject-card glass-card">
+                            <span class="subject-icon">&#x1F4D0;</span>
+                            <h3>Mathematik</h3>
+                            <p>Alle Themen + Aufgaben</p>
+                        </a>
+                        <a href="deutsch.html" class="subject-card glass-card">
+                            <span class="subject-icon">&#x1F1E9;&#x1F1EA;</span>
+                            <h3>Deutsch</h3>
+                            <p>Analyse, Schreiben, ZP Info</p>
+                        </a>
+                        <a href="englisch.html" class="subject-card glass-card">
+                            <span class="subject-icon">&#x1F1EC;&#x1F1E7;</span>
+                            <h3>Englisch</h3>
+                            <p>Lessons, Phrases, Lernplan</p>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="note-section">
+                    <div class="eng-congrats">
+                        <h3>Du schaffst das!</h3>
+                        <p>Osterferien richtig nutzen + nach den Ferien dranbleiben = Quali sicher + gute Noten!</p>
+                        <p style="margin-top:0.5rem; font-size:0.9rem;">Jeden Tag ein bisschen = viel besser als selten viel &#x1F4AA;</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
