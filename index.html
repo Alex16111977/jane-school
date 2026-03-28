@@ -85,6 +85,18 @@
             </div>
         </div>
 
+        <!-- ZP Countdown -->
+        <div class="learning-progress" style="margin-top:1rem; border-color: rgba(248,81,73,0.3);">
+            <h3>&#x23F3; Countdown bis ZP 10</h3>
+            <div id="zp-countdown" style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:0.8rem;"></div>
+        </div>
+
+        <!-- Aufgabe des Tages -->
+        <div class="learning-progress" style="margin-top:1rem; border-color: rgba(210,153,34,0.3);">
+            <h3>&#x2B50; Aufgabe des Tages</h3>
+            <div id="daily-task" style="margin-top:0.5rem;"></div>
+        </div>
+
         <h2>F&auml;cher</h2>
         <div class="subjects">
             <a href="mathe.html" class="subject-card glass-card">
@@ -246,6 +258,56 @@
         searchInput.addEventListener('blur', () => {
             setTimeout(() => searchResults.classList.remove('active'), 200);
         });
+
+        // ZP Countdown
+        const zpDates = [
+            { name: 'Deutsch', date: new Date('2026-05-13'), emoji: '\uD83C\uDDE9\uD83C\uDDEA', color: '#4493f8' },
+            { name: 'Englisch', date: new Date('2026-05-19'), emoji: '\uD83C\uDDEC\uD83C\uDDE7', color: '#3fb950' },
+            { name: 'Mathe', date: new Date('2026-05-28'), emoji: '\uD83D\uDCD0', color: '#f85149' }
+        ];
+        function updateCountdown() {
+            const now = new Date();
+            const el = document.getElementById('zp-countdown');
+            el.innerHTML = zpDates.map(zp => {
+                const diff = Math.ceil((zp.date - now) / (1000 * 60 * 60 * 24));
+                const urgent = diff <= 14;
+                return '<div style="flex:1; min-width:140px; background:' + (urgent ? 'rgba(248,81,73,0.1)' : 'var(--color-bg-card)') + '; border:1px solid ' + (urgent ? 'rgba(248,81,73,0.3)' : 'var(--color-border)') + '; border-radius:12px; padding:1rem; text-align:center;">' +
+                    '<div style="font-size:1.5rem;">' + zp.emoji + '</div>' +
+                    '<div style="font-size:0.85rem; color:var(--color-text-muted); margin:0.3rem 0;">' + zp.name + '</div>' +
+                    '<div style="font-size:1.8rem; font-weight:800; color:' + (urgent ? 'var(--color-red)' : zp.color) + ';">' + (diff > 0 ? diff : '\u2705') + '</div>' +
+                    '<div style="font-size:0.78rem; color:var(--color-text-muted);">' + (diff > 0 ? (diff === 1 ? 'Tag' : 'Tage') : 'Geschafft!') + '</div>' +
+                '</div>';
+            }).join('');
+        }
+        updateCountdown();
+
+        // Aufgabe des Tages
+        const dailyTasks = [
+            { text: 'Schreibe eine Einleitung f\u00fcr eine Stellungnahme zum Thema \u201eSoziale Medien\u201c', link: 'deutsch.html', subject: 'Deutsch' },
+            { text: 'L\u00f6se 5 Binomische Formeln im Trainer', link: 'mathe-binomische.html', subject: 'Mathe' },
+            { text: 'Lies den Text \u201eEmma\u2019s Bookshop\u201c und beantworte die True/False-Fragen', link: 'englisch.html', subject: 'Englisch' },
+            { text: '\u00dcbe 6 Stilmittel im Trainer \u2014 schaffst du 6/6?', link: 'deutsch.html', subject: 'Deutsch' },
+            { text: 'Wiederhole die Dreisatz-Textaufgaben (Zuordnungen)', link: 'mathe-zuordnung.html', subject: 'Mathe' },
+            { text: 'Lerne 12 Vokabeln \u201eWork & Jobs\u201c mit den Flashcards', link: 'englisch.html', subject: 'Englisch' },
+            { text: 'Schreibe eine Grafik-Beschreibung (150 W\u00f6rter)', link: 'deutsch.html', subject: 'Deutsch' },
+            { text: 'Wiederhole die 4 typischen Fehler bei Binomischen Formeln', link: 'mathe-binomische.html', subject: 'Mathe' },
+            { text: 'Schreibe eine Email auf Englisch (80\u2013100 W\u00f6rter)', link: 'englisch.html', subject: 'Englisch' },
+            { text: 'L\u00f6se die Textaufgabe \u201eIm Supermarkt\u201c mit Dreisatz', link: 'mathe-zuordnung.html', subject: 'Mathe' },
+            { text: 'Wiederhole alle Useful Phrases \u2014 Conclusion-Bereich', link: 'englisch.html', subject: 'Englisch' },
+            { text: 'Schreibe eine komplette Stellungnahme (150\u2013200 W\u00f6rter) mit Timer', link: 'deutsch.html', subject: 'Deutsch' },
+            { text: '\u00dcbe 3 K\u00f6rper-Textaufgaben (Pyramide, Kegel)', link: 'mathe-koerper.html', subject: 'Mathe' },
+            { text: 'Lies den ZP-Beispieltext \u201eDigitale Welten\u201c und beantworte die Fragen', link: 'deutsch.html', subject: 'Deutsch' }
+        ];
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const todayTask = dailyTasks[dayOfYear % dailyTasks.length];
+        const badgeColors = { Deutsch: '#4493f8', Englisch: '#3fb950', Mathe: '#f85149' };
+        document.getElementById('daily-task').innerHTML =
+            '<div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">' +
+            '<span style="background:' + badgeColors[todayTask.subject] + '; color:#fff; font-size:0.72rem; font-weight:700; text-transform:uppercase; padding:0.2rem 0.6rem; border-radius:4px;">' + todayTask.subject + '</span>' +
+            '<span style="flex:1; font-size:0.95rem; color:var(--color-text);">' + todayTask.text + '</span>' +
+            '</div>' +
+            '<a href="' + todayTask.link + '" class="btn-continue" style="margin-top:1rem; display:inline-flex;">' +
+            'Aufgabe starten <span class="arrow">\u2192</span></a>';
     </script>
 </body>
 </html>

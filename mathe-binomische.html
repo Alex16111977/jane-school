@@ -88,6 +88,54 @@
             </div>
         </div>
 
+        <!-- Formeln-Quiz -->
+        <h2 style="margin-top: 2.5rem;">&#x1F9E9; Formeln-Quiz</h2>
+        <div class="quiz-container">
+            <p style="color:var(--color-text-muted); font-size:0.88rem; margin-bottom:1rem;">W&auml;hle die richtige Formel!</p>
+
+            <div class="quiz-question" data-answer="a">
+                <p><strong>1.</strong> (a + b)&sup2; = ?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'a')">a&sup2; + 2ab + b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'b')">a&sup2; + b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'c')">a&sup2; &minus; 2ab + b&sup2;</button>
+                </div>
+                <p class="quiz-feedback"></p>
+            </div>
+
+            <div class="quiz-question" data-answer="c">
+                <p><strong>2.</strong> (a &minus; b)&sup2; = ?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'a')">a&sup2; + 2ab + b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'b')">a&sup2; &minus; b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'c')">a&sup2; &minus; 2ab + b&sup2;</button>
+                </div>
+                <p class="quiz-feedback"></p>
+            </div>
+
+            <div class="quiz-question" data-answer="b">
+                <p><strong>3.</strong> (a + b)(a &minus; b) = ?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'a')">a&sup2; + b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'b')">a&sup2; &minus; b&sup2;</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'c')">a&sup2; &minus; 2ab + b&sup2;</button>
+                </div>
+                <p class="quiz-feedback"></p>
+            </div>
+
+            <div class="quiz-question" data-answer="b">
+                <p><strong>4.</strong> (3x + 2)&sup2; = ?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'a')">3x&sup2; + 12x + 4</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'b')">9x&sup2; + 12x + 4</button>
+                    <button class="quiz-btn" onclick="checkFormelQuiz(this,'c')">9x&sup2; + 6x + 4</button>
+                </div>
+                <p class="quiz-feedback"></p>
+            </div>
+
+            <p class="quiz-score" id="formel-score"></p>
+        </div>
+
         <!-- Training -->
         <h2 style="margin-top: 2.5rem;">Training</h2>
         <div class="training-container">
@@ -217,6 +265,36 @@
         document.getElementById('answer-input').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') checkAnswer();
         });
+
+        // Formeln-Quiz
+        let fqScore = 0, fqTotal = 0;
+        function checkFormelQuiz(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            const btns = q.querySelectorAll('.quiz-btn');
+            btns.forEach(b => b.disabled = true);
+            fqTotal++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Richtig!';
+                feedback.style.color = 'var(--color-green)';
+                fqScore++;
+            } else {
+                btn.classList.add('wrong');
+                btns.forEach(b => { if (b.onclick && b.onclick.toString().includes("'" + correct + "'")) b.classList.add('correct'); });
+                feedback.textContent = 'Falsch!';
+                feedback.style.color = 'var(--color-red)';
+            }
+            if (fqTotal === 4) {
+                const s = document.getElementById('formel-score');
+                if (fqScore === 4) { s.innerHTML = '\u2B50 ' + fqScore + '/4 \u2014 Perfekt!'; s.style.color = 'var(--color-green)'; }
+                else if (fqScore >= 2) { s.innerHTML = fqScore + '/4 \u2014 Wiederhole die Formeln oben!'; s.style.color = 'var(--color-orange)'; }
+                else { s.innerHTML = fqScore + '/4 \u2014 Lerne die 3 Formeln nochmal!'; s.style.color = 'var(--color-red)'; }
+            }
+        }
     </script>
 </body>
 </html>
