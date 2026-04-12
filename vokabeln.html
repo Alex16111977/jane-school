@@ -7,50 +7,290 @@
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
     <style>
+        /* ===== LEVEL SELECTOR ===== */
         .level-tabs {
             display: flex;
             gap: 0.8rem;
-            margin: 1.5rem 0 0.5rem;
+            margin: 1rem 0 1.5rem;
             flex-wrap: wrap;
         }
         .level-btn {
             flex: 1;
             min-width: 120px;
-            padding: 1rem 1.2rem;
-            border-radius: var(--radius-md);
-            background: rgba(13, 17, 23, 0.7);
-            border: 1px solid var(--color-border);
+            padding: 1.1rem 1.2rem;
+            border-radius: 14px;
+            background: rgba(13, 17, 23, 0.75);
+            backdrop-filter: blur(6px);
+            border: 2px solid transparent;
             color: var(--color-text);
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .level-btn:hover {
-            border-color: var(--color-accent);
+        .level-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.25s;
         }
-        .level-btn.active {
-            background: var(--color-accent);
-            border-color: var(--color-accent);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(68, 147, 248, 0.3);
+        .level-btn:hover { transform: translateY(-2px); }
+
+        /* B1 blue */
+        .level-btn[data-level="b1"] { border-color: rgba(68, 147, 248, 0.3); }
+        .level-btn[data-level="b1"]::before { background: linear-gradient(135deg, rgba(68, 147, 248, 0.12), transparent); }
+        .level-btn[data-level="b1"]:hover { border-color: rgba(68, 147, 248, 0.6); }
+        .level-btn[data-level="b1"].active {
+            border-color: #4493f8;
+            background: linear-gradient(135deg, rgba(68, 147, 248, 0.25), rgba(68, 147, 248, 0.08));
+            box-shadow: 0 4px 24px rgba(68, 147, 248, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
         }
+        .level-btn[data-level="b1"].active::before { opacity: 1; }
+
+        /* B2 purple */
+        .level-btn[data-level="b2"] { border-color: rgba(163, 113, 247, 0.3); }
+        .level-btn[data-level="b2"]::before { background: linear-gradient(135deg, rgba(163, 113, 247, 0.12), transparent); }
+        .level-btn[data-level="b2"]:hover { border-color: rgba(163, 113, 247, 0.6); }
+        .level-btn[data-level="b2"].active {
+            border-color: #a371f7;
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.25), rgba(163, 113, 247, 0.08));
+            box-shadow: 0 4px 24px rgba(163, 113, 247, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .level-btn[data-level="b2"].active::before { opacity: 1; }
+
+        /* C1 gold */
+        .level-btn[data-level="c1"] { border-color: rgba(210, 153, 34, 0.3); }
+        .level-btn[data-level="c1"]::before { background: linear-gradient(135deg, rgba(210, 153, 34, 0.12), transparent); }
+        .level-btn[data-level="c1"]:hover { border-color: rgba(210, 153, 34, 0.6); }
+        .level-btn[data-level="c1"].active {
+            border-color: #d29922;
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.25), rgba(210, 153, 34, 0.08));
+            box-shadow: 0 4px 24px rgba(210, 153, 34, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .level-btn[data-level="c1"].active::before { opacity: 1; }
+
+        .level-btn .level-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .level-btn[data-level="b1"] .level-badge { background: rgba(68, 147, 248, 0.2); color: #79b8ff; }
+        .level-btn[data-level="b2"] .level-badge { background: rgba(163, 113, 247, 0.2); color: #c8a5ff; }
+        .level-btn[data-level="c1"] .level-badge { background: rgba(210, 153, 34, 0.2); color: #e3b341; }
+        .level-btn.active .level-badge { background: rgba(255,255,255,0.15); color: #fff; }
+
         .level-btn small {
             display: block;
             font-weight: 400;
             font-size: 0.78rem;
-            opacity: 0.8;
-            margin-top: 0.2rem;
+            opacity: 0.65;
+            margin-top: 0.35rem;
         }
-        .topic-info {
-            color: var(--color-text-muted);
+
+        /* ===== TOPIC PILLS ===== */
+        .topic-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0 0 1.5rem;
+        }
+        .topic-pill {
+            padding: 0.55rem 1.2rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-text-secondary);
             font-size: 0.88rem;
-            margin: 0.5rem 0 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .topic-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--color-text);
+        }
+        .topic-pill.active {
+            background: rgba(68, 147, 248, 0.12);
+            border-color: rgba(68, 147, 248, 0.4);
+            color: #fff;
+        }
+        /* Purple active for B2 */
+        body.level-b2 .topic-pill.active {
+            background: rgba(163, 113, 247, 0.12);
+            border-color: rgba(163, 113, 247, 0.4);
+        }
+        /* Gold active for C1 */
+        body.level-c1 .topic-pill.active {
+            background: rgba(210, 153, 34, 0.12);
+            border-color: rgba(210, 153, 34, 0.4);
+        }
+
+        /* ===== WORD COUNT ===== */
+        .vocab-count-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .vocab-count-bar .count-num {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* ===== VOCAB CARD GRID ===== */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.7rem;
+        }
+
+        /* ===== VOCAB CARD ===== */
+        .vocab-card {
+            position: relative;
+            min-height: 130px;
+            border-radius: 14px;
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            overflow: hidden;
+            perspective: 600px;
+        }
+        .vocab-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Colored left border by level */
+        .vocab-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 14px 0 0 14px;
+        }
+        body.level-b1 .vocab-card::before { background: #4493f8; }
+        body.level-b2 .vocab-card::before { background: #a371f7; }
+        body.level-c1 .vocab-card::before { background: #d29922; }
+
+        /* Flip icon */
+        .vocab-card .flip-icon {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.7rem;
+            font-size: 0.8rem;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+        }
+        .vocab-card:hover .flip-icon { opacity: 0.6; }
+        .vocab-card.flipped .flip-icon { opacity: 0; }
+
+        /* FRONT */
+        .vocab-card .card-front {
+            padding: 1.2rem 1.2rem 1rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 130px;
+        }
+        .vocab-card .card-front .word-main {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        /* BACK */
+        .vocab-card .card-back {
+            display: none;
+            padding: 1.2rem 1.2rem 1rem 1.4rem;
+            min-height: 130px;
+        }
+        .vocab-card.flipped .card-front { display: none; }
+        .vocab-card.flipped .card-back { display: flex; flex-direction: column; justify-content: center; }
+
+        .vocab-card .card-back .translation {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        body.level-b1 .vocab-card .card-back .translation { color: #79b8ff; }
+        body.level-b2 .vocab-card .card-back .translation { color: #c8a5ff; }
+        body.level-c1 .vocab-card .card-back .translation { color: #e3b341; }
+
+        .vocab-card .card-back .example {
+            font-size: 0.82rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+        .vocab-card .card-back .back-level {
+            display: inline-block;
+            margin-top: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+        body.level-b1 .back-level { background: rgba(68, 147, 248, 0.15); color: #79b8ff; }
+        body.level-b2 .back-level { background: rgba(163, 113, 247, 0.15); color: #c8a5ff; }
+        body.level-c1 .back-level { background: rgba(210, 153, 34, 0.15); color: #e3b341; }
+
+        /* Subtle top border glow on hover */
+        .vocab-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 4px;
+            right: 0;
+            height: 1px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        body.level-b1 .vocab-card::after { background: linear-gradient(90deg, rgba(68,147,248,0.5), transparent); }
+        body.level-b2 .vocab-card::after { background: linear-gradient(90deg, rgba(163,113,247,0.5), transparent); }
+        body.level-c1 .vocab-card::after { background: linear-gradient(90deg, rgba(210,153,34,0.5), transparent); }
+        .vocab-card:hover::after { opacity: 1; }
+
+        /* ===== SECTION LABEL ===== */
+        .section-label {
+            color: var(--color-text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.6rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .level-btn { padding: 0.8rem 0.6rem; font-size: 0.95rem; }
+            .vocab-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .vocab-card .card-front { padding: 1rem 0.8rem 0.8rem 1rem; min-height: 100px; }
+            .vocab-card .card-back { padding: 1rem 0.8rem 0.8rem 1rem; min-height: 100px; }
+            .vocab-card .card-front .word-main { font-size: 1rem; }
+        }
+        @media (max-width: 380px) {
+            .vocab-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body class="dark-theme page-bg-image" style="background: transparent">
+<body class="dark-theme page-bg-image level-b1" style="background: transparent">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
         <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
         <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
@@ -77,41 +317,47 @@
 
         <div class="page-header" style="text-align:left; padding-top:1rem">
             <h1>Vokabeln</h1>
-            <p class="page-subtitle">W&auml;hle dein Niveau und dein Thema &mdash; klicke auf die Karte f&uuml;r die &Uuml;bersetzung</p>
+            <p class="page-subtitle">W&ouml;rter f&uuml;r die ZP 10 &mdash; klicke auf die Karte f&uuml;r die &Uuml;bersetzung</p>
         </div>
 
-        <!-- Schritt 1: Niveau -->
-        <h3 style="color:#fff; margin-top:1.5rem; margin-bottom:0.5rem;">1. W&auml;hle dein Niveau</h3>
+        <!-- Niveau -->
+        <p class="section-label">Niveau</p>
         <div class="level-tabs">
-            <button class="level-btn active" data-level="b1">B1 <small>Basiswortschatz</small></button>
-            <button class="level-btn" data-level="b2">B2 <small>F&uuml;r Texte &amp; Analyse</small></button>
-            <button class="level-btn" data-level="c1">C1 <small>Akademisch &amp; gehoben</small></button>
+            <button class="level-btn active" data-level="b1">
+                <span class="level-badge">B1</span>
+                <small>Basiswortschatz</small>
+            </button>
+            <button class="level-btn" data-level="b2">
+                <span class="level-badge">B2</span>
+                <small>Texte &amp; Analyse</small>
+            </button>
+            <button class="level-btn" data-level="c1">
+                <span class="level-badge">C1</span>
+                <small>Akademisch</small>
+            </button>
         </div>
 
-        <!-- Schritt 2: Thema -->
-        <h3 style="color:#fff; margin-top:1.5rem; margin-bottom:0.5rem;">2. W&auml;hle dein Thema</h3>
-        <div class="tabs">
-            <button class="tab active" data-topic="gefuehle">&#x1F496; Gef&uuml;hle</button>
-            <button class="tab" data-topic="schule">&#x1F393; Schule</button>
-            <button class="tab" data-topic="umwelt">&#x1F33F; Umwelt</button>
-            <button class="tab" data-topic="gesellschaft">&#x1F465; Gesellschaft</button>
+        <!-- Thema -->
+        <p class="section-label">Thema</p>
+        <div class="topic-pills">
+            <button class="topic-pill active" data-topic="gefuehle">Gef&uuml;hle</button>
+            <button class="topic-pill" data-topic="schule">Schule</button>
+            <button class="topic-pill" data-topic="umwelt">Umwelt</button>
+            <button class="topic-pill" data-topic="gesellschaft">Gesellschaft</button>
         </div>
 
-        <!-- Vokabel-Grid -->
-        <div class="zp-notes" style="margin-top:1rem;">
-            <section class="note-section">
-                <div class="lesson-header-block">
-                    <span class="lesson-header-icon" id="vocab-icon">&#x1F496;</span>
-                    <div>
-                        <h2 id="vocab-title">Gef&uuml;hle &mdash; B1</h2>
-                        <p class="lesson-header-sub" id="vocab-subtitle">Чувства и эмоции &mdash; базовая лексика</p>
-                    </div>
-                </div>
-                <p class="topic-info" id="vocab-count"></p>
-                <div class="flashcard-grid" id="vocab-grid"></div>
-            </section>
+        <!-- Word count -->
+        <div class="vocab-count-bar">
+            <span id="vocab-icon">&#x1F496;</span>
+            <span id="vocab-title" style="color:#fff; font-weight:600;"></span>
+            <span>&middot;</span>
+            <span id="vocab-count"></span>
         </div>
 
+        <!-- Cards -->
+        <div class="vocab-grid" id="vocab-grid"></div>
+
+        <div style="height: 3rem;"></div>
     </div>
 
     <footer class="footer-dark" style="position:relative;z-index:1">
@@ -122,18 +368,23 @@
         // ===== Vocabulary Data =====
         // Format: [deutsches Wort, русский перевод, Beispielsatz]
         const VOCAB = {
-            // ===== GEFÜHLE — для описания персонажей и себя (важно для Aufgabentyp 4a) =====
+            // ===== GEFÜHLE =====
             'b1:gefuehle': [
                 ['sich freuen &uuml;ber', 'радоваться чему-то', 'Sie freut sich &uuml;ber das Geschenk.'],
                 ['sich &auml;rgern &uuml;ber', 'злиться на что-то', 'Er &auml;rgert sich &uuml;ber den L&auml;rm.'],
                 ['Angst haben vor', 'бояться чего-то', 'Das Kind hat Angst vor dem Dunkeln.'],
-                ['enttäuscht sein', 'быть разочарованным', 'Ich war entt&auml;uscht von dem Film.'],
+                ['entt&auml;uscht sein', 'быть разочарованным', 'Ich war entt&auml;uscht von dem Film.'],
                 ['stolz sein auf', 'гордиться кем-то', 'Die Mutter ist stolz auf ihren Sohn.'],
                 ['sich Sorgen machen', 'беспокоиться', 'Die Eltern machen sich Sorgen um ihre Tochter.'],
                 ['aufgeregt', 'взволнованный', 'Vor der Pr&uuml;fung war sie aufgeregt.'],
                 ['nerv&ouml;s', 'нервный', 'Er war nerv&ouml;s vor dem Auftritt.'],
                 ['zufrieden', 'довольный', 'Ich bin mit meiner Note zufrieden.'],
-                ['sich schämen', 'стыдиться', 'Er sch&auml;mt sich f&uuml;r seinen Fehler.']
+                ['sich sch&auml;men', 'стыдиться', 'Er sch&auml;mt sich f&uuml;r seinen Fehler.'],
+                ['einsam', 'одинокий', 'Er f&uuml;hlt sich einsam ohne Freunde.'],
+                ['sich f&uuml;hlen', 'чувствовать себя', 'Ich f&uuml;hle mich heute gut.'],
+                ['dankbar sein', 'быть благодарным', 'Ich bin dankbar f&uuml;r meine Freunde.'],
+                ['neidisch', 'завистливый', 'Sie wurde neidisch auf ihre Schwester.'],
+                ['unsicher', 'неуверенный', 'Vor der Klasse f&uuml;hlte er sich unsicher.']
             ],
             'b2:gefuehle': [
                 ['die Verzweiflung', 'отчаяние', 'In ihrer Verzweiflung wusste sie keinen Ausweg.'],
@@ -142,10 +393,15 @@
                 ['sich &uuml;berfordert f&uuml;hlen', 'чувствовать себя перегруженным', 'Viele Sch&uuml;ler f&uuml;hlen sich &uuml;berfordert.'],
                 ['gekr&auml;nkt', 'обиженный', 'Sie war durch seine Worte tief gekr&auml;nkt.'],
                 ['die Zuneigung', 'симпатия, привязанность', 'Er empfand gro&szlig;e Zuneigung zu seinem Gro&szlig;vater.'],
-                ['die Gleichgültigkeit', 'равнодушие', 'Ihre Gleichg&uuml;ltigkeit verletzte ihn.'],
+                ['die Gleichg&uuml;ltigkeit', 'равнодушие', 'Ihre Gleichg&uuml;ltigkeit verletzte ihn.'],
                 ['das Selbstvertrauen', 'уверенность в себе', 'Sport st&auml;rkt das Selbstvertrauen.'],
                 ['unsicher wirken', 'казаться неуверенным', 'Vor der Klasse wirkte er sehr unsicher.'],
-                ['die Einsamkeit', 'одиночество', 'In der Gro&szlig;stadt empfand sie Einsamkeit.']
+                ['die Einsamkeit', 'одиночество', 'In der Gro&szlig;stadt empfand sie Einsamkeit.'],
+                ['unter Druck stehen', 'быть под давлением', 'Sie steht unter enormem Druck.'],
+                ['die Eifersucht', 'ревность, зависть', 'Eifersucht zerst&ouml;rt Beziehungen.'],
+                ['sich unterdr&uuml;ckt f&uuml;hlen', 'чувствовать себя подавленным', 'Er f&uuml;hlte sich durch die Regeln unterdr&uuml;ckt.'],
+                ['hilflos', 'беспомощный', 'In dieser Situation war er v&ouml;llig hilflos.'],
+                ['die Geborgenheit', 'защищённость, уют', 'Das Kind sucht Geborgenheit bei der Mutter.']
             ],
             'c1:gefuehle': [
                 ['die Zerrissenheit', 'внутренняя раздвоенность', 'Die Zerrissenheit der Figur wird deutlich.'],
@@ -157,10 +413,15 @@
                 ['zwiesp&auml;ltig', 'противоречивый', 'Der Leser bekommt einen zwiesp&auml;ltigen Eindruck.'],
                 ['die Resignation', 'покорность, смирение', 'In seinen Worten klingt leise Resignation.'],
                 ['die Wehmut', 'тоска, меланхолия', 'Mit Wehmut erinnert sich die Erz&auml;hlerin an ihre Kindheit.'],
-                ['die Bestürzung', 'потрясение, смятение', 'Die Nachricht l&ouml;ste tiefe Best&uuml;rzung aus.']
+                ['die Best&uuml;rzung', 'потрясение, смятение', 'Die Nachricht l&ouml;ste tiefe Best&uuml;rzung aus.'],
+                ['die Ambivalenz', 'двойственность', 'Die Ambivalenz seiner Gef&uuml;hle pr&auml;gt den Text.'],
+                ['die Ohnmacht', 'бессилие', 'Er empfand Ohnmacht gegen&uuml;ber dem System.'],
+                ['die Empathie', 'эмпатия', 'Empathie ist eine zentrale soziale Kompetenz.'],
+                ['die Entr&uuml;stung', 'возмущение', 'Der Vorschlag stie&szlig; auf allgemeine Entr&uuml;stung.'],
+                ['die Gem&uuml;tslage', 'душевное состояние', 'Seine Gem&uuml;tslage schwankte zwischen Hoffnung und Angst.']
             ],
 
-            // ===== SCHULE — учёба, давление, будущее =====
+            // ===== SCHULE =====
             'b1:schule': [
                 ['die Klassenarbeit', 'контрольная работа', 'Morgen schreiben wir eine Klassenarbeit.'],
                 ['das Fach', 'предмет', 'Mein Lieblingsfach ist Deutsch.'],
@@ -171,7 +432,12 @@
                 ['faul', 'ленивый', 'Ich war letztes Jahr ziemlich faul.'],
                 ['schwierig', 'трудный', 'Die Aufgabe ist zu schwierig f&uuml;r mich.'],
                 ['der Abschluss', 'выпуск, аттестат', 'Nach dem Abschluss will ich eine Ausbildung machen.'],
-                ['eine Pr&uuml;fung ablegen', 'сдавать экзамен', 'Im Juni legt sie die ZP 10 ab.']
+                ['eine Pr&uuml;fung ablegen', 'сдавать экзамен', 'Im Juni legt sie die ZP 10 ab.'],
+                ['die Note', 'оценка', 'Ich habe eine gute Note bekommen.'],
+                ['der Unterricht', 'урок, занятие', 'Der Unterricht beginnt um 8 Uhr.'],
+                ['aufpassen', 'быть внимательным', 'Du musst im Unterricht aufpassen!'],
+                ['nachschlagen', 'смотреть (в словаре)', 'Ich muss das Wort nachschlagen.'],
+                ['wiederholen', 'повторять', 'Wir wiederholen den Stoff vor der Pr&uuml;fung.']
             ],
             'b2:schule': [
                 ['der Leistungsdruck', 'давление успеваемости', 'Viele Sch&uuml;ler leiden unter gro&szlig;em Leistungsdruck.'],
@@ -183,11 +449,16 @@
                 ['scheitern', 'потерпеть неудачу', 'Wer nicht wagt, der kann auch scheitern.'],
                 ['der Erfolg', 'успех', 'Der Erfolg h&auml;ngt von der Vorbereitung ab.'],
                 ['aufgeben', 'сдаваться', 'Gib niemals auf, auch wenn es schwer wird!'],
-                ['sich motivieren', 'мотивировать себя', 'Es f&auml;llt mir schwer, mich jeden Tag zu motivieren.']
+                ['sich motivieren', 'мотивировать себя', 'Es f&auml;llt mir schwer, mich jeden Tag zu motivieren.'],
+                ['ehrgeizig', 'амбициозный', 'Sie ist eine sehr ehrgeizige Sch&uuml;lerin.'],
+                ['die Konzentration', 'концентрация', 'Mir fehlt die Konzentration nach 6 Stunden Unterricht.'],
+                ['sich verbessern', 'улучшаться', 'Ich m&ouml;chte meine Noten verbessern.'],
+                ['die Lernstrategie', 'стратегия обучения', 'Mit der richtigen Lernstrategie geht es schneller.'],
+                ['das Zeitmanagement', 'тайм-менеджмент', 'Gutes Zeitmanagement ist die halbe Miete.']
             ],
             'c1:schule': [
                 ['die Chancengleichheit', 'равенство возможностей', 'Chancengleichheit im Bildungswesen bleibt ein Ideal.'],
-                ['die Selbstständigkeit', 'самостоятельность', 'Die Schule soll Selbstst&auml;ndigkeit f&ouml;rdern.'],
+                ['die Selbstst&auml;ndigkeit', 'самостоятельность', 'Die Schule soll Selbstst&auml;ndigkeit f&ouml;rdern.'],
                 ['das lebenslange Lernen', 'обучение на протяжении жизни', 'Lebenslanges Lernen wird immer wichtiger.'],
                 ['kritisch hinterfragen', 'критически осмыслять', 'Man sollte Informationen kritisch hinterfragen.'],
                 ['der Leistungsanspruch', 'требование успеваемости', 'Der hohe Leistungsanspruch belastet viele Jugendliche.'],
@@ -195,10 +466,15 @@
                 ['die Bildungschancen', 'образовательные возможности', 'Nicht alle Kinder haben die gleichen Bildungschancen.'],
                 ['die Digitalisierung', 'цифровизация', 'Die Digitalisierung ver&auml;ndert den Unterricht grundlegend.'],
                 ['einen Beitrag leisten', 'вносить вклад', 'Jeder Sch&uuml;ler kann einen Beitrag zur Klasse leisten.'],
-                ['sich Wissen aneignen', 'усваивать знания', 'Man eignet sich Wissen durch &Uuml;bung an.']
+                ['sich Wissen aneignen', 'усваивать знания', 'Man eignet sich Wissen durch &Uuml;bung an.'],
+                ['die Kompetenz', 'компетенция', 'Digitale Kompetenzen werden immer wichtiger.'],
+                ['eigenverantwortlich', 'под свою ответственность', 'Sch&uuml;ler sollen eigenverantwortlich lernen.'],
+                ['reflektieren', 'осмысливать', 'Die Sch&uuml;ler sollen ihre Lernprozesse reflektieren.'],
+                ['die Medienkompetenz', 'медиаграмотность', 'Medienkompetenz geh&ouml;rt zur modernen Bildung.'],
+                ['das Bildungssystem', 'система образования', 'Das deutsche Bildungssystem ist dreistufig aufgebaut.']
             ],
 
-            // ===== UMWELT — классическая ZP-тематика для 4b аргументации =====
+            // ===== UMWELT =====
             'b1:umwelt': [
                 ['die Natur', 'природа', 'Am Wochenende gehen wir in die Natur.'],
                 ['das Klima', 'климат', 'Das Klima ver&auml;ndert sich.'],
@@ -209,7 +485,12 @@
                 ['Strom sparen', 'экономить электричество', 'Mach das Licht aus, um Strom zu sparen!'],
                 ['der Wald', 'лес', 'Der Wald ist wichtig f&uuml;r unser Klima.'],
                 ['die Tierart', 'вид животных', 'Viele Tierarten sind in Gefahr.'],
-                ['umweltfreundlich', 'экологичный', 'Ein E-Auto ist umweltfreundlicher als ein Benziner.']
+                ['umweltfreundlich', 'экологичный', 'Ein E-Auto ist umweltfreundlicher als ein Benziner.'],
+                ['die Luft', 'воздух', 'Die Luft in der Stadt ist oft schlecht.'],
+                ['das Plastik', 'пластик', 'Plastik ist sch&auml;dlich f&uuml;r die Tiere.'],
+                ['sch&uuml;tzen', 'защищать', 'Wir m&uuml;ssen die Natur sch&uuml;tzen.'],
+                ['verbrauchen', 'потреблять', 'Wir verbrauchen zu viel Energie.'],
+                ['die Erde', 'Земля', 'Die Erde braucht unsere Hilfe.']
             ],
             'b2:umwelt': [
                 ['der Klimawandel', 'изменение климата', 'Der Klimawandel hat bereits sp&uuml;rbare Folgen.'],
@@ -221,7 +502,12 @@
                 ['sch&auml;dlich f&uuml;r', 'вредный для', 'Plastik ist sch&auml;dlich f&uuml;r die Meere.'],
                 ['reduzieren', 'сокращать', 'Wir m&uuml;ssen unseren CO&#8322;-Verbrauch reduzieren.'],
                 ['die Auswirkung', 'последствие', 'Die Auswirkungen sind deutlich sp&uuml;rbar.'],
-                ['die Plastikverschmutzung', 'пластиковое загрязнение', 'Die Plastikverschmutzung der Meere nimmt zu.']
+                ['die Plastikverschmutzung', 'пластиковое загрязнение', 'Die Plastikverschmutzung der Meere nimmt zu.'],
+                ['das Bewusstsein', 'осознанность', 'Das Umweltbewusstsein w&auml;chst.'],
+                ['bedrohte Arten', 'виды под угрозой', 'Bedrohte Arten m&uuml;ssen gesch&uuml;tzt werden.'],
+                ['der Konsum', 'потребление', 'Unser Konsum hat Folgen f&uuml;r die Umwelt.'],
+                ['die Wegwerfgesellschaft', 'общество потребления', 'Wir leben in einer Wegwerfgesellschaft.'],
+                ['die Naturkatastrophe', 'природная катастрофа', 'Naturkatastrophen werden h&auml;ufiger durch den Klimawandel.']
             ],
             'c1:umwelt': [
                 ['die Nachhaltigkeit', 'устойчивость', 'Nachhaltigkeit ist das Leitprinzip unserer Zeit.'],
@@ -233,10 +519,15 @@
                 ['gravierende Folgen', 'серьёзные последствия', 'Die gravierenden Folgen sind nicht mehr zu leugnen.'],
                 ['die Energiewende', 'энергетический переход', 'Die Energiewende ist in vollem Gange.'],
                 ['den CO&#8322;-Aussto&szlig; senken', 'снижать выбросы CO&#8322;', 'Wir m&uuml;ssen den CO&#8322;-Aussto&szlig; drastisch senken.'],
-                ['die Verantwortung &uuml;bernehmen', 'брать на себя ответственность', 'Jeder muss Verantwortung f&uuml;r die Umwelt &uuml;bernehmen.']
+                ['die Verantwortung &uuml;bernehmen', 'брать на себя ответственность', 'Jeder muss Verantwortung f&uuml;r die Umwelt &uuml;bernehmen.'],
+                ['die Kreislaufwirtschaft', 'циркулярная экономика', 'Die Kreislaufwirtschaft vermeidet Abf&auml;lle.'],
+                ['die Dekarbonisierung', 'декарбонизация', 'Die Dekarbonisierung der Industrie ist notwendig.'],
+                ['die Emissionen', 'выбросы', 'Die Emissionen m&uuml;ssen bis 2030 halbiert werden.'],
+                ['die Biodiversit&auml;t', 'биоразнообразие', 'Der Schutz der Biodiversit&auml;t ist essenziell.'],
+                ['zugrunde liegen', 'лежать в основе', 'Dem Problem liegen komplexe Ursachen zugrunde.']
             ],
 
-            // ===== GESELLSCHAFT — для 4b-аргументации и анализа =====
+            // ===== GESELLSCHAFT =====
             'b1:gesellschaft': [
                 ['die Freundschaft', 'дружба', 'Freundschaft ist mir sehr wichtig.'],
                 ['sich streiten', 'ссориться', 'Wir streiten uns selten.'],
@@ -247,7 +538,12 @@
                 ['unterst&uuml;tzen', 'поддерживать', 'Meine Familie unterst&uuml;tzt mich immer.'],
                 ['respektieren', 'уважать', 'Wir sollen andere Meinungen respektieren.'],
                 ['die Meinung sagen', 'высказать мнение', 'Jeder darf seine Meinung sagen.'],
-                ['zusammenhalten', 'держаться вместе', 'In der Klasse halten wir zusammen.']
+                ['zusammenhalten', 'держаться вместе', 'In der Klasse halten wir zusammen.'],
+                ['gerecht', 'справедливый', 'Das ist nicht gerecht!'],
+                ['gemein', 'подлый, злой', 'Das war ein gemeiner Kommentar.'],
+                ['sich entschuldigen', 'извиняться', 'Er hat sich bei ihr entschuldigt.'],
+                ['h&ouml;flich', 'вежливый', 'Sei immer h&ouml;flich zu anderen.'],
+                ['r&uuml;cksichtsvoll', 'тактичный', 'Sie ist sehr r&uuml;cksichtsvoll gegen&uuml;ber anderen.']
             ],
             'b2:gesellschaft': [
                 ['soziale Medien', 'соцсети', 'Soziale Medien beeinflussen die Jugend stark.'],
@@ -259,32 +555,37 @@
                 ['das Vorurteil', 'предрассудок', 'Vorurteile entstehen durch Unwissenheit.'],
                 ['engagiert', 'активный, вовлечённый', 'Sie ist politisch sehr engagiert.'],
                 ['die Verantwortung tragen', 'нести ответственность', 'Eltern tragen gro&szlig;e Verantwortung.'],
-                ['im Gegensatz zu', 'в отличие от', 'Im Gegensatz zu fr&uuml;her sind wir heute vernetzter.']
+                ['im Gegensatz zu', 'в отличие от', 'Im Gegensatz zu fr&uuml;her sind wir heute vernetzter.'],
+                ['die Gleichberechtigung', 'равноправие', 'Gleichberechtigung ist ein Grundrecht.'],
+                ['die Diskriminierung', 'дискриминация', 'Diskriminierung darf nicht geduldet werden.'],
+                ['die Generation', 'поколение', 'Jede Generation hat ihre eigenen Werte.'],
+                ['der Konflikt', 'конфликт', 'Konflikte kann man friedlich l&ouml;sen.'],
+                ['die Zivilcourage', 'гражданская смелость', 'Zivilcourage zu zeigen erfordert Mut.']
             ],
             'c1:gesellschaft': [
                 ['der gesellschaftliche Wandel', 'общественные перемены', 'Der gesellschaftliche Wandel vollzieht sich rasant.'],
                 ['die Polarisierung', 'поляризация', 'Die Polarisierung der Gesellschaft nimmt zu.'],
                 ['die Integration', 'интеграция', 'Integration ist ein wechselseitiger Prozess.'],
                 ['der soziale Zusammenhalt', 'социальная сплочённость', 'Der soziale Zusammenhalt ist bedroht.'],
-                ['die Zivilcourage', 'гражданская смелость', 'Zivilcourage zu zeigen, erfordert Mut.'],
                 ['das Engagement', 'активная гражданская позиция', 'Ihr Engagement ist vorbildlich.'],
                 ['marginalisiert', 'маргинализированный', 'Marginalisierte Gruppen brauchen mehr Unterst&uuml;tzung.'],
                 ['infolgedessen', 'вследствие этого', 'Infolgedessen kam es zu hitzigen Debatten.'],
                 ['zugrunde liegen', 'лежать в основе', 'Dem Konflikt liegen tiefere Ursachen zugrunde.'],
-                ['die Schlussfolgerung ziehen', 'делать вывод', 'Daraus l&auml;sst sich folgende Schlussfolgerung ziehen.']
+                ['die Schlussfolgerung ziehen', 'делать вывод', 'Daraus l&auml;sst sich folgende Schlussfolgerung ziehen.'],
+                ['verdeutlichen', 'пояснять', 'Der Autor verdeutlicht seine These mit Beispielen.'],
+                ['die Partizipation', 'участие', 'Politische Partizipation ist Grundlage der Demokratie.'],
+                ['die Koh&auml;sion', 'сплочённость', 'Die soziale Koh&auml;sion schwindet zunehmend.'],
+                ['der Diskurs', 'дискурс', 'Der &ouml;ffentliche Diskurs wird zunehmend emotionaler.'],
+                ['die Segregation', 'сегрегация', 'Soziale Segregation verst&auml;rkt die Ungleichheit.'],
+                ['der Wertekonflikt', 'конфликт ценностей', 'Der Wertekonflikt zwischen den Generationen w&auml;chst.']
             ]
         };
 
         const TOPIC_META = {
-            gefuehle: { icon: '\u{1F496}', title: 'Gef\u00fchle', sub: 'Чувства и эмоции' },
-            schule: { icon: '\u{1F393}', title: 'Schule', sub: 'Школа и учёба' },
-            umwelt: { icon: '\u{1F33F}', title: 'Umwelt', sub: 'Экология и природа' },
-            gesellschaft: { icon: '\u{1F465}', title: 'Gesellschaft', sub: 'Общество и ценности' }
-        };
-        const LEVEL_SUB = {
-            b1: 'базовая лексика',
-            b2: 'для текстов и анализа',
-            c1: 'академические слова'
+            gefuehle: { icon: '\u{1F496}', title: 'Gef\u00fchle' },
+            schule: { icon: '\u{1F393}', title: 'Schule' },
+            umwelt: { icon: '\u{1F33F}', title: 'Umwelt' },
+            gesellschaft: { icon: '\u{1F465}', title: 'Gesellschaft' }
         };
 
         let currentLevel = 'b1';
@@ -295,20 +596,27 @@
             const data = VOCAB[key] || [];
             const grid = document.getElementById('vocab-grid');
             const meta = TOPIC_META[currentTopic];
+            const lvl = currentLevel.toUpperCase();
+
+            // Update body class for color theming
+            document.body.classList.remove('level-b1', 'level-b2', 'level-c1');
+            document.body.classList.add('level-' + currentLevel);
 
             document.getElementById('vocab-icon').innerHTML = meta.icon;
-            document.getElementById('vocab-title').textContent = meta.title + ' \u2014 ' + currentLevel.toUpperCase();
-            document.getElementById('vocab-subtitle').textContent = meta.sub + ' \u2014 ' + LEVEL_SUB[currentLevel];
-            document.getElementById('vocab-count').textContent = data.length + ' W\u00f6rter';
+            document.getElementById('vocab-title').textContent = meta.title + ' \u2014 ' + lvl;
+            document.getElementById('vocab-count').innerHTML = '<span class="count-num">' + data.length + '</span> W\u00f6rter';
 
             grid.innerHTML = data.map(function(item) {
-                return '<div class="flashcard">' +
-                    '<div class="flashcard-front">' + item[0] + '</div>' +
-                    '<div class="flashcard-back">' +
-                        '<strong>' + item[1] + '</strong>' +
-                        '<p style="margin-top:0.4rem; font-style:italic;">&laquo;' + item[2] + '&raquo;</p>' +
+                return '<div class="vocab-card">' +
+                    '<span class="flip-icon">\u{1F504}</span>' +
+                    '<div class="card-front">' +
+                        '<div class="word-main">' + item[0] + '</div>' +
                     '</div>' +
-                    '<div class="flashcard-hint">klicken zum Umdrehen</div>' +
+                    '<div class="card-back">' +
+                        '<div class="translation">' + item[1] + '</div>' +
+                        '<div class="example">\u00ab' + item[2] + '\u00bb</div>' +
+                        '<span class="back-level">' + lvl + '</span>' +
+                    '</div>' +
                 '</div>';
             }).join('');
         }
@@ -323,19 +631,19 @@
             });
         });
 
-        // Topic tabs
-        document.querySelectorAll('.tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-                tab.classList.add('active');
-                currentTopic = tab.dataset.topic;
+        // Topic pills
+        document.querySelectorAll('.topic-pill').forEach(function(pill) {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.topic-pill').forEach(function(p) { p.classList.remove('active'); });
+                pill.classList.add('active');
+                currentTopic = pill.dataset.topic;
                 renderVocab();
             });
         });
 
         // Flashcard flip (delegated)
         document.addEventListener('click', function(e) {
-            const card = e.target.closest('.flashcard');
+            var card = e.target.closest('.vocab-card');
             if (card) card.classList.toggle('flipped');
         });
 
