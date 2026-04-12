@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabeln | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .level-tabs {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1.5rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+        .level-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            background: rgba(13, 17, 23, 0.7);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .level-btn:hover {
+            border-color: var(--color-accent);
+        }
+        .level-btn.active {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(68, 147, 248, 0.3);
+        }
+        .level-btn small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.78rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+        .topic-info {
+            color: var(--color-text-muted);
+            font-size: 0.88rem;
+            margin: 0.5rem 0 1rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html" class="active">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Vokabeln</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Vokabeln</h1>
+            <p class="page-subtitle">W&auml;hle dein Niveau und dein Thema &mdash; klicke auf die Karte f&uuml;r die &Uuml;bersetzung</p>
+        </div>
+
+        <!-- Schritt 1: Niveau -->
+        <h3 style="color:#fff; margin-top:1.5rem; margin-bottom:0.5rem;">1. W&auml;hle dein Niveau</h3>
+        <div class="level-tabs">
+            <button class="level-btn active" data-level="b1">B1 <small>Basiswortschatz</small></button>
+            <button class="level-btn" data-level="b2">B2 <small>F&uuml;r Texte &amp; Analyse</small></button>
+            <button class="level-btn" data-level="c1">C1 <small>Akademisch &amp; gehoben</small></button>
+        </div>
+
+        <!-- Schritt 2: Thema -->
+        <h3 style="color:#fff; margin-top:1.5rem; margin-bottom:0.5rem;">2. W&auml;hle dein Thema</h3>
+        <div class="tabs">
+            <button class="tab active" data-topic="gefuehle">&#x1F496; Gef&uuml;hle</button>
+            <button class="tab" data-topic="schule">&#x1F393; Schule</button>
+            <button class="tab" data-topic="umwelt">&#x1F33F; Umwelt</button>
+            <button class="tab" data-topic="gesellschaft">&#x1F465; Gesellschaft</button>
+        </div>
+
+        <!-- Vokabel-Grid -->
+        <div class="zp-notes" style="margin-top:1rem;">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon" id="vocab-icon">&#x1F496;</span>
+                    <div>
+                        <h2 id="vocab-title">Gef&uuml;hle &mdash; B1</h2>
+                        <p class="lesson-header-sub" id="vocab-subtitle">Чувства и эмоции &mdash; базовая лексика</p>
+                    </div>
+                </div>
+                <p class="topic-info" id="vocab-count"></p>
+                <div class="flashcard-grid" id="vocab-grid"></div>
+            </section>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        // ===== Vocabulary Data =====
+        // Format: [deutsches Wort, русский перевод, Beispielsatz]
+        const VOCAB = {
+            // ===== GEFÜHLE — для описания персонажей и себя (важно для Aufgabentyp 4a) =====
+            'b1:gefuehle': [
+                ['sich freuen &uuml;ber', 'радоваться чему-то', 'Sie freut sich &uuml;ber das Geschenk.'],
+                ['sich &auml;rgern &uuml;ber', 'злиться на что-то', 'Er &auml;rgert sich &uuml;ber den L&auml;rm.'],
+                ['Angst haben vor', 'бояться чего-то', 'Das Kind hat Angst vor dem Dunkeln.'],
+                ['enttäuscht sein', 'быть разочарованным', 'Ich war entt&auml;uscht von dem Film.'],
+                ['stolz sein auf', 'гордиться кем-то', 'Die Mutter ist stolz auf ihren Sohn.'],
+                ['sich Sorgen machen', 'беспокоиться', 'Die Eltern machen sich Sorgen um ihre Tochter.'],
+                ['aufgeregt', 'взволнованный', 'Vor der Pr&uuml;fung war sie aufgeregt.'],
+                ['nerv&ouml;s', 'нервный', 'Er war nerv&ouml;s vor dem Auftritt.'],
+                ['zufrieden', 'довольный', 'Ich bin mit meiner Note zufrieden.'],
+                ['sich schämen', 'стыдиться', 'Er sch&auml;mt sich f&uuml;r seinen Fehler.']
+            ],
+            'b2:gefuehle': [
+                ['die Verzweiflung', 'отчаяние', 'In ihrer Verzweiflung wusste sie keinen Ausweg.'],
+                ['die Erleichterung', 'облегчение', 'Nach der Nachricht sp&uuml;rte er gro&szlig;e Erleichterung.'],
+                ['sich zur&uuml;ckziehen', 'замыкаться в себе', 'Nach dem Streit zog sich der Junge zur&uuml;ck.'],
+                ['sich &uuml;berfordert f&uuml;hlen', 'чувствовать себя перегруженным', 'Viele Sch&uuml;ler f&uuml;hlen sich &uuml;berfordert.'],
+                ['gekr&auml;nkt', 'обиженный', 'Sie war durch seine Worte tief gekr&auml;nkt.'],
+                ['die Zuneigung', 'симпатия, привязанность', 'Er empfand gro&szlig;e Zuneigung zu seinem Gro&szlig;vater.'],
+                ['die Gleichgültigkeit', 'равнодушие', 'Ihre Gleichg&uuml;ltigkeit verletzte ihn.'],
+                ['das Selbstvertrauen', 'уверенность в себе', 'Sport st&auml;rkt das Selbstvertrauen.'],
+                ['unsicher wirken', 'казаться неуверенным', 'Vor der Klasse wirkte er sehr unsicher.'],
+                ['die Einsamkeit', 'одиночество', 'In der Gro&szlig;stadt empfand sie Einsamkeit.']
+            ],
+            'c1:gefuehle': [
+                ['die Zerrissenheit', 'внутренняя раздвоенность', 'Die Zerrissenheit der Figur wird deutlich.'],
+                ['der innere Konflikt', 'внутренний конфликт', 'Der Protagonist k&auml;mpft mit einem inneren Konflikt.'],
+                ['die Verbitterung', 'озлобленность', 'Seine Verbitterung zeigt sich in jedem Wort.'],
+                ['sich entfremden', 'отчуждаться', 'Die beiden Freunde haben sich mit der Zeit entfremdet.'],
+                ['das Unbehagen', 'неловкость, беспокойство', 'Ein Gef&uuml;hl des Unbehagens ergriff sie.'],
+                ['die Beklemmung', 'подавленность, тревога', 'Mit Beklemmung betrat er das alte Haus.'],
+                ['zwiesp&auml;ltig', 'противоречивый', 'Der Leser bekommt einen zwiesp&auml;ltigen Eindruck.'],
+                ['die Resignation', 'покорность, смирение', 'In seinen Worten klingt leise Resignation.'],
+                ['die Wehmut', 'тоска, меланхолия', 'Mit Wehmut erinnert sich die Erz&auml;hlerin an ihre Kindheit.'],
+                ['die Bestürzung', 'потрясение, смятение', 'Die Nachricht l&ouml;ste tiefe Best&uuml;rzung aus.']
+            ],
+
+            // ===== SCHULE — учёба, давление, будущее =====
+            'b1:schule': [
+                ['die Klassenarbeit', 'контрольная работа', 'Morgen schreiben wir eine Klassenarbeit.'],
+                ['das Fach', 'предмет', 'Mein Lieblingsfach ist Deutsch.'],
+                ['der Stundenplan', 'расписание', 'Wir haben einen neuen Stundenplan bekommen.'],
+                ['die Pause', 'перемена', 'In der Pause treffe ich meine Freunde.'],
+                ['&uuml;ben', 'упражняться', 'Man muss t&auml;glich &uuml;ben, um besser zu werden.'],
+                ['flei&szlig;ig', 'прилежный', 'Sie ist eine flei&szlig;ige Sch&uuml;lerin.'],
+                ['faul', 'ленивый', 'Ich war letztes Jahr ziemlich faul.'],
+                ['schwierig', 'трудный', 'Die Aufgabe ist zu schwierig f&uuml;r mich.'],
+                ['der Abschluss', 'выпуск, аттестат', 'Nach dem Abschluss will ich eine Ausbildung machen.'],
+                ['eine Pr&uuml;fung ablegen', 'сдавать экзамен', 'Im Juni legt sie die ZP 10 ab.']
+            ],
+            'b2:schule': [
+                ['der Leistungsdruck', 'давление успеваемости', 'Viele Sch&uuml;ler leiden unter gro&szlig;em Leistungsdruck.'],
+                ['sich unter Druck setzen', 'давить на себя', 'Sie setzt sich selbst zu sehr unter Druck.'],
+                ['die &Uuml;berforderung', 'перегрузка', 'Zu viele Aufgaben f&uuml;hren zur &Uuml;berforderung.'],
+                ['sich anstrengen', 'стараться', 'Wenn du dich anstrengst, schaffst du es.'],
+                ['die Herausforderung', 'вызов', 'Die ZP 10 ist eine gro&szlig;e Herausforderung.'],
+                ['das Ziel erreichen', 'достичь цели', 'Sie hat ihr Ziel erreicht und bestanden.'],
+                ['scheitern', 'потерпеть неудачу', 'Wer nicht wagt, der kann auch scheitern.'],
+                ['der Erfolg', 'успех', 'Der Erfolg h&auml;ngt von der Vorbereitung ab.'],
+                ['aufgeben', 'сдаваться', 'Gib niemals auf, auch wenn es schwer wird!'],
+                ['sich motivieren', 'мотивировать себя', 'Es f&auml;llt mir schwer, mich jeden Tag zu motivieren.']
+            ],
+            'c1:schule': [
+                ['die Chancengleichheit', 'равенство возможностей', 'Chancengleichheit im Bildungswesen bleibt ein Ideal.'],
+                ['die Selbstständigkeit', 'самостоятельность', 'Die Schule soll Selbstst&auml;ndigkeit f&ouml;rdern.'],
+                ['das lebenslange Lernen', 'обучение на протяжении жизни', 'Lebenslanges Lernen wird immer wichtiger.'],
+                ['kritisch hinterfragen', 'критически осмыслять', 'Man sollte Informationen kritisch hinterfragen.'],
+                ['der Leistungsanspruch', 'требование успеваемости', 'Der hohe Leistungsanspruch belastet viele Jugendliche.'],
+                ['f&ouml;rdern und fordern', 'поддерживать и требовать', 'Gute Schulen f&ouml;rdern und fordern ihre Sch&uuml;ler.'],
+                ['die Bildungschancen', 'образовательные возможности', 'Nicht alle Kinder haben die gleichen Bildungschancen.'],
+                ['die Digitalisierung', 'цифровизация', 'Die Digitalisierung ver&auml;ndert den Unterricht grundlegend.'],
+                ['einen Beitrag leisten', 'вносить вклад', 'Jeder Sch&uuml;ler kann einen Beitrag zur Klasse leisten.'],
+                ['sich Wissen aneignen', 'усваивать знания', 'Man eignet sich Wissen durch &Uuml;bung an.']
+            ],
+
+            // ===== UMWELT — классическая ZP-тематика для 4b аргументации =====
+            'b1:umwelt': [
+                ['die Natur', 'природа', 'Am Wochenende gehen wir in die Natur.'],
+                ['das Klima', 'климат', 'Das Klima ver&auml;ndert sich.'],
+                ['der M&uuml;ll', 'мусор', 'Wir produzieren zu viel M&uuml;ll.'],
+                ['M&uuml;ll trennen', 'сортировать мусор', 'In Deutschland muss man M&uuml;ll trennen.'],
+                ['sauber halten', 'держать в чистоте', 'Wir sollen die Stadt sauber halten.'],
+                ['Fahrrad fahren', 'ездить на велосипеде', 'Ich fahre lieber Fahrrad als Auto.'],
+                ['Strom sparen', 'экономить электричество', 'Mach das Licht aus, um Strom zu sparen!'],
+                ['der Wald', 'лес', 'Der Wald ist wichtig f&uuml;r unser Klima.'],
+                ['die Tierart', 'вид животных', 'Viele Tierarten sind in Gefahr.'],
+                ['umweltfreundlich', 'экологичный', 'Ein E-Auto ist umweltfreundlicher als ein Benziner.']
+            ],
+            'b2:umwelt': [
+                ['der Klimawandel', 'изменение климата', 'Der Klimawandel hat bereits sp&uuml;rbare Folgen.'],
+                ['die Erderw&auml;rmung', 'глобальное потепление', 'Die Erderw&auml;rmung bedroht die Gletscher.'],
+                ['erneuerbare Energien', 'возобновляемые источники', 'Wind und Sonne sind erneuerbare Energien.'],
+                ['der Treibhauseffekt', 'парниковый эффект', 'Der Treibhauseffekt wird durch CO&#8322; verst&auml;rkt.'],
+                ['verschwenden', 'растрачивать', 'Wir verschwenden viel zu viel Wasser.'],
+                ['nachhaltig leben', 'жить устойчиво', 'Immer mehr Menschen wollen nachhaltig leben.'],
+                ['sch&auml;dlich f&uuml;r', 'вредный для', 'Plastik ist sch&auml;dlich f&uuml;r die Meere.'],
+                ['reduzieren', 'сокращать', 'Wir m&uuml;ssen unseren CO&#8322;-Verbrauch reduzieren.'],
+                ['die Auswirkung', 'последствие', 'Die Auswirkungen sind deutlich sp&uuml;rbar.'],
+                ['die Plastikverschmutzung', 'пластиковое загрязнение', 'Die Plastikverschmutzung der Meere nimmt zu.']
+            ],
+            'c1:umwelt': [
+                ['die Nachhaltigkeit', 'устойчивость', 'Nachhaltigkeit ist das Leitprinzip unserer Zeit.'],
+                ['der &ouml;kologische Fu&szlig;abdruck', 'экологический след', 'Jeder sollte seinen &ouml;kologischen Fu&szlig;abdruck verringern.'],
+                ['die Klimaneutralit&auml;t', 'климатическая нейтральность', 'Deutschland strebt Klimaneutralit&auml;t bis 2045 an.'],
+                ['die Artenvielfalt', 'биоразнообразие', 'Die Artenvielfalt schwindet dramatisch.'],
+                ['die Generationengerechtigkeit', 'справедливость между поколениями', 'Es geht um Generationengerechtigkeit.'],
+                ['ressourcenschonend', 'сберегающий ресурсы', 'Wir m&uuml;ssen ressourcenschonend handeln.'],
+                ['gravierende Folgen', 'серьёзные последствия', 'Die gravierenden Folgen sind nicht mehr zu leugnen.'],
+                ['die Energiewende', 'энергетический переход', 'Die Energiewende ist in vollem Gange.'],
+                ['den CO&#8322;-Aussto&szlig; senken', 'снижать выбросы CO&#8322;', 'Wir m&uuml;ssen den CO&#8322;-Aussto&szlig; drastisch senken.'],
+                ['die Verantwortung &uuml;bernehmen', 'брать на себя ответственность', 'Jeder muss Verantwortung f&uuml;r die Umwelt &uuml;bernehmen.']
+            ],
+
+            // ===== GESELLSCHAFT — для 4b-аргументации и анализа =====
+            'b1:gesellschaft': [
+                ['die Freundschaft', 'дружба', 'Freundschaft ist mir sehr wichtig.'],
+                ['sich streiten', 'ссориться', 'Wir streiten uns selten.'],
+                ['sich vertragen', 'мириться', 'Nach dem Streit haben sie sich wieder vertragen.'],
+                ['das Vertrauen', 'доверие', 'Ohne Vertrauen gibt es keine Freundschaft.'],
+                ['ehrlich', 'честный', 'Ein echter Freund ist ehrlich zu dir.'],
+                ['jemandem helfen', 'помогать кому-то', 'Echte Freunde helfen einander.'],
+                ['unterst&uuml;tzen', 'поддерживать', 'Meine Familie unterst&uuml;tzt mich immer.'],
+                ['respektieren', 'уважать', 'Wir sollen andere Meinungen respektieren.'],
+                ['die Meinung sagen', 'высказать мнение', 'Jeder darf seine Meinung sagen.'],
+                ['zusammenhalten', 'держаться вместе', 'In der Klasse halten wir zusammen.']
+            ],
+            'b2:gesellschaft': [
+                ['soziale Medien', 'соцсети', 'Soziale Medien beeinflussen die Jugend stark.'],
+                ['der Einfluss', 'влияние', 'Der Einfluss von Influencern w&auml;chst st&auml;ndig.'],
+                ['das Mobbing', 'травля', 'Mobbing an Schulen ist ein ernstes Problem.'],
+                ['sich einsetzen f&uuml;r', 'выступать за', 'Viele Jugendliche setzen sich f&uuml;r das Klima ein.'],
+                ['die Meinungsfreiheit', 'свобода слова', 'Meinungsfreiheit ist ein Grundrecht.'],
+                ['der Zusammenhalt', 'сплочённость', 'Der Zusammenhalt in der Gesellschaft l&auml;sst nach.'],
+                ['das Vorurteil', 'предрассудок', 'Vorurteile entstehen durch Unwissenheit.'],
+                ['engagiert', 'активный, вовлечённый', 'Sie ist politisch sehr engagiert.'],
+                ['die Verantwortung tragen', 'нести ответственность', 'Eltern tragen gro&szlig;e Verantwortung.'],
+                ['im Gegensatz zu', 'в отличие от', 'Im Gegensatz zu fr&uuml;her sind wir heute vernetzter.']
+            ],
+            'c1:gesellschaft': [
+                ['der gesellschaftliche Wandel', 'общественные перемены', 'Der gesellschaftliche Wandel vollzieht sich rasant.'],
+                ['die Polarisierung', 'поляризация', 'Die Polarisierung der Gesellschaft nimmt zu.'],
+                ['die Integration', 'интеграция', 'Integration ist ein wechselseitiger Prozess.'],
+                ['der soziale Zusammenhalt', 'социальная сплочённость', 'Der soziale Zusammenhalt ist bedroht.'],
+                ['die Zivilcourage', 'гражданская смелость', 'Zivilcourage zu zeigen, erfordert Mut.'],
+                ['das Engagement', 'активная гражданская позиция', 'Ihr Engagement ist vorbildlich.'],
+                ['marginalisiert', 'маргинализированный', 'Marginalisierte Gruppen brauchen mehr Unterst&uuml;tzung.'],
+                ['infolgedessen', 'вследствие этого', 'Infolgedessen kam es zu hitzigen Debatten.'],
+                ['zugrunde liegen', 'лежать в основе', 'Dem Konflikt liegen tiefere Ursachen zugrunde.'],
+                ['die Schlussfolgerung ziehen', 'делать вывод', 'Daraus l&auml;sst sich folgende Schlussfolgerung ziehen.']
+            ]
+        };
+
+        const TOPIC_META = {
+            gefuehle: { icon: '\u{1F496}', title: 'Gef\u00fchle', sub: 'Чувства и эмоции' },
+            schule: { icon: '\u{1F393}', title: 'Schule', sub: 'Школа и учёба' },
+            umwelt: { icon: '\u{1F33F}', title: 'Umwelt', sub: 'Экология и природа' },
+            gesellschaft: { icon: '\u{1F465}', title: 'Gesellschaft', sub: 'Общество и ценности' }
+        };
+        const LEVEL_SUB = {
+            b1: 'базовая лексика',
+            b2: 'для текстов и анализа',
+            c1: 'академические слова'
+        };
+
+        let currentLevel = 'b1';
+        let currentTopic = 'gefuehle';
+
+        function renderVocab() {
+            const key = currentLevel + ':' + currentTopic;
+            const data = VOCAB[key] || [];
+            const grid = document.getElementById('vocab-grid');
+            const meta = TOPIC_META[currentTopic];
+
+            document.getElementById('vocab-icon').innerHTML = meta.icon;
+            document.getElementById('vocab-title').textContent = meta.title + ' \u2014 ' + currentLevel.toUpperCase();
+            document.getElementById('vocab-subtitle').textContent = meta.sub + ' \u2014 ' + LEVEL_SUB[currentLevel];
+            document.getElementById('vocab-count').textContent = data.length + ' W\u00f6rter';
+
+            grid.innerHTML = data.map(function(item) {
+                return '<div class="flashcard">' +
+                    '<div class="flashcard-front">' + item[0] + '</div>' +
+                    '<div class="flashcard-back">' +
+                        '<strong>' + item[1] + '</strong>' +
+                        '<p style="margin-top:0.4rem; font-style:italic;">&laquo;' + item[2] + '&raquo;</p>' +
+                    '</div>' +
+                    '<div class="flashcard-hint">klicken zum Umdrehen</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // Level buttons
+        document.querySelectorAll('.level-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.level-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentLevel = btn.dataset.level;
+                renderVocab();
+            });
+        });
+
+        // Topic tabs
+        document.querySelectorAll('.tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                currentTopic = tab.dataset.topic;
+                renderVocab();
+            });
+        });
+
+        // Flashcard flip (delegated)
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.flashcard');
+            if (card) card.classList.toggle('flipped');
+        });
+
+        // Initial render
+        renderVocab();
+    </script>
+</body>
+</html>
