@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
     <style>
+        html { background: #0a0a14; }
+
         /* ===== LEVEL SELECTOR ===== */
         .level-tabs {
             display: flex;
@@ -150,7 +152,7 @@
         /* ===== VOCAB CARD GRID ===== */
         .vocab-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 0.7rem;
         }
 
@@ -215,8 +217,8 @@
         /* BACK */
         .vocab-card .card-back {
             display: none;
-            padding: 1.2rem 1.2rem 1rem 1.4rem;
-            min-height: 130px;
+            padding: 1.1rem 1.1rem 0.9rem 1.3rem;
+            min-height: 160px;
         }
         .vocab-card.flipped .card-front { display: none; }
         .vocab-card.flipped .card-back { display: flex; flex-direction: column; justify-content: center; }
@@ -230,12 +232,18 @@
         body.level-b2 .vocab-card .card-back .translation { color: #c8a5ff; }
         body.level-c1 .vocab-card .card-back .translation { color: #e3b341; }
 
+        .vocab-card .card-back .explanation {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+            margin-top: 0.4rem;
+        }
         .vocab-card .card-back .example {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-style: italic;
             color: var(--color-text-muted);
             margin-top: 0.5rem;
-            line-height: 1.5;
+            line-height: 1.45;
         }
         .vocab-card .card-back .back-level {
             display: inline-block;
@@ -290,7 +298,7 @@
         }
     </style>
 </head>
-<body class="dark-theme page-bg-image level-b1" style="background: transparent">
+<body class="dark-theme page-bg-image level-b1" style="background: #0a0a14">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
         <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
         <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
@@ -367,217 +375,182 @@
     <script>
         // ===== Vocabulary Data =====
         // Format: [deutsches Wort, русский перевод, Beispielsatz]
+        // Format: [word, translation, explanation, example]
         const VOCAB = {
-            // ===== GEFÜHLE =====
+            // ===== GEF&Uuml;HLE =====
             'b1:gefuehle': [
-                ['sich freuen &uuml;ber', 'радоваться чему-то', 'Sie freut sich &uuml;ber das Geschenk.'],
-                ['sich &auml;rgern &uuml;ber', 'злиться на что-то', 'Er &auml;rgert sich &uuml;ber den L&auml;rm.'],
-                ['Angst haben vor', 'бояться чего-то', 'Das Kind hat Angst vor dem Dunkeln.'],
-                ['entt&auml;uscht sein', 'быть разочарованным', 'Ich war entt&auml;uscht von dem Film.'],
-                ['stolz sein auf', 'гордиться кем-то', 'Die Mutter ist stolz auf ihren Sohn.'],
-                ['sich Sorgen machen', 'беспокоиться', 'Die Eltern machen sich Sorgen um ihre Tochter.'],
-                ['aufgeregt', 'взволнованный', 'Vor der Pr&uuml;fung war sie aufgeregt.'],
-                ['nerv&ouml;s', 'нервный', 'Er war nerv&ouml;s vor dem Auftritt.'],
-                ['zufrieden', 'довольный', 'Ich bin mit meiner Note zufrieden.'],
-                ['sich sch&auml;men', 'стыдиться', 'Er sch&auml;mt sich f&uuml;r seinen Fehler.'],
-                ['einsam', 'одинокий', 'Er f&uuml;hlt sich einsam ohne Freunde.'],
-                ['sich f&uuml;hlen', 'чувствовать себя', 'Ich f&uuml;hle mich heute gut.'],
-                ['dankbar sein', 'быть благодарным', 'Ich bin dankbar f&uuml;r meine Freunde.'],
-                ['neidisch', 'завистливый', 'Sie wurde neidisch auf ihre Schwester.'],
-                ['unsicher', 'неуверенный', 'Vor der Klasse f&uuml;hlte er sich unsicher.']
+                ['sich sch&auml;men', 'стыдиться', 'Когда тебе неловко за то, что ты сделал, и хочется провалиться сквозь землю', 'Er sch&auml;mt sich f&uuml;r seinen Fehler vor der ganzen Klasse.'],
+                ['die Entt&auml;uschung', 'разочарование', 'Ты ждал чего-то хорошего, а вышло плохо &mdash; и теперь грустно и обидно', 'Die Entt&auml;uschung &uuml;ber das Ergebnis war ihm deutlich anzusehen.'],
+                ['erleichtert sein', 'с облегчением', 'Когда наконец-то закончилось что-то тяжёлое &mdash; вздохнул и думаешь &laquo;ну слава богу&raquo;', 'Nach der Pr&uuml;fung war sie sichtlich erleichtert.'],
+                ['beunruhigt sein', 'обеспокоенный', 'Тебя что-то тревожит, не можешь перестать думать о плохом', 'Die Eltern waren beunruhigt, weil ihr Kind nicht nach Hause kam.'],
+                ['&uuml;berw&auml;ltigt sein', 'потрясённый', 'Чувств так много, что ты не можешь их обработать &mdash; от радости или от шока', 'Sie war &uuml;berw&auml;ltigt von der Unterst&uuml;tzung ihrer Freunde.'],
+                ['sich freuen &uuml;ber', 'радоваться', 'Просто радость &mdash; тебе подарили что-то, получил хорошую новость', 'Ich freue mich &uuml;ber die gute Note in Deutsch.'],
+                ['w&uuml;tend', 'злой, в ярости', 'Сильная злость &mdash; не просто раздражён, а реально кипишь', 'Er wurde w&uuml;tend, als er die Wahrheit erfuhr.'],
+                ['einsam', 'одинокий', 'Когда вокруг вроде люди, но ты чувствуешь себя один', 'In der neuen Stadt f&uuml;hlte er sich einsam.'],
+                ['stolz sein auf', 'гордиться', 'Когда кто-то добился чего-то и тебе за него приятно', 'Die Mutter ist stolz auf den Abschluss ihrer Tochter.'],
+                ['sich Sorgen machen', 'беспокоиться', 'Думать о ком-то или о чём-то плохом, что может случиться', 'Die Eltern machen sich Sorgen um die Zukunft ihrer Kinder.'],
+                ['traurig', 'грустный', 'Не злой, не обиженный, а просто тихо грустно', 'Nach dem Abschied von ihrer Freundin war sie sehr traurig.'],
+                ['aufgeregt', 'взволнованный', 'Перед чем-то важным &mdash; сердце стучит, руки дрожат, не можешь усидеть', 'Vor der Pr&auml;sentation war sie total aufgeregt.']
             ],
             'b2:gefuehle': [
-                ['die Verzweiflung', 'отчаяние', 'In ihrer Verzweiflung wusste sie keinen Ausweg.'],
-                ['die Erleichterung', 'облегчение', 'Nach der Nachricht sp&uuml;rte er gro&szlig;e Erleichterung.'],
-                ['sich zur&uuml;ckziehen', 'замыкаться в себе', 'Nach dem Streit zog sich der Junge zur&uuml;ck.'],
-                ['sich &uuml;berfordert f&uuml;hlen', 'чувствовать себя перегруженным', 'Viele Sch&uuml;ler f&uuml;hlen sich &uuml;berfordert.'],
-                ['gekr&auml;nkt', 'обиженный', 'Sie war durch seine Worte tief gekr&auml;nkt.'],
-                ['die Zuneigung', 'симпатия, привязанность', 'Er empfand gro&szlig;e Zuneigung zu seinem Gro&szlig;vater.'],
-                ['die Gleichg&uuml;ltigkeit', 'равнодушие', 'Ihre Gleichg&uuml;ltigkeit verletzte ihn.'],
-                ['das Selbstvertrauen', 'уверенность в себе', 'Sport st&auml;rkt das Selbstvertrauen.'],
-                ['unsicher wirken', 'казаться неуверенным', 'Vor der Klasse wirkte er sehr unsicher.'],
-                ['die Einsamkeit', 'одиночество', 'In der Gro&szlig;stadt empfand sie Einsamkeit.'],
-                ['unter Druck stehen', 'быть под давлением', 'Sie steht unter enormem Druck.'],
-                ['die Eifersucht', 'ревность, зависть', 'Eifersucht zerst&ouml;rt Beziehungen.'],
-                ['sich unterdr&uuml;ckt f&uuml;hlen', 'чувствовать себя подавленным', 'Er f&uuml;hlte sich durch die Regeln unterdr&uuml;ckt.'],
-                ['hilflos', 'беспомощный', 'In dieser Situation war er v&ouml;llig hilflos.'],
-                ['die Geborgenheit', 'защищённость, уют', 'Das Kind sucht Geborgenheit bei der Mutter.']
+                ['die Betroffenheit', 'потрясение', 'Когда узнаёшь что-то плохое и тебя это реально задевает &mdash; не равнодушен', 'Die Betroffenheit der Zuh&ouml;rer war nach dem Bericht sp&uuml;rbar.'],
+                ['das Mitgef&uuml;hl', 'сочувствие', 'Ты чувствуешь чужую боль как свою, хочешь помочь', 'Er zeigte gro&szlig;es Mitgef&uuml;hl f&uuml;r die betroffenen Familien.'],
+                ['verunsichert sein', 'растерянный', 'Раньше был уверен, а теперь не знаешь &mdash; может я ошибался?', 'Durch die st&auml;ndige Kritik war er v&ouml;llig verunsichert.'],
+                ['die Zerrissenheit', 'раздвоенность', 'Когда тебя тянет в две стороны и ты не можешь выбрать &mdash; &laquo;и хочется и колется&raquo;', 'Die Figur zeigt eine innere Zerrissenheit zwischen Pflicht und Freiheit.'],
+                ['beklommen sein', 'тревожно на душе', 'Тяжёлое чувство в груди, когда что-то плохое вот-вот случится', 'Mit beklemmenem Gef&uuml;hl betrat er das leere Haus.'],
+                ['sich &uuml;berfordert f&uuml;hlen', 'перегруженный', 'Задач больше, чем ты можешь потянуть &mdash; хочется всё бросить', 'Viele Sch&uuml;ler f&uuml;hlen sich vor den Pr&uuml;fungen &uuml;berfordert.'],
+                ['die Gleichg&uuml;ltigkeit', 'равнодушие', 'Когда тебе просто всё равно &mdash; не радостно и не грустно, никак', 'Ihre Gleichg&uuml;ltigkeit gegen&uuml;ber dem Problem verletzte ihn.'],
+                ['gekr&auml;nkt', 'обиженный', 'Тебе сказали что-то неприятное и это задело за живое', 'Sie war durch seine Worte tief gekr&auml;nkt.'],
+                ['die Sehnsucht', 'тоска, томление', 'Скучаешь по чему-то далёкому &mdash; по дому, по человеку, по прошлому', 'Der Protagonist versp&uuml;rt Sehnsucht nach seiner Heimat.'],
+                ['das Selbstvertrauen', 'уверенность в себе', 'Ты веришь, что справишься &mdash; не боишься пробовать новое', 'Die Erfahrung st&auml;rkte sein Selbstvertrauen.'],
+                ['hilflos', 'беспомощный', 'Хочешь что-то сделать, но не можешь &mdash; ситуация сильнее тебя', 'Gegen&uuml;ber dem Mobbing f&uuml;hlte er sich v&ouml;llig hilflos.'],
+                ['die Verzweiflung', 'отчаяние', 'Когда кажется, что выхода вообще нет &mdash; самая сильная безнадёга', 'In ihrer Verzweiflung suchte sie Hilfe bei einer Beratungsstelle.']
             ],
             'c1:gefuehle': [
-                ['die Zerrissenheit', 'внутренняя раздвоенность', 'Die Zerrissenheit der Figur wird deutlich.'],
-                ['der innere Konflikt', 'внутренний конфликт', 'Der Protagonist k&auml;mpft mit einem inneren Konflikt.'],
-                ['die Verbitterung', 'озлобленность', 'Seine Verbitterung zeigt sich in jedem Wort.'],
-                ['sich entfremden', 'отчуждаться', 'Die beiden Freunde haben sich mit der Zeit entfremdet.'],
-                ['das Unbehagen', 'неловкость, беспокойство', 'Ein Gef&uuml;hl des Unbehagens ergriff sie.'],
-                ['die Beklemmung', 'подавленность, тревога', 'Mit Beklemmung betrat er das alte Haus.'],
-                ['zwiesp&auml;ltig', 'противоречивый', 'Der Leser bekommt einen zwiesp&auml;ltigen Eindruck.'],
-                ['die Resignation', 'покорность, смирение', 'In seinen Worten klingt leise Resignation.'],
-                ['die Wehmut', 'тоска, меланхолия', 'Mit Wehmut erinnert sich die Erz&auml;hlerin an ihre Kindheit.'],
-                ['die Best&uuml;rzung', 'потрясение, смятение', 'Die Nachricht l&ouml;ste tiefe Best&uuml;rzung aus.'],
-                ['die Ambivalenz', 'двойственность', 'Die Ambivalenz seiner Gef&uuml;hle pr&auml;gt den Text.'],
-                ['die Ohnmacht', 'бессилие', 'Er empfand Ohnmacht gegen&uuml;ber dem System.'],
-                ['die Empathie', 'эмпатия', 'Empathie ist eine zentrale soziale Kompetenz.'],
-                ['die Entr&uuml;stung', 'возмущение', 'Der Vorschlag stie&szlig; auf allgemeine Entr&uuml;stung.'],
-                ['die Gem&uuml;tslage', 'душевное состояние', 'Seine Gem&uuml;tslage schwankte zwischen Hoffnung und Angst.']
+                ['die Ambivalenz', 'двойственность', 'Одновременно чувствуешь два противоположных чувства &mdash; и любишь и ненавидишь', 'Die Ambivalenz seiner Gef&uuml;hle gegen&uuml;ber der Entscheidung pr&auml;gt den Text.'],
+                ['das Unbehagen', 'дискомфорт', 'Лёгкая тревога, что-то не так, но не можешь объяснить что именно', 'Ein wachsendes Unbehagen ergriff sie w&auml;hrend des Gespr&auml;chs.'],
+                ['die Ern&uuml;chterung', 'отрезвление', 'Сначала был в восторге, а потом понял &mdash; всё не так круто как казалось', 'Nach anf&auml;nglicher Begeisterung folgte schnell die Ern&uuml;chterung.'],
+                ['resigniert', 'смирившийся', 'Устал бороться и просто принял: ладно, пусть будет как будет', 'Resigniert nahm er das Ergebnis hin, ohne zu protestieren.'],
+                ['die Ohnmacht', 'бессилие', 'Ты видишь проблему, но совершенно не можешь ничего изменить', 'Angesichts der Situation empfand er tiefe Ohnmacht.'],
+                ['die Wehmut', 'меланхолия', 'Лёгкая грусть, когда вспоминаешь что-то хорошее, чего уже нет', 'Mit Wehmut erinnert sich die Erz&auml;hlerin an ihre Kindheit.'],
+                ['der innere Konflikt', 'внутренний конфликт', 'Герой борется сам с собой &mdash; голова говорит одно, сердце другое', 'Der Protagonist k&auml;mpft mit einem inneren Konflikt zwischen Pflicht und Wunsch.'],
+                ['sich entfremden', 'отчуждаться', 'Постепенно становиться чужими &mdash; раньше были близки, а теперь нет', 'Im Laufe der Geschichte entfremden sich die beiden Figuren voneinander.'],
+                ['die Best&uuml;rzung', 'потрясение', 'Сильный шок от плохой новости &mdash; не веришь своим ушам', 'Die Nachricht l&ouml;ste in der Gemeinde tiefe Best&uuml;rzung aus.'],
+                ['die Verbitterung', 'озлобленность', 'Долго копил обиду, и она превратилась в постоянную злость на мир', 'Seine Verbitterung &uuml;ber das Unrecht zeigt sich in jeder &Auml;u&szlig;erung.'],
+                ['zwiesp&auml;ltig', 'противоречивый', 'Не однозначный &mdash; с одной стороны хорошо, с другой плохо', 'Der Leser gewinnt einen zwiesp&auml;ltigen Eindruck von der Hauptfigur.'],
+                ['die Entr&uuml;stung', 'возмущение', 'Когда что-то настолько несправедливо, что ты кипишь от злости', 'Der Vorschlag stie&szlig; in der &Ouml;ffentlichkeit auf allgemeine Entr&uuml;stung.']
             ],
 
             // ===== SCHULE =====
             'b1:schule': [
-                ['die Klassenarbeit', 'контрольная работа', 'Morgen schreiben wir eine Klassenarbeit.'],
-                ['das Fach', 'предмет', 'Mein Lieblingsfach ist Deutsch.'],
-                ['der Stundenplan', 'расписание', 'Wir haben einen neuen Stundenplan bekommen.'],
-                ['die Pause', 'перемена', 'In der Pause treffe ich meine Freunde.'],
-                ['&uuml;ben', 'упражняться', 'Man muss t&auml;glich &uuml;ben, um besser zu werden.'],
-                ['flei&szlig;ig', 'прилежный', 'Sie ist eine flei&szlig;ige Sch&uuml;lerin.'],
-                ['faul', 'ленивый', 'Ich war letztes Jahr ziemlich faul.'],
-                ['schwierig', 'трудный', 'Die Aufgabe ist zu schwierig f&uuml;r mich.'],
-                ['der Abschluss', 'выпуск, аттестат', 'Nach dem Abschluss will ich eine Ausbildung machen.'],
-                ['eine Pr&uuml;fung ablegen', 'сдавать экзамен', 'Im Juni legt sie die ZP 10 ab.'],
-                ['die Note', 'оценка', 'Ich habe eine gute Note bekommen.'],
-                ['der Unterricht', 'урок, занятие', 'Der Unterricht beginnt um 8 Uhr.'],
-                ['aufpassen', 'быть внимательным', 'Du musst im Unterricht aufpassen!'],
-                ['nachschlagen', 'смотреть (в словаре)', 'Ich muss das Wort nachschlagen.'],
-                ['wiederholen', 'повторять', 'Wir wiederholen den Stoff vor der Pr&uuml;fung.']
+                ['die Leistung', 'успеваемость', 'То, какие результаты ты показываешь &mdash; хорошие оценки = gute Leistung', 'Er zeigt in letzter Zeit gute Leistungen in Deutsch.'],
+                ['f&ouml;rdern', 'поддерживать', 'Помогать расти &mdash; учитель помогает слабому ученику, школа помогает талантливым', 'Die Schule soll alle Sch&uuml;ler individuell f&ouml;rdern.'],
+                ['&uuml;berfordern', 'перегружать', 'Давать больше, чем человек может потянуть &mdash; слишком много и слишком сложно', 'Zu viele Aufgaben auf einmal &uuml;berfordern die Sch&uuml;ler.'],
+                ['scheitern', 'провалиться', 'Серьёзный провал &mdash; экзамен не сдал, план не сработал', 'Er ist trotz intensiver Vorbereitung an der Pr&uuml;fung gescheitert.'],
+                ['die Pr&uuml;fungsangst', 'страх перед экзаменом', 'Паника перед тестом &mdash; руки трясутся, всё забыл, хотя учил', 'Viele Sch&uuml;ler leiden unter starker Pr&uuml;fungsangst.'],
+                ['die Klassenarbeit', 'контрольная работа', 'Тест в классе, который пишут все вместе в определённый день', 'Morgen schreiben wir die letzte Klassenarbeit in Mathe.'],
+                ['flei&szlig;ig', 'прилежный', 'Тот, кто реально старается &mdash; делает домашку, учит, не ленится', 'Sie ist die flei&szlig;igste Sch&uuml;lerin in der Klasse.'],
+                ['&uuml;ben', 'тренироваться', 'Повторять снова и снова, пока не получится', 'Nur wer t&auml;glich &uuml;bt, kann sich verbessern.'],
+                ['der Abschluss', 'аттестат', 'То, что получаешь в конце школы &mdash; документ, что ты закончил', 'Ohne Abschluss ist es schwer, eine gute Ausbildung zu finden.'],
+                ['sich vorbereiten', 'готовиться', 'Делать всё заранее, чтобы быть готовым к чему-то важному', 'Wir bereiten uns intensiv auf die ZP 10 vor.'],
+                ['schwierig', 'сложный', 'Не лёгкий &mdash; надо подумать, разобраться', 'Die Aufgabe war schwierig, aber am Ende habe ich sie geschafft.'],
+                ['sich anstrengen', 'стараться', 'Прикладывать усилия, даже когда тяжело &mdash; не сдаваться', 'Wenn du dich anstrengst, wirst du die Pr&uuml;fung bestehen.']
             ],
             'b2:schule': [
-                ['der Leistungsdruck', 'давление успеваемости', 'Viele Sch&uuml;ler leiden unter gro&szlig;em Leistungsdruck.'],
-                ['sich unter Druck setzen', 'давить на себя', 'Sie setzt sich selbst zu sehr unter Druck.'],
-                ['die &Uuml;berforderung', 'перегрузка', 'Zu viele Aufgaben f&uuml;hren zur &Uuml;berforderung.'],
-                ['sich anstrengen', 'стараться', 'Wenn du dich anstrengst, schaffst du es.'],
-                ['die Herausforderung', 'вызов', 'Die ZP 10 ist eine gro&szlig;e Herausforderung.'],
-                ['das Ziel erreichen', 'достичь цели', 'Sie hat ihr Ziel erreicht und bestanden.'],
-                ['scheitern', 'потерпеть неудачу', 'Wer nicht wagt, der kann auch scheitern.'],
-                ['der Erfolg', 'успех', 'Der Erfolg h&auml;ngt von der Vorbereitung ab.'],
-                ['aufgeben', 'сдаваться', 'Gib niemals auf, auch wenn es schwer wird!'],
-                ['sich motivieren', 'мотивировать себя', 'Es f&auml;llt mir schwer, mich jeden Tag zu motivieren.'],
-                ['ehrgeizig', 'амбициозный', 'Sie ist eine sehr ehrgeizige Sch&uuml;lerin.'],
-                ['die Konzentration', 'концентрация', 'Mir fehlt die Konzentration nach 6 Stunden Unterricht.'],
-                ['sich verbessern', 'улучшаться', 'Ich m&ouml;chte meine Noten verbessern.'],
-                ['die Lernstrategie', 'стратегия обучения', 'Mit der richtigen Lernstrategie geht es schneller.'],
-                ['das Zeitmanagement', 'тайм-менеджмент', 'Gutes Zeitmanagement ist die halbe Miete.']
+                ['die Chancengleichheit', 'равенство возможностей', 'Когда у всех одинаковые шансы на успех &mdash; неважно бедный ты или богатый', 'Chancengleichheit in der Bildung bleibt ein unerreichtes Ideal.'],
+                ['benachteiligt sein', 'быть ущемлённым', 'Когда у тебя меньше шансов из-за происхождения или доходов семьи', 'Kinder aus einkommensschwachen Familien sind im Bildungssystem oft benachteiligt.'],
+                ['das Bildungssystem hinterfragen', 'сомневаться в системе образования', 'Не просто спрашивать, а сомневаться &mdash; а реально ли эта система работает?', 'Immer mehr Experten hinterfragen das deutsche Bildungssystem.'],
+                ['der Leistungsdruck', 'давление успеваемости', 'Когда тебе постоянно надо показывать результат &mdash; и от этого стресс', 'Der st&auml;ndige Leistungsdruck f&uuml;hrt bei vielen Jugendlichen zu Stress.'],
+                ['die Eigenverantwortung', 'личная ответственность', 'Когда ты сам отвечаешь за свой результат &mdash; никто за тебя не сделает', 'Die F&ouml;rderung von Eigenverantwortung ist ein wichtiges Lernziel.'],
+                ['die Herausforderung', 'вызов', 'Что-то сложное, но реальное &mdash; если постараешься, можно справиться', 'Die ZP 10 ist f&uuml;r viele eine gro&szlig;e Herausforderung.'],
+                ['sich motivieren', 'мотивировать себя', 'Заставлять себя что-то делать, когда не хочется', 'Es f&auml;llt vielen Sch&uuml;lern schwer, sich t&auml;glich zu motivieren.'],
+                ['die &Uuml;berforderung', 'перегрузка', 'Когда на тебя навалили столько, что ты уже не справляешься', '&Uuml;berforderung in der Schule f&uuml;hrt h&auml;ufig zu psychischem Stress.'],
+                ['der Erfolg', 'успех', 'Когда получилось &mdash; сдал, прошёл, достиг', 'Der Erfolg bei der Pr&uuml;fung hing von der guten Vorbereitung ab.'],
+                ['das Ziel erreichen', 'достичь цели', 'Дойти до конца &mdash; ты поставил цель и добился её', 'Sie hat durch harte Arbeit ihr Ziel erreicht.'],
+                ['sich verbessern', 'улучшаться', 'Становиться лучше &mdash; раньше была тройка, теперь четвёрка', 'Ich m&ouml;chte mich in Deutsch deutlich verbessern.'],
+                ['die Konzentration', 'концентрация', 'Способность сосредоточиться на одном &mdash; не отвлекаться', 'Nach sechs Stunden Unterricht fehlt vielen die Konzentration.']
             ],
             'c1:schule': [
-                ['die Chancengleichheit', 'равенство возможностей', 'Chancengleichheit im Bildungswesen bleibt ein Ideal.'],
-                ['die Selbstst&auml;ndigkeit', 'самостоятельность', 'Die Schule soll Selbstst&auml;ndigkeit f&ouml;rdern.'],
-                ['das lebenslange Lernen', 'обучение на протяжении жизни', 'Lebenslanges Lernen wird immer wichtiger.'],
-                ['kritisch hinterfragen', 'критически осмыслять', 'Man sollte Informationen kritisch hinterfragen.'],
-                ['der Leistungsanspruch', 'требование успеваемости', 'Der hohe Leistungsanspruch belastet viele Jugendliche.'],
-                ['f&ouml;rdern und fordern', 'поддерживать и требовать', 'Gute Schulen f&ouml;rdern und fordern ihre Sch&uuml;ler.'],
-                ['die Bildungschancen', 'образовательные возможности', 'Nicht alle Kinder haben die gleichen Bildungschancen.'],
-                ['die Digitalisierung', 'цифровизация', 'Die Digitalisierung ver&auml;ndert den Unterricht grundlegend.'],
-                ['einen Beitrag leisten', 'вносить вклад', 'Jeder Sch&uuml;ler kann einen Beitrag zur Klasse leisten.'],
-                ['sich Wissen aneignen', 'усваивать знания', 'Man eignet sich Wissen durch &Uuml;bung an.'],
-                ['die Kompetenz', 'компетенция', 'Digitale Kompetenzen werden immer wichtiger.'],
-                ['eigenverantwortlich', 'под свою ответственность', 'Sch&uuml;ler sollen eigenverantwortlich lernen.'],
-                ['reflektieren', 'осмысливать', 'Die Sch&uuml;ler sollen ihre Lernprozesse reflektieren.'],
-                ['die Medienkompetenz', 'медиаграмотность', 'Medienkompetenz geh&ouml;rt zur modernen Bildung.'],
-                ['das Bildungssystem', 'система образования', 'Das deutsche Bildungssystem ist dreistufig aufgebaut.']
+                ['die Bildungsgerechtigkeit', 'справедливость в образовании', 'Идеал, что каждый ребёнок получит хорошее образование, независимо от семьи', 'Bildungsgerechtigkeit bleibt trotz Reformen eine zentrale Herausforderung.'],
+                ['das Selektionsprinzip', 'принцип отбора', 'Система, где детей разделяют на &laquo;сильных&raquo; и &laquo;слабых&raquo; уже в 10 лет', 'Das Selektionsprinzip des deutschen Schulsystems wird vielfach kritisiert.'],
+                ['die kognitive &Uuml;berlastung', 'когнитивная перегрузка', 'Мозг не справляется &mdash; слишком много информации, ничего не усваивается', 'Die kognitive &Uuml;berlastung beeintr&auml;chtigt das nachhaltige Lernen.'],
+                ['pr&auml;gend', 'формирующий', 'То, что оставляет глубокий след &mdash; школа &laquo;формирует&raquo; тебя как человека', 'Die Schulzeit ist pr&auml;gend f&uuml;r die gesamte Pers&ouml;nlichkeitsentwicklung.'],
+                ['die Pers&ouml;nlichkeitsentwicklung', 'развитие личности', 'Не только оценки &mdash; школа учит быть человеком, находить себя', 'Schule dient nicht nur dem Wissen, sondern auch der Pers&ouml;nlichkeitsentwicklung.'],
+                ['die Kompetenz', 'компетенция', 'Не просто знание, а умение применить его на практике', 'Digitale Kompetenzen werden in der modernen Arbeitswelt immer wichtiger.'],
+                ['eigenverantwortlich', 'самостоятельно', 'Делать что-то сам, без контроля &mdash; ты сам решаешь как и когда', 'Sch&uuml;ler sollen lernen, eigenverantwortlich zu arbeiten.'],
+                ['die Medienkompetenz', 'медиаграмотность', 'Умение понимать медиа &mdash; отличать фейки, критически читать новости', 'Medienkompetenz geh&ouml;rt zu den Schl&uuml;sselqualifikationen der Zukunft.'],
+                ['kritisch hinterfragen', 'критически осмыслять', 'Не верить всему &mdash; думать &laquo;а точно ли это так?&raquo; и проверять', 'Sch&uuml;ler sollten Informationen aus dem Internet kritisch hinterfragen.'],
+                ['das lebenslange Lernen', 'обучение всю жизнь', 'Не только в школе &mdash; человек учится всегда, и в 30, и в 50 лет', 'In einer sich wandelnden Gesellschaft wird lebenslanges Lernen unverzichtbar.'],
+                ['f&ouml;rdern und fordern', 'поддерживать и требовать', 'Баланс: помогай ученику, но и ставь высокие требования', 'Gute Schulen f&ouml;rdern und fordern ihre Sch&uuml;ler gleicherma&szlig;en.'],
+                ['die Selbstst&auml;ndigkeit', 'самостоятельность', 'Умение делать всё самому &mdash; не ждать, что кто-то скажет что делать', 'Eines der wichtigsten Ziele der Schule ist die F&ouml;rderung der Selbstst&auml;ndigkeit.']
             ],
 
             // ===== UMWELT =====
             'b1:umwelt': [
-                ['die Natur', 'природа', 'Am Wochenende gehen wir in die Natur.'],
-                ['das Klima', 'климат', 'Das Klima ver&auml;ndert sich.'],
-                ['der M&uuml;ll', 'мусор', 'Wir produzieren zu viel M&uuml;ll.'],
-                ['M&uuml;ll trennen', 'сортировать мусор', 'In Deutschland muss man M&uuml;ll trennen.'],
-                ['sauber halten', 'держать в чистоте', 'Wir sollen die Stadt sauber halten.'],
-                ['Fahrrad fahren', 'ездить на велосипеде', 'Ich fahre lieber Fahrrad als Auto.'],
-                ['Strom sparen', 'экономить электричество', 'Mach das Licht aus, um Strom zu sparen!'],
-                ['der Wald', 'лес', 'Der Wald ist wichtig f&uuml;r unser Klima.'],
-                ['die Tierart', 'вид животных', 'Viele Tierarten sind in Gefahr.'],
-                ['umweltfreundlich', 'экологичный', 'Ein E-Auto ist umweltfreundlicher als ein Benziner.'],
-                ['die Luft', 'воздух', 'Die Luft in der Stadt ist oft schlecht.'],
-                ['das Plastik', 'пластик', 'Plastik ist sch&auml;dlich f&uuml;r die Tiere.'],
-                ['sch&uuml;tzen', 'защищать', 'Wir m&uuml;ssen die Natur sch&uuml;tzen.'],
-                ['verbrauchen', 'потреблять', 'Wir verbrauchen zu viel Energie.'],
-                ['die Erde', 'Земля', 'Die Erde braucht unsere Hilfe.']
+                ['der Klimawandel', 'изменение климата', 'Земля нагревается из-за действий человека &mdash; меняется погода, природа, всё', 'Der Klimawandel betrifft alle Menschen auf der Erde.'],
+                ['sch&uuml;tzen', 'защищать', 'Беречь что-то от разрушения &mdash; природу, животных, леса', 'Wir m&uuml;ssen die Natur sch&uuml;tzen, solange es noch m&ouml;glich ist.'],
+                ['verbrauchen', 'потреблять', 'Использовать ресурсы &mdash; воду, электричество, бензин', 'Wir verbrauchen viel zu viel Energie im Alltag.'],
+                ['die Verschmutzung', 'загрязнение', 'Когда вода, воздух или земля становятся грязными из-за человека', 'Die Verschmutzung der Ozeane durch Plastik ist ein globales Problem.'],
+                ['nachhaltig', 'устойчивый', 'Так, чтобы хватило и нам и будущим поколениям', 'Wir sollten lernen, nachhaltiger zu leben.'],
+                ['der M&uuml;ll', 'мусор', 'Всё, что мы выбрасываем &mdash; упаковки, остатки еды, старые вещи', 'In Deutschland wird M&uuml;ll in verschiedene Tonnen getrennt.'],
+                ['M&uuml;ll trennen', 'сортировать мусор', 'Пластик отдельно, бумага отдельно, стекло отдельно &mdash; так в Германии', 'In Deutschland muss man den M&uuml;ll sorgf&auml;ltig trennen.'],
+                ['umweltfreundlich', 'экологичный', 'Не вредит природе &mdash; велосипед экологичнее машины', 'Fahrradfahren ist umweltfreundlicher als Autofahren.'],
+                ['Strom sparen', 'экономить электричество', 'Выключать свет, не оставлять зарядку в розетке', 'Jeder kann Strom sparen, indem er das Licht ausschaltet.'],
+                ['der Wald', 'лес', 'Деревья, животные, воздух &mdash; лес нужен для климата', 'Der Wald ist wichtig f&uuml;r saubere Luft und das Klima.'],
+                ['die Natur', 'природа', 'Всё живое вокруг &mdash; деревья, реки, горы, животные', 'Wir sollten mehr Zeit in der Natur verbringen.'],
+                ['sauber halten', 'содержать в чистоте', 'Не мусорить, убирать за собой &mdash; чтобы вокруг было чисто', 'Wir alle sollten unsere Umwelt sauber halten.']
             ],
             'b2:umwelt': [
-                ['der Klimawandel', 'изменение климата', 'Der Klimawandel hat bereits sp&uuml;rbare Folgen.'],
-                ['die Erderw&auml;rmung', 'глобальное потепление', 'Die Erderw&auml;rmung bedroht die Gletscher.'],
-                ['erneuerbare Energien', 'возобновляемые источники', 'Wind und Sonne sind erneuerbare Energien.'],
-                ['der Treibhauseffekt', 'парниковый эффект', 'Der Treibhauseffekt wird durch CO&#8322; verst&auml;rkt.'],
-                ['verschwenden', 'растрачивать', 'Wir verschwenden viel zu viel Wasser.'],
-                ['nachhaltig leben', 'жить устойчиво', 'Immer mehr Menschen wollen nachhaltig leben.'],
-                ['sch&auml;dlich f&uuml;r', 'вредный для', 'Plastik ist sch&auml;dlich f&uuml;r die Meere.'],
-                ['reduzieren', 'сокращать', 'Wir m&uuml;ssen unseren CO&#8322;-Verbrauch reduzieren.'],
-                ['die Auswirkung', 'последствие', 'Die Auswirkungen sind deutlich sp&uuml;rbar.'],
-                ['die Plastikverschmutzung', 'пластиковое загрязнение', 'Die Plastikverschmutzung der Meere nimmt zu.'],
-                ['das Bewusstsein', 'осознанность', 'Das Umweltbewusstsein w&auml;chst.'],
-                ['bedrohte Arten', 'виды под угрозой', 'Bedrohte Arten m&uuml;ssen gesch&uuml;tzt werden.'],
-                ['der Konsum', 'потребление', 'Unser Konsum hat Folgen f&uuml;r die Umwelt.'],
-                ['die Wegwerfgesellschaft', 'общество потребления', 'Wir leben in einer Wegwerfgesellschaft.'],
-                ['die Naturkatastrophe', 'природная катастрофа', 'Naturkatastrophen werden h&auml;ufiger durch den Klimawandel.']
+                ['die Treibhausgase', 'парниковые газы', 'Газы вроде CO&#8322;, которые нагревают Землю как теплица', 'Treibhausgase wie CO&#8322; verst&auml;rken den Klimawandel erheblich.'],
+                ['der Ressourcenverbrauch', 'потребление ресурсов', 'Сколько воды, нефти, дерева мы тратим &mdash; и хватит ли на будущее', 'Der weltweite Ressourcenverbrauch muss drastisch gesenkt werden.'],
+                ['erneuerbar', 'возобновляемый', 'Энергия, которая не кончается &mdash; ветер, солнце, вода (не нефть!)', 'Wind und Sonne sind wichtige erneuerbare Energiequellen.'],
+                ['die Erderw&auml;rmung', 'глобальное потепление', 'Средняя температура Земли растёт &mdash; тают льды, меняется погода', 'Die Erderw&auml;rmung bedroht die Gletscher und den Meeresspiegel.'],
+                ['belasten', 'загрязнять, нагружать', 'Создавать нагрузку на природу &mdash; фабрики, машины, мусор', 'Der wachsende Verkehr belastet die Umwelt in den St&auml;dten stark.'],
+                ['der Treibhauseffekt', 'парниковый эффект', 'Газы задерживают тепло, как стекло в теплице &mdash; Земля перегревается', 'Der Treibhauseffekt wird durch den Aussto&szlig; von CO&#8322; verst&auml;rkt.'],
+                ['verschwenden', 'расточать', 'Тратить больше, чем нужно &mdash; воду, еду, энергию впустую', 'Wir verschwenden t&auml;glich gro&szlig;e Mengen an Trinkwasser.'],
+                ['reduzieren', 'сокращать', 'Уменьшить количество &mdash; меньше CO&#8322;, меньше мусора', 'Wir m&uuml;ssen unseren CO&#8322;-Aussto&szlig; deutlich reduzieren.'],
+                ['die Auswirkung', 'последствие', 'То, что происходит из-за чего-то &mdash; засухи, наводнения', 'Die Auswirkungen des Klimawandels sind bereits jetzt sp&uuml;rbar.'],
+                ['sch&auml;dlich', 'вредный', 'Плохо для здоровья или природы &mdash; пластик вреден для морей', 'Plastikm&uuml;ll ist besonders sch&auml;dlich f&uuml;r die Meerestiere.'],
+                ['das Bewusstsein', 'осознанность', 'Понимание проблемы &mdash; люди начинают думать об экологии', 'Das Umweltbewusstsein in der Bev&ouml;lkerung w&auml;chst stetig.'],
+                ['die Naturkatastrophe', 'природная катастрофа', 'Наводнения, пожары, ураганы &mdash; и их всё больше из-за климата', 'Durch den Klimawandel nehmen Naturkatastrophen weltweit zu.']
             ],
             'c1:umwelt': [
-                ['die Nachhaltigkeit', 'устойчивость', 'Nachhaltigkeit ist das Leitprinzip unserer Zeit.'],
-                ['der &ouml;kologische Fu&szlig;abdruck', 'экологический след', 'Jeder sollte seinen &ouml;kologischen Fu&szlig;abdruck verringern.'],
-                ['die Klimaneutralit&auml;t', 'климатическая нейтральность', 'Deutschland strebt Klimaneutralit&auml;t bis 2045 an.'],
-                ['die Artenvielfalt', 'биоразнообразие', 'Die Artenvielfalt schwindet dramatisch.'],
-                ['die Generationengerechtigkeit', 'справедливость между поколениями', 'Es geht um Generationengerechtigkeit.'],
-                ['ressourcenschonend', 'сберегающий ресурсы', 'Wir m&uuml;ssen ressourcenschonend handeln.'],
-                ['gravierende Folgen', 'серьёзные последствия', 'Die gravierenden Folgen sind nicht mehr zu leugnen.'],
-                ['die Energiewende', 'энергетический переход', 'Die Energiewende ist in vollem Gange.'],
-                ['den CO&#8322;-Aussto&szlig; senken', 'снижать выбросы CO&#8322;', 'Wir m&uuml;ssen den CO&#8322;-Aussto&szlig; drastisch senken.'],
-                ['die Verantwortung &uuml;bernehmen', 'брать на себя ответственность', 'Jeder muss Verantwortung f&uuml;r die Umwelt &uuml;bernehmen.'],
-                ['die Kreislaufwirtschaft', 'циркулярная экономика', 'Die Kreislaufwirtschaft vermeidet Abf&auml;lle.'],
-                ['die Dekarbonisierung', 'декарбонизация', 'Die Dekarbonisierung der Industrie ist notwendig.'],
-                ['die Emissionen', 'выбросы', 'Die Emissionen m&uuml;ssen bis 2030 halbiert werden.'],
-                ['die Biodiversit&auml;t', 'биоразнообразие', 'Der Schutz der Biodiversit&auml;t ist essenziell.'],
-                ['zugrunde liegen', 'лежать в основе', 'Dem Problem liegen komplexe Ursachen zugrunde.']
+                ['die Biodiversit&auml;t', 'биоразнообразие', 'Разнообразие видов жизни &mdash; чем больше разных видов, тем здоровее экосистема', 'Der Schutz der Biodiversit&auml;t ist f&uuml;r das &Ouml;kosystem essenziell.'],
+                ['das Artensterben', 'вымирание видов', 'Виды животных и растений исчезают навсегда &mdash; из-за человека', 'Das Artensterben beschleunigt sich weltweit in alarmierendem Tempo.'],
+                ['die Dekarbonisierung', 'декарбонизация', 'Переход от угля и нефти к чистой энергии &mdash; убрать углерод из экономики', 'Die Dekarbonisierung der Industrie ist eine zentrale Aufgabe.'],
+                ['unvermeidlich', 'неизбежный', 'Того, чего уже не избежать &mdash; некоторые последствия не отменить', 'Einige Folgen des Klimawandels sind mittlerweile unvermeidlich.'],
+                ['die Klimaneutralit&auml;t', 'климатическая нейтральность', 'Когда страна выбрасывает ровно столько CO&#8322;, сколько поглощает', 'Deutschland strebt Klimaneutralit&auml;t bis zum Jahr 2045 an.'],
+                ['der &ouml;kologische Fu&szlig;abdruck', 'экологический след', 'Сколько ресурсов Земли ты лично тратишь &mdash; чем меньше, тем лучше', 'Jeder sollte seinen &ouml;kologischen Fu&szlig;abdruck kennen und verringern.'],
+                ['die Nachhaltigkeit', 'устойчивость', 'Принцип: живи так, чтобы и внуки могли жить нормально', 'Nachhaltigkeit ist das zentrale Leitprinzip unserer Zeit.'],
+                ['die Kreislaufwirtschaft', 'циркулярная экономика', 'Вместо &laquo;использовал-выбросил&raquo; &mdash; переработка и повторное использование', 'Die Kreislaufwirtschaft reduziert Abf&auml;lle und schont Ressourcen.'],
+                ['ressourcenschonend', 'бережный к ресурсам', 'Использовать как можно меньше, не тратить лишнего', 'Wir m&uuml;ssen lernen, ressourcenschonend zu wirtschaften.'],
+                ['die Energiewende', 'энергетический переход', 'Переход страны от угля и газа на ветер и солнце', 'Die Energiewende ist in Deutschland politisch beschlossene Sache.'],
+                ['gravierende Folgen', 'серьёзные последствия', 'Не мелочи, а реально тяжёлые последствия &mdash; засухи, голод, миграция', 'Die gravierenden Folgen des Klimawandels betreffen alle Kontinente.'],
+                ['die Generationengerechtigkeit', 'справедливость между поколениями', 'Идея, что мы не должны забирать у будущих поколений их ресурсы', 'Beim Klimaschutz geht es auch um Generationengerechtigkeit.']
             ],
 
             // ===== GESELLSCHAFT =====
             'b1:gesellschaft': [
-                ['die Freundschaft', 'дружба', 'Freundschaft ist mir sehr wichtig.'],
-                ['sich streiten', 'ссориться', 'Wir streiten uns selten.'],
-                ['sich vertragen', 'мириться', 'Nach dem Streit haben sie sich wieder vertragen.'],
-                ['das Vertrauen', 'доверие', 'Ohne Vertrauen gibt es keine Freundschaft.'],
-                ['ehrlich', 'честный', 'Ein echter Freund ist ehrlich zu dir.'],
-                ['jemandem helfen', 'помогать кому-то', 'Echte Freunde helfen einander.'],
-                ['unterst&uuml;tzen', 'поддерживать', 'Meine Familie unterst&uuml;tzt mich immer.'],
-                ['respektieren', 'уважать', 'Wir sollen andere Meinungen respektieren.'],
-                ['die Meinung sagen', 'высказать мнение', 'Jeder darf seine Meinung sagen.'],
-                ['zusammenhalten', 'держаться вместе', 'In der Klasse halten wir zusammen.'],
-                ['gerecht', 'справедливый', 'Das ist nicht gerecht!'],
-                ['gemein', 'подлый, злой', 'Das war ein gemeiner Kommentar.'],
-                ['sich entschuldigen', 'извиняться', 'Er hat sich bei ihr entschuldigt.'],
-                ['h&ouml;flich', 'вежливый', 'Sei immer h&ouml;flich zu anderen.'],
-                ['r&uuml;cksichtsvoll', 'тактичный', 'Sie ist sehr r&uuml;cksichtsvoll gegen&uuml;ber anderen.']
+                ['die Verantwortung', 'ответственность', 'Когда ты отвечаешь за что-то &mdash; за свои поступки, за других людей', 'Jeder Mensch tr&auml;gt Verantwortung f&uuml;r sein Handeln.'],
+                ['beeinflussen', 'влиять', 'Менять чьё-то мнение или поведение &mdash; реклама влияет, друзья влияют', 'Soziale Medien beeinflussen das Verhalten der Jugendlichen.'],
+                ['die Meinung vertreten', 'отстаивать мнение', 'Не просто думать &mdash; а открыто говорить и защищать свою позицию', 'In einer Demokratie darf jeder seine Meinung frei vertreten.'],
+                ['sich anpassen', 'приспосабливаться', 'Менять поведение, чтобы подходить под окружение &mdash; новая школа, новые правила', 'In einer neuen Gruppe muss man sich zun&auml;chst anpassen.'],
+                ['ablehnen', 'отклонять, отказывать', 'Сказать &laquo;нет&raquo; &mdash; не согласиться на предложение или идею', 'Sie lehnte das Angebot h&ouml;flich, aber bestimmt ab.'],
+                ['respektieren', 'уважать', 'Принимать другого таким, какой он есть &mdash; даже если не согласен', 'Wir sollten die Meinung anderer Menschen respektieren.'],
+                ['unterst&uuml;tzen', 'поддерживать', 'Помогать кому-то &mdash; словом, делом или просто быть рядом', 'Freunde unterst&uuml;tzen sich gegenseitig in schwierigen Zeiten.'],
+                ['zusammenhalten', 'держаться вместе', 'Не бросать друг друга &mdash; стоять друг за друга как команда', 'In schwierigen Zeiten m&uuml;ssen wir als Gesellschaft zusammenhalten.'],
+                ['das Vertrauen', 'доверие', 'Когда ты веришь другому человеку &mdash; основа любых отношений', 'Vertrauen ist die Grundlage jeder guten Beziehung.'],
+                ['ehrlich', 'честный', 'Говорить правду, не врать &mdash; даже когда это неприятно', 'Ein ehrliches Gespr&auml;ch kann viele Probleme l&ouml;sen.'],
+                ['sich entschuldigen', 'извиняться', 'Признать, что был неправ, и сказать &laquo;прости&raquo;', 'Nach dem Streit hat er sich aufrichtig bei ihr entschuldigt.'],
+                ['r&uuml;cksichtsvoll', 'тактичный', 'Думать о чувствах других &mdash; не шуметь, когда кто-то спит', 'Sie ist immer r&uuml;cksichtsvoll gegen&uuml;ber ihren Mitsch&uuml;lern.']
             ],
             'b2:gesellschaft': [
-                ['soziale Medien', 'соцсети', 'Soziale Medien beeinflussen die Jugend stark.'],
-                ['der Einfluss', 'влияние', 'Der Einfluss von Influencern w&auml;chst st&auml;ndig.'],
-                ['das Mobbing', 'травля', 'Mobbing an Schulen ist ein ernstes Problem.'],
-                ['sich einsetzen f&uuml;r', 'выступать за', 'Viele Jugendliche setzen sich f&uuml;r das Klima ein.'],
-                ['die Meinungsfreiheit', 'свобода слова', 'Meinungsfreiheit ist ein Grundrecht.'],
-                ['der Zusammenhalt', 'сплочённость', 'Der Zusammenhalt in der Gesellschaft l&auml;sst nach.'],
-                ['das Vorurteil', 'предрассудок', 'Vorurteile entstehen durch Unwissenheit.'],
-                ['engagiert', 'активный, вовлечённый', 'Sie ist politisch sehr engagiert.'],
-                ['die Verantwortung tragen', 'нести ответственность', 'Eltern tragen gro&szlig;e Verantwortung.'],
-                ['im Gegensatz zu', 'в отличие от', 'Im Gegensatz zu fr&uuml;her sind wir heute vernetzter.'],
-                ['die Gleichberechtigung', 'равноправие', 'Gleichberechtigung ist ein Grundrecht.'],
-                ['die Diskriminierung', 'дискриминация', 'Diskriminierung darf nicht geduldet werden.'],
-                ['die Generation', 'поколение', 'Jede Generation hat ihre eigenen Werte.'],
-                ['der Konflikt', 'конфликт', 'Konflikte kann man friedlich l&ouml;sen.'],
-                ['die Zivilcourage', 'гражданская смелость', 'Zivilcourage zu zeigen erfordert Mut.']
+                ['die Chancengleichheit', 'равенство возможностей', 'Идея, что у каждого одинаковые шансы &mdash; бедный или богатый, мигрант или нет', 'Wahre Chancengleichheit in der Gesellschaft bleibt ein unerreichtes Ziel.'],
+                ['die Benachteiligung', 'ущемление', 'Когда одни получают меньше возможностей из-за происхождения или пола', 'Die Benachteiligung von Minderheiten ist ein bekanntes gesellschaftliches Problem.'],
+                ['pr&auml;gen', 'формировать', 'Оставлять глубокий след &mdash; детство формирует характер', 'Die Erfahrungen in der Kindheit pr&auml;gen den Charakter eines Menschen.'],
+                ['die Herausforderung', 'вызов', 'Сложная задача, с которой надо справиться &mdash; не невозможно, но трудно', 'Die Integration von Migranten bleibt eine gesellschaftliche Herausforderung.'],
+                ['hinterfragen', 'ставить под сомнение', 'Не просто спрашивать, а сомневаться &mdash; &laquo;а точно ли это правильно?&raquo;', 'Der Autor hinterfragt die Rolle der Medien in der Gesellschaft.'],
+                ['sich einsetzen f&uuml;r', 'выступать за', 'Активно бороться за что-то &mdash; за права, за экологию', 'Viele Jugendliche setzen sich aktiv f&uuml;r den Klimaschutz ein.'],
+                ['das Vorurteil', 'предрассудок', 'Мнение о ком-то ДО того, как ты узнал этого человека', 'Vorurteile gegen&uuml;ber Fremden entstehen oft durch Unwissenheit.'],
+                ['das Mobbing', 'травля, буллинг', 'Систематическое издевательство над кем-то &mdash; в школе, в интернете', 'Mobbing an Schulen ist ein ernstes Problem, das alle betrifft.'],
+                ['der Zusammenhalt', 'сплочённость', 'Когда люди в обществе стоят друг за друга &mdash; не расколоты', 'Der gesellschaftliche Zusammenhalt wird durch Krisen oft gest&auml;rkt.'],
+                ['engagiert', 'активный', 'Не просто сидишь &mdash; реально делаешь что-то полезное для общества', 'Sie ist ehrenamtlich sehr engagiert und hilft in der Gemeinde.'],
+                ['die Gleichberechtigung', 'равноправие', 'Одинаковые права для всех &mdash; мужчин и женщин, всех национальностей', 'Gleichberechtigung von Mann und Frau ist ein grundlegendes Menschenrecht.'],
+                ['die Diskriminierung', 'дискриминация', 'Когда к тебе относятся хуже из-за цвета кожи, пола или религии', 'Diskriminierung in jeder Form darf nicht geduldet werden.']
             ],
             'c1:gesellschaft': [
-                ['der gesellschaftliche Wandel', 'общественные перемены', 'Der gesellschaftliche Wandel vollzieht sich rasant.'],
-                ['die Polarisierung', 'поляризация', 'Die Polarisierung der Gesellschaft nimmt zu.'],
-                ['die Integration', 'интеграция', 'Integration ist ein wechselseitiger Prozess.'],
-                ['der soziale Zusammenhalt', 'социальная сплочённость', 'Der soziale Zusammenhalt ist bedroht.'],
-                ['das Engagement', 'активная гражданская позиция', 'Ihr Engagement ist vorbildlich.'],
-                ['marginalisiert', 'маргинализированный', 'Marginalisierte Gruppen brauchen mehr Unterst&uuml;tzung.'],
-                ['infolgedessen', 'вследствие этого', 'Infolgedessen kam es zu hitzigen Debatten.'],
-                ['zugrunde liegen', 'лежать в основе', 'Dem Konflikt liegen tiefere Ursachen zugrunde.'],
-                ['die Schlussfolgerung ziehen', 'делать вывод', 'Daraus l&auml;sst sich folgende Schlussfolgerung ziehen.'],
-                ['verdeutlichen', 'пояснять', 'Der Autor verdeutlicht seine These mit Beispielen.'],
-                ['die Partizipation', 'участие', 'Politische Partizipation ist Grundlage der Demokratie.'],
-                ['die Koh&auml;sion', 'сплочённость', 'Die soziale Koh&auml;sion schwindet zunehmend.'],
-                ['der Diskurs', 'дискурс', 'Der &ouml;ffentliche Diskurs wird zunehmend emotionaler.'],
-                ['die Segregation', 'сегрегация', 'Soziale Segregation verst&auml;rkt die Ungleichheit.'],
-                ['der Wertekonflikt', 'конфликт ценностей', 'Der Wertekonflikt zwischen den Generationen w&auml;chst.']
+                ['die Marginalisierung', 'маргинализация', 'Когда группу людей выталкивают на обочину общества &mdash; их голос не слышен', 'Die Marginalisierung bestimmter Gruppen verst&auml;rkt die soziale Ungleichheit.'],
+                ['die Diskrepanz', 'несоответствие', 'Разрыв между тем, что должно быть, и тем, что есть на самом деле', 'Die Diskrepanz zwischen Arm und Reich w&auml;chst in vielen L&auml;ndern.'],
+                ['infolgedessen', 'вследствие этого', 'Из-за этого, в результате &mdash; крутое слово для ZP-сочинений!', 'Die Arbeitslosigkeit stieg; infolgedessen nahm auch die Armut zu.'],
+                ['zugrunde liegen', 'лежать в основе', 'Быть настоящей причиной &mdash; то, что на самом деле стоит за проблемой', 'Dem Konflikt liegen tiefere soziale Ursachen zugrunde.'],
+                ['die Schlussfolgerung', 'вывод', 'Итог, к которому приходишь после анализа &mdash; &laquo;из всего этого следует, что...&raquo;', 'Aus den Daten l&auml;sst sich folgende Schlussfolgerung ziehen.'],
+                ['die Polarisierung', 'поляризация', 'Общество раскалывается на два лагеря &mdash; &laquo;за&raquo; и &laquo;против&raquo;, без середины', 'Die politische Polarisierung der Gesellschaft nimmt deutlich zu.'],
+                ['der gesellschaftliche Wandel', 'общественные перемены', 'Когда общество меняется &mdash; новые ценности, технологии, образ жизни', 'Der gesellschaftliche Wandel vollzieht sich immer schneller.'],
+                ['verdeutlichen', 'наглядно показывать', 'Сделать что-то понятным &mdash; автор поясняет свою мысль примером', 'Der Autor verdeutlicht seine zentrale These anhand konkreter Beispiele.'],
+                ['die Partizipation', 'участие', 'Когда люди реально участвуют в жизни общества &mdash; голосуют, действуют', 'Politische Partizipation ist eine Grundlage der Demokratie.'],
+                ['der Diskurs', 'дискурс', 'Публичное обсуждение важной темы &mdash; в СМИ, в политике', 'Der &ouml;ffentliche Diskurs &uuml;ber Migration wird zunehmend emotional gef&uuml;hrt.'],
+                ['die Koh&auml;sion', 'сплочённость', 'Внутренняя связь общества &mdash; ощущение &laquo;мы вместе&raquo;', 'Die soziale Koh&auml;sion in vielen Gesellschaften schwindet.'],
+                ['der Wertekonflikt', 'конфликт ценностей', 'Когда у разных групп разные ценности и они сталкиваются', 'Der Wertekonflikt zwischen den Generationen pr&auml;gt die aktuelle Debatte.']
             ]
         };
 
@@ -614,7 +587,8 @@
                     '</div>' +
                     '<div class="card-back">' +
                         '<div class="translation">' + item[1] + '</div>' +
-                        '<div class="example">\u00ab' + item[2] + '\u00bb</div>' +
+                        '<div class="explanation">' + item[2] + '</div>' +
+                        '<div class="example">\u00ab' + item[3] + '\u00bb</div>' +
                         '<span class="back-level">' + lvl + '</span>' +
                     '</div>' +
                 '</div>';
