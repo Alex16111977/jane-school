@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Vocabulary | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== LEVEL SELECTOR ===== */
+        .level-tabs {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0 1.5rem;
+            flex-wrap: wrap;
+        }
+        .level-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 1.1rem 1.2rem;
+            border-radius: 14px;
+            background: rgba(13, 17, 23, 0.75);
+            backdrop-filter: blur(6px);
+            border: 2px solid transparent;
+            color: var(--color-text);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .level-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .level-btn:hover { transform: translateY(-2px); }
+
+        /* B1 blue */
+        .level-btn[data-level="b1"] { border-color: rgba(68, 147, 248, 0.3); }
+        .level-btn[data-level="b1"]::before { background: linear-gradient(135deg, rgba(68, 147, 248, 0.12), transparent); }
+        .level-btn[data-level="b1"]:hover { border-color: rgba(68, 147, 248, 0.6); }
+        .level-btn[data-level="b1"].active {
+            border-color: #4493f8;
+            background: linear-gradient(135deg, rgba(68, 147, 248, 0.25), rgba(68, 147, 248, 0.08));
+            box-shadow: 0 4px 24px rgba(68, 147, 248, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .level-btn[data-level="b1"].active::before { opacity: 1; }
+
+        /* B2 purple */
+        .level-btn[data-level="b2"] { border-color: rgba(163, 113, 247, 0.3); }
+        .level-btn[data-level="b2"]::before { background: linear-gradient(135deg, rgba(163, 113, 247, 0.12), transparent); }
+        .level-btn[data-level="b2"]:hover { border-color: rgba(163, 113, 247, 0.6); }
+        .level-btn[data-level="b2"].active {
+            border-color: #a371f7;
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.25), rgba(163, 113, 247, 0.08));
+            box-shadow: 0 4px 24px rgba(163, 113, 247, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .level-btn[data-level="b2"].active::before { opacity: 1; }
+
+        /* C1 gold */
+        .level-btn[data-level="c1"] { border-color: rgba(210, 153, 34, 0.3); }
+        .level-btn[data-level="c1"]::before { background: linear-gradient(135deg, rgba(210, 153, 34, 0.12), transparent); }
+        .level-btn[data-level="c1"]:hover { border-color: rgba(210, 153, 34, 0.6); }
+        .level-btn[data-level="c1"].active {
+            border-color: #d29922;
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.25), rgba(210, 153, 34, 0.08));
+            box-shadow: 0 4px 24px rgba(210, 153, 34, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .level-btn[data-level="c1"].active::before { opacity: 1; }
+
+        .level-btn .level-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .level-btn[data-level="b1"] .level-badge { background: rgba(68, 147, 248, 0.2); color: #79b8ff; }
+        .level-btn[data-level="b2"] .level-badge { background: rgba(163, 113, 247, 0.2); color: #c8a5ff; }
+        .level-btn[data-level="c1"] .level-badge { background: rgba(210, 153, 34, 0.2); color: #e3b341; }
+        .level-btn.active .level-badge { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .level-btn small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.78rem;
+            opacity: 0.65;
+            margin-top: 0.35rem;
+        }
+
+        /* ===== TOPIC PILLS ===== */
+        .topic-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0 0 1.5rem;
+        }
+        .topic-pill {
+            padding: 0.55rem 1.2rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-text-secondary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .topic-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--color-text);
+        }
+        .topic-pill.active {
+            background: rgba(68, 147, 248, 0.12);
+            border-color: rgba(68, 147, 248, 0.4);
+            color: #fff;
+        }
+        body.level-b2 .topic-pill.active {
+            background: rgba(163, 113, 247, 0.12);
+            border-color: rgba(163, 113, 247, 0.4);
+        }
+        body.level-c1 .topic-pill.active {
+            background: rgba(210, 153, 34, 0.12);
+            border-color: rgba(210, 153, 34, 0.4);
+        }
+
+        /* ===== WORD COUNT ===== */
+        .vocab-count-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .vocab-count-bar .count-num {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* ===== VOCAB CARD GRID ===== */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.7rem;
+        }
+
+        /* ===== VOCAB CARD ===== */
+        .vocab-card {
+            position: relative;
+            min-height: 130px;
+            border-radius: 14px;
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            overflow: hidden;
+            perspective: 600px;
+        }
+        .vocab-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+        .vocab-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 14px 0 0 14px;
+        }
+        body.level-b1 .vocab-card::before { background: #4493f8; }
+        body.level-b2 .vocab-card::before { background: #a371f7; }
+        body.level-c1 .vocab-card::before { background: #d29922; }
+
+        .vocab-card .flip-icon {
+            position: absolute;
+            top: 0.6rem; right: 0.7rem;
+            font-size: 0.8rem;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+        }
+        .vocab-card:hover .flip-icon { opacity: 0.6; }
+        .vocab-card.flipped .flip-icon { opacity: 0; }
+
+        .vocab-card .card-front {
+            padding: 1.2rem 1.2rem 1rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 130px;
+        }
+        .vocab-card .card-front .word-main {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .vocab-card .card-back {
+            display: none;
+            padding: 1.1rem 1.1rem 0.9rem 1.3rem;
+            min-height: 160px;
+        }
+        .vocab-card.flipped .card-front { display: none; }
+        .vocab-card.flipped .card-back { display: flex; flex-direction: column; justify-content: center; }
+
+        .vocab-card .card-back .translation {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        body.level-b1 .vocab-card .card-back .translation { color: #79b8ff; }
+        body.level-b2 .vocab-card .card-back .translation { color: #c8a5ff; }
+        body.level-c1 .vocab-card .card-back .translation { color: #e3b341; }
+
+        .vocab-card .card-back .explanation {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+            margin-top: 0.4rem;
+        }
+        .vocab-card .card-back .example {
+            font-size: 0.78rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.45;
+        }
+        .vocab-card .card-back .back-level {
+            display: inline-block;
+            margin-top: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+        body.level-b1 .back-level { background: rgba(68, 147, 248, 0.15); color: #79b8ff; }
+        body.level-b2 .back-level { background: rgba(163, 113, 247, 0.15); color: #c8a5ff; }
+        body.level-c1 .back-level { background: rgba(210, 153, 34, 0.15); color: #e3b341; }
+
+        .vocab-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 4px; right: 0;
+            height: 1px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        body.level-b1 .vocab-card::after { background: linear-gradient(90deg, rgba(68,147,248,0.5), transparent); }
+        body.level-b2 .vocab-card::after { background: linear-gradient(90deg, rgba(163,113,247,0.5), transparent); }
+        body.level-c1 .vocab-card::after { background: linear-gradient(90deg, rgba(210,153,34,0.5), transparent); }
+        .vocab-card:hover::after { opacity: 1; }
+
+        .section-label {
+            color: var(--color-text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.6rem;
+        }
+
+        @media (max-width: 600px) {
+            .level-btn { padding: 0.8rem 0.6rem; font-size: 0.95rem; }
+            .vocab-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .vocab-card .card-front { padding: 1rem 0.8rem 0.8rem 1rem; min-height: 100px; }
+            .vocab-card .card-back { padding: 1rem 0.8rem 0.8rem 1rem; min-height: 100px; }
+            .vocab-card .card-front .word-main { font-size: 1rem; }
+        }
+        @media (max-width: 380px) {
+            .vocab-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image level-b1" style="background: #0a0a14">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Vocabulary</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>English Vocabulary</h1>
+            <p class="page-subtitle">ZP 10 W&ouml;rter &mdash; klicke auf die Karte f&uuml;r die &Uuml;bersetzung &amp; Erkl&auml;rung</p>
+        </div>
+
+        <!-- Niveau -->
+        <p class="section-label">Level</p>
+        <div class="level-tabs">
+            <button class="level-btn active" data-level="b1">
+                <span class="level-badge">B1</span>
+                <small>Basiswortschatz</small>
+            </button>
+            <button class="level-btn" data-level="b2">
+                <span class="level-badge">B2</span>
+                <small>Texte &amp; Analyse</small>
+            </button>
+            <button class="level-btn" data-level="c1">
+                <span class="level-badge">C1</span>
+                <small>Akademisch</small>
+            </button>
+        </div>
+
+        <!-- Thema -->
+        <p class="section-label">Topic</p>
+        <div class="topic-pills">
+            <button class="topic-pill active" data-topic="connectors">Connectors</button>
+            <button class="topic-pill" data-topic="everyday">Everyday Life</button>
+            <button class="topic-pill" data-topic="environment">Environment</button>
+            <button class="topic-pill" data-topic="media">Media &amp; Technology</button>
+            <button class="topic-pill" data-topic="school">School &amp; Future</button>
+        </div>
+
+        <!-- Word count -->
+        <div class="vocab-count-bar">
+            <span id="vocab-icon">&#x1F517;</span>
+            <span id="vocab-title" style="color:#fff; font-weight:600;"></span>
+            <span>&middot;</span>
+            <span id="vocab-count"></span>
+        </div>
+
+        <!-- Cards -->
+        <div class="vocab-grid" id="vocab-grid"></div>
+
+        <div style="height: 3rem;"></div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        // ===== English Vocabulary Data =====
+        // Format: [English word/phrase, переклад, пояснення українською, example sentence]
+        const VOCAB = {
+
+            // ===== CONNECTORS (linking words for Writing) =====
+            'b1:connectors': [
+                ['however', 'однак, проте', 'Коли хочеш сказати щось протилежне попередньому. Ставиш на початок речення + кома', 'The test was difficult. However, most students passed it.'],
+                ['therefore', 'тому, отже', 'Показує результат або висновок з попереднього речення', 'She studied hard. Therefore, she got a good grade.'],
+                ['although', 'хоча', 'На початку речення &mdash; вводить факт, який здається протиріччям', 'Although it was raining, we went for a walk.'],
+                ['because', 'тому що', 'Пояснює причину. Стоїть перед причиною в реченні', 'I stayed home because I was feeling sick.'],
+                ['for example', 'наприклад', 'Коли наводиш конкретний приклад до свого аргументу', 'Many countries face pollution. For example, India has severe air quality problems.'],
+                ['in addition', 'крім того, на додаток', 'Додаєш ще один аргумент до вже сказаного', 'The hotel was expensive. In addition, the service was terrible.'],
+                ['on the other hand', 'з іншого боку', 'Показуєш протилежну точку зору &mdash; дуже корисно в Writing!', 'Social media connects people. On the other hand, it can cause addiction.'],
+                ['firstly / secondly / finally', 'по-перше / по-друге / нарешті', 'Структурує твої аргументи &mdash; обовʼязково використовуй у Writing!', 'Firstly, sport keeps you healthy. Secondly, it reduces stress. Finally, it is fun.'],
+                ['in my opinion', 'на мою думку', 'Коли висловлюєш свою точку зору. Часто треба в Writing ZP', 'In my opinion, school uniforms are a good idea.'],
+                ['as a result', 'як результат, внаслідок', 'Показує наслідок попередньої дії або ситуації', 'He missed many lessons. As a result, he failed the exam.'],
+                ['moreover', 'більше того, до того ж', 'Додаєш сильніший аргумент до попереднього', 'The food was delicious. Moreover, the prices were very low.'],
+                ['in conclusion', 'на завершення, підсумовуючи', 'Використовуй у кінці тексту, щоб підвести підсумок', 'In conclusion, technology has both advantages and disadvantages.']
+            ],
+            'b2:connectors': [
+                ['nevertheless', 'тим не менш', 'Як however, але більш офіційне. Означає &laquo;незважаючи на це&raquo;', 'The plan had flaws. Nevertheless, they decided to go ahead with it.'],
+                ['furthermore', 'крім того, більш того', 'Як moreover, але ще офіційніше. Додає вагомий аргумент', 'The project saves money. Furthermore, it creates new jobs.'],
+                ['whereas', 'тоді як, в той час як', 'Протиставляє дві різні ситуації в одному реченні', 'Some students prefer working alone, whereas others enjoy group work.'],
+                ['despite / in spite of', 'незважаючи на', 'Після них йде іменник або -ing форма (НЕ речення!)', 'Despite the rain, the event was a huge success.'],
+                ['consequently', 'внаслідок цього, отже', 'Офіційний спосіб показати результат або наслідок', 'The company cut costs. Consequently, many people lost their jobs.'],
+                ['on the one hand... on the other hand', 'з одного боку... з іншого', 'Ідеальна конструкція для показу двох сторін проблеми в есе', 'On the one hand, cars are convenient. On the other hand, they pollute the air.'],
+                ['due to', 'через, завдяки, внаслідок', 'Показує причину. Після due to йде іменник, не речення', 'The match was cancelled due to heavy rain.'],
+                ['in contrast', 'на противагу, навпаки', 'Протиставляє два факти або ситуації', 'Life in the city is fast. In contrast, the countryside is peaceful.'],
+                ['as long as', 'доки, за умови що', 'Ставить умову &mdash; &laquo;це буде так, ЯКЩО виконається ось це&raquo;', 'You can go out as long as you finish your homework first.'],
+                ['to sum up', 'підсумовуючи', 'Офіційніший варіант in conclusion для закінчення тексту', 'To sum up, both options have their pros and cons.'],
+                ['not only... but also', 'не тільки... але й', 'Підсилює аргумент &mdash; &laquo;це ще не все, є й інше!&raquo;', 'She is not only intelligent but also very creative.'],
+                ['even though', 'навіть попри те, що', 'Сильніше за although &mdash; підкреслює несподіваність', 'Even though he was tired, he kept studying until midnight.']
+            ],
+            'c1:connectors': [
+                ['notwithstanding', 'незважаючи на', 'Дуже офіційне слово. Як despite, але академічніше', 'Notwithstanding the criticism, the law was passed.'],
+                ['hence', 'звідси, тому', 'Формальний варіант therefore. Часто в академічних текстах', 'Costs have risen sharply; hence, prices will increase.'],
+                ['provided that', 'за умови, що', 'Офіційний спосіб поставити умову &mdash; як if, але формальніше', 'You may leave early, provided that you finish all your work.'],
+                ['with regard to', 'стосовно, щодо', 'Коли переходиш до нової теми або аспекту проблеми', 'With regard to education, the government has announced new reforms.'],
+                ['it is worth noting that', 'варто зазначити, що', 'Привертає увагу до важливого факту &mdash; круто для есе', 'It is worth noting that the results vary across different age groups.'],
+                ['in light of', 'з огляду на, у світлі', 'Враховуючи певну інформацію або обставини', 'In light of recent events, the policy has been updated.'],
+                ['be that as it may', 'хай там як', 'Визнаєш факт, але далі кажеш &laquo;але це не змінює мою думку&raquo;', 'The project is expensive. Be that as it may, the benefits outweigh the costs.'],
+                ['thereby', 'тим самим, завдяки чому', 'Показує, як одна дія призводить до іншої', 'They reduced waste, thereby saving money and protecting the environment.'],
+                ['insofar as', 'настільки, наскільки', 'Обмежує твердження &mdash; &laquo;це правда, але тільки в певному сенсі&raquo;', 'The theory is useful insofar as it explains basic patterns.'],
+                ['all things considered', 'враховуючи все', 'Підсумок з урахуванням усіх аргументів &mdash; ідеально для висновку', 'All things considered, the advantages of remote work outweigh the drawbacks.'],
+                ['admittedly', 'треба визнати', 'Визнаєш щось на користь протилежної сторони перед своїм аргументом', 'Admittedly, the old system was cheaper. However, it was far less efficient.'],
+                ['by the same token', 'з тієї ж причини', 'Додає аргумент, що слідує з тієї ж логіки', 'We expect students to be punctual. By the same token, teachers should set an example.']
+            ],
+
+            // ===== EVERYDAY LIFE =====
+            'b1:everyday': [
+                ['to afford', 'дозволити собі (фінансово)', 'Коли маєш достатньо грошей на щось. Часто з can/canʼt', 'Many families cannot afford to go on holiday every year.'],
+                ['neighbourhood', 'район, сусідство', 'Місце, де ти живеш, і люди навколо тебе', 'Our neighbourhood is quiet and safe for children.'],
+                ['to complain', 'скаржитись', 'Говорити, що тобі щось не подобається, що щось погано', 'Customers often complain about the long waiting times.'],
+                ['convenient', 'зручний', 'Коли щось легко використовувати або підходить за часом/місцем', 'Online shopping is very convenient for busy people.'],
+                ['responsibility', 'відповідальність', 'Обовʼязок щось робити або за щось відповідати', 'It is our responsibility to protect the environment.'],
+                ['to support', 'підтримувати', 'Допомагати комусь &mdash; словом, грошима, присутністю', 'Friends should support each other in difficult times.'],
+                ['experience', 'досвід / переживання', 'Те, що ти пережив або навчився за життя', 'Travelling gives you new experiences and broadens your mind.'],
+                ['to improve', 'покращувати', 'Робити щось кращим, ніж було раніше', 'She wants to improve her English before the exam.'],
+                ['advantage / disadvantage', 'перевага / недолік', 'Плюс і мінус чогось. Дуже часте слово в Writing!', 'One advantage of city life is public transport. A disadvantage is the noise.'],
+                ['to avoid', 'уникати', 'Не робити чогось навмисно, обходити стороною', 'You should avoid eating too much sugar.'],
+                ['opportunity', 'можливість, шанс', 'Хороша нагода зробити щось корисне', 'University gives you the opportunity to meet new people.'],
+                ['behaviour', 'поведінка', 'Як людина себе поводить &mdash; добре чи погано', 'His behaviour in class has improved a lot this year.']
+            ],
+            'b2:everyday': [
+                ['to cope with', 'справлятися з', 'Впоратися з трудною ситуацією, не здатися', 'Teenagers often struggle to cope with exam stress.'],
+                ['to rely on', 'покладатися на', 'Довіряти комусь або чомусь, залежати від', 'You canʼt always rely on your parents to solve your problems.'],
+                ['a drawback', 'недолік, мінус', 'Офіційніший варіант disadvantage. Часто в текстах ZP', 'A major drawback of social media is cyberbullying.'],
+                ['to take into account', 'враховувати, брати до уваги', 'Думати про щось при прийнятті рішення', 'We must take into account the needs of all students.'],
+                ['to be aware of', 'усвідомлювати, бути в курсі', 'Знати про існування чогось, розуміти', 'Many people are not aware of the dangers of fast food.'],
+                ['to have an impact on', 'мати вплив на', 'Впливати на щось &mdash; позитивно або негативно', 'Social media has a huge impact on young peopleʼs self-esteem.'],
+                ['significant', 'значний, суттєвий', 'Важливий, великий за масштабом або значенням', 'There has been a significant increase in online learning.'],
+                ['to contribute to', 'сприяти, робити внесок', 'Бути частиною причини або допомагати чомусь', 'Exercise contributes to better mental health.'],
+                ['current', 'поточний, нинішній', 'Те, що відбувається зараз, сучасний стан речей', 'The current situation is very different from ten years ago.'],
+                ['to deal with', 'мати справу з, вирішувати', 'Працювати над проблемою або ситуацією', 'Schools must deal with bullying more seriously.'],
+                ['issue', 'проблема, питання', 'Важлива тема або проблема, яку обговорюють', 'Climate change is one of the biggest issues of our time.'],
+                ['to encourage', 'заохочувати, підтримувати', 'Мотивувати когось робити щось хороше', 'Teachers should encourage students to read more books.']
+            ],
+            'c1:everyday': [
+                ['to encompass', 'охоплювати, включати', 'Містити в собі багато різних частин або аспектів', 'The study encompasses a wide range of social factors.'],
+                ['implications', 'наслідки, значення', 'Те, що може відбутися в результаті якоїсь дії або рішення', 'The implications of this policy are far-reaching.'],
+                ['to undermine', 'підривати, послаблювати', 'Поступово руйнувати або послаблювати щось', 'Fake news can undermine trust in the media.'],
+                ['to elaborate on', 'детальніше пояснити', 'Розповісти більше подробиць, розкрити тему глибше', 'Could you elaborate on your argument about education reform?'],
+                ['inherent', 'притаманний, властивий', 'Те, що є невідʼємною частиною чогось', 'There are inherent risks in any new technology.'],
+                ['to exacerbate', 'погіршувати, загострювати', 'Робити погану ситуацію ще гіршою', 'Social inequality is exacerbated by limited access to education.'],
+                ['to facilitate', 'сприяти, полегшувати', 'Робити процес простішим або можливим', 'Technology can facilitate communication between students and teachers.'],
+                ['prevalent', 'поширений, розповсюджений', 'Дуже часто зустрічається, типовий для певного часу або місця', 'Cyberbullying is prevalent among teenagers today.'],
+                ['to diminish', 'зменшуватися, послаблюватися', 'Ставати менше або слабше з часом', 'Public trust in institutions has diminished over the years.'],
+                ['to substantiate', 'підтверджувати фактами', 'Доводити щось за допомогою доказів або прикладів', 'You need to substantiate your claims with evidence.'],
+                ['to scrutinize', 'ретельно досліджувати', 'Дуже уважно вивчати, аналізувати кожну деталь', 'The report scrutinizes the effects of screen time on children.'],
+                ['to mitigate', 'помʼякшувати, зменшувати', 'Зробити щось менш серйозним або менш болючим', 'Governments must take steps to mitigate the effects of climate change.']
+            ],
+
+            // ===== ENVIRONMENT =====
+            'b1:environment': [
+                ['climate change', 'зміна клімату', 'Глобальна зміна погоди через діяльність людини &mdash; стає тепліше', 'Climate change is one of the biggest problems in the world today.'],
+                ['pollution', 'забруднення', 'Коли повітря, вода або земля стають брудними через людину', 'Air pollution in big cities is getting worse every year.'],
+                ['to protect', 'захищати', 'Берегти від шкоди &mdash; природу, тварин, ліси', 'We need to protect endangered animals from extinction.'],
+                ['renewable energy', 'відновлювальна енергія', 'Енергія від вітру, сонця, води &mdash; не закінчується', 'Many countries are investing in renewable energy sources.'],
+                ['to waste', 'марнувати, витрачати даремно', 'Використовувати більше ніж треба або викидати те, що ще можна використати', 'We waste too much food every day.'],
+                ['to recycle', 'переробляти', 'Перетворювати старі речі на нові &mdash; пластик, папір, скло', 'You should recycle plastic bottles instead of throwing them away.'],
+                ['to reduce', 'зменшувати, скорочувати', 'Використовувати менше чогось &mdash; менше пластику, менше CO2', 'We should all try to reduce our energy consumption.'],
+                ['endangered', 'вимираючий, під загрозою', 'Вид тварин або рослин, який може зникнути назавжди', 'The polar bear is an endangered species due to melting ice.'],
+                ['global warming', 'глобальне потепління', 'Температура Землі зростає через парникові гази', 'Global warming causes ice caps to melt and sea levels to rise.'],
+                ['to damage', 'пошкоджувати, шкодити', 'Завдавати шкоди чомусь &mdash; природі, здоровʼю', 'Plastic bags damage the environment and harm sea animals.'],
+                ['sustainable', 'стійкий, екологічний', 'Такий, що не шкодить планеті і вистачить для майбутніх поколінь', 'We need to find sustainable ways to produce energy.'],
+                ['carbon footprint', 'вуглецевий слід', 'Скільки CO2 ти виробляєш &mdash; через їзду на авто, їжу, покупки', 'Flying by plane increases your carbon footprint significantly.']
+            ],
+            'b2:environment': [
+                ['biodiversity', 'біорізноманіття', 'Різноманітність видів тварин і рослин у природі', 'Loss of biodiversity threatens the balance of ecosystems.'],
+                ['greenhouse gases', 'парникові гази', 'Гази (CO2, метан), які затримують тепло і нагрівають Землю', 'We must reduce greenhouse gas emissions to slow down climate change.'],
+                ['deforestation', 'вирубка лісів', 'Масове знищення лісів &mdash; для сільського господарства або будівництва', 'Deforestation in the Amazon is destroying vital habitats.'],
+                ['to emit', 'випускати, викидати', 'Випускати гази або речовини в атмосферу', 'Factories emit large amounts of carbon dioxide every day.'],
+                ['ecosystem', 'екосистема', 'Усі живі організми разом із їхнім середовищем &mdash; ліс, озеро, океан', 'Coral reefs are some of the most diverse ecosystems on Earth.'],
+                ['fossil fuels', 'викопне паливо', 'Вугілля, нафта, газ &mdash; горять і забруднюють повітря', 'We must stop relying on fossil fuels and switch to clean energy.'],
+                ['drought', 'засуха', 'Тривала відсутність дощу &mdash; гинуть рослини, немає води', 'Climate change is causing more frequent droughts in many regions.'],
+                ['to preserve', 'зберігати, оберігати', 'Підтримувати в хорошому стані, не дати зруйнуватися', 'It is important to preserve natural habitats for future generations.'],
+                ['extinction', 'вимирання', 'Коли вид тварин або рослин зникає назавжди', 'Many species are facing extinction due to human activity.'],
+                ['consumption', 'споживання', 'Скільки ми використовуємь ресурсів &mdash; енергії, їжі, води', 'Reducing consumption is key to protecting the planet.'],
+                ['emissions', 'викиди', 'Гази та речовини, що потрапляють у повітря від машин, фабрик', 'The EU aims to cut carbon emissions by 55% by 2030.'],
+                ['to deplete', 'вичерпувати, виснажувати', 'Використати щось повністю, так що нічого не залишиться', 'We are rapidly depleting the Earthʼs natural resources.']
+            ],
+            'c1:environment': [
+                ['decarbonization', 'декарбонізація', 'Перехід від вугілля та нафти до чистої енергії &mdash; прибрати вуглець з економіки', 'Decarbonization of the economy requires massive investment in green technology.'],
+                ['carbon neutrality', 'вуглецева нейтральність', 'Коли країна викидає рівно стільки CO2, скільки поглинає', 'The EU has committed to achieving carbon neutrality by 2050.'],
+                ['to offset', 'компенсувати', 'Зробити щось, щоб врівноважити негативний ефект', 'Companies try to offset their emissions by planting trees.'],
+                ['irreversible', 'незворотний', 'Те, що не можна відмінити або повернути назад', 'Some effects of climate change are already irreversible.'],
+                ['to advocate for', 'відстоювати, виступати за', 'Активно підтримувати ідею або зміни', 'Greta Thunberg advocates for immediate climate action.'],
+                ['degradation', 'деградація, погіршення', 'Поступове погіршення стану &mdash; землі, води, довкілля', 'Soil degradation is a serious threat to food production worldwide.'],
+                ['resilience', 'стійкість, здатність відновлюватися', 'Здатність відновлюватися після негативного впливу', 'Building climate resilience is essential for vulnerable communities.'],
+                ['to phase out', 'поступово відмовлятися від', 'Крок за кроком припиняти використання чогось', 'Many countries plan to phase out coal power plants by 2035.'],
+                ['the circular economy', 'циркулярна економіка', 'Замість &laquo;використав-викинув&raquo; &mdash; переробка і повторне використання', 'The circular economy aims to eliminate waste and reuse materials.'],
+                ['ecological footprint', 'екологічний слід', 'Скільки ресурсів Землі ти особисто витрачаєш', 'Wealthier nations tend to have a much larger ecological footprint.'],
+                ['to exacerbate', 'погіршувати, загострювати', 'Робити і так погану ситуацію ще гіршою', 'Urbanization exacerbates the problem of air pollution in cities.'],
+                ['intergenerational justice', 'справедливість між поколіннями', 'Ідея, що ми не маємо забирати ресурси у майбутніх поколінь', 'Climate policy must be guided by the principle of intergenerational justice.']
+            ],
+
+            // ===== MEDIA & TECHNOLOGY =====
+            'b1:media': [
+                ['social media', 'соціальні мережі', 'Instagram, TikTok, Snapchat &mdash; платформи для спілкування і контенту', 'Many teenagers spend several hours a day on social media.'],
+                ['to influence', 'впливати', 'Змінювати чиюсь думку або поведінку', 'Advertisements influence what people buy.'],
+                ['screen time', 'час перед екраном', 'Скільки годин на день ти дивишся в телефон, компʼютер, телевізор', 'Too much screen time can be harmful for your health.'],
+                ['to communicate', 'спілкуватися', 'Обмінюватися інформацією з іншими людьми', 'Technology makes it easier to communicate with friends abroad.'],
+                ['to share', 'ділитися', 'Відправляти фото, думки, новини іншим людям', 'Be careful about what you share online.'],
+                ['to access', 'мати доступ до', 'Мати можливість використовувати або дістатися до чогось', 'Not everyone can access the internet easily.'],
+                ['privacy', 'приватність, конфіденційність', 'Право людини на особисте життя без стеження', 'Social media companies often donʼt respect usersʼ privacy.'],
+                ['addiction', 'залежність', 'Коли не можеш зупинитися &mdash; від телефону, ігор, соцмереж', 'Phone addiction is becoming a serious problem among young people.'],
+                ['fake news', 'фейкові новини', 'Неправдива інформація, яку поширюють навмисно', 'It is important to check whether news is real or fake.'],
+                ['online / offline', 'в мережі / поза мережею', 'Коли підключений до інтернету або ні', 'Many people prefer to shop online rather than go to a store.'],
+                ['useful', 'корисний', 'Те, що допомагає, має практичну цінність', 'The internet is a useful tool for learning new things.'],
+                ['dangerous', 'небезпечний', 'Те, що може завдати шкоди &mdash; фізичної або емоційної', 'Sharing personal information online can be dangerous.']
+            ],
+            'b2:media': [
+                ['cyberbullying', 'кібербулінг', 'Травля через інтернет &mdash; образи, погрози, приниження в мережі', 'Cyberbullying can have devastating effects on victimsʼ mental health.'],
+                ['to manipulate', 'маніпулювати', 'Непомітно впливати на когось, щоб досягти своєї мети', 'Social media algorithms manipulate what content users see.'],
+                ['digital literacy', 'цифрова грамотність', 'Уміння критично працювати з інтернетом, відрізняти правду від фейків', 'Schools should teach digital literacy from an early age.'],
+                ['to spread', 'поширювати(ся)', 'Коли інформація швидко розходиться серед людей', 'False information can spread quickly on social media.'],
+                ['reliable', 'надійний, достовірний', 'Джерело, якому можна довіряти &mdash; перевірена інформація', 'Wikipedia is not always a reliable source of information.'],
+                ['to expose', 'піддавати впливу / викривати', 'Показувати щось приховане або піддавати когось чомусь', 'Children are exposed to violent content at a very young age.'],
+                ['to raise awareness', 'підвищувати обізнаність', 'Привертати увагу до важливої проблеми', 'Campaigns help to raise awareness about mental health issues.'],
+                ['anonymous', 'анонімний', 'Коли ніхто не знає, хто ти &mdash; без імені', 'People often behave differently when they are anonymous online.'],
+                ['to restrict', 'обмежувати', 'Встановлювати правила або межі для чогось', 'Some parents restrict their childrenʼs screen time to two hours a day.'],
+                ['content', 'контент, зміст', 'Те, що публікують &mdash; відео, фото, тексти в інтернеті', 'The quality of online content varies greatly.'],
+                ['data protection', 'захист даних', 'Правила, які захищають особисту інформацію людей', 'Data protection laws are becoming stricter in Europe.'],
+                ['to disconnect', 'відʼєднатися, вимкнутися', 'Припинити користуватися технологіями, відпочити від екрану', 'Itʼs healthy to disconnect from your phone for a few hours every day.']
+            ],
+            'c1:media': [
+                ['algorithm', 'алгоритм', 'Програма, яка вирішує, що ти бачиш у стрічці &mdash; на основі твоїх вподобань', 'Social media algorithms create filter bubbles that limit diverse perspectives.'],
+                ['echo chamber', 'інформаційна бульбашка', 'Коли бачиш тільки ту думку, яка збігається з твоєю &mdash; без іншої точки зору', 'Echo chambers on social media reinforce existing beliefs.'],
+                ['disinformation', 'дезінформація', 'Навмисно поширювана неправда для маніпуляції суспільною думкою', 'The spread of disinformation poses a threat to democratic societies.'],
+                ['surveillance', 'стеження, спостереження', 'Коли за тобою стежать через камери, телефон або інтернет', 'Many people are concerned about government surveillance of online activities.'],
+                ['to exploit', 'експлуатувати, використовувати', 'Використовувати когось або щось у своїх інтересах, часто нечесно', 'Some companies exploit usersʼ personal data for profit.'],
+                ['to discern', 'розрізняти, відрізняти', 'Здатність відрізняти правду від брехні, хороше від поганого', 'Students must learn to discern credible sources from unreliable ones.'],
+                ['accountability', 'відповідальність, підзвітність', 'Обовʼязок відповідати за свої дії, особливо публічно', 'Tech companies should be held accountable for the content on their platforms.'],
+                ['the digital divide', 'цифровий розрив', 'Різниця між тими, хто має доступ до технологій, і тими, хто ні', 'The digital divide between rich and poor countries remains significant.'],
+                ['misinformation', 'хибна інформація', 'Неправдива інформація, поширена без злого наміру (на відміну від disinformation)', 'Misinformation about health can have serious consequences.'],
+                ['to curate', 'відбирати, курувати', 'Ретельно обирати і організовувати контент', 'Users curate their social media profiles to present an ideal version of themselves.'],
+                ['to perpetuate', 'увічнювати, підтримувати', 'Робити так, щоб щось продовжувало існувати (часто щось негативне)', 'Social media can perpetuate stereotypes and unrealistic beauty standards.'],
+                ['digital well-being', 'цифрове благополуччя', 'Здоровий баланс у використанні технологій, без шкоди для психіки', 'Schools are beginning to include digital well-being in their curriculum.']
+            ],
+
+            // ===== SCHOOL & FUTURE =====
+            'b1:school': [
+                ['to achieve', 'досягати', 'Добитися результату &mdash; здати іспит, виграти змагання', 'She worked hard to achieve her goals.'],
+                ['qualification', 'кваліфікація, диплом', 'Документ, який підтверджує твої знання і вміння', 'Good qualifications help you find a better job.'],
+                ['to prepare', 'готуватися', 'Робити все заздалегідь для чогось важливого', 'You need to prepare well for the final exam.'],
+                ['to fail', 'провалити, не здати', 'Не пройти іспит або не досягти мети', 'If you donʼt study, you might fail the test.'],
+                ['to succeed', 'досягти успіху', 'Добитися того, чого хотів &mdash; протилежність to fail', 'With enough practice, you will succeed.'],
+                ['career', 'карʼєра', 'Професійний шлях людини &mdash; ким ти працюєш і куди рухаєшся', 'She wants to have a career in medicine.'],
+                ['skill', 'навичка, вміння', 'Щось, що ти вмієш робити добре &mdash; мова, програмування, комунікація', 'Communication skills are important in every job.'],
+                ['grade', 'оцінка', 'Бал або оцінка за роботу, іспит', 'He got excellent grades in English this year.'],
+                ['to apply for', 'подавати заявку на', 'Надсилати документи, щоб отримати роботу або місце', 'She decided to apply for a scholarship abroad.'],
+                ['pressure', 'тиск', 'Коли на тебе тиснуть &mdash; батьки, школа, суспільство', 'Many students feel pressure to get perfect grades.'],
+                ['to develop', 'розвивати(ся)', 'Рости, ставати кращим або створювати щось нове', 'Reading helps to develop critical thinking skills.'],
+                ['education', 'освіта', 'Процес навчання &mdash; в школі, університеті, протягом життя', 'Education is the key to a better future.']
+            ],
+            'b2:school': [
+                ['to acquire', 'набувати, здобувати', 'Отримувати нові знання або навички через навчання та практику', 'Students acquire important skills during their school years.'],
+                ['to pursue', 'прагнути до, досягати', 'Активно рухатися до мети &mdash; мрії, карʼєри, освіти', 'He decided to pursue a degree in engineering.'],
+                ['competitive', 'конкурентний', 'Коли багато людей змагаються за одне місце', 'The job market is becoming increasingly competitive.'],
+                ['to motivate', 'мотивувати', 'Надавати комусь бажання і сили діяти', 'Good teachers know how to motivate their students.'],
+                ['to evaluate', 'оцінювати', 'Аналізувати і визначати якість або цінність чогось', 'Teachers evaluate studentsʼ progress through regular tests.'],
+                ['to struggle', 'боротися, мати труднощі', 'Коли тобі важко і ти докладаєш зусиль, щоб впоратися', 'Many students struggle with maths in secondary school.'],
+                ['dropout', 'той хто кинув навчання', 'Людина, яка покинула школу або університет, не закінчивши', 'The school dropout rate has decreased in recent years.'],
+                ['to gain', 'отримувати, набувати', 'Здобувати щось цінне &mdash; досвід, знання, навички', 'An internship helps you gain practical experience.'],
+                ['to demand', 'вимагати', 'Наполягати на чомусь рішуче', 'The modern job market demands flexibility and digital skills.'],
+                ['vocational training', 'професійне навчання', 'Навчання конкретній професії &mdash; не університет, а Ausbildung', 'In Germany, vocational training is an important alternative to university.'],
+                ['lifelong learning', 'навчання впродовж життя', 'Ідея, що людина вчиться завжди &mdash; і в 20, і в 50 років', 'In a changing world, lifelong learning is essential.'],
+                ['equal opportunities', 'рівні можливості', 'Коли у кожного однакові шанси на успіх, незалежно від походження', 'Every child deserves equal opportunities in education.']
+            ],
+            'c1:school': [
+                ['meritocracy', 'меритократія', 'Система, де успіх залежить від здібностей, а не від грошей чи звʼязків', 'Critics argue that true meritocracy does not exist in modern education.'],
+                ['to foster', 'сприяти, виховувати', 'Допомагати чомусь рости і розвиватися &mdash; талантам, навичкам', 'Schools should foster creativity and independent thinking.'],
+                ['disparity', 'нерівність, розбіжність', 'Велика різниця між групами людей &mdash; в можливостях, доходах', 'There is a growing disparity between students from rich and poor families.'],
+                ['to empower', 'надавати сили, наділяти правами', 'Давати людям впевненість і інструменти для самостійних дій', 'Education empowers young people to shape their own future.'],
+                ['to hinder', 'перешкоджати, заважати', 'Робити щось важчим або неможливим', 'Poverty can hinder access to quality education.'],
+                ['cognitive', 'когнітивний, розумовий', 'Повʼязаний з мисленням, памʼяттю, увагою', 'Sleep deprivation negatively affects cognitive performance in school.'],
+                ['to equip', 'оснащувати, готувати', 'Давати комусь необхідні знання та навички', 'Schools must equip students with the skills needed for the 21st century.'],
+                ['the achievement gap', 'розрив у досягненнях', 'Різниця в результатах між учнями з різних соціальних верств', 'Closing the achievement gap remains a key goal of education policy.'],
+                ['holistic', 'цілісний, комплексний', 'Який розглядає людину в цілому &mdash; не тільки знання, а й емоції, здоровʼя', 'A holistic approach to education includes mental health support.'],
+                ['to nurture', 'плекати, виховувати', 'Дбайливо розвивати &mdash; таланти, здібності, потенціал', 'It is essential to nurture each studentʼs individual potential.'],
+                ['pedagogy', 'педагогіка', 'Наука і мистецтво навчання &mdash; як правильно вчити', 'Modern pedagogy emphasizes student-centered learning.'],
+                ['socioeconomic', 'соціально-економічний', 'Повʼязаний і з соціальним статусом, і з грошами', 'Socioeconomic background should not determine educational success.']
+            ]
+        };
+
+        const TOPIC_META = {
+            connectors: { icon: '\u{1F517}', title: 'Connectors' },
+            everyday: { icon: '\u{1F3E0}', title: 'Everyday Life' },
+            environment: { icon: '\u{1F33F}', title: 'Environment' },
+            media: { icon: '\u{1F4F1}', title: 'Media & Technology' },
+            school: { icon: '\u{1F393}', title: 'School & Future' }
+        };
+
+        let currentLevel = 'b1';
+        let currentTopic = 'connectors';
+
+        function renderVocab() {
+            const key = currentLevel + ':' + currentTopic;
+            const data = VOCAB[key] || [];
+            const grid = document.getElementById('vocab-grid');
+            const meta = TOPIC_META[currentTopic];
+            const lvl = currentLevel.toUpperCase();
+
+            document.body.classList.remove('level-b1', 'level-b2', 'level-c1');
+            document.body.classList.add('level-' + currentLevel);
+
+            document.getElementById('vocab-icon').innerHTML = meta.icon;
+            document.getElementById('vocab-title').textContent = meta.title + ' \u2014 ' + lvl;
+            document.getElementById('vocab-count').innerHTML = '<span class="count-num">' + data.length + '</span> words';
+
+            grid.innerHTML = data.map(function(item) {
+                return '<div class="vocab-card">' +
+                    '<span class="flip-icon">\u{1F504}</span>' +
+                    '<div class="card-front">' +
+                        '<div class="word-main">' + item[0] + '</div>' +
+                    '</div>' +
+                    '<div class="card-back">' +
+                        '<div class="translation">' + item[1] + '</div>' +
+                        '<div class="explanation">' + item[2] + '</div>' +
+                        '<div class="example">\u00ab' + item[3] + '\u00bb</div>' +
+                        '<span class="back-level">' + lvl + '</span>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // Level buttons
+        document.querySelectorAll('.level-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.level-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentLevel = btn.dataset.level;
+                renderVocab();
+            });
+        });
+
+        // Topic pills
+        document.querySelectorAll('.topic-pill').forEach(function(pill) {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.topic-pill').forEach(function(p) { p.classList.remove('active'); });
+                pill.classList.add('active');
+                currentTopic = pill.dataset.topic;
+                renderVocab();
+            });
+        });
+
+        // Flashcard flip
+        document.addEventListener('click', function(e) {
+            var card = e.target.closest('.vocab-card');
+            if (card) card.classList.toggle('flipped');
+        });
+
+        renderVocab();
+    </script>
+</body>
+</html>
