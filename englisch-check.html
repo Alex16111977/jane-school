@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZP 10 Check | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .check-intro {
+            background: rgba(13,17,23,0.8);
+            border-radius: 16px;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .check-intro h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
+        .check-intro p { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6; margin: 0; }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar-wrap {
+            position: sticky;
+            top: 60px;
+            z-index: 50;
+            background: rgba(10,10,20,0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 0;
+            margin: 0 -1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .progress-info .score {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .progress-info .score.good { color: #3fb950; }
+        .progress-info .score.ok { color: #d29922; }
+        .progress-info .score.bad { color: #f85149; }
+        .progress-track {
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease, background 0.4s ease;
+            width: 0%;
+        }
+        .progress-fill.good { background: linear-gradient(90deg, #238636, #3fb950); }
+        .progress-fill.ok { background: linear-gradient(90deg, #9e6a03, #d29922); }
+        .progress-fill.bad { background: linear-gradient(90deg, #da3633, #f85149); }
+
+        /* ===== CATEGORY SECTION ===== */
+        .cat-section {
+            margin-bottom: 1.8rem;
+        }
+        .cat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .cat-icon {
+            font-size: 1.4rem;
+            width: 2.2rem;
+            height: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+        }
+        .cat-header h2 {
+            font-size: 1.1rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        .cat-header .cat-count {
+            margin-left: auto;
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            font-weight: 600;
+        }
+
+        /* ===== SKILL ROW ===== */
+        .skill-row {
+            background: rgba(13,17,23,0.7);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: all 0.25s;
+        }
+        .skill-row:hover {
+            border-color: rgba(255,255,255,0.1);
+        }
+        .skill-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+        .skill-text {
+            flex: 1;
+        }
+        .skill-text .skill-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+            line-height: 1.4;
+        }
+        .skill-text .skill-desc {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+            line-height: 1.5;
+        }
+        .skill-btns {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .skill-btn {
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--color-text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .skill-btn:hover {
+            border-color: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+        .skill-btn.yes {
+            border-color: rgba(63,185,80,0.3);
+        }
+        .skill-btn.yes:hover, .skill-btn.yes.active {
+            background: rgba(63,185,80,0.15);
+            border-color: #3fb950;
+            color: #3fb950;
+        }
+        .skill-btn.no {
+            border-color: rgba(248,81,73,0.3);
+        }
+        .skill-btn.no:hover, .skill-btn.no.active {
+            background: rgba(248,81,73,0.15);
+            border-color: #f85149;
+            color: #f85149;
+        }
+
+        /* Answered states */
+        .skill-row.answered-yes {
+            border-color: rgba(63,185,80,0.15);
+            background: rgba(63,185,80,0.03);
+        }
+        .skill-row.answered-no {
+            border-color: rgba(248,81,73,0.15);
+            background: rgba(248,81,73,0.03);
+        }
+
+        /* ===== HELP BOX ===== */
+        .help-box {
+            display: none;
+            margin-top: 0.8rem;
+            padding: 0.9rem 1rem;
+            background: rgba(248,81,73,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(248,81,73,0.15);
+        }
+        .skill-row.answered-no .help-box { display: block; }
+        .help-box .help-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #f85149;
+            margin-bottom: 0.4rem;
+        }
+        .help-box ul {
+            margin: 0;
+            padding: 0 0 0 1.1rem;
+            list-style: none;
+        }
+        .help-box li {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            position: relative;
+        }
+        .help-box li::before {
+            content: '\2192';
+            position: absolute;
+            left: -1.1rem;
+            color: rgba(248,81,73,0.5);
+        }
+        .help-box a {
+            color: #79b8ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .help-box a:hover {
+            text-decoration: underline;
+        }
+        .help-box .help-tag {
+            display: inline-block;
+            padding: 0.1rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            margin-left: 0.3rem;
+            vertical-align: middle;
+        }
+        .help-tag.on-site {
+            background: rgba(68,147,248,0.15);
+            color: #79b8ff;
+        }
+        .help-tag.external {
+            background: rgba(210,153,34,0.15);
+            color: #e3b341;
+        }
+
+        /* ===== RESULTS PANEL ===== */
+        .results-panel {
+            display: none;
+            background: rgba(13,17,23,0.85);
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin-top: 2rem;
+            border: 2px solid rgba(255,255,255,0.08);
+            text-align: center;
+        }
+        .results-panel.visible { display: block; }
+        .results-panel .big-score {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+        }
+        .results-panel .big-score.good { color: #3fb950; }
+        .results-panel .big-score.ok { color: #d29922; }
+        .results-panel .big-score.bad { color: #f85149; }
+        .results-panel .result-msg {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .results-panel .weak-list {
+            text-align: left;
+            margin-top: 1.2rem;
+            padding: 1rem 1.2rem;
+            background: rgba(248,81,73,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(248,81,73,0.12);
+        }
+        .results-panel .weak-list h3 {
+            font-size: 0.9rem;
+            color: #f85149;
+            margin: 0 0 0.6rem;
+        }
+        .results-panel .weak-list li {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .reset-btn {
+            margin-top: 1.5rem;
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: transparent;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 600px) {
+            .skill-top { flex-direction: column; gap: 0.5rem; }
+            .skill-btns { align-self: flex-start; }
+            .progress-bar-wrap { top: 50px; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: #0a0a14">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">ZP 10 Check</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>ZP 10 Englisch &mdash; Check</h1>
+            <p class="page-subtitle">Pr&uuml;fe dich selbst &mdash; was kannst du schon, was musst du noch lernen?</p>
+        </div>
+
+        <div class="check-intro">
+            <h2>Как это работает?</h2>
+            <p>Тут собрано ВСЁ, что нужно знать для ZP 10 по английскому. Нажимай <strong style="color:#3fb950;">Могу</strong> или <strong style="color:#f85149;">Надо учить</strong> для каждого пункта. Если чего-то не знаешь &mdash; увидишь советы, где это выучить.</p>
+        </div>
+
+        <!-- Sticky Progress -->
+        <div class="progress-bar-wrap">
+            <div class="progress-info">
+                <span style="color:var(--color-text-muted)"><span id="answered-count">0</span> / <span id="total-count">0</span> отвечено</span>
+                <span class="score" id="score-text">&mdash;</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- SKILLS LIST (generated by JS) -->
+        <div id="skills-container"></div>
+
+        <!-- RESULTS -->
+        <div class="results-panel" id="results-panel">
+            <p style="color:var(--color-text-muted); font-size:0.85rem; margin:0;">Твой результат</p>
+            <div class="big-score" id="big-score"></div>
+            <div class="result-msg" id="result-msg"></div>
+            <div class="weak-list" id="weak-list" style="display:none;">
+                <h3>Это нужно ещё выучить:</h3>
+                <ul id="weak-items"></ul>
+            </div>
+            <button class="reset-btn" onclick="resetAll()">Пройти заново</button>
+        </div>
+
+        <div style="height:3rem;"></div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+    const SKILLS = [
+        {
+            cat: 'Listening',
+            icon: '\u{1F3A7}',
+            items: [
+                {
+                    name: 'Я понимаю английскую речь на слух',
+                    desc: 'Объявления, диалоги, новости, интервью',
+                    help: [
+                        ['<a href="englisch-listening.html">Listening-Strategien</a> auf NeoStudy', 'on-site'],
+                        ['BBC Learning English &mdash; 6 Minute English (Podcast, kostenlos)', 'external'],
+                        ['YouTube: einfache englische Podcasts mit Untertiteln h&ouml;ren', 'external'],
+                        ['T&auml;glich 10 Min. englische Videos mit EN-Untertiteln schauen', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу уловить главную мысль аудио',
+                    desc: 'О чём речь? Какая тема? Кто говорит?',
+                    help: [
+                        ['<a href="englisch-listening.html">Listening &mdash; Strategien</a>: Skimming-Technik', 'on-site'],
+                        ['Перед прослушиванием: прочитай задания и подчеркни ключевые слова!', 'external'],
+                        ['При первом прослушивании слушай только главную мысль', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу расслышать детали в аудио',
+                    desc: 'Имена, числа, места, причины, мнения',
+                    help: [
+                        ['<a href="englisch-listening.html">Listening &mdash; Aufgabentypen</a>: Gap Filling, Short Answers', 'on-site'],
+                        ['При втором прослушивании ищи конкретные детали', 'external'],
+                        ['Тренируйся с диктантами и текстами с пропусками', 'external']
+                    ]
+                },
+                {
+                    name: 'Я различаю True/False/Not in the text на слух',
+                    desc: 'False = сказали противоположное. Not in the text = вообще не упоминалось',
+                    help: [
+                        ['<a href="englisch-listening.html">Listening &mdash; True/False/Not in text</a>', 'on-site'],
+                        ['Важно: «False» ≠ «Not in the text»!', 'external'],
+                        ['Отвечай только то, что реально слышал &mdash; не угадывай!', 'external']
+                    ]
+                }
+            ]
+        },
+        {
+            cat: 'Reading',
+            icon: '\u{1F4D6}',
+            items: [
+                {
+                    name: 'Я понимаю английский текст целиком',
+                    desc: 'Главная мысль, тема, тон текста',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading-Strategien</a>: Skimming & Scanning', 'on-site'],
+                        ['Каждый день читай короткую статью на английском (например, News in Levels)', 'external'],
+                        ['Сначала пробеги весь текст глазами, потом читай задания', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу понять незнакомые слова по контексту',
+                    desc: 'Без словаря &mdash; по смыслу предложения',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading &mdash; Strategien f&uuml;r unbekannte W&ouml;rter</a>', 'on-site'],
+                        ['Используй словообразование: employ → employer, employment, employee', 'external'],
+                        ['Узнавай интернационализмы: information, communication, problem', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу решать тесты по тексту (Multiple Choice)',
+                    desc: 'Найти правильный ответ и распознать ловушки',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading &mdash; Aufgabentypen</a>', 'on-site'],
+                        ['Прочитай все варианты, прежде чем выбирать!', 'external'],
+                        ['Исключай неправильные ответы (метод исключения)', 'external']
+                    ]
+                },
+                {
+                    name: 'Я узнаю синонимы и перефразировки',
+                    desc: 'В тексте написано иначе, чем в вопросе &mdash; тот же смысл, другие слова',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading &mdash; Synonyme</a>', 'on-site'],
+                        ['<a href="englisch-vokabeln.html">English Vocabulary</a> lernen!', 'on-site'],
+                        ['Synonyme aktiv lernen: happy = glad = pleased = delighted', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу найти нужную информацию в длинном тексте',
+                    desc: 'Scanning: быстро найти конкретные данные (числа, имена, факты)',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading &mdash; Scanning-Technik</a>', 'on-site'],
+                        ['Подчеркни ключевые слова в вопросе и ищи их в тексте', 'external'],
+                        ['Вопросы обычно идут в том же порядке, что и текст!', 'external']
+                    ]
+                }
+            ]
+        },
+        {
+            cat: 'Writing',
+            icon: '\u{270D}\u{FE0F}',
+            items: [
+                {
+                    name: 'Я могу написать текст со вступлением, основной частью и заключением',
+                    desc: 'Чёткая структура: Introduction → Main Body → Conclusion',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; Textstruktur</a>', 'on-site'],
+                        ['Всегда начинай с вводного предложения, которое называет тему', 'external'],
+                        ['Заключение: To sum up / In conclusion + своё мнение', 'external']
+                    ]
+                },
+                {
+                    name: 'Я знаю и использую Connectors / Linking Words',
+                    desc: 'however, moreover, although, in addition, on the other hand...',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; Connectors-Liste</a>', 'on-site'],
+                        ['<a href="englisch-vokabeln.html">Vocabulary &mdash; Connectors</a> (mit Erkl&auml;rungen!)', 'on-site'],
+                        ['Используй мин. 5–6 разных Connectors в одном тексте', 'external'],
+                        ['Учи их группами: причина, противопоставление, дополнение, следствие', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу написать e-mail / письмо',
+                    desc: 'Обращение, формальный/неформальный стиль, приветствие, прощание',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; Textformen</a>', 'on-site'],
+                        ['Формально: Dear Sir/Madam → Yours faithfully', 'external'],
+                        ['Неформально: Hi/Dear [Name] → Best wishes / Take care', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу выразить и обосновать своё мнение по-английски',
+                    desc: 'In my opinion... I believe that... because / since / therefore',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; Meinung &auml;u&szlig;ern</a>', 'on-site'],
+                        ['Мнение + причина + пример = сильный абзац', 'external'],
+                        ['Используй разные фразы для мнения (не только «I think»)', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу сформулировать аргументы за и против',
+                    desc: 'On the one hand... On the other hand... Показать обе стороны',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; Argumentation</a>', 'on-site'],
+                        ['Сначала за, потом против, потом своё мнение', 'external'],
+                        ['Каждый аргумент: утверждение + обоснование + пример', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу писать разные типы текстов',
+                    desc: 'E-Mail, статья, дневник, рецензия, заявление, пересказ',
+                    help: [
+                        ['<a href="englisch-writing.html">Writing &mdash; alle Textformen</a>', 'on-site'],
+                        ['У каждого типа текста свои правила &mdash; учи различия!', 'external'],
+                        ['Напиши каждый тип текста минимум 1 раз до экзамена', 'external']
+                    ]
+                },
+                {
+                    name: 'Я слежу за орфографией и грамматикой при письме',
+                    desc: 'Без типичных ошибок: *becouse, *wich, *there/their/they\'re',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; alle Themen</a>', 'on-site'],
+                        ['В конце оставь 5 мин. на перечитку!', 'external'],
+                        ['Частые ошибки: its/it\'s, your/you\'re, then/than, to/too', 'external'],
+                        ['Используй Grammarly (бесплатно) для тренировки', 'external']
+                    ]
+                }
+            ]
+        },
+        {
+            cat: 'Grammar',
+            icon: '\u{1F4DA}',
+            items: [
+                {
+                    name: 'Я могу правильно использовать английские времена',
+                    desc: 'Simple Present, Past, Present Perfect, Progressive, Will/Going-to Future',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Tenses</a> (alle Zeiten mit Signalw&ouml;rtern)', 'on-site'],
+                        ['Учи сигнальные слова! yesterday → Simple Past, already → Present Perfect', 'external'],
+                        ['Ego4u.de или Englisch-Hilfen.de &mdash; бесплатные упражнения', 'external']
+                    ]
+                },
+                {
+                    name: 'Я различаю Simple Present и Present Progressive',
+                    desc: 'I work (вообще) vs. I am working (прямо сейчас)',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Present Tenses</a>', 'on-site'],
+                        ['Simple = always, every day, usually, often', 'external'],
+                        ['Progressive = now, at the moment, right now, Look!', 'external']
+                    ]
+                },
+                {
+                    name: 'Я различаю Simple Past и Present Perfect',
+                    desc: 'I went (закончилось) vs. I have been (связь с настоящим)',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Past vs. Perfect</a>', 'on-site'],
+                        ['Simple Past: yesterday, last week, ago, in 2020', 'external'],
+                        ['Present Perfect: already, yet, ever, never, just, since, for', 'external']
+                    ]
+                },
+                {
+                    name: 'Я знаю все три If-Clauses и могу их применить',
+                    desc: 'Type 1 (реальное), Type 2 (гипотетическое), Type 3 (невозможное/прошлое)',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; If-Clauses</a> (alle 3 Typen)', 'on-site'],
+                        ['Type 1: If + Present &rarr; will + Infinitiv', 'external'],
+                        ['Type 2: If + Past &rarr; would + Infinitiv', 'external'],
+                        ['Type 3: If + Past Perfect &rarr; would have + Past Participle', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу образовать и использовать Passive Voice',
+                    desc: 'The book was written by... / English is spoken in...',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Passive Voice</a>', 'on-site'],
+                        ['Формула: to be + Past Participle (3-я форма)', 'external'],
+                        ['Практикуй пассив в разных временах!', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу строить Relative Clauses',
+                    desc: 'who, which, that, whose, where &mdash; относительные предложения связывают информацию',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Relative Clauses</a>', 'on-site'],
+                        ['who = люди, which = вещи, where = места', 'external'],
+                        ['Defining (без запятой) vs. Non-defining (с запятой)', 'external']
+                    ]
+                },
+                {
+                    name: 'Я могу образовать Reported Speech / косвенную речь',
+                    desc: 'He said that he was tired. She told me she had finished.',
+                    help: [
+                        ['<a href="englisch-grammar.html">Grammar &mdash; Reported Speech</a>', 'on-site'],
+                        ['Сдвиг времён: is → was, will → would, can → could', 'external'],
+                        ['say vs. tell: He said... / He told me...', 'external']
+                    ]
+                }
+            ]
+        },
+        {
+            cat: 'Wortschatz & Themen',
+            icon: '\u{1F4AC}',
+            items: [
+                {
+                    name: 'Ich kenne Vokabeln zu: School & Career',
+                    desc: 'education, qualification, career, achieve, skill, apply for...',
+                    help: [
+                        ['<a href="englisch-vokabeln.html">Vocabulary &mdash; School & Future</a>', 'on-site'],
+                        ['Quizlet: ищи ZP 10 English Vocabulary Sets', 'external'],
+                        ['Каждый день учи 10 новых слов с примером', 'external']
+                    ]
+                },
+                {
+                    name: 'Ich kenne Vokabeln zu: Environment & Climate',
+                    desc: 'climate change, pollution, sustainable, renewable, recycle...',
+                    help: [
+                        ['<a href="englisch-vokabeln.html">Vocabulary &mdash; Environment</a>', 'on-site'],
+                        ['Экология &mdash; любимая тема ZP &mdash; готовься хорошо!', 'external'],
+                        ['Ключевые слова: greenhouse gases, carbon footprint, biodiversity', 'external']
+                    ]
+                },
+                {
+                    name: 'Ich kenne Vokabeln zu: Media & Technology',
+                    desc: 'social media, cyberbullying, privacy, fake news, influence...',
+                    help: [
+                        ['<a href="englisch-vokabeln.html">Vocabulary &mdash; Media & Technology</a>', 'on-site'],
+                        ['Типичный вопрос: плюсы/минусы Social Media', 'external'],
+                        ['Фразы для мнения + медиа-слова = идеальная комбинация для Writing', 'external']
+                    ]
+                },
+                {
+                    name: 'Ich kenne Vokabeln zu: Everyday Life & Society',
+                    desc: 'responsibility, behaviour, advantage, improve, support...',
+                    help: [
+                        ['<a href="englisch-vokabeln.html">Vocabulary &mdash; Everyday Life</a>', 'on-site'],
+                        ['Эти слова встречаются в КАЖДОЙ теме &mdash; базовый словарь!', 'external'],
+                        ['Учи слова не по одному, а в предложениях', 'external']
+                    ]
+                },
+                {
+                    name: 'Я знаю неправильные глаголы',
+                    desc: 'go-went-gone, write-wrote-written, take-took-taken...',
+                    help: [
+                        ['<a href="englisch-verben.html">Irregular Verbs &mdash; Liste</a>', 'on-site'],
+                        ['Выучи наизусть топ-50 неправильных глаголов!', 'external'],
+                        ['Повторяй 5 глаголов в день &mdash; через 10 дней будешь знать 50', 'external']
+                    ]
+                }
+            ]
+        },
+        {
+            cat: 'Стратегия экзамена',
+            icon: '\u{1F3AF}',
+            items: [
+                {
+                    name: 'Я знаю структуру ZP 10 по английскому',
+                    desc: '130 мин. = Listening (~20) + Reading (~40) + Writing (~60)',
+                    help: [
+                        ['<a href="englisch.html">Englisch &mdash; ZP 10 Aufbau</a>', 'on-site'],
+                        ['Тайминг: не зависай слишком долго на одном задании!', 'external'],
+                        ['Используй 10 мин. в начале, чтобы прочитать ВСЁ', 'external']
+                    ]
+                },
+                {
+                    name: 'Я не оставляю пустых ответов',
+                    desc: 'Всегда пишу хоть что-то &mdash; за пустой ответ 0 баллов',
+                    help: [
+                        ['Пустой ответ = 0 баллов. Лучше угадай &mdash; есть шанс!', 'external'],
+                        ['Multiple Choice: исключи неправильные → угадывай из оставшихся', 'external']
+                    ]
+                },
+                {
+                    name: 'Я оставляю 5 минут на проверку',
+                    desc: 'В конце перечитать всё: орфография, грамматика, полнота ответов',
+                    help: [
+                        ['Checkliste: Alle Aufgaben отвечено? Keine leeren Felder?', 'external'],
+                        ['Типичные ошибки: -s в 3-м лице, артикли, предлоги', 'external']
+                    ]
+                },
+                {
+                    name: 'Я знаю основные типы заданий',
+                    desc: 'Multiple Choice, True/False, Gap Fill, Matching, Short Answers, написание текста',
+                    help: [
+                        ['<a href="englisch-reading.html">Reading &mdash; Aufgabentypen</a>', 'on-site'],
+                        ['<a href="englisch-listening.html">Listening &mdash; Aufgabentypen</a>', 'on-site'],
+                        ['<a href="englisch-writing.html">Writing &mdash; Textformen</a>', 'on-site'],
+                        ['Прорешать старые ZP-экзамены (Standardsicherung NRW)', 'external']
+                    ]
+                }
+            ]
+        }
+    ];
+
+    // Render
+    const container = document.getElementById('skills-container');
+    let totalSkills = 0;
+    let skillIndex = 0;
+
+    SKILLS.forEach(function(cat) {
+        let html = '<div class="cat-section">';
+        html += '<div class="cat-header">';
+        html += '<div class="cat-icon">' + cat.icon + '</div>';
+        html += '<h2>' + cat.cat + '</h2>';
+        html += '<span class="cat-count">' + cat.items.length + ' Skills</span>';
+        html += '</div>';
+
+        cat.items.forEach(function(item) {
+            const idx = skillIndex++;
+            totalSkills++;
+
+            let helpHtml = '';
+            if (item.help && item.help.length) {
+                helpHtml = '<div class="help-box"><div class="help-title">Где учить?</div><ul>';
+                item.help.forEach(function(h) {
+                    const tag = h[1] === 'on-site'
+                        ? '<span class="help-tag on-site">NeoStudy</span>'
+                        : '<span class="help-tag external">Tipp</span>';
+                    helpHtml += '<li>' + h[0] + ' ' + tag + '</li>';
+                });
+                helpHtml += '</ul></div>';
+            }
+
+            html += '<div class="skill-row" id="skill-' + idx + '">';
+            html += '<div class="skill-top">';
+            html += '<div class="skill-text">';
+            html += '<div class="skill-name">' + item.name + '</div>';
+            html += '<div class="skill-desc">' + item.desc + '</div>';
+            html += '</div>';
+            html += '<div class="skill-btns">';
+            html += '<button class="skill-btn yes" data-idx="' + idx + '" data-val="yes" onclick="answer(' + idx + ',\'yes\')">Могу</button>';
+            html += '<button class="skill-btn no" data-idx="' + idx + '" data-val="no" onclick="answer(' + idx + ',\'no\')">Надо учить</button>';
+            html += '</div>';
+            html += '</div>';
+            html += helpHtml;
+            html += '</div>';
+        });
+
+        html += '</div>';
+        container.innerHTML += html;
+    });
+
+    document.getElementById('total-count').textContent = totalSkills;
+
+    // State
+    const answers = {};
+
+    function answer(idx, val) {
+        // Toggle: if same answer clicked again, remove it
+        if (answers[idx] === val) {
+            delete answers[idx];
+            const row = document.getElementById('skill-' + idx);
+            row.classList.remove('answered-yes', 'answered-no');
+            row.querySelectorAll('.skill-btn').forEach(function(b) { b.classList.remove('active'); });
+        } else {
+            answers[idx] = val;
+            const row = document.getElementById('skill-' + idx);
+            row.classList.remove('answered-yes', 'answered-no');
+            row.classList.add(val === 'yes' ? 'answered-yes' : 'answered-no');
+            row.querySelectorAll('.skill-btn').forEach(function(b) { b.classList.remove('active'); });
+            row.querySelector('.skill-btn.' + (val === 'yes' ? 'yes' : 'no')).classList.add('active');
+        }
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const count = Object.keys(answers).length;
+        const yesCount = Object.values(answers).filter(function(v) { return v === 'yes'; }).length;
+        const pct = count > 0 ? Math.round((yesCount / totalSkills) * 100) : 0;
+        const answeredPct = Math.round((count / totalSkills) * 100);
+
+        document.getElementById('answered-count').textContent = count;
+
+        const fill = document.getElementById('progress-fill');
+        fill.style.width = pct + '%';
+
+        const scoreText = document.getElementById('score-text');
+        fill.classList.remove('good', 'ok', 'bad');
+        scoreText.classList.remove('good', 'ok', 'bad');
+
+        if (count === 0) {
+            scoreText.textContent = '\u2014';
+        } else {
+            scoreText.textContent = pct + '% могу';
+            if (pct >= 70) {
+                fill.classList.add('good');
+                scoreText.classList.add('good');
+            } else if (pct >= 40) {
+                fill.classList.add('ok');
+                scoreText.classList.add('ok');
+            } else {
+                fill.classList.add('bad');
+                scoreText.classList.add('bad');
+            }
+        }
+
+        // Show results when all answered
+        const panel = document.getElementById('results-panel');
+        if (count === totalSkills) {
+            panel.classList.add('visible');
+            const bigScore = document.getElementById('big-score');
+            const resultMsg = document.getElementById('result-msg');
+            bigScore.textContent = pct + '%';
+            bigScore.classList.remove('good', 'ok', 'bad');
+
+            if (pct >= 85) {
+                bigScore.classList.add('good');
+                resultMsg.innerHTML = 'Ты супер подготовлен! Продолжай и повторяй регулярно. ZP тебе по силам!';
+            } else if (pct >= 70) {
+                bigScore.classList.add('good');
+                resultMsg.innerHTML = 'Хорошая база! Пару тем ещё нужно подтянуть, но ты на правильном пути.';
+            } else if (pct >= 50) {
+                bigScore.classList.add('ok');
+                resultMsg.innerHTML = 'Есть над чем работать! Посмотри на красные пункты и проработай их. Время ещё есть!';
+            } else if (pct >= 30) {
+                bigScore.classList.add('bad');
+                resultMsg.innerHTML = 'Нужно ещё много выучить &mdash; но без паники! Начни с основ и двигайся вверх.';
+            } else {
+                bigScore.classList.add('bad');
+                resultMsg.innerHTML = 'Много работы &mdash; но все с чего-то начинают! Нажми на красные пункты выше для советов.';
+            }
+
+            // Weak list
+            const noItems = [];
+            let si = 0;
+            SKILLS.forEach(function(cat) {
+                cat.items.forEach(function(item) {
+                    if (answers[si] === 'no') {
+                        noItems.push(item.name);
+                    }
+                    si++;
+                });
+            });
+
+            const weakList = document.getElementById('weak-list');
+            const weakItems = document.getElementById('weak-items');
+            if (noItems.length > 0) {
+                weakList.style.display = 'block';
+                weakItems.innerHTML = noItems.map(function(n) { return '<li>' + n + '</li>'; }).join('');
+            } else {
+                weakList.style.display = 'none';
+            }
+        } else {
+            panel.classList.remove('visible');
+        }
+    }
+
+    function resetAll() {
+        Object.keys(answers).forEach(function(k) { delete answers[k]; });
+        document.querySelectorAll('.skill-row').forEach(function(r) {
+            r.classList.remove('answered-yes', 'answered-no');
+            r.querySelectorAll('.skill-btn').forEach(function(b) { b.classList.remove('active'); });
+        });
+        document.getElementById('results-panel').classList.remove('visible');
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    </script>
+</body>
+</html>

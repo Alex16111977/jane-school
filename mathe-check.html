@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selbsteinsch&auml;tzung | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .check-progress {
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 60px;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+        }
+        .check-progress h3 { margin: 0 0 0.6rem 0; font-size: 1rem; }
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: var(--color-bg-card);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-green), #22c55e);
+            border-radius: 6px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .check-section-title {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .check-section-title .badge {
+            font-size: 0.7rem;
+            padding: 0.15em 0.6em;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .topic-card {
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.6rem;
+            transition: border-color 0.2s;
+        }
+        .topic-card.done-ok {
+            border-color: var(--color-green);
+            background: var(--color-green-subtle);
+        }
+        .topic-card.done-practice {
+            border-color: var(--color-orange);
+            background: var(--color-orange-subtle);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .topic-info { flex: 1; min-width: 200px; }
+        .topic-info h4 { margin: 0 0 0.2rem 0; font-size: 1rem; }
+        .topic-info p { margin: 0; font-size: 0.88rem; color: var(--color-text-secondary); }
+        .topic-info .hint { font-size: 0.82rem; color: var(--color-text-muted); }
+
+        .topic-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .topic-btn {
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--color-border);
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .topic-btn:hover { border-color: var(--color-text-muted); }
+        .topic-btn:active { transform: scale(0.97); }
+        .topic-btn.btn-ok { border-color: var(--color-green); color: var(--color-green); }
+        .topic-btn.btn-ok:hover { background: var(--color-green-subtle); }
+        .topic-btn.btn-ok.selected { background: var(--color-green); color: #fff; }
+        .topic-btn.btn-practice { border-color: var(--color-orange); color: var(--color-orange); }
+        .topic-btn.btn-practice:hover { background: var(--color-orange-subtle); }
+        .topic-btn.btn-practice.selected { background: var(--color-orange); color: #fff; }
+
+        .topic-link {
+            margin-top: 0.6rem;
+            padding: 0.5rem 0.8rem;
+            background: var(--color-accent-subtle);
+            border-radius: var(--radius-sm);
+            display: none;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.88rem;
+        }
+        .topic-link.visible { display: flex; }
+        .topic-link a {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .topic-link a:hover { text-decoration: underline; }
+
+        .reset-btn {
+            margin-top: 2rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { border-color: var(--color-red); color: var(--color-red); }
+
+        .summary-box {
+            margin-top: 2rem;
+            padding: 1.2rem 1.5rem;
+            background: var(--color-bg-elevated);
+            border: 2px solid var(--color-accent);
+            border-radius: var(--radius-lg);
+            display: none;
+        }
+        .summary-box.visible { display: block; }
+        .summary-box h3 { margin: 0 0 0.8rem 0; }
+        .summary-list { list-style: none; padding: 0; margin: 0; }
+        .summary-list li {
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .summary-list li a { color: var(--color-accent); text-decoration: none; }
+        .summary-list li a:hover { text-decoration: underline; }
+
+        @media (max-width: 500px) {
+            .topic-header { flex-direction: column; }
+            .topic-buttons { width: 100%; }
+            .topic-btn { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <nav class="navbar">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html" class="active">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="mathe.html">Mathematik</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Selbsteinsch&auml;tzung</span>
+        </nav>
+
+        <a href="mathe.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Mathematik</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Selbsteinsch&auml;tzung</h1>
+            <p class="page-subtitle">Was kann ich schon? Was muss ich noch &uuml;ben? <span style="color:var(--color-text-muted); font-size:0.85rem;">(что я уже знаю? что ещё нужно учить?)</span></p>
+        </div>
+
+        <!-- Progress -->
+        <div class="check-progress">
+            <h3>Fortschritt <span style="color:var(--color-text-muted);font-size:0.85rem;">(прогресс)</span></h3>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressLabel">0 von 25 Themen bewertet</span>
+                <span id="progressPercent">0 %</span>
+            </div>
+        </div>
+
+        <!-- ====== SECTION 1: Arithmetik / Algebra ====== -->
+        <h2 class="check-section-title">
+            &#x1F522; Arithmetik / Algebra
+            <span class="badge" style="background:#3b82f6;">8 Themen</span>
+        </h2>
+
+        <div class="topic-card" data-topic="rationale">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Rechnen und Ordnen</h4>
+                    <p>Grundrechenarten f&uuml;r rationale Zahlen, Zahlen ordnen und vergleichen</p>
+                    <span class="hint">(действия с рациональными числами, сравнение)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-algebra.html#tab-rationale" onclick="setTab('rationale')">Algebra &rarr; Rationale Zahlen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="prozente">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Prozente</h4>
+                    <p>Prozentwerte, Prozents&auml;tze, Grundwerte berechnen &amp; Zinsrechnung</p>
+                    <span class="hint">(проценты: основное значение, процентная ставка, начисление)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-prozent.html">Prozentrechnung</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="systeme">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Gleichungssysteme</h4>
+                    <p>Lineare Gleichungssysteme mit zwei Variablen l&ouml;sen, Sachsituationen aufstellen</p>
+                    <span class="hint">(системы уравнений с двумя переменными)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-algebra.html#tab-systeme" onclick="setTab('systeme')">Algebra &rarr; Gleichungssysteme</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="einheiten">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Sch&auml;tzen &amp; Einheiten</h4>
+                    <p>Gr&ouml;&szlig;en sch&auml;tzen, Einheiten in kleinere oder gr&ouml;&szlig;ere umrechnen</p>
+                    <span class="hint">(оценка величин, перевод единиц)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-einheiten.html">Einheiten &amp; Sch&auml;tzen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="wintercheck">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Wintercheck &mdash; Tabellenkalkulation</h4>
+                    <p>Berechnungen mithilfe einer Tabellenkalkulation auff&uuml;hren</p>
+                    <span class="hint">(вычисления с помощью таблицы)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-basisteil.html">Basisteil Trainer</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="gleichungen">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Lineare Gleichungen l&ouml;sen</h4>
+                    <p>Gleichungen l&ouml;sen, Sachsituationen in Gleichungen &uuml;bersetzen</p>
+                    <span class="hint">(решение линейных уравнений, текстовые задачи)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-algebra.html#tab-gleichungen" onclick="setTab('gleichungen')">Algebra &rarr; Gleichungen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="terme">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Terme &amp; Formeln</h4>
+                    <p>Terme vereinfachen, Klammern aufl&ouml;sen, Formeln umstellen</p>
+                    <span class="hint">(упрощение выражений, раскрытие скобок)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-algebra.html#tab-terme" onclick="setTab('terme')">Algebra &rarr; Terme &amp; Formeln</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="binomisch">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Binomische Formeln</h4>
+                    <p>Die drei binomischen Formeln anwenden</p>
+                    <span class="hint">(формулы сокращённого умножения)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-binomische.html">Binomische Formeln</a>
+            </div>
+        </div>
+
+        <!-- ====== SECTION 2: Funktionen ====== -->
+        <h2 class="check-section-title">
+            &#x1F4C8; Funktionen
+            <span class="badge" style="background:#8b5cf6;">5 Themen</span>
+        </h2>
+
+        <div class="topic-card" data-topic="zuordnungen">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Zuordnungen</h4>
+                    <p>Proportionale und antiproportionale Zuordnungen erkennen, Graphen skizzieren</p>
+                    <span class="hint">(пропорциональные и обратно пропорциональные зависимости)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-zuordnung.html">Zuordnungen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="linear">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Lineare Funktionen &amp; Graphen</h4>
+                    <p>Gleichungen und Graphen einander zuordnen, Sachsituationen durch lineare Funktionen beschreiben</p>
+                    <span class="hint">(линейные функции: y = mx + b, графики, текстовые задачи)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-funktionen.html#tab-linear" onclick="setTab('linear')">Funktionen &rarr; Lineare Funktionen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="quadratisch">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Quadratische Funktionen &amp; Parabeln</h4>
+                    <p>Scheitelpunktform, Graph zeichnen, zwischen Gleichung/Graph/Wertetabelle wechseln</p>
+                    <span class="hint">(квадратичные функции: парабола, вершина, нули)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-funktionen.html#tab-quadratisch" onclick="setTab('quadratisch')">Funktionen &rarr; Quadratische Funktionen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="wachstum-lin">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Exponentielles Wachstum &amp; Zinseszins</h4>
+                    <p>Exponentielles Wachstum erkennen, Werte berechnen, Zinseszins (auch Abnahme)</p>
+                    <span class="hint">(экспоненциальный рост, сложные проценты)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-funktionen.html#tab-wachstum" onclick="setTab('wachstum')">Funktionen &rarr; Wachstum &amp; Zinseszins</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="sachsit">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Lineare Funktion &mdash; F&uuml;llmenge / Sachaufgaben</h4>
+                    <p>Sachsituationen durch Gleichungen und Graphen von linearen Funktionen beschreiben</p>
+                    <span class="hint">(текстовые задачи с линейными функциями)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-funktionen.html#tab-linear" onclick="setTab('linear')">Funktionen &rarr; Lineare Funktionen</a>
+            </div>
+        </div>
+
+        <!-- ====== SECTION 3: Geometrie ====== -->
+        <h2 class="check-section-title">
+            &#x1F4D0; Geometrie
+            <span class="badge" style="background:#22c55e;">8 Themen</span>
+        </h2>
+
+        <div class="topic-card" data-topic="rechteck">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Rechteck</h4>
+                    <p>Umfang und Fl&auml;cheninhalt eines Rechtecks berechnen, auch Sachsituationen</p>
+                    <span class="hint">(периметр и площадь прямоугольника)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-flaechen" onclick="setTab('flaechen')">Geometrie &rarr; Fl&auml;chen</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="dreieck">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Dreieck, Parallelogramm, Trapez</h4>
+                    <p>Punkte im Koordinatensystem eintragen, Fl&auml;cheninhalte berechnen</p>
+                    <span class="hint">(треугольник, параллелограмм, трапеция в координатной системе)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-koordinaten" onclick="setTab('koordinaten')">Geometrie &rarr; Koordinatensystem</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="quader">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Quader (Volumen)</h4>
+                    <p>Volumen eines Quaders berechnen, auch mit unterschiedlichen Einheiten</p>
+                    <span class="hint">(объём прямоугольного параллелепипеда)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-koerper" onclick="setTab('koerper')">Geometrie &rarr; K&ouml;rper</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="zylinder">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Zylinder</h4>
+                    <p>Fl&auml;cheninhalt des Kreises, Mantelfl&auml;che, Oberfl&auml;che und Volumen</p>
+                    <span class="hint">(цилиндр: круг, боковая поверхность, объём)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-koerper" onclick="setTab('koerper')">Geometrie &rarr; K&ouml;rper</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="strahlen">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Strahlens&auml;tze</h4>
+                    <p>Streckenl&auml;ngen mithilfe der Strahlens&auml;tze bestimmen</p>
+                    <span class="hint">(теоремы о лучах: пропорции отрезков)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-strahlen" onclick="setTab('strahlen')">Geometrie &rarr; Strahlens&auml;tze</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="pythagoras">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Satz des Pythagoras</h4>
+                    <p>Streckenl&auml;ngen mithilfe des Satzes von Pythagoras berechnen</p>
+                    <span class="hint">(теорема Пифагора: a&sup2; + b&sup2; = c&sup2;)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-pythagoras" onclick="setTab('pythagoras')">Geometrie &rarr; Pythagoras</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="winkel">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Winkel</h4>
+                    <p>Winkelgr&ouml;&szlig;en mithilfe der Winkels&auml;tze und Winkelsumme bestimmen</p>
+                    <span class="hint">(углы: свойства углов, сумма углов в треугольнике)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-winkel" onclick="setTab('winkel')">Geometrie &rarr; Winkel</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="buchstaben">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Buchstaben-Design (Streckung)</h4>
+                    <p>Zentrische Streckung durchf&uuml;hren, Streckenverh&auml;ltnisse bestimmen</p>
+                    <span class="hint">(центральное растяжение, масштаб)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-geometrie.html#tab-koordinaten" onclick="setTab('koordinaten')">Geometrie &rarr; Koordinatensystem</a>
+            </div>
+        </div>
+
+        <!-- ====== SECTION 4: Daten und Zufall ====== -->
+        <h2 class="check-section-title">
+            &#x1F3B2; Daten und Zufall
+            <span class="badge" style="background:#f59e0b;">4 Themen</span>
+        </h2>
+
+        <div class="topic-card" data-topic="statistik">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Statistik &mdash; Tabelle</h4>
+                    <p>Spannweite, Median und arithmetisches Mittel angeben</p>
+                    <span class="hint">(размах, медиана, среднее арифметическое)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-stochastik.html">Stochastik</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="diagramme">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Diagramme &amp; H&auml;ufigkeiten</h4>
+                    <p>Werte aus Diagrammen ablesen, relative H&auml;ufigkeiten berechnen, Kreis-/Streifendiagramme</p>
+                    <span class="hint">(диаграммы, относительная частота)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-stochastik.html">Stochastik</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="laplace">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>Laplace-Wahrscheinlichkeit</h4>
+                    <p>Die Wahrscheinlichkeit eines Ereignisses bei einem Laplace-Experiment berechnen</p>
+                    <span class="hint">(вероятность Лапласа: благоприятные / все исходы)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-stochastik.html">Stochastik</a>
+            </div>
+        </div>
+
+        <div class="topic-card" data-topic="wuerfel">
+            <div class="topic-header">
+                <div class="topic-info">
+                    <h4>W&uuml;rfel &amp; Versuchsreihen</h4>
+                    <p>Wahrscheinlichkeiten mit Ergebnissen einer langen Versuchsreihe sch&auml;tzen</p>
+                    <span class="hint">(кубики: оценка вероятности через эксперимент)</span>
+                </div>
+                <div class="topic-buttons">
+                    <button class="topic-btn btn-ok" onclick="mark(this,'ok')">&#x2714; Kann ich</button>
+                    <button class="topic-btn btn-practice" onclick="mark(this,'practice')">&#x270F;&#xFE0F; Muss &uuml;ben</button>
+                </div>
+            </div>
+            <div class="topic-link">
+                &#x27A1;&#xFE0F; <a href="mathe-wahrscheinlichkeit.html">Wahrscheinlichkeit</a>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box" id="summaryBox">
+            <h3>&#x1F4CB; Was du noch &uuml;ben musst: <span style="color:var(--color-text-muted);font-size:0.85rem;">(что ещё нужно учить)</span></h3>
+            <ul class="summary-list" id="summaryList"></ul>
+        </div>
+
+        <button class="reset-btn" onclick="resetAll()">&#x1F504; Alles zur&uuml;cksetzen</button>
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        const TOTAL = document.querySelectorAll('.topic-card').length;
+        let states = {};
+
+        // Load saved state
+        try {
+            const saved = localStorage.getItem('mathe-check');
+            if (saved) {
+                states = JSON.parse(saved);
+                document.querySelectorAll('.topic-card').forEach(card => {
+                    const topic = card.dataset.topic;
+                    if (states[topic]) {
+                        applyState(card, states[topic]);
+                    }
+                });
+                updateProgress();
+            }
+        } catch(e) {}
+
+        function mark(btn, type) {
+            const card = btn.closest('.topic-card');
+            const topic = card.dataset.topic;
+
+            // If clicking the same button again, deselect
+            if (states[topic] === type) {
+                delete states[topic];
+                clearState(card);
+            } else {
+                states[topic] = type;
+                applyState(card, type);
+            }
+
+            save();
+            updateProgress();
+        }
+
+        function applyState(card, type) {
+            card.classList.remove('done-ok', 'done-practice');
+            card.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('selected'));
+            const link = card.querySelector('.topic-link');
+
+            if (type === 'ok') {
+                card.classList.add('done-ok');
+                card.querySelector('.btn-ok').classList.add('selected');
+                link.classList.remove('visible');
+            } else {
+                card.classList.add('done-practice');
+                card.querySelector('.btn-practice').classList.add('selected');
+                link.classList.add('visible');
+            }
+        }
+
+        function clearState(card) {
+            card.classList.remove('done-ok', 'done-practice');
+            card.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('selected'));
+            card.querySelector('.topic-link').classList.remove('visible');
+        }
+
+        function updateProgress() {
+            const done = Object.keys(states).length;
+            const pct = Math.round(done / TOTAL * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = done + ' von ' + TOTAL + ' Themen bewertet';
+            document.getElementById('progressPercent').textContent = pct + ' %';
+
+            // Update summary
+            const box = document.getElementById('summaryBox');
+            const list = document.getElementById('summaryList');
+            const practiceTopics = [];
+
+            document.querySelectorAll('.topic-card').forEach(card => {
+                const topic = card.dataset.topic;
+                if (states[topic] === 'practice') {
+                    const name = card.querySelector('h4').textContent;
+                    const linkEl = card.querySelector('.topic-link a');
+                    practiceTopics.push({ name, href: linkEl.href, text: linkEl.textContent });
+                }
+            });
+
+            if (practiceTopics.length > 0) {
+                list.innerHTML = practiceTopics.map(t =>
+                    '<li>&#x1F4D6; <a href="' + t.href + '">' + t.name + '</a> <span style="color:var(--color-text-muted);font-size:0.82rem;">&rarr; ' + t.text + '</span></li>'
+                ).join('');
+                box.classList.add('visible');
+            } else {
+                box.classList.remove('visible');
+            }
+        }
+
+        function save() {
+            try { localStorage.setItem('mathe-check', JSON.stringify(states)); } catch(e) {}
+        }
+
+        function resetAll() {
+            states = {};
+            document.querySelectorAll('.topic-card').forEach(clearState);
+            save();
+            updateProgress();
+        }
+
+        // Helper: set tab on target page via localStorage
+        function setTab(tabName) {
+            try { localStorage.setItem('mathe-open-tab', tabName); } catch(e) {}
+        }
+    </script>
+</body>
+</html>

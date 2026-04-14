@@ -6,6 +6,23 @@
     <title>Aufgabentyp 4a | NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .sc-item { padding:0.7rem 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .sc-item:last-child { border-bottom:none; }
+        .sc-q { font-size:0.92rem; color:#fff; margin-bottom:0.5rem; }
+        .sc-q small { display:block; color:var(--color-text-muted); font-size:0.78rem; margin-top:0.15rem; font-weight:400; }
+        .sc-btns { display:flex; gap:0.4rem; }
+        .sc-btn { padding:0.4rem 0.9rem; border-radius:8px; border:none; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+        .sc-btn-yes { background:rgba(63,185,80,0.12); color:#3fb950; border:1px solid rgba(63,185,80,0.25); }
+        .sc-btn-yes:hover { background:rgba(63,185,80,0.22); }
+        .sc-btn-no { background:rgba(210,153,34,0.1); color:#e3b341; border:1px solid rgba(210,153,34,0.2); }
+        .sc-btn-no:hover { background:rgba(210,153,34,0.2); }
+        .sc-btn.chosen { opacity:1; } .sc-btn.dimmed { opacity:0.35; pointer-events:none; }
+        .sc-tip { display:none; margin-top:0.5rem; padding:0.7rem 0.9rem; border-radius:8px; background:rgba(210,153,34,0.06); border:1px solid rgba(210,153,34,0.15); font-size:0.82rem; color:var(--color-text-secondary); line-height:1.5; }
+        .sc-tip.visible { display:block; }
+        .sc-tip a { color:var(--color-accent); text-decoration:underline; }
+        .sc-done { font-size:0.82rem; color:#3fb950; margin-top:0.15rem; }
+    </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
@@ -37,6 +54,18 @@
         <div class="page-header" style="text-align:left; padding-top:0.5rem">
             <h1>Aufgabentyp 4a &mdash; Textanalyse</h1>
             <p class="page-subtitle">Einen Text analysieren und interpretieren</p>
+        </div>
+
+        <!-- Selbstcheck -->
+        <div class="note-card" style="margin-bottom:1.5rem; border:1px solid rgba(68,147,248,0.2);" id="selbstcheck-box">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;cursor:pointer;" onclick="document.getElementById('sc-body').style.display=document.getElementById('sc-body').style.display==='none'?'block':'none'">
+                <span style="font-size:1.5rem;">&#x1F3AF;</span>
+                <div><strong style="color:#fff;font-size:1.05rem;">Selbstcheck &mdash; Bin ich bereit?</strong>
+                <p style="color:var(--color-text-muted);font-size:0.82rem;margin:0;">Klicke um zu pr&uuml;fen, was du schon kannst</p></div>
+                <span style="margin-left:auto;color:var(--color-text-muted);font-size:1.2rem;">&#x25BE;</span>
+            </div>
+            <div id="sc-body"><div id="sc-items"></div>
+            <div id="sc-result" style="display:none;margin-top:1rem;padding:1rem;border-radius:10px;background:rgba(68,147,248,0.08);border:1px solid rgba(68,147,248,0.2);"></div></div>
         </div>
 
         <div class="zp-notes">
@@ -407,7 +436,19 @@
     </div>
 
     <script>
-        // Tab system not used on this page — single-page layout
+        var SC_DATA = [
+            { q: 'TATTE-Einleitung schreiben', sub: 'Titel, Autor, Textsorte, Thema, Erscheinungsjahr', tip: '\u{1F4A1} TATTE ist deine Formel f\u00fcr die perfekte Einleitung: <strong>T</strong>itel, <strong>A</strong>utor, <strong>T</strong>extsorte, <strong>T</strong>hema, <strong>E</strong>rscheinungsjahr. Schau dir das TATTE-Schema weiter unten auf dieser Seite an. <br><br>\u{1F4DD} Beispiel: &laquo;Die Kurzgeschichte &bdquo;...&ldquo; von [Autor], ver\u00f6ffentlicht [Jahr], handelt von...&raquo;' },
+            { q: 'Inhalt zusammenfassen', sub: 'Worum geht es? Was passiert im Text?', tip: '\u{1F4A1} Kurz und neutral: wer, was, wo, wann. Keine eigene Meinung, nur Fakten. Schreibe im Pr\u00e4sens. <br><br>\u{1F4DD} Tipp: Teile den Text in 3-4 Abschnitte und fasse jeden in 1-2 S\u00e4tzen zusammen.' },
+            { q: 'Figuren analysieren', sub: 'Eigenschaften, Verhalten, Beziehungen, Entwicklung', tip: '\u{1F4A1} Beschreibe die Figur: Wie ist sie? Was tut sie? Wie ver\u00e4ndert sie sich? Belege IMMER mit Zitaten! Mehr dazu auf der <a href="deutsch.html">Deutsch-Seite \u2192 Stilmittel &amp; Figurenanalyse</a>. <br><br>\u{1F4DD} Formel: &laquo;Die Figur wirkt..., was sich daran zeigt, dass...&raquo;' },
+            { q: 'Erz\u00e4hltechnik erkennen', sub: 'Erz\u00e4hlperspektive, Zeitgestaltung, Erz\u00e4hlform', tip: '\u{1F4A1} Wer erz\u00e4hlt? (Ich-Erz\u00e4hler oder Er/Sie?) Aus welcher Sicht? (auktorial, personal, neutral?) Welche Zeitform? Alles dazu findest du in der Tabelle &laquo;Erz\u00e4hltechnik im Detail&raquo; weiter unten. <br><br>\u{1F4DD} Tipp: Suche im Text nach &laquo;ich&raquo;, &laquo;er dachte&raquo;, &laquo;sie f\u00fchlte&raquo; \u2014 das verr\u00e4t die Perspektive!' },
+            { q: 'Stilmittel erkennen', sub: 'Metapher, Vergleich, Personifikation, Ironie...', tip: '\u{1F4A1} Die wichtigsten: Metapher, Vergleich (mit &laquo;wie&raquo;), Personifikation, Wiederholung, rhetorische Frage, Ironie. \u00dcbe mit dem <a href="deutsch.html">Stilmittel-Trainer auf der Deutsch-Seite</a>! <br><br>\u{1F4DA} Alle Stilmittel mit Beispielen: <a href="deutsch.html">Deutsch \u2192 Tab Stilmittel</a>' },
+            { q: 'Wirkung erkl\u00e4ren', sub: 'WARUM benutzt der Autor dieses Stilmittel?', tip: '\u{1F4A1} Das ist der WICHTIGSTE Schritt! Nicht nur &laquo;hier ist eine Metapher&raquo;, sondern &laquo;diese Metapher verdeutlicht die Einsamkeit der Figur&raquo;. <br><br>\u{1F4DD} Formel: Stilmittel + Zitat + Wirkung. Immer alle drei zusammen!' },
+            { q: 'Zitate korrekt einbauen', sub: 'Textstellen als Beweis verwenden', tip: '\u{1F4A1} Zitate immer in Anf\u00fchrungszeichen mit Zeilenangabe: &laquo;...&raquo; (Z. 12). Zitate m\u00fcssen in deinen Satz eingebaut werden, nicht einfach hingestellt. <br><br>\u{1F4DD} Beispiel: Wie der Autor zeigt, ist die Figur &laquo;verzweifelt und allein&raquo; (Z. 24).' },
+            { q: 'Deutung / Interpretation', sub: 'Was will der Autor sagen? Welche Botschaft?', tip: '\u{1F4A1} Im Schluss interpretierst du: Was ist die Botschaft des Textes? Welche Wirkung hat er auf den Leser? <br><br>\u{1F4DD} Formeln: &laquo;Der Text l\u00e4sst sich als Kritik an... deuten&raquo;, &laquo;Vermutlich m\u00f6chte der Autor darauf aufmerksam machen, dass...&raquo;' },
+            { q: 'E-H-S Struktur einhalten', sub: 'Einleitung \u2014 Hauptteil \u2014 Schluss', tip: '\u{1F4A1} IMMER drei Teile: Einleitung (TATTE + Inhalt), Hauptteil (Analyse: Figuren + Sprache + Erz\u00e4hltechnik), Schluss (Deutung). Ohne diese Struktur fehlen dir Punkte! <br><br>\u{1F4DD} Schau dir die &laquo;6 Schritte zur Bearbeitung&raquo; weiter unten an.' },
+            { q: 'Gedicht analysieren', sub: 'Strophen, Reimschema, Metrum, sprachliche Mittel', tip: '\u{1F4A1} Falls ein Gedicht kommt: z\u00e4hle Strophen und Verse, bestimme das Reimschema (Paarreim, Kreuzreim), suche Stilmittel. <br><br>\u{1F4DA} Alles \u00fcber Gedichtanalyse findest du weiter unten auf dieser Seite im Abschnitt &laquo;Gedichtanalyse&raquo;.' }
+        ];
+        (function(){var c=document.getElementById('sc-items'),total=SC_DATA.length,answers={};c.innerHTML=SC_DATA.map(function(item,i){return'<div class="sc-item" data-idx="'+i+'"><div class="sc-q"><strong>'+(i+1)+'. '+item.q+'</strong>'+(item.sub?'<small>'+item.sub+'</small>':'')+'</div><div class="sc-btns"><button class="sc-btn sc-btn-yes" onclick="scAnswer('+i+',true)">Kann ich \u2705</button><button class="sc-btn sc-btn-no" onclick="scAnswer('+i+',false)">Muss ich lernen \u{1F4D6}</button></div><div class="sc-tip" id="sc-tip-'+i+'">'+item.tip+'</div></div>';}).join('');window.scAnswer=function(idx,canDo){answers[idx]=canDo;var item=document.querySelector('.sc-item[data-idx="'+idx+'"]');var btns=item.querySelectorAll('.sc-btn');btns[0].className='sc-btn sc-btn-yes'+(canDo?' chosen':' dimmed');btns[1].className='sc-btn sc-btn-no'+(!canDo?' chosen':' dimmed');document.getElementById('sc-tip-'+idx).className=canDo?'sc-tip':'sc-tip visible';if(canDo&&!item.querySelector('.sc-done')){var d=document.createElement('div');d.className='sc-done';d.textContent='\u2713 Super!';item.appendChild(d);}else if(!canDo){var d=item.querySelector('.sc-done');if(d)d.remove();}if(Object.keys(answers).length===total){var yes=0,weak=[];for(var k in answers){if(answers[k])yes++;else weak.push(SC_DATA[k].q);}var r=document.getElementById('sc-result');r.style.display='block';if(yes===total)r.innerHTML='<strong style="color:#3fb950;">\u{1F31F} '+yes+'/'+total+' \u2014 Du bist bereit!</strong>';else r.innerHTML='<strong style="color:#e3b341;">\u{1F4AA} '+yes+'/'+total+' \u2014 Fast geschafft!</strong><p style="margin:0.5rem 0 0;font-size:0.85rem;color:var(--color-text-muted);">\u00dcbe noch:</p><ul style="margin:0.3rem 0 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-secondary);">'+weak.map(function(w){return'<li>'+w+'</li>';}).join('')+'</ul>';}};})();
     </script>
 </body>
 </html>

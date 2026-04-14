@@ -6,6 +6,23 @@
     <title>Aufgabentyp 4b | NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .sc-item { padding:0.7rem 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .sc-item:last-child { border-bottom:none; }
+        .sc-q { font-size:0.92rem; color:#fff; margin-bottom:0.5rem; }
+        .sc-q small { display:block; color:var(--color-text-muted); font-size:0.78rem; margin-top:0.15rem; font-weight:400; }
+        .sc-btns { display:flex; gap:0.4rem; }
+        .sc-btn { padding:0.4rem 0.9rem; border-radius:8px; border:none; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+        .sc-btn-yes { background:rgba(63,185,80,0.12); color:#3fb950; border:1px solid rgba(63,185,80,0.25); }
+        .sc-btn-yes:hover { background:rgba(63,185,80,0.22); }
+        .sc-btn-no { background:rgba(210,153,34,0.1); color:#e3b341; border:1px solid rgba(210,153,34,0.2); }
+        .sc-btn-no:hover { background:rgba(210,153,34,0.2); }
+        .sc-btn.chosen { opacity:1; } .sc-btn.dimmed { opacity:0.35; pointer-events:none; }
+        .sc-tip { display:none; margin-top:0.5rem; padding:0.7rem 0.9rem; border-radius:8px; background:rgba(210,153,34,0.06); border:1px solid rgba(210,153,34,0.15); font-size:0.82rem; color:var(--color-text-secondary); line-height:1.5; }
+        .sc-tip.visible { display:block; }
+        .sc-tip a { color:var(--color-accent); text-decoration:underline; }
+        .sc-done { font-size:0.82rem; color:#3fb950; margin-top:0.15rem; }
+    </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
@@ -37,6 +54,18 @@
         <div class="page-header" style="text-align:left; padding-top:0.5rem">
             <h1>Aufgabentyp 4b &mdash; Materialgest&uuml;tztes Schreiben</h1>
             <p class="page-subtitle">Argumentieren, Stellung nehmen, Er&ouml;rtern</p>
+        </div>
+
+        <!-- Selbstcheck -->
+        <div class="note-card" style="margin-bottom:1.5rem; border:1px solid rgba(68,147,248,0.2);" id="selbstcheck-box">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;cursor:pointer;" onclick="document.getElementById('sc-body').style.display=document.getElementById('sc-body').style.display==='none'?'block':'none'">
+                <span style="font-size:1.5rem;">&#x1F3AF;</span>
+                <div><strong style="color:#fff;font-size:1.05rem;">Selbstcheck &mdash; Bin ich bereit?</strong>
+                <p style="color:var(--color-text-muted);font-size:0.82rem;margin:0;">Klicke um zu pr&uuml;fen, was du schon kannst</p></div>
+                <span style="margin-left:auto;color:var(--color-text-muted);font-size:1.2rem;">&#x25BE;</span>
+            </div>
+            <div id="sc-body"><div id="sc-items"></div>
+            <div id="sc-result" style="display:none;margin-top:1rem;padding:1rem;border-radius:10px;background:rgba(68,147,248,0.08);border:1px solid rgba(68,147,248,0.2);"></div></div>
         </div>
 
         <div class="zp-notes">
@@ -404,7 +433,6 @@
     </div>
 
     <script>
-        // Tab logic (not used on this page, kept for consistency)
         document.querySelectorAll('.tab').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -414,6 +442,20 @@
                 if (target) target.classList.add('active');
             });
         });
+
+        var SC_DATA = [
+            { q: 'Eigene Position formulieren', sub: 'Klar sagen: daf\u00fcr oder dagegen?', tip: '\u{1F4A1} Bei 4b DARFST und MUSST du deine Meinung sagen! Aber: erst begr\u00fcnden, dann Meinung. Formeln: &laquo;Meiner Meinung nach...&raquo;, &laquo;Ich bin der Auffassung, dass...&raquo;. <br><br>\u{1F4DA} Fertige Phrasen: <a href="vokabeln.html" target="_blank">Vokabeln \u2192 Phrasen</a>' },
+            { q: 'These + Argumente aufbauen', sub: 'These \u2192 Argument \u2192 Beispiel \u2192 R\u00fcckkopplung', tip: '\u{1F4A1} Jedes Argument braucht 4 Teile: 1) These (Behauptung), 2) Begr\u00fcndung (warum?), 3) Beispiel (Beweis), 4) R\u00fcckkopplung (was folgt daraus?). <br><br>\u{1F4DD} Tipp: Mindestens 2-3 Argumente im Hauptteil!' },
+            { q: 'Argumente mit Material belegen', sub: 'Nicht nur behaupten \u2014 mit M1, M2 beweisen', tip: '\u{1F4A1} Du MUSST die Materialien nutzen! &laquo;Wie aus M1 hervorgeht...&raquo;, &laquo;Dies wird durch die Grafik in M2 best\u00e4tigt...&raquo;. Ohne Materialbezug gibt es Punktabzug. <br><br>\u{1F4DD} Schau dir die Formulierungen weiter unten auf dieser Seite an.' },
+            { q: 'Gegenargumente einbauen', sub: 'Auch die andere Seite zeigen \u2014 und entkr\u00e4ften', tip: '\u{1F4A1} Zeige, dass du auch die Gegenseite kennst: &laquo;Zwar k\u00f6nnte man einwenden, dass..., jedoch...&raquo;. Das macht deinen Text st\u00e4rker! <br><br>\u{1F517} <a href="vokabeln.html" target="_blank">Vokabeln \u2192 Konnektoren</a> (zwar...aber, einerseits...andererseits)' },
+            { q: 'Materialien vergleichen', sub: 'Unterschiede und Gemeinsamkeiten finden', tip: '\u{1F4A1} Zeige, wie sich die Materialien erg\u00e4nzen oder widersprechen: &laquo;W\u00e4hrend M1 zeigt, dass..., betont M2 hingegen...&raquo;. Tabelle: informativ vs. argumentativ \u2014 sieh dir den Abschnitt &laquo;Materialien vergleichen&raquo; weiter unten an.' },
+            { q: 'Einerseits/andererseits verwenden', sub: 'Pro und Contra abw\u00e4gen, nicht nur eine Seite', tip: '\u{1F4A1} &laquo;Einerseits... andererseits...&raquo; ist die Traumkonstruktion f\u00fcr 4b. Damit zeigst du: ich kann differenziert denken. <br><br>\u{1F517} Mehr Konnektoren: <a href="vokabeln.html" target="_blank">Vokabeln \u2192 Konnektoren B2</a> (jedoch, w\u00e4hrend, sodass, zudem)' },
+            { q: 'Einleitung mit Themenfrage', sub: 'Aktuellen Bezug herstellen, Fragestellung pr\u00e4sentieren', tip: '\u{1F4A1} Deine Einleitung muss das Thema vorstellen und die zentrale Frage benennen. Gut: aktueller Bezug (&laquo;In den letzten Jahren wird verst\u00e4rkt diskutiert, ob...&raquo;). <br><br>\u{1F4DD} Formel: Thema + Aktualit\u00e4t + Fragestellung + kurze Vorstellung der Materialien.' },
+            { q: 'Schluss mit Fazit und Ausblick', sub: 'Position zusammenfassen + Zukunft', tip: '\u{1F4A1} Im Schluss: fasse deine Position zusammen, beziehe dich auf die st\u00e4rksten Argumente, gib einen Ausblick. &laquo;Abschlie\u00dfend l\u00e4sst sich festhalten...&raquo;. <br><br>\u{1F4DA} <a href="vokabeln.html" target="_blank">Vokabeln \u2192 Phrasen C1</a> f\u00fcr perfekte Schluss-Formulierungen' },
+            { q: 'Sachlich argumentieren', sub: 'Trotz eigener Meinung \u2014 nicht emotional werden', tip: '\u{1F4A1} Du darfst deine Meinung sagen, aber NICHT schimpfen oder emotional werden. Kein &laquo;das ist total bl\u00f6d&raquo; \u2014 sondern &laquo;diese Ma\u00dfnahme ist kritisch zu betrachten, da...&raquo;. <br><br>\u{1F6AB} Vermeide: umgangssprachlich, \u00fcbertrieben, beleidigend.' },
+            { q: 'Konnektoren und Verkn\u00fcpfungen', sub: 'dar\u00fcber hinaus, im Gegensatz dazu, aus diesem Grund...', tip: '\u{1F4A1} Dein Text braucht Konnektoren wie ein Auto Benzin. Ohne sie klingt alles abgehackt. Mindestens 5-7 verschiedene! <br><br>\u{1F517} Alle Konnektoren mit Erkl\u00e4rungen: <a href="vokabeln.html" target="_blank">Vokabeln \u2192 Konnektoren</a>' }
+        ];
+        (function(){var c=document.getElementById('sc-items'),total=SC_DATA.length,answers={};c.innerHTML=SC_DATA.map(function(item,i){return'<div class="sc-item" data-idx="'+i+'"><div class="sc-q"><strong>'+(i+1)+'. '+item.q+'</strong>'+(item.sub?'<small>'+item.sub+'</small>':'')+'</div><div class="sc-btns"><button class="sc-btn sc-btn-yes" onclick="scAnswer('+i+',true)">Kann ich \u2705</button><button class="sc-btn sc-btn-no" onclick="scAnswer('+i+',false)">Muss ich lernen \u{1F4D6}</button></div><div class="sc-tip" id="sc-tip-'+i+'">'+item.tip+'</div></div>';}).join('');window.scAnswer=function(idx,canDo){answers[idx]=canDo;var item=document.querySelector('.sc-item[data-idx="'+idx+'"]');var btns=item.querySelectorAll('.sc-btn');btns[0].className='sc-btn sc-btn-yes'+(canDo?' chosen':' dimmed');btns[1].className='sc-btn sc-btn-no'+(!canDo?' chosen':' dimmed');document.getElementById('sc-tip-'+idx).className=canDo?'sc-tip':'sc-tip visible';if(canDo&&!item.querySelector('.sc-done')){var d=document.createElement('div');d.className='sc-done';d.textContent='\u2713 Super!';item.appendChild(d);}else if(!canDo){var d=item.querySelector('.sc-done');if(d)d.remove();}if(Object.keys(answers).length===total){var yes=0,weak=[];for(var k in answers){if(answers[k])yes++;else weak.push(SC_DATA[k].q);}var r=document.getElementById('sc-result');r.style.display='block';if(yes===total)r.innerHTML='<strong style="color:#3fb950;">\u{1F31F} '+yes+'/'+total+' \u2014 Du bist bereit!</strong>';else r.innerHTML='<strong style="color:#e3b341;">\u{1F4AA} '+yes+'/'+total+' \u2014 Fast geschafft!</strong><p style="margin:0.5rem 0 0;font-size:0.85rem;color:var(--color-text-muted);">\u00dcbe noch:</p><ul style="margin:0.3rem 0 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-secondary);">'+weak.map(function(w){return'<li>'+w+'</li>';}).join('')+'</ul>';}};})();
     </script>
 </body>
 </html>
