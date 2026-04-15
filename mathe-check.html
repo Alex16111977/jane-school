@@ -678,21 +678,6 @@
         const TOTAL = document.querySelectorAll('.topic-card').length;
         let states = {};
 
-        // Load saved state
-        try {
-            const saved = localStorage.getItem('mathe-check');
-            if (saved) {
-                states = JSON.parse(saved);
-                document.querySelectorAll('.topic-card').forEach(card => {
-                    const topic = card.dataset.topic;
-                    if (states[topic]) {
-                        applyState(card, states[topic]);
-                    }
-                });
-                updateProgress();
-            }
-        } catch(e) {}
-
         function mark(btn, type) {
             const card = btn.closest('.topic-card');
             const topic = card.dataset.topic;
@@ -778,6 +763,24 @@
         function setTab(tabName) {
             try { localStorage.setItem('mathe-open-tab', tabName); } catch(e) {}
         }
+
+        // Load saved state on page load
+        function loadSavedState() {
+            try {
+                var saved = localStorage.getItem('mathe-check');
+                if (saved) {
+                    states = JSON.parse(saved);
+                    document.querySelectorAll('.topic-card').forEach(function(card) {
+                        var topic = card.dataset.topic;
+                        if (states[topic]) {
+                            applyState(card, states[topic]);
+                        }
+                    });
+                    updateProgress();
+                }
+            } catch(e) { console.log('Could not load saved state:', e); }
+        }
+        loadSavedState();
     </script>
 </body>
 </html>
