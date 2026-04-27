@@ -443,16 +443,17 @@
                 <section class="note-section">
                     <h2>Checklist перед экзаменом</h2>
                     <div class="note-card">
-                        <div class="eng-checklist">
-                            <label class="eng-check"><input type="checkbox"> Leseverstehen &mdash; отвечать своими словами</label>
-                            <label class="eng-check"><input type="checkbox"> Aufgabentyp 2 &mdash; sachlich, ohne Meinung</label>
-                            <label class="eng-check"><input type="checkbox"> Aufgabentyp 4a &mdash; Inhalt + Figuren + Sprache + Wirkung</label>
-                            <label class="eng-check"><input type="checkbox"> Aufgabentyp 4b &mdash; Vergleich + Argumente + Beispiele</label>
-                            <label class="eng-check"><input type="checkbox"> Stilmittel &mdash; Metapher, Vergleich, Personifikation...</label>
-                            <label class="eng-check"><input type="checkbox"> Einleitung &mdash; Hauptteil &mdash; Schluss (ВСЕГДА!)</label>
-                            <label class="eng-check"><input type="checkbox"> Textstellen als Beweis einbauen</label>
-                            <label class="eng-check"><input type="checkbox"> 1 Originalpr&uuml;fung komplett gemacht</label>
+                        <div class="eng-checklist" id="zp-checklist">
+                            <label class="eng-check"><input type="checkbox" data-cl="lv"> Leseverstehen &mdash; отвечать своими словами</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="t2"> Aufgabentyp 2 &mdash; sachlich, ohne Meinung</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="t4a"> Aufgabentyp 4a &mdash; Inhalt + Figuren + Sprache + Wirkung</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="t4b"> Aufgabentyp 4b &mdash; Vergleich + Argumente + Beispiele</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="stil"> Stilmittel &mdash; Metapher, Vergleich, Personifikation...</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="aufbau"> Einleitung &mdash; Hauptteil &mdash; Schluss (ВСЕГДА!)</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="zitate"> Textstellen als Beweis einbauen</label>
+                            <label class="eng-check"><input type="checkbox" data-cl="orig"> 1 Originalpr&uuml;fung komplett gemacht</label>
                         </div>
+                        <div id="zp-checklist-progress" style="margin-top:0.8rem; font-size:0.82rem; color:var(--color-text-muted);"></div>
                     </div>
                 </section>
 
@@ -709,6 +710,49 @@
             const card = e.target.closest('.flashcard');
             if (card) card.classList.toggle('flipped');
         });
+
+        // ===== Checklist persistence (localStorage) =====
+        (function() {
+            const STORAGE_KEY = 'neo_zp_checklist';
+            const checklist = document.getElementById('zp-checklist');
+            const progressEl = document.getElementById('zp-checklist-progress');
+            if (!checklist || !progressEl) return;
+
+            function loadState() {
+                try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+                catch (e) { return {}; }
+            }
+            function saveState(state) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }
+            function updateProgress() {
+                const boxes = checklist.querySelectorAll('input[type="checkbox"]');
+                const done = Array.from(boxes).filter(b => b.checked).length;
+                const total = boxes.length;
+                const pct = Math.round(done / total * 100);
+                if (done === 0) {
+                    progressEl.innerHTML = '\u{1F4DD} 0 / ' + total + ' \u2014 поставь галочку, когда выучишь пункт';
+                } else if (done === total) {
+                    progressEl.innerHTML = '\u{1F389} <strong style="color:var(--color-green);">' + done + ' / ' + total + ' \u2014 ты готова к ZP!</strong>';
+                } else {
+                    progressEl.innerHTML = '\u2705 <strong style="color:var(--color-green);">' + done + ' / ' + total + '</strong> (' + pct + '%) \u2014 продолжай!';
+                }
+            }
+
+            const state = loadState();
+            const boxes = checklist.querySelectorAll('input[type="checkbox"]');
+            boxes.forEach(box => {
+                const key = box.dataset.cl;
+                if (state[key]) box.checked = true;
+                box.addEventListener('change', () => {
+                    const s = loadState();
+                    s[key] = box.checked;
+                    saveState(s);
+                    updateProgress();
+                });
+            });
+            updateProgress();
+        })();
     </script>
 </body>
 </html>

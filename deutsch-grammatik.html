@@ -6,6 +6,174 @@
     <title>Grammatik | NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ===== KONJUNKTIV TRAINER ===== */
+        .konj-trainer-block {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(68, 147, 248, 0.25);
+            border-radius: 14px;
+            backdrop-filter: blur(8px);
+        }
+        .konj-question {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.1rem 1.2rem;
+            margin-top: 1rem;
+            transition: border-color 0.2s;
+        }
+        .konj-question.solved-correct { border-color: rgba(63, 185, 80, 0.4); }
+        .konj-question.solved-wrong { border-color: rgba(248, 81, 73, 0.35); }
+        .konj-question.revealed { border-color: rgba(210, 153, 34, 0.35); }
+
+        .konj-tag-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.7rem;
+            flex-wrap: wrap;
+        }
+        .konj-tag {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .konj-tag.tag-blue { background: rgba(68,147,248,0.18); color: #79b8ff; }
+        .konj-tag.tag-purple { background: rgba(163,113,247,0.18); color: #c8a5ff; }
+        .konj-tag.tag-orange { background: rgba(210,153,34,0.18); color: #e3b341; }
+        .konj-tag.tag-red { background: rgba(248,81,73,0.18); color: #ff8b85; }
+        .konj-tag-verb {
+            font-family: ui-monospace, "SF Mono", Menlo, monospace;
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            opacity: 0.85;
+        }
+
+        .konj-direct {
+            font-size: 1.02rem;
+            color: #fff;
+            line-height: 1.5;
+            padding: 0.6rem 0.9rem;
+            background: rgba(68,147,248,0.05);
+            border-left: 3px solid rgba(68,147,248,0.5);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 0.6rem;
+        }
+        .konj-direct strong { color: #79b8ff; }
+        .konj-prefix {
+            font-size: 0.92rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.4rem;
+            font-style: italic;
+        }
+        .konj-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.7rem 0.9rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .konj-input:focus { border-color: rgba(68, 147, 248, 0.5); background: rgba(255,255,255,0.06); }
+        .konj-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .konj-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .konj-check-btn, .konj-show-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .konj-check-btn {
+            background: rgba(68, 147, 248, 0.2);
+            color: #79b8ff;
+            border: 1px solid rgba(68,147,248,0.3);
+        }
+        .konj-check-btn:hover:not(:disabled) { background: rgba(68, 147, 248, 0.3); }
+        .konj-check-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .konj-show-btn {
+            background: transparent;
+            color: var(--color-text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .konj-show-btn:hover:not(:disabled) { background: rgba(255,255,255,0.06); color: #fff; }
+        .konj-show-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .konj-feedback {
+            margin-top: 0.6rem;
+            font-size: 0.88rem;
+            min-height: 0;
+            font-weight: 500;
+        }
+        .konj-feedback.ok { color: #3fb950; }
+        .konj-feedback.fail { color: #f85149; }
+
+        .konj-answer {
+            display: none;
+            margin-top: 0.7rem;
+            padding: 0.8rem 1rem;
+            background: rgba(63, 185, 80, 0.08);
+            border: 1px solid rgba(63, 185, 80, 0.25);
+            border-radius: 8px;
+        }
+        .konj-question.show-answer .konj-answer { display: block; }
+        .konj-answer-label {
+            display: inline-block;
+            font-size: 0.78rem;
+            color: #3fb950;
+            font-weight: 700;
+            margin-right: 0.4rem;
+        }
+        .konj-answer-text {
+            font-size: 0.98rem;
+            color: #fff;
+        }
+        .konj-answer-text em {
+            color: #3fb950;
+            font-style: normal;
+            font-weight: 700;
+            background: rgba(63,185,80,0.15);
+            padding: 0 0.25em;
+            border-radius: 3px;
+        }
+        .konj-answer-explain {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            margin: 0.5rem 0 0;
+            line-height: 1.5;
+        }
+        .konj-answer-explain em { color: #79b8ff; font-style: normal; }
+        .konj-answer-explain strong { color: #fff; }
+
+        .konj-trainer-tip {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 1.2rem;
+            padding: 0.7rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
@@ -171,6 +339,173 @@
                     <p style="color:var(--color-text-muted); font-size:0.85rem; margin-top:0.6rem;">
                         &#x27A1; Запомни эти 3 глагола &mdash; <strong>sei, habe, werde</strong> &mdash; это ключи ко всем временам Konjunktiv I. Без них ничего не построишь!
                     </p>
+                </div>
+
+                <!-- ===== Direkte → Indirekte Rede Trainer ===== -->
+                <div class="konj-trainer-block">
+                    <div class="lesson-header-block" style="margin-top:0;">
+                        <span class="lesson-header-icon">&#x1F501;</span>
+                        <div>
+                            <h3 style="margin:0;">Direkte &rarr; Indirekte Rede &mdash; Trainer</h3>
+                            <p style="color:var(--color-text-muted); font-size:0.88rem; margin:0.3rem 0 0;">Перепиши предложение в косвенной речи (Konjunktiv I). Если не знаешь &mdash; жми &laquo;Antwort zeigen&raquo;.</p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Er sagt, er komme morgen sp&auml;ter."
+                         data-explain="Pr&auml;sens: <strong>kommt</strong> &rarr; <strong>komme</strong>. 3-е лицо ед.ч. + окончание <em>-e</em>.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-blue">Pr&auml;sens</span>
+                            <span class="konj-tag-verb">kommen</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Ich <strong>komme</strong> morgen sp&auml;ter.&raquo;</div>
+                        <div class="konj-prefix">Er sagt, ___</div>
+                        <input class="konj-input" placeholder="Er sagt, er ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Er sagt, er <em>komme</em> morgen sp&auml;ter.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Sie sagt, sie sei m&uuml;de."
+                         data-explain="<strong>sein</strong> &mdash; особый глагол: <em>bin/ist</em> &rarr; <strong>sei</strong>. Главная форма для индиректа!">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-blue">Pr&auml;sens</span>
+                            <span class="konj-tag-verb">sein</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Ich <strong>bin</strong> m&uuml;de.&raquo;</div>
+                        <div class="konj-prefix">Sie sagt, ___</div>
+                        <input class="konj-input" placeholder="Sie sagt, sie ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Sie sagt, sie <em>sei</em> m&uuml;de.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Er sagt, er habe gestern gearbeitet."
+                         data-explain="Vergangenheit: <strong>habe + Partizip II</strong> (gearbeitet). Действие в прошлом &mdash; вспомогательный глагол в Konjunktiv I.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-purple">Vergangenheit</span>
+                            <span class="konj-tag-verb">arbeiten</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Ich <strong>habe</strong> gestern <strong>gearbeitet</strong>.&raquo;</div>
+                        <div class="konj-prefix">Er sagt, ___</div>
+                        <input class="konj-input" placeholder="Er sagt, er ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Er sagt, er <em>habe</em> gestern <em>gearbeitet</em>.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Sie sagt, sie werde morgen kommen."
+                         data-explain="Futur: <strong>werde + Infinitiv</strong>. Будущее в косвенной речи всегда так.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-orange">Futur</span>
+                            <span class="konj-tag-verb">kommen</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Ich <strong>werde</strong> morgen <strong>kommen</strong>.&raquo;</div>
+                        <div class="konj-prefix">Sie sagt, ___</div>
+                        <input class="konj-input" placeholder="Sie sagt, sie ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Sie sagt, sie <em>werde</em> morgen <em>kommen</em>.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Er sagt, er k&ouml;nne das verstehen."
+                         data-explain="Modalverb: <strong>kann</strong> &rarr; <strong>k&ouml;nne</strong>. Окончание <em>-e</em> у 3-го лица ед.ч.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-red">Modal</span>
+                            <span class="konj-tag-verb">k&ouml;nnen</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Ich <strong>kann</strong> das verstehen.&raquo;</div>
+                        <div class="konj-prefix">Er sagt, ___</div>
+                        <input class="konj-input" placeholder="Er sagt, er ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Er sagt, er <em>k&ouml;nne</em> das verstehen.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Sie sagen, sie h&auml;tten keine Zeit."
+                         data-explain="Внимание: 3 л. <em>мн. ч.</em> Konj. I = <em>haben</em> = Indikativ &rarr; берём <strong>Konjunktiv II: h&auml;tten</strong>.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-purple">Vergangenheit</span>
+                            <span class="konj-tag-verb">haben (Plural!)</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Wir <strong>haben</strong> keine Zeit.&raquo;</div>
+                        <div class="konj-prefix">Sie sagen, ___</div>
+                        <input class="konj-input" placeholder="Sie sagen, sie ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Sie sagen, sie <em>h&auml;tten</em> keine Zeit.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <div class="konj-question"
+                         data-answer="Der Lehrer sagt, man m&uuml;sse mehr lernen."
+                         data-explain="Modalverb: <strong>muss</strong> &rarr; <strong>m&uuml;sse</strong>. Безличное <em>man</em> = 3 л. ед. ч.">
+                        <div class="konj-tag-row">
+                            <span class="konj-tag tag-red">Modal</span>
+                            <span class="konj-tag-verb">m&uuml;ssen</span>
+                        </div>
+                        <div class="konj-direct">&laquo;Man <strong>muss</strong> mehr lernen.&raquo;</div>
+                        <div class="konj-prefix">Der Lehrer sagt, ___</div>
+                        <input class="konj-input" placeholder="Der Lehrer sagt, ..." autocomplete="off">
+                        <div class="konj-controls">
+                            <button class="konj-check-btn" onclick="checkKonjAnswer(this)">Pr&uuml;fen</button>
+                            <button class="konj-show-btn" onclick="showKonjAnswer(this)">Antwort zeigen</button>
+                        </div>
+                        <div class="konj-feedback"></div>
+                        <div class="konj-answer">
+                            <span class="konj-answer-label">&#x2705; Richtig:</span>
+                            <span class="konj-answer-text">Der Lehrer sagt, man <em>m&uuml;sse</em> mehr lernen.</span>
+                            <p class="konj-answer-explain"></p>
+                        </div>
+                    </div>
+
+                    <p class="konj-trainer-tip">&#x1F4A1; <strong>Подсказка:</strong> сравнение игнорирует регистр и пробелы. &laquo;Er sei m&uuml;de&raquo; и &laquo;er sei m&uuml;de&raquo; засчитываются одинаково.</p>
                 </div>
 
             </section>
@@ -1037,6 +1372,59 @@
                 else if (s.score >= Math.ceil(s.max / 2)) { scoreEl.innerHTML = s.score + '/' + s.max + ' \u2014 Gut! Schau dir die Tabellen nochmal an.'; scoreEl.style.color = 'var(--color-orange)'; }
                 else { scoreEl.innerHTML = s.score + '/' + s.max + ' \u2014 Lerne die Formen nochmal!'; scoreEl.style.color = 'var(--color-red)'; }
             }
+        }
+
+        // ===== Konjunktiv Trainer (Direkte → Indirekte Rede) =====
+        function normalizeKonj(s) {
+            return s
+                .toLowerCase()
+                .replace(/\u00a0/g, ' ')
+                .replace(/[\u00ab\u00bb"'\u201e\u201c\u201d]/g, '')
+                .replace(/[.,;:!?]+$/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/[\.\!\?\,]/g, '')
+                .trim();
+        }
+        function checkKonjAnswer(btn) {
+            const q = btn.closest('.konj-question');
+            const input = q.querySelector('.konj-input');
+            const feedback = q.querySelector('.konj-feedback');
+            const answer = q.dataset.answer;
+            const userVal = input.value.trim();
+            if (!userVal) {
+                feedback.textContent = '\u270D\uFE0F Введи варiант або жми Antwort zeigen';
+                feedback.className = 'konj-feedback fail';
+                return;
+            }
+            const normUser = normalizeKonj(userVal);
+            const normAns = normalizeKonj(answer);
+            // Accept full match OR suffix match (user typed only predicate)
+            const ok = normUser === normAns || normAns.endsWith(' ' + normUser) || normAns.endsWith(normUser);
+            input.disabled = true;
+            btn.disabled = true;
+            if (ok) {
+                feedback.innerHTML = '\u2705 Richtig! Super gemacht!';
+                feedback.className = 'konj-feedback ok';
+                q.classList.add('solved-correct');
+                showKonjAnswer(q.querySelector('.konj-show-btn'), true);
+            } else {
+                feedback.innerHTML = '\u274C Nicht ganz. Klicke <strong>Antwort zeigen</strong>, um zu sehen, was richtig ist.';
+                feedback.className = 'konj-feedback fail';
+                q.classList.add('solved-wrong');
+            }
+        }
+        function showKonjAnswer(btn, autoTriggered) {
+            const q = btn.closest('.konj-question');
+            q.classList.add('show-answer');
+            if (!autoTriggered) q.classList.add('revealed');
+            const explainEl = q.querySelector('.konj-answer-explain');
+            const explain = q.dataset.explain;
+            if (explain && explainEl) explainEl.innerHTML = explain;
+            const input = q.querySelector('.konj-input');
+            const checkBtn = q.querySelector('.konj-check-btn');
+            input.disabled = true;
+            checkBtn.disabled = true;
+            btn.disabled = true;
         }
     </script>
 </body>

@@ -22,6 +22,149 @@
         .sc-tip.visible { display:block; }
         .sc-tip a { color:var(--color-accent); text-decoration:underline; }
         .sc-done { font-size:0.82rem; color:#3fb950; margin-top:0.15rem; }
+
+        /* ===== VORLAGE-GENERATOR ===== */
+        .vorlage-builder {
+            margin-top: 1.5rem;
+            padding: 1.4rem;
+            background: rgba(13, 17, 23, 0.85);
+            border: 1px solid rgba(68, 147, 248, 0.3);
+            border-radius: 14px;
+            backdrop-filter: blur(8px);
+        }
+        .vorlage-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+        .vorlage-icon {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .vorlage-sub {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin: 0.3rem 0 0;
+            line-height: 1.5;
+        }
+        .vorlage-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .vorlage-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .vorlage-field-wide { grid-column: 1 / -1; }
+        .vorlage-label {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+        }
+        .vorlage-hint {
+            color: var(--color-text-muted);
+            font-weight: 400;
+            font-size: 0.74rem;
+            margin-left: 0.2rem;
+        }
+        .vorlage-input {
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 0.92rem;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .vorlage-input:focus {
+            border-color: rgba(68, 147, 248, 0.5);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        select.vorlage-input { cursor: pointer; }
+        select.vorlage-input option { background: #0d1117; color: #fff; }
+
+        .vorlage-preview-label {
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+        .vorlage-preview {
+            padding: 1rem 1.1rem;
+            background: rgba(63, 185, 80, 0.06);
+            border: 1px solid rgba(63, 185, 80, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1.7;
+            min-height: 4rem;
+            transition: all 0.15s;
+        }
+        .vorlage-preview .vorlage-placeholder {
+            color: var(--color-text-muted);
+            font-style: italic;
+            font-size: 0.92rem;
+        }
+        .vorlage-preview .vorlage-blank {
+            display: inline-block;
+            min-width: 60px;
+            padding: 0 0.4em;
+            background: rgba(255, 255, 255, 0.07);
+            border-bottom: 1.5px dashed rgba(255, 255, 255, 0.3);
+            color: var(--color-text-muted);
+            font-style: italic;
+            border-radius: 3px;
+        }
+        .vorlage-preview .vorlage-filled {
+            color: #3fb950;
+            font-weight: 600;
+        }
+
+        .vorlage-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.9rem;
+            flex-wrap: wrap;
+        }
+        .vorlage-copy-btn, .vorlage-clear-btn {
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .vorlage-copy-btn {
+            background: rgba(68, 147, 248, 0.2);
+            color: #79b8ff;
+            border: 1px solid rgba(68, 147, 248, 0.3);
+        }
+        .vorlage-copy-btn:hover { background: rgba(68, 147, 248, 0.3); }
+        .vorlage-copy-btn.copied {
+            background: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+            border-color: rgba(63, 185, 80, 0.4);
+        }
+        .vorlage-clear-btn {
+            background: transparent;
+            color: var(--color-text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .vorlage-clear-btn:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+
+        @media (max-width: 600px) {
+            .vorlage-fields { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
@@ -113,6 +256,50 @@
                     <p><strong class="accent">Beispiel:</strong></p>
                     <p style="margin-top:0.4rem; font-style:italic;">&laquo;Die Kurzgeschichte &bdquo;...&ldquo; von ... aus dem Jahr ... handelt von ...&raquo;</p>
                 </div>
+
+                <!-- ===== Interaktive Einleitung-Vorlage ===== -->
+                <div class="vorlage-builder">
+                    <div class="vorlage-header">
+                        <span class="vorlage-icon">&#x270D;&#xFE0F;</span>
+                        <div>
+                            <h3 style="margin:0;">Vorlage-Generator: Einleitung</h3>
+                            <p class="vorlage-sub">Заполни 5 полей &mdash; готовая Einleitung появится снизу. Можно скопировать.</p>
+                        </div>
+                    </div>
+
+                    <div class="vorlage-fields">
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Textsorte <span class="vorlage-hint">(жанр)</span></span>
+                            <input type="text" class="vorlage-input" id="ein-sorte" placeholder="Kurzgeschichte / Erz&auml;hlung / Romanauszug" oninput="updateEinleitung()">
+                        </label>
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Titel <span class="vorlage-hint">(назва тексту)</span></span>
+                            <input type="text" class="vorlage-input" id="ein-titel" placeholder="z.B. Spaghetti f&uuml;r zwei" oninput="updateEinleitung()">
+                        </label>
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Autor</span>
+                            <input type="text" class="vorlage-input" id="ein-autor" placeholder="z.B. Federica de Cesco" oninput="updateEinleitung()">
+                        </label>
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Erscheinungsjahr</span>
+                            <input type="text" class="vorlage-input" id="ein-jahr" placeholder="z.B. 1987" oninput="updateEinleitung()">
+                        </label>
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Thema <span class="vorlage-hint">(о чём текст &mdash; одним предложением)</span></span>
+                            <input type="text" class="vorlage-input" id="ein-thema" placeholder="z.B. einem Missverst&auml;ndnis zwischen zwei Jugendlichen im Restaurant (Dativ!)" oninput="updateEinleitung()">
+                        </label>
+                    </div>
+
+                    <div class="vorlage-preview-label">&#x1F4DD; Deine Einleitung:</div>
+                    <div class="vorlage-preview" id="ein-preview">
+                        <span class="vorlage-placeholder">Заповни поля вище &mdash; готовий текст з'явиться тут.</span>
+                    </div>
+
+                    <div class="vorlage-actions">
+                        <button class="vorlage-copy-btn" onclick="copyVorlage('ein-preview', this)">&#x1F4CB; Kopieren</button>
+                        <button class="vorlage-clear-btn" onclick="clearVorlage(['ein-sorte','ein-titel','ein-autor','ein-jahr','ein-thema'], 'ein-preview', updateEinleitung)">&#x1F5D1;&#xFE0F; L&ouml;schen</button>
+                    </div>
+                </div>
             </section>
 
             <!-- Was analysieren: Erzähltechnik, Figuren, Sprache -->
@@ -188,6 +375,57 @@
                     <p><strong class="accent">Immer verbinden:</strong> <strong>Textstelle</strong> &rarr; <strong>Stilmittel</strong> &rarr; <strong>Wirkung</strong></p>
                     <p style="margin-top:0.4rem; font-style:italic;">&laquo;In Zeile 7 verwendet der Autor eine Metapher (&bdquo;...&ldquo;), um ... zu verdeutlichen.&raquo;</p>
                 </div>
+
+                <!-- ===== Interaktive Stilmittel-Vorlage ===== -->
+                <div class="vorlage-builder">
+                    <div class="vorlage-header">
+                        <span class="vorlage-icon">&#x1F50D;</span>
+                        <div>
+                            <h3 style="margin:0;">Vorlage-Generator: Stilmittel-Analyse</h3>
+                            <p class="vorlage-sub">Заполни 4 поля &mdash; получишь готовое предложение для анализа в Hauptteil.</p>
+                        </div>
+                    </div>
+
+                    <div class="vorlage-fields">
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Stilmittel <span class="vorlage-hint">(приём)</span></span>
+                            <select class="vorlage-input" id="stil-mittel" oninput="updateStilmittel()">
+                                <option value="">&mdash; w&auml;hle &mdash;</option>
+                                <option value="Metapher">Metapher</option>
+                                <option value="Vergleich">Vergleich</option>
+                                <option value="Personifikation">Personifikation</option>
+                                <option value="Wiederholung">Wiederholung</option>
+                                <option value="Hyperbel">Hyperbel (&Uuml;bertreibung)</option>
+                                <option value="rhetorische Frage">rhetorische Frage</option>
+                                <option value="Ironie">Ironie</option>
+                                <option value="Aufz&auml;hlung">Aufz&auml;hlung</option>
+                                <option value="Alliteration">Alliteration</option>
+                            </select>
+                        </label>
+                        <label class="vorlage-field">
+                            <span class="vorlage-label">Zeile <span class="vorlage-hint">(Z. 5 / Z. 7-9)</span></span>
+                            <input type="text" class="vorlage-input" id="stil-zeile" placeholder="z.B. Z. 7" oninput="updateStilmittel()">
+                        </label>
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Zitat aus dem Text <span class="vorlage-hint">(в кавычках)</span></span>
+                            <input type="text" class="vorlage-input" id="stil-zitat" placeholder="z.B. Herz aus Stein" oninput="updateStilmittel()">
+                        </label>
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Wirkung <span class="vorlage-hint">(что эффект &mdash; um/dass-Satz)</span></span>
+                            <input type="text" class="vorlage-input" id="stil-wirkung" placeholder="z.B. die Gef&uuml;hllosigkeit der Figur zu verdeutlichen" oninput="updateStilmittel()">
+                        </label>
+                    </div>
+
+                    <div class="vorlage-preview-label">&#x1F4DD; Dein Analyse-Satz:</div>
+                    <div class="vorlage-preview" id="stil-preview">
+                        <span class="vorlage-placeholder">Заповни поля вище &mdash; готовий аналітичний абзац з'явиться тут.</span>
+                    </div>
+
+                    <div class="vorlage-actions">
+                        <button class="vorlage-copy-btn" onclick="copyVorlage('stil-preview', this)">&#x1F4CB; Kopieren</button>
+                        <button class="vorlage-clear-btn" onclick="clearVorlage(['stil-mittel','stil-zeile','stil-zitat','stil-wirkung'], 'stil-preview', updateStilmittel)">&#x1F5D1;&#xFE0F; L&ouml;schen</button>
+                    </div>
+                </div>
             </section>
 
             <!-- Erzähltechnik im Detail -->
@@ -238,6 +476,42 @@
                         <li>&laquo;Die Analyse zeigt deutlich, dass ...&raquo;</li>
                         <li>&laquo;Zusammenfassend l&auml;sst sich sagen, dass ...&raquo;</li>
                     </ul>
+                </div>
+
+                <!-- ===== Interaktive Schluss-Vorlage ===== -->
+                <div class="vorlage-builder">
+                    <div class="vorlage-header">
+                        <span class="vorlage-icon">&#x1F3AF;</span>
+                        <div>
+                            <h3 style="margin:0;">Vorlage-Generator: Schluss (Deutung)</h3>
+                            <p class="vorlage-sub">Заповни 3 поля &mdash; отримаєш повний скелет завершення аналізу.</p>
+                        </div>
+                    </div>
+
+                    <div class="vorlage-fields">
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Botschaft des Textes <span class="vorlage-hint">(головна думка автора)</span></span>
+                            <input type="text" class="vorlage-input" id="schluss-botschaft" placeholder="z.B. Vorurteile k&ouml;nnen zu peinlichen Missverst&auml;ndnissen f&uuml;hren" oninput="updateSchluss()">
+                        </label>
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Wirkung auf den Leser <span class="vorlage-hint">(що автор хоче викликати)</span></span>
+                            <input type="text" class="vorlage-input" id="schluss-wirkung" placeholder="z.B. zum Nachdenken &uuml;ber eigene Vorurteile anregen" oninput="updateSchluss()">
+                        </label>
+                        <label class="vorlage-field vorlage-field-wide">
+                            <span class="vorlage-label">Aktualit&auml;t / persönliche Meinung <span class="vorlage-hint">(один речення)</span></span>
+                            <input type="text" class="vorlage-input" id="schluss-aktuell" placeholder="z.B. Auch heute sind Vorurteile in der Gesellschaft weit verbreitet" oninput="updateSchluss()">
+                        </label>
+                    </div>
+
+                    <div class="vorlage-preview-label">&#x1F4DD; Dein Schluss:</div>
+                    <div class="vorlage-preview" id="schluss-preview">
+                        <span class="vorlage-placeholder">Заповни поля вище &mdash; готовий завершальний абзац з'явиться тут.</span>
+                    </div>
+
+                    <div class="vorlage-actions">
+                        <button class="vorlage-copy-btn" onclick="copyVorlage('schluss-preview', this)">&#x1F4CB; Kopieren</button>
+                        <button class="vorlage-clear-btn" onclick="clearVorlage(['schluss-botschaft','schluss-wirkung','schluss-aktuell'], 'schluss-preview', updateSchluss)">&#x1F5D1;&#xFE0F; L&ouml;schen</button>
+                    </div>
                 </div>
             </section>
 
@@ -449,6 +723,111 @@
             { q: 'Gedicht analysieren', sub: 'Strophen, Reimschema, Metrum, sprachliche Mittel', tip: '\u{1F4A1} Falls ein Gedicht kommt: z\u00e4hle Strophen und Verse, bestimme das Reimschema (Paarreim, Kreuzreim), suche Stilmittel. <br><br>\u{1F4DA} Alles \u00fcber Gedichtanalyse findest du weiter unten auf dieser Seite im Abschnitt &laquo;Gedichtanalyse&raquo;.' }
         ];
         (function(){var c=document.getElementById('sc-items'),total=SC_DATA.length,answers={};c.innerHTML=SC_DATA.map(function(item,i){return'<div class="sc-item" data-idx="'+i+'"><div class="sc-q"><strong>'+(i+1)+'. '+item.q+'</strong>'+(item.sub?'<small>'+item.sub+'</small>':'')+'</div><div class="sc-btns"><button class="sc-btn sc-btn-yes" onclick="scAnswer('+i+',true)">Kann ich \u2705</button><button class="sc-btn sc-btn-no" onclick="scAnswer('+i+',false)">Muss ich lernen \u{1F4D6}</button></div><div class="sc-tip" id="sc-tip-'+i+'">'+item.tip+'</div></div>';}).join('');window.scAnswer=function(idx,canDo){answers[idx]=canDo;var item=document.querySelector('.sc-item[data-idx="'+idx+'"]');var btns=item.querySelectorAll('.sc-btn');btns[0].className='sc-btn sc-btn-yes'+(canDo?' chosen':' dimmed');btns[1].className='sc-btn sc-btn-no'+(!canDo?' chosen':' dimmed');document.getElementById('sc-tip-'+idx).className=canDo?'sc-tip':'sc-tip visible';if(canDo&&!item.querySelector('.sc-done')){var d=document.createElement('div');d.className='sc-done';d.textContent='\u2713 Super!';item.appendChild(d);}else if(!canDo){var d=item.querySelector('.sc-done');if(d)d.remove();}if(Object.keys(answers).length===total){var yes=0,weak=[];for(var k in answers){if(answers[k])yes++;else weak.push(SC_DATA[k].q);}var r=document.getElementById('sc-result');r.style.display='block';if(yes===total)r.innerHTML='<strong style="color:#3fb950;">\u{1F31F} '+yes+'/'+total+' \u2014 Du bist bereit!</strong>';else r.innerHTML='<strong style="color:#e3b341;">\u{1F4AA} '+yes+'/'+total+' \u2014 Fast geschafft!</strong><p style="margin:0.5rem 0 0;font-size:0.85rem;color:var(--color-text-muted);">\u00dcbe noch:</p><ul style="margin:0.3rem 0 0;padding-left:1.2rem;font-size:0.85rem;color:var(--color-text-secondary);">'+weak.map(function(w){return'<li>'+w+'</li>';}).join('')+'</ul>';}};})();
+
+        // ===== Vorlage-Generator =====
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, function(c) {
+                return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+            });
+        }
+        function fillOrBlank(value, placeholder) {
+            var v = (value || '').trim();
+            if (v) return '<span class="vorlage-filled">' + escapeHtml(v) + '</span>';
+            return '<span class="vorlage-blank">' + escapeHtml(placeholder || '___') + '</span>';
+        }
+
+        function updateEinleitung() {
+            var sorte = document.getElementById('ein-sorte').value;
+            var titel = document.getElementById('ein-titel').value;
+            var autor = document.getElementById('ein-autor').value;
+            var jahr = document.getElementById('ein-jahr').value;
+            var thema = document.getElementById('ein-thema').value;
+
+            var titelDisp = (titel || '').trim() ? '\u201E' + escapeHtml(titel) + '\u201C' : '<span class="vorlage-blank">Titel</span>';
+            var preview = 'Die ' + fillOrBlank(sorte, 'Textsorte') + ' ' +
+                titelDisp + ' von ' +
+                fillOrBlank(autor, 'Autor') + ', erschienen ' +
+                fillOrBlank(jahr, 'Jahr') + ', handelt von ' +
+                fillOrBlank(thema, 'dem Thema') + '. ' +
+                'Im Folgenden werde ich den Text analysieren und seine sprachlichen Besonderheiten untersuchen.';
+
+            document.getElementById('ein-preview').innerHTML = preview;
+        }
+
+        function updateStilmittel() {
+            var mittel = document.getElementById('stil-mittel').value;
+            var zeile = document.getElementById('stil-zeile').value;
+            var zitat = document.getElementById('stil-zitat').value;
+            var wirkung = document.getElementById('stil-wirkung').value;
+
+            // Article logic for Stilmittel
+            var articles = { 'Metapher': 'eine', 'Personifikation': 'eine', 'Wiederholung': 'eine', 'Hyperbel': 'eine', 'rhetorische Frage': 'eine', 'Ironie': 'eine', 'Aufz\u00e4hlung': 'eine', 'Alliteration': 'eine', 'Vergleich': 'einen' };
+            var artikel = articles[mittel] || 'ein';
+            var mittelStr = mittel ? artikel + ' <span class="vorlage-filled">' + escapeHtml(mittel) + '</span>' : '<span class="vorlage-blank">Stilmittel</span>';
+
+            var zitatDisp = (zitat || '').trim() ? '\u201E' + escapeHtml(zitat) + '\u201C' : '<span class="vorlage-blank">Zitat</span>';
+            var zeileDisp = fillOrBlank(zeile, 'Z. X');
+
+            var preview = 'Der Autor verwendet ' + mittelStr +
+                ' (' + zitatDisp + ', ' + zeileDisp + '), um ' +
+                fillOrBlank(wirkung, 'die Wirkung zu beschreiben') + '.';
+
+            document.getElementById('stil-preview').innerHTML = preview;
+        }
+
+        function updateSchluss() {
+            var bot = document.getElementById('schluss-botschaft').value;
+            var wirk = document.getElementById('schluss-wirkung').value;
+            var akt = document.getElementById('schluss-aktuell').value;
+
+            var preview = 'Zusammenfassend l\u00e4sst sich sagen, dass der Autor zeigen m\u00f6chte, dass ' +
+                fillOrBlank(bot, 'Botschaft des Textes') + '. ' +
+                'Mit den verwendeten sprachlichen Mitteln will er ' +
+                fillOrBlank(wirk, 'eine Wirkung auf den Leser erzielen') + '. ' +
+                fillOrBlank(akt, 'Aktualität / persönliche Meinung') + '.';
+
+            document.getElementById('schluss-preview').innerHTML = preview;
+        }
+
+        function copyVorlage(previewId, btn) {
+            var el = document.getElementById(previewId);
+            // Get text without placeholder
+            var clone = el.cloneNode(true);
+            // Remove blanks from copy
+            clone.querySelectorAll('.vorlage-blank').forEach(function(b) { b.remove(); });
+            clone.querySelectorAll('.vorlage-placeholder').forEach(function(b) { b.remove(); });
+            var text = clone.textContent.replace(/\s+/g, ' ').replace(/\s+([\.\,\!\?])/g, '$1').trim();
+            if (!text || text.length < 5) {
+                btn.textContent = '\u26A0\uFE0F Заповни поля!';
+                setTimeout(function() { btn.textContent = '\u{1F4CB} Kopieren'; }, 2000);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(function() {
+                var orig = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '\u2705 Kopiert!';
+                setTimeout(function() {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = orig;
+                }, 1800);
+            }).catch(function() {
+                btn.textContent = '\u274C Fehler';
+                setTimeout(function() { btn.textContent = '\u{1F4CB} Kopieren'; }, 1800);
+            });
+        }
+
+        function clearVorlage(fieldIds, previewId, updateFn) {
+            fieldIds.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            updateFn();
+        }
+
+        // Initial render so blanks are visible
+        if (document.getElementById('ein-preview')) updateEinleitung();
+        if (document.getElementById('stil-preview')) updateStilmittel();
+        if (document.getElementById('schluss-preview')) updateSchluss();
     </script>
 </body>
 </html>
