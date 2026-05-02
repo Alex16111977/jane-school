@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsche Verben | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .verb-filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        .verb-filter-btn {
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .verb-filter-btn.active, .verb-filter-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+            background: rgba(88,166,255,0.08);
+        }
+        .verb-search-wrap {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .verb-search {
+            width: 100%;
+            padding: 0.55rem 1rem 0.55rem 2.2rem;
+            border-radius: 10px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: var(--color-text);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .verb-search:focus { outline: none; border-color: var(--color-accent); }
+        .verb-search-icon {
+            position: absolute;
+            left: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .verb-table-wrap { overflow-x: auto; }
+        .verb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .verb-table th {
+            background: rgba(88,166,255,0.08);
+            color: var(--color-accent);
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            white-space: nowrap;
+            font-weight: 600;
+            border-bottom: 1.5px solid rgba(88,166,255,0.2);
+        }
+        .verb-table td {
+            padding: 0.55rem 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            vertical-align: middle;
+        }
+        .verb-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .verb-table tr.hidden-row { display: none; }
+        .inf { font-weight: 700; color: var(--color-text); }
+        .pres-change { color: #e3a832; font-weight: 600; }
+        .pret { color: #7ee787; }
+        .part { color: #d2a8ff; }
+        .aux-haben { color: var(--color-accent); font-size: 0.8rem; }
+        .aux-sein { color: #ff7b72; font-size: 0.8rem; }
+        .ru { color: var(--color-text-muted); font-size: 0.8rem; }
+        .group-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+        .badge-stark { background: rgba(227,168,50,0.15); color: #e3a832; border: 1px solid rgba(227,168,50,0.3); }
+        .badge-schwach { background: rgba(126,231,135,0.1); color: #7ee787; border: 1px solid rgba(126,231,135,0.25); }
+        .badge-modal { background: rgba(210,168,255,0.1); color: #d2a8ff; border: 1px solid rgba(210,168,255,0.25); }
+        .badge-mixed { background: rgba(255,123,114,0.1); color: #ff7b72; border: 1px solid rgba(255,123,114,0.25); }
+        .conj-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.15rem 1.5rem;
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+        }
+        .conj-grid span { display: block; }
+        .conj-grid .ich-form { color: var(--color-text); }
+        .tip-box {
+            background: rgba(88,166,255,0.06);
+            border-left: 3px solid var(--color-accent);
+            border-radius: 0 8px 8px 0;
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.88rem;
+        }
+        .legend-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.82rem;
+            margin-bottom: 0.8rem;
+        }
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verben</span>
+        </nav>
+
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Deutsche Verben</h1>
+            <p class="page-subtitle">Alle Formen auswendig lernen &mdash; Inf. / Pr&auml;s. / Pr&auml;t. / Partizip II</p>
+        </div>
+
+        <div class="zp-notes">
+            <section class="note-section">
+
+                <!-- Legende & Tipps -->
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Wie lernt man Verben?</strong> F&uuml;r jedes Verb lerne: <strong>Infinitiv &rarr; er-Form (Pr&auml;sens) &rarr; ich-Form (Pr&auml;teritum) &rarr; Partizip II + haben/sein</strong>
+                    <span style="color:var(--color-text-muted); font-size:0.85rem;"> &mdash; учи 4 формы каждого глагола!</span></p>
+                    <div class="legend-row" style="margin-top:0.7rem;">
+                        <span><span class="pres-change">gelb</span> = Vokalwechsel im Pr&auml;sens <span class="ru">(смена гласной)</span></span>
+                        <span><span class="pret">gr&uuml;n</span> = Pr&auml;teritum <span class="ru">(прошедшее)</span></span>
+                        <span><span class="part">lila</span> = Partizip II <span class="ru">(причастие II)</span></span>
+                        <span><span class="aux-haben">blau = hat</span> / <span class="aux-sein">rot = ist</span> <span class="ru">(Hilfsverb)</span></span>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Tipp:</strong> Starke Verben haben einen Vokalwechsel: <em>fahren &rarr; f&auml;hrt &rarr; fuhr &rarr; gefahren</em>. Schwache Verben enden im Partizip auf <strong>-t</strong>: <em>machen &rarr; gemacht</em>. Mischverben kombinieren beides: <em>bringen &rarr; brachte &rarr; gebracht</em>.
+                </div>
+
+                <!-- Filter & Suche -->
+                <div class="verb-search-wrap">
+                    <span class="verb-search-icon">&#128269;</span>
+                    <input type="text" class="verb-search" id="verbSearch" placeholder="Verb suchen... (z.B. fahren, haben, laufen)" autocomplete="off">
+                </div>
+                <div class="verb-filter-bar" id="filterBar">
+                    <button class="verb-filter-btn active" data-filter="all">Alle</button>
+                    <button class="verb-filter-btn" data-filter="stark"><span class="badge-stark">stark</span> Unregelm&auml;&szlig;ig</button>
+                    <button class="verb-filter-btn" data-filter="schwach"><span class="badge-schwach">schwach</span> Regelm&auml;&szlig;ig</button>
+                    <button class="verb-filter-btn" data-filter="modal"><span class="badge-modal">modal</span> Modalverben</button>
+                    <button class="verb-filter-btn" data-filter="mixed"><span class="badge-mixed">gemischt</span> Mischverben</button>
+                    <button class="verb-filter-btn" data-filter="sein">+&nbsp;sein</button>
+                    <button class="verb-filter-btn" data-filter="haben">+&nbsp;haben</button>
+                </div>
+                <div class="stats-bar">
+                    <span id="verbCount">Verben: —</span>
+                </div>
+
+                <!-- ===== HAUPTTABELLE ===== -->
+                <div class="note-card" style="padding:0.5rem 0.5rem 1rem;">
+                    <div class="verb-table-wrap">
+                    <table class="verb-table" id="verbTable">
+                        <thead>
+                            <tr>
+                                <th>Infinitiv</th>
+                                <th>Pr&auml;sens<br><span style="font-weight:400;font-size:0.78rem;color:var(--color-text-muted)">er / sie / es</span></th>
+                                <th>Pr&auml;teritum<br><span style="font-weight:400;font-size:0.78rem;color:var(--color-text-muted)">ich</span></th>
+                                <th>Partizip II</th>
+                                <th>Hilfsverb</th>
+                                <th>Typ</th>
+                                <th>&#x1F1F7;&#x1F1FA; Bedeutung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verbBody">
+                            <!-- Modalverben -->
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">d&uuml;rfen</td>
+                                <td><span class="pres-change">darf</span></td>
+                                <td class="pret">durfte</td>
+                                <td class="part">gedurft / d&uuml;rfen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">мочь (разрешено)</td>
+                            </tr>
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">k&ouml;nnen</td>
+                                <td><span class="pres-change">kann</span></td>
+                                <td class="pret">konnte</td>
+                                <td class="part">gekonnt / k&ouml;nnen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">мочь (уметь)</td>
+                            </tr>
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">m&uuml;ssen</td>
+                                <td><span class="pres-change">muss</span></td>
+                                <td class="pret">musste</td>
+                                <td class="part">gemusst / m&uuml;ssen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">должен</td>
+                            </tr>
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">sollen</td>
+                                <td><span class="pres-change">soll</span></td>
+                                <td class="pret">sollte</td>
+                                <td class="part">gesollt / sollen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">должен (по чужой воле)</td>
+                            </tr>
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">wollen</td>
+                                <td><span class="pres-change">will</span></td>
+                                <td class="pret">wollte</td>
+                                <td class="part">gewollt / wollen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">хотеть</td>
+                            </tr>
+                            <tr data-type="modal" data-aux="haben">
+                                <td class="inf">m&ouml;gen</td>
+                                <td><span class="pres-change">mag</span></td>
+                                <td class="pret">mochte</td>
+                                <td class="part">gem&ouml;gt / m&ouml;gen*</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-modal">modal</span></td>
+                                <td class="ru">любить, нравиться</td>
+                            </tr>
+
+                            <!-- Hilfsverben (особые) -->
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">haben</td>
+                                <td><span class="pres-change">hat</span></td>
+                                <td class="pret">hatte</td>
+                                <td class="part">gehabt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">иметь</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">sein</td>
+                                <td><span class="pres-change">ist</span></td>
+                                <td class="pret">war</td>
+                                <td class="part">gewesen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">быть</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">werden</td>
+                                <td><span class="pres-change">wird</span></td>
+                                <td class="pret">wurde</td>
+                                <td class="part">geworden</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">становиться / будущее</td>
+                            </tr>
+
+                            <!-- Starke Verben - Bewegung -->
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">fahren</td>
+                                <td><span class="pres-change">f&auml;hrt</span></td>
+                                <td class="pret">fuhr</td>
+                                <td class="part">gefahren</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">ехать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">gehen</td>
+                                <td>geht</td>
+                                <td class="pret">ging</td>
+                                <td class="part">gegangen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">идти</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">kommen</td>
+                                <td>kommt</td>
+                                <td class="pret">kam</td>
+                                <td class="part">gekommen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">приходить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">laufen</td>
+                                <td><span class="pres-change">l&auml;uft</span></td>
+                                <td class="pret">lief</td>
+                                <td class="part">gelaufen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">бежать, ходить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">fliegen</td>
+                                <td>fliegt</td>
+                                <td class="pret">flog</td>
+                                <td class="part">geflogen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">летать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">reisen</td>
+                                <td>reist</td>
+                                <td class="pret">reiste</td>
+                                <td class="part">gereist</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">путешествовать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="sein">
+                                <td class="inf">steigen</td>
+                                <td>steigt</td>
+                                <td class="pret">stieg</td>
+                                <td class="part">gestiegen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">подниматься</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schwimmen</td>
+                                <td>schwimmt</td>
+                                <td class="pret">schwamm</td>
+                                <td class="part">geschwommen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">плавать</td>
+                            </tr>
+
+                            <!-- Starke Verben - Sinneswahrnehmung / Alltag -->
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">sehen</td>
+                                <td><span class="pres-change">sieht</span></td>
+                                <td class="pret">sah</td>
+                                <td class="part">gesehen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">видеть</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">lesen</td>
+                                <td><span class="pres-change">liest</span></td>
+                                <td class="pret">las</td>
+                                <td class="part">gelesen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">читать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">geben</td>
+                                <td><span class="pres-change">gibt</span></td>
+                                <td class="pret">gab</td>
+                                <td class="part">gegeben</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">давать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">nehmen</td>
+                                <td><span class="pres-change">nimmt</span></td>
+                                <td class="pret">nahm</td>
+                                <td class="part">genommen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">брать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schreiben</td>
+                                <td>schreibt</td>
+                                <td class="pret">schrieb</td>
+                                <td class="part">geschrieben</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">писать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">sprechen</td>
+                                <td><span class="pres-change">spricht</span></td>
+                                <td class="pret">sprach</td>
+                                <td class="part">gesprochen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">говорить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">helfen</td>
+                                <td><span class="pres-change">hilft</span></td>
+                                <td class="pret">half</td>
+                                <td class="part">geholfen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">помогать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">treffen</td>
+                                <td><span class="pres-change">trifft</span></td>
+                                <td class="pret">traf</td>
+                                <td class="part">getroffen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">встречать(ся)</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">treiben</td>
+                                <td>treibt</td>
+                                <td class="pret">trieb</td>
+                                <td class="part">getrieben</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">заниматься (спортом)</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">tragen</td>
+                                <td><span class="pres-change">tr&auml;gt</span></td>
+                                <td class="pret">trug</td>
+                                <td class="part">getragen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">носить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">waschen</td>
+                                <td><span class="pres-change">w&auml;scht</span></td>
+                                <td class="pret">wusch</td>
+                                <td class="part">gewaschen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">мыть, стирать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schlafen</td>
+                                <td><span class="pres-change">schl&auml;ft</span></td>
+                                <td class="pret">schlief</td>
+                                <td class="part">geschlafen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">спать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">essen</td>
+                                <td><span class="pres-change">isst</span></td>
+                                <td class="pret">a&szlig;</td>
+                                <td class="part">gegessen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">есть (кушать)</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">trinken</td>
+                                <td>trinkt</td>
+                                <td class="pret">trank</td>
+                                <td class="part">getrunken</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">пить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">finden</td>
+                                <td>findet</td>
+                                <td class="pret">fand</td>
+                                <td class="part">gefunden</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">находить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">halten</td>
+                                <td><span class="pres-change">h&auml;lt</span></td>
+                                <td class="pret">hielt</td>
+                                <td class="part">gehalten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">держать, останавливать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">lassen</td>
+                                <td><span class="pres-change">l&auml;sst</span></td>
+                                <td class="pret">lie&szlig;</td>
+                                <td class="part">gelassen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">оставлять, разрешать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">fallen</td>
+                                <td><span class="pres-change">f&auml;llt</span></td>
+                                <td class="pret">fiel</td>
+                                <td class="part">gefallen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">падать; нравиться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">stehen</td>
+                                <td>steht</td>
+                                <td class="pret">stand</td>
+                                <td class="part">gestanden</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">стоять</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">sitzen</td>
+                                <td>sitzt</td>
+                                <td class="pret">sa&szlig;</td>
+                                <td class="part">gesessen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">сидеть</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">liegen</td>
+                                <td>liegt</td>
+                                <td class="pret">lag</td>
+                                <td class="part">gelegen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">лежать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schlie&szlig;en</td>
+                                <td>schlie&szlig;t</td>
+                                <td class="pret">schloss</td>
+                                <td class="part">geschlossen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">закрывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">&ouml;ffnen</td>
+                                <td>&ouml;ffnet</td>
+                                <td class="pret">&ouml;ffnete</td>
+                                <td class="part">ge&ouml;ffnet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">открывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">rufen</td>
+                                <td>ruft</td>
+                                <td class="pret">rief</td>
+                                <td class="part">gerufen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">звать, кричать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">ziehen</td>
+                                <td>zieht</td>
+                                <td class="pret">zog</td>
+                                <td class="part">gezogen</td>
+                                <td><span class="aux-haben">hat</span> / <span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">тянуть; переезжать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">gewinnen</td>
+                                <td>gewinnt</td>
+                                <td class="pret">gewann</td>
+                                <td class="part">gewonnen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">побеждать, выигрывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">verlieren</td>
+                                <td>verliert</td>
+                                <td class="pret">verlor</td>
+                                <td class="part">verloren</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">терять, проигрывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">beginnen</td>
+                                <td>beginnt</td>
+                                <td class="pret">begann</td>
+                                <td class="part">begonnen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">начинать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">vergessen</td>
+                                <td><span class="pres-change">vergisst</span></td>
+                                <td class="pret">vergaß</td>
+                                <td class="part">vergessen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">забывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">verstehen</td>
+                                <td>versteht</td>
+                                <td class="pret">verstand</td>
+                                <td class="part">verstanden</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">понимать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">gefallen</td>
+                                <td><span class="pres-change">gef&auml;llt</span></td>
+                                <td class="pret">gefiel</td>
+                                <td class="part">gefallen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">нравиться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">ankommen</td>
+                                <td>kommt an</td>
+                                <td class="pret">kam an</td>
+                                <td class="part">angekommen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">прибывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">einladen</td>
+                                <td><span class="pres-change">l&auml;dt ein</span></td>
+                                <td class="pret">lud ein</td>
+                                <td class="part">eingeladen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">приглашать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">ausgehen</td>
+                                <td>geht aus</td>
+                                <td class="pret">ging aus</td>
+                                <td class="part">ausgegangen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">выходить (гулять)</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">vorstellen</td>
+                                <td>stellt vor</td>
+                                <td class="pret">stellte vor</td>
+                                <td class="part">vorgestellt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">представлять(ся)</td>
+                            </tr>
+
+                            <!-- Starke Verben - weitere -->
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">werfen</td>
+                                <td><span class="pres-change">wirft</span></td>
+                                <td class="pret">warf</td>
+                                <td class="part">geworfen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">бросать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">stoßen</td>
+                                <td><span class="pres-change">st&ouml;&szlig;t</span></td>
+                                <td class="pret">stie&szlig;</td>
+                                <td class="part">gesto&szlig;en</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">толкать, натолкнуться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schneiden</td>
+                                <td>schneidet</td>
+                                <td class="pret">schnitt</td>
+                                <td class="part">geschnitten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">резать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">beißen</td>
+                                <td>bei&szlig;t</td>
+                                <td class="pret">biss</td>
+                                <td class="part">gebissen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">кусать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">reißen</td>
+                                <td>rei&szlig;t</td>
+                                <td class="pret">riss</td>
+                                <td class="part">gerissen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">рвать, разрывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">streiten</td>
+                                <td>streitet</td>
+                                <td class="pret">stritt</td>
+                                <td class="part">gestritten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">спорить, ссориться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">leiden</td>
+                                <td>leidet</td>
+                                <td class="pret">litt</td>
+                                <td class="part">gelitten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">страдать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">bieten</td>
+                                <td>bietet</td>
+                                <td class="pret">bot</td>
+                                <td class="part">geboten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">предлагать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">bitten</td>
+                                <td>bittet</td>
+                                <td class="pret">bat</td>
+                                <td class="part">gebeten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">просить</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">gelten</td>
+                                <td><span class="pres-change">gilt</span></td>
+                                <td class="pret">galt</td>
+                                <td class="part">gegolten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">действовать, считаться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">bekommen</td>
+                                <td>bekommt</td>
+                                <td class="pret">bekam</td>
+                                <td class="part">bekommen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">получать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">beschreiben</td>
+                                <td>beschreibt</td>
+                                <td class="pret">beschrieb</td>
+                                <td class="part">beschrieben</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">описывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">entscheiden</td>
+                                <td>entscheidet</td>
+                                <td class="pret">entschied</td>
+                                <td class="part">entschieden</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">решать, принимать решение</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">versprechen</td>
+                                <td><span class="pres-change">verspricht</span></td>
+                                <td class="pret">versprach</td>
+                                <td class="part">versprochen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">обещать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">empfehlen</td>
+                                <td><span class="pres-change">empfiehlt</span></td>
+                                <td class="pret">empfahl</td>
+                                <td class="part">empfohlen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">рекомендовать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">erscheinen</td>
+                                <td>erscheint</td>
+                                <td class="pret">erschien</td>
+                                <td class="part">erschienen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">появляться, выходить (книга)</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">erhalten</td>
+                                <td><span class="pres-change">erh&auml;lt</span></td>
+                                <td class="pret">erhielt</td>
+                                <td class="part">erhalten</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">получать, сохранять</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">erkennen</td>
+                                <td>erkennt</td>
+                                <td class="pret">erkannte</td>
+                                <td class="part">erkannt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">узнавать, распознавать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">erschrecken</td>
+                                <td><span class="pres-change">erschrickt</span></td>
+                                <td class="pret">erschrak</td>
+                                <td class="part">erschrocken</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">пугаться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">sinken</td>
+                                <td>sinkt</td>
+                                <td class="pret">sank</td>
+                                <td class="part">gesunken</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">снижаться, тонуть</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">steigen</td>
+                                <td>steigt</td>
+                                <td class="pret">stieg</td>
+                                <td class="part">gestiegen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">расти, подниматься</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">wachsen</td>
+                                <td><span class="pres-change">w&auml;chst</span></td>
+                                <td class="pret">wuchs</td>
+                                <td class="part">gewachsen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">расти</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schaffen</td>
+                                <td>schafft</td>
+                                <td class="pret">schuf</td>
+                                <td class="part">geschaffen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">создавать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">scheinen</td>
+                                <td>scheint</td>
+                                <td class="pret">schien</td>
+                                <td class="part">geschienen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">светить; казаться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">scheiden</td>
+                                <td>scheidet</td>
+                                <td class="pret">schied</td>
+                                <td class="part">geschieden</td>
+                                <td><span class="aux-haben">hat</span> / <span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">разводиться; разделять</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">greifen</td>
+                                <td>greift</td>
+                                <td class="pret">griff</td>
+                                <td class="part">gegriffen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">хватать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">schweigen</td>
+                                <td>schweigt</td>
+                                <td class="pret">schwieg</td>
+                                <td class="part">geschwiegen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">молчать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">weisen</td>
+                                <td>weist</td>
+                                <td class="pret">wies</td>
+                                <td class="part">gewiesen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">указывать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">hängen</td>
+                                <td>h&auml;ngt</td>
+                                <td class="pret">hing</td>
+                                <td class="part">gehangen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">висеть</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">abfahren</td>
+                                <td><span class="pres-change">f&auml;hrt ab</span></td>
+                                <td class="pret">fuhr ab</td>
+                                <td class="part">abgefahren</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">отправляться, уезжать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">aufstehen</td>
+                                <td>steht auf</td>
+                                <td class="pret">stand auf</td>
+                                <td class="part">aufgestanden</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">вставать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">aufnehmen</td>
+                                <td><span class="pres-change">nimmt auf</span></td>
+                                <td class="pret">nahm auf</td>
+                                <td class="part">aufgenommen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">записывать; принимать</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">mitnehmen</td>
+                                <td><span class="pres-change">nimmt mit</span></td>
+                                <td class="pret">nahm mit</td>
+                                <td class="part">mitgenommen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">брать с собой</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">zurückkommen</td>
+                                <td>kommt zur&uuml;ck</td>
+                                <td class="pret">kam zur&uuml;ck</td>
+                                <td class="part">zur&uuml;ckgekommen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">возвращаться</td>
+                            </tr>
+                            <tr data-type="stark" data-aux="haben">
+                                <td class="inf">weitergehen</td>
+                                <td>geht weiter</td>
+                                <td class="pret">ging weiter</td>
+                                <td class="part">weitergegangen</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">продолжаться; идти дальше</td>
+                            </tr>
+
+                            <!-- Mischverben -->
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">bringen</td>
+                                <td>bringt</td>
+                                <td class="pret">brachte</td>
+                                <td class="part">gebracht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">приносить</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">denken</td>
+                                <td>denkt</td>
+                                <td class="pret">dachte</td>
+                                <td class="part">gedacht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">думать</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">kennen</td>
+                                <td>kennt</td>
+                                <td class="pret">kannte</td>
+                                <td class="part">gekannt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">знать (кого-то)</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">nennen</td>
+                                <td>nennt</td>
+                                <td class="pret">nannte</td>
+                                <td class="part">genannt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">называть</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">wissen</td>
+                                <td><span class="pres-change">wei&szlig;</span></td>
+                                <td class="pret">wusste</td>
+                                <td class="part">gewusst</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">знать (факт)</td>
+                            </tr>
+
+                            <!-- Mischverben - weitere -->
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">senden</td>
+                                <td>sendet</td>
+                                <td class="pret">sandte / sendete</td>
+                                <td class="part">gesandt / gesendet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">отправлять</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">brennen</td>
+                                <td>brennt</td>
+                                <td class="pret">brannte</td>
+                                <td class="part">gebrannt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">гореть</td>
+                            </tr>
+                            <tr data-type="mixed" data-aux="haben">
+                                <td class="inf">rennen</td>
+                                <td>rennt</td>
+                                <td class="pret">rannte</td>
+                                <td class="part">gerannt</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-mixed">gemischt</span></td>
+                                <td class="ru">бежать, мчаться</td>
+                            </tr>
+
+                            <!-- Schwache Verben -->
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">machen</td>
+                                <td>macht</td>
+                                <td class="pret">machte</td>
+                                <td class="part">gemacht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">делать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">arbeiten</td>
+                                <td>arbeitet</td>
+                                <td class="pret">arbeitete</td>
+                                <td class="part">gearbeitet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">работать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">lernen</td>
+                                <td>lernt</td>
+                                <td class="pret">lernte</td>
+                                <td class="part">gelernt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">учить(ся)</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">kaufen</td>
+                                <td>kauft</td>
+                                <td class="pret">kaufte</td>
+                                <td class="part">gekauft</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">покупать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">spielen</td>
+                                <td>spielt</td>
+                                <td class="pret">spielte</td>
+                                <td class="part">gespielt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">играть</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">h&ouml;ren</td>
+                                <td>h&ouml;rt</td>
+                                <td class="pret">h&ouml;rte</td>
+                                <td class="part">geh&ouml;rt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">слышать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">wohnen</td>
+                                <td>wohnt</td>
+                                <td class="pret">wohnte</td>
+                                <td class="part">gewohnt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">жить (проживать)</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">leben</td>
+                                <td>lebt</td>
+                                <td class="pret">lebte</td>
+                                <td class="part">gelebt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">жить</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">fragen</td>
+                                <td>fragt</td>
+                                <td class="pret">fragte</td>
+                                <td class="part">gefragt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">спрашивать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">sagen</td>
+                                <td>sagt</td>
+                                <td class="pret">sagte</td>
+                                <td class="part">gesagt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">говорить, сказать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">zeigen</td>
+                                <td>zeigt</td>
+                                <td class="pret">zeigte</td>
+                                <td class="part">gezeigt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">показывать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">brauchen</td>
+                                <td>braucht</td>
+                                <td class="pret">brauchte</td>
+                                <td class="part">gebraucht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">нуждаться, нужен</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">suchen</td>
+                                <td>sucht</td>
+                                <td class="pret">suchte</td>
+                                <td class="part">gesucht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">искать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">lieben</td>
+                                <td>liebt</td>
+                                <td class="pret">liebte</td>
+                                <td class="part">geliebt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">любить</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">kosten</td>
+                                <td>kostet</td>
+                                <td class="pret">kostete</td>
+                                <td class="part">gekostet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">стоить</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">glauben</td>
+                                <td>glaubt</td>
+                                <td class="pret">glaubte</td>
+                                <td class="part">geglaubt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">верить, думать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">bedeuten</td>
+                                <td>bedeutet</td>
+                                <td class="pret">bedeutete</td>
+                                <td class="part">bedeutet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">означать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">benutzen</td>
+                                <td>benutzt</td>
+                                <td class="pret">benutzte</td>
+                                <td class="part">benutzt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">использовать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">lachen</td>
+                                <td>lacht</td>
+                                <td class="pret">lachte</td>
+                                <td class="part">gelacht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">смеяться</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">weinen</td>
+                                <td>weint</td>
+                                <td class="pret">weinte</td>
+                                <td class="part">geweint</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">плакать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">tanzen</td>
+                                <td>tanzt</td>
+                                <td class="pret">tanzte</td>
+                                <td class="part">getanzt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">танцевать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">kochen</td>
+                                <td>kocht</td>
+                                <td class="pret">kochte</td>
+                                <td class="part">gekocht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">готовить (еду)</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">putzen</td>
+                                <td>putzt</td>
+                                <td class="pret">putzte</td>
+                                <td class="part">geputzt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">чистить, убирать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">reden</td>
+                                <td>redet</td>
+                                <td class="pret">redete</td>
+                                <td class="part">geredet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">говорить, беседовать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">lächeln</td>
+                                <td>l&auml;chelt</td>
+                                <td class="pret">l&auml;chelte</td>
+                                <td class="part">gel&auml;chelt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">улыбаться</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">warten</td>
+                                <td>wartet</td>
+                                <td class="pret">wartete</td>
+                                <td class="part">gewartet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">ждать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">antworten</td>
+                                <td>antwortet</td>
+                                <td class="pret">antwortete</td>
+                                <td class="part">geantwortet</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">отвечать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">bezahlen</td>
+                                <td>bezahlt</td>
+                                <td class="pret">bezahlte</td>
+                                <td class="part">bezahlt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">платить, оплачивать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">verdienen</td>
+                                <td>verdient</td>
+                                <td class="pret">verdiente</td>
+                                <td class="part">verdient</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">зарабатывать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">verkaufen</td>
+                                <td>verkauft</td>
+                                <td class="pret">verkaufte</td>
+                                <td class="part">verkauft</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">продавать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">erzählen</td>
+                                <td>erz&auml;hlt</td>
+                                <td class="pret">erz&auml;hlte</td>
+                                <td class="part">erz&auml;hlt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">рассказывать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">erklären</td>
+                                <td>erkl&auml;rt</td>
+                                <td class="pret">erkl&auml;rte</td>
+                                <td class="part">erkl&auml;rt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">объяснять</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">versuchen</td>
+                                <td>versucht</td>
+                                <td class="pret">versuchte</td>
+                                <td class="part">versucht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">пробовать, пытаться</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">verbessern</td>
+                                <td>verbessert</td>
+                                <td class="pret">verbesserte</td>
+                                <td class="part">verbessert</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">улучшать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">gehören</td>
+                                <td>geh&ouml;rt</td>
+                                <td class="pret">geh&ouml;rte</td>
+                                <td class="part">geh&ouml;rt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">принадлежать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">fehlen</td>
+                                <td>fehlt</td>
+                                <td class="pret">fehlte</td>
+                                <td class="part">gefehlt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">не хватать, отсутствовать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">folgen</td>
+                                <td>folgt</td>
+                                <td class="pret">folgte</td>
+                                <td class="part">gefolgt</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">следовать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">teilen</td>
+                                <td>teilt</td>
+                                <td class="pret">teilte</td>
+                                <td class="part">geteilt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">делить(ся)</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">stören</td>
+                                <td>st&ouml;rt</td>
+                                <td class="pret">st&ouml;rte</td>
+                                <td class="part">gest&ouml;rt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">мешать, беспокоить</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">merken</td>
+                                <td>merkt</td>
+                                <td class="pret">merkte</td>
+                                <td class="part">gemerkt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">замечать, запоминать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">klingen</td>
+                                <td>klingt</td>
+                                <td class="pret">klang</td>
+                                <td class="part">geklungen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">звучать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">zweifeln</td>
+                                <td>zweifelt</td>
+                                <td class="pret">zweifelte</td>
+                                <td class="part">gezweifelt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">сомневаться</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">träumen</td>
+                                <td>tr&auml;umt</td>
+                                <td class="pret">tr&auml;umte</td>
+                                <td class="part">getr&auml;umt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">мечтать, сниться</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">aufhören</td>
+                                <td>h&ouml;rt auf</td>
+                                <td class="pret">h&ouml;rte auf</td>
+                                <td class="part">aufgeh&ouml;rt</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">прекращать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">anfangen</td>
+                                <td><span class="pres-change">f&auml;ngt an</span></td>
+                                <td class="pret">fing an</td>
+                                <td class="part">angefangen</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-stark">stark</span></td>
+                                <td class="ru">начинать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">aufmachen</td>
+                                <td>macht auf</td>
+                                <td class="pret">machte auf</td>
+                                <td class="part">aufgemacht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">открывать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">zumachen</td>
+                                <td>macht zu</td>
+                                <td class="pret">machte zu</td>
+                                <td class="part">zugemacht</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">закрывать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">studieren</td>
+                                <td>studiert</td>
+                                <td class="pret">studierte</td>
+                                <td class="part">studiert</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">учиться (в вузе)</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">interessieren</td>
+                                <td>interessiert</td>
+                                <td class="pret">interessierte</td>
+                                <td class="part">interessiert</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">интересовать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">fotografieren</td>
+                                <td>fotografiert</td>
+                                <td class="pret">fotografierte</td>
+                                <td class="part">fotografiert</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">фотографировать</td>
+                            </tr>
+                            <tr data-type="schwach" data-aux="haben">
+                                <td class="inf">diskutieren</td>
+                                <td>diskutiert</td>
+                                <td class="pret">diskutierte</td>
+                                <td class="part">diskutiert</td>
+                                <td><span class="aux-haben">hat</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">обсуждать</td>
+                            </tr>
+
+                            <tr data-type="schwach" data-aux="sein">
+                                <td class="inf">passieren</td>
+                                <td>passiert</td>
+                                <td class="pret">passierte</td>
+                                <td class="part">passiert</td>
+                                <td><span class="aux-sein">ist</span></td>
+                                <td><span class="group-badge badge-schwach">schwach</span></td>
+                                <td class="ru">происходить</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- Präsens Konjugation Übersicht -->
+                <div class="note-card">
+                    <h3>&#128196; Pr&auml;sens-Endungen &mdash; schnelle &Uuml;bersicht</h3>
+                    <div style="overflow-x:auto;">
+                    <table class="unit-table">
+                        <tr>
+                            <th>Pronomen</th>
+                            <th>Endung<br><span style="font-weight:400;font-size:0.78rem">regul&auml;r</span></th>
+                            <th>machen</th>
+                            <th>arbeiten<br><span style="font-weight:400;font-size:0.78rem">(-t/-d)</span></th>
+                            <th>fahren<br><span style="font-weight:400;font-size:0.78rem">stark</span></th>
+                            <th>sprechen<br><span style="font-weight:400;font-size:0.78rem">stark</span></th>
+                            <th>haben</th>
+                            <th>sein</th>
+                            <th>werden</th>
+                        </tr>
+                        <tr><td><strong>ich</strong></td><td>-e</td><td>mache</td><td>arbeite</td><td>fahre</td><td>spreche</td><td>habe</td><td>bin</td><td>werde</td></tr>
+                        <tr><td><strong>du</strong></td><td>-st</td><td>machst</td><td>arbeitest</td><td><span class="pres-change">f&auml;hrst</span></td><td><span class="pres-change">sprichst</span></td><td>hast</td><td>bist</td><td>wirst</td></tr>
+                        <tr><td><strong>er/sie/es</strong></td><td>-t</td><td>macht</td><td>arbeitet</td><td><span class="pres-change">f&auml;hrt</span></td><td><span class="pres-change">spricht</span></td><td><span class="pres-change">hat</span></td><td>ist</td><td><span class="pres-change">wird</span></td></tr>
+                        <tr><td><strong>wir</strong></td><td>-en</td><td>machen</td><td>arbeiten</td><td>fahren</td><td>sprechen</td><td>haben</td><td>sind</td><td>werden</td></tr>
+                        <tr><td><strong>ihr</strong></td><td>-t</td><td>macht</td><td>arbeitet</td><td><span class="pres-change">fahrt</span></td><td>sprecht</td><td>habt</td><td>seid</td><td>werdet</td></tr>
+                        <tr><td><strong>sie/Sie</strong></td><td>-en</td><td>machen</td><td>arbeiten</td><td>fahren</td><td>sprechen</td><td>haben</td><td>sind</td><td>werden</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- Partizip II Regeln -->
+                <div class="note-card">
+                    <h3>&#128218; Partizip II bilden &mdash; Regelübersicht</h3>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; margin-top:0.5rem;">
+                        <div class="tip-box">
+                            <strong>Schwache Verben:</strong> ge- + Stamm + <strong>-t</strong><br>
+                            <span class="ru">machen &rarr; ge<strong>mach</strong>t &nbsp;|&nbsp; kaufen &rarr; ge<strong>kauf</strong>t</span><br>
+                            <span style="font-size:0.82rem;color:var(--color-text-muted)">Bei -t/-d-Stamm: ge + Stamm + <strong>-et</strong> &nbsp; arbeiten &rarr; ge<strong>arbeit</strong>et</span>
+                        </div>
+                        <div class="tip-box">
+                            <strong>Starke Verben:</strong> ge- + (Stammvokalwechsel) + <strong>-en</strong><br>
+                            <span class="ru">fahren &rarr; ge<strong>fahr</strong>en &nbsp;|&nbsp; schreiben &rarr; ge<strong>schrieb</strong>en</span>
+                        </div>
+                        <div class="tip-box">
+                            <strong>Verben auf -ieren:</strong> Partizip ohne ge-!<br>
+                            <span class="ru">passieren &rarr; passiert &nbsp;|&nbsp; studieren &rarr; studiert</span>
+                        </div>
+                        <div class="tip-box">
+                            <strong>Trennbare Verben:</strong> ge- kommt zwischen Pr&auml;fix und Stamm<br>
+                            <span class="ru">einladen &rarr; ein<strong>ge</strong>laden &nbsp;|&nbsp; ausgehen &rarr; aus<strong>ge</strong>gangen</span>
+                        </div>
+                        <div class="tip-box">
+                            <strong>Untrennbare Verben</strong> (be-, ge-, er-, ver-, zer-, emp-, miss-, ent-): <strong>kein ge-</strong><br>
+                            <span class="ru">vergessen &rarr; vergessen &nbsp;|&nbsp; benutzen &rarr; benutzt</span>
+                        </div>
+                        <div class="tip-box">
+                            <strong>haben oder sein?</strong><br>
+                            <span class="aux-sein">sein</span>: Bewegung von A&rarr;B &nbsp;<span class="ru">(gehen, fahren, kommen)</span><br>
+                            <span class="aux-sein">sein</span>: Zustands&auml;nderung &nbsp;<span class="ru">(werden, wachsen, sterben)</span><br>
+                            <span class="aux-haben">haben</span>: alle anderen Verben
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modalverben Konjugation -->
+                <div class="note-card">
+                    <h3>&#128203; Modalverben &mdash; vollst&auml;ndige Konjugation</h3>
+                    <div style="overflow-x:auto;">
+                    <table class="unit-table">
+                        <tr>
+                            <th>Pronomen</th>
+                            <th>d&uuml;rfen<br><span style="font-weight:400;font-size:0.78rem">разрешено</span></th>
+                            <th>k&ouml;nnen<br><span style="font-weight:400;font-size:0.78rem">уметь</span></th>
+                            <th>m&uuml;ssen<br><span style="font-weight:400;font-size:0.78rem">должен</span></th>
+                            <th>sollen<br><span style="font-weight:400;font-size:0.78rem">по чужой воле</span></th>
+                            <th>wollen<br><span style="font-weight:400;font-size:0.78rem">хотеть</span></th>
+                            <th>m&ouml;gen<br><span style="font-weight:400;font-size:0.78rem">любить</span></th>
+                        </tr>
+                        <tr><td><strong>ich</strong></td><td>darf</td><td>kann</td><td>muss</td><td>soll</td><td>will</td><td>mag</td></tr>
+                        <tr><td><strong>du</strong></td><td>darfst</td><td>kannst</td><td>musst</td><td>sollst</td><td>willst</td><td>magst</td></tr>
+                        <tr><td><strong>er/sie/es</strong></td><td>darf</td><td>kann</td><td>muss</td><td>soll</td><td>will</td><td>mag</td></tr>
+                        <tr><td><strong>wir</strong></td><td>d&uuml;rfen</td><td>k&ouml;nnen</td><td>m&uuml;ssen</td><td>sollen</td><td>wollen</td><td>m&ouml;gen</td></tr>
+                        <tr><td><strong>ihr</strong></td><td>d&uuml;rft</td><td>k&ouml;nnt</td><td>m&uuml;sst</td><td>sollt</td><td>wollt</td><td>m&ouml;gt</td></tr>
+                        <tr><td><strong>sie/Sie</strong></td><td>d&uuml;rfen</td><td>k&ouml;nnen</td><td>m&uuml;ssen</td><td>sollen</td><td>wollen</td><td>m&ouml;gen</td></tr>
+                        <tr style="background:rgba(255,255,255,0.03)">
+                            <td><strong>Pr&auml;t. ich</strong></td>
+                            <td class="pret">durfte</td><td class="pret">konnte</td><td class="pret">musste</td>
+                            <td class="pret">sollte</td><td class="pret">wollte</td><td class="pret">mochte</td>
+                        </tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.82rem; color:var(--color-text-muted); margin-top:0.5rem;">* Im Perfekt mit Infinitiv (Ersatzinfinitiv): <em>Ich habe fahren m&uuml;ssen.</em></p>
+                </div>
+
+            </section>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        const body = document.getElementById('verbBody');
+        const search = document.getElementById('verbSearch');
+        const filterBtns = document.querySelectorAll('.verb-filter-btn');
+        const countEl = document.getElementById('verbCount');
+        let currentFilter = 'all';
+
+        function countRows() {
+            const visible = body.querySelectorAll('tr:not(.hidden-row)').length;
+            countEl.textContent = 'Verben: ' + visible;
+        }
+
+        function applyFilters() {
+            const q = search.value.toLowerCase().trim();
+            const rows = body.querySelectorAll('tr');
+            rows.forEach(row => {
+                const type = row.dataset.type || '';
+                const aux = row.dataset.aux || '';
+                const text = row.textContent.toLowerCase();
+
+                let typeMatch = true;
+                if (currentFilter === 'stark') typeMatch = type === 'stark';
+                else if (currentFilter === 'schwach') typeMatch = type === 'schwach';
+                else if (currentFilter === 'modal') typeMatch = type === 'modal';
+                else if (currentFilter === 'mixed') typeMatch = type === 'mixed';
+                else if (currentFilter === 'sein') typeMatch = aux === 'sein';
+                else if (currentFilter === 'haben') typeMatch = aux === 'haben';
+
+                const searchMatch = !q || text.includes(q);
+
+                if (typeMatch && searchMatch) {
+                    row.classList.remove('hidden-row');
+                } else {
+                    row.classList.add('hidden-row');
+                }
+            });
+            countRows();
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        search.addEventListener('input', applyFilters);
+
+        applyFilters();
+    })();
+    </script>
+</body>
+</html>

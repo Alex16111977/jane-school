@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wortbildung | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ===== Suffix-Karten ===== */
+        .suffix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        .suffix-card {
+            border-radius: 12px;
+            padding: 1.1rem 1.2rem;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            transition: border-color 0.2s;
+        }
+        .suffix-card:hover { border-color: rgba(255,255,255,0.18); }
+
+        .suffix-badge {
+            display: inline-block;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            border-radius: 8px;
+            padding: 0.1rem 0.7rem;
+            margin-bottom: 0.55rem;
+        }
+        .s-ung   { background: rgba(88,166,255,0.13); color: #58a6ff; border: 1.5px solid rgba(88,166,255,0.3); }
+        .s-keit  { background: rgba(126,231,135,0.1); color: #7ee787; border: 1.5px solid rgba(126,231,135,0.25); }
+        .s-heit  { background: rgba(210,168,255,0.1); color: #d2a8ff; border: 1.5px solid rgba(210,168,255,0.25); }
+        .s-lich  { background: rgba(255,212,59,0.1);  color: #f0c040; border: 1.5px solid rgba(255,212,59,0.25); }
+        .s-los   { background: rgba(255,123,114,0.1); color: #ff7b72; border: 1.5px solid rgba(255,123,114,0.25); }
+        .s-ig    { background: rgba(255,166,77,0.1);  color: #ffa64d; border: 1.5px solid rgba(255,166,77,0.25); }
+        .s-isch  { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1.5px solid rgba(100,200,255,0.25); }
+        .s-er    { background: rgba(180,140,255,0.1); color: #b48cff; border: 1.5px solid rgba(180,140,255,0.25); }
+        .s-in    { background: rgba(255,150,200,0.1); color: #ff96c8; border: 1.5px solid rgba(255,150,200,0.25); }
+
+        .suffix-meta {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .suffix-rule {
+            font-size: 0.88rem;
+            margin-bottom: 0.7rem;
+            line-height: 1.55;
+        }
+        .suffix-examples {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .suffix-examples li {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            padding: 0.22rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .suffix-examples li:last-child { border-bottom: none; }
+        .ex-from { color: var(--color-text-muted); min-width: 90px; font-size: 0.8rem; }
+        .ex-arrow { color: var(--color-text-muted); font-size: 0.75rem; }
+        .ex-word { font-weight: 700; color: var(--color-text); }
+        .ex-ru { color: var(--color-text-muted); font-size: 0.78rem; margin-left: auto; }
+
+        /* ===== Verb → Nomen Tabelle ===== */
+        .wb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .wb-table th {
+            background: rgba(88,166,255,0.08);
+            color: var(--color-accent);
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            white-space: nowrap;
+            font-weight: 600;
+            border-bottom: 1.5px solid rgba(88,166,255,0.2);
+        }
+        .wb-table td {
+            padding: 0.5rem 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+        .wb-table tr:hover td { background: rgba(255,255,255,0.025); }
+        .verb-col { color: #58a6ff; font-weight: 600; }
+        .nomen-col { font-weight: 700; }
+        .artikel-der  { color: #58a6ff; font-weight: 700; font-size: 0.82rem; }
+        .artikel-die  { color: #ff96c8; font-weight: 700; font-size: 0.82rem; }
+        .artikel-das  { color: #7ee787; font-weight: 700; font-size: 0.82rem; }
+        .ru-col { color: var(--color-text-muted); font-size: 0.8rem; }
+
+        /* ===== Formel-Box ===== */
+        .formel-box {
+            background: rgba(88,166,255,0.06);
+            border: 1.5px solid rgba(88,166,255,0.2);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+        .formel-box code {
+            background: rgba(255,255,255,0.08);
+            border-radius: 5px;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+        }
+
+        /* ===== Merke-Box ===== */
+        .merke-box {
+            background: rgba(255,212,59,0.06);
+            border-left: 3px solid #f0c040;
+            border-radius: 0 8px 8px 0;
+            padding: 0.7rem 1rem;
+            font-size: 0.87rem;
+            margin: 0.6rem 0;
+            line-height: 1.6;
+        }
+
+        /* ===== Quiz ===== */
+        .quiz-wrap { display: flex; flex-direction: column; gap: 0.8rem; }
+        .quiz-item {
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+        }
+        .quiz-question { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.92rem; }
+        .quiz-hint { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+        .quiz-options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .quiz-btn {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: transparent;
+            color: var(--color-text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .quiz-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+        .quiz-btn.correct { border-color: #7ee787; background: rgba(126,231,135,0.12); color: #7ee787; }
+        .quiz-btn.wrong   { border-color: #ff7b72; background: rgba(255,123,114,0.10); color: #ff7b72; }
+        .quiz-feedback { font-size: 0.82rem; margin-top: 0.45rem; min-height: 1.1rem; }
+
+        /* ===== Tabs ===== */
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Wortbildung</span>
+        </nav>
+
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Wortbildung</h1>
+            <p class="page-subtitle">Suffixe &amp; Wortfamilien &mdash; aus einem Wort viele machen</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="suffixe">Suffixe &Uuml;bersicht</button>
+            <button class="tab" data-tab="verb-nomen">Verb &rarr; Nomen</button>
+            <button class="tab" data-tab="adjektive">Adjektiv-Suffixe</button>
+            <button class="tab" data-tab="quiz">&#127981; &Uuml;ben</button>
+        </div>
+
+        <!-- ==================== TAB 1: Suffixe Übersicht ==================== -->
+        <div class="tab-content active" id="tab-suffixe">
+        <div class="zp-notes">
+            <section class="note-section">
+
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9F1;</span>
+                    <div>
+                        <h2>Was ist Wortbildung?</h2>
+                        <p class="lesson-header-sub">Суффиксы — строительные кирпичики немецкого языка</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Зачем учить суффиксы?</strong> Зная суффикс, ты автоматически знаешь <strong>род существительного</strong> и можешь строить новые слова из известных корней — это удваивает твой словарный запас!</p>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:0.8rem;">
+                        <span class="suffix-badge s-ung">-ung</span>
+                        <span class="suffix-badge s-keit">-keit</span>
+                        <span class="suffix-badge s-heit">-heit</span>
+                        <span class="suffix-badge s-lich">-lich</span>
+                        <span class="suffix-badge s-los">-los</span>
+                        <span class="suffix-badge s-ig">-ig</span>
+                        <span class="suffix-badge s-isch">-isch</span>
+                        <span class="suffix-badge s-er">-er</span>
+                        <span class="suffix-badge s-in">-in</span>
+                    </div>
+                </div>
+
+                <div class="merke-box">
+                    <strong>&#x1F4CC; Goldene Regel:</strong><br>
+                    <strong style="color:#ff96c8;">die</strong> — alle Nomen auf <strong>-ung, -heit, -keit, -schaft, -ion, -tät</strong> &nbsp;|&nbsp;
+                    <strong style="color:#58a6ff;">der</strong> — все Nomen на <strong>-er</strong> (Berufe)<br>
+                    <strong style="color:#7ee787;">das</strong> — infinitiv als Nomen: <em>das Laufen, das Schreiben</em>
+                </div>
+
+                <!-- SUFFIX -UNG -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-ung">-ung</span>
+                        <div>
+                            <span class="suffix-meta">Nomen &bull; immer <strong style="color:#ff96c8;">die</strong> &bull; Plural: -ungen</span><br>
+                            <span class="suffix-rule">Aus <strong>Verben</strong> → bezeichnet Prozess, Ergebnis oder Zustand<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(из глаголов → процесс или результат действия)</span></span>
+                        </div>
+                    </div>
+                    <div class="formel-box">
+                        Verb-Stamm + <code>-ung</code> = <strong style="color:#ff96c8;">die</strong> Nomen<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">lösen &rarr; die Lös<strong>ung</strong> &nbsp;|&nbsp; ändern &rarr; die Änder<strong>ung</strong></span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">lösen</span><span class="ex-arrow">→</span><span class="ex-word">die Lösung</span><span class="ex-ru">решение</span></li>
+                        <li><span class="ex-from">ändern</span><span class="ex-arrow">→</span><span class="ex-word">die Änderung</span><span class="ex-ru">изменение</span></li>
+                        <li><span class="ex-from">erklären</span><span class="ex-arrow">→</span><span class="ex-word">die Erklärung</span><span class="ex-ru">объяснение</span></li>
+                        <li><span class="ex-from">bedeuten</span><span class="ex-arrow">→</span><span class="ex-word">die Bedeutung</span><span class="ex-ru">значение</span></li>
+                        <li><span class="ex-from">untersuchen</span><span class="ex-arrow">→</span><span class="ex-word">die Untersuchung</span><span class="ex-ru">исследование</span></li>
+                        <li><span class="ex-from">entscheiden</span><span class="ex-arrow">→</span><span class="ex-word">die Entscheidung</span><span class="ex-ru">решение (принятое)</span></li>
+                        <li><span class="ex-from">ordnen</span><span class="ex-arrow">→</span><span class="ex-word">die Ordnung</span><span class="ex-ru">порядок</span></li>
+                        <li><span class="ex-from">meinen</span><span class="ex-arrow">→</span><span class="ex-word">die Meinung</span><span class="ex-ru">мнение</span></li>
+                        <li><span class="ex-from">wohnen</span><span class="ex-arrow">→</span><span class="ex-word">die Wohnung</span><span class="ex-ru">квартира</span></li>
+                        <li><span class="ex-from">üben</span><span class="ex-arrow">→</span><span class="ex-word">die Übung</span><span class="ex-ru">упражнение</span></li>
+                        <li><span class="ex-from">leisten</span><span class="ex-arrow">→</span><span class="ex-word">die Leistung</span><span class="ex-ru">достижение, успеваемость</span></li>
+                        <li><span class="ex-from">regieren</span><span class="ex-arrow">→</span><span class="ex-word">die Regierung</span><span class="ex-ru">правительство</span></li>
+                        <li><span class="ex-from">verletzen</span><span class="ex-arrow">→</span><span class="ex-word">die Verletzung</span><span class="ex-ru">травма</span></li>
+                        <li><span class="ex-from">fördern</span><span class="ex-arrow">→</span><span class="ex-word">die Förderung</span><span class="ex-ru">поддержка, поощрение</span></li>
+                        <li><span class="ex-from">beziehen</span><span class="ex-arrow">→</span><span class="ex-word">die Beziehung</span><span class="ex-ru">отношение, связь</span></li>
+                    </ul>
+                </div>
+
+                <!-- SUFFIX -HEIT -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-heit">-heit</span>
+                        <div>
+                            <span class="suffix-meta">Nomen &bull; immer <strong style="color:#ff96c8;">die</strong> &bull; Plural: -heiten</span><br>
+                            <span class="suffix-rule">Aus <strong>Adjektiven</strong> → abstrakte Zustände, Eigenschaften<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(из прилагательных → абстрактные качества)</span></span>
+                        </div>
+                    </div>
+                    <div class="formel-box">
+                        Adjektiv + <code>-heit</code> = <strong style="color:#ff96c8;">die</strong> Nomen<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">frei &rarr; die Frei<strong>heit</strong> &nbsp;|&nbsp; krank &rarr; die Krank<strong>heit</strong></span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">frei</span><span class="ex-arrow">→</span><span class="ex-word">die Freiheit</span><span class="ex-ru">свобода</span></li>
+                        <li><span class="ex-from">krank</span><span class="ex-arrow">→</span><span class="ex-word">die Krankheit</span><span class="ex-ru">болезнь</span></li>
+                        <li><span class="ex-from">wahr</span><span class="ex-arrow">→</span><span class="ex-word">die Wahrheit</span><span class="ex-ru">правда</span></li>
+                        <li><span class="ex-from">schön</span><span class="ex-arrow">→</span><span class="ex-word">die Schönheit</span><span class="ex-ru">красота</span></li>
+                        <li><span class="ex-from">sicher</span><span class="ex-arrow">→</span><span class="ex-word">die Sicherheit</span><span class="ex-ru">безопасность</span></li>
+                        <li><span class="ex-from">gesund</span><span class="ex-arrow">→</span><span class="ex-word">die Gesundheit</span><span class="ex-ru">здоровье</span></li>
+                        <li><span class="ex-from">dunkel</span><span class="ex-arrow">→</span><span class="ex-word">die Dunkelheit</span><span class="ex-ru">темнота</span></li>
+                        <li><span class="ex-from">gleich</span><span class="ex-arrow">→</span><span class="ex-word">die Gleichheit</span><span class="ex-ru">равенство</span></li>
+                        <li><span class="ex-from">einheit</span><span class="ex-arrow">→</span><span class="ex-word">die Einheit</span><span class="ex-ru">единство</span></li>
+                        <li><span class="ex-from">bereit</span><span class="ex-arrow">→</span><span class="ex-word">die Bereitschaft*</span><span class="ex-ru">готовность *(-schaft)</span></li>
+                    </ul>
+                </div>
+
+                <!-- SUFFIX -KEIT -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-keit">-keit</span>
+                        <div>
+                            <span class="suffix-meta">Nomen &bull; immer <strong style="color:#ff96c8;">die</strong> &bull; Plural: -keiten</span><br>
+                            <span class="suffix-rule">Aus <strong>Adjektiven auf -ig, -lich, -sam, -bar</strong> → abstrakte Eigenschaften<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(после -ig, -lich, -sam, -bar → добавляется -keit)</span></span>
+                        </div>
+                    </div>
+                    <div class="formel-box">
+                        Adj. (-ig/-lich/-sam/-bar) + <code>-keit</code> = <strong style="color:#ff96c8;">die</strong> Nomen<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">möglich &rarr; die Möglich<strong>keit</strong> &nbsp;|&nbsp; freundlich &rarr; die Freundlich<strong>keit</strong></span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">möglich</span><span class="ex-arrow">→</span><span class="ex-word">die Möglichkeit</span><span class="ex-ru">возможность</span></li>
+                        <li><span class="ex-from">freundlich</span><span class="ex-arrow">→</span><span class="ex-word">die Freundlichkeit</span><span class="ex-ru">дружелюбие</span></li>
+                        <li><span class="ex-from">fähig</span><span class="ex-arrow">→</span><span class="ex-word">die Fähigkeit</span><span class="ex-ru">способность</span></li>
+                        <li><span class="ex-from">einig</span><span class="ex-arrow">→</span><span class="ex-word">die Einigkeit</span><span class="ex-ru">единодушие</span></li>
+                        <li><span class="ex-from">aufmerksam</span><span class="ex-arrow">→</span><span class="ex-word">die Aufmerksamkeit</span><span class="ex-ru">внимание</span></li>
+                        <li><span class="ex-from">notwendig</span><span class="ex-arrow">→</span><span class="ex-word">die Notwendigkeit</span><span class="ex-ru">необходимость</span></li>
+                        <li><span class="ex-from">wirklich</span><span class="ex-arrow">→</span><span class="ex-word">die Wirklichkeit</span><span class="ex-ru">реальность</span></li>
+                        <li><span class="ex-from">persönlich</span><span class="ex-arrow">→</span><span class="ex-word">die Persönlichkeit</span><span class="ex-ru">личность</span></li>
+                        <li><span class="ex-from">ehrlich</span><span class="ex-arrow">→</span><span class="ex-word">die Ehrlichkeit</span><span class="ex-ru">честность</span></li>
+                        <li><span class="ex-from">pünktlich</span><span class="ex-arrow">→</span><span class="ex-word">die Pünktlichkeit</span><span class="ex-ru">пунктуальность</span></li>
+                    </ul>
+                </div>
+
+                <!-- SUFFIX -LICH -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-lich">-lich</span>
+                        <div>
+                            <span class="suffix-meta">Adjektiv &bull; bedeutet „typisch für / wie / in gewisser Weise"</span><br>
+                            <span class="suffix-rule">Aus <strong>Nomen oder Verben</strong> → macht Adjektive<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(из существительных или глаголов → прилагательное)</span></span>
+                        </div>
+                    </div>
+                    <div class="formel-box">
+                        Nomen / Verb + <code>-lich</code> = Adjektiv<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">Freund &rarr; freund<strong>lich</strong> &nbsp;|&nbsp; natürlich / täglich / monatlich</span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">der Freund</span><span class="ex-arrow">→</span><span class="ex-word">freundlich</span><span class="ex-ru">дружелюбный</span></li>
+                        <li><span class="ex-from">die Natur</span><span class="ex-arrow">→</span><span class="ex-word">natürlich</span><span class="ex-ru">естественный</span></li>
+                        <li><span class="ex-from">der Tag</span><span class="ex-arrow">→</span><span class="ex-word">täglich</span><span class="ex-ru">ежедневный</span></li>
+                        <li><span class="ex-from">der Monat</span><span class="ex-arrow">→</span><span class="ex-word">monatlich</span><span class="ex-ru">ежемесячный</span></li>
+                        <li><span class="ex-from">das Jahr</span><span class="ex-arrow">→</span><span class="ex-word">jährlich</span><span class="ex-ru">ежегодный</span></li>
+                        <li><span class="ex-from">die Woche</span><span class="ex-arrow">→</span><span class="ex-word">wöchentlich</span><span class="ex-ru">еженедельный</span></li>
+                        <li><span class="ex-from">persön (Pers.)</span><span class="ex-arrow">→</span><span class="ex-word">persönlich</span><span class="ex-ru">личный</span></li>
+                        <li><span class="ex-from">mündlich</span><span class="ex-arrow">→</span><span class="ex-word">mündlich</span><span class="ex-ru">устный</span></li>
+                        <li><span class="ex-from">schriftlich</span><span class="ex-arrow">→</span><span class="ex-word">schriftlich</span><span class="ex-ru">письменный</span></li>
+                        <li><span class="ex-from">üblich</span><span class="ex-arrow">→</span><span class="ex-word">üblich</span><span class="ex-ru">обычный</span></li>
+                        <li><span class="ex-from">mögen</span><span class="ex-arrow">→</span><span class="ex-word">möglich</span><span class="ex-ru">возможный</span></li>
+                        <li><span class="ex-from">herrlich</span><span class="ex-arrow">→</span><span class="ex-word">herrlich</span><span class="ex-ru">великолепный</span></li>
+                    </ul>
+                </div>
+
+                <!-- SUFFIX -LOS -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-los">-los</span>
+                        <div>
+                            <span class="suffix-meta">Adjektiv &bull; bedeutet „ohne …" (без …)</span><br>
+                            <span class="suffix-rule">Aus <strong>Nomen</strong> → Adjektiv mit negativer Bedeutung „ohne"<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(без чего-то — аналог английского -less)</span></span>
+                        </div>
+                    </div>
+                    <div class="formel-box">
+                        Nomen + <code>-los</code> = Adjektiv (ohne…)<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">die Arbeit &rarr; arbeits<strong>los</strong> (безработный) &nbsp;|&nbsp; der Sinn &rarr; sinn<strong>los</strong> (бессмысленный)</span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">die Arbeit</span><span class="ex-arrow">→</span><span class="ex-word">arbeitslos</span><span class="ex-ru">безработный</span></li>
+                        <li><span class="ex-from">der Sinn</span><span class="ex-arrow">→</span><span class="ex-word">sinnlos</span><span class="ex-ru">бессмысленный</span></li>
+                        <li><span class="ex-from">die Hoffnung</span><span class="ex-arrow">→</span><span class="ex-word">hoffnungslos</span><span class="ex-ru">безнадёжный</span></li>
+                        <li><span class="ex-from">das Ende</span><span class="ex-arrow">→</span><span class="ex-word">endlos</span><span class="ex-ru">бесконечный</span></li>
+                        <li><span class="ex-from">die Kraft</span><span class="ex-arrow">→</span><span class="ex-word">kraftlos</span><span class="ex-ru">бессильный</span></li>
+                        <li><span class="ex-from">der Fehler</span><span class="ex-arrow">→</span><span class="ex-word">fehlerlos</span><span class="ex-ru">без ошибок</span></li>
+                        <li><span class="ex-from">der Zweck</span><span class="ex-arrow">→</span><span class="ex-word">zwecklos</span><span class="ex-ru">бесцельный</span></li>
+                        <li><span class="ex-from">die Hilfe</span><span class="ex-arrow">→</span><span class="ex-word">hilflos</span><span class="ex-ru">беспомощный</span></li>
+                        <li><span class="ex-from">das Ziel</span><span class="ex-arrow">→</span><span class="ex-word">ziellos</span><span class="ex-ru">без цели</span></li>
+                        <li><span class="ex-from">der Mut</span><span class="ex-arrow">→</span><span class="ex-word">mutlos</span><span class="ex-ru">малодушный</span></li>
+                        <li><span class="ex-from">die Macht</span><span class="ex-arrow">→</span><span class="ex-word">machtlos</span><span class="ex-ru">бессильный</span></li>
+                    </ul>
+                </div>
+
+                <!-- SUFFIX -IG -->
+                <div class="note-card">
+                    <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap;">
+                        <span class="suffix-badge s-ig">-ig</span>
+                        <div>
+                            <span class="suffix-meta">Adjektiv &bull; bedeutet „mit … versehen / wie …"</span><br>
+                            <span class="suffix-rule">Aus <strong>Nomen</strong> → Adjektiv (имеющий свойство)<br>
+                            <span style="color:var(--color-text-muted); font-size:0.82rem;">(обладающий чем-то)</span></span>
+                        </div>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">der Hunger</span><span class="ex-arrow">→</span><span class="ex-word">hungrig</span><span class="ex-ru">голодный</span></li>
+                        <li><span class="ex-from">der Durst</span><span class="ex-arrow">→</span><span class="ex-word">durstig</span><span class="ex-ru">жаждущий</span></li>
+                        <li><span class="ex-from">die Ruhe</span><span class="ex-arrow">→</span><span class="ex-word">ruhig</span><span class="ex-ru">спокойный</span></li>
+                        <li><span class="ex-from">der Mut</span><span class="ex-arrow">→</span><span class="ex-word">mutig</span><span class="ex-ru">смелый</span></li>
+                        <li><span class="ex-from">der Fleiß</span><span class="ex-arrow">→</span><span class="ex-word">fleißig</span><span class="ex-ru">прилежный</span></li>
+                        <li><span class="ex-from">die Schuld</span><span class="ex-arrow">→</span><span class="ex-word">schuldig</span><span class="ex-ru">виновный</span></li>
+                        <li><span class="ex-from">die Abhängigkeit</span><span class="ex-arrow">→</span><span class="ex-word">abhängig</span><span class="ex-ru">зависимый</span></li>
+                        <li><span class="ex-from">die Notwendigkeit</span><span class="ex-arrow">→</span><span class="ex-word">notwendig</span><span class="ex-ru">необходимый</span></li>
+                        <li><span class="ex-from">einig</span><span class="ex-arrow">→</span><span class="ex-word">einig</span><span class="ex-ru">единодушный</span></li>
+                        <li><span class="ex-from">fertig</span><span class="ex-arrow">→</span><span class="ex-word">fertig</span><span class="ex-ru">готовый</span></li>
+                    </ul>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TAB 2: Verb → Nomen ==================== -->
+        <div class="tab-content" id="tab-verb-nomen">
+        <div class="zp-notes">
+            <section class="note-section">
+
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F504;</span>
+                    <div>
+                        <h2>Verb &rarr; Nomen</h2>
+                        <p class="lesson-header-sub">Три способа сделать из глагола существительное</p>
+                    </div>
+                </div>
+
+                <!-- Способ 1: -ung -->
+                <div class="note-card">
+                    <h3><span class="suffix-badge s-ung" style="font-size:1rem;">-ung</span> &nbsp; Methode 1 — am h&auml;ufigsten!</h3>
+                    <div class="formel-box">
+                        Verb-Stamm + <code>-ung</code> &nbsp;&rarr;&nbsp; <strong style="color:#ff96c8;">die</strong> Nomen (immer feminin!)<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">Schritt 1: Infinitiv nehmen &nbsp;|&nbsp; Schritt 2: -en wegstreichen &nbsp;|&nbsp; Schritt 3: -ung anh&auml;ngen</span>
+                    </div>
+                    <div class="merke-box">
+                        ⚠️ Nicht alle Verben bilden -ung-Nomen! Vor allem <strong>Verben mit Präfix</strong> (er-, ver-, be-, ent-, …) funktionieren gut:<br>
+                        <em>erklären &rarr; die Erklärung &nbsp;|&nbsp; verbessern &rarr; die Verbesserung</em>
+                    </div>
+                    <div style="overflow-x:auto;">
+                    <table class="wb-table">
+                        <thead>
+                            <tr>
+                                <th>Verb</th>
+                                <th>Stamm</th>
+                                <th>+ -ung</th>
+                                <th>Plural</th>
+                                <th>Bedeutung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="verb-col">lösen</td><td>lös-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Lösung</span></td><td>die Lösungen</td><td class="ru-col">решение</td></tr>
+                            <tr><td class="verb-col">ändern</td><td>änder-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Änderung</span></td><td>die Änderungen</td><td class="ru-col">изменение</td></tr>
+                            <tr><td class="verb-col">erklären</td><td>erklar-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Erklärung</span></td><td>die Erklärungen</td><td class="ru-col">объяснение</td></tr>
+                            <tr><td class="verb-col">verbessern</td><td>verbessern-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Verbesserung</span></td><td>die Verbesserungen</td><td class="ru-col">улучшение</td></tr>
+                            <tr><td class="verb-col">meinen</td><td>mein-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Meinung</span></td><td>die Meinungen</td><td class="ru-col">мнение</td></tr>
+                            <tr><td class="verb-col">ordnen</td><td>ordn-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Ordnung</span></td><td>die Ordnungen</td><td class="ru-col">порядок</td></tr>
+                            <tr><td class="verb-col">entscheiden</td><td>entscheid-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Entscheidung</span></td><td>die Entscheidungen</td><td class="ru-col">решение</td></tr>
+                            <tr><td class="verb-col">untersuchen</td><td>untersuch-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Untersuchung</span></td><td>die Untersuchungen</td><td class="ru-col">исследование</td></tr>
+                            <tr><td class="verb-col">beschreiben</td><td>beschreib-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Beschreibung</span></td><td>die Beschreibungen</td><td class="ru-col">описание</td></tr>
+                            <tr><td class="verb-col">vorbereiten</td><td>vorbereit-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Vorbereitung</span></td><td>die Vorbereitungen</td><td class="ru-col">подготовка</td></tr>
+                            <tr><td class="verb-col">einladen</td><td>einlad-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Einladung</span></td><td>die Einladungen</td><td class="ru-col">приглашение</td></tr>
+                            <tr><td class="verb-col">beobachten</td><td>beobacht-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Beobachtung</span></td><td>die Beobachtungen</td><td class="ru-col">наблюдение</td></tr>
+                            <tr><td class="verb-col">erzählen</td><td>erzähl-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Erzählung</span></td><td>die Erzählungen</td><td class="ru-col">рассказ</td></tr>
+                            <tr><td class="verb-col">üben</td><td>üb-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Übung</span></td><td>die Übungen</td><td class="ru-col">упражнение</td></tr>
+                            <tr><td class="verb-col">bedeuten</td><td>bedeut-</td><td><span class="artikel-die">die</span> <span class="nomen-col">Bedeutung</span></td><td>die Bedeutungen</td><td class="ru-col">значение</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- Способ 2: Infinitiv als Nomen -->
+                <div class="note-card">
+                    <h3><span class="suffix-badge s-er" style="font-size:1rem; background:rgba(126,231,135,0.1); color:#7ee787; border-color:rgba(126,231,135,0.3);">Infinitiv</span> &nbsp; Methode 2 — Infinitiv als Nomen</h3>
+                    <div class="formel-box">
+                        Infinitiv (unver&auml;ndert) = <strong style="color:#7ee787;">das</strong> Nomen &nbsp;&rarr;&nbsp; immer Neutrum!<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">laufen &rarr; das Laufen &nbsp;|&nbsp; Schreiben &rarr; das Schreiben &nbsp;|&nbsp; Groß schreiben!</span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                    <table class="wb-table">
+                        <thead>
+                            <tr><th>Verb</th><th>Nomen (das …)</th><th>Beispiel</th><th>Bedeutung</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="verb-col">laufen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Laufen</span></td><td><em>Das Laufen macht Spaß.</em></td><td class="ru-col">бег / беготня</td></tr>
+                            <tr><td class="verb-col">schreiben</td><td><span class="artikel-das">das</span> <span class="nomen-col">Schreiben</span></td><td><em>Das Schreiben fällt ihm schwer.</em></td><td class="ru-col">письмо / написание</td></tr>
+                            <tr><td class="verb-col">lernen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Lernen</span></td><td><em>Das Lernen ist wichtig.</em></td><td class="ru-col">учёба / обучение</td></tr>
+                            <tr><td class="verb-col">kochen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Kochen</span></td><td><em>Das Kochen macht sie glücklich.</em></td><td class="ru-col">готовка</td></tr>
+                            <tr><td class="verb-col">lesen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Lesen</span></td><td><em>Das Lesen fördert die Sprache.</em></td><td class="ru-col">чтение</td></tr>
+                            <tr><td class="verb-col">reisen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Reisen</span></td><td><em>Das Reisen erweitert den Horizont.</em></td><td class="ru-col">путешествия</td></tr>
+                            <tr><td class="verb-col">tanzen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Tanzen</span></td><td><em>Sie liebt das Tanzen.</em></td><td class="ru-col">танцы</td></tr>
+                            <tr><td class="verb-col">spielen</td><td><span class="artikel-das">das</span> <span class="nomen-col">Spielen</span></td><td><em>Das Spielen gehört zur Kindheit.</em></td><td class="ru-col">игра / игры</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- Способ 3: -er (Agentennomen) -->
+                <div class="note-card">
+                    <h3><span class="suffix-badge s-er">-er / -in</span> &nbsp; Methode 3 — Person, die etwas tut</h3>
+                    <div class="formel-box">
+                        Verb-Stamm + <code>-er</code> = <strong style="color:#58a6ff;">der</strong> (männlich) &nbsp;|&nbsp; + <code>-erin</code> = <strong style="color:#ff96c8;">die</strong> (weiblich)<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">lehren &rarr; der Lehrer / die Lehrerin &nbsp;|&nbsp; spielen &rarr; der Spieler / die Spielerin</span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                    <table class="wb-table">
+                        <thead>
+                            <tr><th>Verb</th><th>der … (m)</th><th>die … (f)</th><th>Bedeutung</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="verb-col">lehren</td><td><span class="artikel-der">der</span> <span class="nomen-col">Lehrer</span></td><td><span class="artikel-die">die</span> Lehrerin</td><td class="ru-col">учитель / учительница</td></tr>
+                            <tr><td class="verb-col">spielen</td><td><span class="artikel-der">der</span> <span class="nomen-col">Spieler</span></td><td><span class="artikel-die">die</span> Spielerin</td><td class="ru-col">игрок</td></tr>
+                            <tr><td class="verb-col">arbeiten</td><td><span class="artikel-der">der</span> <span class="nomen-col">Arbeiter</span></td><td><span class="artikel-die">die</span> Arbeiterin</td><td class="ru-col">рабочий</td></tr>
+                            <tr><td class="verb-col">schreiben</td><td><span class="artikel-der">der</span> <span class="nomen-col">Schreiber</span></td><td><span class="artikel-die">die</span> Schreiberin</td><td class="ru-col">писарь / писатель</td></tr>
+                            <tr><td class="verb-col">lesen</td><td><span class="artikel-der">der</span> <span class="nomen-col">Leser</span></td><td><span class="artikel-die">die</span> Leserin</td><td class="ru-col">читатель</td></tr>
+                            <tr><td class="verb-col">fahren</td><td><span class="artikel-der">der</span> <span class="nomen-col">Fahrer</span></td><td><span class="artikel-die">die</span> Fahrerin</td><td class="ru-col">водитель</td></tr>
+                            <tr><td class="verb-col">singen</td><td><span class="artikel-der">der</span> <span class="nomen-col">Sänger</span></td><td><span class="artikel-die">die</span> Sängerin</td><td class="ru-col">певец / певица</td></tr>
+                            <tr><td class="verb-col">sprechen</td><td><span class="artikel-der">der</span> <span class="nomen-col">Sprecher</span></td><td><span class="artikel-die">die</span> Sprecherin</td><td class="ru-col">диктор / оратор</td></tr>
+                            <tr><td class="verb-col">forschen</td><td><span class="artikel-der">der</span> <span class="nomen-col">Forscher</span></td><td><span class="artikel-die">die</span> Forscherin</td><td class="ru-col">исследователь</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TAB 3: Adjektiv-Suffixe ==================== -->
+        <div class="tab-content" id="tab-adjektive">
+        <div class="zp-notes">
+            <section class="note-section">
+
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3A8;</span>
+                    <div>
+                        <h2>Adjektiv-Suffixe im Vergleich</h2>
+                        <p class="lesson-header-sub">-lich, -los, -ig, -isch, -bar, -haft — что когда использовать</p>
+                    </div>
+                </div>
+
+                <!-- Сравнительная таблица -->
+                <div class="note-card">
+                    <h3>&#128203; &Uuml;bersichtstabelle — alle Adjektiv-Suffixe</h3>
+                    <div style="overflow-x:auto;">
+                    <table class="wb-table">
+                        <thead>
+                            <tr>
+                                <th>Suffix</th>
+                                <th>Bedeutung / Funktion</th>
+                                <th>Beispiele</th>
+                                <th>Russisch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="suffix-badge s-lich" style="font-size:0.95rem;">-lich</span></td>
+                                <td>typisch für, wie, in Art von</td>
+                                <td>freundlich, natürlich, täglich, möglichkeit</td>
+                                <td class="ru-col">-ный, -ский (типичный)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge s-los" style="font-size:0.95rem;">-los</span></td>
+                                <td>ohne … (negativ, Fehlen)</td>
+                                <td>arbeitslos, sinnlos, hoffnungslos, endlos</td>
+                                <td class="ru-col">без- / бес-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge s-ig" style="font-size:0.95rem;">-ig</span></td>
+                                <td>mit … versehen, wie …</td>
+                                <td>hungrig, mutig, ruhig, fleißig, schuldig</td>
+                                <td class="ru-col">-ный (обладающий)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge s-isch" style="font-size:0.95rem;">-isch</span></td>
+                                <td>Herkunft, Art (часто негативно)</td>
+                                <td>kindisch, typisch, politisch, musikalisch</td>
+                                <td class="ru-col">-ский, -ический</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge" style="background:rgba(100,220,180,0.1);color:#64dcb4;border:1.5px solid rgba(100,220,180,0.3);font-size:0.95rem;">-bar</span></td>
+                                <td>kann gemacht werden (passivisch)</td>
+                                <td>machbar, lesbar, sichtbar, essbar</td>
+                                <td class="ru-col">-емый, -имый (можно…)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge" style="background:rgba(200,160,255,0.1);color:#c8a0ff;border:1.5px solid rgba(200,160,255,0.3);font-size:0.95rem;">-haft</span></td>
+                                <td>in der Art von, ähnlich wie</td>
+                                <td>fehlerhaft, krankhaft, märchenhaft</td>
+                                <td class="ru-col">-подобный, со свойством</td>
+                            </tr>
+                            <tr>
+                                <td><span class="suffix-badge" style="background:rgba(255,200,100,0.1);color:#ffc864;border:1.5px solid rgba(255,200,100,0.3);font-size:0.95rem;">-sam</span></td>
+                                <td>Eigenschaft, Tendenz</td>
+                                <td>langsam, aufmerksam, einsam, sparsam</td>
+                                <td class="ru-col">-ливый (склонный к)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- -bar подробнее -->
+                <div class="note-card">
+                    <h3><span class="suffix-badge" style="background:rgba(100,220,180,0.1);color:#64dcb4;border:1.5px solid rgba(100,220,180,0.3);">-bar</span> &nbsp; „kann … werden" — часто встречается в ZP!</h3>
+                    <div class="formel-box">
+                        Verb-Stamm + <code>-bar</code> = „man kann es …"<br>
+                        <span style="font-size:0.82rem; color:var(--color-text-muted);">lesen &rarr; les<strong>bar</strong> (читаемый, можно читать) &nbsp;|&nbsp; machen &rarr; mach<strong>bar</strong> (осуществимо)</span>
+                    </div>
+                    <ul class="suffix-examples">
+                        <li><span class="ex-from">machen</span><span class="ex-arrow">→</span><span class="ex-word">machbar</span><span class="ex-ru">осуществимый</span></li>
+                        <li><span class="ex-from">lesen</span><span class="ex-arrow">→</span><span class="ex-word">lesbar</span><span class="ex-ru">читаемый</span></li>
+                        <li><span class="ex-from">sehen</span><span class="ex-arrow">→</span><span class="ex-word">sichtbar</span><span class="ex-ru">видимый</span></li>
+                        <li><span class="ex-from">essen</span><span class="ex-arrow">→</span><span class="ex-word">essbar</span><span class="ex-ru">съедобный</span></li>
+                        <li><span class="ex-from">verwenden</span><span class="ex-arrow">→</span><span class="ex-word">verwendbar</span><span class="ex-ru">применимый</span></li>
+                        <li><span class="ex-from">erkennen</span><span class="ex-arrow">→</span><span class="ex-word">erkennbar</span><span class="ex-ru">различимый</span></li>
+                        <li><span class="ex-from">lösen</span><span class="ex-arrow">→</span><span class="ex-word">lösbar</span><span class="ex-ru">решаемый</span></li>
+                        <li><span class="ex-from">vermeiden</span><span class="ex-arrow">→</span><span class="ex-word">vermeidbar</span><span class="ex-ru">избежный</span></li>
+                    </ul>
+                </div>
+
+                <!-- Wortfamilien -->
+                <div class="note-card">
+                    <h3>&#127795; Wortfamilien — eine Wurzel, viele W&ouml;rter</h3>
+                    <p style="color:var(--color-text-muted); font-size:0.88rem; margin-bottom:0.8rem;">Учи слова семьями — так запоминается в 3 раза быстрее!</p>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:0.8rem;">
+
+                        <div style="background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:10px; padding:0.8rem;">
+                            <p style="color:var(--color-accent); font-weight:700; margin-bottom:0.4rem;">Wurzel: <em>arbeit-</em></p>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; line-height:2;">
+                                <li>&#128295; arbeiten <span class="ru-col">(работать)</span></li>
+                                <li>&#128295; <strong>der</strong> Arbeiter <span class="ru-col">(рабочий)</span></li>
+                                <li>&#128295; <strong>die</strong> Arbeit <span class="ru-col">(работа)</span></li>
+                                <li>&#128295; arbeitslos <span class="ru-col">(безработный)</span></li>
+                                <li>&#128295; <strong>die</strong> Arbeitslosigkeit <span class="ru-col">(безработица)</span></li>
+                                <li>&#128295; fleißig / arbeitseifrig <span class="ru-col">(трудолюбивый)</span></li>
+                            </ul>
+                        </div>
+
+                        <div style="background:rgba(126,231,135,0.05); border:1px solid rgba(126,231,135,0.15); border-radius:10px; padding:0.8rem;">
+                            <p style="color:#7ee787; font-weight:700; margin-bottom:0.4rem;">Wurzel: <em>frei-</em></p>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; line-height:2;">
+                                <li>&#128295; frei <span class="ru-col">(свободный)</span></li>
+                                <li>&#128295; <strong>die</strong> Freiheit <span class="ru-col">(свобода)</span></li>
+                                <li>&#128295; befreien <span class="ru-col">(освобождать)</span></li>
+                                <li>&#128295; <strong>die</strong> Befreiung <span class="ru-col">(освобождение)</span></li>
+                                <li>&#128295; freilich <span class="ru-col">(конечно же)</span></li>
+                                <li>&#128295; freiwillig <span class="ru-col">(добровольно)</span></li>
+                            </ul>
+                        </div>
+
+                        <div style="background:rgba(210,168,255,0.05); border:1px solid rgba(210,168,255,0.15); border-radius:10px; padding:0.8rem;">
+                            <p style="color:#d2a8ff; font-weight:700; margin-bottom:0.4rem;">Wurzel: <em>möglich-</em></p>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; line-height:2;">
+                                <li>&#128295; möglich <span class="ru-col">(возможный)</span></li>
+                                <li>&#128295; <strong>die</strong> Möglichkeit <span class="ru-col">(возможность)</span></li>
+                                <li>&#128295; ermöglichen <span class="ru-col">(делать возможным)</span></li>
+                                <li>&#128295; unmöglich <span class="ru-col">(невозможный)</span></li>
+                                <li>&#128295; möglichst <span class="ru-col">(по возможности)</span></li>
+                            </ul>
+                        </div>
+
+                        <div style="background:rgba(255,166,77,0.05); border:1px solid rgba(255,166,77,0.15); border-radius:10px; padding:0.8rem;">
+                            <p style="color:#ffa64d; font-weight:700; margin-bottom:0.4rem;">Wurzel: <em>sicher-</em></p>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; line-height:2;">
+                                <li>&#128295; sicher <span class="ru-col">(безопасный, уверенный)</span></li>
+                                <li>&#128295; <strong>die</strong> Sicherheit <span class="ru-col">(безопасность)</span></li>
+                                <li>&#128295; sichern <span class="ru-col">(обеспечивать)</span></li>
+                                <li>&#128295; unsicher <span class="ru-col">(небезопасный)</span></li>
+                                <li>&#128295; sicherlich <span class="ru-col">(наверняка)</span></li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TAB 4: Quiz ==================== -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#127981;</span>
+                    <div>
+                        <h2>&Uuml;bungen</h2>
+                        <p class="lesson-header-sub">Проверь себя — выбери правильный Suffix или Artikel</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="quiz-wrap" id="quizWrap"></div>
+                    <div style="margin-top:1.2rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
+                        <button id="quizResetBtn" style="padding:0.45rem 1.2rem; border-radius:20px; border:1.5px solid var(--color-accent); background:transparent; color:var(--color-accent); font-size:0.9rem; cursor:pointer;">&#x21BA; Neu starten</button>
+                        <span id="quizScore" style="color:var(--color-text-muted); font-size:0.88rem;"></span>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <script>
+    // ===== TABS =====
+    document.querySelectorAll('.tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ===== QUIZ =====
+    const quizData = [
+        { q: 'lösen → ___', hint: 'Verb → Nomen mit -ung', opts: ['die Lösung','das Lösen','der Löser','die Lösheit'], correct: 0 },
+        { q: 'frei → ___ (Zustand)', hint: 'Adjektiv → Nomen mit -heit', opts: ['die Freikeit','die Freiheit','das Freien','der Freier'], correct: 1 },
+        { q: 'möglich → ___ (Eigenschaft)', hint: 'Adjektiv auf -lich → Nomen mit -keit', opts: ['die Möglichheit','die Möglichung','die Möglichkeit','das Möglichen'], correct: 2 },
+        { q: 'arbeits___ (ohne Arbeit)', hint: 'Suffix: ohne etwas', opts: ['-lich','-ig','-los','-isch'], correct: 2 },
+        { q: 'Wohnen → ___', hint: 'Verb → Nomen auf -ung', opts: ['die Wohnung','das Wohnen','der Wohner','die Wohnheit'], correct: 0 },
+        { q: 'hunger → hungr___', hint: 'Nomen → Adjektiv: besitzt Eigenschaft', opts: ['-lich','-los','-ig','-isch'], correct: 2 },
+        { q: 'lesen → les___ (kann gelesen werden)', hint: 'Verb → Adj: möglich zu …', opts: ['-los','-bar','-lich','-ig'], correct: 1 },
+        { q: 'lehren → ___ (Person)', hint: 'Verb → Nomen (Beruf): der …', opts: ['der Lehring','der Lehre','der Lehrer','das Lehren'], correct: 2 },
+        { q: 'freundlich → die Freundlich___', hint: 'Adj auf -lich → abstraktes Nomen', opts: ['-heit','-keit','-ung','-ig'], correct: 1 },
+        { q: 'sinn___ (ohne Sinn)', hint: '-los = ohne', opts: ['sinnig','sinnlich','sinnlos','sinnbar'], correct: 2 },
+        { q: 'schreiben → das ___', hint: 'Infinitiv als Nomen — welcher Artikel?', opts: ['die Schreibung','der Schreiber','das Schreiben','die Schreibheit'], correct: 2 },
+        { q: 'wahr → die Wahr___', hint: 'einfaches Adjektiv → -heit', opts: ['-keit','-heit','-ung','-lich'], correct: 1 },
+        { q: 'erklären → ___', hint: 'Verb mit er- Präfix → -ung', opts: ['die Erklärheit','die Erklärkeit','die Erklärung','das Erklären'], correct: 2 },
+        { q: 'kind___ (wie ein Kind, negativ)', hint: '-isch = Herkunft/Art', opts: ['kindlich','kindlos','kindisch','kindhaft'], correct: 2 },
+        { q: 'lachen → der ___ (Person)', hint: 'Verb + -er = Berufsbezeichnung', opts: ['Lachung','Lachheit','Lacher','Lächler'], correct: 2 },
+    ];
+
+    let answered = [];
+
+    function renderQuiz() {
+        const wrap = document.getElementById('quizWrap');
+        wrap.innerHTML = '';
+        answered = new Array(quizData.length).fill(null);
+        quizData.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'quiz-item';
+            div.innerHTML = `
+                <div class="quiz-question">${i+1}. ${item.q}</div>
+                <div class="quiz-hint">&#128161; ${item.hint}</div>
+                <div class="quiz-options" id="opts-${i}">
+                    ${item.opts.map((o,j) => `<button class="quiz-btn" data-q="${i}" data-idx="${j}">${o}</button>`).join('')}
+                </div>
+                <div class="quiz-feedback" id="fb-${i}"></div>
+            `;
+            wrap.appendChild(div);
+        });
+        wrap.querySelectorAll('.quiz-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const q = +this.dataset.q;
+                const idx = +this.dataset.idx;
+                if (answered[q] !== null) return;
+                answered[q] = idx;
+                const correct = quizData[q].correct;
+                const allBtns = document.querySelectorAll(`#opts-${q} .quiz-btn`);
+                allBtns[correct].classList.add('correct');
+                if (idx !== correct) this.classList.add('wrong');
+                const fb = document.getElementById(`fb-${q}`);
+                fb.textContent = idx === correct ? '✅ Richtig!' : `❌ Falsch — richtig: ${quizData[q].opts[correct]}`;
+                fb.style.color = idx === correct ? '#7ee787' : '#ff7b72';
+                updateScore();
+            });
+        });
+        updateScore();
+    }
+
+    function updateScore() {
+        const done = answered.filter(a => a !== null).length;
+        const correct = answered.filter((a, i) => a === quizData[i].correct).length;
+        const el = document.getElementById('quizScore');
+        if (done === 0) { el.textContent = ''; return; }
+        el.textContent = `${correct} / ${done} richtig`;
+        el.style.color = correct === done ? '#7ee787' : 'var(--color-text-muted)';
+    }
+
+    document.getElementById('quizResetBtn').addEventListener('click', renderQuiz);
+    renderQuiz();
+    </script>
+</body>
+</html>
