@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch Memes | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== HERO ===== */
+        .meme-hero {
+            text-align: center;
+            padding: 1.5rem 0 0.5rem;
+        }
+        .meme-hero h1 {
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff7b72, #d2a8ff, #58a6ff, #7ee787);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+        }
+        .meme-hero p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ===== CATEGORY PILLS ===== */
+        .cat-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1.2rem 0 1rem;
+        }
+        .cat-pill {
+            padding: 0.45rem 1rem;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .cat-pill:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .cat-pill.active {
+            background: rgba(255,123,114,0.12);
+            border-color: rgba(255,123,114,0.5);
+            color: #ff7b72;
+        }
+        .cat-pill[data-cat="trap"].active    { background: rgba(210,168,255,0.12); border-color: rgba(210,168,255,0.5); color: #d2a8ff; }
+        .cat-pill[data-cat="gigaword"].active{ background: rgba(88,166,255,0.12);  border-color: rgba(88,166,255,0.5);  color: #58a6ff; }
+        .cat-pill[data-cat="literal"].active { background: rgba(126,231,135,0.12); border-color: rgba(126,231,135,0.5); color: #7ee787; }
+        .cat-pill[data-cat="slang"].active   { background: rgba(255,212,59,0.12);  border-color: rgba(255,212,59,0.5);  color: #f0c040; }
+        .cat-pill[data-cat="all"].active     { background: rgba(255,123,114,0.12); border-color: rgba(255,123,114,0.5); color: #ff7b72; }
+
+        /* ===== CARD GRID ===== */
+        .meme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 0.8rem;
+        }
+
+        /* ===== MEME CARD ===== */
+        .meme-card {
+            position: relative;
+            border-radius: 16px;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            overflow: hidden;
+            min-height: 150px;
+        }
+        .meme-card:hover {
+            transform: translateY(-4px) rotate(-0.5deg);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.18);
+        }
+
+        /* category color stripe */
+        .meme-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 16px 0 0 16px;
+        }
+        .meme-card[data-cat="funny"]::before   { background: linear-gradient(180deg,#ff7b72,#ffa070); }
+        .meme-card[data-cat="trap"]::before    { background: linear-gradient(180deg,#d2a8ff,#a371f7); }
+        .meme-card[data-cat="gigaword"]::before{ background: linear-gradient(180deg,#58a6ff,#388bfd); }
+        .meme-card[data-cat="literal"]::before { background: linear-gradient(180deg,#7ee787,#56d364); }
+        .meme-card[data-cat="slang"]::before   { background: linear-gradient(180deg,#f0c040,#e3a832); }
+
+        /* FRONT */
+        .card-front, .card-back {
+            padding: 1.1rem 1.1rem 1rem 1.4rem;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .card-back { display: none; }
+        .meme-card.flipped .card-front { display: none; }
+        .meme-card.flipped .card-back  { display: flex; }
+
+        .card-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.35rem;
+            line-height: 1;
+        }
+        .card-word {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 0.25rem;
+        }
+        .card-hint {
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            font-style: italic;
+        }
+        .card-tap {
+            position: absolute;
+            bottom: 0.6rem;
+            right: 0.8rem;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.2);
+            transition: color 0.2s;
+        }
+        .meme-card:hover .card-tap { color: rgba(255,255,255,0.4); }
+        .meme-card.flipped .card-tap { display: none; }
+
+        /* BACK */
+        .card-translation {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .meme-card[data-cat="funny"]    .card-translation { color: #ff7b72; }
+        .meme-card[data-cat="trap"]     .card-translation { color: #d2a8ff; }
+        .meme-card[data-cat="gigaword"] .card-translation { color: #58a6ff; }
+        .meme-card[data-cat="literal"]  .card-translation { color: #7ee787; }
+        .meme-card[data-cat="slang"]    .card-translation { color: #f0c040; }
+
+        .card-meme {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.55;
+            margin-top: 0.3rem;
+        }
+        .card-meme .lol {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            font-style: italic;
+        }
+
+        /* ===== CAT BADGE ===== */
+        .cat-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
+            width: fit-content;
+        }
+        .badge-funny   { background: rgba(255,123,114,0.15); color: #ff7b72; }
+        .badge-trap    { background: rgba(210,168,255,0.15); color: #d2a8ff; }
+        .badge-giga    { background: rgba(88,166,255,0.15);  color: #58a6ff; }
+        .badge-literal { background: rgba(126,231,135,0.15); color: #7ee787; }
+        .badge-slang   { background: rgba(240,192,64,0.15);  color: #f0c040; }
+
+        /* ===== COUNTER ===== */
+        .meme-count {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        /* ===== SHUFFLE BTN ===== */
+        .shuffle-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,123,114,0.4);
+            background: rgba(255,123,114,0.07);
+            color: #ff7b72;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+        .shuffle-btn:hover {
+            background: rgba(255,123,114,0.15);
+            border-color: #ff7b72;
+        }
+
+        @media (max-width: 600px) {
+            .meme-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .card-word { font-size: 1rem; }
+        }
+        @media (max-width: 380px) {
+            .meme-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Deutsch Memes</span>
+        </nav>
+
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="meme-hero">
+            <h1>&#127881; Deutsch Memes</h1>
+            <p>Смешные слова, ловушки и гигантские составные — учи немецкий с юмором</p>
+        </div>
+
+        <!-- Category filter -->
+        <div class="cat-pills">
+            <button class="cat-pill active" data-cat="all">&#128516; Все</button>
+            <button class="cat-pill" data-cat="funny">&#128514; Смешные слова</button>
+            <button class="cat-pill" data-cat="trap">&#128123; Ловушки</button>
+            <button class="cat-pill" data-cat="gigaword">&#129504; Гигаслова</button>
+            <button class="cat-pill" data-cat="literal">&#129300; Дословный перевод</button>
+            <button class="cat-pill" data-cat="slang">&#128526; Slang</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+            <button class="shuffle-btn" id="shuffleBtn">&#x1F500; Перемешать</button>
+            <span class="meme-count" id="cardCount"></span>
+        </div>
+
+        <!-- CARD GRID -->
+        <div class="meme-grid" id="memeGrid"></div>
+
+    </div><!-- /page-content -->
+
+    <script>
+    const cards = [
+
+        // ===== 😂 СМЕШНЫЕ СЛОВА =====
+        {
+            cat: 'funny',
+            emoji: '🐢',
+            word: 'die Schildkröte',
+            hint: 'что-то про щит и жабу...',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'черепаха',
+            meme: '«Щит-жаба» — Schildkröte буквально: <b>щит</b> (Schild) + <b>жаба</b> (Kröte).',
+            lol: 'Немцы увидели черепаху и подумали: жаба в щите. Гениально 🐢🛡️'
+        },
+        {
+            cat: 'funny',
+            emoji: '🧤',
+            word: 'der Handschuh',
+            hint: 'рука + обувь = ?',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'перчатка',
+            meme: 'Hand (рука) + Schuh (обувь) = перчатка.<br>Перчатка — это буквально <b>обувь для руки</b> 🤌',
+            lol: 'Немецкий — это просто описание реальности крупным шрифтом'
+        },
+        {
+            cat: 'funny',
+            emoji: '🦔',
+            word: 'der Igel',
+            hint: 'произносится как «игел»',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'ёж',
+            meme: '<b>Igel</b> — ёж.',
+            lol: '«Игел» — не «Игорь», не «Иголка», а просто... ёж. Запомни 🦔'
+        },
+        {
+            cat: 'funny',
+            emoji: '🌂',
+            word: 'der Regenschirm',
+            hint: 'дождь + щит = ?',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'зонтик',
+            meme: 'Regen (дождь) + Schirm (щит/экран) = <b>дождевой щит</b>.',
+            lol: 'Зонт = защита от дождя. Немцы описали функцию — и всё 🛡️☔'
+        },
+        {
+            cat: 'funny',
+            emoji: '💊',
+            word: 'das Stinktier',
+            hint: 'smelly + animal',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'скунс',
+            meme: 'stinken (вонять) + Tier (животное) = <b>вонючее животное</b>.',
+            lol: 'Немцы не стали придумывать красивое название. Просто: оно воняет 💀'
+        },
+        {
+            cat: 'funny',
+            emoji: '🌡️',
+            word: 'das Fieberthermometer',
+            hint: 'жар + измеритель...',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'медицинский термометр',
+            meme: 'Fieber (жар) + Thermometer (термометр) = термометр для измерения жара.',
+            lol: 'В немецком нельзя просто сказать «термометр». Надо уточнить, какой именно 📏'
+        },
+        {
+            cat: 'funny',
+            emoji: '🐿️',
+            word: 'das Eichhörnchen',
+            hint: 'попробуй произнести с первого раза',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'белка',
+            meme: '<b>Айхх-хёрн-хен</b> — белка. Буквально: «дубовый рожок» (Eiche = дуб).',
+            lol: 'Немцы: назовём белку в честь дуба. Почему? Потому что желуди. Логика 100% 🐿️'
+        },
+        {
+            cat: 'funny',
+            emoji: '🚿',
+            word: 'die Zahnpasta',
+            hint: 'зуб + паста',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'зубная паста',
+            meme: 'Zahn (зуб) + Pasta (паста). Всё честно!',
+            lol: 'Zahn = зуб. Запомни — и сразу знаешь: Zahnarzt = зубной врач 🦷'
+        },
+        {
+            cat: 'funny',
+            emoji: '🧊',
+            word: 'der Kühlschrank',
+            hint: 'холод + шкаф',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'холодильник',
+            meme: 'kühl (холодный) + Schrank (шкаф) = <b>холодный шкаф</b>.',
+            lol: 'Холодильник — буквально холодный шкаф. Немецкий — это просто опись квартиры 🏠'
+        },
+        {
+            cat: 'funny',
+            emoji: '🦷',
+            word: 'der Zahnarzt',
+            hint: 'зуб + доктор',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'стоматолог',
+            meme: 'Zahn (зуб) + Arzt (врач) = <b>зубной врач</b>.',
+            lol: 'Теперь знаешь Zahn — знаешь половину слов из стоматологии 🦷'
+        },
+        {
+            cat: 'funny',
+            emoji: '🧳',
+            word: 'das Gepäck',
+            hint: 'звучит как «гепак»',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'багаж',
+            meme: '<b>Gepäck</b> — багаж, весь ваш скарб.',
+            lol: '«Гепак» — в аэропорту произноси уверенно, никто не засмеётся... наверное 😅'
+        },
+        {
+            cat: 'funny',
+            emoji: '🥴',
+            word: 'die Handtasche',
+            hint: 'рука + карман',
+            badge: '😂 Смешное слово',
+            badgeClass: 'badge-funny',
+            translation: 'сумочка / дамская сумка',
+            meme: 'Hand (рука) + Tasche (карман/сумка) = <b>ручная сумка</b>.',
+            lol: 'Handy = мобильник (ручной). Tasche = сумка. Handtasche = ручная сумка. Всё связано! 🔗'
+        },
+
+        // ===== 👻 ЛОВУШКИ (false friends) =====
+        {
+            cat: 'trap',
+            emoji: '👻',
+            word: 'das Gift',
+            hint: 'звучит как «подарок»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: '☠️ яд / отрава',
+            meme: '<b>Gift ≠ подарок!</b> Подарок по-немецки — das <b>Geschenk</b>.',
+            lol: 'Не дари немцу Gift — это буквально яд 💀 Лучше Geschenk!'
+        },
+        {
+            cat: 'trap',
+            emoji: '🙅',
+            word: 'bekommen',
+            hint: 'похоже на «become»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'получать (NOT «становиться»)',
+            meme: '<b>bekommen ≠ become!</b> «Стать» по-немецки — <b>werden</b>.',
+            lol: '«Ich bekomme einen Brief» = я получаю письмо, а не «становлюсь письмом» 📬'
+        },
+        {
+            cat: 'trap',
+            emoji: '😴',
+            word: 'sensibel',
+            hint: 'похоже на «sensible»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'чувствительный (NOT «разумный»)',
+            meme: '<b>sensibel ≠ разумный!</b> Разумный = <b>vernünftig</b>.',
+            lol: '«Er ist sehr sensibel» = он очень чувствительный. Не «разумный» 🥺'
+        },
+        {
+            cat: 'trap',
+            emoji: '📚',
+            word: 'das Gymnasium',
+            hint: 'звучит как «спортзал»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'гимназия (школа), НЕ спортзал',
+            meme: 'Спортзал = die <b>Turnhalle</b> или das <b>Fitnessstudio</b>.',
+            lol: '«Ich gehe ins Gymnasium» = иду в гимназию, а не качаться 🏋️❌'
+        },
+        {
+            cat: 'trap',
+            emoji: '😵',
+            word: 'aktuell',
+            hint: 'похоже на «actually»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'текущий / актуальный (NOT «на самом деле»)',
+            meme: '«На самом деле» = <b>eigentlich</b>.<br>aktuell = современный, нынешний.',
+            lol: '«Die aktuelle Situation» = нынешняя ситуация, не «на самом деле ситуация» 😅'
+        },
+        {
+            cat: 'trap',
+            emoji: '🍳',
+            word: 'das Rezept',
+            hint: 'рецепт... какой?',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'рецепт (и кулинарный, и врачебный!)',
+            meme: 'Rezept = и рецепт блюда, и рецепт от врача.',
+            lol: '«Das Rezept vom Arzt» = рецепт от доктора 💊<br>«Das Rezept für Kuchen» = рецепт торта 🎂'
+        },
+        {
+            cat: 'trap',
+            emoji: '😶',
+            word: 'genial',
+            hint: 'похоже на «genial»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'гениальный / потрясающий (разг.)',
+            meme: 'В немецком <b>genial</b> значит «гениально» или просто «круто».',
+            lol: '«Das ist genial!» = это гениально! Тут всё совпало — повезло 🎉'
+        },
+        {
+            cat: 'trap',
+            emoji: '🤯',
+            word: 'eventuell',
+            hint: 'похоже на «eventually»',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'возможно / при случае (NOT «в конце концов»)',
+            meme: '«В конце концов» = <b>schließlich / letztendlich</b>.<br>eventuell = может быть, возможно.',
+            lol: '«Eventuell komme ich» = может, приду. Не «в конце концов приду» 🕐'
+        },
+        {
+            cat: 'trap',
+            emoji: '💼',
+            word: 'die Fabrik',
+            hint: 'fabric? фабрика?',
+            badge: '👻 Ловушка!',
+            badgeClass: 'badge-trap',
+            translation: 'завод / фабрика (правильно!)',
+            meme: 'Fabrik = фабрика. Тут ловушки нет — просто знай!<br>«Ткань» = der <b>Stoff</b>.',
+            lol: 'Fabric (англ.) = ткань. Fabrik (нем.) = фабрика. Не путай языки 🧵🏭'
+        },
+
+        // ===== 🧠 ГИГАСЛОВА =====
+        {
+            cat: 'gigaword',
+            emoji: '🚢',
+            word: 'Donaudampfschifffahrtsgesellschaft',
+            hint: '34 буквы. Удачи.',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'Общество пароходства по Дунаю',
+            meme: 'Donau (Дунай) + Dampf (пар) + Schiff (корабль) + Fahrt (рейс) + Gesellschaft (общество).',
+            lol: 'В немецком можно склеить бесконечно. Это просто... страшно 🫠'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '⚖️',
+            word: 'Rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz',
+            hint: '63 буквы. Был реальный закон.',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'Закон о надзоре за маркировкой говядины',
+            meme: 'Rindfleisch (говядина) + Etikettierung (маркировка) + Überwachung (надзор) + Aufgaben (задачи) + Übertragung (передача) + Gesetz (закон).',
+            lol: 'Реально существовавший закон в Германии. Отменили в 2013. Вероятно, потому что никто не мог его произнести 🐄'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '🌞',
+            word: 'Sonnenblumenkernöl',
+            hint: 'солнце + цветок + ядро + масло',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'подсолнечное масло',
+            meme: 'Sonne (солнце) + Blume (цветок) + Kern (ядро/семечко) + Öl (масло).',
+            lol: '«Масло из семечек цветка солнца» — ты просто описал этикетку 🌻'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '🏥',
+            word: 'Krankenversicherungsbeitrag',
+            hint: 'больной + страховка + взнос',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'взнос на медицинское страхование',
+            meme: 'Krank (больной) + Versicherung (страховка) + Beitrag (взнос).',
+            lol: 'Одно слово вместо трёх. Немецкий — это экономия... нет, стоп, это НЕ экономия 😂'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '🚗',
+            word: 'Kraftfahrzeugzulassungsstelle',
+            hint: 'авто + регистрация + место',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'отдел регистрации автомобилей (ГИБДД)',
+            meme: 'Kraft (сила) + Fahrzeug (транспорт) + Zulassung (регистрация) + Stelle (место/отдел).',
+            lol: 'Немецкая ГИБДД. Сократи это до аббревиатуры — и никто не поймёт 🚔'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '👶',
+            word: 'Mutterschaftsurlaubsregelung',
+            hint: 'мама + отпуск + правило',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'положение об отпуске по материнству',
+            meme: 'Mutter (мать) + Schaft (состояние) + Urlaub (отпуск) + Regelung (регулирование).',
+            lol: 'Декрет по-немецки. Тут уже нужен отдельный отпуск, чтобы выучить это слово 🍼'
+        },
+        {
+            cat: 'gigaword',
+            emoji: '🌊',
+            word: 'Streichholzschächtelchen',
+            hint: 'маленькая коробочка со спичками',
+            badge: '🧠 Гигаслово',
+            badgeClass: 'badge-giga',
+            translation: 'маленькая спичечная коробочка',
+            meme: 'Streich (удар) + Holz (дерево) + Schachtel (коробка) + -chen (уменьш.).',
+            lol: 'Уменьшительный суффикс в конце 500-буквенного слова. Немецкая нежность 🥺'
+        },
+
+        // ===== 🌿 ДОСЛОВНЫЙ ПЕРЕВОД =====
+        {
+            cat: 'literal',
+            emoji: '🧤',
+            word: 'der Handschuh',
+            hint: 'дословно: обувь для руки',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'перчатка',
+            meme: 'Hand = рука | Schuh = обувь/туфля.<br>Немцы: «Обувь, но для руки». Вуаля — перчатка!',
+            lol: 'Следующий вопрос: почему у нас нет «ножной перчатки» для носка? 🧦'
+        },
+        {
+            cat: 'literal',
+            emoji: '🐙',
+            word: 'der Tintenfisch',
+            hint: 'чернила + рыба',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'осьминог / кальмар',
+            meme: 'Tinte (чернила) + Fisch (рыба) = <b>чернильная рыба</b>.',
+            lol: 'Немцы увидели, что он выпускает чернила — и назвали его «чернилорыбой». Честно! 🖋️'
+        },
+        {
+            cat: 'literal',
+            emoji: '🦦',
+            word: 'das Faultier',
+            hint: 'ленивый + животное',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'ленивец',
+            meme: 'faul (ленивый) + Tier (животное) = <b>ленивое животное</b>.',
+            lol: 'Не «sloths», не «bradypodidae». Просто: ленивое животное. Уважаем 🦥'
+        },
+        {
+            cat: 'literal',
+            emoji: '💡',
+            word: 'die Glühbirne',
+            hint: 'светиться + груша',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'лампочка',
+            meme: 'glühen (светиться/раскаляться) + Birne (груша) = <b>светящаяся груша</b>.',
+            lol: 'Лампочка правда похожа на грушу. Немцы первые это заметили 🍐💡'
+        },
+        {
+            cat: 'literal',
+            emoji: '🏥',
+            word: 'das Krankenhaus',
+            hint: 'больной + дом',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'больница',
+            meme: 'krank (больной) + Haus (дом) = <b>дом больных</b>.',
+            lol: 'Больница — буквально «дом больных». Точнее некуда 🏠🤒'
+        },
+        {
+            cat: 'literal',
+            emoji: '📱',
+            word: 'das Handy',
+            hint: 'ручной?',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'мобильный телефон',
+            meme: 'В немецком «handy» значит <b>мобильник</b>. В английском — «удобный».',
+            lol: 'Немцы взяли английское слово и присвоили ему другой смысл. Колонизация наоборот 😂'
+        },
+        {
+            cat: 'literal',
+            emoji: '🔵',
+            word: 'blauäugig',
+            hint: 'голубоглазый = ?',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'наивный / доверчивый',
+            meme: 'blau (синий) + Auge (глаз) + -ig = <b>голубоглазый</b>.<br>Но значит: наивный, простодушный.',
+            lol: 'Выражение пошло от расхожего стереотипа. Сейчас — просто «он наивен» 🫧'
+        },
+        {
+            cat: 'literal',
+            emoji: '☔',
+            word: 'Schnapsidee',
+            hint: 'шнапс + идея',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'бредовая идея (пьяная идея)',
+            meme: 'Schnaps (водка/шнапс) + Idee (идея) = <b>идея из-под шнапса</b>.',
+            lol: '«Das war eine Schnapsidee!» — это была бредовая идея. Всё понятно без перевода 🍶💡'
+        },
+        {
+            cat: 'literal',
+            emoji: '🌧️',
+            word: 'Weltschmerz',
+            hint: 'мир + боль',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'мировая скорбь / тоска по несовершенству мира',
+            meme: 'Welt (мир) + Schmerz (боль) = <b>мировая боль</b>.<br>Это слово перешло в английский без перевода!',
+            lol: 'Немцы придумали слово для «боли от того, что мир несовершенен». Sehr deutsch 🥀'
+        },
+        {
+            cat: 'literal',
+            emoji: '🐌',
+            word: 'die Schneckenpost',
+            hint: 'улитка + почта',
+            badge: '🌿 Дословный перевод',
+            badgeClass: 'badge-literal',
+            translation: 'обычная почта (в противовес email)',
+            meme: 'Schnecke (улитка) + Post (почта) = <b>улиточная почта</b>.',
+            lol: 'Когда хочешь сказать «обычное письмо»: «Ich schicke es per Schneckenpost» 🐌📮'
+        },
+
+        // ===== 😎 SLANG =====
+        {
+            cat: 'slang',
+            emoji: '😎',
+            word: 'geil',
+            hint: 'буквально грубое слово, но...',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'круто / классно (в современном сленге)',
+            meme: 'Формально — похабное слово. Но в молодёжном немецком: просто <b>«круто»</b>.',
+            lol: '«Das ist total geil!» = это супер круто! Немецкие бабушки в шоке 👵😱'
+        },
+        {
+            cat: 'slang',
+            emoji: '🤙',
+            word: 'krass',
+            hint: 'krass = ?',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'жёстко / мощно / вау',
+            meme: '<b>krass</b> — универсальный восклицатель. Хорошее и плохое сразу.',
+            lol: '«Krass, oder?» = жёстко, да? Используй когда хочешь звучать по-немецки 🤌'
+        },
+        {
+            cat: 'slang',
+            emoji: '💬',
+            word: 'Alter!',
+            hint: 'звучит как «пожилой»...',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'чувак! / мужик! (обращение)',
+            meme: 'Alter = старик (дословно). Но в сленге: <b>«чувак!»</b>.',
+            lol: '«Alter, was machst du?!» = чувак, ты что творишь?! Не бойся этого слова 😄'
+        },
+        {
+            cat: 'slang',
+            emoji: '🎯',
+            word: 'genau',
+            hint: 'немцы говорят это постоянно',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'точно / именно / угу',
+            meme: '<b>genau</b> — «точно». Немцы используют его как русское «ага» или «угу».',
+            lol: '«Genau, genau, genau...» — можно так соглашаться бесконечно, не думая 😂'
+        },
+        {
+            cat: 'slang',
+            emoji: '😤',
+            word: 'Quatsch!',
+            hint: 'квач? квачш?',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'чепуха! / ерунда! / вздор!',
+            meme: '<b>Quatsch!</b> — восклицание когда кто-то несёт бред.',
+            lol: '«Das ist Quatsch!» = это полная чепуха! Звучит смешно, работает серьёзно 🙅'
+        },
+        {
+            cat: 'slang',
+            emoji: '🤷',
+            word: 'Jein',
+            hint: 'смесь ja и nein',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'и да, и нет (одновременно)',
+            meme: 'ja (да) + nein (нет) = <b>jein</b>. Немецкое слово для нерешительного ответа.',
+            lol: '«Kommst du?» — «Jein...» Когда не знаешь, идти или нет. Универсальный ответ 🙃'
+        },
+        {
+            cat: 'slang',
+            emoji: '🔥',
+            word: 'mega',
+            hint: 'используется как наречие',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'мега / очень / жутко (усилитель)',
+            meme: 'В немецком <b>mega</b> = очень. Mega cool, mega lecker, mega wichtig.',
+            lol: '«Das ist mega lecker!» = это мегавкусно! Работает как наш «офигенно» 🍕🔥'
+        },
+        {
+            cat: 'slang',
+            emoji: '😩',
+            word: 'Das nervt!',
+            hint: 'нервы...',
+            badge: '😎 Slang',
+            badgeClass: 'badge-slang',
+            translation: 'это раздражает! / достало!',
+            meme: 'nerven = раздражать, надоедать.<br>«Das nervt mich total» = это меня жутко раздражает.',
+            lol: '«Das nervt!» — фраза на каждый день. Пробки, дз, понедельник... nervig 😤'
+        },
+    ];
+
+    // ===== RENDER =====
+    const grid = document.getElementById('memeGrid');
+    const countEl = document.getElementById('cardCount');
+    let currentCat = 'all';
+    let currentOrder = [...cards];
+
+    function renderCards() {
+        const filtered = currentCat === 'all' ? currentOrder : currentOrder.filter(c => c.cat === currentCat);
+        grid.innerHTML = '';
+        filtered.forEach((c, i) => {
+            const div = document.createElement('div');
+            div.className = 'meme-card';
+            div.dataset.cat = c.cat;
+            div.innerHTML = `
+                <div class="card-front">
+                    <div class="card-emoji">${c.emoji}</div>
+                    <div class="card-word">${c.word}</div>
+                    <div class="card-hint">${c.hint}</div>
+                </div>
+                <div class="card-back">
+                    <span class="cat-badge ${c.badgeClass}">${c.badge}</span>
+                    <div class="card-translation">${c.translation}</div>
+                    <div class="card-meme">${c.meme}<span class="lol">${c.lol}</span></div>
+                </div>
+                <span class="card-tap">нажми ↩</span>
+            `;
+            div.addEventListener('click', () => div.classList.toggle('flipped'));
+            grid.appendChild(div);
+        });
+        countEl.textContent = `${filtered.length} карточек`;
+    }
+
+    // ===== FILTER =====
+    document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCat = btn.dataset.cat;
+            renderCards();
+        });
+    });
+
+    // ===== SHUFFLE =====
+    document.getElementById('shuffleBtn').addEventListener('click', () => {
+        currentOrder = [...cards].sort(() => Math.random() - 0.5);
+        renderCards();
+    });
+
+    renderCards();
+    </script>
+</body>
+</html>

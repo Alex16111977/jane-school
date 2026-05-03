@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Едрён Батон | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <style>
+        html, body { background: #0a0a14; }
+
+        /* ===== HERO ===== */
+        .eb-hero {
+            text-align: center;
+            padding: 2.5rem 1rem 1rem;
+        }
+        .eb-title {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #ff7b72, #ffa040, #f0c040, #7ee787, #58a6ff, #d2a8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300%;
+            animation: rainbow 6s linear infinite alternate;
+            letter-spacing: -0.02em;
+        }
+        @keyframes rainbow {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .eb-sub {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== PILLS ===== */
+        .eb-pills {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin: 1.2rem 0 0.6rem;
+        }
+        .eb-pill {
+            padding: 0.38rem 0.95rem;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.45);
+            font-size: 0.83rem;
+            cursor: pointer;
+            transition: all 0.16s;
+            user-select: none;
+        }
+        .eb-pill:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .eb-pill.active { color: #fff; border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); }
+
+        /* ===== CONTROLS ===== */
+        .eb-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.1rem;
+        }
+        .eb-btn {
+            padding: 0.42rem 1rem;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.16s;
+        }
+        .eb-btn:hover { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.25); }
+        .eb-count { font-size: 0.8rem; color: rgba(255,255,255,0.25); }
+
+        /* ===== GRID ===== */
+        .eb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.8rem;
+        }
+
+        /* ===== CARD ===== */
+        .eb-card {
+            position: relative;
+            border-radius: 18px;
+            background: rgba(15,18,28,0.92);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            min-height: 155px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .eb-card:hover {
+            transform: translateY(-5px) rotate(-0.5deg);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* полоска слева */
+        .eb-card::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 18px 0 0 18px;
+        }
+        /* свечение при ховере */
+        .eb-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .eb-card:hover::before { opacity: 1; }
+
+        /* цвет по "силе" выражения */
+        .eb-card[data-level="mild"]::after   { background: linear-gradient(#7ee787,#56d364); }
+        .eb-card[data-level="medium"]::after { background: linear-gradient(#f0c040,#e3a832); }
+        .eb-card[data-level="spicy"]::after  { background: linear-gradient(#ff7b72,#f85149); }
+        .eb-card[data-level="epic"]::after   { background: linear-gradient(#d2a8ff,#a371f7); }
+
+        .eb-card[data-level="mild"]::before   { background: radial-gradient(ellipse at 0 0, rgba(126,231,135,0.07), transparent 60%); }
+        .eb-card[data-level="medium"]::before { background: radial-gradient(ellipse at 0 0, rgba(240,192,64,0.07), transparent 60%); }
+        .eb-card[data-level="spicy"]::before  { background: radial-gradient(ellipse at 0 0, rgba(255,123,114,0.07), transparent 60%); }
+        .eb-card[data-level="epic"]::before   { background: radial-gradient(ellipse at 0 0, rgba(210,168,255,0.07), transparent 60%); }
+
+        /* FRONT */
+        .eb-front, .eb-back {
+            padding: 1.1rem 1.1rem 1rem 1.5rem;
+            min-height: 155px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .eb-back { display: none; }
+        .eb-card.flipped .eb-front { display: none; }
+        .eb-card.flipped .eb-back  { display: flex; }
+
+        .eb-word {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.25;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.01em;
+        }
+        .eb-when {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+            font-style: italic;
+        }
+
+        /* уровень-шкала на карточке front */
+        .eb-heat {
+            display: flex;
+            gap: 3px;
+            margin-top: 0.6rem;
+        }
+        .eb-heat span {
+            width: 18px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .eb-card[data-level="mild"]   .eb-heat span:nth-child(-n+1) { background: #7ee787; }
+        .eb-card[data-level="medium"] .eb-heat span:nth-child(-n+2) { background: #f0c040; }
+        .eb-card[data-level="spicy"]  .eb-heat span:nth-child(-n+3) { background: #ff7b72; }
+        .eb-card[data-level="epic"]   .eb-heat span:nth-child(-n+4) { background: #d2a8ff; }
+
+        .eb-tap {
+            position: absolute;
+            bottom: 0.6rem;
+            right: 0.8rem;
+            font-size: 0.67rem;
+            color: rgba(255,255,255,0.16);
+            transition: color 0.2s;
+        }
+        .eb-card:hover .eb-tap { color: rgba(255,255,255,0.35); }
+        .eb-card.flipped .eb-tap { display: none; }
+
+        /* BACK */
+        .eb-badge {
+            display: inline-block;
+            font-size: 0.63rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            margin-bottom: 0.45rem;
+            width: fit-content;
+            text-transform: uppercase;
+        }
+        .badge-mild   { background: rgba(126,231,135,0.15); color: #7ee787; }
+        .badge-medium { background: rgba(240,192,64,0.15);  color: #f0c040; }
+        .badge-spicy  { background: rgba(255,123,114,0.15); color: #ff7b72; }
+        .badge-epic   { background: rgba(210,168,255,0.15); color: #d2a8ff; }
+
+        .eb-meaning {
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 0.35rem;
+        }
+        .eb-card[data-level="mild"]   .eb-meaning { color: #7ee787; }
+        .eb-card[data-level="medium"] .eb-meaning { color: #f0c040; }
+        .eb-card[data-level="spicy"]  .eb-meaning { color: #ff7b72; }
+        .eb-card[data-level="epic"]   .eb-meaning { color: #d2a8ff; }
+
+        .eb-origin {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.5;
+        }
+        .eb-example {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.28);
+            font-style: italic;
+            line-height: 1.45;
+            border-left: 2px solid rgba(255,255,255,0.1);
+            padding-left: 0.5rem;
+        }
+
+        /* ===== PAGE WRAP ===== */
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.2rem 4rem;
+        }
+
+        @media (max-width: 600px) {
+            .eb-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .eb-front, .eb-back { min-height: 130px; padding: 0.9rem 0.9rem 0.8rem 1.1rem; }
+            .eb-word { font-size: 1.05rem; }
+        }
+        @media (max-width: 380px) {
+            .eb-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dark-theme" style="background:#0a0a14; min-height:100vh;">
+
+    <nav class="navbar" style="position:sticky;top:0;z-index:100;background:rgba(10,10,20,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.07);">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="edryon.html" class="active" style="color:#f0c040;">💥 Едрён</a>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+
+        <div class="eb-hero">
+            <div class="eb-title">💥 Едрён Батон</div>
+            <div class="eb-sub">словарь сленга — угадай что это значит, потом переворачивай</div>
+        </div>
+
+        <!-- Легенда -->
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin:0.5rem 0 1rem;font-size:0.8rem;color:rgba(255,255,255,0.35);">
+            <span style="color:#f0c040;">👑 легенды</span>
+            <span style="color:#7ee787;">● из интернета</span>
+            <span style="color:#f0c040;">● из игр</span>
+            <span style="color:#ff7b72;">● жизненное</span>
+            <span style="color:#d2a8ff;">● английское в русском</span>
+            <span style="margin-left:auto;font-style:italic;">тыкай — узнай значение</span>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="eb-pills">
+            <button class="eb-pill active" data-filter="all">Все</button>
+            <button class="eb-pill" data-filter="legend">👑 Легенды</button>
+            <button class="eb-pill" data-filter="mild">🌐 Интернет</button>
+            <button class="eb-pill" data-filter="medium">🎮 Игровой</button>
+            <button class="eb-pill" data-filter="spicy">💀 Жизненное</button>
+            <button class="eb-pill" data-filter="epic">🇬🇧 Англицизмы</button>
+        </div>
+
+        <div class="eb-controls">
+            <button class="eb-btn" id="shuffleBtn">🔀 Перемешать</button>
+            <button class="eb-btn" id="resetBtn">↩ Перевернуть все</button>
+            <span class="eb-count" id="ebCount"></span>
+        </div>
+
+        <div class="eb-grid" id="ebGrid"></div>
+
+    </div>
+
+    <script>
+    const cards = [
+
+        // 👑 ЛЕГЕНДЫ (те самые)
+        {
+            level: 'legend',
+            word: '💥 Едрён батон',
+            when: 'когда хочешь выругаться но нельзя / всё пошло не так',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'универсальная замена мата — звучит смешно и безобидно',
+            origin: 'Это как нажать Ctrl+Z на матерное слово. Говоришь — и сам смеёшься. Стресс снят. Никто не обиделся.',
+            example: '— У нас сегодня контрольная??\n— ЕДРЁН БАТОН, я не готовилась 😵'
+        },
+        {
+            level: 'legend',
+            word: '🎭 Ёперный театр',
+            when: 'ты 5 минут ищешь телефон — а он в руке',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'удивление + бешенство в одном флаконе',
+            origin: 'Начинается на Ё — этим всё сказано. «Театр» добавляет драму. Произносится медленно, с выражением.',
+            example: '— Ты только что положила ключи на стол!\n— Ёперный театр, вот же они 🤦'
+        },
+        {
+            level: 'legend',
+            word: '🐱 Ёшкин кот',
+            when: 'лёгкая досада — злиться уже лень',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'раздражение в режиме «ну и ладно»',
+            origin: 'Кот сюда ни при чём — просто звучит смешно. «Ёшкин кот в смятку» — усиленная версия.',
+            example: '— Опять дождь, а я без зонта\n— Ёшкин кот, каждый раз! 😾'
+        },
+        {
+            level: 'legend',
+            word: '🇯🇵 Японский городовой',
+            when: 'произошло что-то настолько абсурдное, что слов нет',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'растерянность на максималках',
+            origin: 'Японский + городовой = два абсолютно несвязанных слова. Именно этот абсурд и делает его смешным.',
+            example: '— Он написал шпаргалку таким мелким шрифтом, что сам не смог прочитать\n— Японский городовой 😂'
+        },
+
+        // 🌐 ИНТЕРНЕТ-СЛЕНГ
+        {
+            level: 'mild',
+            word: 'Жиза 😭',
+            when: 'это про тебя / это твоя жизнь / узнала себя',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'жизненно — когда мем попадает прямо в душу',
+            origin: 'Сокращение от «жизненно». Когда видишь мем и думаешь «это я» — пишешь «жиза» и ставишь 💀',
+            example: '— [мем про то как делаешь уроки в 23:58]\n— жиза жиза жиза 😭😭😭'
+        },
+        {
+            level: 'mild',
+            word: 'Кринж 😬',
+            when: 'видишь что-то стыдное / неловкое / второй-hand embarrassment',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'что-то настолько неловкое, что аж самой стыдно',
+            origin: 'От английского "cringe" — съёживаться. Когда видишь чужой провал и физически корчишься.',
+            example: '— Он на камеру спел серенаду, а она его не знает\n— это такой кринж 😬😬😬'
+        },
+        {
+            level: 'mild',
+            word: 'Вайб ✨',
+            when: 'атмосфера, настроение, ощущение места или человека',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'энергетика — хорошая или плохая',
+            origin: 'От английского "vibe". Вайб — это когда заходишь в комнату и сразу понимаешь как тут.',
+            example: '— Этот плейлист такой вайб ☁️\n— У неё странный вайб, не знаю...'
+        },
+        {
+            level: 'mild',
+            word: 'Орать 💀',
+            when: 'что-то настолько смешное что не можешь остановиться',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'умираю от смеха (буквально не смешно — просто мем)',
+            origin: 'В интернете значит смеяться. В жизни — кричать. Контекст решает всё.',
+            example: '— [смотрит мем в 2 ночи]\n— орууу 😭😭 они всё знали'
+        },
+        {
+            level: 'mild',
+            word: 'Рофл 🤣',
+            when: 'что-то смешное / ирония / шутка',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'хаха / прикол / я пошутила',
+            origin: 'ROFL = Rolling On Floor Laughing. Говорят уже без смысла — просто означает «смешно» или «шутка».',
+            example: '— Ты серьёзно это сделала?\n— рофл нет конечно 💀'
+        },
+        {
+            level: 'mild',
+            word: 'Залипнуть 📱',
+            when: 'не можешь оторваться от телефона / видео / игры',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'потерять себя в контенте на несколько часов',
+            origin: 'Залипла — значит прилипла. Как жвачка к волосам. Не отдерёшься.',
+            example: '— Я просто хотела проверить тикток...\n— залипла на 3 часа 😐'
+        },
+        {
+            level: 'mild',
+            word: 'Скролить 📲',
+            when: 'листаешь ленту без цели, просто потому что',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'бездумно листать соцсети',
+            origin: 'От "scroll". Скролишь — значит листаешь. Обычно без причины. Обычно слишком долго.',
+            example: '— Что делаешь?\n— ничего, скролю\n— уже час?\n— ну... да 🙃'
+        },
+        {
+            level: 'mild',
+            word: 'Дроп 🔥',
+            when: 'вышло что-то новое — альбом, коллекция, мем',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'релиз / выход / появление чего-то крутого',
+            origin: 'От английского "drop" — падает с неба как подарок. Новый дроп = новый контент.',
+            example: '— Слышала? Новый дроп от неё!\n— уже слушаю 🎧'
+        },
+
+        // 🎮 ИГРОВОЙ
+        {
+            level: 'medium',
+            word: 'Изи 😎',
+            when: 'что-то лёгкое / справилась без усилий',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'easy — просто, без проблем',
+            origin: 'Из геймерского: "ez game" — лёгкая победа. Теперь говорят в жизни о любой лёгкой задаче.',
+            example: '— Ты сдала контрольную?\n— изи, пять минут делов 😎'
+        },
+        {
+            level: 'medium',
+            word: 'ГГ 🏆',
+            when: 'что-то закончилось — хорошо или плохо',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'good game — всё, конец, было хорошо (или нет)',
+            origin: 'В играх пишут после матча. В жизни — когда что-то завершилось. Иногда иронично.',
+            example: '— Телефон умер перед финалом\n— гг 💀\n— Сдала последний экзамен!\n— гг 🏆'
+        },
+        {
+            level: 'medium',
+            word: 'Нуб 🐣',
+            when: 'кто-то явно не умеет / не знает / делает всё неправильно',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'новичок, который не умеет — иногда ласково',
+            origin: 'От "newbie" → "noob" → нуб. Не всегда обидно — зависит от интонации.',
+            example: '— Она не знает кто такой Моргенштерн??\n— нуб 💀'
+        },
+        {
+            level: 'medium',
+            word: 'Имба 💪',
+            when: 'что-то слишком сильное / слишком хорошее / несправедливо крутое',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'имбалансный — слишком OP, нечестно сильный',
+            origin: 'От "imbalanced". Персонаж имба = он слишком мощный. Теперь говорят про всё что слишком крутое.',
+            example: '— Она учит 5 языков и ходит в зал\n— она просто имба 😭'
+        },
+        {
+            level: 'medium',
+            word: 'Фейл 🤦',
+            when: 'что-то пошло не так / провал / облажалась',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'неудача, провал',
+            origin: 'От английского "fail". Фейл — это когда ты рассчитывала на одно, а вышло совсем другое.',
+            example: '— Написала "спасибо" учителю после урока и обняла его\n— эпик фейл 😭'
+        },
+        {
+            level: 'medium',
+            word: 'Читить ⚡',
+            when: 'использовать преимущество / схитрить / найти лазейку',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'жульничать — с читом или без',
+            origin: 'От "cheat". Читер в игре — тот кто жулит. В жизни — тот кто нашёл способ попроще.',
+            example: '— Она гуглит во время теста?\n— читит как всегда 🙄'
+        },
+        {
+            level: 'medium',
+            word: 'Рандом 🎲',
+            when: 'случайный человек / случайное событие / непонятно откуда взялось',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'рандомный — случайный, незнакомый, непредсказуемый',
+            origin: 'От "random". В играх — случайный игрок. В жизни — незнакомец или что-то внезапное.',
+            example: '— Какой-то рандом написал мне в дм\n— кто это вообще?? 😭'
+        },
+        {
+            level: 'medium',
+            word: 'Скипнуть ⏭',
+            when: 'пропустить / проигнорировать / не заморачиваться',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'skip — пропустить, обойти стороной',
+            origin: 'От "skip". Скипнуть катсцену в игре. Скипнуть скучный урок. Скипнуть неловкий момент.',
+            example: '— Ты смотрела вступление?\n— скипнула, сразу к делу 😌'
+        },
+
+        // 💀 ЖИЗНЕННОЕ
+        {
+            level: 'spicy',
+            word: 'Жесть 😱',
+            when: 'что-то настолько дикое что слов нет — хорошо или плохо',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'жестоко / невероятно / это за гранью',
+            origin: 'Жесть = листовой металл. Жёсткий, острый. «Жёстко» → «жесть». Теперь работает в обе стороны.',
+            example: '— Она за ночь прочитала весь учебник\n— жесть, я бы умерла 💀\n— Нам 10 параграфов на завтра\n— жесть... [другая интонация]'
+        },
+        {
+            level: 'spicy',
+            word: 'Дичь 🦆',
+            when: 'что-то абсурдное / дикое / не поддаётся логике',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'полная дикость — это ненормально',
+            origin: 'Дичь — дикое животное. Нести дичь = говорить дикие вещи. Теперь про любой абсурд.',
+            example: '— Он ел чипсы во время экзамена\n— это какая-то дичь 💀'
+        },
+        {
+            level: 'spicy',
+            word: 'Токсик ☠️',
+            when: 'человек негативный / агрессивный / отравляет атмосферу',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'токсичный — ядовитый для общения',
+            origin: 'Из игрового сленга — toxic player. Теперь говорят про всех кто ведёт себя отравляюще.',
+            example: '— Она постоянно обесценивает мои успехи\n— она токсик, держись подальше 😤'
+        },
+        {
+            level: 'spicy',
+            word: 'Шиза 🌀',
+            when: 'что-то безумное / сумасшедшее / выходящее за рамки',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'сумасшествие — в хорошем или плохом смысле',
+            origin: 'От «шизофрения» — но используется легко и без обиды. Просто значит «это безумие».',
+            example: '— Она записалась ещё на два кружка\n— это шиза, у неё уже 6 😭'
+        },
+        {
+            level: 'spicy',
+            word: 'Зашквар 💩',
+            when: 'что-то стыдное / позорное / ниже твоего уровня',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'это унизительно / стыдно / западло',
+            origin: 'Из тюремного жаргона. В молодёжном языке — что-то что считается стрёмным или позорным.',
+            example: '— Он носит носки с сандалями\n— это такой зашквар 😐'
+        },
+        {
+            level: 'spicy',
+            word: 'Угар 🔥',
+            when: 'что-то очень смешное / весёлая ситуация',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'это было угарно — смешно, угорательно',
+            origin: 'Угар = когда горит. В смысле — когда так смешно, что «горишь». Угарать = ржать.',
+            example: '— Мы вчера так угорали на репетиции 😂\n— расскажи!'
+        },
+        {
+            level: 'spicy',
+            word: 'Хайп 📣',
+            when: 'что-то сейчас очень популярно / все об этом говорят',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'шумиха, ажиотаж, все хотят это',
+            origin: 'От английского "hype". Хайп = когда что-то резко стало модным и обсуждаемым.',
+            example: '— Ты уже смотрела этот сериал?\n— весь инстаграм в хайпе из-за него 🔥'
+        },
+        {
+            level: 'spicy',
+            word: 'Кринжово 😬',
+            when: 'ситуация такая неловкая что физически больно смотреть',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'максимально неловко — хочется исчезнуть',
+            origin: 'Кринж + -ово. Русский суффикс сделал английское слово своим. Кринжово = по-кринжовому.',
+            example: '— Он написал ей стихотворение в личку незнакомой\n— кринжово до слёз 😬'
+        },
+
+        // 🇬🇧 АНГЛИЦИЗМЫ
+        {
+            level: 'epic',
+            word: 'Краш 💘',
+            when: 'человек который тебе нравится / на которого смотришь и умираешь',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'тот по кому сохнешь — тайная симпатия',
+            origin: 'От английского "crush". Краш — это не парень/девушка. Это просто тот, от кого бабочки.',
+            example: '— мой краш посмотрел мою сторис\n— ЧТО ДЕЛАТЬ 😭💀'
+        },
+        {
+            level: 'epic',
+            word: 'Симп 🥺',
+            when: 'кто-то делает всё ради человека который его не замечает',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'тот кто слишком старается ради краша — часто безответно',
+            origin: 'От "simp" — слишком сочувствующий. Симп = делает всё для кого-то, не получая взамен ничего.',
+            example: '— Он носит ей рюкзак каждый день\n— симп 🥺 но мило'
+        },
+        {
+            level: 'epic',
+            word: 'Чилить 😌',
+            when: 'отдыхать / расслабляться / ничего не делать с удовольствием',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'chill — отдыхать, никуда не торопиться',
+            origin: 'От "chill out". Чилить = лежать, слушать музыку, не думать об уроках. Идеальное состояние.',
+            example: '— Что делаешь?\n— просто чиллю 😌\n— А дз?\n— ...чиллю 😐'
+        },
+        {
+            level: 'epic',
+            word: 'Флексить 💅',
+            when: 'хвастаться / показывать что у тебя есть / выпендриваться',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'flex — демонстрировать превосходство',
+            origin: 'От "flex" — напрягать мышцы. Флексить = показывать что у тебя есть то чего нет у других.',
+            example: '— Она флексит новыми кроссами уже третий день\n— мы видели, окей 🙄'
+        },
+        {
+            level: 'epic',
+            word: 'Сорян 🙏',
+            when: 'извиняешься — легко или серьёзно',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'sorry — извини, прости, жаль',
+            origin: 'От "sorry". Сорян — мягче чем «извини». Говорят и когда реально виноваты, и когда нет.',
+            example: '— Ты опять опоздала\n— сорян, автобус 🙏\n— это пятый раз\n— ...сорян 😬'
+        },
+        {
+            level: 'epic',
+            word: 'Го 🚀',
+            when: 'предложение куда-то / давай / пойдём',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'go — идём / давай / погнали',
+            origin: 'От "go". Одно слово — и всё понятно. Го есть, го гулять, го смотреть, го спать.',
+            example: '— Го в кафе после школы?\n— го 🔥\n— Го учиться\n— нет 💀'
+        },
+        {
+            level: 'epic',
+            word: 'Топ 🏆',
+            when: 'что-то лучшее / самое крутое / рекомендуешь',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'top — лучшее, отличное, на высоте',
+            origin: 'От "top". Топ = лучший. «Топчик» — ещё более нежная версия. «Абсолютный топ» — максимум.',
+            example: '— Как кафе?\n— топ, берём снова 🏆\n— Как выступила?\n— топчик если честно 😌'
+        },
+        {
+            level: 'epic',
+            word: 'Хейт 😤',
+            when: 'когда кто-то агрессивно критикует / ненавидит без причины',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'hate — ненависть, агрессивная критика',
+            origin: 'От "hate". Хейтить = критиковать агрессивно. Хейтеры — те кто это делают. Классика интернета.',
+            example: '— Под её постом столько хейта\n— они просто завидуют 💅'
+        },
+        {
+            level: 'epic',
+            word: 'Муд 🌙',
+            when: 'настроение / состояние / атмосфера момента',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'mood — настроение, это описывает моё состояние',
+            origin: 'От "mood". Писать «это муд» = «это точно про меня сейчас». Часто под грустными мемами.',
+            example: '— [фото кота который лежит и не двигается]\n— это такой муд 🌙'
+        },
+        {
+            level: 'epic',
+            word: 'Аутфит 👗',
+            when: 'говоришь про чью-то одежду / образ / что надеть',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'outfit — образ, комплект одежды',
+            origin: 'От "outfit". Аутфит = весь образ целиком, а не просто одежда. Аутфит дня = OOTD.',
+            example: '— Какой аутфит на завтра?\n— не знаю, кризис гардероба 😭'
+        },
+        {
+            level: 'epic',
+            word: 'Лук 👀',
+            when: 'образ / внешний вид / как кто-то выглядит',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'look — внешний вид, образ',
+            origin: 'От "look". Лук — это про стиль. «Лук огонь» = выглядишь потрясно. Без контекста — просто взгляд.',
+            example: '— Видела её лук сегодня?\n— лук огонь 🔥 я хочу так же'
+        },
+        {
+            level: 'epic',
+            word: 'Чекнуть 🔍',
+            when: 'проверить / посмотреть / зайти куда-то',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'check — проверить, глянуть',
+            origin: 'От "check". Чекнуть сторис, чекнуть расписание, чекнуть цену — работает везде.',
+            example: '— Чекни расписание, когда у нас физра?\n— секунду... ой, завтра 😱'
+        },
+        {
+            level: 'epic',
+            word: 'Абьюз 🚩',
+            when: 'кто-то использует другого / ситуацию нечестно',
+            badge: '🇬🇧 Англицизмы', badgeClass: 'badge-epic',
+            meaning: 'abuse — злоупотреблять, использовать',
+            origin: 'От "abuse". В играх — абьюзить механику = использовать баг. В жизни — использовать человека.',
+            example: '— Она пишет только когда ей что-то нужно\n— это абьюз, уходи 🚩'
+        },
+
+        // 👑 ЕЩЁ ЛЕГЕНДЫ
+        {
+            level: 'legend',
+            word: '💀 Капец',
+            when: 'всему конец / ситуация аварийная / слов нет',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'мягкая версия слова на «п» — но все всё понимают',
+            origin: 'Капец полностью заменил оригинал. Говорят при учителях, бабушках, на записи. Универсально.',
+            example: '— Телефон 3%, зарядки нет, до дома ещё час\n— капец. просто капец. 🔋'
+        },
+        {
+            level: 'legend',
+            word: '😩 Приплыли',
+            when: 'ты в ловушке / выхода не видно / всё',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'мы добрались до дна — причалили',
+            origin: 'Ирония: плыли куда-то — приплыли. Только куда именно — туда, откуда не выбраться.',
+            example: '— Мама нашла дневник\n— ну всё, приплыли 🙂'
+        },
+        {
+            level: 'legend',
+            word: '🎪 Цирк с конями',
+            when: 'полный хаос / бардак / все орут и ничего не понятно',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'ситуация вышла из-под контроля и стала абсурдной',
+            origin: 'Цирк — уже хаос. Кони добавляют масштаб. Вместе — катастрофа с артистами.',
+            example: '— На уроке все орут, кто-то уронил стул, учитель сдался\n— ну и цирк с конями 🐴'
+        },
+        {
+            level: 'legend',
+            word: '😵 Ёклмн',
+            when: 'хочешь сказать матерное — но рядом люди',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'буквы алфавита подряд — случайно звучит как ругательство',
+            origin: 'Ё-К-Л-М-Н — просто буквы. Но звучит как что-то запрещённое. Полностью невиновно. Суд оправдает.',
+            example: '— [роняет всё что держала]\n— Ёклмн... [оглядывается] ...это буквы алфавита 😇'
+        },
+        {
+            level: 'legend',
+            word: '🍃 Да ну нафиг',
+            when: 'отказ от идеи которая даже не рассматривается',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'категоричное «нет» — мягко, но без вариантов',
+            origin: 'Мягко, но непреклонно. Никто не обидится. Все поймут что это финальный ответ.',
+            example: '— Го завтра на пробежку в 6 утра\n— да ну нафиг, я в 6 ещё сплю 🛌'
+        },
+        {
+            level: 'legend',
+            word: '🫡 Ну ок',
+            when: 'услышала, не согласна, спорить не буду',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'смирение с судьбой в двух словах',
+            origin: 'Самый короткий способ сказать «я услышала, не согласна, но ладно». КПД максимальный.',
+            example: '— Экзамен перенесли на неделю раньше\n— ...ну ок. [закрывает ноутбук] 💻'
+        },
+        {
+            level: 'legend',
+            word: '🌚 Да ладно',
+            when: 'не веришь / удивлена / хочешь чтоб повторили',
+            badge: '👑 Легенда', badgeClass: 'badge-epic',
+            meaning: 'универсальная реакция на любую новость — 6 значений в одной фразе',
+            origin: 'Два слова — шесть разных смыслов в зависимости от интонации. Русский язык в одной фразе.',
+            example: '— Урок отменили!\n— да ладно?! 😱\n— Твой ответ неправильный\n— да ла-адно... 🙄'
+        },
+
+        // 🌐 ЕЩЁ ИНТЕРНЕТ
+        {
+            level: 'mild',
+            word: 'Трэш 🗑',
+            when: 'что-то ужасное / отстой / полная дичь',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'trash — мусор, треш, ужасно',
+            origin: 'От "trash". Трэш-контент = контент ради контента, без смысла. Иногда — комплимент.',
+            example: '— Этот фильм такой трэш\n— знаю, именно поэтому смотрела три раза 😂'
+        },
+        {
+            level: 'mild',
+            word: 'Пранк 😈',
+            when: 'кто-то разыгрывает / шутит / ставит ловушку',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'prank — розыгрыш, подстава',
+            origin: 'От "prank". Pranking someone = разыгрывать. Часто снимают на видео. Иногда не смешно.',
+            example: '— Она сказала что нам задали 5 страниц эссе\n— пранк? скажи что пранк 😰'
+        },
+        {
+            level: 'mild',
+            word: 'Контент 📸',
+            when: 'всё что снимают / постят / делают ради соцсетей',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'content — контент, материал для публикации',
+            origin: 'От "content". «Это контент» = это стоит запостить. Жизнь теперь делится на контент и не-контент.',
+            example: '— [происходит что-то смешное]\n— подожди, дай сниму, это контент 📱'
+        },
+        {
+            level: 'mild',
+            word: 'Изи катка 🎯',
+            when: 'что-то прошло легко и без проблем',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'лёгкая победа — справилась без усилий',
+            origin: 'Изи (easy) + катка (партия в игре). Теперь говорят про любую ситуацию которая прошла гладко.',
+            example: '— Как контрольная?\n— изи катка, всё знала 😌'
+        },
+        {
+            level: 'mild',
+            word: 'Рофлить 🤡',
+            when: 'шутить / прикалываться / не воспринимать серьёзно',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'смеяться / прикалываться / говорить несерьёзно',
+            origin: 'ROFL → рофл → рофлить. Рофлишь = шутишь или смеёшься. «Я рофлю» = я не серьёзно.',
+            example: '— Ты это серьёзно?\n— нет, рофлю 😂\n— ...а я уже испугалась'
+        },
+        {
+            level: 'mild',
+            word: 'Тред 🧵',
+            when: 'длинная цепочка твитов / постов / переписка',
+            badge: '🌐 Интернет', badgeClass: 'badge-mild',
+            meaning: 'thread — нить, цепочка сообщений',
+            origin: 'От "thread". Тред = серия связанных постов. «Читай тред» = читай с начала, там всё объясняется.',
+            example: '— Объясни что случилось\n— это долго, лучше прочитай тред 🧵'
+        },
+
+        // 🎮 ЕЩЁ ИГРОВОЙ
+        {
+            level: 'medium',
+            word: 'АФК 🚶',
+            when: 'кто-то не отвечает / исчез / ушёл и не предупредил',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'AFK = Away From Keyboard — отошла от клавиатуры',
+            origin: 'В играх — игрок который не играет. В жизни — человек который пропал без ответа.',
+            example: '— Ты куда пропала?\n— сорян, была в афк, ела 🍕'
+        },
+        {
+            level: 'medium',
+            word: 'Грайнд 💪',
+            when: 'усердно работаешь / учишь / делаешь одно и то же снова и снова',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'grind — монотонно пахать ради результата',
+            origin: 'В играх — фармить опыт долго и муторно. В жизни — заниматься чем-то упорно и долго.',
+            example: '— Что делала всё лето?\n— грайндила английский 📚\n— и как?\n— b2 сдала 😤'
+        },
+        {
+            level: 'medium',
+            word: 'Лут 🎁',
+            when: 'получила что-то ценное / неожиданный бонус / подарок',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'loot — добыча, халява, что-то ценное',
+            origin: 'В играх — предметы которые выпадают после победы. В жизни — любая неожиданная добыча.',
+            example: '— Бабушка приехала!\n— какой лут? 👀\n— торт и 500 грн\n— топ лут 🎂'
+        },
+        {
+            level: 'medium',
+            word: 'Баг 🐛',
+            when: 'что-то сломалось / пошло не так / система не работает',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'bug — ошибка, сбой, что-то что не работает как надо',
+            origin: 'От "bug" (жук) — первый компьютерный баг буквально нашли жука в машине. Теперь про всё.',
+            example: '— Я три раза отправила это сообщение\n— баг в голове или в приложении? 😂'
+        },
+        {
+            level: 'medium',
+            word: 'Лаг 📡',
+            when: 'что-то тормозит / медленно соображает / не успевает',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'lag — задержка, тормоза, зависание',
+            origin: 'В играх — задержка сети. В жизни — любое «торможение». Мозг лагает = не понимаю.',
+            example: '— Ты слышала что я сказала?\n— сорян, лагаю сегодня 🧠'
+        },
+        {
+            level: 'medium',
+            word: 'Клатч 🔥',
+            when: 'вытянула ситуацию в последний момент / спасла всё',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'clutch — спасение в последнюю секунду',
+            origin: 'В играх — один игрок побеждает всех оставшихся. В жизни — успела в последний момент.',
+            example: '— Я сдала проект за 10 минут до дедлайна\n— чистый клатч 🔥'
+        },
+        {
+            level: 'medium',
+            word: 'Тролль 🧌',
+            when: 'кто-то специально раздражает / провоцирует / издевается',
+            badge: '🎮 Игровой', badgeClass: 'badge-medium',
+            meaning: 'troll — тот кто провоцирует ради реакции',
+            origin: 'Тролль из скандинавских мифов — злобное существо. В интернете — тот кто специально злит.',
+            example: '— Он снова написал что наш класс худший\n— не обращай внимания, он просто троллит 🧌'
+        },
+
+        // 💀 ЕЩЁ ЖИЗНЕННОЕ
+        {
+            level: 'spicy',
+            word: 'Бомбит 💣',
+            when: 'тебя бесит / злишься / внутри всё кипит',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'бомбануло — резкое раздражение',
+            origin: 'Бомба взрывается — как злость внутри. «У меня бомбит» = меня это дико бесит.',
+            example: '— Она опять не пришла на встречу\n— у меня уже реально бомбит 💣'
+        },
+        {
+            level: 'spicy',
+            word: 'Трясёт 😤',
+            when: 'что-то настолько бесит или пугает, что трясёшься',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'трясёт от злости / страха / стресса',
+            origin: 'Буквально — дрожишь. Фигурально — очень сильная эмоция любого знака.',
+            example: '— Она снова сказала это при всех\n— меня аж трясёт 😤'
+        },
+        {
+            level: 'spicy',
+            word: 'Стрёмно 😬',
+            when: 'страшновато / подозрительно / не хочется',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'страшно + стыдно + тревожно одновременно',
+            origin: 'От «стрёмный» — подозрительный, опасный. Стрёмно = не по себе, не хочу туда.',
+            example: '— Пойдём через тот парк?\n— стрёмно, лучше по улице 😬'
+        },
+        {
+            level: 'spicy',
+            word: 'Чел 🧍',
+            when: 'обращаешься к кому-то / говоришь про кого-то',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'человек — нейтральное обращение',
+            origin: 'Сокращение от «человек». Чел = чувак = человек. Без пола, без оценки. Просто — чел.',
+            example: '— Этот чел снова опоздал\n— какой чел?\n— ну тот чел 🤷'
+        },
+        {
+            level: 'spicy',
+            word: 'Пушка 🎯',
+            when: 'что-то очень крутое / отличное / огонь',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'отлично, классно, бомба',
+            origin: 'Пушка стреляет — мощно. «Это пушка» = это мощно, круто. Иногда «пушечно».',
+            example: '— Как концерт?\n— пушка, я рыдала от кайфа 🎤'
+        },
+        {
+            level: 'spicy',
+            word: 'Норм 👌',
+            when: 'всё в порядке / приемлемо / могло быть хуже',
+            badge: '💀 Жизненное', badgeClass: 'badge-spicy',
+            meaning: 'нормально — не плохо, не хорошо, просто норм',
+            origin: 'Сокращение от «нормально». Самая амбивалентная оценка в русском языке. Норм = окей.',
+            example: '— Как дела?\n— норм\n— а точнее?\n— ну... норм 🙂'
+        },
+    ];
+
+    let currentFilter = 'all';
+    let order = [...cards];
+
+    function heatBar() {
+        return `<div class="eb-heat"><span></span><span></span><span></span><span></span></div>`;
+    }
+
+    function render() {
+        const grid = document.getElementById('ebGrid');
+        const filtered = currentFilter === 'all' ? order : order.filter(c => c.level === currentFilter);
+        grid.innerHTML = '';
+        filtered.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'eb-card';
+            div.dataset.level = c.level;
+            div.innerHTML = `
+                <div class="eb-front">
+                    <div class="eb-word">${c.word}</div>
+                    <div class="eb-when">${c.when}</div>
+                    ${heatBar()}
+                </div>
+                <div class="eb-back">
+                    <span class="eb-badge ${c.badgeClass}">${c.badge}</span>
+                    <div class="eb-meaning">${c.meaning}</div>
+                    <div class="eb-origin">${c.origin}<span class="eb-example">${c.example}</span></div>
+                </div>
+                <span class="eb-tap">тыкни ↩</span>
+            `;
+            div.addEventListener('click', () => div.classList.toggle('flipped'));
+            grid.appendChild(div);
+        });
+        document.getElementById('ebCount').textContent = filtered.length + ' выражений';
+    }
+
+    document.querySelectorAll('.eb-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.eb-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            render();
+        });
+    });
+
+    document.getElementById('shuffleBtn').addEventListener('click', () => {
+        order = [...cards].sort(() => Math.random() - 0.5);
+        render();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.querySelectorAll('.eb-card.flipped').forEach(c => c.classList.remove('flipped'));
+    });
+
+    render();
+    </script>
+</body>
+</html>

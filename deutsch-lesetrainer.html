@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesetrainer | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .typ-filter { display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.8rem; }
+        .typ-btn {
+            padding:0.5rem 1.3rem; border-radius:22px; border:1.5px solid rgba(68,147,248,0.3);
+            background:rgba(68,147,248,0.07); color:var(--color-text-secondary);
+            font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.18s;
+        }
+        .typ-btn.active, .typ-btn:hover { background:rgba(68,147,248,0.2); color:#fff; border-color:rgba(68,147,248,0.6); }
+        .typ-btn[data-typ="2"].active  { background:rgba(88,166,255,0.15); border-color:#58a6ff; color:#58a6ff; }
+        .typ-btn[data-typ="4b"].active { background:rgba(210,153,34,0.15); border-color:#e3b341; color:#e3b341; }
+
+        /* ── Exam Card ── */
+        .text-card {
+            background:rgba(16,20,36,0.97); border:1px solid rgba(255,255,255,0.09);
+            border-radius:16px; padding:2rem 2.2rem; margin-bottom:2.8rem;
+        }
+        .card-top { display:flex; align-items:flex-start; gap:0.9rem; margin-bottom:1.6rem; }
+        .typ-badge {
+            padding:0.25rem 0.85rem; border-radius:20px; font-size:0.78rem;
+            font-weight:700; letter-spacing:0.04em; flex-shrink:0; margin-top:0.2rem;
+        }
+        .badge-2  { background:rgba(88,166,255,0.13); color:#58a6ff; border:1px solid rgba(88,166,255,0.3); }
+        .badge-4b { background:rgba(227,179,65,0.13); color:#e3b341;  border:1px solid rgba(227,179,65,0.3); }
+        .card-title  { font-size:1.2rem; font-weight:700; color:#fff; margin:0 0 0.25rem 0; }
+        .card-source { font-size:0.8rem; color:var(--color-text-muted); margin:0; }
+
+        /* ── Situation box ── */
+        .situation-box {
+            background:rgba(68,147,248,0.06); border:1px solid rgba(68,147,248,0.2);
+            border-radius:10px; padding:1rem 1.2rem; margin-bottom:1.4rem;
+        }
+        .situation-box strong { color:#58a6ff; font-size:0.8rem; letter-spacing:0.05em; text-transform:uppercase; display:block; margin-bottom:0.4rem; }
+        .situation-box p { margin:0; font-size:0.92rem; color:#c9d1d9; line-height:1.6; }
+
+        /* ── Aufgabenstellung box (dark blue like in the book) ── */
+        .aufgaben-box {
+            background:rgba(20,40,80,0.7); border:1.5px solid rgba(68,147,248,0.35);
+            border-radius:12px; padding:1.3rem 1.5rem; margin-bottom:1.8rem;
+        }
+        .aufgaben-box-title {
+            font-size:0.75rem; font-weight:800; color:#58a6ff; letter-spacing:0.08em;
+            text-transform:uppercase; margin:0 0 1rem 0;
+            border-bottom:1px solid rgba(68,147,248,0.2); padding-bottom:0.5rem;
+        }
+        .aufgaben-box p { font-size:0.92rem; color:#d0d7de; line-height:1.6; margin:0 0 0.5rem 0; }
+        .aufgaben-box p:last-child { margin:0; }
+
+        /* Schreibauftrag */
+        .schreibauftrag-label {
+            font-size:0.82rem; font-weight:700; color:#fff; margin:0.8rem 0 0.6rem 0;
+        }
+        .schreibauftrag-list { margin:0; padding:0; list-style:none; }
+        .schreibauftrag-list li {
+            display:flex; gap:0.5rem; align-items:flex-start;
+            font-size:0.92rem; color:#d0d7de; line-height:1.6;
+            padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.05);
+        }
+        .schreibauftrag-list li:last-child { border-bottom:none; }
+        .schreibauftrag-list li::before {
+            content:'•'; color:#58a6ff; font-size:1.1rem; flex-shrink:0; line-height:1.4;
+        }
+        .schreibauftrag-list li strong { color:#fff; }
+        .schreibauftrag-list li em { color:#58a6ff; font-style:normal; }
+
+        /* 4b sub-tasks a/b/c/d */
+        .subtask-list { margin:0.8rem 0 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:0; }
+        .subtask-item {
+            display:flex; gap:0; align-items:stretch;
+            border-bottom:1px solid rgba(227,179,65,0.1);
+        }
+        .subtask-item:last-child { border-bottom:none; }
+        .subtask-letter-col {
+            width:3rem; flex-shrink:0; display:flex; align-items:flex-start;
+            justify-content:center; padding-top:1rem;
+        }
+        .subtask-letter {
+            width:1.6rem; height:1.6rem; border-radius:6px;
+            background:rgba(227,179,65,0.18); color:#e3b341; font-size:0.82rem;
+            font-weight:800; display:flex; align-items:center; justify-content:center;
+            border:1px solid rgba(227,179,65,0.3);
+        }
+        .subtask-body {
+            flex:1; padding:0.85rem 0.5rem 0.85rem 0;
+            font-size:0.92rem; color:#c9d1d9; line-height:1.65;
+        }
+        .subtask-body strong { color:#fff; }
+
+        /* Mitschüler-Aussage */
+        .mitschueler-zitat {
+            margin:0.6rem 0 0 0; padding:0.8rem 1.1rem;
+            border-left:3px solid #e3b341; background:rgba(227,179,65,0.07);
+            border-radius:0 8px 8px 0; font-size:0.91rem; color:#f0c96b; font-style:italic;
+            line-height:1.6;
+        }
+
+        /* Nimm Stellung */
+        .stellung-box {
+            margin-top:0.6rem; padding:0.85rem 1.1rem;
+            background:rgba(227,179,65,0.06); border-radius:8px;
+            border:1px dashed rgba(227,179,65,0.35);
+            font-size:0.91rem; color:#d0d7de; line-height:1.65;
+        }
+        .stellung-box p { margin:0 0 0.25rem 0; }
+        .stellung-box p:last-child { margin:0; }
+
+        /* ── Materialien ── */
+        .materials-wrap { margin-bottom:1.8rem; }
+        .material-block {
+            border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+            padding:1.2rem 1.4rem; margin-bottom:1rem; background:rgba(255,255,255,0.02);
+        }
+        .material-block.m4b {
+            border-color:rgba(227,179,65,0.2); background:rgba(227,179,65,0.03);
+        }
+        .material-label {
+            font-size:0.72rem; font-weight:800; color:#58a6ff; margin-bottom:0.7rem;
+            letter-spacing:0.07em; text-transform:uppercase;
+        }
+        .material-label.gold { color:#e3b341; }
+
+        /* Long text */
+        .exam-text {
+            font-size:0.96rem; line-height:1.85; color:#c9d1d9;
+        }
+        .exam-text p { margin:0 0 0.85rem 0; }
+        .exam-text p:last-child { margin:0; }
+        .ln { color:rgba(255,255,255,0.2); font-size:0.72rem; margin-right:0.35rem; user-select:none; }
+
+        /* ── Diagramm ── */
+        .diagram-block {
+            background:rgba(22,27,42,0.9); border:1px solid rgba(255,255,255,0.08);
+            border-radius:10px; padding:1.1rem 1.3rem;
+        }
+        .diagram-title { font-size:0.83rem; font-weight:700; color:#fff; margin:0 0 1rem 0; }
+        .bar-chart { display:flex; flex-direction:column; gap:0.55rem; }
+        .bar-row { display:grid; grid-template-columns:160px 1fr 44px; align-items:center; gap:0.6rem; }
+        .bar-label { font-size:0.8rem; color:var(--color-text-secondary); text-align:right; }
+        .bar-track { background:rgba(255,255,255,0.05); border-radius:20px; height:16px; overflow:hidden; }
+        .bar-fill  { height:100%; border-radius:20px; transition:width 1.1s ease; }
+        .bar-val   { font-size:0.8rem; font-weight:700; color:#fff; }
+
+        /* ── Musterlösung ── */
+        .loesung-wrap { margin-top:0.9rem; }
+        .loesung-toggle {
+            display:inline-flex; align-items:center; gap:0.4rem;
+            font-size:0.82rem; font-weight:600; color:var(--color-accent); cursor:pointer;
+            background:rgba(68,147,248,0.08); border:1px solid rgba(68,147,248,0.22);
+            border-radius:7px; padding:0.4rem 0.9rem; transition:all 0.15s;
+        }
+        .loesung-toggle:hover { background:rgba(68,147,248,0.16); }
+        .loesung-block {
+            display:none; margin-top:0.6rem; padding:1rem 1.1rem;
+            border-radius:8px; background:rgba(63,185,80,0.07);
+            border:1px solid rgba(63,185,80,0.22);
+            font-size:0.87rem; color:#c9d1d9; line-height:1.65;
+        }
+        .loesung-block.open { display:block; }
+        .loesung-block strong { color:#3fb950; }
+        .loesung-block em { color:#58a6ff; }
+
+        @keyframes shake {
+            0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+        }
+        .shake { animation:shake 0.45s ease; }
+
+        @media (max-width: 600px) {
+            .text-card { padding:1.2rem 1rem; }
+            .bar-row { grid-template-columns:110px 1fr 36px; }
+            .bar-label { font-size:0.72rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.87)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Lesetrainer</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>Lesetrainer &mdash; Pr&uuml;fungstexte</h1>
+            <p class="page-subtitle">Originalformat ZP10 &mdash; Typ 2 &amp; Typ 4b</p>
+        </div>
+
+        <div class="note-card highlight-card" style="margin-bottom:1.8rem;">
+            <p style="margin:0;font-size:0.92rem;line-height:1.6;">
+                <strong class="accent">Wie &uuml;ben:</strong> Lies zun&auml;chst die Aufgabe, dann die Materialien &mdash; schreibe deinen Text auf Papier &mdash; danach Musterlösung vergleichen (Geheimcode n&ouml;tig).
+            </p>
+        </div>
+
+        <div class="typ-filter">
+            <button class="typ-btn active" data-typ="alle">Alle</button>
+            <button class="typ-btn" data-typ="2">Typ 2 &mdash; Informierender Text</button>
+            <button class="typ-btn" data-typ="4b">Typ 4b &mdash; Materialgest&uuml;tzt</button>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════
+             AUFGABENTYP 2
+        ═══════════════════════════════════════════════════ -->
+        <div class="text-card" data-typ="2">
+            <div class="card-top">
+                <span class="typ-badge badge-2">Typ 2</span>
+                <div>
+                    <p class="card-title">Digitaler Stress bei Jugendlichen</p>
+                    <p class="card-source">Themenbereich: Medien &amp; Gesellschaft &mdash; Materialien M1&ndash;M3 &mdash; ca. 600&ndash;800 W&ouml;rter eigener Text</p>
+                </div>
+            </div>
+
+            <!-- AUFGABENSTELLUNG -->
+            <div class="aufgaben-box">
+                <p class="aufgaben-box-title">Aufgabenstellung</p>
+
+                <div class="situation-box" style="margin-bottom:1rem;">
+                    <strong>Situation:</strong>
+                    <p>Deine Schule nimmt an einem bundesweiten Projekttag zum Thema „Digitale Gesundheit" teil. Du wirst gebeten, f&uuml;r die Schulwebsite einen <strong>informierenden Text</strong> zu verfassen, der Sch&uuml;lerinnen und Sch&uuml;lern, Lehrkr&auml;ften und Eltern erkl&auml;rt, was digitaler Stress ist und wie man damit umgehen kann. Dir wird dazu eine Materialsammlung (M1&ndash;M3) zur Verf&uuml;gung gestellt.</p>
+                </div>
+
+                <p class="schreibauftrag-label">Schreibauftrag:</p>
+                <p style="font-size:0.92rem;color:#d0d7de;margin:0 0 0.7rem 0;">Verfasse auf der Grundlage der Materialien M1&ndash;M3 einen <strong>informierenden Text</strong> zum Thema „Digitaler Stress bei Jugendlichen". Schreibe nicht einfach aus den Materialien ab, sondern achte auf eine eigenst&auml;ndige Darstellung in einem zusammenh&auml;ngenden Text.</p>
+
+                <ul class="schreibauftrag-list">
+                    <li><strong>Formuliere</strong> f&uuml;r deinen Text eine passende, zum Lesen anregende <em>Überschrift</em>.</li>
+                    <li><strong>Erkl&auml;re</strong> einleitend, was unter dem Begriff „Always-on-Stress" zu verstehen ist und welche Jugendlichen davon besonders betroffen sind.</li>
+                    <li><strong>Stelle dar</strong>, welche <em>Ursachen</em> f&uuml;r digitalen Stress die Materialien nennen, und erkl&auml;re, wie Algorithmen sozialer Plattformen dabei eine Rolle spielen.</li>
+                    <li><strong>Erl&auml;utere</strong> anhand der Materialien, welche <em>Folgen</em> &uuml;berm&auml;&szlig;ige Smartphone-Nutzung auf Schlaf, Konzentration und Wohlbefinden hat. Nutze dabei auch die Angaben aus M2.</li>
+                    <li><strong>Stelle dar</strong>, welche <em>L&ouml;sungsans&auml;tze</em> in den Materialien vorgeschlagen werden, und <strong>beurteile</strong> anhand der Materialien und eigener &Uuml;berlegungen, welcher Ansatz am sinnvollsten erscheint.</li>
+                    <li><strong>Schlussfolgere</strong>, welche Verantwortung Jugendliche, Eltern und Schule beim Umgang mit digitalen Medien tragen.</li>
+                </ul>
+            </div>
+
+            <!-- MATERIALIEN -->
+            <div class="materials-wrap">
+                <p style="font-weight:700;color:#fff;font-size:0.95rem;margin:0 0 0.9rem 0;">&#x1F4CE; Materialien</p>
+
+                <!-- M1 -->
+                <div class="material-block">
+                    <p class="material-label">M1 &mdash; &bdquo;Always on&rdquo; &mdash; Wenn das Smartphone zur Belastung wird &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Süddeutsche Zeitung Magazin (adaptiert)</span></p>
+                    <div class="exam-text">
+                        <p><span class="ln">1</span>Es ist kurz nach Mitternacht. Lena, 16 Jahre, liegt im Bett und starrt auf ihr Smartphone. Auf dem Bildschirm flimmert ein Video nach dem anderen &mdash; eigentlich wollte sie nur kurz nachschauen, was ihre Freundinnen auf Instagram gepostet haben. Jetzt ist eine Stunde vergangen. Morgen hat sie eine wichtige Klassenarbeit, doch der Schlaf will nicht kommen. Lena ist kein Einzelfall.</p>
+                        <p><span class="ln">7</span>Die Bundeszentrale f&uuml;r gesundheitliche Aufkl&auml;rung (BZgA) ver&ouml;ffentlichte 2024 eine Studie, laut der 71 Prozent der deutschen Jugendlichen zwischen 12 und 17 Jahren ihr Smartphone als „st&auml;ndig pr&auml;sent" erleben. Gemeint ist damit nicht nur die physische Anwesenheit des Ger&auml;ts &mdash; gemeint ist ein Gef&uuml;hl der Verpflichtung: auf Nachrichten antworten zu m&uuml;ssen, die neuesten Posts nicht verpassen zu d&uuml;rfen, immer erreichbar zu sein. Fachleute nennen dieses Ph&auml;nomen „Always-on-Stress".</p>
+                        <p><span class="ln">16</span>Woher kommt dieser Druck? Ein Erkl&auml;rungsansatz liegt in der Funktionsweise sozialer Plattformen selbst. Die Algorithmen von Instagram, TikTok oder Snapchat sind darauf ausgelegt, die Aufmerksamkeit m&ouml;glichst lange zu fesseln. Kurze Videos, sofortige Belohnungen durch Likes und Kommentare, endlose Scrollm&ouml;glichkeiten &mdash; all das aktiviert im Gehirn das sogenannte Belohnungssystem. &Auml;hnlich wie bei Gl&uuml;cksspielen entsteht eine Art Suchtdynamik: Man sucht immer wieder nach dem n&auml;chsten „Gef&auml;llt mir"-Treffer.</p>
+                        <p><span class="ln">24</span>Dar&uuml;ber hinaus berichten viele Jugendliche von einem wachsenden Vergleichsdruck. Auf Social-Media-Plattformen werden bevorzugt Highlights pr&auml;sentiert: perfekte K&ouml;rper, glamour&ouml;se Urlaube, gl&uuml;ckliche Freundschaften. Dass diese Bilder sorgf&auml;ltig inszeniert und oft nachbearbeitet sind, wissen die meisten &mdash; und dennoch l&ouml;sen sie Minderwertigkeitsgef&uuml;hle aus. Die Psychologin Dr. Miriam Schulz erkl&auml;rt: „Das menschliche Gehirn vergleicht automatisch. Wenn wir st&auml;ndig mit idealisierten Bildern konfrontiert werden, verzerrt das unsere Wahrnehmung der eigenen Realit&auml;t."</p>
+                        <p><span class="ln">32</span>Doch nicht alle Stimmen sind alarmistisch. Medienp&auml;dagogin Katja Richter warnt davor, Jugendliche als hilflose Opfer darzustellen: „Viele Sch&uuml;lerinnen und Sch&uuml;ler gehen sehr reflektiert mit digitalen Medien um. Sie nutzen soziale Netzwerke bewusst, um sich zu vernetzen, politisch zu engagieren oder kreativ zu sein." Tats&auml;chlich zeigen Erhebungen des Deutschen Jugendinstituts, dass rund 40 Prozent der 14- bis 17-J&auml;hrigen Smartphones regelm&auml;&szlig;ig f&uuml;r Lernzwecke einsetzen.</p>
+                        <p><span class="ln">39</span>Die L&ouml;sung liegt wohl nicht im Verbot, sondern in der F&ouml;rderung von Medienkompetenz. Schulen, die digitale Gesundheit als Unterrichtsthema einf&uuml;hren, verzeichnen laut einer Pilotstudie des Bundesministeriums f&uuml;r Bildung (2023) deutlich weniger Beschwerden &uuml;ber Konzentrationsprobleme und Schlafst&ouml;rungen. Sch&uuml;lerinnen und Sch&uuml;ler lernen dabei, zwischen aktivem und passivem Konsum zu unterscheiden und bewusst zu entscheiden, wann und wie sie ihr Ger&auml;t nutzen.</p>
+                        <p><span class="ln">46</span>Lena h&auml;tte in dieser Nacht vielleicht eine einfache Regel helfen k&ouml;nnen: Handy um 22 Uhr aus. Doch diese Erkenntnis muss erst erarbeitet werden &mdash; von Jugendlichen selbst, mit Unterst&uuml;tzung von Schule und Elternhaus. Die Technologie ist nicht das Problem. Das Problem ist, dass wir verlernt haben, uns von ihr zu trennen.</p>
+                    </div>
+                </div>
+
+                <!-- M2 Diagramm -->
+                <div class="material-block">
+                    <p class="material-label">M2 &mdash; Grafik: Smartphone-Nutzung und Auswirkungen auf Jugendliche &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Charit&eacute; Berlin, Langzeitstudie 2021&ndash;2024 (adaptiert)</span></p>
+                    <div class="diagram-block">
+                        <p class="diagram-title">Vergleich: mit vs. ohne Bildschirmzeit vor dem Schlafen (Durchschnittswerte, Skala 0&ndash;100)</p>
+                        <div class="bar-chart" id="chart-m2"></div>
+                        <p style="font-size:0.78rem;color:var(--color-text-muted);margin:0.8rem 0 0 0;">
+                            &#9632; <span style="color:#58a6ff;">Blau</span> = mit Bildschirmzeit &nbsp;&#9632; <span style="color:#3fb950;">Gr&uuml;n</span> = ohne Bildschirmzeit
+                        </p>
+                    </div>
+                </div>
+
+                <!-- M3 -->
+                <div class="material-block">
+                    <p class="material-label">M3 &mdash; Experteninterview &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Prof. Dr. Klaus Bergmann, Medienpsychologie, Universität Köln (adaptiert)</span></p>
+                    <div class="exam-text">
+                        <p><span class="ln">1</span><strong style="color:#fff;">Interviewer:</strong> Herr Bergmann, werden Jugendliche von sozialen Medien manipuliert?</p>
+                        <p><span class="ln">3</span><strong style="color:#fff;">Prof. Bergmann:</strong> Das Wort „manipuliert" ist zu stark. Aber die Plattformen sind so gestaltet, dass sie unsere psychologischen Bed&uuml;rfnisse &mdash; nach Zugeh&ouml;rigkeit, Anerkennung, Neuheit &mdash; gezielt ansprechen. Das ist kein Zufall, sondern das Gesch&auml;ftsmodell. Wer l&auml;nger scrollt, sieht mehr Werbung.</p>
+                        <p><span class="ln">8</span><strong style="color:#fff;">Interviewer:</strong> Was raten Sie Jugendlichen konkret?</p>
+                        <p><span class="ln">10</span><strong style="color:#fff;">Prof. Bergmann:</strong> Drei Dinge: Erstens, feste „offline-Zeiten" einf&uuml;hren &mdash; zum Beispiel beim Essen oder eine Stunde vor dem Schlafen. Zweitens, Benachrichtigungen deaktivieren &mdash; nicht die App kontrolliert dich, sondern du die App. Drittens, und das ist entscheidend: sich fragen, <em>warum</em> man gerade zum Handy greift. Langeweile? Einsamkeit? Stress? Oft hilft etwas anderes viel besser.</p>
+                        <p><span class="ln">17</span><strong style="color:#fff;">Interviewer:</strong> Sehen Sie auch positive Seiten?</p>
+                        <p><span class="ln">19</span><strong style="color:#fff;">Prof. Bergmann:</strong> Nat&uuml;rlich. Digitale Medien erm&ouml;glichen Vernetzung, Lernen, kreative Ausdrucksm&ouml;glichkeiten. Das Problem ist nicht die Technologie selbst, sondern die fehlende Reflexion im Umgang damit. Wir m&uuml;ssen Medienkompetenz so selbstverst&auml;ndlich machen wie Lesen und Schreiben. Dann ist das Smartphone ein Werkzeug &mdash; und kein Stressfaktor.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MUSTERLÖSUNG -->
+            <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:1.3rem;">
+                <p style="font-size:0.9rem;color:var(--color-text-muted);margin:0 0 0.8rem 0;">Musterlösungen zu den einzelnen Punkten des Schreibauftrags:</p>
+
+                <div style="margin-bottom:0.7rem;">
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; Überschrift</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            <strong>Mögliche Überschriften:</strong><br>
+                            „Immer online &mdash; immer gestresst? Digitaler Stress bei Jugendlichen"<br>
+                            „Zwischen Likes und Schlafmangel &mdash; wie Smartphones Jugendliche belasten"<br>
+                            „Always on: Wenn das Handy zum Stressfaktor wird"
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.7rem;">
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; Always-on-Stress erkl&auml;ren (Einleitung)</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Als „Always-on-Stress" bezeichnet man das Gef&uuml;hl, st&auml;ndig erreichbar sein zu m&uuml;ssen und nichts verpassen zu d&uuml;rfen. Laut einer Studie der BZgA erleben 71 Prozent der deutschen Jugendlichen zwischen 12 und 17 Jahren ihr Smartphone als „st&auml;ndig pr&auml;sent" (M1, Z. 7&ndash;14). Besonders betroffen sind Jugendliche, die soziale Plattformen intensiv nutzen und deren soziales Leben stark mit digitaler Kommunikation verkn&uuml;pft ist.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.7rem;">
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; Ursachen &amp; Algorithmen darstellen</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Eine wesentliche Ursache liegt in der Gestaltung sozialer Plattformen. Laut M1 sind Algorithmen von Instagram, TikTok und Snapchat darauf ausgelegt, Nutzer m&ouml;glichst lange zu fesseln (Z. 17&ndash;18). Kurze Videos und sofortige Belohnungen durch Likes aktivieren das Belohnungssystem im Gehirn und erzeugen eine sucht&auml;hnliche Dynamik (Z. 20&ndash;22). Prof. Bergmann best&auml;tigt in M3, dass dieses Design kein Zufall sei, sondern dem Gesch&auml;ftsmodell der Plattformen diene: Mehr Bildschirmzeit bedeutet mehr Werbeeinnahmen (M3, Z. 5&ndash;7).
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.7rem;">
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; Folgen erl&auml;utern (mit M2)</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Die Folgen &uuml;berm&auml;&szlig;iger Nutzung sind vielf&auml;ltig. Wie M2 zeigt, schlafen Jugendliche mit abendlicher Bildschirmzeit deutlich schlechter (63 von 100 Punkten) als Gleichaltrige ohne Bildschirmzeit (78 Punkte). Auch Konzentration und Wohlbefinden sind bei h&auml;ufiger Nutzung messbar geringer. Zus&auml;tzlich beschreibt M1 einen wachsenden Vergleichsdruck durch idealisierte Social-Media-Bilder, der Minderwertigkeitsgef&uuml;hle ausl&ouml;sen kann (M1, Z. 24&ndash;31).
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.7rem;">
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; L&ouml;sungsans&auml;tze + Beurteilung</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Die Materialien schlagen verschiedene Ans&auml;tze vor. M1 pl&auml;diert f&uuml;r schulische Medienkompetenz statt Verbote (Z. 39&ndash;44). M3 empfiehlt konkrete Verhaltens&auml;nderungen: feste Offline-Zeiten, Deaktivierung von Benachrichtigungen und bewusstes Reflektieren der eigenen Nutzungsmotive (Z. 10&ndash;16). Der Ansatz der Medienkompetenz &uuml;berzeugt am meisten, da er nachhaltig wirkt und Jugendliche nicht bevormundet, sondern bef&auml;higt, eigenverantwortlich zu handeln.
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p style="font-size:0.88rem;color:#fff;font-weight:600;margin:0 0 0.3rem 0;">&#x2022; Schlussfolgerung &mdash; Verantwortung</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Zusammenfassend l&auml;sst sich festhalten, dass digitaler Stress ein gesamtgesellschaftliches Problem ist, das nicht allein von Jugendlichen gel&ouml;st werden kann. W&auml;hrend Jugendliche einen bewussteren Umgang mit ihren Ger&auml;ten erlernen m&uuml;ssen, sind Eltern gefordert, Vorbilder zu sein. Die Schule tr&auml;gt die Verantwortung, Medienkompetenz systematisch zu vermitteln. Nur wenn alle drei Ebenen zusammenwirken, kann digitaler Stress wirkungsvoll reduziert werden.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════════════════
+             AUFGABENTYP 4b
+        ═══════════════════════════════════════════════════ -->
+        <div class="text-card" data-typ="4b">
+            <div class="card-top">
+                <span class="typ-badge badge-4b">Typ 4b</span>
+                <div>
+                    <p class="card-title">Erklärvideos im Unterricht &mdash; Lernhilfe oder Ablenkung?</p>
+                    <p class="card-source">Themenbereich: Schule &amp; Medien &mdash; Materialien M1a, M1b, M2, M3</p>
+                </div>
+            </div>
+
+            <!-- AUFGABENSTELLUNG -->
+            <div style="background:rgba(227,179,65,0.05);border-left:4px solid #e3b341;border-radius:0 10px 10px 0;padding:1.2rem 1.5rem;margin-bottom:2rem;">
+                <p style="font-size:0.72rem;font-weight:800;color:#e3b341;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.7rem 0;">Aufgabenstellung</p>
+                <p style="font-size:0.93rem;color:#d0d7de;line-height:1.65;margin:0 0 1.1rem 0;">
+                    Lies zun&auml;chst die Aufgabe und dann die Materialien aufmerksam durch, bevor du mit dem Schreiben beginnst. <strong style="color:#fff;">Untersuche die Materialien M1a, M1b, M2 und M3.</strong> Schreibe einen zusammenh&auml;ngenden Text &mdash; schreibe nicht einfach aus den Materialien ab, sondern achte auf eine eigenst&auml;ndige Darstellung.
+                </p>
+
+                <ul class="subtask-list">
+                    <li class="subtask-item">
+                        <div class="subtask-letter-col"><span class="subtask-letter">a</span></div>
+                        <div class="subtask-body">
+                            <strong>Benenne</strong> das gemeinsame Thema von M1a, M1b und M2.<br>
+                            <strong>Fasse</strong> die Informationen aus <strong>M1a</strong> und <strong>M1b</strong> zusammen.
+                        </div>
+                    </li>
+                    <li class="subtask-item">
+                        <div class="subtask-letter-col"><span class="subtask-letter">b</span></div>
+                        <div class="subtask-body">
+                            <strong>Stelle</strong> die Aussagen aus <strong>M2</strong> und <strong>M3</strong> mit eigenen Worten dar. <strong>Vergleiche</strong> dabei die Positionen im Hinblick auf die Frage, welche M&ouml;glichkeiten Erkl&auml;rvideos f&uuml;r den Unterricht haben k&ouml;nnen. <strong>Belege</strong> deine Ausf&uuml;hrungen im Text.
+                        </div>
+                    </li>
+                    <li class="subtask-item">
+                        <div class="subtask-letter-col"><span class="subtask-letter">c</span></div>
+                        <div class="subtask-body">
+                            <strong>Setze dich kritisch</strong> mit der folgenden Aussage einer Mitsch&uuml;lerin <strong>auseinander</strong>:
+                            <div class="mitschueler-zitat">„Erkl&auml;rvideos steigern den Lernerfolg automatisch &mdash; wer sie schaut, muss sich keine Notizen mehr machen und versteht den Stoff trotzdem besser."</div>
+                        </div>
+                    </li>
+                    <li class="subtask-item">
+                        <div class="subtask-letter-col"><span class="subtask-letter">d</span></div>
+                        <div class="subtask-body">
+                            <div class="stellung-box">
+                                <p><strong>Nimm Stellung</strong> zur Aussage der Mitsch&uuml;lerin.</p>
+                                <p>&ndash; <strong>Begr&uuml;nde</strong> deine Meinung.</p>
+                                <p>&ndash; <strong>Beziehe</strong> dich dabei auf die Materialien M1 bis M3.</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- MATERIALIEN -->
+            <div class="materials-wrap">
+                <p style="font-weight:700;color:#fff;font-size:0.95rem;margin:0 0 1rem 0;">&#x1F4CE; Materialien</p>
+
+                <div class="material-block m4b">
+                    <p class="material-label gold">M1a &mdash; Sachtext &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Bundeszentrale f&uuml;r politische Bildung, bpb.de (adaptiert)</span></p>
+                    <div class="exam-text">
+                        <p><span class="ln">1</span>Erkl&auml;rvideos &mdash; kurze, meist animierte oder kommentierte Filme, die komplexe Sachverhalte verst&auml;ndlich machen &mdash; sind seit Jahren ein fester Bestandteil der digitalen Lernkultur. Plattformen wie YouTube oder Khan Academy bieten Millionen solcher Videos zu nahezu jedem Schulfach an. Allein der deutschsprachige Kanal „Lehrer Schmidt" wurde &uuml;ber 60 Millionen Mal aufgerufen.</p>
+                        <p><span class="ln">7</span>Der zentrale Vorteil liegt in der Flexibilit&auml;t: Sch&uuml;lerinnen und Sch&uuml;ler k&ouml;nnen Videos pausieren, zur&uuml;ckspulen und in ihrem eigenen Tempo lernen. Besonders f&uuml;r Jugendliche, die im Unterricht den Anschluss verloren haben oder sich auf Pr&uuml;fungen vorbereiten, bieten Erkl&auml;rvideos eine niedrigschwellige M&ouml;glichkeit, Wissensl&uuml;cken zu schlie&szlig;en.</p>
+                        <p><span class="ln">13</span>Kritisch zu betrachten ist jedoch der passive Konsum: Wer ein Video nur anschaut, ohne mitzuschreiben oder nachzudenken, &uuml;bersieht oft, dass Verstehen und Behalten zwei verschiedene Dinge sind. Bildungsforscher warnen vor dem sogenannten „Illusion-of-Knowing"-Effekt: Man glaubt, den Stoff verstanden zu haben, weil man die Erkl&auml;rung plausibel fand &mdash; tats&auml;chlich aber fehlt das tiefe Durchdenken.</p>
+                    </div>
+                </div>
+
+                <div class="material-block m4b">
+                    <p class="material-label gold">M1b &mdash; Grafik &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Deutsches Institut f&uuml;r P&auml;dagogische Forschung (DIPF), 2023</span></p>
+                    <div class="diagram-block">
+                        <p class="diagram-title">Wie nutzen Sch&uuml;ler (Klasse 8&ndash;10) Erkl&auml;rvideos? &mdash; Mehrfachnennungen m&ouml;glich (in %)</p>
+                        <div class="bar-chart" id="chart-4b"></div>
+                    </div>
+                </div>
+
+                <div class="material-block m4b">
+                    <p class="material-label gold">M2 &mdash; Kommentar &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Dr. Lena Faber, Lernpsychologin, Tagesspiegel (adaptiert)</span></p>
+                    <div class="exam-text">
+                        <p><span class="ln">1</span>Erkl&auml;rvideos sind kein Allheilmittel &mdash; aber sie k&ouml;nnen ein ausgezeichnetes Lernwerkzeug sein, wenn man sie richtig einsetzt. Entscheidend ist das <em>aktive</em> Lernen: Wer beim Schauen mitschreibt, das Video stoppt und Fragen formuliert oder anschlie&szlig;end das Gelernte mit eigenen Worten zusammenfasst, profitiert nachweislich mehr als jemand, der passiv konsumiert.</p>
+                        <p><span class="ln">7</span>Studien zeigen, dass Sch&uuml;lerinnen und Sch&uuml;ler, die Erkl&auml;rvideos aktiv nutzen, bei Tests im Durchschnitt 18 Prozent besser abschneiden als Vergleichsgruppen ohne digitale Unterst&uuml;tzung. Gleichzeitig warnt Faber: „Das Video ersetzt nicht das Gespr&auml;ch, nicht das Nachfragen, nicht das Fehlerkorrigieren durch eine Lehrkraft. Es erg&auml;nzt &mdash; es ersetzt nicht."</p>
+                        <p><span class="ln">13</span>F&uuml;r Schulen empfiehlt sie ein klares Konzept: Videos gezielt einsetzen, begleitet von Aufgaben, die zum aktiven Nachdenken zwingen. Nur so k&ouml;nne aus einem passiven Zuschauer ein echter Lernender werden.</p>
+                    </div>
+                </div>
+
+                <div class="material-block m4b">
+                    <p class="material-label gold">M3 &mdash; Sch&uuml;lermeinung &nbsp;|&nbsp; <span style="font-weight:400;text-transform:none;letter-spacing:0;">Schulzeitung IGS Hannover, Leserbriefe</span></p>
+                    <div class="exam-text">
+                        <p><span class="ln">1</span>„F&uuml;r mich sind Erkl&auml;rvideos unverzichtbar geworden. Wenn ich im Unterricht etwas nicht verstehe, schaue ich mir abends ein Video dazu an &mdash; meistens reichen f&uuml;nf Minuten, um den Knoten zu l&ouml;sen. Was mein Lehrer in 45 Minuten erkl&auml;rt hat, wird im Video in drei Minuten auf den Punkt gebracht. Das ist effizient." &mdash; <em>Tom, 15</em></p>
+                        <p><span class="ln">6</span>„Ich sehe das anders. Ich habe vor der letzten Mathearbeit nur Videos geschaut und dachte, ich h&auml;tte alles drauf. Dann sa&szlig; ich vor dem Test und konnte die Aufgaben trotzdem nicht l&ouml;sen &mdash; weil ich nie selbst gerechnet hatte. Videos sind sch&ouml;n, aber sie ersetzen das eigene &Uuml;ben nicht." &mdash; <em>Sara, 16</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MUSTERLÖSUNGEN -->
+            <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:1.4rem;">
+                <p style="font-size:0.88rem;color:var(--color-text-muted);margin:0 0 1rem 0;">Musterlösungen zu a) &mdash; d):</p>
+
+                <div style="margin-bottom:0.8rem;padding:0.9rem 1.1rem;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">
+                    <p style="font-size:0.85rem;color:#e3b341;font-weight:700;margin:0 0 0.35rem 0;">a) Gemeinsames Thema + Zusammenfassung M1a &amp; M1b</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            <strong>Gemeinsames Thema:</strong> M1a, M1b und M2 behandeln alle die Nutzung und Wirkung von Erkl&auml;rvideos als Lernmittel f&uuml;r Sch&uuml;lerinnen und Sch&uuml;ler.<br><br>
+                            <strong>M1a</strong> erl&auml;utert, dass Erkl&auml;rvideos flexibles, selbstgesteuertes Lernen erm&ouml;glichen und Wissensl&uuml;cken schlie&szlig;en k&ouml;nnen (Z. 7&ndash;12). Gleichzeitig warnt der Text vor dem „Illusion-of-Knowing"-Effekt: Passives Zuschauen vermittle das Gef&uuml;hl des Verstehens, ohne echtes Lernen zu bewirken (Z. 13&ndash;17).<br><br>
+                            <strong>M1b</strong> zeigt, wof&uuml;r Sch&uuml;ler Videos konkret nutzen: am h&auml;ufigsten zur Pr&uuml;fungsvorbereitung (78&nbsp;%) und zum Nachlernen verpasster Stunden (65&nbsp;%). Nur 24&nbsp;% verwenden sie als Erg&auml;nzung zum Unterricht.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.8rem;padding:0.9rem 1.1rem;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">
+                    <p style="font-size:0.85rem;color:#e3b341;font-weight:700;margin:0 0 0.35rem 0;">b) Darstellen &amp; Vergleichen M2 und M3</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Dr. Faber (M2) bewertet Erkl&auml;rvideos positiv, betont aber, dass ihr Nutzen vom <em>aktiven</em> Einsatz abh&auml;nge. Wer mitschreibe und nachdenke, profitiere nachweislich; passives Schauen hingegen bringe wenig. Sie empfiehlt Schulen, Videos mit begleitenden Aufgaben zu kombinieren (M2, Z. 13&ndash;15).<br><br>
+                            M3 zeigt zwei gegens&auml;tzliche Sch&uuml;lerperspektiven: Tom (M3, Z. 1&ndash;5) empfindet Videos als effizient und unverzichtbar. Sara (M3, Z. 6&ndash;9) hingegen machte die Erfahrung, dass reines Zuschauen ohne eigenes &Uuml;ben nicht zum Lernerfolg f&uuml;hrt.<br><br>
+                            <em>Vergleich:</em> Alle drei Quellen sind sich einig, dass Erkl&auml;rvideos allein nicht ausreichen &mdash; entscheidend ist, wie aktiv man dabei lernt. M2 und Saras Erfahrung (M3) erg&auml;nzen sich: Beide belegen, dass passiver Konsum den Lernerfolg t&auml;uscht.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.8rem;padding:0.9rem 1.1rem;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">
+                    <p style="font-size:0.85rem;color:#e3b341;font-weight:700;margin:0 0 0.35rem 0;">c) Kritische Auseinandersetzung</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Die Aussage der Mitsch&uuml;lerin ist verst&auml;ndlich, vereinfacht aber zu stark.<br><br>
+                            Richtig ist, dass Erkl&auml;rvideos Lerninhalte anschaulich vermitteln k&ouml;nnen &mdash; das best&auml;tigen sowohl M1a als auch M2. Falsch ist jedoch die Annahme, dass allein das Schauen zum Verstehen ausreicht. M1a nennt ausdr&uuml;cklich den „Illusion-of-Knowing"-Effekt (Z. 15&ndash;17): Man f&uuml;hlt sich verstehend, ohne es wirklich zu sein. Saras Beispiel (M3, Z. 6&ndash;9) beweist dies aus eigener Erfahrung &mdash; trotz intensivem Videoschauen scheiterte sie an der Arbeit, weil sie nicht selbst ge&uuml;bt hatte.<br><br>
+                            Die Aussage, man m&uuml;sse sich keine Notizen mehr machen, ist daher aus lernpsychologischer Sicht abzulehnen: Aktives Mitschreiben ist ein wesentlicher Teil des Lernprozesses.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding:0.9rem 1.1rem;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">
+                    <p style="font-size:0.85rem;color:#e3b341;font-weight:700;margin:0 0 0.35rem 0;">d) Stellungnahme</p>
+                    <div class="loesung-wrap">
+                        <button class="loesung-toggle" onclick="toggleLoesung(this)">&#128065; Musterlösung</button>
+                        <div class="loesung-block">
+                            Ich stimme der Aussage der Mitsch&uuml;lerin nicht zu. Erkl&auml;rvideos k&ouml;nnen den Lernerfolg unterst&uuml;tzen &mdash; aber nur dann, wenn man sie aktiv nutzt.<br><br>
+                            Die Materialien belegen &uuml;bereinstimmend, dass passives Zuschauen nicht ausreicht. Dr. Faber (M2) betont, dass aktive Lernstrategien wie Mitschreiben und Zusammenfassen entscheidend sind. Saras Erfahrung (M3) zeigt, was passiert, wenn man darauf verzichtet.<br><br>
+                            Meine Meinung: Erkl&auml;rvideos sind ein wertvolles Erg&auml;nzungsmittel, kein Ersatz f&uuml;r aktives &Uuml;ben und das Denken mit dem Stift in der Hand. Wer Videos schaut und dabei mitschreibt, Fragen stellt und das Gelernte anwendet &mdash; der lernt wirklich. Wer nur zuschaut, t&auml;uscht sich selbst.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="height:3rem;"></div>
+    </div>
+
+    <!-- ── Code Modal ── -->
+    <div id="code-overlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+        <div id="code-card" style="background:#161b2e;border:1px solid rgba(68,147,248,0.3);border-radius:16px;padding:2rem 2.2rem;width:90%;max-width:360px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+            <div style="font-size:2.2rem;margin-bottom:0.6rem;">&#x1F510;</div>
+            <h3 style="color:#fff;margin:0 0 0.4rem 0;font-size:1.1rem;">Geheimcode eingeben</h3>
+            <p style="color:var(--color-text-muted);font-size:0.85rem;margin:0 0 1.2rem 0;">Kennst du den Code? Dann gib ihn ein.</p>
+            <input id="code-input" type="text" placeholder="Code eingeben..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1.5px solid rgba(68,147,248,0.3);border-radius:8px;padding:0.65rem 1rem;color:#fff;font-size:1rem;text-align:center;outline:none;letter-spacing:0.1em;">
+            <p id="code-error" style="display:none;color:#e05c5c;font-size:0.82rem;margin:0.5rem 0 0 0;">Falscher Code. Versuch nochmal!</p>
+            <div style="display:flex;gap:0.7rem;margin-top:1.1rem;">
+                <button id="code-cancel" style="flex:1;padding:0.6rem;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--color-text-muted);cursor:pointer;font-size:0.9rem;">Abbrechen</button>
+                <button id="code-submit" style="flex:2;padding:0.6rem;border-radius:8px;border:1px solid rgba(68,147,248,0.35);background:rgba(68,147,248,0.2);color:#58a6ff;font-weight:700;cursor:pointer;font-size:0.9rem;">&#x2713; Best&auml;tigen</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes shake {
+            0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+        }
+        .shake { animation:shake 0.45s ease; }
+    </style>
+
+    <script>
+        // Filter
+        document.querySelectorAll('.typ-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.typ-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const typ = btn.dataset.typ;
+                document.querySelectorAll('.text-card').forEach(card => {
+                    card.style.display = (typ === 'alle' || card.dataset.typ === typ) ? '' : 'none';
+                });
+            });
+        });
+
+        // ── Secret code ──
+        let unlocked = false;
+        const SECRET = 'жулик';
+
+        function toggleLoesung(btn) {
+            const block = btn.nextElementSibling;
+            if (block.classList.contains('open')) {
+                block.classList.remove('open');
+                btn.innerHTML = '&#128065; Musterlösung';
+                return;
+            }
+            if (unlocked) { block.classList.add('open'); btn.innerHTML = '&#x1F648; Musterlösung verbergen'; return; }
+            showCodeModal(function() { block.classList.add('open'); btn.innerHTML = '&#x1F648; Musterlösung verbergen'; });
+        }
+
+        function showCodeModal(onSuccess) {
+            const overlay = document.getElementById('code-overlay');
+            const input   = document.getElementById('code-input');
+            const card    = document.getElementById('code-card');
+            const err     = document.getElementById('code-error');
+            input.value = ''; err.style.display = 'none';
+            overlay.style.display = 'flex';
+            setTimeout(() => input.focus(), 80);
+            document.getElementById('code-submit').onclick = function() {
+                if (input.value.trim().toLowerCase() === SECRET) {
+                    unlocked = true; overlay.style.display = 'none'; onSuccess();
+                } else {
+                    err.style.display = 'block';
+                    card.classList.add('shake');
+                    input.value = '';
+                    setTimeout(() => card.classList.remove('shake'), 500);
+                }
+            };
+            input.onkeydown = function(e) {
+                if (e.key === 'Enter') document.getElementById('code-submit').click();
+                if (e.key === 'Escape') overlay.style.display = 'none';
+            };
+            document.getElementById('code-cancel').onclick = () => overlay.style.display = 'none';
+            overlay.onclick = e => { if (e.target === overlay) overlay.style.display = 'none'; };
+        }
+
+        // ── Charts ──
+        function buildChart(id, rows) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const max = Math.max(...rows.map(r => r.val));
+            rows.forEach(r => {
+                const row = document.createElement('div');
+                row.className = 'bar-row';
+                row.innerHTML = `<span class="bar-label">${r.label}</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:${r.col}"></div></div><span class="bar-val">${r.val}${r.unit||' %'}</span>`;
+                el.appendChild(row);
+                setTimeout(() => row.querySelector('.bar-fill').style.width = (r.val/max*100)+'%', 120);
+            });
+        }
+
+        buildChart('chart-m2', [
+            { label:'Schlafdauer (Score)',     val:63, col:'#58a6ff' },
+            { label:'Schlafdauer (Score)',     val:78, col:'#3fb950' },
+            { label:'Konzentration (Score)',   val:54, col:'#58a6ff' },
+            { label:'Konzentration (Score)',   val:81, col:'#3fb950' },
+            { label:'Wohlbefinden (Score)',    val:58, col:'#58a6ff' },
+            { label:'Wohlbefinden (Score)',    val:76, col:'#3fb950' },
+        ]);
+
+        buildChart('chart-4b', [
+            { label:'Prüfungsvorbereitung', val:78, col:'#e3b341' },
+            { label:'Nachholen (Fehlstunden)', val:65, col:'#e3b341' },
+            { label:'Hausaufgaben',         val:51, col:'#58a6ff' },
+            { label:'Unterrichtsergänzung', val:24, col:'#58a6ff' },
+            { label:'Freiwillig / Hobby',   val:18, col:'#3fb950' },
+        ]);
+    </script>
+</body>
+</html>
