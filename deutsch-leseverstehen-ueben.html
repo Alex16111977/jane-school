@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leseverstehen &mdash; &Uuml;ben | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .exam-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .exam-wrap { grid-template-columns: 1fr; }
+        }
+        .text-panel {
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+        .text-panel::-webkit-scrollbar { width: 5px; }
+        .text-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+        .tasks-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .lz-abschnitt { margin-bottom: 1rem; }
+        .lz-abschnitt-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 0.3rem;
+            opacity: 0.7;
+        }
+        .lz-line { display: flex; gap: 0.6rem; line-height: 1.75; font-size: 0.9rem; }
+        .lz-num {
+            min-width: 2rem;
+            text-align: right;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            padding-top: 0.12rem;
+            font-variant-numeric: tabular-nums;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .lz-text { color: #d0d7de; }
+        .glossar-block {
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+        }
+        .glossar-block strong { color: #d0d7de; }
+        .task-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem;
+        }
+        .task-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 0.82rem;
+            margin-bottom: 0.6rem;
+            flex-shrink: 0;
+        }
+        .task-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.12rem 0.55rem;
+            border-radius: 20px;
+            margin-left: 0.4rem;
+            vertical-align: middle;
+        }
+        .multi-opt {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            transition: background 0.15s;
+            margin-bottom: 0.35rem;
+        }
+        .multi-opt:hover { background: rgba(255,255,255,0.06); }
+        .multi-opt input { margin-top: 3px; flex-shrink: 0; accent-color: var(--color-accent); }
+        .multi-opt.co { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.4); }
+        .multi-opt.wo { background: rgba(248,81,73,0.1); border-color: rgba(248,81,73,0.35); }
+        .multi-opt.mo { background: rgba(241,196,15,0.1); border-color: rgba(241,196,15,0.4); }
+        .task-feedback { font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; }
+        .text-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.2rem;
+        }
+        .text-source {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .score-bar {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .score-num { font-size: 2rem; font-weight: 800; color: var(--color-accent); }
+        .progress-wrap { flex:1; }
+        .progress-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-top: 0.3rem; }
+        .progress-fill { height: 100%; border-radius: 4px; background: var(--color-accent); transition: width 0.4s; }
+        .stellungnahme-area {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: #d0d7de;
+            font-family: inherit;
+            font-size: 0.88rem;
+            padding: 0.7rem 0.9rem;
+            resize: vertical;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+        .stellungnahme-area:focus { outline: none; border-color: rgba(68,147,248,0.5); }
+        .muster-block {
+            display: none;
+            margin-top: 0.7rem;
+            background: rgba(63,185,80,0.06);
+            border: 1px solid rgba(63,185,80,0.3);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+        .hint-ref {
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            cursor: pointer;
+            text-decoration: underline dotted;
+            margin-left: 0.3rem;
+        }
+        .quiz-btn.selected {
+            background: rgba(68,147,248,0.18);
+            border-color: rgba(68,147,248,0.55);
+            color: #58a6ff;
+        }
+        .check-all-bar {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+        /* ---- secret code modal ---- */
+        .code-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.72);
+            align-items: center;
+            justify-content: center;
+        }
+        .code-overlay.active { display: flex; }
+        .code-box {
+            background: #131a24;
+            border: 1.5px solid rgba(68,147,248,0.35);
+            border-radius: 18px;
+            padding: 2rem 2.2rem;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+        .code-box h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+        .code-box p { font-size: 0.84rem; color: var(--color-text-muted); margin: 0 0 1.2rem; }
+        .code-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: #d0d7de;
+            font-size: 1rem;
+            padding: 0.55rem 0.9rem;
+            text-align: center;
+            letter-spacing: 0.08em;
+            box-sizing: border-box;
+            margin-bottom: 0.9rem;
+        }
+        .code-input:focus { outline: none; border-color: rgba(68,147,248,0.6); }
+        .code-err { font-size: 0.82rem; color: var(--color-red); min-height: 1.1rem; margin-bottom: 0.6rem; }
+        .lock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            color: #e3b341;
+            background: rgba(227,179,65,0.1);
+            border: 1px solid rgba(227,179,65,0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .lock-badge:hover { background: rgba(227,179,65,0.18); }
+        .lock-badge.unlocked { color: var(--color-green); background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.85)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-leseverstehen.html">Leseverstehen</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">&Uuml;ben</span>
+        </nav>
+        <a href="deutsch-leseverstehen.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Leseverstehen</a>
+
+        <div class="page-header" style="text-align:left; padding-top:0.5rem; padding-bottom:0.8rem;">
+            <h1>Leseverstehen &mdash; &Uuml;ben</h1>
+            <p class="page-subtitle">Sachtext lesen &mdash; 14 Aufgaben l&ouml;sen &mdash; Antworten pr&uuml;fen</p>
+        </div>
+
+        <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;">
+            <button onclick="resetAll()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#d0d7de;padding:0.45rem 1rem;border-radius:8px;cursor:pointer;font-size:0.84rem;">&#x21BA; Reset</button>
+            <span class="lock-badge" id="lock-badge" onclick="openCodeModal()">&#x1F512; Ответы закрыты</span>
+        </div>
+
+        <!-- Secret code modal -->
+        <div class="code-overlay" id="code-overlay">
+            <div class="code-box">
+                <h3>&#x1F512; Секретный код</h3>
+                <p>Введи код, чтобы разблокировать проверку ответов</p>
+                <input class="code-input" id="code-input" type="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkCode()">
+                <div class="code-err" id="code-err"></div>
+                <div style="display:flex;gap:0.6rem;justify-content:center;">
+                    <button onclick="closeCodeModal()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#d0d7de;padding:0.45rem 1.1rem;border-radius:8px;cursor:pointer;font-size:0.88rem;">Отмена</button>
+                    <button onclick="checkCode()" style="background:rgba(68,147,248,0.2);border:1px solid rgba(68,147,248,0.4);color:#58a6ff;padding:0.45rem 1.2rem;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:600;">Войти</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hinweis -->
+        <div style="background:rgba(68,147,248,0.07);border:1px solid rgba(68,147,248,0.2);border-radius:10px;padding:0.6rem 1rem;margin-bottom:1.2rem;font-size:0.84rem;color:var(--color-text-muted);">
+            &#x1F4A1; <strong style="color:#d0d7de;">Tipp:</strong> Lies zuerst <strong>alle Aufgaben durch</strong> (rechts), dann lies den Text (links). So weisst du, worauf du achten musst.
+        </div>
+
+        <div class="exam-wrap">
+
+            <!-- ===== TEXT PANEL ===== -->
+            <div class="text-panel">
+                <div class="text-title">F 2 &nbsp;|&nbsp; Leseverstehen &mdash; selbst&auml;ndiges &Uuml;ben</div>
+                <div class="text-source">Themenbereich: Medien &amp; Gesellschaft</div>
+
+                <p style="font-weight:700;font-size:1rem;color:#fff;margin:0 0 0.15rem;">Influencer &mdash; Traumberuf oder digitale Fassade?</p>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 1rem;">Julia Meier &nbsp;|&nbsp; Jugendmagazin &bdquo;klar!&ldquo;, 2024 (adaptiert)</p>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 1</div>
+                    <div class="lz-line"><span class="lz-num">1</span><span class="lz-text">Auf Instagram, TikTok und YouTube verfolgen Millionen Menschen t&auml;glich das Leben anderer &mdash;</span></div>
+                    <div class="lz-line"><span class="lz-num">2</span><span class="lz-text">und viele davon nennt man Influencer. Diese Personen nutzen soziale Plattformen, um Inhalte zu</span></div>
+                    <div class="lz-line"><span class="lz-num">3</span><span class="lz-text">ver&ouml;ffentlichen, Meinungen zu teilen und Produkte zu empfehlen. In Deutschland gibt es laut einer</span></div>
+                    <div class="lz-line"><span class="lz-num">4</span><span class="lz-text">Studie des Digitalverbands Bitkom (2023) &uuml;ber zwei Millionen Menschen, die sich als Content</span></div>
+                    <div class="lz-line"><span class="lz-num">5</span><span class="lz-text">Creator bezeichnen &mdash; davon verdienen rund 80.000 haupts&auml;chlich damit ihren Lebensunterhalt.</span></div>
+                    <div class="lz-line"><span class="lz-num">6</span><span class="lz-text">Das Wort &bdquo;Influencer&ldquo; kommt vom englischen Verb &bdquo;to influence&ldquo; (beeinflussen) &mdash; und genau das</span></div>
+                    <div class="lz-line"><span class="lz-num">7</span><span class="lz-text">ist die Kernaufgabe dieser digitalen Pers&ouml;nlichkeiten: Menschen zu beeinflussen.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 2</div>
+                    <div class="lz-line"><span class="lz-num">8</span><span class="lz-text">Unter Jugendlichen gilt der Beruf des Influencers als besonders erstrebenswert. Laut einer Umfrage</span></div>
+                    <div class="lz-line"><span class="lz-num">9</span><span class="lz-text">des Berufsberatungsportals &bdquo;Azubi.de&ldquo; (2023) w&uuml;nschen sich 34 Prozent der 14- bis 19-J&auml;hrigen,</span></div>
+                    <div class="lz-line"><span class="lz-num">10</span><span class="lz-text">selbst Influencer zu werden &mdash; mehr als Arzt, Lehrer oder Ingenieur. Die Gr&uuml;nde sind vielf&auml;ltig:</span></div>
+                    <div class="lz-line"><span class="lz-num">11</span><span class="lz-text">Freiheit, Kreativit&auml;t, Ber&uuml;hmtheit und die scheinbar leicht verdiente Aufmerksamkeit. Das bunte,</span></div>
+                    <div class="lz-line"><span class="lz-num">12</span><span class="lz-text">aufgeregte Leben, das auf dem Bildschirm sichtbar ist, wirkt verlockend und erreichbar zugleich.</span></div>
+                    <div class="lz-line"><span class="lz-num">13</span><span class="lz-text">Dabei &uuml;bersehen viele Jugendliche, wie viel Arbeit, Planung und Technik hinter jedem Beitrag steckt.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 3</div>
+                    <div class="lz-line"><span class="lz-num">14</span><span class="lz-text">Hinter dem gl&auml;nzenden Auftritt steckt jedoch ein durchkalkuliertes Gesch&auml;ftsmodell. Influencer</span></div>
+                    <div class="lz-line"><span class="lz-num">15</span><span class="lz-text">verdienen ihr Geld haupts&auml;chlich durch sogenannte Kooperationen: Unternehmen bezahlen daf&uuml;r,</span></div>
+                    <div class="lz-line"><span class="lz-num">16</span><span class="lz-text">dass Influencer ihre Produkte empfehlen. Bei einem Kanal mit einer Million Followern kann ein</span></div>
+                    <div class="lz-line"><span class="lz-num">17</span><span class="lz-text">einzelner Beitrag mehrere tausend Euro einbringen. Dabei ist die Grenze zwischen ehrlicher Meinung</span></div>
+                    <div class="lz-line"><span class="lz-num">18</span><span class="lz-text">und bezahlter Werbung oft flie&szlig;end &mdash; und f&uuml;r Zuschauer kaum erkennbar, selbst wenn Beitr&auml;ge</span></div>
+                    <div class="lz-line"><span class="lz-num">19</span><span class="lz-text">als &bdquo;Werbung&ldquo; gekennzeichnet sind.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 4</div>
+                    <div class="lz-line"><span class="lz-num">20</span><span class="lz-text">Ein weiteres Problem ist die Manipulation von Zahlen. Gef&auml;lschte Follower &mdash; auch als &bdquo;Fake</span></div>
+                    <div class="lz-line"><span class="lz-num">21</span><span class="lz-text">Follower&ldquo; bezeichnet &mdash; lassen sich f&uuml;r wenige Euro im Internet kaufen. Laut der Analyse-Plattform</span></div>
+                    <div class="lz-line"><span class="lz-num">22</span><span class="lz-text">HypeAuditor (2023) haben durchschnittlich 45 Prozent aller Instagram-Accounts mindestens 20 Prozent</span></div>
+                    <div class="lz-line"><span class="lz-num">23</span><span class="lz-text">gef&auml;lschte Follower. Dies t&auml;uscht Unternehmen &uuml;ber die tats&auml;chliche Reichweite hinweg und f&uuml;hrt</span></div>
+                    <div class="lz-line"><span class="lz-num">24</span><span class="lz-text">dazu, dass Zuschauer die Beliebtheit eines Influencers falsch einsch&auml;tzen.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 5</div>
+                    <div class="lz-line"><span class="lz-num">25</span><span class="lz-text">Besonders besorgniserregend sind die psychologischen Auswirkungen auf junge Zuschauerinnen und</span></div>
+                    <div class="lz-line"><span class="lz-num">26</span><span class="lz-text">Zuschauer. Wissenschaftler der Universit&auml;t K&ouml;ln stellten in einer Studie (2022) fest, dass regelm&auml;&szlig;iger</span></div>
+                    <div class="lz-line"><span class="lz-num">27</span><span class="lz-text">Influencer-Konsum bei Jugendlichen zwischen 12 und 17 Jahren zu einem verzerrten K&ouml;rperbild und</span></div>
+                    <div class="lz-line"><span class="lz-num">28</span><span class="lz-text">gesteigertem Konsumwunsch f&uuml;hren kann. Die Idealbilder von perfekten K&ouml;rpern, Luxuswohnungen</span></div>
+                    <div class="lz-line"><span class="lz-num">29</span><span class="lz-text">und teuren Urlauben erzeugen Vergleichsdruck &mdash; und das Gef&uuml;hl, im eigenen Leben nicht gut</span></div>
+                    <div class="lz-line"><span class="lz-num">30</span><span class="lz-text">genug zu sein.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 6</div>
+                    <div class="lz-line"><span class="lz-num">31</span><span class="lz-text">Angesichts dieser Risiken fordern Medienp&auml;dagogen und Verbraucherschutz eine st&auml;rkere Regulierung</span></div>
+                    <div class="lz-line"><span class="lz-num">32</span><span class="lz-text">des Influencer-Marketings. In Deutschland gilt seit 2022 eine versch&auml;rfte Kennzeichnungspflicht f&uuml;r</span></div>
+                    <div class="lz-line"><span class="lz-num">33</span><span class="lz-text">Werbung in sozialen Medien &mdash; doch Verst&ouml;&szlig;e werden selten konsequent geahndet. Kritiker bem&auml;ngeln</span></div>
+                    <div class="lz-line"><span class="lz-num">34</span><span class="lz-text">au&szlig;erdem, dass Plattformen wie Instagram und TikTok bewusst darauf ausgelegt sind, m&ouml;glichst lange</span></div>
+                    <div class="lz-line"><span class="lz-num">35</span><span class="lz-text">Bildschirmzeiten zu erzeugen, da dies ihre Werbeeinnahmen steigert.</span></div>
+                </div>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 7</div>
+                    <div class="lz-line"><span class="lz-num">36</span><span class="lz-text">F&uuml;r Nutzerinnen und Nutzer empfehlen Experten deshalb einen bewussteren Umgang mit sozialen</span></div>
+                    <div class="lz-line"><span class="lz-num">37</span><span class="lz-text">Medien. Konkret bedeutet das: Werbung als solche erkennen und hinterfragen, Influencer-Inhalte</span></div>
+                    <div class="lz-line"><span class="lz-num">38</span><span class="lz-text">kritisch einordnen statt unreflektiert konsumieren, eigene Bildschirmzeiten aktiv begrenzen sowie</span></div>
+                    <div class="lz-line"><span class="lz-num">39</span><span class="lz-text">bei Unsicherheiten zuverl&auml;ssige Quellen wie Stiftung Warentest oder Verbraucherzentrale nutzen.</span></div>
+                    <div class="lz-line"><span class="lz-num">40</span><span class="lz-text">Wer diese Strategien kennt, kann Influencer-Inhalte genie&szlig;en, ohne ihnen blind zu vertrauen.</span></div>
+                </div>
+
+                <!-- Glossar -->
+                <div class="glossar-block">
+                    <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Glossar</div>
+                    <div><strong>1 der Content Creator:</strong> Person, die digitale Inhalte erstellt und ver&ouml;ffentlicht</div>
+                    <div><strong>2 die Kooperation:</strong> bezahlte Zusammenarbeit zwischen Influencer und Unternehmen</div>
+                    <div><strong>3 der Fake Follower:</strong> gef&auml;lschte, nicht echte Abonnenten eines Kanals</div>
+                    <div><strong>4 der Konsumwunsch:</strong> der Wille, etwas zu kaufen oder zu besitzen</div>
+                    <div><strong>5 die Kennzeichnungspflicht:</strong> gesetzliche Pflicht, Werbung als Werbung zu markieren</div>
+                    <div><strong>6 der Vergleichsdruck:</strong> Druck, der entsteht wenn man sich mit anderen vergleicht</div>
+                </div>
+            </div>
+
+            <!-- ===== TASKS PANEL ===== -->
+            <div class="tasks-panel">
+
+                <!-- AUFGABE 1 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">1</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 1</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Das Wort &bdquo;Influencer&ldquo; bezeichnet laut Text Personen, die &hellip;</p>
+                    <div id="q1o">
+                        <button class="quiz-btn" onclick="sel(this,'q1','a')">a) ausschlie&szlig;lich f&uuml;r Unternehmen arbeiten und Produkte bewerben.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q1','b')">b) soziale Plattformen nutzen, um Inhalte zu ver&ouml;ffentlichen und Menschen zu beeinflussen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q1','c')">c) haupts&auml;chlich Fotos und Videos produzieren und im Internet verkaufen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q1','d')">d) in Deutschland alle haupts&auml;chlich als Content Creator ihren Lebensunterhalt verdienen.</button>
+                    </div>
+                    <div class="task-feedback" id="q1f"></div>
+                </div>
+
+                <!-- AUFGABE 2 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">2</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 2</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Laut der Umfrage von &bdquo;Azubi.de&ldquo; m&ouml;chten 34 Prozent der Jugendlichen &hellip;</p>
+                    <div id="q2o">
+                        <button class="quiz-btn" onclick="sel(this,'q2','a')">a) sp&auml;ter in sozialen Medien nur als Zuschauer aktiv sein.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q2','b')">b) einen klassischen Beruf wie Arzt oder Ingenieur ergreifen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q2','c')">c) selbst als Influencer t&auml;tig werden.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q2','d')">d) Unternehmen im Bereich digitales Marketing beraten.</button>
+                    </div>
+                    <div class="task-feedback" id="q2f"></div>
+                </div>
+
+                <!-- AUFGABE 3 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-green);color:#fff;">3</span>
+                        <span class="task-badge" style="background:rgba(63,185,80,0.15);color:var(--color-green);">mehrere richtige Antworten</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 2</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtigen Antworten an.</strong><br>
+                    Der Beruf des Influencers wirkt auf Jugendliche attraktiv, weil &hellip;</p>
+                    <div id="q3o">
+                        <label class="multi-opt"><input type="checkbox" data-q="q3" value="a"> a) er mit Freiheit und Kreativit&auml;t verbunden wird.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q3" value="b"> b) er garantiert hohe Einnahmen von Anfang an verspricht.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q3" value="c"> c) er Ber&uuml;hmtheit und Aufmerksamkeit bringt.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q3" value="d"> d) das Leben von Influencern verlockend und erreichbar wirkt.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q3" value="e"> e) Jugendliche den Arbeitsaufwand dahinter gut kennen.</label>
+                    </div>
+                    <div class="task-feedback" id="q3f"></div>
+                </div>
+
+                <!-- AUFGABE 4 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">4</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Durch die folgenden Abschnitte (3&ndash;7) macht die Autorin deutlich, dass &hellip;</p>
+                    <div id="q4o">
+                        <button class="quiz-btn" onclick="sel(this,'q4','a')">a) der Influencer-Beruf eine sichere und empfehlenswerte Karriere f&uuml;r Jugendliche ist.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q4','b')">b) hinter dem bunten Bild von Influencern Probleme und Risiken stecken, &uuml;ber die man aufgekl&auml;rt sein sollte.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q4','c')">c) soziale Medien ausschlie&szlig;lich negative Auswirkungen auf Jugendliche haben.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q4','d')">d) Unternehmen vom Influencer-Marketing kaum profitieren.</button>
+                    </div>
+                    <div class="task-feedback" id="q4f"></div>
+                </div>
+
+                <!-- AUFGABE 5 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">5</span>
+                        <span class="task-badge" style="background:rgba(241,196,15,0.15);color:#e8c547;">eigene Worte</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 14, Abschnitt 3</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.5rem;"><strong>Erl&auml;utere in eigenen Worten,</strong> was mit &bdquo;durchkalkuliertes Gesch&auml;ftsmodell&ldquo; (Z.&nbsp;14) gemeint ist.</p>
+                    <textarea class="stellungnahme-area" placeholder="Schreibe hier deine Antwort..." rows="3"></textarea>
+                    <button class="quiz-btn" onclick="showMuster('m5')" style="margin-top:0.5rem;max-width:200px;">&#x1F441; Musterantwort</button>
+                    <div class="muster-block" id="m5">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Das bedeutet, dass Influencer ihre Inhalte nicht spontan oder aus reinem Spa&szlig; erstellen, sondern nach einem genauen Plan arbeiten: Sie kooperieren mit Unternehmen, erhalten Geld f&uuml;r Produktempfehlungen und nutzen ihre Followerzahl als Ware. Alles &mdash; Bilder, Videos, Texte &mdash; ist darauf ausgerichtet, m&ouml;glichst viel Einnahmen zu erzielen.
+                    </div>
+                </div>
+
+                <!-- AUFGABE 6 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">6</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 3</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Die Grenze zwischen ehrlicher Meinung und Werbung ist laut Text schwer erkennbar, weil &hellip;</p>
+                    <div id="q6o">
+                        <button class="quiz-btn" onclick="sel(this,'q6','a')">a) Influencer keine Werbung in sozialen Medien machen d&uuml;rfen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q6','b')">b) Kooperationen zwar verboten, aber trotzdem &uuml;blich sind.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q6','c')">c) selbst gekennzeichnete Beitr&auml;ge von Zuschauern kaum als Werbung wahrgenommen werden.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q6','d')">d) Unternehmen Influencer zwingen, keine Kennzeichnung zu nutzen.</button>
+                    </div>
+                    <div class="task-feedback" id="q6f"></div>
+                </div>
+
+                <!-- AUFGABE 7 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">7</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 4</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Fake Follower sind laut Text ein Problem, weil sie &hellip;</p>
+                    <div id="q7o">
+                        <button class="quiz-btn" onclick="sel(this,'q7','a')">a) dazu f&uuml;hren, dass Plattformen weniger Werbeeinnahmen erzielen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q7','b')">b) Unternehmen und Zuschauer &uuml;ber die tats&auml;chliche Beliebtheit eines Influencers t&auml;uschen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q7','c')">c) die Inhalte von Influencern minderwertig machen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q7','d')">d) von der Analyse-Plattform HypeAuditor selbst erstellt werden.</button>
+                    </div>
+                    <div class="task-feedback" id="q7f"></div>
+                </div>
+
+                <!-- AUFGABE 8 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-green);color:#fff;">8</span>
+                        <span class="task-badge" style="background:rgba(63,185,80,0.15);color:var(--color-green);">mehrere richtige Antworten</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 5</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtigen Antworten an.</strong><br>
+                    Die Studie der Universit&auml;t K&ouml;ln zeigt, dass regelm&auml;&szlig;iger Influencer-Konsum bei Jugendlichen &hellip;</p>
+                    <div id="q8o">
+                        <label class="multi-opt"><input type="checkbox" data-q="q8" value="a"> a) zu einem verzerrten K&ouml;rperbild f&uuml;hren kann.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q8" value="b"> b) den Konsumwunsch steigern kann.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q8" value="c"> c) das Interesse an Luxusleben und Reisen grunds&auml;tzlich absenkt.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q8" value="d"> d) das Gef&uuml;hl erzeugen kann, im eigenen Leben nicht gut genug zu sein.</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q8" value="e"> e) wissenschaftlich als v&ouml;llig unbedenklich eingestuft wird.</label>
+                    </div>
+                    <div class="task-feedback" id="q8f"></div>
+                </div>
+
+                <!-- AUFGABE 9 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">9</span>
+                        <span class="task-badge" style="background:rgba(241,196,15,0.15);color:#e8c547;">eigene Worte</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 29&ndash;30, Abschnitt 5</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.5rem;"><strong>Erl&auml;utere in eigenen Worten im Textzusammenhang,</strong> was &bdquo;Vergleichsdruck&ldquo; (Z.&nbsp;29) bedeutet und wie er durch Influencer-Inhalte entsteht.</p>
+                    <textarea class="stellungnahme-area" placeholder="Schreibe hier deine Antwort..." rows="3"></textarea>
+                    <button class="quiz-btn" onclick="showMuster('m9')" style="margin-top:0.5rem;max-width:200px;">&#x1F441; Musterantwort</button>
+                    <div class="muster-block" id="m9">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        &bdquo;Vergleichsdruck&ldquo; bezeichnet das Gef&uuml;hl, das entsteht, wenn man sich mit anderen vergleicht und dabei schlechter abschneidet. Durch Influencer entsteht dieser Druck, weil sie perfekte K&ouml;rper, teure Wohnungen und aufregende Urlauben zeigen. Jugendliche vergleichen ihr normales Leben damit und bekommen das Gef&uuml;hl, ihr eigenes Leben sei nicht gut genug.
+                    </div>
+                </div>
+
+                <!-- AUFGABE 10 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">10</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 6</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Verst&ouml;&szlig;e gegen die Kennzeichnungspflicht werden selten bestraft, obwohl &hellip;</p>
+                    <div id="q10o">
+                        <button class="quiz-btn" onclick="sel(this,'q10','a')">a) Influencer keine Werbung machen d&uuml;rfen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q10','b')">b) seit 2022 eine versch&auml;rfte Kennzeichnungspflicht in Deutschland gilt.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q10','c')">c) Verbraucherschutz dies nie gefordert hat.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q10','d')">d) Influencer von sich aus immer korrekt kennzeichnen.</button>
+                    </div>
+                    <div class="task-feedback" id="q10f"></div>
+                </div>
+
+                <!-- AUFGABE 11 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">11</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 6</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Plattformen wie Instagram und TikTok sind laut Text so gestaltet, dass &hellip;</p>
+                    <div id="q11o">
+                        <button class="quiz-btn" onclick="sel(this,'q11','a')">a) Nutzer m&ouml;glichst wenig Zeit auf ihnen verbringen.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q11','b')">b) sie m&ouml;glichst lange Bildschirmzeiten erzeugen, um Werbeeinnahmen zu steigern.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q11','c')">c) Werbung klar von normalen Inhalten getrennt wird.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q11','d')">d) sie Nutzern helfen, bewusster mit sozialen Medien umzugehen.</button>
+                    </div>
+                    <div class="task-feedback" id="q11f"></div>
+                </div>
+
+                <!-- AUFGABE 12 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-green);color:#fff;">12</span>
+                        <span class="task-badge" style="background:rgba(63,185,80,0.15);color:var(--color-green);">mehrere richtige Antworten</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 7</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze an, welche Empfehlungen Experten laut Text f&uuml;r den Umgang mit Influencer-Inhalten geben.</strong></p>
+                    <div id="q12o">
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="a"> a) Werbung als solche erkennen und hinterfragen</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="b"> b) Influencer generell nicht mehr folgen</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="c"> c) Bildschirmzeiten aktiv begrenzen</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="d"> d) Influencer-Inhalte kritisch einordnen statt unreflektiert konsumieren</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="e"> e) ausschlie&szlig;lich Influencer mit &uuml;ber einer Million Followern konsumieren</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="f"> f) bei Unsicherheiten Stiftung Warentest oder Verbraucherzentrale nutzen</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="g"> g) soziale Medien vollst&auml;ndig meiden</label>
+                        <label class="multi-opt"><input type="checkbox" data-q="q12" value="h"> h) Kooperationen von Influencern finanziell unterst&uuml;tzen</label>
+                    </div>
+                    <div class="task-feedback" id="q12f"></div>
+                </div>
+
+                <!-- AUFGABE 13 -->
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:var(--color-accent);color:#fff;">13</span>
+                        <span class="task-badge" style="background:rgba(68,147,248,0.15);color:var(--color-accent);">eine richtige Antwort</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.7rem;"><strong>Kreuze die richtige Antwort an.</strong><br>
+                    Der Artikel aus dem Jugendmagazin &bdquo;klar!&ldquo; macht darauf aufmerksam, dass &hellip;</p>
+                    <div id="q13o">
+                        <button class="quiz-btn" onclick="sel(this,'q13','a')">a) Influencer grunds&auml;tzlich unehrlich und gef&auml;hrlich sind und gemieden werden sollten.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q13','b')">b) soziale Medien f&uuml;r Jugendliche gesetzlich verboten werden sollten.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q13','c')">c) hinter der gl&auml;nzenden Oberfl&auml;che des Influencer-Lebens Risiken stecken, &uuml;ber die man aufgekl&auml;rt sein sollte.</button>
+                        <button class="quiz-btn" onclick="sel(this,'q13','d')">d) Jugendliche keine sozialen Medien mehr nutzen sollten.</button>
+                    </div>
+                    <div class="task-feedback" id="q13f"></div>
+                </div>
+
+                <!-- AUFGABE 14 -->
+                <div class="task-card" style="border-color:rgba(248,140,70,0.35);">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                        <span class="task-num" style="background:#f88c46;color:#fff;">14</span>
+                        <span class="task-badge" style="background:rgba(248,140,70,0.15);color:#f88c46;">Stellungnahme &mdash; deine Meinung!</span>
+                    </div>
+                    <p style="font-size:0.88rem;margin:0 0 0.5rem;"><strong>Eine Sch&uuml;lerin sagt nach dem Lesen des Textes:</strong></p>
+                    <blockquote style="border-left:3px solid rgba(248,140,70,0.5);padding:0.5rem 0.9rem;margin:0 0 0.7rem;font-style:italic;color:var(--color-text-muted);background:rgba(248,140,70,0.04);border-radius:0 8px 8px 0;font-size:0.88rem;">
+                        &bdquo;Man sollte Influencern gar nicht mehr folgen &mdash; sie sind alle unehrlich und manipulieren nur.&ldquo;
+                    </blockquote>
+                    <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 0.3rem;">Schreibe eine kurze Stellungnahme. Stimme zu oder nicht &mdash; aber begr&uuml;nde deine Meinung und beziehe dich auf den Text.</p>
+                    <textarea class="stellungnahme-area" placeholder="Ich stimme dieser Aussage [zu / nicht zu], weil ...&#10;Im Text steht, dass ...&#10;Deshalb finde ich, dass ..." rows="5"></textarea>
+                    <button class="quiz-btn" onclick="showMuster('m14')" style="margin-top:0.5rem;max-width:200px;">&#x1F441; Musterantwort</button>
+                    <div class="muster-block" id="m14">
+                        <strong>&#x2705; Musterantwort (nicht zustimmen):</strong><br>
+                        Ich stimme dieser Aussage nicht vollst&auml;ndig zu. Zwar zeigt der Text, dass viele Influencer gef&auml;lschte Follower nutzen und Werbung kaum erkennbar machen &mdash; das ist problematisch. Aber nicht alle Influencer sind automatisch unehrlich. Im Text steht, dass Experten empfehlen, Inhalte kritisch einzuordnen statt sie zu meiden. Deshalb finde ich, dass man Influencern folgen kann, solange man gelernt hat, Werbung zu erkennen und Inhalte zu hinterfragen.
+                        <hr style="border-color:rgba(255,255,255,0.1);margin:0.7rem 0;">
+                        <strong>Структура:</strong> Ich stimme [nicht zu] &rarr; was stimmt am Vorwurf &rarr; aber + eigene Position &rarr; Im Text steht, dass &rarr; Fazit
+                    </div>
+                </div>
+
+                <!-- CHECK ALL BAR -->
+                <div class="check-all-bar">
+                    <span id="result-summary" style="font-size:0.85rem;color:var(--color-text-muted);"></span>
+                    <button onclick="checkAll()" style="background:linear-gradient(135deg,rgba(63,185,80,0.25),rgba(63,185,80,0.12));border:1.5px solid rgba(63,185,80,0.5);color:var(--color-green);padding:0.6rem 1.6rem;border-radius:10px;cursor:pointer;font-size:0.95rem;font-weight:700;">&#x2714; Alle Antworten pr&uuml;fen</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        const correct = { q1:'b', q2:'c', q4:'b', q6:'c', q7:'b', q10:'b', q11:'b', q13:'c' };
+        const mcCorrect = { q3:['a','c','d'], q8:['a','b','d'], q12:['a','c','d','f'] };
+        const selections = {};
+        const fb = {
+            q1: {
+                a:'Falsch! Influencer arbeiten nicht ausschlie&szlig;lich f&uuml;r Unternehmen.',
+                b:'Richtig! Genau das steht in Z. 2&ndash;3 und Z. 6&ndash;7.',
+                c:'Falsch! Sie verkaufen keine Fotos &mdash; sie beeinflussen Menschen.',
+                d:'Falsch! Nur 80.000 von 2 Mio. verdienen haupts&auml;chlich damit.'
+            },
+            q2: {
+                a:'Falsch! Sie wollen selbst Influencer werden, nicht nur zuschauen.',
+                b:'Falsch! Der Text sagt, Influencer ist beliebter als Arzt oder Ingenieur.',
+                c:'Richtig! Das steht direkt in Z. 9&ndash;10.',
+                d:'Falsch! Das steht nicht im Text.'
+            },
+            q4: {
+                a:'Falsch! Der Text beschreibt genau die Kehrseite und Risiken.',
+                b:'Richtig! Abschnitte 3&ndash;7 beschreiben alle Gefahren und Probleme.',
+                c:'Falsch! &bdquo;ausschlie&szlig;lich&ldquo; ist eine &Uuml;bertreibung &mdash; typische Falle!',
+                d:'Falsch! Unternehmen zahlen viel Geld an Influencer.'
+            },
+            q6: {
+                a:'Falsch! Werbung ist erlaubt, muss aber gekennzeichnet werden.',
+                b:'Falsch! Kooperationen sind legal.',
+                c:'Richtig! Z. 18&ndash;19: selbst bei Kennzeichnung kaum erkennbar.',
+                d:'Falsch! Das steht nicht im Text.'
+            },
+            q7: {
+                a:'Falsch! Fake Follower erh&ouml;hen die scheinbare Reichweite &mdash; Plattformen profitieren eher.',
+                b:'Richtig! Z. 23&ndash;24: t&auml;uscht &uuml;ber tats&auml;chliche Reichweite hinweg.',
+                c:'Falsch! Die Qualit&auml;t der Inhalte ist nicht das Problem.',
+                d:'Falsch! HypeAuditor analysiert sie, erstellt sie nicht.'
+            },
+            q10: {
+                a:'Falsch! Werbung ist erlaubt, muss aber gekennzeichnet werden.',
+                b:'Richtig! Z. 32&ndash;33: die Pflicht gilt seit 2022, aber Verst&ouml;&szlig;e werden kaum geahndet.',
+                c:'Falsch! Verbraucherschutz fordert genau das &mdash; Z. 31.',
+                d:'Falsch! Das Gegenteil beschreibt das Problem.'
+            },
+            q11: {
+                a:'Falsch! Das Gegenteil: m&ouml;glichst lange Nutzung ist das Ziel.',
+                b:'Richtig! Z. 34&ndash;35: lange Bildschirmzeit = mehr Werbeeinnahmen.',
+                c:'Falsch! Genau das ist das Problem laut Text.',
+                d:'Falsch! Das Gegenteil ist der Fall.'
+            },
+            q13: {
+                a:'Falsch! &bdquo;grunds&auml;tzlich&ldquo; ist eine &Uuml;bertreibung &mdash; klassische Falle!',
+                b:'Falsch! Der Text spricht nicht &uuml;ber ein Verbot.',
+                c:'Richtig! Der Text kl&auml;rt auf, gibt aber auch Tipps zum bewussten Umgang.',
+                d:'Falsch! Der Text sagt, man kann Influencer genie&szlig;en, wenn man kritisch bleibt.'
+            }
+        };
+
+        let unlocked = false;
+
+        function openCodeModal() {
+            if (unlocked) return;
+            document.getElementById('code-overlay').classList.add('active');
+            document.getElementById('code-input').value = '';
+            document.getElementById('code-err').textContent = '';
+            setTimeout(() => document.getElementById('code-input').focus(), 80);
+        }
+        function closeCodeModal() {
+            document.getElementById('code-overlay').classList.remove('active');
+        }
+        function checkCode() {
+            const val = document.getElementById('code-input').value.trim().toLowerCase();
+            if (val === 'отличник') {
+                unlocked = true;
+                closeCodeModal();
+                const badge = document.getElementById('lock-badge');
+                badge.textContent = '✅ Ответы открыты';
+                badge.classList.add('unlocked');
+                badge.onclick = null;
+                badge.style.cursor = 'default';
+            } else {
+                document.getElementById('code-err').textContent = 'Неверный код. Попробуй ещё раз.';
+                document.getElementById('code-input').value = '';
+                document.getElementById('code-input').focus();
+            }
+        }
+        function requireUnlock() {
+            if (!unlocked) { openCodeModal(); return false; }
+            return true;
+        }
+
+        // Selection only — no immediate check
+        function sel(btn, qid, chosen) {
+            const opts = document.getElementById(qid + 'o');
+            if (opts.classList.contains('answered-q')) return;
+            opts.querySelectorAll('.quiz-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selections[qid] = chosen;
+        }
+
+        function checkAll() {
+            if (!requireUnlock()) return;
+
+            let scRight = 0, scTotal = 0, mcRight = 0, mcTotal = 0;
+
+            // Check SC questions
+            Object.keys(correct).forEach(qid => {
+                const opts = document.getElementById(qid + 'o');
+                if (opts.classList.contains('answered-q')) return;
+                opts.classList.add('answered-q');
+                scTotal++;
+                const cor = correct[qid];
+                const chosen = selections[qid];
+                const f = document.getElementById(qid + 'f');
+                opts.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+                if (!chosen) {
+                    f.innerHTML = '<span style="color:#e3b341">&#x26A0;&#xFE0F; Keine Antwort gew&auml;hlt.</span>';
+                    opts.querySelectorAll('.quiz-btn').forEach(b => {
+                        if (b.getAttribute('onclick').includes("'" + cor + "'")) b.classList.add('correct');
+                    });
+                } else if (chosen === cor) {
+                    scRight++;
+                    opts.querySelector('.quiz-btn.selected').classList.add('correct');
+                    f.innerHTML = '<span style="color:var(--color-green)">&#x2705; ' + (fb[qid][chosen] || 'Richtig!') + '</span>';
+                } else {
+                    opts.querySelector('.quiz-btn.selected').classList.add('wrong');
+                    opts.querySelectorAll('.quiz-btn').forEach(b => {
+                        if (b.getAttribute('onclick').includes("'" + cor + "'")) b.classList.add('correct');
+                    });
+                    f.innerHTML = '<span style="color:var(--color-red)">&#x274C; Falsch. ' + (fb[qid][chosen] || '') + '</span>';
+                }
+            });
+
+            // Check MC questions
+            Object.keys(mcCorrect).forEach(qid => {
+                const correctArr = mcCorrect[qid];
+                const opts = document.getElementById(qid + 'o');
+                if (opts.classList.contains('answered-q')) return;
+                opts.classList.add('answered-q');
+                mcTotal++;
+                const boxes = document.querySelectorAll('[data-q="' + qid + '"]');
+                const chosen = Array.from(boxes).filter(c => c.checked).map(c => c.value);
+                boxes.forEach(c => c.disabled = true);
+                document.querySelectorAll('#' + qid + 'o .multi-opt').forEach(label => {
+                    const val = label.querySelector('input').value;
+                    const isCor = correctArr.includes(val);
+                    const isCho = chosen.includes(val);
+                    if (isCor && isCho) label.classList.add('co');
+                    else if (!isCor && isCho) label.classList.add('wo');
+                    else if (isCor && !isCho) label.classList.add('mo');
+                });
+                const right = chosen.filter(v => correctArr.includes(v)).length;
+                const wrong = chosen.filter(v => !correctArr.includes(v)).length;
+                const missed = correctArr.filter(v => !chosen.includes(v)).length;
+                const f = document.getElementById(qid + 'f');
+                if (wrong === 0 && missed === 0) {
+                    mcRight++;
+                    f.innerHTML = '<span style="color:var(--color-green)">&#x2705; Perfekt! Alle richtigen Antworten gew&auml;hlt.</span>';
+                } else {
+                    f.innerHTML = '<span style="color:var(--color-red)">&#x274C; ' + right + '/' + correctArr.length + ' richtig.' +
+                        (wrong > 0 ? ' ' + wrong + ' falsch markiert.' : '') +
+                        (missed > 0 ? ' ' + missed + ' &uuml;bersehen (gelb markiert).' : '') + '</span>';
+                }
+            });
+
+            const total = scTotal + mcTotal;
+            const allRight = scRight + mcRight;
+            document.getElementById('result-summary').textContent =
+                'Результат: ' + allRight + ' / ' + total + ' правильно';
+        }
+
+        function showMuster(id) {
+            if (!requireUnlock()) return;
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+        }
+
+        function resetAll() {
+            Object.keys(selections).forEach(k => delete selections[k]);
+            document.querySelectorAll('.answered-q').forEach(el => el.classList.remove('answered-q'));
+            document.querySelectorAll('.quiz-btn').forEach(b => {
+                b.disabled = false;
+                b.classList.remove('correct', 'wrong', 'selected');
+            });
+            document.querySelectorAll('.task-feedback').forEach(f => f.innerHTML = '');
+            document.querySelectorAll('.multi-opt').forEach(l => {
+                l.classList.remove('co', 'wo', 'mo');
+                l.querySelector('input').checked = false;
+                l.querySelector('input').disabled = false;
+            });
+            document.querySelectorAll('.muster-block').forEach(m => m.style.display = 'none');
+            document.querySelectorAll('.stellungnahme-area').forEach(t => t.value = '');
+            document.getElementById('result-summary').textContent = '';
+        }
+    </script>
+</body>
+</html>
