@@ -47,6 +47,8 @@
             <button class="tab active" data-tab="ueberblick">&#x1F4CB; &Uuml;berblick</button>
             <button class="tab" data-tab="strategien">Strategien</button>
             <button class="tab" data-tab="aufgabentypen">Aufgabentypen</button>
+            <button class="tab" data-tab="antworten">&#x270D;&#xFE0F; Antworten</button>
+            <button class="tab" data-tab="kiueben">&#x1F916; KI &uuml;ben</button>
             <button class="tab" data-tab="fallen">&#x26A0;&#xFE0F; Fallen</button>
         </div>
 
@@ -501,6 +503,268 @@
         </div>
         </div>
 
+        <!-- ===== KI ÜBEN ===== -->
+        <div class="tab-content" id="tab-kiueben">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F916;</span>
+                    <div>
+                        <h2>KI &uuml;ben &mdash; Feedback von Claude</h2>
+                        <p class="lesson-header-sub">Schreib deine Antwort &rarr; kopiere den Prompt &rarr; f&uuml;ge ihn in Claude.ai ein</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">&#x2139;&#xFE0F; Как это работает</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.8rem; margin-top:0.7rem;">
+                        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.8rem; text-align:center;">
+                            <div style="font-size:1.6rem;">&#x31;&#xFE0F;&#x20E3;</div>
+                            <p style="font-size:0.85rem; margin:0.4rem 0 0 0; line-height:1.5;">Выбери задание из списка</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.8rem; text-align:center;">
+                            <div style="font-size:1.6rem;">&#x32;&#xFE0F;&#x20E3;</div>
+                            <p style="font-size:0.85rem; margin:0.4rem 0 0 0; line-height:1.5;">Напиши свой ответ</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.8rem; text-align:center;">
+                            <div style="font-size:1.6rem;">&#x33;&#xFE0F;&#x20E3;</div>
+                            <p style="font-size:0.85rem; margin:0.4rem 0 0 0; line-height:1.5;">Нажми «Prompt kopieren»</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.8rem; text-align:center;">
+                            <div style="font-size:1.6rem;">&#x34;&#xFE0F;&#x20E3;</div>
+                            <p style="font-size:0.85rem; margin:0.4rem 0 0 0; line-height:1.5;">Вставь в Claude.ai → получи фидбэк</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Выбор задания -->
+                <div class="note-card" style="border-color:rgba(88,166,255,0.3); background:rgba(88,166,255,0.05);">
+                    <h3 style="color:#58a6ff; margin-bottom:0.8rem;">&#x1F4CB; Шаг 1: Выбери задание</h3>
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;" id="ki-task-list">
+                        <label style="display:flex; align-items:flex-start; gap:0.7rem; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; transition:background 0.15s;" id="ki-label-0">
+                            <input type="radio" name="ki-task" value="0" style="margin-top:3px; accent-color:#c8a5ff;" checked onchange="kiSelectTask(0)">
+                            <div>
+                                <p style="font-weight:700; font-size:0.88rem; margin:0 0 0.2rem 0; color:#c8a5ff;">Aufgabe A — Fake News</p>
+                                <p style="font-size:0.88rem; margin:0; line-height:1.6;">Erläutere in eigenen Worten, was diese Aussage bedeutet: <em>„Manche Menschen erfinden sich einen eigenen Internet-Charakter."</em> (Z. 13) — bezogen auf Online-Spiele oder soziale Medien.</p>
+                            </div>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:0.7rem; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; transition:background 0.15s;" id="ki-label-1">
+                            <input type="radio" name="ki-task" value="1" style="margin-top:3px; accent-color:#c8a5ff;" onchange="kiSelectTask(1)">
+                            <div>
+                                <p style="font-weight:700; font-size:0.88rem; margin:0 0 0.2rem 0; color:#c8a5ff;">Aufgabe B — Klimawandel</p>
+                                <p style="font-size:0.88rem; margin:0; line-height:1.6;">Erkläre in eigenen Worten, was der Autor mit folgender Aussage meint: <em>„Der Klimawandel ist kein Problem der Zukunft — er ist längst Gegenwart."</em> — beziehe dich dabei auf konkrete Beispiele aus dem Text.</p>
+                            </div>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:0.7rem; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; transition:background 0.15s;" id="ki-label-2">
+                            <input type="radio" name="ki-task" value="2" style="margin-top:3px; accent-color:#c8a5ff;" onchange="kiSelectTask(2)">
+                            <div>
+                                <p style="font-weight:700; font-size:0.88rem; margin:0 0 0.2rem 0; color:#c8a5ff;">Aufgabe C — Schule &amp; Lernen</p>
+                                <p style="font-size:0.88rem; margin:0; line-height:1.6;">Erläutere in eigenen Worten: <em>„Digitales Lernen ersetzt nicht den Lehrer — es verändert seine Rolle."</em> — Was bedeutet das für den Schulalltag?</p>
+                            </div>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:0.7rem; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; transition:background 0.15s;" id="ki-label-3">
+                            <input type="radio" name="ki-task" value="3" style="margin-top:3px; accent-color:#c8a5ff;" onchange="kiSelectTask(3)">
+                            <div>
+                                <p style="font-weight:700; font-size:0.88rem; margin:0 0 0.2rem 0; color:#c8a5ff;">Aufgabe D — Konsum &amp; Werbung</p>
+                                <p style="font-size:0.88rem; margin:0; line-height:1.6;">Erkläre die Aussage mit eigenen Worten: <em>„Werbung verkauft kein Produkt — sie verkauft ein Lebensgefühl."</em> — Nenne ein konkretes Beispiel.</p>
+                            </div>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:0.7rem; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; transition:background 0.15s;" id="ki-label-4">
+                            <input type="radio" name="ki-task" value="4" style="margin-top:3px; accent-color:#c8a5ff;" onchange="kiSelectTask(4)">
+                            <div>
+                                <p style="font-weight:700; font-size:0.88rem; margin:0 0 0.2rem 0; color:#c8a5ff;">Aufgabe E — Migration &amp; Identität</p>
+                                <p style="font-size:0.88rem; margin:0; line-height:1.6;">Erläutere in eigenen Worten: <em>„Zwischen zwei Kulturen zu leben bedeutet nicht, zerrissen zu sein — es bedeutet, doppelt bereichert zu werden."</em></p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="note-card" style="border-color:rgba(185,240,160,0.3); background:rgba(185,240,160,0.04);">
+                    <h3 style="color:#b9f0a0; margin-bottom:0.6rem;">&#x270D;&#xFE0F; Шаг 2: Напиши свой ответ</h3>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.6rem;">Минимум 2–3 полных предложения. Используй фразы из таба «Antworten».</p>
+                    <textarea id="ki-answer" placeholder="Schreib hier deinen Antwort auf Deutsch..." style="width:100%; min-height:120px; background:rgba(255,255,255,0.05); border:1px solid rgba(185,240,160,0.25); border-radius:10px; padding:0.8rem; color:#e6edf3; font-size:0.9rem; line-height:1.7; resize:vertical; font-family:inherit; box-sizing:border-box;" oninput="kiUpdateCount()"></textarea>
+                    <p style="font-size:0.8rem; color:var(--color-text-muted); margin-top:0.4rem;" id="ki-count">0 Wörter</p>
+                </div>
+
+                <!-- Кнопки -->
+                <div style="display:flex; flex-direction:column; gap:0.7rem;">
+                    <button onclick="kiCopyPrompt()" style="width:100%; padding:0.9rem; background:linear-gradient(135deg,#a371f7,#c8a5ff); color:#0e0a1a; font-weight:800; font-size:1rem; border:none; border-radius:12px; cursor:pointer; letter-spacing:0.02em;" id="ki-copy-btn">
+                        &#x1F4CB; Prompt kopieren &amp; zu Claude.ai gehen
+                    </button>
+                    <a href="https://claude.ai" target="_blank" style="display:block; width:100%; padding:0.75rem; background:rgba(163,113,247,0.12); border:1px solid rgba(163,113,247,0.35); color:#c8a5ff; font-weight:700; font-size:0.9rem; border-radius:12px; cursor:pointer; text-align:center; text-decoration:none; box-sizing:border-box;">
+                        &#x1F517; Claude.ai öffnen
+                    </a>
+                </div>
+
+                <div id="ki-copied-msg" style="display:none; background:rgba(63,185,80,0.12); border:1px solid rgba(63,185,80,0.35); border-radius:10px; padding:0.8rem 1rem; margin-top:0.5rem; font-size:0.9rem; line-height:1.7;">
+                    &#x2705; <strong>Prompt kopiert!</strong> Gehe zu <a href="https://claude.ai" target="_blank" style="color:#b9f0a0;">claude.ai</a>, starte ein neues Gespräch und füge den Prompt ein (<strong>Strg+V</strong> / <strong>Cmd+V</strong>).
+                </div>
+
+                <!-- Что будет в промпте -->
+                <div class="note-card" style="border-color:rgba(241,196,15,0.25); background:rgba(241,196,15,0.04); margin-top:0.5rem;">
+                    <h3 style="color:#e8c547; font-size:0.95rem;">&#x1F50D; Что будет в промпте для Claude?</h3>
+                    <ul style="font-size:0.88rem; line-height:1.9; margin:0.4rem 0 0 0; padding-left:1.2rem; color:var(--color-text-muted);">
+                        <li>Роль: учитель немецкого, готовящий к ZP10</li>
+                        <li>Задание и твой ответ</li>
+                        <li>Просьба: что хорошо, что улучшить, пример лучшего ответа</li>
+                        <li>Оценка по шкале ZP10 (1–3 балла)</li>
+                        <li>Фидбэк на <strong>русском</strong>, чтобы всё понять</li>
+                    </ul>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ===== ANTWORTEN ===== -->
+        <div class="tab-content" id="tab-antworten">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Offene Aufgaben &mdash; so antwortest du</h2>
+                        <p class="lesson-header-sub">Готовые фразы + план на 30 минут</p>
+                    </div>
+                </div>
+
+                <!-- Zeitplan -->
+                <div class="note-card highlight-card" style="border-color:rgba(241,196,15,0.4); background:rgba(241,196,15,0.06);">
+                    <h3 style="color:#e8c547;">&#x23F1; Zeitplan — 30 Minuten</h3>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>Время</th><th>Что делаешь</th><th>Подсказка</th></tr>
+                        <tr>
+                            <td><strong style="color:#e8c547;">0–5 мин</strong></td>
+                            <td>Читай текст первый раз</td>
+                            <td>Только общий смысл — не застревай на словах</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:#ffa657;">5–8 мин</strong></td>
+                            <td>Читай все задания (1–14)</td>
+                            <td>Пойми, что ищешь — потом легче читать</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:#58a6ff;">8–20 мин</strong></td>
+                            <td>Задания 1–10 (Kreuz / richtig-falsch)</td>
+                            <td>~1 мин на задание, не зависай</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:#b9f0a0;">20–27 мин</strong></td>
+                            <td>Открытые задания (Erläutere / Erkläre)</td>
+                            <td>2–3 предложения, фразы ниже ↓</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:#f4a7b9;">27–30 мин</strong></td>
+                            <td>Проверка</td>
+                            <td>Все ли галочки? Полные ли предложения?</td>
+                        </tr>
+                    </table>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.6rem;">&#x1F4CC; Застрял на задании? <strong>Пропусти, иди дальше</strong> — вернёшься в конце.</p>
+                </div>
+
+                <!-- Erläutere in eigenen Worten -->
+                <div class="note-card highlight-card" style="border-color:rgba(244,167,185,0.35); background:rgba(244,167,185,0.06);">
+                    <h3 style="color:#f4a7b9;">&#x1F4DD; „Erläutere in eigenen Worten" — формула ответа</h3>
+                    <div style="background:rgba(244,167,185,0.1); border-left:3px solid #f4a7b9; padding:0.6rem 0.9rem; border-radius:0.4rem; margin:0.5rem 0 0.8rem 0; line-height:1.9; font-size:0.9rem;">
+                        <strong>Шаг 1.</strong> Перефразируй цитату — что она буквально означает<br>
+                        <strong>Шаг 2.</strong> Примени к контексту из задания (Soziale Medien / Online-Spiele / ...)<br>
+                        <strong>Шаг 3.</strong> (бонус) Короткий пример или вывод
+                    </div>
+                    <p style="font-weight:700; margin-bottom:0.5rem; font-size:0.9rem;">Фразы для шага 1 — «что это значит»:</p>
+                    <table class="unit-table">
+                        <tr><th>Фраза</th><th>Когда использовать</th></tr>
+                        <tr><td><strong>Die Aussage bedeutet, dass...</strong></td><td>Универсальный старт</td></tr>
+                        <tr><td><strong>Damit ist gemeint, dass...</strong></td><td>«Под этим подразумевается...»</td></tr>
+                        <tr><td><strong>Das bedeutet mit anderen Worten, dass...</strong></td><td>Прямая перефразировка</td></tr>
+                        <tr><td><strong>Der Autor meint damit, dass...</strong></td><td>Когда это мнение автора</td></tr>
+                        <tr><td><strong>Das lässt sich so verstehen, dass...</strong></td><td>«Это можно понять так, что...»</td></tr>
+                    </table>
+                    <p style="font-weight:700; margin:0.8rem 0 0.5rem 0; font-size:0.9rem;">Фразы для шага 2 — «применить к контексту»:</p>
+                    <table class="unit-table">
+                        <tr><th>Фраза</th><th>Смысл</th></tr>
+                        <tr><td><strong>Bezogen auf soziale Medien bedeutet das, dass...</strong></td><td>В контексте соцсетей это значит</td></tr>
+                        <tr><td><strong>Im Bereich der Online-Spiele zeigt sich das darin, dass...</strong></td><td>В онлайн-играх это проявляется в том, что</td></tr>
+                        <tr><td><strong>Das ist zum Beispiel dann der Fall, wenn...</strong></td><td>Пример из жизни</td></tr>
+                        <tr><td><strong>Im Alltag bedeutet das konkret, dass...</strong></td><td>В повседневной жизни это значит</td></tr>
+                    </table>
+                    <div style="background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.25); border-radius:10px; padding:0.8rem 1rem; margin-top:0.8rem;">
+                        <p style="font-weight:700; color:#b9f0a0; margin-bottom:0.4rem;">&#x2705; Пример готового ответа:</p>
+                        <p style="font-style:italic; line-height:1.9; font-size:0.9rem; margin:0;">Die Aussage bedeutet, dass viele Menschen im Internet eine andere Identität annehmen, die nicht ihrer echten Persönlichkeit entspricht. Bezogen auf soziale Medien zeigt sich das darin, dass Nutzer nur positive Seiten ihres Lebens zeigen und erfolgreicher wirken als sie wirklich sind. In Online-Spielen erstellen sie Avatare, die ganz andere Eigenschaften haben als sie selbst.</p>
+                    </div>
+                </div>
+
+                <!-- Erkläre / Beschreibe -->
+                <div class="note-card highlight-card" style="border-color:rgba(88,166,255,0.35); background:rgba(88,166,255,0.06);">
+                    <h3 style="color:#58a6ff;">&#x1F4AC; „Erkläre" / „Beschreibe" / „Nenne" — фразы</h3>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>Тип задания</th><th>Стартовые фразы</th></tr>
+                        <tr>
+                            <td><strong>Erkläre, warum...</strong></td>
+                            <td>
+                                <em>Der Grund dafür ist, dass...</em><br>
+                                <em>Das liegt daran, dass...</em><br>
+                                <em>Dies lässt sich damit erklären, dass...</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Beschreibe, wie...</strong></td>
+                            <td>
+                                <em>Im Text wird beschrieben, dass...</em><br>
+                                <em>Laut Text funktioniert das so: ...</em><br>
+                                <em>Der Ablauf ist folgender: ...</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nenne / Gib an...</strong></td>
+                            <td>
+                                <em>Im Text werden folgende ... genannt: ...</em><br>
+                                <em>Laut Abschnitt ... sind das: ...</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stelle dar...</strong></td>
+                            <td>
+                                <em>Der Text stellt dar, dass...</em><br>
+                                <em>Es wird deutlich, dass...</em>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Ссылка на текст -->
+                <div class="note-card highlight-card" style="border-color:rgba(185,240,160,0.35); background:rgba(185,240,160,0.06);">
+                    <h3 style="color:#b9f0a0;">&#x1F4CE; Ссылка на текст — обязательно!</h3>
+                    <p style="font-size:0.9rem; color:var(--color-text-muted); margin:0.2rem 0 0.7rem 0;">При открытых заданиях всегда ссылайся на текст — это даёт баллы.</p>
+                    <table class="unit-table">
+                        <tr><th>Фраза</th><th>Когда</th></tr>
+                        <tr><td><strong>Laut dem Text...</strong></td><td>Универсально</td></tr>
+                        <tr><td><strong>Im Text steht, dass...</strong></td><td>Прямая информация из текста</td></tr>
+                        <tr><td><strong>Laut Abschnitt 3 / Zeile 13...</strong></td><td>Конкретная ссылка — даёт доп. баллы</td></tr>
+                        <tr><td><strong>Der Autor betont / erklärt / beschreibt...</strong></td><td>Для авторской позиции</td></tr>
+                        <tr><td><strong>Wie im Text erwähnt...</strong></td><td>Мягкая ссылка</td></tr>
+                        <tr><td><strong>Das Beispiel im Text zeigt, dass...</strong></td><td>Когда текст даёт пример</td></tr>
+                    </table>
+                </div>
+
+                <!-- Чего НЕ делать -->
+                <div class="note-card" style="border-color:rgba(248,81,73,0.3); background:rgba(248,81,73,0.05);">
+                    <h3 style="color:var(--color-red);">&#x26A0;&#xFE0F; Чего НЕ делать</h3>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>&#x274C; Неправильно</th><th>&#x2714; Правильно</th></tr>
+                        <tr><td>Повторить цитату дословно</td><td>Перефразировать <strong>своими словами</strong></td></tr>
+                        <tr><td>1 короткое предложение</td><td>Минимум <strong>2 полных предложения</strong></td></tr>
+                        <tr><td>«Ich finde das interessant»</td><td>Не оценивай — <strong>объясняй</strong></td></tr>
+                        <tr><td>Ответить без ссылки на текст</td><td><strong>Laut Text / Laut Abschnitt...</strong></td></tr>
+                        <tr><td>Писать по-русски или смешивать языки</td><td>Только немецкий, полные предложения</td></tr>
+                        <tr><td>Тратить 10 мин на одно задание</td><td>Максимум <strong>3–4 мин</strong> на открытый ответ</td></tr>
+                    </table>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
     </div>
 
     <footer class="footer-dark" style="position:relative;z-index:1">
@@ -615,6 +879,94 @@
                 btn.innerHTML = '&#x1F441; Musterantwort zeigen';
             }
         }
+
+        // ===== KI ÜBEN =====
+        const kiTasks = [
+            {
+                label: 'Aufgabe A — Fake News',
+                task: 'Erläutere in eigenen Worten, was diese Aussage bezogen auf Online-Spiele oder soziale Medien bedeutet: „Manche Menschen erfinden sich einen eigenen Internet-Charakter." (Z. 13)'
+            },
+            {
+                label: 'Aufgabe B — Klimawandel',
+                task: 'Erkläre in eigenen Worten, was der Autor mit folgender Aussage meint: „Der Klimawandel ist kein Problem der Zukunft — er ist längst Gegenwart." Beziehe dich dabei auf konkrete Beispiele.'
+            },
+            {
+                label: 'Aufgabe C — Schule & Lernen',
+                task: 'Erläutere in eigenen Worten: „Digitales Lernen ersetzt nicht den Lehrer — es verändert seine Rolle." Was bedeutet das für den Schulalltag?'
+            },
+            {
+                label: 'Aufgabe D — Konsum & Werbung',
+                task: 'Erkläre die Aussage mit eigenen Worten: „Werbung verkauft kein Produkt — sie verkauft ein Lebensgefühl." Nenne ein konkretes Beispiel.'
+            },
+            {
+                label: 'Aufgabe E — Migration & Identität',
+                task: 'Erläutere in eigenen Worten: „Zwischen zwei Kulturen zu leben bedeutet nicht, zerrissen zu sein — es bedeutet, doppelt bereichert zu werden."'
+            }
+        ];
+
+        let kiCurrentTask = 0;
+
+        function kiSelectTask(idx) {
+            kiCurrentTask = idx;
+            for (let i = 0; i < kiTasks.length; i++) {
+                const lbl = document.getElementById('ki-label-' + i);
+                if (lbl) lbl.style.background = i === idx ? 'rgba(163,113,247,0.12)' : 'rgba(255,255,255,0.03)';
+            }
+        }
+
+        function kiUpdateCount() {
+            const text = document.getElementById('ki-answer').value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            const el = document.getElementById('ki-count');
+            el.textContent = words + ' Wörter';
+            el.style.color = words >= 30 ? '#b9f0a0' : words >= 15 ? '#e8c547' : 'var(--color-text-muted)';
+        }
+
+        function kiCopyPrompt() {
+            const answer = document.getElementById('ki-answer').value.trim();
+            if (!answer) {
+                const btn = document.getElementById('ki-copy-btn');
+                btn.textContent = '⚠️ Zuerst deinen Antwort schreiben!';
+                btn.style.background = 'rgba(248,81,73,0.3)';
+                setTimeout(() => {
+                    btn.innerHTML = '&#x1F4CB; Prompt kopieren &amp; zu Claude.ai gehen';
+                    btn.style.background = 'linear-gradient(135deg,#a371f7,#c8a5ff)';
+                }, 2000);
+                return;
+            }
+            const task = kiTasks[kiCurrentTask];
+            const prompt = `Du bist mein Deutschlehrer und bereitest mich auf die ZP10 (Deutsch-Prüfung in Deutschland) vor.
+
+AUFGABE:
+${task.task}
+
+MEINE ANTWORT:
+${answer}
+
+Bitte gib mir Feedback auf Russisch (damit ich alles verstehe):
+1. ✅ Was habe ich gut gemacht?
+2. 🔧 Was soll ich verbessern? (konkret — welche Sätze, welche Wörter)
+3. 📝 Zeig mir ein Beispiel einer besseren Antwort auf Deutsch
+4. ⭐ Gib mir eine Note: 3 Punkte (sehr gut), 2 Punkte (gut, aber...), 1 Punkt (muss nochmal üben)
+
+Sei ehrlich und konkret — ich will wirklich besser werden!`;
+
+            navigator.clipboard.writeText(prompt).then(() => {
+                document.getElementById('ki-copied-msg').style.display = 'block';
+                const btn = document.getElementById('ki-copy-btn');
+                btn.innerHTML = '&#x2705; Kopiert! Jetzt claude.ai öffnen';
+                btn.style.background = 'linear-gradient(135deg,#3fb954,#6ee68a)';
+                btn.style.color = '#0a1f0e';
+                setTimeout(() => {
+                    btn.innerHTML = '&#x1F4CB; Prompt kopieren &amp; zu Claude.ai gehen';
+                    btn.style.background = 'linear-gradient(135deg,#a371f7,#c8a5ff)';
+                    btn.style.color = '#0e0a1a';
+                }, 4000);
+            });
+        }
+
+        // highlight selected task on load
+        kiSelectTask(0);
     </script>
 </body>
 </html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erl&auml;utern &amp; Erkl&auml;ren &mdash; &Uuml;ben | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .exam-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .exam-wrap { grid-template-columns: 1fr; }
+        }
+        .text-panel {
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+        .text-panel::-webkit-scrollbar { width: 5px; }
+        .text-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+        .tasks-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .lz-abschnitt { margin-bottom: 1rem; }
+        .lz-abschnitt-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 0.2rem;
+            opacity: 0.7;
+        }
+        .lz-ueberschrift {
+            font-size: 0.93rem;
+            font-weight: 700;
+            color: #e0e6ed;
+            margin-bottom: 0.5rem;
+        }
+        .lz-line { display: flex; gap: 0.6rem; line-height: 1.75; font-size: 0.9rem; }
+        .lz-num {
+            min-width: 2rem;
+            text-align: right;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            padding-top: 0.12rem;
+            font-variant-numeric: tabular-nums;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .lz-text { color: #d0d7de; }
+        .glossar-block {
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+        }
+        .glossar-block strong { color: #d0d7de; }
+
+        /* Task cards */
+        .task-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem;
+        }
+        .task-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+        .task-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.12rem 0.55rem;
+            border-radius: 20px;
+            margin-left: 0.4rem;
+            vertical-align: middle;
+        }
+        .task-type-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
+            opacity: 0.85;
+        }
+        .stellungnahme-area {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #d0d7de;
+            font-size: 0.88rem;
+            padding: 0.7rem 0.9rem;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+        .stellungnahme-area:focus { outline: none; border-color: rgba(68,147,248,0.45); }
+        .muster-block {
+            display: none;
+            margin-top: 0.8rem;
+            background: rgba(63,185,80,0.06);
+            border: 1px solid rgba(63,185,80,0.2);
+            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            font-size: 0.85rem;
+            color: #c3d6c3;
+            line-height: 1.7;
+        }
+        .quiz-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #c8d0da;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .quiz-btn:hover { background: rgba(255,255,255,0.08); }
+
+        /* Self-check */
+        .selfcheck-block {
+            display: none;
+            margin-top: 0.75rem;
+            background: rgba(68,147,248,0.06);
+            border: 1px solid rgba(68,147,248,0.18);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+        }
+        .selfcheck-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.6rem;
+        }
+        .selfcheck-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.82rem;
+            color: #b0bbc8;
+            cursor: pointer;
+            user-select: none;
+        }
+        .selfcheck-item input[type="checkbox"] {
+            margin-top: 0.15rem;
+            accent-color: var(--color-accent);
+            flex-shrink: 0;
+        }
+        .selfcheck-item.checked { color: #7ec98a; }
+        .selfcheck-score {
+            margin-top: 0.55rem;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            font-weight: 600;
+        }
+
+        /* Tabs */
+        .text-tabs-bar { display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap; }
+        .text-tab {
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.12);
+            color:var(--color-text-muted);
+            padding:0.5rem 1.3rem;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:0.88rem;
+            font-weight:600;
+            transition:all 0.15s;
+            font-family: inherit;
+        }
+        .text-tab:hover { background:rgba(255,255,255,0.09); color:#d0d7de; }
+        .text-tab.active { background:rgba(68,147,248,0.18); border-color:rgba(68,147,248,0.5); color:#58a6ff; }
+
+        /* Info banner */
+        .info-banner {
+            background: rgba(68,147,248,0.08);
+            border: 1px solid rgba(68,147,248,0.2);
+            border-radius: 12px;
+            padding: 0.85rem 1.1rem;
+            font-size: 0.85rem;
+            color: #8db8e8;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+        .info-banner strong { color: #58a6ff; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg" style="position:relative;z-index:1">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Erl&auml;utern &amp; Erkl&auml;ren</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>Erl&auml;utern &amp; Erkl&auml;ren</h1>
+            <p class="page-subtitle">Открытые задания — объясни своими словами</p>
+        </div>
+
+        <div class="info-banner">
+            <strong>Как работает эта страница:</strong> читай текст слева &rarr; пиши ответ в поле &rarr; нажми <strong>Musterantwort</strong>, чтобы сравнить &rarr; отметь галочками, что ты сделал правильно. Никаких кнопок «правильно/неправильно» &mdash; здесь ты сам оцениваешь себя.
+        </div>
+
+        <div class="text-tabs-bar">
+            <button class="text-tab active" data-topic="a" onclick="switchTab('a')">&#x1F916; Thema 1 &mdash; K&uuml;nstliche Intelligenz</button>
+            <button class="text-tab" data-topic="b" onclick="switchTab('b')">&#x1F3D9; Thema 2 &mdash; Gentrifizierung</button>
+        </div>
+
+        <!-- ===== THEMA 1: KI ===== -->
+        <div id="wrap-a" class="exam-wrap">
+            <div class="text-panel">
+                <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent);opacity:0.7;margin-bottom:0.3rem;">Leseverstehen &mdash; Text</div>
+                <div style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:1rem;">Themenbereich: Technologie &amp; Arbeit</div>
+
+                <p style="font-weight:700;font-size:1rem;color:#fff;margin:0 0 0.15rem;">Mensch und Maschine &mdash; K&uuml;nstliche Intelligenz in der Arbeitswelt</p>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 1rem;">Wirtschaftsmagazin &bdquo;Zukunft Arbeit&ldquo;, 2024 (adaptiert)</p>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 1</div>
+                    <div class="lz-ueberschrift">Eine neue &Auml;ra der Arbeit</div>
+                    <div class="lz-line"><span class="lz-num">1</span><span class="lz-text">K&uuml;nstliche Intelligenz (KI) ver&auml;ndert die Arbeitswelt in einem Tempo, das Experten noch vor</span></div>
+                    <div class="lz-line"><span class="lz-num">2</span><span class="lz-text">zehn Jahren f&uuml;r unm&ouml;glich gehalten h&auml;tten. Systeme wie ChatGPT, Bildgeneratoren und autonome</span></div>
+                    <div class="lz-line"><span class="lz-num">3</span><span class="lz-text">Analyseprogramme dringen in Bereiche vor, die lange als exklusiv menschlich galten: kreatives</span></div>
+                    <div class="lz-line"><span class="lz-num">4</span><span class="lz-text">Schreiben, medizinische Diagnose, juristische Recherche. Das McKinsey Global Institute (2023)</span></div>
+                    <div class="lz-line"><span class="lz-num">5</span><span class="lz-text">sch&auml;tzt, dass bis 2030 weltweit bis zu 300 Millionen Vollzeitarbeitspl&auml;tze durch KI automatisiert</span></div>
+                    <div class="lz-line"><span class="lz-num">6</span><span class="lz-text">werden k&ouml;nnten &ndash; gleichzeitig entstehen aber auch neue Berufsfelder.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 2</div>
+                    <div class="lz-ueberschrift">Welche Berufe sind gef&auml;hrdet?</div>
+                    <div class="lz-line"><span class="lz-num">7</span><span class="lz-text">Besonders gef&auml;hrdet sind Routineberufe mit klar definierten Aufgaben: Buchhalter, Dateneingabe-</span></div>
+                    <div class="lz-line"><span class="lz-num">8</span><span class="lz-text">kr&auml;fte, einfache Sachbearbeiter. Aber auch qualifizierte Berufe ger&auml;ten unter Druck: Radiologen</span></div>
+                    <div class="lz-line"><span class="lz-num">9</span><span class="lz-text">werden von KI-Systemen bei der Bildauswertung &uuml;bertroffen, Anw&auml;lte bei der Vertragsanalyse.</span></div>
+                    <div class="lz-line"><span class="lz-num">10</span><span class="lz-text">Weniger gef&auml;hrdet gelten dagegen Berufe mit hohem Anteil sozialer Interaktion, emotionaler</span></div>
+                    <div class="lz-line"><span class="lz-num">11</span><span class="lz-text">Intelligenz und k&ouml;rperlicher Pr&auml;senz &ndash; Pflegepersonal, Erzieher, Handwerker. Der Mensch</span></div>
+                    <div class="lz-line"><span class="lz-num">12</span><span class="lz-text">bleibt dort unersetzlich, wo Maschinen keine Empathie zeigen k&ouml;nnen.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 3</div>
+                    <div class="lz-ueberschrift">Chancen statt Bedrohung?</div>
+                    <div class="lz-line"><span class="lz-num">13</span><span class="lz-text">Viele Wirtschaftsforscher betonen die andere Seite: KI k&ouml;nne Arbeitnehmer von m&uuml;hsamen</span></div>
+                    <div class="lz-line"><span class="lz-num">14</span><span class="lz-text">Routineaufgaben befreien und ihnen erlauben, sich auf kreative, strategische und zwischen-</span></div>
+                    <div class="lz-line"><span class="lz-num">15</span><span class="lz-text">menschliche Aufgaben zu konzentrieren. Das Konzept der &bdquo;Mensch-Maschine-Kollaboration&ldquo;</span></div>
+                    <div class="lz-line"><span class="lz-num">16</span><span class="lz-text">beschreibt eine Zukunft, in der KI als Werkzeug dient &ndash; nicht als Ersatz. &Auml;rzte nutzen KI</span></div>
+                    <div class="lz-line"><span class="lz-num">17</span><span class="lz-text">zur schnelleren Diagnose, Lehrer zur personalisierten Unterrichtsgestaltung. Der entscheidende</span></div>
+                    <div class="lz-line"><span class="lz-num">18</span><span class="lz-text">Faktor: Wer die Technologie zu nutzen wei&szlig;, ist im Vorteil.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 4</div>
+                    <div class="lz-ueberschrift">Das Problem der Ungleichheit</div>
+                    <div class="lz-line"><span class="lz-num">19</span><span class="lz-text">Ein zentrales Risiko ist die wachsende soziale Ungleichheit. Hochqualifizierte Arbeitnehmer,</span></div>
+                    <div class="lz-line"><span class="lz-num">20</span><span class="lz-text">die KI kompetent einsetzen k&ouml;nnen, werden produktiver und besser entlohnt. Geringqualifizierte</span></div>
+                    <div class="lz-line"><span class="lz-num">21</span><span class="lz-text">hingegen verlieren ihre Stellen an Maschinen, ohne einfach in andere Berufsfelder wechseln</span></div>
+                    <div class="lz-line"><span class="lz-num">22</span><span class="lz-text">zu k&ouml;nnen. &Ouml;konomen warnen vor einer &bdquo;digitalen Spaltung&ldquo;: einer Gesellschaft, in der KI-</span></div>
+                    <div class="lz-line"><span class="lz-num">23</span><span class="lz-text">Kompetenz zur neuen Schl&uuml;sselqualifikation wird &ndash; und wer sie nicht besitzt, abgeh&auml;ngt wird.</span></div>
+                    <div class="lz-line"><span class="lz-num">24</span><span class="lz-text">Besonders betroffen: &auml;ltere Arbeitnehmer und Menschen ohne formale Bildung.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 5</div>
+                    <div class="lz-ueberschrift">Umschulung und lebenslanges Lernen</div>
+                    <div class="lz-line"><span class="lz-num">25</span><span class="lz-text">Als Antwort auf diese Herausforderungen setzen Regierungen und Unternehmen auf &bdquo;Upskilling&ldquo;</span></div>
+                    <div class="lz-line"><span class="lz-num">26</span><span class="lz-text">und &bdquo;Reskilling&ldquo; &ndash; die gezielte Weiterbildung bzw. Umschulung von Arbeitnehmern. In</span></div>
+                    <div class="lz-line"><span class="lz-num">27</span><span class="lz-text">Deutschland hat die Bundesagentur f&uuml;r Arbeit entsprechende F&ouml;rderprogramme ausgebaut.</span></div>
+                    <div class="lz-line"><span class="lz-num">28</span><span class="lz-text">Das Weltwirtschaftsforum (2023) prognostiziert, dass 44 Prozent der Kernkompetenzen von</span></div>
+                    <div class="lz-line"><span class="lz-num">29</span><span class="lz-text">Arbeitnehmern sich bis 2027 ver&auml;ndern werden. Lebenslanges Lernen wird damit nicht zur</span></div>
+                    <div class="lz-line"><span class="lz-num">30</span><span class="lz-text">Option, sondern zur Notwendigkeit.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 6</div>
+                    <div class="lz-ueberschrift">Ethik und Regulierung</div>
+                    <div class="lz-line"><span class="lz-num">31</span><span class="lz-text">Neben wirtschaftlichen Fragen stellen sich ethische: Wer haftet, wenn eine KI einen Fehler</span></div>
+                    <div class="lz-line"><span class="lz-num">32</span><span class="lz-text">macht &ndash; bei einer Fehldiagnose oder einer falschen Kreditentscheidung? Die EU hat mit dem</span></div>
+                    <div class="lz-line"><span class="lz-num">33</span><span class="lz-text">&bdquo;AI Act&ldquo; (2024) den weltweit ersten umfassenden Rechtsrahmen f&uuml;r KI verabschiedet. Systeme</span></div>
+                    <div class="lz-line"><span class="lz-num">34</span><span class="lz-text">mit hohem Risikopotenzial &ndash; etwa in Medizin oder Justiz &ndash; unterliegen besonders strengen</span></div>
+                    <div class="lz-line"><span class="lz-num">35</span><span class="lz-text">Anforderungen. Kritiker bemängeln jedoch, dass Regulierung der Technologieentwicklung immer</span></div>
+                    <div class="lz-line"><span class="lz-num">36</span><span class="lz-text">hinterherhinkt &ndash; und das Gesetz bereits &uuml;berholt sei, bevor es vollst&auml;ndig in Kraft tritt.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 7</div>
+                    <div class="lz-ueberschrift">Ausblick: Wer gestaltet die Zukunft?</div>
+                    <div class="lz-line"><span class="lz-num">37</span><span class="lz-text">Die entscheidende Frage ist nicht ob, sondern wie KI die Arbeitswelt ver&auml;ndert. Experten sind</span></div>
+                    <div class="lz-line"><span class="lz-num">38</span><span class="lz-text">sich einig: Technologie ist kein Schicksal &ndash; sie wird durch politische Entscheidungen, Bildungs-</span></div>
+                    <div class="lz-line"><span class="lz-num">39</span><span class="lz-text">investitionen und gesellschaftliche Werte gestaltet. L&auml;nder, die fr&uuml;hzeitig in KI-Bildung</span></div>
+                    <div class="lz-line"><span class="lz-num">40</span><span class="lz-text">investieren und soziale Absicherung mit technologischem Fortschritt verbinden, k&ouml;nnen die</span></div>
+                    <div class="lz-line"><span class="lz-num">41</span><span class="lz-text">Chancen nutzen, ohne die Risiken zu ignorieren. Ob KI zum Segen oder Fluch wird, liegt</span></div>
+                    <div class="lz-line"><span class="lz-num">42</span><span class="lz-text">letztendlich in menschlicher Hand.</span></div>
+                </div>
+                <div class="glossar-block">
+                    <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Glossar</div>
+                    <div><strong>1 die K&uuml;nstliche Intelligenz (KI):</strong> Computersysteme, die menschliche Denkprozesse imitieren</div>
+                    <div><strong>2 die Mensch-Maschine-Kollaboration:</strong> Zusammenarbeit von Menschen und KI-Systemen</div>
+                    <div><strong>3 die digitale Spaltung:</strong> wachsende Ungleichheit zwischen denen, die Technologie beherrschen, und denen, die es nicht tun</div>
+                    <div><strong>4 das Upskilling:</strong> Erweiterung vorhandener Kompetenzen durch gezielte Weiterbildung</div>
+                    <div><strong>5 das Reskilling:</strong> vollst&auml;ndige Umschulung f&uuml;r einen neuen Beruf</div>
+                    <div><strong>6 der AI Act:</strong> erstes umfassendes EU-Gesetz zur Regulierung von K&uuml;nstlicher Intelligenz (2024)</div>
+                </div>
+            </div>
+
+            <!-- TASKS -->
+            <div class="tasks-panel">
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">1</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 15&ndash;16 &mdash; Abschnitt 3</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4DD; Begriff erl&auml;utern</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erl&auml;utere den Begriff &bdquo;Mensch-Maschine-Kollaboration&ldquo; (Z.&nbsp;15&ndash;16)</strong> in eigenen Worten. Erkl&auml;re, was damit gemeint ist und nenne ein konkretes Beispiel aus dem Text.</p>
+                    <textarea class="stellungnahme-area" placeholder="Der Begriff &#x201E;Mensch-Maschine-Kollaboration&#x201C; bedeutet ...&#10;Im Text wird als Beispiel genannt, dass ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a1')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a1')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a1">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Der Begriff &bdquo;Mensch-Maschine-Kollaboration&ldquo; beschreibt ein Arbeitsmodell, in dem Menschen und KI-Systeme nicht gegeneinander, sondern miteinander arbeiten: Die KI &uuml;bernimmt Routineaufgaben, w&auml;hrend der Mensch kreative und soziale Aufgaben beh&auml;lt. KI dient dabei als Werkzeug, nicht als Ersatz. Im Text wird als Beispiel genannt, dass &Auml;rzte KI zur schnelleren Diagnose nutzen und Lehrer sie zur Gestaltung personalisierter Unterrichtsinhalte einsetzen (Z. 16&ndash;17).<br><br>
+                        <strong>Struktur:</strong> Begriff erkl&auml;ren &rarr; Kernidee (Werkzeug, kein Ersatz) &rarr; Beispiel aus Text
+                    </div>
+                    <div class="selfcheck-block" id="sc-a1">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a1')"> Ich habe den Begriff mit eigenen Worten erkl&auml;rt (nicht nur abgeschrieben).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a1')"> Ich habe die Kernidee genannt: KI als Werkzeug, nicht als Ersatz.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a1')"> Ich habe mindestens ein Beispiel aus dem Text verwendet.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a1')"> Ich habe vollst&auml;ndige S&auml;tze geschrieben.</label>
+                        <div class="selfcheck-score" id="score-a1"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">2</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 22&ndash;23 &mdash; Abschnitt 4</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4DD; Begriff erl&auml;utern</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erl&auml;utere den Begriff &bdquo;digitale Spaltung&ldquo; (Z.&nbsp;22&ndash;23)</strong> und erkl&auml;re, wen sie laut Text besonders trifft und warum.</p>
+                    <textarea class="stellungnahme-area" placeholder="&#x201E;Digitale Spaltung&#x201C; bedeutet ...&#10;Besonders betroffen sind laut Text ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a2')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a2')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a2">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        &bdquo;Digitale Spaltung&ldquo; beschreibt die wachsende gesellschaftliche Ungleichheit zwischen Menschen, die KI kompetent einsetzen k&ouml;nnen, und jenen, die das nicht k&ouml;nnen. Erstere werden produktiver und besser entlohnt; letztere verlieren ihre Arbeitspl&auml;tze, ohne leicht in andere Berufe wechseln zu k&ouml;nnen. Laut Text trifft diese Spaltung besonders &auml;ltere Arbeitnehmer und Menschen ohne formale Bildung (Z. 24), weil f&uuml;r sie der Einstieg in KI-Kompetenz am schwierigsten ist.<br><br>
+                        <strong>Struktur:</strong> Begriff definieren &rarr; Kontrast (wer profitiert / wer verliert) &rarr; besonders Betroffene + Grund
+                    </div>
+                    <div class="selfcheck-block" id="sc-a2">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a2')"> Ich habe die Ungleichheit als Kernidee des Begriffs erkl&auml;rt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a2')"> Ich habe beide Seiten genannt: wer profitiert und wer verliert.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a2')"> Ich habe konkret aus dem Text zitiert oder paraphrasiert (Z. 24).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a2')"> Ich habe erkl&auml;rt, warum die genannten Gruppen besonders betroffen sind.</label>
+                        <div class="selfcheck-score" id="score-a2"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#9b59b6;color:#fff;">3</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 2</span>
+                    </div>
+                    <div class="task-type-label">&#x1F50D; Unterschied erkl&auml;ren</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erkl&auml;re laut Text den Unterschied</strong> zwischen Berufen, die durch KI besonders gef&auml;hrdet sind, und solchen, die weniger gef&auml;hrdet sind. Was ist das entscheidende Kriterium?</p>
+                    <textarea class="stellungnahme-area" placeholder="Besonders gef&#228;hrdet sind Berufe, die ...&#10;Weniger gef&#228;hrdet sind hingegen ...&#10;Das entscheidende Kriterium ist ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a3')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a3')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a3">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Besonders gef&auml;hrdet sind laut Text Routineberufe mit klar definierten Aufgaben &ndash; wie Buchhalter oder Dateneingabekr&auml;fte &ndash; aber auch qualifizierte Berufe wie Radiologen oder Anw&auml;lte, bei denen KI spezifische Teilaufgaben besser erledigt (Z. 7&ndash;9). Weniger gef&auml;hrdet sind Berufe mit hohem Anteil an sozialer Interaktion, emotionaler Intelligenz und k&ouml;rperlicher Pr&auml;senz, etwa Pflegepersonal, Erzieher oder Handwerker (Z. 10&ndash;12). Das entscheidende Kriterium ist also die F&auml;higkeit zur Empathie und zu echter menschlicher Interaktion &ndash; etwas, das Maschinen (noch) nicht imitieren k&ouml;nnen.<br><br>
+                        <strong>Struktur:</strong> Gef&auml;hrdet (mit Beispielen) &rarr; weniger gef&auml;hrdet (mit Beispielen) &rarr; gemeinsames Kriterium benennen
+                    </div>
+                    <div class="selfcheck-block" id="sc-a3">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a3')"> Ich habe beide Seiten beschrieben (gef&auml;hrdet / nicht gef&auml;hrdet).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a3')"> Ich habe konkrete Berufsbeispiele aus dem Text genannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a3')"> Ich habe das entscheidende Kriterium (Empathie / soziale Interaktion) klar benannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a3')"> Meine Antwort hat eine klare Struktur (Kontrast erkennbar).</label>
+                        <div class="selfcheck-score" id="score-a3"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#1abc9c;color:#fff;">4</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 5</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4CA; Zusammenhang erkl&auml;ren</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erkl&auml;re den Zusammenhang</strong> zwischen KI und &bdquo;lebenslangem Lernen&ldquo; (Z.&nbsp;29&ndash;30). Warum ist lebenslanges Lernen laut Text keine Option mehr, sondern eine Notwendigkeit?</p>
+                    <textarea class="stellungnahme-area" placeholder="Der Zusammenhang zwischen KI und lebenslangem Lernen besteht darin, dass ...&#10;Laut Weltwirtschaftsforum ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a4')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a4')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a4">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Da KI die Arbeitswelt so schnell ver&auml;ndert, werden viele Berufskompetenzen binnen weniger Jahre veraltet. Das Weltwirtschaftsforum (2023) prognostiziert, dass sich 44 Prozent der Kernkompetenzen von Arbeitnehmern bis 2027 ver&auml;ndern werden (Z. 28&ndash;29). Das bedeutet: Wer sich nicht regelm&auml;&szlig;ig weiterbildet, verliert den Anschluss. Lebenslanges Lernen ist deshalb keine pers&ouml;nliche Entscheidung mehr, sondern eine strukturelle Notwendigkeit &ndash; wer stillsteht, wird vom technologischen Wandel &uuml;berholt.<br><br>
+                        <strong>Struktur:</strong> Ursache (KI ver&auml;ndert Kompetenzen) &rarr; Beleg aus Text (44%, 2027) &rarr; Schlussfolgerung (Notwendigkeit)
+                    </div>
+                    <div class="selfcheck-block" id="sc-a4">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a4')"> Ich habe erkl&auml;rt, warum KI lebenslanges Lernen notwendig macht.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a4')"> Ich habe die Zahl 44% und die Prognose bis 2027 verwendet.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a4')"> Ich habe den Unterschied zwischen &bdquo;Option&ldquo; und &bdquo;Notwendigkeit&ldquo; erkl&auml;rt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a4')"> Meine Antwort hat einen logischen Aufbau (Ursache &rarr; Folge).</label>
+                        <div class="selfcheck-score" id="score-a4"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e67e22;color:#fff;">5</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 6</span>
+                    </div>
+                    <div class="task-type-label">&#x2696;&#xFE0F; Position des Autors</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Welche Position nimmt der Text zum EU-&bdquo;AI Act&ldquo; ein?</strong> Beschreibe sowohl die Bef&uuml;rworter- als auch die Kritikerseite und erkl&auml;re, welche Perspektive im Text dominiert.</p>
+                    <textarea class="stellungnahme-area" placeholder="Bef&#252;rworter des AI Act sagen, dass ...&#10;Kritiker hingegen bemängeln ...&#10;Im Text dominiert die Perspektive ..." rows="5"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a5')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a5')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a5">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Der Text stellt den AI Act als historisch bedeutsam dar: Als erster umfassender Rechtsrahmen f&uuml;r KI weltweit (Z. 33) soll er vor allem Hochrisikobereiche wie Medizin und Justiz regulieren. Das spricht f&uuml;r eine grundlegend positive Bewertung. Gleichzeitig gibt der Text der Kritikerseite Raum: Regulierung hinke der Technologieentwicklung immer hinterher, das Gesetz sei m&ouml;glicherweise bereits veraltet, bevor es vollst&auml;ndig gilt (Z. 35&ndash;36). Insgesamt nimmt der Text eine ausgewogene, informierende Position ein &ndash; er wertet nicht einseitig, sondern pr&auml;sentiert beide Perspektiven sachlich.<br><br>
+                        <strong>Struktur:</strong> Bef&uuml;rworterseite (mit Beleg) &rarr; Kritikerseite (mit Beleg) &rarr; Gesamttendenz des Textes bewerten
+                    </div>
+                    <div class="selfcheck-block" id="sc-a5">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a5')"> Ich habe die Bef&uuml;rworterposition mit Textbeleg beschrieben.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a5')"> Ich habe die Kritikerposition mit Textbeleg beschrieben.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a5')"> Ich habe bewertet, welche Perspektive im Text &uuml;berwiegt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a5')"> Ich habe keine eigene Meinung eingebracht (reine Textanalyse).</label>
+                        <div class="selfcheck-score" id="score-a5"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e74c3c;color:#fff;">6</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 7</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4AC; Kernaussage formulieren</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Formuliere die Kernaussage des gesamten Textes</strong> in 2&ndash;3 S&auml;tzen in eigenen Worten. Benutze keine direkte Abschrift aus dem Text.</p>
+                    <textarea class="stellungnahme-area" placeholder="Der Text beschäftigt sich mit ... und kommt zu dem Schluss, dass ...&#10;Dabei wird betont, dass ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a6')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a6')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a6">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Der Text untersucht die Auswirkungen von K&uuml;nstlicher Intelligenz auf die Arbeitswelt und zeigt, dass KI sowohl Risiken als auch Chancen mit sich bringt. Einerseits gef&auml;hrdet sie Millionen von Arbeitspl&auml;tzen und verschärft soziale Ungleichheiten; andererseits er&ouml;ffnet sie neue M&ouml;glichkeiten, wenn Menschen die Technologie als Werkzeug nutzen. Die zentrale Botschaft lautet: Die Zukunft der Arbeit h&auml;ngt nicht von der Technologie selbst ab, sondern von bewussten gesellschaftlichen und politischen Entscheidungen.<br><br>
+                        <strong>Struktur:</strong> Thema benennen &rarr; beide Seiten (Risiko + Chance) &rarr; &uuml;bergeordnete Aussage (Hauptbotschaft)
+                    </div>
+                    <div class="selfcheck-block" id="sc-a6">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a6')"> Ich habe das zentrale Thema des Textes benannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a6')"> Ich habe sowohl Chancen als auch Risiken erw&auml;hnt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a6')"> Ich habe die &uuml;bergeordnete Botschaft / Schlussfolgerung des Textes erfasst.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a6')"> Ich habe eigene Formulierungen verwendet (kein direktes Abschreiben).</label>
+                        <div class="selfcheck-score" id="score-a6"></div>
+                    </div>
+                </div>
+
+                <div class="task-card" style="border-color:rgba(248,140,70,0.35);">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#f88c46;color:#fff;">7</span>
+                    </div>
+                    <div class="task-type-label" style="color:#f88c46;">&#x1F5E3;&#xFE0F; Stellungnahme</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Eine Politikerin sagt:</strong></p>
+                    <blockquote style="border-left:3px solid rgba(248,140,70,0.5);padding:0.5rem 0.9rem;margin:0 0 0.7rem;font-style:italic;color:var(--color-text-muted);background:rgba(248,140,70,0.04);border-radius:0 8px 8px 0;font-size:0.88rem;">
+                        &bdquo;KI ist die gr&ouml;&szlig;te Bedrohung f&uuml;r den Arbeitsmarkt seit der Industrialisierung. Wir m&uuml;ssen die Entwicklung sofort stoppen, bevor es zu sp&auml;t ist.&ldquo;
+                    </blockquote>
+                    <p style="font-size:0.85rem;margin:0 0 0.4rem;">Nimm Stellung. Stimmst du zu, widersprichst du oder siehst du es differenziert? Beziehe dich auf den Text.</p>
+                    <textarea class="stellungnahme-area" placeholder="Ich stimme dieser Aussage [zu / nicht zu / teilweise zu], weil ...&#10;Der Text zeigt, dass ...&#10;Deshalb finde ich ..." rows="5"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('a7')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('a7')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-a7">
+                        <strong>&#x2705; Musterantwort (differenziert):</strong><br>
+                        Ich stimme dieser Aussage nur teilweise zu. Ja, KI birgt ernste Risiken: Der Text nennt 300 Millionen gef&auml;hrdete Stellen weltweit und die drohende digitale Spaltung. Diese Bedenken sind berechtigt. Jedoch ist die Forderung, die Entwicklung &bdquo;sofort zu stoppen&ldquo;, unrealistisch und w&uuml;rde Chancen vernichten: Der Text zeigt, dass KI Arbeitnehmer auch entlasten und die Mensch-Maschine-Kollaboration neue M&ouml;glichkeiten er&ouml;ffnen kann. Die L&ouml;sung liegt nicht im Stopp, sondern &ndash; wie der Text betont &ndash; in klugen politischen Entscheidungen, Bildungsinvestitionen und Regulierung (AI Act).
+                        <hr style="border-color:rgba(255,255,255,0.1);margin:0.7rem 0;">
+                        <strong>Struktur:</strong> Differenziert einleiten &rarr; was stimmt (Risiken + Beleg) &rarr; was nicht stimmt (Chancen + Beleg) &rarr; eigene L&ouml;sung aus Text ableiten
+                    </div>
+                    <div class="selfcheck-block" id="sc-a7">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a7')"> Ich habe klar meine Position genannt (zustimmen / widersprechen / differenziert).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a7')"> Ich habe Argumente f&uuml;r meine Position mit Textbelegen unterst&uuml;tzt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a7')"> Ich habe die Gegenposition ber&uuml;cksichtigt (nicht nur eine Seite).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a7')"> Ich habe einen logischen Schluss / eine eigene Schlussfolgerung formuliert.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('a7')"> Meine Antwort hat eine erkennbare Struktur (Einleitung &rarr; Argumente &rarr; Fazit).</label>
+                        <div class="selfcheck-score" id="score-a7"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== THEMA 2: Gentrifizierung ===== -->
+        <div id="wrap-b" class="exam-wrap" style="display:none">
+            <div class="text-panel">
+                <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent);opacity:0.7;margin-bottom:0.3rem;">Leseverstehen &mdash; Text</div>
+                <div style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:1rem;">Themenbereich: Stadt &amp; Gesellschaft</div>
+
+                <p style="font-weight:700;font-size:1rem;color:#fff;margin:0 0 0.15rem;">Wenn das Viertel sich ver&auml;ndert &mdash; Gentrifizierung in deutschen St&auml;dten</p>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 1rem;">Stadtmagazin &bdquo;Urban Report&ldquo;, 2024 (adaptiert)</p>
+
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 1</div>
+                    <div class="lz-ueberschrift">Ein Stadtph&auml;nomen mit Namen</div>
+                    <div class="lz-line"><span class="lz-num">1</span><span class="lz-text">In vielen deutschen Gro&szlig;st&auml;dten vollzieht sich ein Wandel, der von manchen als Aufwertung</span></div>
+                    <div class="lz-line"><span class="lz-num">2</span><span class="lz-text">gefeiert und von anderen als Verdr&auml;ngung bek&auml;mpft wird: Gentrifizierung. Der Begriff &ndash; abgeleitet</span></div>
+                    <div class="lz-line"><span class="lz-num">3</span><span class="lz-text">vom englischen &bdquo;gentry&ldquo; (Kleinadel) &ndash; beschreibt den Prozess, durch den einkommensschwache</span></div>
+                    <div class="lz-line"><span class="lz-num">4</span><span class="lz-text">Stadtteile aufgewertet, saniert und schrittweise von zahlungskr&auml;ftigeren Bev&ouml;lkerungsgruppen</span></div>
+                    <div class="lz-line"><span class="lz-num">5</span><span class="lz-text">&uuml;bernommen werden. Laut einer Studie des Deutschen Instituts f&uuml;r Wirtschaftsforschung (DIW,</span></div>
+                    <div class="lz-line"><span class="lz-num">6</span><span class="lz-text">2023) sind &uuml;ber 40 Prozent der Mietwohnungen in deutschen Gro&szlig;st&auml;dten von Verdr&auml;ngung bedroht.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 2</div>
+                    <div class="lz-ueberschrift">Wie Gentrifizierung entsteht</div>
+                    <div class="lz-line"><span class="lz-num">7</span><span class="lz-text">Typischerweise beginnt Gentrifizierung, wenn K&uuml;nstler, Studierende oder kreative Berufsgruppen</span></div>
+                    <div class="lz-line"><span class="lz-num">8</span><span class="lz-text">g&uuml;nstige Mieten in vernachl&auml;ssigten Stadtteilen nutzen und diese kulturell beleben. Cafes,</span></div>
+                    <div class="lz-line"><span class="lz-num">9</span><span class="lz-text">Galerien und alternativer Einzelhandel entstehen &ndash; das Viertel wird &bdquo;interessant&ldquo;. In der</span></div>
+                    <div class="lz-line"><span class="lz-num">10</span><span class="lz-text">Folge steigen Bodenpreise und Mieten. Investoren erkennen das Potenzial und kaufen Immobilien</span></div>
+                    <div class="lz-line"><span class="lz-num">11</span><span class="lz-text">auf; Modernisierungen erh&ouml;hen die Mieten weiter. Die urspr&uuml;nglichen Bewohner &ndash; oft Geringverdiener,</span></div>
+                    <div class="lz-line"><span class="lz-num">12</span><span class="lz-text">Rentner, Migrantenfamilien &ndash; k&ouml;nnen sich die steigenden Preise nicht mehr leisten und ziehen weg.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 3</div>
+                    <div class="lz-ueberschrift">Wer profitiert, wer verliert?</div>
+                    <div class="lz-line"><span class="lz-num">13</span><span class="lz-text">Die Gewinner der Gentrifizierung sind Immobilienbesitzer und Investoren, die von steigenden</span></div>
+                    <div class="lz-line"><span class="lz-num">14</span><span class="lz-text">Grundst&uuml;ckswerten profitieren, sowie Neu-Bewohner mit h&ouml;herem Einkommen, die in aufge-</span></div>
+                    <div class="lz-line"><span class="lz-num">15</span><span class="lz-text">werteten Vierteln mit besserer Infrastruktur wohnen. Verlierer sind die alteingesessenen</span></div>
+                    <div class="lz-line"><span class="lz-num">16</span><span class="lz-text">Bewohner, die ihr soziales Netzwerk, ihre Nachbarschaft und kulturelle Heimat verlieren &ndash;</span></div>
+                    <div class="lz-line"><span class="lz-num">17</span><span class="lz-text">oft ohne die M&ouml;glichkeit, in der N&auml;he eine bezahlbare Alternative zu finden. Soziolog innen</span></div>
+                    <div class="lz-line"><span class="lz-num">18</span><span class="lz-text">sprechen von &bdquo;sozialer Entwurzelung&ldquo; &ndash; dem Verlust von Zugeh&ouml;rigkeitsgef&uuml;hl und Identit&auml;t.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 4</div>
+                    <div class="lz-ueberschrift">Das Paradox der Pioniere</div>
+                    <div class="lz-line"><span class="lz-num">19</span><span class="lz-text">Ironischerweise sind es oft die kreativen Pioniere selbst &ndash; K&uuml;nstler, Musiker, alternative</span></div>
+                    <div class="lz-line"><span class="lz-num">20</span><span class="lz-text">Unternehmer &ndash; die den Prozess ausw&ouml;sen, am Ende aber selbst verdrängt werden. Wenn das</span></div>
+                    <div class="lz-line"><span class="lz-num">21</span><span class="lz-text">Viertel &bdquo;hip&ldquo; geworden ist, k&ouml;nnen auch sie die gestiegenen Mieten nicht mehr bezahlen</span></div>
+                    <div class="lz-line"><span class="lz-num">22</span><span class="lz-text">und m&uuml;ssen weiterziehen. Dieses Ph&auml;nomen wird als &bdquo;Pionier-Paradox&ldquo; bezeichnet: Die</span></div>
+                    <div class="lz-line"><span class="lz-num">23</span><span class="lz-text">Impulsgeber des Wandels werden zu seinen ersten Opfern. So entsteht ein Kreislauf der</span></div>
+                    <div class="lz-line"><span class="lz-num">24</span><span class="lz-text">Gentrifizierung, der sich in immer neue Stadtteile verlagert.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 5</div>
+                    <div class="lz-ueberschrift">Politische Gegenma&szlig;nahmen</div>
+                    <div class="lz-line"><span class="lz-num">25</span><span class="lz-text">Als Reaktion auf steigende Mieten haben Bund und L&auml;nder verschiedene Instrumente entwickelt.</span></div>
+                    <div class="lz-line"><span class="lz-num">26</span><span class="lz-text">Die &bdquo;Mietpreisbremse&ldquo; soll verhindern, dass Mieten bei Neuvermietung &uuml;ber 10 Prozent &uuml;ber</span></div>
+                    <div class="lz-line"><span class="lz-num">27</span><span class="lz-text">dem ortsüblichen Vergleichsmietenniveau steigen. &bdquo;Soziale Erhaltungssatzungen&ldquo; sch&uuml;tzen</span></div>
+                    <div class="lz-line"><span class="lz-num">28</span><span class="lz-text">bestimmte Viertel vor &uuml;berlastenden Modernisierungen. Kritiker dieser Ma&szlig;nahmen argumentieren</span></div>
+                    <div class="lz-line"><span class="lz-num">29</span><span class="lz-text">jedoch, dass sie das eigentliche Problem &ndash; mangelnden Neubau &ndash; nicht l&ouml;sen, sondern nur</span></div>
+                    <div class="lz-line"><span class="lz-num">30</span><span class="lz-text">die Symptome bek&auml;mpfen und gleichzeitig Investoren abschrecken.</span></div>
+                </div>
+                <div class="lz-abschnitt">
+                    <div class="lz-abschnitt-label">Abschnitt 6</div>
+                    <div class="lz-ueberschrift">Zwischen Aufwertung und Verdr&auml;ngung</div>
+                    <div class="lz-line"><span class="lz-num">31</span><span class="lz-text">Die Debatte um Gentrifizierung ist letztlich eine Debatte um das Recht auf Stadt. Wer darf</span></div>
+                    <div class="lz-line"><span class="lz-num">32</span><span class="lz-text">in den besten Lagen wohnen &ndash; nur die, die es sich leisten k&ouml;nnen? St&auml;dteplanerin Sarah Müller</span></div>
+                    <div class="lz-line"><span class="lz-num">33</span><span class="lz-text">formuliert es so: &bdquo;Eine Stadt, die nur noch f&uuml;r Wohlhabende bezahlbar ist, verliert ihre</span></div>
+                    <div class="lz-line"><span class="lz-num">34</span><span class="lz-text">soziale Vielfalt und damit einen Teil ihrer Seele.&ldquo; L&ouml;sungsans&auml;tze wie gemeinschaftliche</span></div>
+                    <div class="lz-line"><span class="lz-num">35</span><span class="lz-text">Wohnprojekte, kommunale Wohnungsbaugesellschaften und der gezielte Schutz von Sozialwohnungen</span></div>
+                    <div class="lz-line"><span class="lz-num">36</span><span class="lz-text">werden diskutiert &ndash; doch eine einfache L&ouml;sung gibt es nicht.</span></div>
+                </div>
+                <div class="glossar-block">
+                    <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Glossar</div>
+                    <div><strong>1 die Gentrifizierung:</strong> Aufwertungsprozess von Stadtvierteln mit Verdr&auml;ngung einkommensschwacher Bev&ouml;lkerung</div>
+                    <div><strong>2 die soziale Entwurzelung:</strong> Verlust von sozialen Bindungen, Zugeh&ouml;rigkeitsgef&uuml;hl und Identit&auml;t</div>
+                    <div><strong>3 das Pionier-Paradox:</strong> Kreative, die ein Viertel attraktiv machen, werden selbst durch steigende Preise verdrängt</div>
+                    <div><strong>4 die Mietpreisbremse:</strong> gesetzliche Regelung zur Begrenzung von Mietpreiserh&ouml;hungen</div>
+                    <div><strong>5 die soziale Erhaltungssatzung:</strong> Instrument zum Schutz von Wohnvierteln vor &uuml;berlastenden Modernisierungen</div>
+                    <div><strong>6 das Recht auf Stadt:</strong> gesellschaftliche Forderung nach Teilhabe aller Bev&ouml;lkerungsgruppen am st&auml;dtischen Leben</div>
+                </div>
+            </div>
+
+            <div class="tasks-panel">
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">1</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 2&ndash;4 &mdash; Abschnitt 1</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4DD; Begriff erl&auml;utern</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erl&auml;utere den Begriff &bdquo;Gentrifizierung&ldquo; (Z.&nbsp;2&ndash;4)</strong> in eigenen Worten. Erkl&auml;re auch, woher der Begriff stammt und nenne eine konkrete Zahl aus dem Text.</p>
+                    <textarea class="stellungnahme-area" placeholder="Gentrifizierung bezeichnet den Prozess, durch den ...&#10;Der Begriff stammt aus dem Englischen und bedeutet ...&#10;Laut einer Studie ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('b1')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('b1')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-b1">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Gentrifizierung beschreibt den Prozess, durch den einkommensschwache Stadtteile saniert und aufgewertet werden, sodass sie f&uuml;r einkommensstärkere Bev&ouml;lkerungsgruppen attraktiv werden &ndash; w&auml;hrend die urspr&uuml;nglichen Bewohner verdrängt werden. Das Wort leitet sich vom englischen &bdquo;gentry&ldquo; ab, was &bdquo;Kleinadel&ldquo; bedeutet und auf die soziale Aufwertung anspielt. Laut einer DIW-Studie (2023) sind &uuml;ber 40 Prozent der Mietwohnungen in deutschen Gro&szlig;st&auml;dten davon bedroht (Z. 5&ndash;6).<br><br>
+                        <strong>Struktur:</strong> Prozess erkl&auml;ren &rarr; Wortherkunft nennen &rarr; Zahl aus Text einbauen
+                    </div>
+                    <div class="selfcheck-block" id="sc-b1">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b1')"> Ich habe den Prozess (Aufwertung + Verdr&auml;ngung) erkl&auml;rt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b1')"> Ich habe die Wortherkunft (&bdquo;gentry&ldquo;) erw&auml;hnt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b1')"> Ich habe die Zahl 40% aus dem Text verwendet.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b1')"> Ich habe eigene Formulierungen benutzt (nicht nur abgeschrieben).</label>
+                        <div class="selfcheck-score" id="score-b1"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#e8c547;color:#1a1100;">2</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Z. 17&ndash;18 &mdash; Abschnitt 3</span>
+                    </div>
+                    <div class="task-type-label">&#x1F4DD; Begriff erl&auml;utern</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erl&auml;utere den Begriff &bdquo;soziale Entwurzelung&ldquo; (Z.&nbsp;17&ndash;18)</strong> und erkl&auml;re, wen er laut Text betrifft und was er konkret bedeutet.</p>
+                    <textarea class="stellungnahme-area" placeholder="&#x201E;Soziale Entwurzelung&#x201C; bedeutet ...&#10;Betroffen sind laut Text ...&#10;Das &auml;u&szlig;ert sich darin, dass ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('b2')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('b2')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-b2">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        &bdquo;Soziale Entwurzelung&ldquo; beschreibt den Verlust von sozialen Bindungen, Zugeh&ouml;rigkeitsgef&uuml;hl und Identit&auml;t, der entsteht, wenn Menschen gezwungen sind, ihr vertrautes Viertel zu verlassen. Betroffen sind laut Text vor allem alteingesessene Bewohner wie Geringverdiener, Rentner und Migrantenfamilien (Z. 11&ndash;12), die durch steigende Mieten verdrängt werden. Sie verlieren nicht nur ihre Wohnung, sondern auch ihr soziales Netzwerk und ihre kulturelle Heimat (Z. 15&ndash;16) &ndash; und finden in der N&auml;he oft keine bezahlbare Alternative.<br><br>
+                        <strong>Struktur:</strong> Begriff definieren &rarr; betroffene Gruppen nennen &rarr; konkrete Verluste benennen
+                    </div>
+                    <div class="selfcheck-block" id="sc-b2">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b2')"> Ich habe den Begriff klar definiert (Verlust von Bindungen, Identit&auml;t).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b2')"> Ich habe konkrete betroffene Gruppen aus dem Text genannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b2')"> Ich habe mehrere Verluste beschrieben (Wohnung + Netzwerk + Heimat).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b2')"> Meine Antwort ist vollst&auml;ndig und klar strukturiert.</label>
+                        <div class="selfcheck-score" id="score-b2"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#9b59b6;color:#fff;">3</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 4</span>
+                    </div>
+                    <div class="task-type-label">&#x1F50D; Ph&auml;nomen erkl&auml;ren</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erkl&auml;re das &bdquo;Pionier-Paradox&ldquo; (Z.&nbsp;22)</strong>: Was ist paradox daran? Beschreibe den Ablauf in eigenen Worten.</p>
+                    <textarea class="stellungnahme-area" placeholder="Das Pionier-Paradox beschreibt die Situation, in der ...&#10;Das Paradoxe daran ist, dass ...&#10;Der Ablauf l&#228;sst sich so beschreiben: ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('b3')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('b3')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-b3">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Das Pionier-Paradox bezeichnet die widersprüchliche Situation, dass genau die Menschen, die ein Viertel durch ihre Kreativit&auml;t attraktiv gemacht haben, am Ende selbst verdrängt werden. Der Ablauf: K&uuml;nstler und kreative Berufsgruppen ziehen in g&uuml;nstige Stadtteile, beleben sie kulturell &ndash; das Viertel wird &bdquo;hip&ldquo;. Steigende Mieten folgen. Die Pioniere, die diesen Prozess ausg&ouml;lst haben, k&ouml;nnen die neuen Preise nicht mehr bezahlen und m&uuml;ssen weiterziehen (Z. 19&ndash;23). Das Paradoxe: Sie sind Ursache und erstes Opfer zugleich.<br><br>
+                        <strong>Struktur:</strong> Ph&auml;nomen benennen &rarr; Ablauf schildern &rarr; das Paradoxe explizit benennen
+                    </div>
+                    <div class="selfcheck-block" id="sc-b3">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b3')"> Ich habe erkl&auml;rt, wer die &bdquo;Pioniere&ldquo; sind.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b3')"> Ich habe den Ablauf des Paradoxes beschrieben (Ursache &rarr; Folge).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b3')"> Ich habe klar formuliert, was das Paradoxe daran ist (Ursache = Opfer).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b3')"> Ich habe Bezug auf den Text genommen (Z. 19&ndash;23).</label>
+                        <div class="selfcheck-score" id="score-b3"></div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#1abc9c;color:#fff;">4</span>
+                        <span style="font-size:0.75rem;color:var(--color-text-muted);">Abschnitt 5</span>
+                    </div>
+                    <div class="task-type-label">&#x2696;&#xFE0F; Position erkl&auml;ren</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.4rem;"><strong>Erkl&auml;re die Kritik an der Mietpreisbremse</strong> (Abschnitt 5). Was argumentieren die Kritiker, und worin liegt laut Text das eigentliche Problem?</p>
+                    <textarea class="stellungnahme-area" placeholder="Die Kritiker der Mietpreisbremse argumentieren, dass ...&#10;Das eigentliche Problem laut Text ist ...&#10;Sie behaupten, dass die Mietpreisbremse ..." rows="4"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('b4')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('b4')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-b4">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Kritiker der Mietpreisbremse argumentieren, dass sie das eigentliche Problem nicht l&ouml;se: mangelnden Neubau von Wohnungen. Stattdessen bek&auml;mpfe sie nur Symptome &ndash; steigende Mieten bei Bestandsvertr&auml;gen &ndash; ohne die Ursache anzugehen. Zus&auml;tzlich bef&uuml;rchten sie, dass strenge Mietregulierungen Investoren abschrecken, weniger gebaut wird und der Wohnungsmangel sich langfristig verschlimmert (Z. 28&ndash;30). Das eigentliche Problem ist demnach eine zu geringe Neubaurate, nicht das Mietpreissystem allein.<br><br>
+                        <strong>Struktur:</strong> Kritikerposition darstellen &rarr; Kernargument (Neubau) &rarr; Nebenargument (Investorenabschreckung) &rarr; Fazit
+                    </div>
+                    <div class="selfcheck-block" id="sc-b4">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b4')"> Ich habe das Hauptargument der Kritiker (Neubau fehlt) benannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b4')"> Ich habe den Unterschied zwischen Symptom und Ursache erkl&auml;rt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b4')"> Ich habe das Argument der Investorenabschreckung erw&auml;hnt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b4')"> Ich habe Bezug auf konkrete Textstellen genommen.</label>
+                        <div class="selfcheck-score" id="score-b4"></div>
+                    </div>
+                </div>
+
+                <div class="task-card" style="border-color:rgba(248,140,70,0.35);">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+                        <span class="task-num" style="background:#f88c46;color:#fff;">5</span>
+                    </div>
+                    <div class="task-type-label" style="color:#f88c46;">&#x1F5E3;&#xFE0F; Stellungnahme</div>
+                    <p style="font-size:0.88rem;margin:0 0 0.5rem;"><strong>St&auml;dteplannerin Sarah M&uuml;ller sagt (Z. 33&ndash;34):</strong></p>
+                    <blockquote style="border-left:3px solid rgba(248,140,70,0.5);padding:0.5rem 0.9rem;margin:0 0 0.7rem;font-style:italic;color:var(--color-text-muted);background:rgba(248,140,70,0.04);border-radius:0 8px 8px 0;font-size:0.88rem;">
+                        &bdquo;Eine Stadt, die nur noch f&uuml;r Wohlhabende bezahlbar ist, verliert ihre soziale Vielfalt und damit einen Teil ihrer Seele.&ldquo;
+                    </blockquote>
+                    <p style="font-size:0.85rem;margin:0 0 0.4rem;">Nimm Stellung zu dieser Aussage. Beziehe dich auf den Text und nenne eigene Argumente.</p>
+                    <textarea class="stellungnahme-area" placeholder="Ich stimme dieser Aussage [zu / nicht zu / teilweise zu], weil ...&#10;Der Text zeigt, dass ...&#10;Ich finde, dass ..." rows="5"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;">
+                        <button class="quiz-btn" onclick="showMA('b5')">&#x1F441; Musterantwort</button>
+                        <button class="quiz-btn" onclick="showCheck('b5')" style="border-color:rgba(68,147,248,0.3);color:var(--color-accent);">&#x2713; Selbst&uuml;berpr&uuml;fung</button>
+                    </div>
+                    <div class="muster-block" id="ma-b5">
+                        <strong>&#x2705; Musterantwort:</strong><br>
+                        Ich stimme dieser Aussage zu. Der Text zeigt deutlich, dass Gentrifizierung nicht nur eine Wohnungsfrage ist, sondern auch eine soziale: Alteingesessene Bewohner &ndash; Geringverdiener, Rentner, Migrantenfamilien &ndash; verlieren ihr soziales Netzwerk und ihre kulturelle Heimat (Z. 15&ndash;17). Wenn sie verdrängt werden, verliert das Viertel seinen ursprünglichen Charakter. Soziale Vielfalt bedeutet, dass Menschen verschiedener Einkommensgruppen, Hintergründe und Lebensstile zusammenleben &ndash; und genau das macht eine Stadt lebendig. Eine Stadt, in der nur Wohlhabende wohnen können, ist homogen und verliert kulturelle Impulse, die oft gerade von kreativen, einkommensschwächeren Gruppen kommen.
+                        <hr style="border-color:rgba(255,255,255,0.1);margin:0.7rem 0;">
+                        <strong>Struktur:</strong> Zustimmung erkl&auml;ren &rarr; Textbeleg (soziale Folgen) &rarr; eigene Begr&uuml;ndung (was Vielfalt bedeutet) &rarr; Schlussgedanke
+                    </div>
+                    <div class="selfcheck-block" id="sc-b5">
+                        <div class="selfcheck-title">&#x1F4CB; Was habe ich richtig gemacht?</div>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b5')"> Ich habe meine Position klar zu Beginn genannt.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b5')"> Ich habe mindestens einen konkreten Textbeleg verwendet.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b5')"> Ich habe erkl&auml;rt, was &bdquo;soziale Vielfalt&ldquo; im Stadtkontext bedeutet.</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b5')"> Ich habe einen eigenen Gedanken eingebracht (nicht nur Textzusammenfassung).</label>
+                        <label class="selfcheck-item"><input type="checkbox" onchange="updateScore('b5')"> Meine Antwort hat eine klare Struktur mit Schlussgedanken.</label>
+                        <div class="selfcheck-score" id="score-b5"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- end page-content -->
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        let activeTab = 'a';
+
+        function switchTab(t) {
+            activeTab = t;
+            document.getElementById('wrap-a').style.display = t === 'a' ? 'grid' : 'none';
+            document.getElementById('wrap-b').style.display = t === 'b' ? 'grid' : 'none';
+            document.querySelectorAll('.text-tab').forEach(el => el.classList.remove('active'));
+            document.querySelector('[data-topic="' + t + '"]').classList.add('active');
+        }
+
+        function showMA(id) {
+            const el = document.getElementById('ma-' + id);
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showCheck(id) {
+            const el = document.getElementById('sc-' + id);
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+            if (el.style.display === 'block') updateScore(id);
+        }
+
+        function updateScore(id) {
+            const sc = document.getElementById('sc-' + id);
+            const boxes = sc.querySelectorAll('input[type="checkbox"]');
+            const total = boxes.length;
+            const checked = Array.from(boxes).filter(b => b.checked).length;
+            const scoreEl = document.getElementById('score-' + id);
+            sc.querySelectorAll('.selfcheck-item').forEach(item => {
+                item.classList.toggle('checked', item.querySelector('input').checked);
+            });
+            if (checked === 0) {
+                scoreEl.textContent = '';
+            } else if (checked === total) {
+                scoreEl.textContent = '✅ Alles erfüllt — sehr gut!';
+                scoreEl.style.color = 'var(--color-green)';
+            } else {
+                scoreEl.textContent = checked + ' / ' + total + ' Kriterien erfüllt';
+                scoreEl.style.color = checked >= total - 1 ? '#e8c547' : 'var(--color-text-muted)';
+            }
+        }
+    </script>
+</body>
+</html>

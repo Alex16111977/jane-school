@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prüfungstrainer Englisch | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .trainer-text {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            line-height: 1.85;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid rgba(163,113,247,0.5);
+        }
+        .trainer-text p { margin: 0.5rem 0; }
+        .trainer-text p:first-child { margin-top: 0; }
+        .trainer-text p:last-child { margin-bottom: 0; }
+
+        .q-block {
+            background: rgba(13,17,23,0.7);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        .q-block.correct { border-color: rgba(63,185,80,0.5); background: rgba(63,185,80,0.05); }
+        .q-block.wrong   { border-color: rgba(248,81,73,0.5);  background: rgba(248,81,73,0.05); }
+
+        .q-num {
+            font-size: 0.78rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .q-text {
+            font-weight: 600;
+            font-size: 0.98rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+
+        /* Multiple choice */
+        .mc-options { display: flex; flex-direction: column; gap: 0.4rem; }
+        .mc-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            text-align: left;
+            color: var(--color-text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .mc-btn:hover:not(:disabled) { border-color: rgba(163,113,247,0.5); background: rgba(163,113,247,0.08); }
+        .mc-btn.selected-correct { border-color: #3fb950; background: rgba(63,185,80,0.12); color: #3fb950; font-weight: 600; }
+        .mc-btn.selected-wrong   { border-color: #f85149; background: rgba(248,81,73,0.12); color: #f85149; }
+        .mc-btn.show-correct     { border-color: #3fb950; background: rgba(63,185,80,0.08); color: #3fb950; }
+        .mc-btn:disabled { cursor: default; opacity: 0.7; }
+
+        /* True/False/NIT */
+        .tf-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tf-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 0.5rem 1.1rem;
+            color: var(--color-text);
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 600;
+        }
+        .tf-btn:hover:not(:disabled) { border-color: rgba(163,113,247,0.5); background: rgba(163,113,247,0.08); }
+        .tf-btn.selected-correct { border-color: #3fb950; background: rgba(63,185,80,0.15); color: #3fb950; }
+        .tf-btn.selected-wrong   { border-color: #f85149; background: rgba(248,81,73,0.15); color: #f85149; }
+        .tf-btn.show-correct     { border-color: #3fb950; background: rgba(63,185,80,0.08); color: #3fb950; }
+        .tf-btn:disabled { cursor: default; }
+
+        /* Feedback */
+        .q-feedback {
+            display: none;
+            margin-top: 0.7rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 7px;
+            font-size: 0.87rem;
+            line-height: 1.5;
+        }
+        .q-feedback.correct { background: rgba(63,185,80,0.1); color: #3fb950; border: 1px solid rgba(63,185,80,0.2); }
+        .q-feedback.wrong   { background: rgba(248,81,73,0.1); color: #f85149; border: 1px solid rgba(248,81,73,0.2); }
+
+        /* Score bar */
+        .score-bar {
+            position: sticky;
+            top: 60px;
+            z-index: 40;
+            background: rgba(10,10,20,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.7rem 0;
+            margin: 0 -1rem 1.5rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .score-label { font-size: 0.85rem; color: var(--color-text-muted); white-space: nowrap; }
+        .score-num { font-weight: 700; font-size: 1.05rem; color: var(--color-accent); min-width: 2.5rem; }
+        .score-track { flex: 1; height: 7px; background: rgba(255,255,255,0.07); border-radius: 6px; overflow: hidden; }
+        .score-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--color-accent), #3fb950); transition: width 0.4s ease; width: 0%; }
+
+        /* Text selector */
+        .text-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .text-tab {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 0.45rem 1rem;
+            color: var(--color-text-muted);
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .text-tab.active {
+            background: rgba(163,113,247,0.15);
+            border-color: rgba(163,113,247,0.5);
+            color: var(--color-text);
+            font-weight: 600;
+        }
+        .text-panel { display: none; }
+        .text-panel.active { display: block; }
+
+        .reset-btn {
+            background: rgba(163,113,247,0.15);
+            border: 1px solid rgba(163,113,247,0.4);
+            border-radius: 8px;
+            padding: 0.45rem 1.1rem;
+            color: #a371f7;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 600;
+        }
+        .reset-btn:hover { background: rgba(163,113,247,0.25); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Pr&uuml;fungstrainer</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Pr&uuml;fungstrainer &mdash; Reading</h1>
+            <p class="page-subtitle">Text lesen &rarr; Fragen l&ouml;sen &rarr; Sofort-Feedback</p>
+        </div>
+
+        <!-- Score bar -->
+        <div class="score-bar">
+            <span class="score-label">Punkte:</span>
+            <span class="score-num" id="scoreDisplay">0 / 0</span>
+            <div class="score-track"><div class="score-fill" id="scoreFill"></div></div>
+            <button class="reset-btn" onclick="resetAll()">&#x21BA; Reset</button>
+        </div>
+
+        <div class="note-card highlight-card" style="margin-bottom:1.5rem;">
+            <p><strong class="accent">So &uuml;bst du:</strong> Lies den Text &rarr; beantworte die Fragen &rarr; du siehst sofort ob es richtig ist &amp; warum. <span style="color:var(--color-text-muted); font-size:0.85rem;">(нажми на вариант — сразу увидишь правильно или нет)</span></p>
+        </div>
+
+        <!-- Text selector -->
+        <div class="text-selector">
+            <button class="text-tab active" onclick="switchText(0, this)">Text 1 &mdash; Social Media</button>
+            <button class="text-tab" onclick="switchText(1, this)">Text 2 &mdash; Environment</button>
+            <button class="text-tab" onclick="switchText(2, this)">Text 3 &mdash; School &amp; Jobs</button>
+        </div>
+
+        <!-- ===================== TEXT 1 ===================== -->
+        <div class="text-panel active" id="panel-0">
+            <div class="trainer-text">
+                <p><strong>Is Social Media Making Us Lonely?</strong></p>
+                <p>More and more young people spend hours every day on social media platforms like Instagram, TikTok and Snapchat. While these apps help people stay connected, some experts believe they may also make us feel more lonely.</p>
+                <p>Dr Sarah Miller, a psychologist from London, explains: &ldquo;When young people compare their lives to the perfect photos they see online, they often feel that their own lives are boring or not good enough. This can lead to feelings of sadness and loneliness, even when they have hundreds of online friends.&rdquo;</p>
+                <p>However, not everyone agrees. A recent study showed that teenagers who use social media to <em>actively</em> communicate &mdash; by messaging friends or joining interest groups &mdash; reported feeling more connected. The problem seems to be <em>passive</em> use: just scrolling and watching without interacting.</p>
+                <p>Many schools in Germany and the UK have now introduced &ldquo;phone-free&rdquo; breaks during the school day to help students focus and talk to each other face-to-face.</p>
+            </div>
+
+            <div id="questions-0">
+                <!-- Q1 MC -->
+                <div class="q-block" id="q0-1">
+                    <div class="q-num">Question 1 &mdash; Multiple Choice</div>
+                    <div class="q-text">According to Dr Sarah Miller, why can social media make young people feel lonely?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q0-1','A','B')">A) Because they spend too much time on their phones instead of sleeping.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-1','B','B')">B) Because they compare their lives to perfect images online and feel their own lives are not good enough.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-1','C','B')">C) Because social media is too expensive for most teenagers.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-1','D','B')">D) Because their parents do not allow them to use social media.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q0-1"></div>
+                </div>
+
+                <!-- Q2 TF -->
+                <div class="q-block" id="q0-2">
+                    <div class="q-num">Question 2 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">The study mentioned in the text showed that all social media use leads to loneliness.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q0-2','True','False')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-2','False','False')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-2','NIT','False')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q0-2"></div>
+                </div>
+
+                <!-- Q3 TF -->
+                <div class="q-block" id="q0-3">
+                    <div class="q-num">Question 3 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Some schools have stopped students from using phones during the entire school day.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q0-3','True','NIT')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-3','False','NIT')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-3','NIT','NIT')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q0-3"></div>
+                </div>
+
+                <!-- Q4 MC -->
+                <div class="q-block" id="q0-4">
+                    <div class="q-num">Question 4 &mdash; Multiple Choice</div>
+                    <div class="q-text">What kind of social media use is described as <em>positive</em> in the text?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q0-4','A','A')">A) Actively messaging friends or joining interest groups.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-4','B','A')">B) Scrolling through photos for at least two hours a day.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-4','C','A')">C) Posting perfect pictures to get many likes.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q0-4','D','A')">D) Watching videos without commenting.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q0-4"></div>
+                </div>
+
+                <!-- Q5 TF -->
+                <div class="q-block" id="q0-5">
+                    <div class="q-num">Question 5 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Dr Sarah Miller works at a university in the United States.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q0-5','True','False')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-5','False','False')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q0-5','NIT','False')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q0-5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TEXT 2 ===================== -->
+        <div class="text-panel" id="panel-1">
+            <div class="trainer-text">
+                <p><strong>Young People and Climate Change</strong></p>
+                <p>Climate change is one of the most talked-about topics among young people today. A 2024 survey of 10,000 teenagers across Europe found that 78% are worried about the future of the planet. Many say they feel frustrated because adults are not doing enough.</p>
+                <p>Sixteen-year-old Lena from Cologne says: &ldquo;I try to live more sustainably &mdash; I cycle instead of taking the car, I eat less meat and I buy second-hand clothes. But it feels like small steps when big companies keep polluting.&rdquo;</p>
+                <p>Schools are reacting too. In many German states, climate education is now a mandatory part of the curriculum from Year 5 onwards. Students learn about renewable energy, recycling, and how individual choices affect the environment.</p>
+                <p>Despite the worries, experts say young people should not lose hope. According to environmental scientist Dr James Park, &ldquo;The changes that happen now will be decided by the young generation. Their voices in politics and business matter more than ever.&rdquo;</p>
+            </div>
+
+            <div id="questions-1">
+                <!-- Q1 -->
+                <div class="q-block" id="q1-1">
+                    <div class="q-num">Question 1 &mdash; Multiple Choice</div>
+                    <div class="q-text">What did the 2024 survey find about European teenagers?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q1-1','A','C')">A) Most teenagers do not care about climate change.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-1','B','C')">B) Teenagers are happy with what adults are doing about the environment.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-1','C','C')">C) Nearly 8 out of 10 teenagers are worried about the planet's future.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-1','D','C')">D) Teenagers prefer to learn about climate change online.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q1-1"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="q-block" id="q1-2">
+                    <div class="q-num">Question 2 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Lena buys all her clothes in new shops because she cares about fashion.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q1-2','True','False')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-2','False','False')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-2','NIT','False')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q1-2"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="q-block" id="q1-3">
+                    <div class="q-num">Question 3 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Climate education became part of the German school curriculum in 2020.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q1-3','True','NIT')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-3','False','NIT')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-3','NIT','NIT')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q1-3"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="q-block" id="q1-4">
+                    <div class="q-num">Question 4 &mdash; Multiple Choice</div>
+                    <div class="q-text">What does Dr James Park say about young people?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q1-4','A','B')">A) They should leave the decisions to older politicians.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-4','B','B')">B) Their voices in politics and business are very important.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-4','C','B')">C) They are too young to understand environmental issues.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q1-4','D','B')">D) They should focus on school and not worry about climate change.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q1-4"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="q-block" id="q1-5">
+                    <div class="q-num">Question 5 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Lena feels that her personal actions alone are enough to stop climate change.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q1-5','True','False')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-5','False','False')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q1-5','NIT','False')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q1-5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TEXT 3 ===================== -->
+        <div class="text-panel" id="panel-2">
+            <div class="trainer-text">
+                <p><strong>From School to Work: What Do Employers Want?</strong></p>
+                <p>Getting your first job after school can feel overwhelming. But what do employers actually look for in young applicants? According to a recent survey of over 500 German companies, the top three things employers want are: good communication skills, reliability, and the ability to work in a team.</p>
+                <p>Interestingly, having perfect grades was ranked only fifth on the list. &ldquo;We can teach someone the technical skills of a job,&rdquo; says HR manager Klaus Berger from a Munich tech company, &ldquo;but we can&rsquo;t easily teach someone to be punctual, honest or to work well with others.&rdquo;</p>
+                <p>For young people preparing for the job market, experts recommend doing internships (&ldquo;Praktikum&rdquo;) as early as possible. An internship gives you real experience and shows employers that you are motivated. Many companies in Germany even offer apprenticeships (&ldquo;Ausbildung&rdquo;) which combine work and school.</p>
+                <p>The job market is changing fast. Skills like digital literacy, creativity and problem-solving are becoming more and more important &mdash; especially as artificial intelligence starts to take over routine tasks.</p>
+            </div>
+
+            <div id="questions-2">
+                <!-- Q1 -->
+                <div class="q-block" id="q2-1">
+                    <div class="q-num">Question 1 &mdash; Multiple Choice</div>
+                    <div class="q-text">According to the survey, what is the most important quality employers look for?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q2-1','A','A')">A) Good communication skills.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-1','B','A')">B) Perfect school grades.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-1','C','A')">C) Experience with artificial intelligence.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-1','D','A')">D) A university degree.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q2-1"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="q-block" id="q2-2">
+                    <div class="q-num">Question 2 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">Klaus Berger says that grades are the most important factor when hiring young people.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q2-2','True','False')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-2','False','False')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-2','NIT','False')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q2-2"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="q-block" id="q2-3">
+                    <div class="q-num">Question 3 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">An &ldquo;Ausbildung&rdquo; combines working and going to school at the same time.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q2-3','True','True')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-3','False','True')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-3','NIT','True')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q2-3"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="q-block" id="q2-4">
+                    <div class="q-num">Question 4 &mdash; Multiple Choice</div>
+                    <div class="q-text">Why are skills like creativity and problem-solving becoming more important?</div>
+                    <div class="mc-options">
+                        <button class="mc-btn" onclick="checkMC(this,'q2-4','A','D')">A) Because schools no longer teach mathematics.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-4','B','D')">B) Because employers prefer creative people over reliable ones.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-4','C','D')">C) Because internships require these skills.</button>
+                        <button class="mc-btn" onclick="checkMC(this,'q2-4','D','D')">D) Because artificial intelligence is taking over routine tasks.</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q2-4"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="q-block" id="q2-5">
+                    <div class="q-num">Question 5 &mdash; True / False / Not in the text</div>
+                    <div class="q-text">The survey mentioned in the text was conducted in over 10 different countries.</div>
+                    <div class="tf-options">
+                        <button class="tf-btn" onclick="checkTF(this,'q2-5','True','NIT')">True</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-5','False','NIT')">False</button>
+                        <button class="tf-btn" onclick="checkTF(this,'q2-5','NIT','NIT')">Not in the text</button>
+                    </div>
+                    <div class="q-feedback" id="fb-q2-5"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        // Score tracking
+        let answered = {};   // qId -> true/false
+        let correct  = 0;
+        let total    = 0;
+
+        function updateScore() {
+            const pct = total === 0 ? 0 : Math.round(correct / total * 100);
+            document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+            document.getElementById('scoreFill').style.width = pct + '%';
+        }
+
+        function checkMC(btn, qId, chosen, answer) {
+            if (answered[qId]) return;
+            answered[qId] = true;
+            total++;
+
+            const block = document.getElementById(qId);
+            const btns  = block.querySelectorAll('.mc-btn');
+            const fb    = document.getElementById('fb-' + qId);
+
+            btns.forEach(b => { b.disabled = true; });
+
+            if (chosen === answer) {
+                btn.classList.add('selected-correct');
+                block.classList.add('correct');
+                fb.textContent = '✓ Richtig!';
+                fb.classList.add('correct');
+                correct++;
+            } else {
+                btn.classList.add('selected-wrong');
+                block.classList.add('wrong');
+                btns.forEach(b => {
+                    if (b.getAttribute('onclick').includes("'" + answer + "','" + answer + "'")) {
+                        b.classList.add('show-correct');
+                    }
+                });
+                fb.textContent = '✗ Falsch. Die richtige Antwort ist ' + answer + '.';
+                fb.classList.add('wrong');
+            }
+            fb.style.display = 'block';
+            updateScore();
+        }
+
+        function checkTF(btn, qId, chosen, answer) {
+            if (answered[qId]) return;
+            answered[qId] = true;
+            total++;
+
+            const block = document.getElementById(qId);
+            const btns  = block.querySelectorAll('.tf-btn');
+            const fb    = document.getElementById('fb-' + qId);
+
+            btns.forEach(b => { b.disabled = true; });
+
+            const labels = { 'True': 'True', 'False': 'False', 'NIT': 'Not in the text' };
+
+            if (chosen === answer) {
+                btn.classList.add('selected-correct');
+                block.classList.add('correct');
+                fb.textContent = '✓ Richtig!';
+                fb.classList.add('correct');
+                correct++;
+            } else {
+                btn.classList.add('selected-wrong');
+                block.classList.add('wrong');
+                btns.forEach(b => {
+                    if (b.textContent.trim().startsWith(answer === 'NIT' ? 'Not' : answer)) {
+                        b.classList.add('show-correct');
+                    }
+                });
+                fb.textContent = '✗ Falsch. Richtig: ' + labels[answer] + '.';
+                fb.classList.add('wrong');
+            }
+            fb.style.display = 'block';
+            updateScore();
+        }
+
+        function switchText(idx, btn) {
+            document.querySelectorAll('.text-panel').forEach((p, i) => {
+                p.classList.toggle('active', i === idx);
+            });
+            document.querySelectorAll('.text-tab').forEach((t, i) => {
+                t.classList.toggle('active', i === idx);
+            });
+        }
+
+        function resetAll() {
+            answered = {};
+            correct  = 0;
+            total    = 0;
+            updateScore();
+
+            document.querySelectorAll('.q-block').forEach(b => {
+                b.className = 'q-block';
+            });
+            document.querySelectorAll('.mc-btn').forEach(b => {
+                b.className = 'mc-btn';
+                b.disabled = false;
+            });
+            document.querySelectorAll('.tf-btn').forEach(b => {
+                b.className = 'tf-btn';
+                b.disabled = false;
+            });
+            document.querySelectorAll('.q-feedback').forEach(f => {
+                f.style.display = 'none';
+                f.className = 'q-feedback';
+                f.textContent = '';
+            });
+        }
+    </script>
+</body>
+</html>
