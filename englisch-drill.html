@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drill List | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .day-pill {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.7rem;
+            border-radius: 14px;
+            background: #f1c40f;
+            color: #0a0a14;
+            margin-bottom: 0.5rem;
+        }
+
+        .drill-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .drill-table th, .drill-table td {
+            padding: 0.5rem 0.7rem;
+            border: 1px solid rgba(255,255,255,0.07);
+            text-align: left;
+            vertical-align: top;
+        }
+        .drill-table th {
+            background: rgba(255,255,255,0.04);
+            font-weight: 700;
+            font-size: 0.83rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+        }
+        .drill-table td.en {
+            font-weight: 700;
+            font-family: 'Georgia', serif;
+            color: #58a6ff;
+        }
+        .drill-table td.ru { color: var(--color-text-muted); }
+        .drill-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+        .priority {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-right: 0.3rem;
+        }
+        .p1 { background: #f85149; color: #fff; }
+        .p2 { background: #f1c40f; color: #0a0a14; }
+        .p3 { background: rgba(255,255,255,0.1); color: var(--color-text-muted); }
+
+        .group-header {
+            background: linear-gradient(135deg, rgba(163,113,247,0.15), rgba(163,113,247,0.04));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-left: 4px solid #a371f7;
+            border-radius: 10px;
+            padding: 0.8rem 1.1rem;
+            margin: 1.2rem 0 0.5rem;
+        }
+        .group-header h3 {
+            margin: 0;
+            color: #a371f7;
+            font-size: 1.05rem;
+        }
+        .group-header p {
+            margin: 0.25rem 0 0;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 0.6rem;
+        }
+        .stat-pill {
+            background: rgba(63,185,80,0.1);
+            border: 1px solid rgba(63,185,80,0.3);
+            color: #3fb950;
+            padding: 0.25rem 0.7rem;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .day-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 4px solid #58a6ff;
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin: 0.7rem 0;
+        }
+        .day-card h3 { margin: 0 0 0.4rem; color: #58a6ff; font-size: 1rem; }
+        .day-card .day-tag {
+            display: inline-block;
+            background: #58a6ff;
+            color: #0a0a14;
+            font-weight: 800;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 10px;
+            margin-right: 0.4rem;
+            letter-spacing: 0.05em;
+        }
+        .day-card ul { margin: 0.4rem 0 0; padding-left: 1.3rem; line-height: 1.85; font-size: 0.9rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Drill List</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Drill List &mdash; 6 дней до ZP10</h1>
+            <p class="page-subtitle">Только то, что реально нужно. ~150 единиц = твой максимум на A2.</p>
+        </div>
+
+        <div class="note-card highlight-card" style="border-color:rgba(241,196,15,0.4); background:rgba(241,196,15,0.06);">
+            <p style="margin:0;"><strong style="color:#f1c40f;">&#x1F3AF; Принцип:</strong> ты не выучишь 2000 слов за 6 дней. Но <strong>150 правильно подобранных</strong> &mdash; реально. И они дадут больше баллов, чем 500 случайных. Каждая категория сортирована: <span class="priority p1">P1</span> &mdash; обязательно, <span class="priority p2">P2</span> &mdash; если успеешь, <span class="priority p3">P3</span> &mdash; для красоты.</p>
+        </div>
+
+        <!-- ============ 6-DAY PLAN ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4C5;</span>
+                    <div>
+                        <h2>План на 6 дней &mdash; что зубрить когда</h2>
+                    </div>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 1</span>Connectors + Writing-фразы (~40 единиц)</h3>
+                    <ul>
+                        <li>20 Connectors (раздел №1)</li>
+                        <li>20 Writing Magic Phrases (раздел №2)</li>
+                    </ul>
+                    <p style="margin:0.4rem 0 0; font-size:0.85rem; color:var(--color-text-muted);">&#x1F4A1; Это даёт <strong>+3-5 баллов</strong> в Writing сразу.</p>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 2</span>Collocations + Phrasal Verbs (~50 единиц)</h3>
+                    <ul>
+                        <li>30 Collocations (раздел №3) &mdash; do/make/take/have</li>
+                        <li>20 Phrasal Verbs (раздел №4)</li>
+                    </ul>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 3</span>Character + Emotion Adjectives (~30 единиц)</h3>
+                    <ul>
+                        <li>15 Character adjectives (раздел №5)</li>
+                        <li>15 Emotion adjectives (раздел №6)</li>
+                    </ul>
+                    <p style="margin:0.4rem 0 0; font-size:0.85rem; color:var(--color-text-muted);">&#x1F4A1; Нужно для <strong>Explain</strong>-задания и <strong>Story</strong>.</p>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 4</span>Темы ZP10 (~40 единиц)</h3>
+                    <ul>
+                        <li>Bezugskulturen / Migration (раздел №7)</li>
+                        <li>School / Future (раздел №8)</li>
+                        <li>Media / Social Media (раздел №9)</li>
+                    </ul>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 5</span>Confusion Pairs + Listening Tricks</h3>
+                    <ul>
+                        <li>20 Confusion Pairs (раздел №10) &mdash; do/make, say/tell, lend/borrow</li>
+                        <li>Numbers, dates, spellings (раздел №11) &mdash; для Listening</li>
+                    </ul>
+                </div>
+
+                <div class="day-card">
+                    <h3><span class="day-tag">DAY 6</span>Повтор всего + Mock</h3>
+                    <ul>
+                        <li>Прогон всех разделов по 10 минут</li>
+                        <li>Полный пробник ZP 2024</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 1. CONNECTORS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>1. Connectors &mdash; 20 must-have</h2>
+                        <p class="lesson-header-sub">Без них Writing на A2 не выйдет за 6/12</p>
+                    </div>
+                </div>
+
+                <div class="group-header">
+                    <h3>Добавление / последовательность</h3>
+                    <p>Используй когда перечисляешь</p>
+                </div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th style="width:35%;">English</th><th>Перевод</th><th style="width:35%;">В предложении</th></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>First of all</td><td class="ru">прежде всего</td><td><em>First of all, I think&hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Also / In addition</td><td class="ru">также</td><td><em>Also, many people&hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Moreover</td><td class="ru">кроме того</td><td><em>Moreover, it is cheaper.</em></td></tr>
+                        <tr><td class="en"><span class="priority p2">P2</span>Furthermore</td><td class="ru">далее</td><td><em>Furthermore, the text says&hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Finally</td><td class="ru">наконец</td><td><em>Finally, I want to say&hellip;</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header">
+                    <h3>Противопоставление</h3>
+                    <p>Когда сравниваешь или показываешь обратное</p>
+                </div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th><th>В предложении</th></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>However</td><td class="ru">однако</td><td><em>However, some people disagree.</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>On the other hand</td><td class="ru">с другой стороны</td><td><em>On the other hand, it&rsquo;s expensive.</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Although</td><td class="ru">хотя</td><td><em>Although it&rsquo;s hard, I like it.</em></td></tr>
+                        <tr><td class="en"><span class="priority p2">P2</span>Despite</td><td class="ru">несмотря на</td><td><em>Despite the rain, we went out.</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header">
+                    <h3>Причина / следствие</h3>
+                </div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th><th>В предложении</th></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Because</td><td class="ru">потому что</td><td><em>I&rsquo;m happy because&hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>So</td><td class="ru">поэтому</td><td><em>It rained, so we stayed home.</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Therefore</td><td class="ru">следовательно</td><td><em>Therefore, we should act.</em></td></tr>
+                        <tr><td class="en"><span class="priority p2">P2</span>As a result</td><td class="ru">в результате</td><td><em>As a result, prices went up.</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header">
+                    <h3>Пример / завершение</h3>
+                </div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th><th>В предложении</th></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>For example / For instance</td><td class="ru">например</td><td><em>For example, in my school&hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>Such as</td><td class="ru">такие как</td><td><em>&hellip;sports such as football</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>In conclusion</td><td class="ru">в заключение</td><td><em>In conclusion, &hellip;</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>To sum up</td><td class="ru">подводя итог</td><td><em>To sum up, I agree.</em></td></tr>
+                        <tr><td class="en"><span class="priority p1">P1</span>All in all</td><td class="ru">в общем</td><td><em>All in all, it was good.</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="stat-row">
+                    <span class="stat-pill">5 connectors в эссе = +2 балла</span>
+                    <span class="stat-pill">в каждом абзаце хотя бы 1</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 2. WRITING MAGIC PHRASES ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2728;</span>
+                    <div>
+                        <h2>2. Writing Magic Phrases &mdash; 20 готовых</h2>
+                        <p class="lesson-header-sub">Заучи дословно &mdash; вставляй в любое сочинение</p>
+                    </div>
+                </div>
+
+                <div class="group-header"><h3>Начать эссе / описание</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrase</th><th>Когда использовать</th></tr>
+                        <tr><td class="en">The text is about&hellip;</td><td>любой пересказ / Summary</td></tr>
+                        <tr><td class="en">Nowadays, many people&hellip;</td><td>начало Comment / Article</td></tr>
+                        <tr><td class="en">In this text/story, &hellip;</td><td>начало анализа</td></tr>
+                        <tr><td class="en">Have you ever wondered&hellip;?</td><td>Article / Blog &mdash; зацепить читателя</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>Выразить мнение</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrase</th><th>Перевод</th></tr>
+                        <tr><td class="en">In my opinion, &hellip;</td><td>По-моему</td></tr>
+                        <tr><td class="en">I think that &hellip;</td><td>Я думаю что</td></tr>
+                        <tr><td class="en">I am convinced that &hellip;</td><td>Я убеждён что</td></tr>
+                        <tr><td class="en">From my point of view, &hellip;</td><td>С моей точки зрения</td></tr>
+                        <tr><td class="en">It seems to me that &hellip;</td><td>Мне кажется</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>Аргументы &laquo;за&raquo;</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrase</th><th>Перевод</th></tr>
+                        <tr><td class="en">One advantage is that &hellip;</td><td>Одно преимущество</td></tr>
+                        <tr><td class="en">A good point is that &hellip;</td><td>Хорошо то что</td></tr>
+                        <tr><td class="en">This shows that &hellip;</td><td>Это показывает что (для Explain!)</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>Аргументы &laquo;против&raquo;</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrase</th><th>Перевод</th></tr>
+                        <tr><td class="en">One disadvantage is that &hellip;</td><td>Один минус</td></tr>
+                        <tr><td class="en">The problem is that &hellip;</td><td>Проблема в том что</td></tr>
+                        <tr><td class="en">Critics say that &hellip;</td><td>Критики говорят</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>Завершение</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrase</th><th>Перевод</th></tr>
+                        <tr><td class="en">All in all, &hellip;</td><td>В общем</td></tr>
+                        <tr><td class="en">To sum up, &hellip;</td><td>Подводя итог</td></tr>
+                        <tr><td class="en">In conclusion, &hellip;</td><td>В заключение</td></tr>
+                        <tr><td class="en">For all these reasons, I believe&hellip;</td><td>По этим причинам</td></tr>
+                        <tr><td class="en">That is why &hellip;</td><td>Вот почему</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 3. COLLOCATIONS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>3. Collocations &mdash; do / make / take / have / get</h2>
+                        <p class="lesson-header-sub">Слова не идут в одиночку. Учи парами!</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Главное правило:</strong> учи английский <strong>фразами</strong>, не словами. &laquo;Make a photo&raquo; &mdash; <strong>WRONG</strong>. &laquo;Take a photo&raquo; &mdash; правильно. На A2 за это снимают баллы.</p>
+                </div>
+
+                <div class="group-header"><h3>DO &mdash; для обязанностей и активностей</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Collocation</th><th>Перевод</th></tr>
+                        <tr><td class="en">do homework</td><td class="ru">делать домашку</td></tr>
+                        <tr><td class="en">do the shopping</td><td class="ru">ходить за покупками</td></tr>
+                        <tr><td class="en">do the washing-up</td><td class="ru">мыть посуду</td></tr>
+                        <tr><td class="en">do sport / exercise</td><td class="ru">заниматься спортом</td></tr>
+                        <tr><td class="en">do your best</td><td class="ru">стараться</td></tr>
+                        <tr><td class="en">do a job / a course</td><td class="ru">работу / курс</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>MAKE &mdash; для создания и решений</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Collocation</th><th>Перевод</th></tr>
+                        <tr><td class="en">make a decision</td><td class="ru">принимать решение</td></tr>
+                        <tr><td class="en">make a mistake</td><td class="ru">совершать ошибку</td></tr>
+                        <tr><td class="en">make friends</td><td class="ru">подружиться</td></tr>
+                        <tr><td class="en">make a phone call</td><td class="ru">позвонить</td></tr>
+                        <tr><td class="en">make noise</td><td class="ru">шуметь</td></tr>
+                        <tr><td class="en">make an effort</td><td class="ru">постараться</td></tr>
+                        <tr><td class="en">make sense</td><td class="ru">иметь смысл</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>TAKE &mdash; брать / делать действие</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Collocation</th><th>Перевод</th></tr>
+                        <tr><td class="en">take a photo</td><td class="ru">сделать фото</td></tr>
+                        <tr><td class="en">take a break</td><td class="ru">сделать перерыв</td></tr>
+                        <tr><td class="en">take a shower</td><td class="ru">принять душ</td></tr>
+                        <tr><td class="en">take an exam</td><td class="ru">сдавать экзамен</td></tr>
+                        <tr><td class="en">take part in</td><td class="ru">участвовать</td></tr>
+                        <tr><td class="en">take care of</td><td class="ru">заботиться о</td></tr>
+                        <tr><td class="en">take the bus / train</td><td class="ru">сесть на автобус/поезд</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>HAVE &mdash; для опыта и активностей</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Collocation</th><th>Перевод</th></tr>
+                        <tr><td class="en">have breakfast / lunch / dinner</td><td class="ru">завтракать / обедать / ужинать</td></tr>
+                        <tr><td class="en">have fun</td><td class="ru">веселиться</td></tr>
+                        <tr><td class="en">have a chance</td><td class="ru">иметь шанс</td></tr>
+                        <tr><td class="en">have a problem</td><td class="ru">иметь проблему</td></tr>
+                        <tr><td class="en">have a conversation</td><td class="ru">разговаривать</td></tr>
+                    </table>
+                </div>
+
+                <div class="group-header"><h3>GET &mdash; получать / становиться</h3></div>
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Collocation</th><th>Перевод</th></tr>
+                        <tr><td class="en">get a job</td><td class="ru">найти работу</td></tr>
+                        <tr><td class="en">get an email / a message</td><td class="ru">получить письмо</td></tr>
+                        <tr><td class="en">get angry / sad / tired</td><td class="ru">разозлиться / устать</td></tr>
+                        <tr><td class="en">get on / off the bus</td><td class="ru">войти / выйти</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 4. PHRASAL VERBS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F501;</span>
+                    <div>
+                        <h2>4. Phrasal Verbs &mdash; топ 20 для ZP10</h2>
+                        <p class="lesson-header-sub">Встречаются в Reading и Listening &mdash; обязательно знать</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Phrasal verb</th><th>Перевод</th><th>В предложении</th></tr>
+                        <tr><td class="en">get up</td><td class="ru">вставать</td><td><em>I get up at 7.</em></td></tr>
+                        <tr><td class="en">find out</td><td class="ru">узнать</td><td><em>I found out the truth.</em></td></tr>
+                        <tr><td class="en">give up</td><td class="ru">сдаваться</td><td><em>Don&rsquo;t give up!</em></td></tr>
+                        <tr><td class="en">grow up</td><td class="ru">расти, взрослеть</td><td><em>I grew up in Berlin.</em></td></tr>
+                        <tr><td class="en">look for</td><td class="ru">искать</td><td><em>I&rsquo;m looking for my keys.</em></td></tr>
+                        <tr><td class="en">look after</td><td class="ru">присматривать</td><td><em>She looks after her brother.</em></td></tr>
+                        <tr><td class="en">look forward to</td><td class="ru">ждать с нетерпением</td><td><em>I look forward to seeing you.</em></td></tr>
+                        <tr><td class="en">turn on / off</td><td class="ru">включать / выключать</td><td><em>Turn off the light.</em></td></tr>
+                        <tr><td class="en">turn up</td><td class="ru">появляться</td><td><em>He turned up late.</em></td></tr>
+                        <tr><td class="en">put on / take off</td><td class="ru">надевать / снимать</td><td><em>Put on your jacket.</em></td></tr>
+                        <tr><td class="en">pick up</td><td class="ru">забрать / поднять</td><td><em>I&rsquo;ll pick you up at 8.</em></td></tr>
+                        <tr><td class="en">come up with</td><td class="ru">придумать</td><td><em>She came up with an idea.</em></td></tr>
+                        <tr><td class="en">deal with</td><td class="ru">справляться с</td><td><em>How do you deal with stress?</em></td></tr>
+                        <tr><td class="en">find out about</td><td class="ru">узнать о</td><td><em>I want to find out about it.</em></td></tr>
+                        <tr><td class="en">run out of</td><td class="ru">заканчиваться</td><td><em>We ran out of milk.</em></td></tr>
+                        <tr><td class="en">hang out (with)</td><td class="ru">тусоваться с</td><td><em>I hang out with friends.</em></td></tr>
+                        <tr><td class="en">break down</td><td class="ru">сломаться</td><td><em>My car broke down.</em></td></tr>
+                        <tr><td class="en">get along with</td><td class="ru">ладить с</td><td><em>I get along with my sister.</em></td></tr>
+                        <tr><td class="en">point out</td><td class="ru">указать на</td><td><em>The text points out that&hellip;</em></td></tr>
+                        <tr><td class="en">bring up</td><td class="ru">воспитывать / поднять тему</td><td><em>She was brought up in&hellip;</em></td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 5. CHARACTER ADJECTIVES ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F464;</span>
+                    <div>
+                        <h2>5. Character Adjectives &mdash; 15 для Explain</h2>
+                        <p class="lesson-header-sub">Нужны когда тебя просят описать характер (как в ZP 2022!)</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Adjective</th><th>Перевод</th><th>Противоположное</th></tr>
+                        <tr><td class="en">kind</td><td class="ru">добрый</td><td>cruel / mean</td></tr>
+                        <tr><td class="en">friendly</td><td class="ru">дружелюбный</td><td>unfriendly</td></tr>
+                        <tr><td class="en">helpful</td><td class="ru">отзывчивый</td><td>selfish</td></tr>
+                        <tr><td class="en">caring</td><td class="ru">заботливый</td><td>cold / indifferent</td></tr>
+                        <tr><td class="en">brave</td><td class="ru">смелый</td><td>shy / scared</td></tr>
+                        <tr><td class="en">shy</td><td class="ru">стеснительный</td><td>outgoing</td></tr>
+                        <tr><td class="en">confident</td><td class="ru">уверенный</td><td>insecure</td></tr>
+                        <tr><td class="en">curious</td><td class="ru">любопытный</td><td>indifferent</td></tr>
+                        <tr><td class="en">honest</td><td class="ru">честный</td><td>dishonest</td></tr>
+                        <tr><td class="en">polite</td><td class="ru">вежливый</td><td>rude</td></tr>
+                        <tr><td class="en">open-minded</td><td class="ru">открытый к новому</td><td>narrow-minded</td></tr>
+                        <tr><td class="en">thoughtful</td><td class="ru">внимательный к другим</td><td>thoughtless</td></tr>
+                        <tr><td class="en">creative</td><td class="ru">творческий</td><td>boring</td></tr>
+                        <tr><td class="en">hard-working</td><td class="ru">трудолюбивый</td><td>lazy</td></tr>
+                        <tr><td class="en">responsible</td><td class="ru">ответственный</td><td>irresponsible</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x1F3AF; Шаблон для Explain:</strong> &laquo;Jaz is <strong>[adjective]</strong>. This is shown when she says &laquo;...&raquo;. <strong>This shows that</strong> she &hellip;&raquo;</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 6. EMOTION ADJECTIVES ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F60A;</span>
+                    <div>
+                        <h2>6. Emotion Adjectives &mdash; 15 для Story</h2>
+                        <p class="lesson-header-sub">Используй вместо &laquo;happy/sad&raquo; &mdash; экзаменатор оценит</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Слабо</th><th>Сильнее (= больше баллов)</th><th>Перевод</th></tr>
+                        <tr><td class="ru">happy</td><td class="en">pleased / delighted / thrilled</td><td>довольный / счастливый</td></tr>
+                        <tr><td class="ru">sad</td><td class="en">upset / disappointed / heartbroken</td><td>расстроенный / разочарованный</td></tr>
+                        <tr><td class="ru">scared</td><td class="en">nervous / anxious / terrified</td><td>нервный / напуганный</td></tr>
+                        <tr><td class="ru">tired</td><td class="en">exhausted / worn out</td><td>измотанный</td></tr>
+                        <tr><td class="ru">angry</td><td class="en">annoyed / furious / frustrated</td><td>раздражённый / в ярости</td></tr>
+                        <tr><td class="ru">surprised</td><td class="en">amazed / astonished / shocked</td><td>удивлённый / шокированный</td></tr>
+                        <tr><td class="ru">bored</td><td class="en">uninterested / fed up</td><td>скучающий / надоело</td></tr>
+                        <tr><td class="ru">excited</td><td class="en">enthusiastic / eager</td><td>воодушевлённый</td></tr>
+                        <tr><td class="ru">embarrassed</td><td class="en">ashamed</td><td>смущённый / стыдно</td></tr>
+                        <tr><td class="ru">confused</td><td class="en">puzzled</td><td>в замешательстве</td></tr>
+                        <tr><td class="ru">proud</td><td class="en">satisfied</td><td>гордый</td></tr>
+                        <tr><td class="ru">relieved</td><td class="en">relaxed</td><td>с облегчением</td></tr>
+                        <tr><td class="ru">disappointed</td><td class="en">let down</td><td>разочарованный</td></tr>
+                        <tr><td class="ru">lonely</td><td class="en">isolated</td><td>одинокий</td></tr>
+                        <tr><td class="ru">grateful</td><td class="en">thankful / appreciative</td><td>благодарный</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 7. BEZUGSKULTUREN ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F30D;</span>
+                    <div>
+                        <h2>7. Bezugskulturen / Migration &mdash; топ 15</h2>
+                        <p class="lesson-header-sub">Тема ZP 2022 &mdash; может вернуться</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th></tr>
+                        <tr><td class="en">culture</td><td class="ru">культура</td></tr>
+                        <tr><td class="en">tradition</td><td class="ru">традиция</td></tr>
+                        <tr><td class="en">background</td><td class="ru">происхождение, бэкграунд</td></tr>
+                        <tr><td class="en">to belong to</td><td class="ru">принадлежать к</td></tr>
+                        <tr><td class="en">refugee</td><td class="ru">беженец</td></tr>
+                        <tr><td class="en">to integrate</td><td class="ru">интегрироваться</td></tr>
+                        <tr><td class="en">prejudice</td><td class="ru">предрассудок</td></tr>
+                        <tr><td class="en">stereotype</td><td class="ru">стереотип</td></tr>
+                        <tr><td class="en">to feel at home</td><td class="ru">чувствовать себя как дома</td></tr>
+                        <tr><td class="en">native language / mother tongue</td><td class="ru">родной язык</td></tr>
+                        <tr><td class="en">to get used to</td><td class="ru">привыкать к</td></tr>
+                        <tr><td class="en">multicultural</td><td class="ru">мультикультурный</td></tr>
+                        <tr><td class="en">community</td><td class="ru">сообщество</td></tr>
+                        <tr><td class="en">to welcome</td><td class="ru">приветствовать, принимать</td></tr>
+                        <tr><td class="en">to share (food, customs)</td><td class="ru">делиться</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 8. SCHOOL & FUTURE ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3EB;</span>
+                    <div>
+                        <h2>8. School &amp; Future &mdash; 15 ключевых</h2>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th></tr>
+                        <tr><td class="en">graduate (from school)</td><td class="ru">окончить школу</td></tr>
+                        <tr><td class="en">apprenticeship</td><td class="ru">обучение профессии (Ausbildung)</td></tr>
+                        <tr><td class="en">internship</td><td class="ru">стажировка (Praktikum)</td></tr>
+                        <tr><td class="en">university / college</td><td class="ru">университет</td></tr>
+                        <tr><td class="en">degree</td><td class="ru">диплом / степень</td></tr>
+                        <tr><td class="en">subject</td><td class="ru">предмет</td></tr>
+                        <tr><td class="en">grade / mark</td><td class="ru">оценка</td></tr>
+                        <tr><td class="en">to pass / to fail an exam</td><td class="ru">сдать / провалить экзамен</td></tr>
+                        <tr><td class="en">career</td><td class="ru">карьера</td></tr>
+                        <tr><td class="en">to apply for a job</td><td class="ru">подавать заявку на работу</td></tr>
+                        <tr><td class="en">skills</td><td class="ru">навыки</td></tr>
+                        <tr><td class="en">qualifications</td><td class="ru">квалификация</td></tr>
+                        <tr><td class="en">to earn money</td><td class="ru">зарабатывать</td></tr>
+                        <tr><td class="en">to make a living</td><td class="ru">зарабатывать на жизнь</td></tr>
+                        <tr><td class="en">dream job</td><td class="ru">работа мечты</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 9. MEDIA & SOCIAL MEDIA ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4F1;</span>
+                    <div>
+                        <h2>9. Media &amp; Social Media &mdash; 15 ключевых</h2>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>English</th><th>Перевод</th></tr>
+                        <tr><td class="en">to post / to share</td><td class="ru">постить / делиться</td></tr>
+                        <tr><td class="en">to upload / to download</td><td class="ru">загружать (туда / сюда)</td></tr>
+                        <tr><td class="en">screen time</td><td class="ru">время за экраном</td></tr>
+                        <tr><td class="en">addicted to</td><td class="ru">зависимый от</td></tr>
+                        <tr><td class="en">influencer</td><td class="ru">инфлюенсер</td></tr>
+                        <tr><td class="en">follower / to follow</td><td class="ru">подписчик / подписаться</td></tr>
+                        <tr><td class="en">to scroll</td><td class="ru">листать</td></tr>
+                        <tr><td class="en">comment / to comment</td><td class="ru">комментарий</td></tr>
+                        <tr><td class="en">cyberbullying</td><td class="ru">травля онлайн</td></tr>
+                        <tr><td class="en">fake news</td><td class="ru">фейк-новости</td></tr>
+                        <tr><td class="en">privacy</td><td class="ru">приватность</td></tr>
+                        <tr><td class="en">data</td><td class="ru">данные</td></tr>
+                        <tr><td class="en">to spend time online</td><td class="ru">проводить время в сети</td></tr>
+                        <tr><td class="en">device</td><td class="ru">устройство</td></tr>
+                        <tr><td class="en">to log in / log out</td><td class="ru">войти / выйти</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 10. CONFUSION PAIRS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x26A0;&#xFE0F;</span>
+                    <div>
+                        <h2>10. Confusion Pairs &mdash; не путай эти 20</h2>
+                        <p class="lesson-header-sub">Здесь A2 теряет больше всего баллов в Writing</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Слова</th><th>Разница</th><th>Пример</th></tr>
+                        <tr><td class="en">do vs make</td><td>do = задачи / make = создавать</td><td><em>do homework, make a cake</em></td></tr>
+                        <tr><td class="en">say vs tell</td><td>say + что / tell + кому</td><td><em>She said hi. She told me.</em></td></tr>
+                        <tr><td class="en">borrow vs lend</td><td>borrow = брать / lend = давать</td><td><em>Can I borrow? Can you lend?</em></td></tr>
+                        <tr><td class="en">bring vs take</td><td>сюда / отсюда</td><td><em>Bring it here. Take it home.</em></td></tr>
+                        <tr><td class="en">teach vs learn</td><td>teach = учить кого / learn = учиться</td><td><em>She teaches us. We learn.</em></td></tr>
+                        <tr><td class="en">remember vs remind</td><td>remember = помнить / remind = напомнить</td><td><em>I remember. Remind me!</em></td></tr>
+                        <tr><td class="en">fun vs funny</td><td>fun = весело / funny = смешно</td><td><em>It&rsquo;s fun. He is funny.</em></td></tr>
+                        <tr><td class="en">boring vs bored</td><td>-ing про вещь / -ed про человека</td><td><em>The film is boring. I am bored.</em></td></tr>
+                        <tr><td class="en">interesting vs interested</td><td>то же правило</td><td><em>It&rsquo;s interesting. I&rsquo;m interested.</em></td></tr>
+                        <tr><td class="en">few vs little</td><td>few = с исчисл. / little = с неисчисл.</td><td><em>few people, little time</em></td></tr>
+                        <tr><td class="en">much vs many</td><td>much = неисчисл. / many = исчисл.</td><td><em>much money, many books</em></td></tr>
+                        <tr><td class="en">since vs for</td><td>since = с (момента) / for = в течение</td><td><em>since 2020, for 5 years</em></td></tr>
+                        <tr><td class="en">their / there / they&rsquo;re</td><td>их / там / они есть</td><td><em>their book, over there, they&rsquo;re happy</em></td></tr>
+                        <tr><td class="en">its / it&rsquo;s</td><td>его (притяж.) / он есть</td><td><em>its name, it&rsquo;s nice</em></td></tr>
+                        <tr><td class="en">your / you&rsquo;re</td><td>твой / ты есть</td><td><em>your bag, you&rsquo;re right</em></td></tr>
+                        <tr><td class="en">than vs then</td><td>чем (сравн.) / потом</td><td><em>bigger than, and then</em></td></tr>
+                        <tr><td class="en">to vs too</td><td>к / тоже / слишком</td><td><em>to school, me too, too much</em></td></tr>
+                        <tr><td class="en">lose vs loose</td><td>терять / свободный</td><td><em>lose keys, loose trousers</em></td></tr>
+                        <tr><td class="en">advice vs advise</td><td>совет (сущ.) / советовать</td><td><em>good advice, I advise you</em></td></tr>
+                        <tr><td class="en">economic vs economical</td><td>про экономику / экономный</td><td><em>economic crisis, economical car</em></td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 11. NUMBERS & SPELLINGS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F522;</span>
+                    <div>
+                        <h2>11. Numbers / Dates / Spellings &mdash; для Listening</h2>
+                    </div>
+                </div>
+
+                <div class="note-card" style="padding:0.5rem;">
+                    <table class="drill-table">
+                        <tr><th>Слышишь</th><th>Пишешь</th><th>Ловушка</th></tr>
+                        <tr><td class="en">thirteen / thirty</td><td>13 / 30</td><td>THIRteen vs THIRty (ударение)</td></tr>
+                        <tr><td class="en">fifteen / fifty</td><td>15 / 50</td><td>то же самое</td></tr>
+                        <tr><td class="en">eighteen / eighty</td><td>18 / 80</td><td>то же</td></tr>
+                        <tr><td class="en">a quarter past</td><td>:15</td><td>пятнадцать минут после часа</td></tr>
+                        <tr><td class="en">half past</td><td>:30</td><td>полчаса &mdash; <em>half past three</em> = 3:30</td></tr>
+                        <tr><td class="en">a quarter to</td><td>:45</td><td><em>a quarter to four</em> = 3:45</td></tr>
+                        <tr><td class="en">oh-seven (007)</td><td>0, 0, 7</td><td>&laquo;oh&raquo; = ноль</td></tr>
+                        <tr><td class="en">double / triple</td><td>55 / 777</td><td><em>double five = 55</em></td></tr>
+                        <tr><td class="en">first / 1st</td><td>1-й</td><td>+ second 2nd, third 3rd, fourth 4th</td></tr>
+                        <tr><td class="en">21st / 31st</td><td>с -st</td><td>+ 22nd, 23rd</td></tr>
+                        <tr><td class="en">the 5th of May / May 5th</td><td>05.05.</td><td>в Listening спеллингуют</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x1F4A1; Listening hack:</strong> когда диктуют имя или адрес &mdash; всегда повторяют по буквам. Пиши <strong>сразу</strong>, не жди второй раз. Особенно следи за <strong>B/P, M/N, G/J</strong> &mdash; они звучат похоже.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ TOTAL STATS ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+                    <h3 style="color:#3fb950; margin-top:0;">&#x1F3C6; Итого</h3>
+                    <div class="stat-row">
+                        <span class="stat-pill">~150 единиц всего</span>
+                        <span class="stat-pill">25 минут в день</span>
+                        <span class="stat-pill">6 дней</span>
+                        <span class="stat-pill">+5&hellip;10 баллов на экзамене</span>
+                    </div>
+                    <p style="margin-top:0.8rem; font-size:0.92rem;">Если выучишь <strong>только разделы 1+2+5</strong> (40 connectors + writing phrases + character adjectives) &mdash; <strong>уже даст</strong> заметный прирост в Writing. Это твой минимум.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>
