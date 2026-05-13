@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Wahl | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .opt-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 900px) { .opt-grid { grid-template-columns: 1fr; } }
+
+        .opt-card {
+            border-radius: 14px;
+            padding: 1.2rem 1.3rem;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+        }
+        .opt-card.win   { border: 2px solid #3fb950; background: rgba(63,185,80,0.07); box-shadow: 0 0 0 4px rgba(63,185,80,0.08); }
+        .opt-card.warn  { border: 1px solid rgba(241,196,15,0.4);  background: rgba(241,196,15,0.05); }
+        .opt-card.bad   { border: 1px solid rgba(248,81,73,0.4);   background: rgba(248,81,73,0.05); }
+
+        .opt-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-bottom: 0.6rem;
+        }
+        .opt-tag.win  { background: #3fb950; color: #0a0a14; }
+        .opt-tag.warn { background: rgba(241,196,15,0.2); color: #f1c40f; border: 1px solid rgba(241,196,15,0.4); }
+        .opt-tag.bad  { background: rgba(248,81,73,0.2); color: #f85149; border: 1px solid rgba(248,81,73,0.4); }
+
+        .opt-letter {
+            font-size: 2.4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+        .opt-card.win  .opt-letter { color: #3fb950; }
+        .opt-card.warn .opt-letter { color: #f1c40f; }
+        .opt-card.bad  .opt-letter { color: #f85149; }
+
+        .opt-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .opt-sub   { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.9rem; }
+
+        .crit {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.06);
+        }
+        .crit:last-of-type { border-bottom: none; }
+        .crit-ico { flex-shrink: 0; width: 1.2rem; text-align: center; }
+        .crit-yes { color: #3fb950; }
+        .crit-no  { color: #f85149; }
+        .crit-mid { color: #f1c40f; }
+
+        .compare-table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-size: 0.88rem; }
+        .compare-table th, .compare-table td { padding: 0.55rem 0.7rem; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
+        .compare-table th { background: rgba(255,255,255,0.04); font-weight: 700; }
+        .compare-table .col-win { background: rgba(63,185,80,0.06); }
+
+        .verdict-banner {
+            background: linear-gradient(135deg, rgba(63,185,80,0.18), rgba(63,185,80,0.06));
+            border: 2px solid #3fb950;
+            border-radius: 14px;
+            padding: 1.3rem 1.5rem;
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .verdict-banner .verdict-ico {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .verdict-banner h3 { margin: 0 0 0.3rem; color: #3fb950; font-size: 1.15rem; }
+        .verdict-banner p  { margin: 0; font-size: 0.92rem; line-height: 1.6; }
+
+        .skel-block {
+            background: rgba(255,255,255,0.04);
+            border-left: 3px solid #a371f7;
+            border-radius: 9px;
+            padding: 0.9rem 1.1rem;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            font-family: 'Georgia', serif;
+            white-space: pre-wrap;
+        }
+        .skel-block em { color: #a371f7; font-style: normal; font-weight: 700; }
+
+        .verb-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+        .verb-chip {
+            background: rgba(163,113,247,0.12);
+            border: 1px solid rgba(163,113,247,0.3);
+            color: #c9b3ff;
+            padding: 0.25rem 0.65rem;
+            border-radius: 16px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .verb-chip span { color: var(--color-text-muted); font-weight: 400; font-size: 0.78rem; margin-left: 0.3rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Writing &mdash; Wahl der Aufgabe</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Welches Writing w&auml;hlen?</h1>
+            <p class="page-subtitle">ZP10 2022 &mdash; Aufgabe 3: a) Comment vs b) Story vs c) Article</p>
+        </div>
+
+        <!-- ============ VERDICT ============ -->
+        <div class="verdict-banner">
+            <span class="verdict-ico">&#x1F3C6;</span>
+            <div>
+                <h3>F&uuml;r dein A2: nimm Option B &mdash; Story Continuation</h3>
+                <p>Дают готовое начало предложения, всё в Past Simple, никаких аргументов и анализа &mdash; просто продолжаешь рассказ по 3 пунктам Include.</p>
+            </div>
+        </div>
+
+        <!-- ============ Original Aufgaben ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DC;</span>
+                    <div>
+                        <h2>Aufgabe 3 &mdash; Original (E MSA HT A 2022)</h2>
+                        <p class="lesson-header-sub">&laquo;Here you can choose between three different options. Do only ONE of them!&raquo;</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Тема экзамена 2022:</strong> Bezugskulturen &mdash; история <strong>Jaz и Nadima</strong> (Nadima &mdash; новая девочка из Сирии). Каждая опция в задании 3 даёт <strong>12 баллов</strong>. Выбери только <strong>ОДНУ</strong>.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ 3 Options Comparison ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2696;&#xFE0F;</span>
+                    <div>
+                        <h2>Сравнение трёх опций</h2>
+                        <p class="lesson-header-sub">Что выбрать на A2 &mdash; и почему</p>
+                    </div>
+                </div>
+
+                <div class="opt-grid">
+                    <!-- Option A -->
+                    <div class="opt-card bad">
+                        <span class="opt-tag bad">&#x26D4; ТЯЖЕЛО</span>
+                        <div class="opt-letter">A</div>
+                        <div class="opt-title">Comment on the chocolate</div>
+                        <div class="opt-sub">&laquo;Comment on the gesture Jaz chooses when she offers chocolate to Nadima.&raquo;</div>
+
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div><strong>Нет starter</strong> &mdash; всё придумываешь сам</div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Нужно <strong>мнение + анализ + оценка</strong></div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Сложные времена: Present + Past + Conditional</div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Лексика B1+: <em>symbolises, represents, meaningful</em></div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Связь с темой <em>Bezugskulturen</em></div></div>
+
+                        <p style="margin-top:0.8rem; font-size:0.83rem; color:var(--color-text-muted);">&#x1F4C9; Шанс на 12/12: <strong style="color:#f85149;">низкий</strong></p>
+                    </div>
+
+                    <!-- Option B -->
+                    <div class="opt-card win">
+                        <span class="opt-tag win">&#x2705; ТВОЙ ВЫБОР</span>
+                        <div class="opt-letter">B</div>
+                        <div class="opt-title">Story continuation</div>
+                        <div class="opt-sub">&laquo;Write how the story continues during dinner.&raquo; &mdash; с готовым starter!</div>
+
+                        <div class="crit"><span class="crit-ico crit-yes">&#x2713;</span><div><strong>Дан starter</strong> &mdash; начало уже написано</div></div>
+                        <div class="crit"><span class="crit-ico crit-yes">&#x2713;</span><div>Только <strong>Past Simple</strong> &mdash; одно время</div></div>
+                        <div class="crit"><span class="crit-ico crit-yes">&#x2713;</span><div>3 Include = 3 готовых абзаца</div></div>
+                        <div class="crit"><span class="crit-ico crit-yes">&#x2713;</span><div>A2-лексика хватает: <em>said, asked, smiled, ate</em></div></div>
+                        <div class="crit"><span class="crit-ico crit-yes">&#x2713;</span><div>Никаких аргументов и анализа</div></div>
+
+                        <p style="margin-top:0.8rem; font-size:0.83rem; color:var(--color-text-muted);">&#x1F4C8; Шанс на 12/12: <strong style="color:#3fb950;">высокий</strong></p>
+                    </div>
+
+                    <!-- Option C -->
+                    <div class="opt-card warn">
+                        <span class="opt-tag warn">&#x26A0; СРЕДНЕ</span>
+                        <div class="opt-letter">C</div>
+                        <div class="opt-title">Article for school homepage</div>
+                        <div class="opt-sub">&laquo;Write an article about a school food bazaar.&raquo;</div>
+
+                        <div class="crit"><span class="crit-ico crit-mid">~</span><div>Дано начало <strong>темы</strong> (не предложения)</div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Структура <strong>статьи</strong> (title, lead, body)</div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Полу-формальный регистр</div></div>
+                        <div class="crit"><span class="crit-ico crit-no">&#x2717;</span><div>Persuasive language: <em>join us, you will enjoy</em></div></div>
+                        <div class="crit"><span class="crit-ico crit-mid">~</span><div>Mix tenses: Present + Future + Past</div></div>
+
+                        <p style="margin-top:0.8rem; font-size:0.83rem; color:var(--color-text-muted);">&#x1F4CA; Шанс на 12/12: <strong style="color:#f1c40f;">средний</strong></p>
+                    </div>
+                </div>
+
+                <!-- Compare Table -->
+                <div class="note-card" style="margin-top:1.2rem;">
+                    <h3>&#x1F4CB; Таблица &mdash; что нужно от тебя</h3>
+                    <table class="compare-table">
+                        <tr>
+                            <th>Критерий</th>
+                            <th>A) Comment</th>
+                            <th class="col-win">B) Story &#x2B50;</th>
+                            <th>C) Article</th>
+                        </tr>
+                        <tr>
+                            <td>Дано начало?</td>
+                            <td>&#x274C;</td>
+                            <td class="col-win">&#x2705; целое предложение</td>
+                            <td>&#x274C;</td>
+                        </tr>
+                        <tr>
+                            <td>Сколько времён</td>
+                            <td>3-4</td>
+                            <td class="col-win">1 (Past Simple)</td>
+                            <td>3 (Present, Future, Past)</td>
+                        </tr>
+                        <tr>
+                            <td>Нужны аргументы?</td>
+                            <td>&#x2705; да</td>
+                            <td class="col-win">&#x274C; нет</td>
+                            <td>~частично</td>
+                        </tr>
+                        <tr>
+                            <td>Регистр</td>
+                            <td>Нейтрально/формально</td>
+                            <td class="col-win">Personal narrative</td>
+                            <td>Полу-формально</td>
+                        </tr>
+                        <tr>
+                            <td>Минимум слов для A2</td>
+                            <td>B1+</td>
+                            <td class="col-win">A2 хватает</td>
+                            <td>A2/B1</td>
+                        </tr>
+                        <tr>
+                            <td>Риск провалить</td>
+                            <td style="color:#f85149;"><strong>Высокий</strong></td>
+                            <td class="col-win" style="color:#3fb950;"><strong>Низкий</strong></td>
+                            <td style="color:#f1c40f;"><strong>Средний</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ Option B Detailed Plan ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DD;</span>
+                    <div>
+                        <h2>План для Option B &mdash; шаг за шагом</h2>
+                        <p class="lesson-header-sub">3 Include-пункта = 3 абзаца. Готовый рецепт.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CC; Что от тебя хотят (Include)</h3>
+                    <ol style="margin:0.5rem 0; padding-left:1.4rem; line-height:1.9;">
+                        <li>how everyone tries to deal with the <strong>communication problem</strong></li>
+                        <li>how <strong>Jaz helps Nadima</strong> to feel more comfortable</li>
+                        <li>how Nadima has <strong>won everybody&rsquo;s sympathy</strong> by the end of dinner</li>
+                    </ol>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.5rem;">&#x1F449; На каждый пункт &mdash; <strong>3-4 предложения</strong>. Всего ~100 слов.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50C; Starter (уже дан в задании)</h3>
+                    <div class="skel-block"><em>Mum and Dad were already busy setting the table. Nadima just stood in the doorway to our kitchen. I saw Nadima taking a deep breath and …</em></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270D;&#xFE0F; Готовый шаблон продолжения</h3>
+                    <div class="skel-block">…she <em>smiled</em> at my parents. My mum <em>said</em> "Welcome!" and <em>gave</em> her a hug.
+
+<em>At first</em>, Nadima was a bit shy. She didn&rsquo;t know what to say in English. My dad <em>asked</em> her about Syria with simple words. He also <em>used</em> his phone to show some pictures. Nadima <em>nodded</em> and slowly <em>started</em> to talk.
+
+<em>Then</em> I <em>helped</em> Nadima to feel comfortable. I <em>showed</em> her my room and my favourite books. I also <em>told</em> her that my parents are very kind. Nadima <em>laughed</em> for the first time.
+
+<em>During dinner</em>, my mum <em>brought</em> the food to the table. Nadima <em>tried</em> everything and <em>said</em> "It is delicious!" She <em>taught</em> us some Arabic words. We all <em>laughed</em> a lot.
+
+<em>By the end</em> of the evening, my parents <em>loved</em> Nadima. They <em>said</em> "You can come every Friday!" Nadima <em>hugged</em> me. "Thank you," she <em>said</em>. "This was the best dinner."</div>
+                    <p style="font-size:0.82rem; color:var(--color-text-muted); margin-top:0.6rem;">~110 слов. Покрывает все 3 Include-пункта. <span style="color:#3fb950;">&#x2713;</span> Past Simple везде. <span style="color:#3fb950;">&#x2713;</span> Connectors: At first, Then, During, By the end.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; 15 глаголов в Past Simple &mdash; выучи наизусть</h3>
+                    <div class="verb-list">
+                        <span class="verb-chip">said <span>say</span></span>
+                        <span class="verb-chip">gave <span>give</span></span>
+                        <span class="verb-chip">took <span>take</span></span>
+                        <span class="verb-chip">came <span>come</span></span>
+                        <span class="verb-chip">went <span>go</span></span>
+                        <span class="verb-chip">brought <span>bring</span></span>
+                        <span class="verb-chip">told <span>tell</span></span>
+                        <span class="verb-chip">felt <span>feel</span></span>
+                        <span class="verb-chip">thought <span>think</span></span>
+                        <span class="verb-chip">sat <span>sit</span></span>
+                        <span class="verb-chip">stood <span>stand</span></span>
+                        <span class="verb-chip">ate <span>eat</span></span>
+                        <span class="verb-chip">drank <span>drink</span></span>
+                        <span class="verb-chip">saw <span>see</span></span>
+                        <span class="verb-chip">knew <span>know</span></span>
+                    </div>
+                    <p style="margin-top:0.7rem; font-size:0.82rem; color:var(--color-text-muted);">+ regular: asked, smiled, laughed, helped, showed, talked, nodded, tried, used, started, listened, hugged.</p>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.35); background:rgba(63,185,80,0.06);">
+                    <h3>&#x2705; Чек-лист перед сдачей</h3>
+                    <ul style="margin:0.5rem 0; padding-left:1.4rem; line-height:1.9;">
+                        <li>Ответил на <strong>все 3 Include</strong>?</li>
+                        <li>Всё в <strong>Past Simple</strong> (не сбился на Present)?</li>
+                        <li>Использовал хотя бы <strong>3 connectors</strong>: At first, Then, During, By the end, After that?</li>
+                        <li>Прямая речь в кавычках: <em>She said "..."</em>?</li>
+                        <li>Хотя бы <strong>1 диалог</strong> (оживляет историю)?</li>
+                        <li>Заглавные буквы у имён (Jaz, Nadima)?</li>
+                        <li>~100 слов?</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ Why not A or C ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F6AB;</span>
+                    <div>
+                        <h2>Почему НЕ A) и НЕ C)</h2>
+                        <p class="lesson-header-sub">Если ты всё-таки колеблешься</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f85149;">
+                    <h3 style="color:#f85149;">A) Comment &mdash; ловушка для A2</h3>
+                    <p>Comment просит тебя <strong>оценить символический жест</strong> (шоколад как мост между культурами). Тебе надо:</p>
+                    <ul style="margin:0.4rem 0; padding-left:1.3rem; line-height:1.8;">
+                        <li>Объяснить, <strong>почему</strong> шоколад важен в контексте Bezugskulturen</li>
+                        <li>Дать <strong>своё мнение</strong>: <em>"I think Jaz&rsquo;s action shows..."</em></li>
+                        <li>Обсудить, что почувствует Nadima &mdash; нужны фразы <em>"might feel", "could think"</em> (modals!)</li>
+                    </ul>
+                    <p style="color:var(--color-text-muted); font-size:0.88rem;">На A2 ты потеряешь баллы за поверхностный анализ. Экзаменатор ждёт глубины.</p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f1c40f;">
+                    <h3 style="color:#f1c40f;">C) Article &mdash; формат-ловушка</h3>
+                    <p>Тебе надо написать <strong>школьную статью</strong>:</p>
+                    <ul style="margin:0.4rem 0; padding-left:1.3rem; line-height:1.8;">
+                        <li>Придумать <strong>заголовок</strong></li>
+                        <li>Lead-параграф (что/где/когда/зачем)</li>
+                        <li>Body с идеями организации</li>
+                        <li>Призыв в конце (<em>"Come and join us!"</em>)</li>
+                        <li>Mix времён: Past (как возникла идея) + Future (что будет) + Present (общие факты о еде)</li>
+                    </ul>
+                    <p style="color:var(--color-text-muted); font-size:0.88rem;">Article это отдельный жанр &mdash; если ты его не отрабатывал, не лезь.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ Strategy ============ -->
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Стратегия на экзамене</h2>
+                        <p class="lesson-header-sub">Что делать в первые 30 секунд после получения задания</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <ol style="margin:0.5rem 0; padding-left:1.4rem; line-height:2;">
+                        <li><strong>Прочитай ВСЕ три опции</strong> (a, b, c) &mdash; быстро</li>
+                        <li>Найди ту, где <strong>есть starter sentence</strong> &rarr; это твой кандидат</li>
+                        <li>Проверь Include &mdash; <strong>понимаешь ли</strong> каждый пункт?</li>
+                        <li>Если в Option B есть starter <strong>и</strong> ты понимаешь Include &mdash; <strong>бери B</strong></li>
+                        <li>Сразу обведи 3 пункта Include &mdash; это твой план абзацев</li>
+                        <li>Пиши <strong>3 абзаца по 3-4 простых предложения</strong></li>
+                        <li>В конце <strong>5 минут</strong> на проверку: глаголы Past Simple? Артикли? Большие буквы?</li>
+                    </ol>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x1F4A1; Главный принцип A2:</strong> простые правильные предложения &gt; сложные с ошибками. <em>"Nadima smiled. She felt happy."</em> &mdash; это твой стиль. Не пытайся писать как B2.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>
