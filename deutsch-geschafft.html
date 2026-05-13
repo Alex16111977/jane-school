@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geschafft! | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-emoji {
+            font-size: 4rem;
+            animation: float 3.5s ease-in-out infinite;
+            display: block;
+            text-align: center;
+            margin-bottom: 0.7rem;
+        }
+        .hero-title {
+            font-size: 2.1rem;
+            font-weight: 900;
+            text-align: center;
+            background: linear-gradient(90deg, #f472b6, #c778f5, #79b8ff, #f472b6);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            text-align: center;
+            font-size: 0.93rem;
+            color: #8b949e;
+            margin-bottom: 2rem;
+        }
+
+        /* Tab switcher */
+        .tab-switcher {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.7rem;
+            margin-bottom: 1.8rem;
+            animation: fadeUp 0.4s ease both;
+        }
+        .tab-btn {
+            padding: 1rem 0.8rem;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: rgba(16,20,36,0.97);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn .tab-emoji { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+        .tab-btn .tab-label { font-size: 0.88rem; font-weight: 700; color: #8b949e; }
+        .tab-btn .tab-sub { font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 0.2rem; }
+
+        .tab-btn.active-good {
+            border-color: rgba(63,185,80,0.5);
+            background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(16,20,36,0.97));
+        }
+        .tab-btn.active-good .tab-label { color: #3fb950; }
+        .tab-btn.active-bad {
+            border-color: rgba(244,114,182,0.5);
+            background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(16,20,36,0.97));
+        }
+        .tab-btn.active-bad .tab-label { color: #f472b6; }
+        .tab-btn.active-dunno {
+            border-color: rgba(227,179,65,0.5);
+            background: linear-gradient(135deg, rgba(227,179,65,0.1), rgba(16,20,36,0.97));
+        }
+        .tab-btn.active-dunno .tab-label { color: #e3b341; }
+
+        /* Content sections */
+        .section { display: none; animation: fadeUp 0.35s ease both; }
+        .section.visible { display: block; }
+
+        /* Cards */
+        .mot-card {
+            background: rgba(16,20,36,0.97);
+            border-radius: 16px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .mot-icon { font-size: 1.7rem; flex-shrink: 0; margin-top: 0.1rem; }
+        .mot-title { font-size: 0.96rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem; }
+        .mot-text { font-size: 0.87rem; color: #8b949e; line-height: 1.7; }
+        .mot-text strong { color: #c9d1d9; }
+        .mot-text em { font-style: normal; }
+
+        .c-green { border: 1px solid rgba(63,185,80,0.25); }
+        .c-gold  { border: 1px solid rgba(227,179,65,0.25); }
+        .c-blue  { border: 1px solid rgba(88,166,255,0.25); }
+        .c-pink  { border: 1px solid rgba(244,114,182,0.25); }
+        .c-purple{ border: 1px solid rgba(199,120,245,0.25); }
+
+        /* Big quote */
+        .big-quote {
+            text-align: center;
+            padding: 1.6rem 1.4rem;
+            border-radius: 18px;
+            margin-bottom: 1.2rem;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .big-quote em { font-style: normal; }
+        .bq-green { background: linear-gradient(135deg,rgba(63,185,80,0.08),rgba(16,20,36,0)); border: 1px solid rgba(63,185,80,0.2); }
+        .bq-green em { color: #3fb950; }
+        .bq-pink  { background: linear-gradient(135deg,rgba(244,114,182,0.08),rgba(16,20,36,0)); border: 1px solid rgba(244,114,182,0.2); }
+        .bq-pink em { color: #f472b6; }
+
+        /* Advice list */
+        .advice-block {
+            background: rgba(16,20,36,0.97);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1rem;
+        }
+        .advice-title {
+            font-size: 0.96rem; font-weight: 800; color: #fff;
+            margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .advice-row {
+            display: flex; gap: 0.7rem; align-items: flex-start;
+            margin-bottom: 0.7rem; font-size: 0.87rem;
+            color: #8b949e; line-height: 1.65;
+        }
+        .advice-row:last-child { margin-bottom: 0; }
+        .advice-row strong { color: #e6edf3; }
+        .adot {
+            width: 6px; height: 6px; border-radius: 50%;
+            flex-shrink: 0; margin-top: 0.5rem;
+        }
+
+        .footer-msg {
+            text-align: center;
+            padding: 1.8rem 1rem 0.5rem;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.2);
+            line-height: 1.9;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/lotus.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center">
+        <div style="position:absolute;inset:0;background:rgba(8,8,20,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Geschafft!</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:1rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+
+        <span class="hero-emoji">🌸</span>
+        <div class="hero-title">Экзамен написан!</div>
+        <p class="hero-sub">Какая оценка?</p>
+
+        <!-- Tab switcher -->
+        <div class="tab-switcher">
+            <button class="tab-btn" id="btn-good" onclick="showSection('good')">
+                <span class="tab-emoji">🥳</span>
+                <div class="tab-label">Хорошая!</div>
+                <div class="tab-sub">всё получилось</div>
+            </button>
+            <button class="tab-btn" id="btn-bad" onclick="showSection('bad')">
+                <span class="tab-emoji">😔</span>
+                <div class="tab-label">Не очень...</div>
+                <div class="tab-sub">бывает и такое</div>
+            </button>
+            <button class="tab-btn" id="btn-dunno" onclick="showSection('dunno')">
+                <span class="tab-emoji">🫣</span>
+                <div class="tab-label">Не знаю ещё</div>
+                <div class="tab-sub">жду и нервничаю</div>
+            </button>
+        </div>
+
+        <!-- ══ GOOD ══ -->
+        <div class="section" id="section-good">
+
+            <div class="big-quote bq-green">
+                Ты готовилась — <em>и это сработало.</em><br>
+                Вот что бывает, когда не сдаёшься 💚
+            </div>
+
+            <div class="mot-card c-green">
+                <div class="mot-icon">🏆</div>
+                <div>
+                    <div class="mot-title">Это заслуженно — не удача</div>
+                    <div class="mot-text">Не говори себе «мне повезло». <strong>Не повезло — ты работала.</strong> Везение не учит слова, не разбирает правила и не сидит над текстами. Ты сделала это сама.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-gold">
+                <div class="mot-icon">📸</div>
+                <div>
+                    <div class="mot-title">Запомни это ощущение</div>
+                    <div class="mot-text">Серьёзно — <strong>запомни как это чувствуется</strong>. Когда в следующий раз будет лень готовиться, вспомни именно этот момент. Он работает лучше любой мотивации.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-blue">
+                <div class="mot-icon">📈</div>
+                <div>
+                    <div class="mot-title">Ты доказала себе — можешь</div>
+                    <div class="mot-text">Теперь ты <strong>точно знаешь</strong> что немецкий тебе по силам. Не «наверное смогу», а знаешь. Это меняет всё — следующий экзамен будет чуть менее страшным.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-pink">
+                <div class="mot-icon">🎯</div>
+                <div>
+                    <div class="mot-title">Что делать с этим импульсом</div>
+                    <div class="mot-text">Когда всё хорошо — <strong>самое время сделать маленький шаг вперёд</strong>, пока есть энергия. Не марафон — просто одна страница, одно правило, пять новых слов. На волне идёт легче.</div>
+                </div>
+            </div>
+
+            <div class="advice-block">
+                <div class="advice-title">🌟 Как закрепить этот успех</div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#3fb950"></div>
+                    <span><strong>Отпразднуй нормально</strong> — скажи себе вслух «я молодец», расскажи кому-нибудь близкому, порадуйся по-настоящему.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#3fb950"></div>
+                    <span><strong>Не обесценивай</strong> — «ну и что, это же просто оценка» это не скромность, это несправедливо по отношению к себе.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#3fb950"></div>
+                    <span><strong>Запиши что именно помогло</strong> — как готовилась, сколько времени, что повторяла. Чтобы в следующий раз повторить формулу.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#3fb950"></div>
+                    <span><strong>Дай себе день отдыха</strong> — заслужила. Завтра снова вперёд, но сегодня — твой день.</span>
+                </div>
+            </div>
+
+            <div class="footer-msg">
+                Ты написала хорошо — потому что ты хорошая.<br>
+                🌸 Так держать 🌸
+            </div>
+
+        </div>
+
+        <!-- ══ BAD ══ -->
+        <div class="section" id="section-bad">
+
+            <div class="big-quote bq-pink">
+                Один экзамен не определяет<br>
+                ни твой ум, ни твоё будущее,<br>
+                <em>ни то, кто ты есть.</em>
+            </div>
+
+            <div class="mot-card c-pink">
+                <div class="mot-icon">💛</div>
+                <div>
+                    <div class="mot-title">Плохая оценка — это не провал</div>
+                    <div class="mot-text">Это просто <strong>информация</strong> — что вот здесь пока не получилось. Не больше. Все через это проходят, даже те кто кажется «отличниками».</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-purple">
+                <div class="mot-icon">🧠</div>
+                <div>
+                    <div class="mot-title">Ты учишь немецкий — это уже подвиг</div>
+                    <div class="mot-text">Немецкий в немецкой школе — <strong>реально сложно</strong>, особенно если это не твой первый язык. То что ты вообще готовилась и пришла — уже круто. Серьёзно.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-blue">
+                <div class="mot-icon">📈</div>
+                <div>
+                    <div class="mot-title">Прогресс важнее оценки</div>
+                    <div class="mot-text">Ты же <strong>лучше пишешь</strong> чем год назад? Знаешь больше слов, меньше боишься? Это и есть настоящий результат — просто в журнале его не видно.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-green">
+                <div class="mot-icon">🔁</div>
+                <div>
+                    <div class="mot-title">Это не последний шанс</div>
+                    <div class="mot-text">Всегда будет следующий тест, следующая работа, следующий год. <strong>Ничего не закрыто навсегда.</strong> Оценка в журнале — не приговор.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-gold">
+                <div class="mot-icon">🌱</div>
+                <div>
+                    <div class="mot-title">То что сложно сейчас — щёлкнет потом</div>
+                    <div class="mot-text">Все эти артикли, падежи, запятые — кажутся бесконечными. Но <strong>в какой-то момент становится легче</strong>. У всех по-разному, но это происходит.</div>
+                </div>
+            </div>
+
+            <div class="advice-block">
+                <div class="advice-title">🫂 Как не грустить — реально работает</div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#f472b6"></div>
+                    <span><strong>Не сравнивай с другими</strong> — ты не знаешь сколько они готовились и какой у них уровень языка изначально.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#f472b6"></div>
+                    <span><strong>Поговори с кем-нибудь</strong> — сказать «мне грустно из-за оценки» вслух уже делает легче. Не держи в себе.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#f472b6"></div>
+                    <span><strong>Сделай что-то приятное сегодня</strong> — не как награду за оценку, а просто потому что ты заслуживаешь хорошего дня независимо от цифры.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#f472b6"></div>
+                    <span><strong>Вспомни что получалось</strong> — был хоть один момент в этом году когда что-то поняла или написала хорошо? Значит — можешь.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#f472b6"></div>
+                    <span><strong>Дай себе день погрустить — и отпусти.</strong> Можно расстроиться. Но потом вперёд — не потому что надо, а потому что ты сильнее этой оценки.</span>
+                </div>
+            </div>
+
+            <div class="footer-msg">
+                Ты учишься. Ты стараешься. Ты в порядке.<br>
+                🌸 Всё будет хорошо 🌸
+            </div>
+
+        </div>
+
+        <!-- ══ DUNNO ══ -->
+        <div class="section" id="section-dunno">
+
+            <div class="big-quote" style="background:linear-gradient(135deg,rgba(227,179,65,0.08),rgba(16,20,36,0));border:1px solid rgba(227,179,65,0.2);">
+                <span style="font-size:1.15rem;font-weight:800;color:#fff;line-height:1.6;">
+                    Ожидание — самая сложная часть.<br>
+                    <em style="color:#e3b341;font-style:normal;">Но что бы ни было — ты уже справилась.</em>
+                </span>
+            </div>
+
+            <div class="mot-card c-gold">
+                <div class="mot-icon">🫁</div>
+                <div>
+                    <div class="mot-title">Выдохни — это уже позади</div>
+                    <div class="mot-text">Экзамен написан. <strong>Самое страшное уже прошло.</strong> То что ты сделала — сделано. Оценка только скажет как, но она не отменит того что ты пришла и написала.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-purple">
+                <div class="mot-icon">🧘</div>
+                <div>
+                    <div class="mot-title">Пока не знаешь — не придумывай</div>
+                    <div class="mot-text">Мозг очень любит в этот момент <strong>представлять худшее</strong>. Не давай ему. Ты не знаешь оценку — значит всё ещё возможно. Включая хорошую.</div>
+                </div>
+            </div>
+
+            <div class="mot-card c-blue">
+                <div class="mot-icon">🎲</div>
+                <div>
+                    <div class="mot-title">Любая оценка — не конец</div>
+                    <div class="mot-text">Когда узнаешь — <strong>вернись сюда и нажми нужную кнопку.</strong> Там уже всё написано что тебе нужно будет услышать 🌸</div>
+                </div>
+            </div>
+
+            <div class="advice-block">
+                <div class="advice-title">⏳ Как пережить ожидание</div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#e3b341"></div>
+                    <span><strong>Не прокручивай экзамен снова и снова</strong> — ты уже ничего не изменишь, а нервы потратишь. Это бессмысленно и нечестно по отношению к себе.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#e3b341"></div>
+                    <span><strong>Займи себя чем-нибудь</strong> — серьёзно, что угодно: сериал, музыка, прогулка. Пустая голова заполняется тревогой.</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#e3b341"></div>
+                    <span><strong>Не спрашивай у одноклассников «а ты как написала?»</strong> — только расстроишься или будешь сравнивать. Оно тебе надо?</span>
+                </div>
+                <div class="advice-row">
+                    <div class="adot" style="background:#e3b341"></div>
+                    <span><strong>Напомни себе</strong> — ты готовилась, ты старалась, ты пришла и написала. Это уже не мало.</span>
+                </div>
+            </div>
+
+            <div class="footer-msg">
+                Скоро узнаешь — и всё станет проще.<br>
+                🌸 Пока что — ты молодец 🌸
+            </div>
+
+        </div>
+
+        <div style="height:2.5rem"></div>
+    </div>
+
+    <script>
+        function showSection(type) {
+            document.getElementById('section-good').classList.remove('visible');
+            document.getElementById('section-bad').classList.remove('visible');
+            document.getElementById('section-dunno').classList.remove('visible');
+            document.getElementById('btn-good').classList.remove('active-good');
+            document.getElementById('btn-bad').classList.remove('active-bad');
+            document.getElementById('btn-dunno').classList.remove('active-dunno');
+
+            document.getElementById('section-' + type).classList.add('visible');
+            document.getElementById('btn-' + type).classList.add('active-' + type);
+        }
+    </script>
+</body>
+</html>

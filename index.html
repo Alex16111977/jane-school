@@ -271,8 +271,8 @@
 
         // ZP Countdown
         const zpDates = [
-            { name: 'Deutsch', date: new Date('2026-05-13'), emoji: '\uD83C\uDDE9\uD83C\uDDEA', color: '#4493f8' },
-            { name: 'Englisch', date: new Date('2026-05-19'), emoji: '\uD83C\uDDEC\uD83C\uDDE7', color: '#3fb950' },
+            { name: 'Deutsch', date: new Date('2026-05-13'), emoji: '\uD83C\uDDE9\uD83C\uDDEA', color: '#4493f8', doneLink: 'deutsch-geschafft.html' },
+            { name: 'Englisch', date: new Date('2026-05-19'), emoji: '\uD83C\uDDEC\uD83C\uDDE7', color: '#3fb950', doneLink: 'englisch-geschafft.html', planLink: 'englisch-6tage.html' },
             { name: 'Mathe', date: new Date('2026-05-28'), emoji: '\uD83D\uDCD0', color: '#f85149' }
         ];
         function updateCountdown() {
@@ -281,12 +281,23 @@
             el.innerHTML = zpDates.map(zp => {
                 const diff = Math.ceil((zp.date - now) / (1000 * 60 * 60 * 24));
                 const urgent = diff <= 14;
-                return '<div style="flex:1; min-width:140px; background:' + (urgent ? 'rgba(248,81,73,0.1)' : 'var(--color-bg-card)') + '; border:1px solid ' + (urgent ? 'rgba(248,81,73,0.3)' : 'var(--color-border)') + '; border-radius:12px; padding:1rem; text-align:center;">' +
+                const done = diff <= 0;
+                const hasPlan = !done && zp.planLink;
+                const inner =
                     '<div style="font-size:1.5rem;">' + zp.emoji + '</div>' +
                     '<div style="font-size:0.85rem; color:var(--color-text-muted); margin:0.3rem 0;">' + zp.name + '</div>' +
                     '<div style="font-size:1.8rem; font-weight:800; color:' + (urgent ? 'var(--color-red)' : zp.color) + ';">' + (diff > 0 ? diff : '\u2705') + '</div>' +
                     '<div style="font-size:0.78rem; color:var(--color-text-muted);">' + (diff > 0 ? (diff === 1 ? 'Tag' : 'Tage') : 'Geschafft!') + '</div>' +
-                '</div>';
+                    (done && zp.doneLink ? '<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(244,114,182,0.7);">\u043D\u0430\u0436\u043C\u0438 &#x2192;</div>' : '') +
+                    (hasPlan ? '<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(63,185,80,0.8);">6-Tage-Plan &#x2192;</div>' : '');
+                const style = 'flex:1; min-width:140px; background:' + (done && zp.doneLink ? 'rgba(244,114,182,0.08)' : hasPlan ? 'rgba(63,185,80,0.07)' : urgent ? 'rgba(248,81,73,0.1)' : 'var(--color-bg-card)') + '; border:1px solid ' + (done && zp.doneLink ? 'rgba(244,114,182,0.35)' : hasPlan ? 'rgba(63,185,80,0.3)' : urgent ? 'rgba(248,81,73,0.3)' : 'var(--color-border)') + '; border-radius:12px; padding:1rem; text-align:center;' + (done && zp.doneLink || hasPlan ? 'cursor:pointer;text-decoration:none;display:block;transition:opacity 0.15s;' : '');
+                if (done && zp.doneLink) {
+                    return '<a href="' + zp.doneLink + '" style="' + style + '">' + inner + '</a>';
+                }
+                if (hasPlan) {
+                    return '<a href="' + zp.planLink + '" style="' + style + '">' + inner + '</a>';
+                }
+                return '<div style="' + style + '">' + inner + '</div>';
             }).join('');
         }
         updateCountdown();

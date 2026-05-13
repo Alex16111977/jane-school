@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6 Tage bis Englisch ZP | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* Day tabs */
+        .day-tabs {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 1.4rem;
+        }
+        .tab-day {
+            background: rgba(16,20,36,0.97);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem 0.3rem;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            transition: all 0.18s;
+            color: #8b949e;
+        }
+        .tab-day:hover { border-color: rgba(63,185,80,0.3); color: #c9d1d9; }
+        .tab-day.active {
+            border-color: rgba(63,185,80,0.5);
+            background: rgba(63,185,80,0.1);
+            color: #3fb950;
+        }
+        .tab-day .day-emoji { font-size: 1.3rem; display: block; margin-bottom: 0.2rem; }
+        .tab-day .day-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* Day content */
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+
+        /* Section blocks */
+        .plan-block {
+            background: rgba(16,20,36,0.97);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1rem;
+        }
+        .plan-block-header {
+            display: flex; align-items: center; gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .plan-block-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .plan-block-title { font-size: 0.98rem; font-weight: 800; color: #fff; margin: 0; }
+        .plan-block-sub { font-size: 0.8rem; color: #8b949e; margin-top: 0.1rem; }
+
+        /* Time badge */
+        .time-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.3rem 0.8rem; border-radius: 20px;
+            font-size: 0.78rem; font-weight: 700;
+            background: rgba(63,185,80,0.12);
+            color: #3fb950;
+            border: 1px solid rgba(63,185,80,0.25);
+            margin-bottom: 0.9rem;
+        }
+
+        /* Task list */
+        .task-list { display: grid; gap: 0.55rem; }
+        .task-row {
+            display: flex; gap: 0.7rem; align-items: flex-start;
+            font-size: 0.87rem; color: #c9d1d9; line-height: 1.6;
+        }
+        .task-icon { flex-shrink: 0; font-size: 0.95rem; margin-top: 0.05rem; }
+        .task-row strong { color: #fff; }
+        .task-row em { font-style: normal; color: #8b949e; }
+
+        /* Switch block */
+        .switch-block {
+            background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(63,185,80,0.05));
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Tip box */
+        .tip-box {
+            margin-top: 0.8rem; padding: 0.6rem 0.9rem;
+            border-radius: 8px; font-size: 0.84rem; color: #c9d1d9; line-height: 1.6;
+        }
+        .tip-green { background: rgba(63,185,80,0.07); border-left: 3px solid rgba(63,185,80,0.4); }
+        .tip-blue  { background: rgba(88,166,255,0.07); border-left: 3px solid rgba(88,166,255,0.4); }
+        .tip-gold  { background: rgba(227,179,65,0.07); border-left: 3px solid rgba(227,179,65,0.4); }
+        .tip-pink  { background: rgba(244,114,182,0.07); border-left: 3px solid rgba(244,114,182,0.4); }
+        .tip-purple{ background: rgba(199,120,245,0.07); border-left: 3px solid rgba(199,120,245,0.4); }
+
+        /* Day header bar */
+        .day-header {
+            display: flex; align-items: center; gap: 0.9rem;
+            margin-bottom: 1.2rem; padding: 1rem 1.4rem;
+            border-radius: 14px;
+        }
+        .day-header .dh-num { font-size: 2rem; font-weight: 900; }
+        .day-header .dh-title { font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; }
+        .day-header .dh-sub { font-size: 0.82rem; color: #8b949e; margin-top: 0.1rem; }
+
+        .dh-green { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(16,20,36,0)); border: 1px solid rgba(63,185,80,0.2); }
+        .dh-blue  { background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(16,20,36,0)); border: 1px solid rgba(88,166,255,0.2); }
+        .dh-gold  { background: linear-gradient(135deg, rgba(227,179,65,0.1), rgba(16,20,36,0)); border: 1px solid rgba(227,179,65,0.2); }
+        .dh-purple{ background: linear-gradient(135deg, rgba(199,120,245,0.1), rgba(16,20,36,0)); border: 1px solid rgba(199,120,245,0.2); }
+        .dh-pink  { background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(16,20,36,0)); border: 1px solid rgba(244,114,182,0.2); }
+        .dh-red   { background: linear-gradient(135deg, rgba(248,81,73,0.1),  rgba(16,20,36,0)); border: 1px solid rgba(248,81,73,0.2); }
+
+        @media (max-width:600px) {
+            .day-tabs { grid-template-columns: repeat(4, 1fr); }
+            .plan-block { padding: 1.1rem 1rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/hero-bg.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">6 Tage bis ZP</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.8rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div style="text-align:left;padding:0.5rem 0 1rem;">
+            <h1 style="margin:0 0 0.3rem;">&#x1F1EC;&#x1F1E7; 6 Tage &mdash; ZP Englisch</h1>
+            <p class="page-subtitle">Как переключиться с немецкого + план по дням + сколько времени в день</p>
+        </div>
+
+        <!-- Day tabs -->
+        <div class="day-tabs">
+            <button class="tab-day active" onclick="switchDay(6)">
+                <span class="day-emoji">6️⃣</span>
+                <span class="day-label">Tag 6</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(5)">
+                <span class="day-emoji">5️⃣</span>
+                <span class="day-label">Tag 5</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(4)">
+                <span class="day-emoji">4️⃣</span>
+                <span class="day-label">Tag 4</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(3)">
+                <span class="day-emoji">3️⃣</span>
+                <span class="day-label">Tag 3</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(2)">
+                <span class="day-emoji">2️⃣</span>
+                <span class="day-label">Tag 2</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(1)">
+                <span class="day-emoji">1️⃣</span>
+                <span class="day-label">Tag 1</span>
+            </button>
+            <button class="tab-day" onclick="switchDay(0)">
+                <span class="day-emoji">🏆</span>
+                <span class="day-label">Prüfung</span>
+            </button>
+        </div>
+
+        <!-- ═══ TAG 6 ═══ -->
+        <div class="day-content active" id="day-6">
+            <div class="day-header dh-blue">
+                <div class="dh-num" style="color:#58a6ff">6</div>
+                <div>
+                    <p class="dh-title">Переключение: Deutsch → English</p>
+                    <p class="dh-sub">Главная задача сегодня — вернуть мозг в английский режим</p>
+                </div>
+            </div>
+
+            <div class="time-badge">⏱ 60–75 мин сегодня</div>
+
+            <!-- Switch block -->
+            <div class="switch-block">
+                <div style="font-size:0.95rem;font-weight:800;color:#fff;margin-bottom:0.8rem;">🔄 Как переключиться с немецкого на английский</div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">🎵</span><span>Включи английскую музыку или подкаст фоном — прямо сейчас, пока делаешь другие вещи. Мозг начнёт «слышать» язык.</span></div>
+                    <div class="task-row"><span class="task-icon">🧠</span><span><strong>Главное: не переводи с немецкого.</strong> В немецком «weil» — глагол в конец. В английском — забудь об этом. Думай сразу по-английски.</span></div>
+                    <div class="task-row"><span class="task-icon">📵</span><span>Первые полчаса подготовки — <strong>только английский.</strong> Никаких немецких страниц, никаких немецких мыслей.</span></div>
+                    <div class="task-row"><span class="task-icon">🗣️</span><span>Скажи вслух 5–10 предложений по-английски о чём угодно — погода, что делала сегодня. Просто чтобы «включить» язык.</span></div>
+                </div>
+                <div class="tip-box tip-blue" style="margin-top:0.9rem;">
+                    ⚡ <strong style="color:#58a6ff">Частые ловушки после немецкого:</strong><br>
+                    <span style="color:#8b949e">❌ не «because I have» → ✅ «because I have» (нет инверсии!)</span><br>
+                    <span style="color:#8b949e">❌ не «I have yesterday done» → ✅ «I did it yesterday»</span><br>
+                    <span style="color:#8b949e">❌ не «The weather it is nice» → ✅ «The weather is nice»</span>
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">📋</span>
+                    <div>
+                        <p class="plan-block-title">Что делать сегодня</p>
+                        <p class="plan-block-sub">Структура ZP + словарный запас</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Посмотри структуру экзамена</strong> — 4 части: Listening · Reading · Language use · Writing. Зайди на <a href="englisch.html" style="color:#58a6ff">englisch.html</a> и освежи.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Вокабeln — 20 слов</strong> по темам ZP: environment, technology, school, social media. Flashcards на <a href="vokabeln.html" style="color:#58a6ff">vokabeln.html</a>.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Прочитай один короткий текст по-английски</strong> — новость, статья, что угодно. Просто чтобы глаза вспомнили темп.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAG 5 ═══ -->
+        <div class="day-content" id="day-5">
+            <div class="day-header dh-green">
+                <div class="dh-num" style="color:#3fb950">5</div>
+                <div>
+                    <p class="dh-title">Reading — стратегия чтения</p>
+                    <p class="dh-sub">Самая большая часть экзамена — научись читать умно, не весь текст</p>
+                </div>
+            </div>
+
+            <div class="time-badge">⏱ 70–90 мин сегодня</div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">📖</span>
+                    <div>
+                        <p class="plan-block-title">Reading Comprehension — как работает на ZP</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">1️⃣</span><span><strong>Сначала читай вопросы</strong> — потом текст. Ты уже знаешь что искать.</span></div>
+                    <div class="task-row"><span class="task-icon">2️⃣</span><span><strong>Ищи ключевые слова из вопроса</strong> в тексте — не переводи всё, ищи именно это.</span></div>
+                    <div class="task-row"><span class="task-icon">3️⃣</span><span><strong>True / False / Not mentioned</strong> — «not mentioned» значит: в тексте нет, не домысливай!</span></div>
+                    <div class="task-row"><span class="task-icon">4️⃣</span><span><strong>Никогда не пропускай</strong> — даже если не уверена, поставь что-нибудь.</span></div>
+                </div>
+                <div class="tip-box tip-green">
+                    ⚡ <strong style="color:#3fb950">Упражнение на сегодня:</strong> возьми любой текст с заданиями из <a href="englisch.html" style="color:#3fb950">englisch.html</a> → сначала прочитай вопросы → потом текст → ответь → проверь. Повтори 2–3 текста.
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">🔤</span>
+                    <div>
+                        <p class="plan-block-title">Словарный запас — ещё 20 слов</p>
+                        <p class="plan-block-sub">Темы: health, environment, future plans</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">✅</span><span>20 новых слов через <a href="vokabeln.html" style="color:#58a6ff">Vokabeln</a> + повтори вчерашние 20.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Составь 3 предложения</strong> с новыми словами — так запоминается лучше чем просто список.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAG 4 ═══ -->
+        <div class="day-content" id="day-4">
+            <div class="day-header dh-gold">
+                <div class="dh-num" style="color:#e3b341">4</div>
+                <div>
+                    <p class="dh-title">Grammar — самые важные правила</p>
+                    <p class="dh-sub">Времена + if-clauses + relative clauses = 80% заданий по грамматике</p>
+                </div>
+            </div>
+
+            <div class="time-badge">⏱ 70–90 мин сегодня</div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">⚙️</span>
+                    <div>
+                        <p class="plan-block-title">Топ-3 грамматики для ZP Englisch</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row">
+                        <span class="task-icon">🔵</span>
+                        <span><strong>Времена (Tenses)</strong> — Present Simple / Progressive, Past Simple, Present Perfect, will / going to.<br>
+                        <em>Ключ: Present Perfect = have/has + V3 → результат важен сейчас. Past Simple = конкретное время в прошлом.</em></span>
+                    </div>
+                    <div class="task-row">
+                        <span class="task-icon">🟡</span>
+                        <span><strong>If-clauses</strong> — Type 1: If it rains, I will stay home. Type 2: If I had money, I would travel.<br>
+                        <em>Запомни: Type 1 = реально, Type 2 = нереально/мечта.</em></span>
+                    </div>
+                    <div class="task-row">
+                        <span class="task-icon">🟢</span>
+                        <span><strong>Relative clauses</strong> — who (люди), which/that (вещи), where (место).<br>
+                        <em>The girl who sits next to me. The book which I read. The place where I grew up.</em></span>
+                    </div>
+                </div>
+                <div class="tip-box tip-gold">
+                    ⚡ <strong style="color:#e3b341">Упражнение:</strong> возьми 10 предложений → переведи с русского на английский используя каждое из трёх правил. Потом попроси AI проверить.
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">📝</span>
+                    <div>
+                        <p class="plan-block-title">Language Use — заполнение пробелов</p>
+                        <p class="plan-block-sub">Это тест на грамматику и словарный запас вместе</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Prepositions</strong> — interested <em>in</em>, good <em>at</em>, afraid <em>of</em>, responsible <em>for</em>, depend <em>on</em>.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Articles</strong> — a/an (первый раз), the (конкретный), no article (общие понятия).</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span>Сделай 1–2 Language Use задания из <a href="englisch.html" style="color:#58a6ff">englisch.html</a>.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAG 3 ═══ -->
+        <div class="day-content" id="day-3">
+            <div class="day-header dh-purple">
+                <div class="dh-num" style="color:#c778f5">3</div>
+                <div>
+                    <p class="dh-title">Writing — пишем текст от начала до конца</p>
+                    <p class="dh-sub">Письмо / имейл / мнение — структура + фразы + практика</p>
+                </div>
+            </div>
+
+            <div class="time-badge">⏱ 75–90 мин сегодня</div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">✍️</span>
+                    <div>
+                        <p class="plan-block-title">Структура Writing на ZP</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">📌</span><span><strong>Introduction</strong> — представь тему, скажи что будешь делать: <em>«In this text, I am going to discuss…»</em></span></div>
+                    <div class="task-row"><span class="task-icon">📌</span><span><strong>Main part</strong> — 2 аргумента ЗА + 1 против (или наоборот). Каждый аргумент = предложение + объяснение + пример.</span></div>
+                    <div class="task-row"><span class="task-icon">📌</span><span><strong>Conclusion</strong> — твоё мнение + итог: <em>«To sum up, I think that…»</em></span></div>
+                </div>
+                <div class="tip-box tip-purple">
+                    ⚡ <strong style="color:#c778f5">Полезные фразы:</strong><br>
+                    <em>Firstly / In addition / However / On the other hand / In my opinion / To sum up / In conclusion</em>
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">⏰</span>
+                    <div>
+                        <p class="plan-block-title">Упражнение: напиши один текст с таймером</p>
+                        <p class="plan-block-sub">Именно с таймером — на экзамене будет то же самое</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">1️⃣</span><span>Поставь <strong>25 минут</strong> на таймере.</span></div>
+                    <div class="task-row"><span class="task-icon">2️⃣</span><span>Тема: <em>«Should students be allowed to use smartphones in class? Give your opinion.»</em></span></div>
+                    <div class="task-row"><span class="task-icon">3️⃣</span><span>Напиши 120–150 слов. Не останавливайся, даже если не уверена.</span></div>
+                    <div class="task-row"><span class="task-icon">4️⃣</span><span>Потом вставь в AI и попроси проверить грамматику и стиль.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAG 2 ═══ -->
+        <div class="day-content" id="day-2">
+            <div class="day-header dh-pink">
+                <div class="dh-num" style="color:#f472b6">2</div>
+                <div>
+                    <p class="dh-title">Listening + повторение — лёгкий день</p>
+                    <p class="dh-sub">Сегодня меньше нагрузки — мозгу нужен отдых перед экзаменом</p>
+                </div>
+            </div>
+
+            <div class="time-badge">⏱ 45–60 мин — не больше!</div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">🎧</span>
+                    <div>
+                        <p class="plan-block-title">Listening — стратегия</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Перед прослушиванием</strong> — читай вопросы. Ты знаешь что искать.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Пиши ключевые слова</strong> пока слушаешь — не полные предложения, только зацепки.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span><strong>Не паникуй если не понял слово</strong> — контекст обычно помогает. Продолжай слушать.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span>Посмотри 1–2 listening задания на <a href="englisch-listening.html" style="color:#58a6ff">englisch-listening.html</a>.</span></div>
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">🔁</span>
+                    <div>
+                        <p class="plan-block-title">Быстрое повторение всего</p>
+                        <p class="plan-block-sub">Только то что уже знаешь — не учи новое!</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">⚡</span><span>Пробеги по карточкам — <strong>только повторение, не новые слова.</strong></span></div>
+                    <div class="task-row"><span class="task-icon">⚡</span><span>Перечитай свой Writing от вчера — запомни фразы которые использовала.</span></div>
+                    <div class="task-row"><span class="task-icon">⚡</span><span>Вспомни 3 if-clause предложения вслух. Готово — хватит.</span></div>
+                </div>
+                <div class="tip-box tip-pink">
+                    ⚡ Сегодня <strong style="color:#f472b6">не нужно</strong> учить новое. Мозг лучше запоминает то что повторяет, а не то что видит впервые за день до экзамена.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAG 1 ═══ -->
+        <div class="day-content" id="day-1">
+            <div class="day-header dh-gold">
+                <div class="dh-num" style="color:#e3b341">1</div>
+                <div>
+                    <p class="dh-title">День перед экзаменом — отдых важнее учёбы</p>
+                    <p class="dh-sub">Сегодня: максимум 30 минут, потом стоп</p>
+                </div>
+            </div>
+
+            <div class="time-badge" style="background:rgba(227,179,65,0.12);color:#e3b341;border-color:rgba(227,179,65,0.25);">⏱ 20–30 мин — и всё, стоп</div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">🌙</span>
+                    <div>
+                        <p class="plan-block-title">Что делать сегодня</p>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">✅</span><span>Перечитай <strong>фразы для Writing</strong> — Firstly, However, In my opinion, To sum up. 5 минут.</span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span>Вспомни структуру: <strong>Reading → сначала вопросы. Listening → пиши ключевые слова. Writing → вступление + 2 аргумента + вывод.</strong></span></div>
+                    <div class="task-row"><span class="task-icon">✅</span><span>Приготовь всё на завтра: ручку, карандаш, бутылку воды.</span></div>
+                    <div class="task-row"><span class="task-icon">🛁</span><span>Потом — душ, еда, что-нибудь приятное, <strong>ранний сон.</strong> Серьёзно.</span></div>
+                </div>
+                <div class="tip-box tip-gold">
+                    ⚡ <strong style="color:#e3b341">Не учи ничего нового.</strong> Мозг во сне закрепляет то что уже знает. Сон важнее ещё одного часа за учебником.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ PRÜFUNGSTAG ═══ -->
+        <div class="day-content" id="day-0">
+            <div class="day-header dh-red">
+                <div class="dh-num" style="color:#f85149">🏆</div>
+                <div>
+                    <p class="dh-title">Prüfungstag — день экзамена</p>
+                    <p class="dh-sub">Ты готова. Вот последние советы.</p>
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">🌅</span>
+                    <div><p class="plan-block-title">Утром перед экзаменом</p></div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">🍳</span><span><strong>Поешь нормально</strong> — мозг работает на глюкозе. Не иди голодной.</span></div>
+                    <div class="task-row"><span class="task-icon">📵</span><span><strong>Не повторяй ничего</strong> за час до экзамена — это только добавит тревогу, не знания.</span></div>
+                    <div class="task-row"><span class="task-icon">🧘</span><span><strong>Глубокое дыхание</strong> — вдох 4 секунды, выдох 6. Снижает панику буквально за 2 минуты.</span></div>
+                </div>
+            </div>
+
+            <div class="plan-block">
+                <div class="plan-block-header">
+                    <span class="plan-block-icon">📋</span>
+                    <div><p class="plan-block-title">На экзамене — по шагам</p></div>
+                </div>
+                <div class="task-list">
+                    <div class="task-row"><span class="task-icon">🎧</span><span><strong>Listening:</strong> читай вопросы ДО прослушивания. Пиши ключевые слова.</span></div>
+                    <div class="task-row"><span class="task-icon">📖</span><span><strong>Reading:</strong> сначала вопросы — потом текст. Ищи ключевые слова, не переводи всё.</span></div>
+                    <div class="task-row"><span class="task-icon">⚙️</span><span><strong>Language use:</strong> не уверена — пропусти, вернись в конце. Не зависай на одном задании.</span></div>
+                    <div class="task-row"><span class="task-icon">✍️</span><span><strong>Writing:</strong> 2 минуты на план (стрелки, ключевые слова) → пиши → проверь в конце.</span></div>
+                    <div class="task-row"><span class="task-icon">⏰</span><span><strong>Следи за временем</strong> — примерно 30 мин на каждую часть. Не застревай.</span></div>
+                </div>
+                <div class="tip-box tip-green" style="margin-top:0.8rem;">
+                    ⚡ <strong style="color:#3fb950">Если паника:</strong> закрой глаза на 10 секунд, глубокий вдох, скажи себе «I know this». Потом продолжай.
+                </div>
+            </div>
+        </div>
+
+        <div style="height:3rem"></div>
+    </div>
+
+    <script>
+        function switchDay(n) {
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.tab-day').forEach(t => t.classList.remove('active'));
+            document.getElementById('day-' + n).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

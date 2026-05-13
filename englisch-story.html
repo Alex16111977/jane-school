@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Masterclass | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .story-quote {
+            background: rgba(163,113,247,0.06);
+            border-left: 3px solid #a371f7;
+            padding: 0.8rem 1.1rem;
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
+            font-size: 0.95rem;
+            line-height: 1.75;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+        }
+        .story-quote .narrator { color: #c9b3ff; }
+        .story-quote .dialogue { color: #58a6ff; font-style: italic; }
+        .story-quote .feeling { color: #f1c40f; }
+        .story-quote .action { color: #3fb950; }
+        .story-quote em { color: #a371f7; font-style: normal; font-weight: 700; }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin: 0.5rem 0;
+        }
+        @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+        .tell-box, .show-box {
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+        .tell-box {
+            background: rgba(248,81,73,0.07);
+            border: 1px solid rgba(248,81,73,0.25);
+        }
+        .show-box {
+            background: rgba(63,185,80,0.07);
+            border: 1px solid rgba(63,185,80,0.25);
+        }
+        .tell-box::before, .show-box::before {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.3rem;
+        }
+        .tell-box::before { content: '❌ TELL (слабо)'; color: #f85149; }
+        .show-box::before { content: '✅ SHOW (сильно)'; color: #3fb950; }
+
+        .phrase-block {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 0;
+        }
+        .phrase-block h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.95rem;
+            color: var(--block-color, #a371f7);
+        }
+        .phrase-block ul { margin: 0; padding-left: 1.2rem; line-height: 1.85; font-size: 0.9rem; }
+        .phrase-block ul li code {
+            background: rgba(255,255,255,0.06);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #c9b3ff;
+        }
+
+        .verb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+        .verb-pair {
+            background: rgba(163,113,247,0.08);
+            border: 1px solid rgba(163,113,247,0.25);
+            border-radius: 8px;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+        .verb-pair strong { color: #c9b3ff; }
+        .verb-pair span { color: var(--color-text-muted); font-size: 0.78rem; display: block; }
+
+        .opener-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid var(--mood-color, #a371f7);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            margin: 0.6rem 0;
+        }
+        .opener-card .mood-tag {
+            display: inline-block;
+            background: var(--mood-color, #a371f7);
+            color: #0a0a14;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 0.15rem 0.55rem;
+            border-radius: 10px;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .opener-card .opener-text {
+            font-family: 'Georgia', serif;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: rgba(230,230,235,0.95);
+            font-style: italic;
+        }
+
+        .step-card {
+            background: rgba(88,166,255,0.05);
+            border: 1px solid rgba(88,166,255,0.25);
+            border-radius: 10px;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            position: relative;
+            margin: 0.5rem 0;
+        }
+        .step-card .step-n {
+            position: absolute;
+            left: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.8rem;
+            height: 1.8rem;
+            background: #58a6ff;
+            color: #0a0a14;
+            font-weight: 900;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+        .step-card h4 { margin: 0 0 0.2rem; color: #58a6ff; font-size: 0.92rem; }
+        .step-card p { margin: 0; font-size: 0.85rem; line-height: 1.5; color: rgba(230,230,235,0.85); }
+
+        .mistake-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 600px) { .mistake-grid { grid-template-columns: 1fr; } }
+        .mistake-grid > div {
+            padding: 0.45rem 0.7rem;
+            border-radius: 6px;
+        }
+        .mistake-grid .m-bad {
+            background: rgba(248,81,73,0.08);
+            border: 1px solid rgba(248,81,73,0.25);
+        }
+        .mistake-grid .m-good {
+            background: rgba(63,185,80,0.08);
+            border: 1px solid rgba(63,185,80,0.25);
+        }
+
+        .checklist {
+            background: rgba(63,185,80,0.05);
+            border: 2px dashed rgba(63,185,80,0.4);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+        }
+        .checklist ul {
+            margin: 0.4rem 0 0;
+            padding-left: 0;
+            list-style: none;
+            line-height: 2;
+        }
+        .checklist ul li::before {
+            content: '☐ ';
+            color: #3fb950;
+            font-weight: 900;
+            margin-right: 0.3rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Story Masterclass</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Story Continuation &mdash; Masterclass</h1>
+            <p class="page-subtitle">Глубокий разбор &mdash; всё, что нужно для Aufgabe 3 option b)</p>
+        </div>
+
+        <div class="note-card highlight-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.06);">
+            <p style="margin:0;"><strong style="color:#a371f7;">&#x1F3AF;</strong> Story Continuation &mdash; самая безопасная опция для A2 (12 баллов). Эта страница даёт <strong>всё</strong>: грамматика времён, диалоги, эмоции, переходы, образцы. Если выучишь &mdash; задание решишь.</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="grammar">&#x1F4D0; Grammatik</button>
+            <button class="tab" data-tab="blocks">&#x1F9F1; 5 Blocks</button>
+            <button class="tab" data-tab="phrases">&#x1F4AC; Phrasen</button>
+            <button class="tab" data-tab="dialogue">&#x1F5E8;&#xFE0F; Dialog</button>
+            <button class="tab" data-tab="show">&#x1F441;&#xFE0F; Show vs Tell</button>
+            <button class="tab" data-tab="openers">&#x1F680; Openers</button>
+            <button class="tab" data-tab="examples">&#x1F4D6; Beispiele</button>
+            <button class="tab" data-tab="checklist">&#x2705; Checkliste</button>
+        </div>
+
+        <!-- ============================= GRAMMAR ============================= -->
+        <div class="tab-content active" id="tab-grammar">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Grammatik &mdash; 3 Zeiten f&uuml;r Story</h2>
+                        <p class="lesson-header-sub">Past Simple (база) + Past Continuous (фон) + Past Perfect (давно до того)</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x26A1; Главное правило A2:</strong> Story = <strong>Past Simple</strong> на 80%. Past Continuous и Past Perfect только когда они <strong>реально нужны</strong>. Лучше много правильного Past Simple, чем смешение всех времён.</p>
+                </div>
+
+                <!-- Past Simple -->
+                <div class="note-card" style="border-left:4px solid #3fb950;">
+                    <h3 style="color:#3fb950;">1. Past Simple &mdash; основа всей истории</h3>
+                    <p style="font-size:0.88rem; margin-bottom:0.5rem;"><strong>Wann:</strong> завершённое действие в прошлом, последовательность событий</p>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Form</th><th>Beispiel</th></tr>
+                        <tr><td>Regelm&auml;&szlig;ig: + ed</td><td>walk &rarr; walk<strong>ed</strong>, smile &rarr; smile<strong>d</strong>, try &rarr; tr<strong>ied</strong></td></tr>
+                        <tr><td>Unregelm&auml;&szlig;ig</td><td>say &rarr; <strong>said</strong>, go &rarr; <strong>went</strong>, come &rarr; <strong>came</strong></td></tr>
+                        <tr><td>Verneinung</td><td>I <strong>didn&rsquo;t</strong> see her.</td></tr>
+                        <tr><td>Frage</td><td><strong>Did</strong> she come?</td></tr>
+                    </table>
+                    <p style="margin-top:0.5rem; font-size:0.85rem;"><em>Beispiel:</em> &laquo;Nadima <strong>smiled</strong>. She <strong>sat down</strong> at the table and <strong>started</strong> to eat. My mum <strong>asked</strong> her a question.&raquo;</p>
+                </div>
+
+                <!-- Past Continuous -->
+                <div class="note-card" style="border-left:4px solid #58a6ff;">
+                    <h3 style="color:#58a6ff;">2. Past Continuous &mdash; was/were + -ing (Hintergrund)</h3>
+                    <p style="font-size:0.88rem; margin-bottom:0.5rem;"><strong>Wann:</strong> описание <em>что происходило в момент</em>, фон сцены, что-то длилось когда вдруг&hellip;</p>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Wann benutzen</th><th>Beispiel</th></tr>
+                        <tr><td>Действие в процессе в прошлом</td><td>The sun <strong>was shining</strong> brightly.</td></tr>
+                        <tr><td>Длилось когда что-то случилось (с Past Simple)</td><td>I <strong>was reading</strong> when she <strong>came</strong> in.</td></tr>
+                        <tr><td>Два параллельных действия</td><td>While I <strong>was cooking</strong>, dad <strong>was setting</strong> the table.</td></tr>
+                    </table>
+                    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--color-text-muted);">&#x1F4A1; Сигнальные слова: <em>while, when, as</em></p>
+                </div>
+
+                <!-- Past Perfect -->
+                <div class="note-card" style="border-left:4px solid #f1c40f;">
+                    <h3 style="color:#f1c40f;">3. Past Perfect &mdash; had + Past Participle (давно до того)</h3>
+                    <p style="font-size:0.88rem; margin-bottom:0.5rem;"><strong>Wann:</strong> чтобы показать, что что-то <em>уже произошло до</em> другого прошлого события</p>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Form</th><th>Beispiel</th></tr>
+                        <tr><td>I <strong>had finished</strong> &hellip;</td><td>When mum came home, I <strong>had finished</strong> my homework. <em>(сначала закончил, потом мама пришла)</em></td></tr>
+                        <tr><td>She <strong>had never seen</strong> &hellip;</td><td>Nadima <strong>had never seen</strong> snow before. <em>(до этого момента не видела)</em></td></tr>
+                    </table>
+                    <p style="margin-top:0.5rem; font-size:0.85rem; color:#f59e0b;">&#x26A0;&#xFE0F; A2-уровень: <strong>не злоупотребляй</strong>. Past Perfect нужен только если хочешь подчеркнуть &laquo;до того, как&raquo;.</p>
+                </div>
+
+                <!-- Sequence example -->
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+                    <h3>&#x1F3AF; Все 3 времени в одном абзаце</h3>
+                    <div class="story-quote">
+                        It <em>was</em> a quiet evening. The sun <em>was setting</em> <span class="feeling">(Past Continuous &mdash; фон)</span> and the kitchen <em>smelled</em> of bread. My mum <em>had already prepared</em> <span class="feeling">(Past Perfect &mdash; до этого)</span> the table. Nadima <em>arrived</em> exactly at six. She <em>knocked</em> on the door, and I <em>opened</em> it <span class="feeling">(Past Simple &mdash; последовательность)</span>.
+                    </div>
+                </div>
+
+                <!-- Sequence words -->
+                <div class="note-card">
+                    <h3>&#x1F517; Связки времени &mdash; transition words</h3>
+                    <div class="phrase-block" style="--block-color:#3fb950;">
+                        <h4>В начале сцены</h4>
+                        <ul>
+                            <li><code>It was a [adjective] [day/evening/morning]</code></li>
+                            <li><code>At first, &hellip;</code></li>
+                            <li><code>In the beginning, &hellip;</code></li>
+                            <li><code>When I arrived, &hellip;</code></li>
+                        </ul>
+                    </div>
+                    <div class="phrase-block" style="--block-color:#58a6ff;">
+                        <h4>В середине &mdash; продолжение</h4>
+                        <ul>
+                            <li><code>Then</code> / <code>After that</code></li>
+                            <li><code>A few minutes later, &hellip;</code></li>
+                            <li><code>Suddenly</code> / <code>All of a sudden</code></li>
+                            <li><code>Meanwhile, &hellip;</code> (тем временем)</li>
+                            <li><code>As soon as &hellip;, &hellip;</code> (как только)</li>
+                        </ul>
+                    </div>
+                    <div class="phrase-block" style="--block-color:#f1c40f;">
+                        <h4>В конце</h4>
+                        <ul>
+                            <li><code>In the end, &hellip;</code></li>
+                            <li><code>Finally, &hellip;</code></li>
+                            <li><code>By the end of the evening, &hellip;</code></li>
+                            <li><code>That was the moment when &hellip;</code></li>
+                            <li><code>And that&rsquo;s how &hellip;</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-grammar -->
+
+        <!-- ============================= 5 BUILDING BLOCKS ============================= -->
+        <div class="tab-content" id="tab-blocks">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9F1;</span>
+                    <div>
+                        <h2>5 Building Blocks &mdash; из чего состоит история</h2>
+                        <p class="lesson-header-sub">Каждый абзац микшируй из этих 5 элементов</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p>Хорошая история на A2 &mdash; не просто &laquo;он пошёл, потом пошёл&raquo;. Это <strong>смесь 5 элементов</strong> в каждом абзаце. Тогда текст оживает.</p>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#3fb950;">
+                    <h4>1. Setting &mdash; обстановка (где, когда, кто)</h4>
+                    <ul>
+                        <li><code>It was a sunny morning in May.</code></li>
+                        <li><code>The kitchen smelled of fresh bread.</code></li>
+                        <li><code>Everyone was already there.</code></li>
+                    </ul>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.4rem;">Используй 1-2 раза на 100 слов. В начале сцены.</p>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#58a6ff;">
+                    <h4>2. Action &mdash; что происходит (глаголы движения)</h4>
+                    <ul>
+                        <li><code>She walked into the room.</code></li>
+                        <li><code>He picked up the cup and drank slowly.</code></li>
+                        <li><code>I opened the door.</code></li>
+                    </ul>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.4rem;">Основа истории. Past Simple. Сильные глаголы.</p>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#f1c40f;">
+                    <h4>3. Dialogue &mdash; прямая речь</h4>
+                    <ul>
+                        <li><code>&laquo;Welcome,&raquo; my mum said with a smile.</code></li>
+                        <li><code>&laquo;Are you okay?&raquo; I asked.</code></li>
+                        <li><code>Nadima whispered, &laquo;Thank you.&raquo;</code></li>
+                    </ul>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.4rem;">2-3 реплики на 100 слов &mdash; оживляет рассказ.</p>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#a371f7;">
+                    <h4>4. Feeling &mdash; эмоция или мысль</h4>
+                    <ul>
+                        <li><code>I felt nervous.</code></li>
+                        <li><code>My heart was pounding.</code></li>
+                        <li><code>For a moment, I didn&rsquo;t know what to say.</code></li>
+                    </ul>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.4rem;">Показывай чувства главного героя &mdash; экзаменатор это любит.</p>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#f85149;">
+                    <h4>5. Reaction &mdash; реакция другого персонажа</h4>
+                    <ul>
+                        <li><code>My dad smiled and nodded.</code></li>
+                        <li><code>Nadima looked surprised.</code></li>
+                        <li><code>Everyone laughed.</code></li>
+                    </ul>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.4rem;">Показывает как другие на это реагируют &mdash; делает сцену живой.</p>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+                    <h3>&#x1F3AF; Формула одного абзаца</h3>
+                    <p style="margin:0; font-size:0.92rem;"><strong>Setting/Transition</strong> &rarr; <strong>Action</strong> &rarr; <strong>Dialogue</strong> &rarr; <strong>Feeling</strong> &rarr; <strong>Reaction</strong></p>
+                    <div class="story-quote" style="margin-top:0.7rem;"><em>By the end of dinner</em> <span class="action">(transition)</span>, my mum <em>brought out</em> a chocolate cake <span class="action">(action)</span>. <span class="dialogue">&laquo;This is for you,&raquo;</span> she <em>said</em> <span class="action">(dialogue)</span>. Nadima&rsquo;s <em>eyes lit up</em> <span class="feeling">(feeling)</span>. She <em>hugged</em> my mum tightly <span class="action">(reaction)</span>.</div>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-blocks -->
+
+        <!-- ============================= PHRASES ============================= -->
+        <div class="tab-content" id="tab-phrases">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>40 Phrasen f&uuml;r Story &mdash; по категориям</h2>
+                        <p class="lesson-header-sub">Заучи 10 любимых из каждой категории = текст готов</p>
+                    </div>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#3fb950;">
+                    <h4>&#x1F535; Opener &mdash; как начать сцену</h4>
+                    <ul>
+                        <li><code>It was a [warm / cold / quiet / strange] [evening / day / morning].</code></li>
+                        <li><code>When I [arrived / opened the door / heard the noise], &hellip;</code></li>
+                        <li><code>I&rsquo;ll never forget the moment when &hellip;</code></li>
+                        <li><code>The room was full of [people / silence / laughter].</code></li>
+                        <li><code>Everything started when &hellip;</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#58a6ff;">
+                    <h4>&#x1F7E2; Transition &mdash; переход во времени</h4>
+                    <ul>
+                        <li><code>A few minutes later, &hellip;</code></li>
+                        <li><code>Just then, &hellip;</code></li>
+                        <li><code>After a while, &hellip;</code></li>
+                        <li><code>Meanwhile, &hellip;</code></li>
+                        <li><code>As soon as &hellip;, &hellip;</code></li>
+                        <li><code>Without warning, &hellip;</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#f1c40f;">
+                    <h4>&#x1F389; Positive emotions &mdash; радость, облегчение</h4>
+                    <ul>
+                        <li><code>I felt a wave of relief.</code></li>
+                        <li><code>My heart jumped with joy.</code></li>
+                        <li><code>A big smile spread across her face.</code></li>
+                        <li><code>I couldn&rsquo;t stop smiling.</code></li>
+                        <li><code>For the first time, I felt at home.</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#f85149;">
+                    <h4>&#x1F62C; Tension / Negative emotions &mdash; нервы, страх</h4>
+                    <ul>
+                        <li><code>My heart was pounding.</code></li>
+                        <li><code>I took a deep breath.</code></li>
+                        <li><code>My hands started to shake.</code></li>
+                        <li><code>For a moment, I couldn&rsquo;t move.</code></li>
+                        <li><code>A cold feeling ran down my back.</code></li>
+                        <li><code>I had no idea what to do.</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#a371f7;">
+                    <h4>&#x1F914; Inner thoughts &mdash; мысли героя</h4>
+                    <ul>
+                        <li><code>I thought to myself, &laquo;&hellip;&raquo;</code></li>
+                        <li><code>For a second, I wondered if &hellip;</code></li>
+                        <li><code>I couldn&rsquo;t believe what I was seeing.</code></li>
+                        <li><code>Something told me that &hellip;</code></li>
+                        <li><code>I knew at that moment that &hellip;</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#38bdf8;">
+                    <h4>&#x1F4F8; Sensory details &mdash; что видно/слышно/пахнет</h4>
+                    <ul>
+                        <li><code>I could hear &hellip; in the distance.</code></li>
+                        <li><code>The smell of fresh coffee filled the room.</code></li>
+                        <li><code>Her eyes were full of tears.</code></li>
+                        <li><code>His voice was soft and gentle.</code></li>
+                        <li><code>The room went silent.</code></li>
+                    </ul>
+                </div>
+
+                <div class="phrase-block" style="--block-color:#f59e0b;">
+                    <h4>&#x1F3C1; Closer &mdash; как закончить</h4>
+                    <ul>
+                        <li><code>And that was the moment I realised &hellip;</code></li>
+                        <li><code>From that day on, &hellip;</code></li>
+                        <li><code>It was the best [day / evening] of my life.</code></li>
+                        <li><code>I knew everything would be okay.</code></li>
+                        <li><code>That night, I slept with a smile on my face.</code></li>
+                        <li><code>And that&rsquo;s how everything changed.</code></li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-phrases -->
+
+        <!-- ============================= DIALOGUE ============================= -->
+        <div class="tab-content" id="tab-dialogue">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E8;&#xFE0F;</span>
+                    <div>
+                        <h2>Dialog &mdash; wie zitiert man richtig</h2>
+                        <p class="lesson-header-sub">Punktuation, &laquo;said&raquo;-Alternativen, Tag-Position</p>
+                    </div>
+                </div>
+
+                <!-- Punctuation -->
+                <div class="note-card">
+                    <h3>&#x1F4DD; Punktuation &mdash; железные правила</h3>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Regel</th><th>Beispiel</th></tr>
+                        <tr><td>Цитата в <strong>&laquo;...&raquo;</strong> (или <code>"..."</code>)</td><td>&laquo;<strong>I am tired</strong>,&raquo; she said.</td></tr>
+                        <tr><td><strong>Запятая</strong> перед закрывающей кавычкой, если потом &laquo;said X&raquo;</td><td>&laquo;Hello<strong>,</strong>&raquo; he said.</td></tr>
+                        <tr><td>Если в конце <strong>?</strong> или <strong>!</strong> &mdash; они остаются</td><td>&laquo;Where are you<strong>?</strong>&raquo; she asked.</td></tr>
+                        <tr><td>&laquo;said X&raquo; пишется со <strong>строчной</strong></td><td>&laquo;Yes,&raquo; <strong>he</strong> said. (не &laquo;He&raquo;)</td></tr>
+                        <tr><td>Каждый новый говорящий &mdash; <strong>новая строка</strong></td><td>&laquo;Hi!&raquo; said Tom.<br>&laquo;Hi back,&raquo; she answered.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Said alternatives -->
+                <div class="note-card">
+                    <h3>&#x1F3AD; Замени &laquo;said&raquo; &mdash; 20 вариантов</h3>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.5rem;">Сильные глаголы дают <strong>+1 балл</strong> по критерию Sprachliche Mittel.</p>
+                    <div class="verb-grid">
+                        <div class="verb-pair"><strong>asked</strong><span>спросил</span></div>
+                        <div class="verb-pair"><strong>answered</strong><span>ответил</span></div>
+                        <div class="verb-pair"><strong>replied</strong><span>ответил</span></div>
+                        <div class="verb-pair"><strong>whispered</strong><span>прошептал</span></div>
+                        <div class="verb-pair"><strong>shouted</strong><span>крикнул</span></div>
+                        <div class="verb-pair"><strong>cried</strong><span>заплакал/крикнул</span></div>
+                        <div class="verb-pair"><strong>exclaimed</strong><span>воскликнул</span></div>
+                        <div class="verb-pair"><strong>muttered</strong><span>пробормотал</span></div>
+                        <div class="verb-pair"><strong>announced</strong><span>объявил</span></div>
+                        <div class="verb-pair"><strong>admitted</strong><span>признал</span></div>
+                        <div class="verb-pair"><strong>continued</strong><span>продолжил</span></div>
+                        <div class="verb-pair"><strong>added</strong><span>добавил</span></div>
+                        <div class="verb-pair"><strong>laughed</strong><span>засмеялся</span></div>
+                        <div class="verb-pair"><strong>sighed</strong><span>вздохнул</span></div>
+                        <div class="verb-pair"><strong>nodded</strong><span>кивнул</span></div>
+                        <div class="verb-pair"><strong>agreed</strong><span>согласился</span></div>
+                        <div class="verb-pair"><strong>promised</strong><span>пообещал</span></div>
+                        <div class="verb-pair"><strong>warned</strong><span>предупредил</span></div>
+                        <div class="verb-pair"><strong>begged</strong><span>умолял</span></div>
+                        <div class="verb-pair"><strong>insisted</strong><span>настаивал</span></div>
+                    </div>
+                </div>
+
+                <!-- Tag positions -->
+                <div class="note-card">
+                    <h3>&#x1F4CD; Wo steht das &laquo;said&raquo; &mdash; 3 Positionen</h3>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Position</th><th>Beispiel</th></tr>
+                        <tr><td><strong>Nach</strong> (am h&auml;ufigsten)</td><td>&laquo;Welcome,&raquo; <strong>my mum said with a smile</strong>.</td></tr>
+                        <tr><td><strong>Vor</strong></td><td><strong>My mum smiled and said</strong>, &laquo;Welcome.&raquo;</td></tr>
+                        <tr><td><strong>In der Mitte</strong> (продвинуто)</td><td>&laquo;Welcome,&raquo; <strong>my mum said</strong>, &laquo;please come in.&raquo;</td></tr>
+                    </table>
+                </div>
+
+                <!-- Dialogue example -->
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3AF; Образец диалога с разнообразием</h3>
+                    <div class="story-quote">
+&laquo;<span class="dialogue">Hi, Nadima,</span>&raquo; my mum <em>said warmly</em>. &laquo;<span class="dialogue">Please come in.</span>&raquo;
+
+Nadima <em>smiled shyly</em> and <em>whispered</em>, &laquo;<span class="dialogue">Thank you.</span>&raquo;
+
+&laquo;<span class="dialogue">Are you hungry?</span>&raquo; my dad <em>asked</em>.
+
+She <em>nodded</em>. &laquo;<span class="dialogue">A little.</span>&raquo;
+
+&laquo;<span class="dialogue">Then sit down,</span>&raquo; he <em>laughed</em>. &laquo;<span class="dialogue">Mum cooked everything!</span>&raquo;
+                    </div>
+                    <p style="margin-top:0.5rem; font-size:0.82rem; color:var(--color-text-muted);">&#x2705; Каждый говорящий &mdash; новая строка. Разные &laquo;said&raquo;-глаголы. Запятые в правильных местах.</p>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-dialogue -->
+
+        <!-- ============================= SHOW DON'T TELL ============================= -->
+        <div class="tab-content" id="tab-show">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F441;&#xFE0F;</span>
+                    <div>
+                        <h2>Show, don&rsquo;t tell &mdash; покажи, не рассказывай</h2>
+                        <p class="lesson-header-sub">Главный приём, который отличает A2 от B1</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x1F4A1; Правило:</strong> вместо &laquo;он был грустный&raquo; покажи, как это <strong>выглядит</strong>: &laquo;его плечи опустились, он смотрел в пол&raquo;. Это <strong>гарантированно</strong> поднимает балл.</p>
+                </div>
+
+                <!-- Comparisons -->
+                <div class="compare-grid">
+                    <div class="tell-box">She was sad.</div>
+                    <div class="show-box">Her shoulders dropped and she stared at the floor.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">He was scared.</div>
+                    <div class="show-box">His hands started to shake. He took a step back.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">She was happy.</div>
+                    <div class="show-box">A big smile spread across her face. She couldn&rsquo;t stop laughing.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">He was angry.</div>
+                    <div class="show-box">He clenched his fists. His face turned red.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">She was surprised.</div>
+                    <div class="show-box">Her eyes went wide. &laquo;What?&raquo; she said, almost dropping the cup.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">He was tired.</div>
+                    <div class="show-box">He yawned and rubbed his eyes. His head felt heavy.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">The room was quiet.</div>
+                    <div class="show-box">You could hear the clock ticking. Nobody moved.</div>
+                </div>
+
+                <div class="compare-grid">
+                    <div class="tell-box">Nadima was nervous.</div>
+                    <div class="show-box">Nadima took a deep breath and looked at the floor. Her hands were holding the bag tightly.</div>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06); margin-top:1rem;">
+                    <h3>&#x1F3AF; Bank эмоций &rarr; действий</h3>
+                    <table class="unit-table" style="font-size:0.88rem;">
+                        <tr><th>Чувство</th><th>Физические признаки (используй ИХ)</th></tr>
+                        <tr><td><strong>Nervous / scared</strong></td><td>shaking hands, deep breath, pounding heart, dry mouth, stepping back</td></tr>
+                        <tr><td><strong>Happy</strong></td><td>smile, laugh, jump, hug, eyes light up</td></tr>
+                        <tr><td><strong>Sad</strong></td><td>tears, drop shoulders, stare at floor, sigh, quiet voice</td></tr>
+                        <tr><td><strong>Angry</strong></td><td>clench fists, red face, raised voice, frown, slam door</td></tr>
+                        <tr><td><strong>Surprised</strong></td><td>wide eyes, mouth open, drop something, step back</td></tr>
+                        <tr><td><strong>Relieved</strong></td><td>let out breath, smile, sit down, relax shoulders</td></tr>
+                        <tr><td><strong>Shy</strong></td><td>look at floor, blush, quiet voice, hide behind something</td></tr>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-show -->
+
+        <!-- ============================= OPENERS ============================= -->
+        <div class="tab-content" id="tab-openers">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F680;</span>
+                    <div>
+                        <h2>5 готовых начал &mdash; под любую сцену</h2>
+                        <p class="lesson-header-sub">Если в задании нет starter&rsquo;а &mdash; используй один из этих</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">&#x1F4A1;</strong> Большинство ZP-заданий дают starter. Но если нет &mdash; вот 5 универсальных шаблонов под любое настроение. Меняй имена и детали.</p>
+                </div>
+
+                <div class="opener-card" style="--mood-color:#3fb950;">
+                    <span class="mood-tag">&#x1F31E; POSITIVE</span>
+                    <div class="opener-text">&laquo;It was a warm Friday evening. My family and I were waiting for our new friend, Nadima. The smell of food filled the kitchen, and I felt nervous but excited. When the doorbell rang, my heart jumped&hellip;&raquo;</div>
+                </div>
+
+                <div class="opener-card" style="--mood-color:#f85149;">
+                    <span class="mood-tag">&#x1F62C; TENSION</span>
+                    <div class="opener-text">&laquo;I didn&rsquo;t know what to do. My hands were shaking, and the room felt suddenly cold. I looked at the door, took a deep breath, and slowly walked inside. Everyone turned to look at me&hellip;&raquo;</div>
+                </div>
+
+                <div class="opener-card" style="--mood-color:#a371f7;">
+                    <span class="mood-tag">&#x1F914; MYSTERIOUS</span>
+                    <div class="opener-text">&laquo;I&rsquo;ll never forget that day. It started like any other Monday, but something felt different from the moment I opened my eyes. When I got to school, my best friend was waiting for me with a strange look on her face&hellip;&raquo;</div>
+                </div>
+
+                <div class="opener-card" style="--mood-color:#58a6ff;">
+                    <span class="mood-tag">&#x1F4DD; REFLECTIVE</span>
+                    <div class="opener-text">&laquo;Looking back, I realise that meeting Nadima changed everything. I still remember the first time she came to our dinner. My mum had made my favourite pasta, and dad was setting the table when&hellip;&raquo;</div>
+                </div>
+
+                <div class="opener-card" style="--mood-color:#f1c40f;">
+                    <span class="mood-tag">&#x26A1; ACTION</span>
+                    <div class="opener-text">&laquo;Without warning, the door flew open. My mum stood there with a huge smile and a bag of groceries. &lsquo;Quick, help me!&rsquo; she said. I jumped up and grabbed the bag, wondering what was happening&hellip;&raquo;</div>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(241,196,15,0.4); background:rgba(241,196,15,0.06); margin-top:1rem;">
+                    <h3>&#x2728; Универсальный шаблон</h3>
+                    <p style="margin:0; font-size:0.9rem;"><strong>[Setting]</strong> + <strong>[Mood/Feeling]</strong> + <strong>[Action that starts the story]</strong></p>
+                    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--color-text-muted);"><em>It was a [adjective] [time]. I felt [emotion]. Then [something happened]&hellip;</em></p>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-openers -->
+
+        <!-- ============================= EXAMPLES ============================= -->
+        <div class="tab-content" id="tab-examples">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D6;</span>
+                    <div>
+                        <h2>2 готовых образца &mdash; A2 vs B1</h2>
+                        <p class="lesson-header-sub">Сравни и пойми, что выводит баллы</p>
+                    </div>
+                </div>
+
+                <!-- A2 Sample -->
+                <div class="note-card" style="border-left:4px solid #f1c40f;">
+                    <h3 style="color:#f1c40f;">&#x1F4DD; A2-уровень &mdash; надёжно (~9/12)</h3>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.5rem;">Aufgabe: <em>Write how the story continues during dinner. (Jaz invites Nadima.)</em></p>
+                    <div class="story-quote">
+Mum and Dad were already busy setting the table. Nadima just stood in the doorway. I saw her taking a deep breath.
+
+&laquo;Welcome!&raquo; my mum said and gave Nadima a hug. Nadima smiled but said nothing.
+
+At first, Nadima was very shy. She didn&rsquo;t know what to say. My dad asked her some questions about Syria. She started to talk slowly.
+
+Then we ate dinner. My mum made pasta. Nadima tried it and said, &laquo;It is delicious!&raquo; We all laughed.
+
+By the end of dinner, my parents loved Nadima. They said, &laquo;You can come every Friday.&raquo; Nadima hugged me. &laquo;Thank you,&raquo; she said. &laquo;This was the best evening.&raquo;
+                    </div>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.5rem;">&#x2705; Все 3 Include &nbsp;&bull;&nbsp; Past Simple весь текст &nbsp;&bull;&nbsp; 4 абзаца &nbsp;&bull;&nbsp; ~95 слов &nbsp;&bull;&nbsp; диалог &nbsp;&bull;&nbsp; простой A2-словарь</p>
+                </div>
+
+                <!-- B1 Sample -->
+                <div class="note-card" style="border-left:4px solid #3fb950;">
+                    <h3 style="color:#3fb950;">&#x1F4D6; B1-уровень &mdash; на высокий балл (~12/12)</h3>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.5rem;">То же задание, но с приёмами Show-don&rsquo;t-Tell, Past Continuous и сильными глаголами.</p>
+                    <div class="story-quote">
+Mum and Dad <em>were already busy</em> setting the table when Nadima <em>arrived</em>. She just <em>stood</em> in the doorway, holding her bag tightly. I <em>saw</em> her <em>take a deep breath</em>.
+
+&laquo;Welcome, sweetheart,&raquo; my mum <em>said warmly</em>, pulling Nadima into a hug. Nadima <em>blushed</em> and <em>whispered</em>, &laquo;Thank you for inviting me.&raquo;
+
+At first, she <em>seemed</em> uncomfortable &mdash; her eyes <em>kept moving</em> around the room. My dad <em>noticed</em> and <em>started asking</em> her about Damascus. <em>Slowly</em>, Nadima <em>began to smile</em>. She <em>told</em> us about her old school and her cat back home.
+
+When mum <em>brought out</em> the pasta, Nadima&rsquo;s eyes <em>lit up</em>. &laquo;This <em>smells</em> amazing,&raquo; she <em>said</em>, and we <em>all laughed</em>. By the end of the evening, she <em>was teaching</em> us Arabic words and my parents <em>couldn&rsquo;t stop smiling</em>.
+
+As she <em>was leaving</em>, my mum <em>hugged</em> her again. &laquo;Come every Friday,&raquo; she <em>insisted</em>. Nadima <em>turned</em> to me, her eyes shining. &laquo;Thank you,&raquo; she <em>said softly</em>. &laquo;This <em>was</em> the best evening I&rsquo;ve had in months.&raquo;
+                    </div>
+                    <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.5rem;">&#x2705; &laquo;Show don&rsquo;t tell&raquo; (blushed, eyes lit up, hands holding bag tightly) &nbsp;&bull;&nbsp; Past Continuous (were setting, was leaving) &nbsp;&bull;&nbsp; Сильные глаголы (whispered, insisted, noticed) &nbsp;&bull;&nbsp; Сенсорные детали (smells amazing)</p>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(241,196,15,0.4); background:rgba(241,196,15,0.06);">
+                    <h3>&#x1F3AF; Тебе на A2 &mdash; цель: первый образец</h3>
+                    <p style="margin:0; font-size:0.9rem;">Первый текст &mdash; <strong>достижимый уровень</strong>. Простой, правильный, все Include покрыты. Не пытайся писать как B1 &mdash; ошибки съедят баллы. Лучше <strong>безупречный A2</strong>, чем кривой B1.</p>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-examples -->
+
+        <!-- ============================= CHECKLIST ============================= -->
+        <div class="tab-content" id="tab-checklist">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2705;</span>
+                    <div>
+                        <h2>Финальный чек-лист &mdash; перед сдачей</h2>
+                        <p class="lesson-header-sub">5 минут на проверку &mdash; пройдись по этому списку</p>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin:0 0 0.4rem; color:#3fb950;">&#x1F4CB; До начала писания</h3>
+                    <ul>
+                        <li>Обвёл все Include-пункты карандашом</li>
+                        <li>Понимаю, какая Textsorte: Story Continuation</li>
+                        <li>Знаю primary tense: Past Simple</li>
+                        <li>Спланировал 4 абзаца под Include-пункты</li>
+                    </ul>
+                </div>
+
+                <div class="checklist" style="margin-top:0.7rem;">
+                    <h3 style="margin:0 0 0.4rem; color:#3fb950;">&#x1F4DD; Во время писания</h3>
+                    <ul>
+                        <li>Каждый абзац отвечает на один Include</li>
+                        <li>Минимум 3 connectors (At first, Then, By the end&hellip;)</li>
+                        <li>Хотя бы 1 кусок прямой речи в кавычках</li>
+                        <li>Использовал хотя бы 2 эмоции (показал, не рассказал)</li>
+                        <li>Заглавные буквы у имён персонажей</li>
+                        <li>~100 слов (не меньше 80, не больше 130)</li>
+                    </ul>
+                </div>
+
+                <div class="checklist" style="margin-top:0.7rem; background:rgba(241,196,15,0.05); border-color:rgba(241,196,15,0.4);">
+                    <h3 style="margin:0 0 0.4rem; color:#f1c40f;">&#x1F50D; 5 минут на проверку</h3>
+                    <ul>
+                        <li>Все глаголы в Past Simple? Не сбился на Present?</li>
+                        <li>Неправильные глаголы: said (не sayed!), went (не goed), came (не comed)</li>
+                        <li>Запятые перед закрывающей кавычкой: <em>&laquo;Hi,&raquo; she said.</em></li>
+                        <li>3 лицо в Past: he/she/it without -s (he <strong>walked</strong>, не <strong>walkeds</strong>)</li>
+                        <li>Артикли: a/an/the</li>
+                        <li>Перечитал текст вслух (про себя) &mdash; звучит естественно?</li>
+                    </ul>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06); margin-top:1rem;">
+                    <h3>&#x1F3C6; Если выучил эту страницу &mdash; ты готов</h3>
+                    <p style="margin:0; font-size:0.92rem;">Тебе хватит для <strong>9-11 баллов из 12</strong> на Story Continuation. Это твоя самая безопасная опция в Aufgabe 3.</p>
+                </div>
+            </section>
+
+        </div>
+        </div><!-- /tab-checklist -->
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: document.querySelector('.tabs').offsetTop - 10, behavior: 'smooth' });
+            });
+        });
+    </script>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>
