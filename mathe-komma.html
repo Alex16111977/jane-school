@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komma verschieben | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .komma-demo {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            text-align: center;
+            background: rgba(13,17,23,0.7);
+            padding: 1.2rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin: 0.8rem 0;
+            letter-spacing: 0.08em;
+        }
+        .komma-demo .komma {
+            color: #f85149;
+            font-weight: 900;
+            font-size: 1.3em;
+            display: inline-block;
+            transform: translateY(-0.05em);
+        }
+        .komma-demo .digit { color: #58a6ff; font-weight: 700; }
+        .komma-demo .arrow {
+            color: #f1c40f;
+            font-size: 0.7em;
+            margin: 0 0.2em;
+            font-weight: 900;
+        }
+        .komma-demo .label {
+            display: block;
+            font-size: 0.55em;
+            color: var(--color-text-muted);
+            margin-top: 0.3rem;
+            letter-spacing: 0;
+        }
+
+        .rule-card {
+            background: linear-gradient(135deg, var(--rule-from, rgba(63,185,80,0.12)), var(--rule-to, rgba(63,185,80,0.04)));
+            border: 1px solid var(--rule-border, rgba(63,185,80,0.35));
+            border-left: 4px solid var(--rule-accent, #3fb950);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+        .rule-card h3 {
+            margin: 0 0 0.5rem;
+            color: var(--rule-accent, #3fb950);
+            font-size: 1.05rem;
+        }
+        .rule-card .formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.15rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 0.4rem 0;
+            color: #fff;
+        }
+
+        .examples-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        .examples-table th, .examples-table td {
+            padding: 0.55rem 0.7rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+        }
+        .examples-table th {
+            background: rgba(255,255,255,0.05);
+            font-weight: 700;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .examples-table td.input { font-family: 'Courier New', monospace; color: #58a6ff; font-weight: 700; }
+        .examples-table td.op { color: #f1c40f; font-family: 'Courier New', monospace; font-weight: 700; }
+        .examples-table td.result { font-family: 'Courier New', monospace; color: #3fb950; font-weight: 700; font-size: 1.05rem; }
+        .examples-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+        .step-card {
+            background: rgba(88,166,255,0.05);
+            border: 1px solid rgba(88,166,255,0.25);
+            border-radius: 12px;
+            padding: 1rem 1.2rem 1rem 3.2rem;
+            position: relative;
+            margin: 0.6rem 0;
+        }
+        .step-card .step-n {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, #58a6ff, #a371f7);
+            color: #fff;
+            font-weight: 900;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+        .step-card h4 { margin: 0 0 0.3rem; color: #58a6ff; font-size: 0.95rem; }
+        .step-card p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+        .step-card code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.92em;
+            color: #fbbf24;
+        }
+
+        .ladder {
+            background: rgba(13,17,23,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        .ladder-line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.3rem 0;
+            font-size: 1rem;
+        }
+        .ladder-line .unit {
+            background: rgba(88,166,255,0.15);
+            border: 1px solid rgba(88,166,255,0.4);
+            color: #58a6ff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            font-weight: 700;
+            min-width: 60px;
+        }
+        .ladder-line .factor {
+            color: #f1c40f;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .mistake-box {
+            background: rgba(248,81,73,0.06);
+            border: 1px solid rgba(248,81,73,0.25);
+            border-left: 4px solid #f85149;
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            margin: 0.7rem 0;
+        }
+        .mistake-box h4 { color: #f85149; margin: 0 0 0.4rem; font-size: 0.95rem; }
+        .mistake-box .wrong { color: #f85149; font-weight: 700; font-family: 'Courier New', monospace; }
+        .mistake-box .right { color: #3fb950; font-weight: 700; font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body class="dark-theme">
+    <nav class="navbar">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html" class="active">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="mathe.html">Mathematik</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Komma verschieben</span>
+        </nav>
+
+        <a href="mathe.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Mathematik</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Komma verschieben</h1>
+            <p class="page-subtitle">Перенос запятой &mdash; правила &middot; ловушки &middot; единицы измерения</p>
+        </div>
+
+        <div class="note-card highlight-card" style="border-color:rgba(241,196,15,0.4); background:rgba(241,196,15,0.06);">
+            <p style="margin:0;"><strong style="color:#f1c40f;">&#x1F3AF;</strong> Это <strong>топ-3</strong> по частоте ошибок в Basisteil. Большинство теряют баллы тут просто потому что путаются куда двигать запятую. Здесь &mdash; железные правила без воды.</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="basis">&#x1F4D0; Основа</button>
+            <button class="tab" data-tab="mal">&times; &middot; 10/100/1000</button>
+            <button class="tab" data-tab="geteilt">&divide; 10/100/1000</button>
+            <button class="tab" data-tab="dezimal">&times; &middot; Dezimalzahlen</button>
+            <button class="tab" data-tab="einheiten">&#x1F4CF; Einheiten</button>
+            <button class="tab" data-tab="fehler">&#x26A0;&#xFE0F; Fehler</button>
+        </div>
+
+        <!-- ============ Tab 1: BASIS ============ -->
+        <div class="tab-content active" id="tab-basis">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Was bedeutet &laquo;Komma verschieben&raquo;?</h2>
+                        <p class="lesson-header-sub">Запятая &laquo;переезжает&raquo; влево или вправо &mdash; и число становится больше или меньше</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <p style="margin-bottom:0.8rem;">Запятая отделяет <strong>целую часть</strong> от <strong>дробной</strong>. Когда она двигается &mdash; число меняется в <strong>10 раз</strong> с каждым шагом.</p>
+
+                    <div class="komma-demo">
+                        <span class="digit">3</span><span class="komma">,</span><span class="digit">45</span>
+                        <span class="label">&laquo;три целых, сорок пять сотых&raquo; &mdash; 3 + 0,45</span>
+                    </div>
+                </div>
+
+                <div class="rule-card" style="--rule-accent:#3fb950; --rule-from:rgba(63,185,80,0.12); --rule-to:rgba(63,185,80,0.04); --rule-border:rgba(63,185,80,0.35);">
+                    <h3>&#x27A1;&#xFE0F; Запятая ВПРАВО &rarr; число БОЛЬШЕ</h3>
+                    <p style="margin:0; font-size:0.92rem;">Каждый шаг вправо = <strong>&times; 10</strong>. Двигаешь на 1 знак &mdash; умножаешь на 10. На 2 знака &mdash; на 100. На 3 знака &mdash; на 1000.</p>
+                    <div class="komma-demo" style="margin-top:0.8rem;">
+                        <span class="digit">3</span><span class="komma">,</span><span class="digit">45</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="digit">34</span><span class="komma">,</span><span class="digit">5</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="digit">345</span><span class="komma">,</span>
+                        <span class="label">3,45 &middot; 10 = 34,5 &nbsp;&nbsp; 3,45 &middot; 100 = 345</span>
+                    </div>
+                </div>
+
+                <div class="rule-card" style="--rule-accent:#f85149; --rule-from:rgba(248,81,73,0.12); --rule-to:rgba(248,81,73,0.04); --rule-border:rgba(248,81,73,0.35);">
+                    <h3>&#x2B05;&#xFE0F; Запятая ВЛЕВО &rarr; число МЕНЬШЕ</h3>
+                    <p style="margin:0; font-size:0.92rem;">Каждый шаг влево = <strong>&divide; 10</strong>. Двигаешь на 1 знак &mdash; делишь на 10. На 2 &mdash; на 100. На 3 &mdash; на 1000.</p>
+                    <div class="komma-demo" style="margin-top:0.8rem;">
+                        <span class="digit">345</span>
+                        <span class="arrow">&larr;</span>
+                        <span class="digit">34</span><span class="komma">,</span><span class="digit">5</span>
+                        <span class="arrow">&larr;</span>
+                        <span class="digit">3</span><span class="komma">,</span><span class="digit">45</span>
+                        <span class="label">345 &divide; 10 = 34,5 &nbsp;&nbsp; 345 &divide; 100 = 3,45</span>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card" style="background:rgba(163,113,247,0.06); border-color:rgba(163,113,247,0.35);">
+                    <p style="margin:0;"><strong style="color:#a371f7;">&#x1F4A1; Запомни одной фразой:</strong></p>
+                    <p style="margin:0.4rem 0 0; font-size:1.05rem;">&laquo;<strong>Запятая идёт ЗА нулями</strong>&raquo;</p>
+                    <p style="margin:0.3rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">Если умножаешь на 100 (2 нуля) &rarr; запятая едет на 2 знака вправо. Делишь на 1000 (3 нуля) &rarr; на 3 знака влево. Количество нулей = количество шагов.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ Tab 2: MAL 10/100/1000 ============ -->
+        <div class="tab-content" id="tab-mal">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2716;&#xFE0F;</span>
+                    <div>
+                        <h2>Multiplizieren mit 10, 100, 1000</h2>
+                        <p class="lesson-header-sub">Умножение на 10/100/1000 &mdash; запятая едет ВПРАВО</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-n">1</div>
+                    <h4>Посчитай нули в множителе</h4>
+                    <p><code>10</code> = 1 ноль &rarr; 1 шаг. <code>100</code> = 2 нуля &rarr; 2 шага. <code>1000</code> = 3 нуля &rarr; 3 шага.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-n">2</div>
+                    <h4>Двигай запятую ВПРАВО на это число</h4>
+                    <p>Если знаков справа не хватает &mdash; <strong>дописывай нули</strong>: <code>3,4 &middot; 100 = 340</code> (нет 2-х знаков справа &rarr; пишем 0)</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-n">3</div>
+                    <h4>Запятая в конце целого числа &mdash; убирается</h4>
+                    <p><code>345,0</code> = <code>345</code>. Запятая после последней цифры не нужна.</p>
+                </div>
+
+                <div class="note-card" style="margin-top:1rem;">
+                    <h3>&#x1F4CB; Примеры</h3>
+                    <table class="examples-table">
+                        <tr><th>Число</th><th>Множитель</th><th>=</th><th>Результат</th></tr>
+                        <tr><td class="input">2,5</td><td class="op">&middot; 10</td><td>&rarr; 1 шаг вправо</td><td class="result">25</td></tr>
+                        <tr><td class="input">2,5</td><td class="op">&middot; 100</td><td>&rarr; 2 шага вправо</td><td class="result">250</td></tr>
+                        <tr><td class="input">2,5</td><td class="op">&middot; 1000</td><td>&rarr; 3 шага вправо</td><td class="result">2 500</td></tr>
+                        <tr><td class="input">0,07</td><td class="op">&middot; 10</td><td>&rarr; 1 шаг</td><td class="result">0,7</td></tr>
+                        <tr><td class="input">0,07</td><td class="op">&middot; 100</td><td>&rarr; 2 шага</td><td class="result">7</td></tr>
+                        <tr><td class="input">0,07</td><td class="op">&middot; 1000</td><td>&rarr; 3 шага (нужно дописать 0)</td><td class="result">70</td></tr>
+                        <tr><td class="input">12,345</td><td class="op">&middot; 100</td><td>&rarr; 2 шага</td><td class="result">1 234,5</td></tr>
+                        <tr><td class="input">0,005</td><td class="op">&middot; 1000</td><td>&rarr; 3 шага</td><td class="result">5</td></tr>
+                    </table>
+                </div>
+
+                <div class="komma-demo">
+                    <span class="digit">2</span><span class="komma">,</span><span class="digit">5</span>
+                    <span class="arrow">&middot; 100 &rarr;</span>
+                    <span class="digit">25</span><span class="komma">,</span><span class="digit">0</span><span class="digit">0</span>
+                    <span class="arrow">=</span>
+                    <span class="digit">250</span>
+                    <span class="label">2,5 &middot; 100 &mdash; запятая &laquo;перепрыгивает&raquo; 2 знака, добавляем 0 в конце</span>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ Tab 3: GETEILT DURCH 10/100/1000 ============ -->
+        <div class="tab-content" id="tab-geteilt">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2797;</span>
+                    <div>
+                        <h2>Dividieren durch 10, 100, 1000</h2>
+                        <p class="lesson-header-sub">Деление на 10/100/1000 &mdash; запятая едет ВЛЕВО</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-n">1</div>
+                    <h4>Посчитай нули в делителе</h4>
+                    <p>То же правило: <code>10</code> = 1 ноль, <code>100</code> = 2 нуля, <code>1000</code> = 3 нуля.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-n">2</div>
+                    <h4>Двигай запятую ВЛЕВО на это число</h4>
+                    <p>Если цифр слева не хватает &mdash; <strong>дописывай нули перед запятой</strong>: <code>3 &divide; 100 = 0,03</code></p>
+                </div>
+                <div class="step-card">
+                    <div class="step-n">3</div>
+                    <h4>Перед запятой всегда 0 (если нет другой цифры)</h4>
+                    <p><code>,5</code> &rarr; пиши <code>0,5</code>. В немецкой школе обязательно ноль слева.</p>
+                </div>
+
+                <div class="note-card" style="margin-top:1rem;">
+                    <h3>&#x1F4CB; Примеры</h3>
+                    <table class="examples-table">
+                        <tr><th>Число</th><th>Делитель</th><th>=</th><th>Результат</th></tr>
+                        <tr><td class="input">25</td><td class="op">&divide; 10</td><td>&rarr; 1 шаг влево</td><td class="result">2,5</td></tr>
+                        <tr><td class="input">25</td><td class="op">&divide; 100</td><td>&rarr; 2 шага влево</td><td class="result">0,25</td></tr>
+                        <tr><td class="input">25</td><td class="op">&divide; 1000</td><td>&rarr; 3 шага (дописать 0)</td><td class="result">0,025</td></tr>
+                        <tr><td class="input">340</td><td class="op">&divide; 100</td><td>&rarr; 2 шага</td><td class="result">3,4</td></tr>
+                        <tr><td class="input">7</td><td class="op">&divide; 10</td><td>&rarr; 1 шаг</td><td class="result">0,7</td></tr>
+                        <tr><td class="input">7</td><td class="op">&divide; 1000</td><td>&rarr; 3 шага</td><td class="result">0,007</td></tr>
+                        <tr><td class="input">1 234,5</td><td class="op">&divide; 100</td><td>&rarr; 2 шага</td><td class="result">12,345</td></tr>
+                        <tr><td class="input">5</td><td class="op">&divide; 1000</td><td>&rarr; 3 шага</td><td class="result">0,005</td></tr>
+                    </table>
+                </div>
+
+                <div class="komma-demo">
+                    <span class="digit">25</span>
+                    <span class="arrow">&divide; 1000 &rarr;</span>
+                    <span class="digit">0</span><span class="digit">0</span><span class="digit">25</span>
+                    <span class="arrow">=</span>
+                    <span class="digit">0</span><span class="komma">,</span><span class="digit">025</span>
+                    <span class="label">Не хватает цифр слева &mdash; дописываем нули и ставим запятую</span>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ Tab 4: DEZIMALZAHLEN ============ -->
+        <div class="tab-content" id="tab-dezimal">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2716;&#xFE0F;</span>
+                    <div>
+                        <h2>Multiplizieren mit Dezimalzahlen</h2>
+                        <p class="lesson-header-sub">Умножение десятичных дробей &mdash; объясняю с нуля</p>
+                    </div>
+                </div>
+
+                <!-- ИНТУИЦИЯ -->
+                <div class="note-card highlight-card" style="background:rgba(163,113,247,0.06); border-color:rgba(163,113,247,0.35);">
+                    <h3 style="color:#a371f7; margin-top:0;">&#x1F914; Сначала пойми ПОЧЕМУ это работает</h3>
+                    <p style="margin:0.5rem 0; font-size:0.95rem;">Десятичная дробь &mdash; это <strong>обычная дробь</strong>:</p>
+                    <div class="komma-demo" style="font-size:1.4rem;">
+                        <span style="color:#58a6ff;">0,3</span> = <span style="color:#3fb950;">3/10</span> &nbsp;&nbsp;
+                        <span style="color:#58a6ff;">0,4</span> = <span style="color:#3fb950;">4/10</span>
+                    </div>
+                    <p style="margin:0.5rem 0; font-size:0.95rem;">Теперь умножаем:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">0,3 &middot; 0,4</span> = <span style="color:#3fb950;">3/10 &middot; 4/10</span> = <span style="color:#f1c40f;">12/100</span> = <span style="color:#3fb950;">0,12</span>
+                    </div>
+                    <p style="margin:0.6rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">&#x1F4A1; Видишь? Когда умножаешь /10 на /10 &mdash; получается /100. <strong>Знаменатели перемножаются</strong>. Поэтому в ответе становится больше знаков после запятой.</p>
+                </div>
+
+                <!-- ПРОСТОЕ ПРАВИЛО -->
+                <div class="rule-card" style="--rule-accent:#3fb950; --rule-from:rgba(63,185,80,0.15); --rule-to:rgba(63,185,80,0.04); --rule-border:rgba(63,185,80,0.4);">
+                    <h3>&#x1F4CC; Простое правило в 3 шага</h3>
+                    <p style="margin:0.5rem 0; font-size:0.95rem;"><strong>1.</strong> Забудь про запятые &mdash; умножай как целые числа</p>
+                    <p style="margin:0.5rem 0; font-size:0.95rem;"><strong>2.</strong> Посчитай <strong>сколько всего знаков после запятой</strong> было в исходных числах</p>
+                    <p style="margin:0.5rem 0; font-size:0.95rem;"><strong>3.</strong> В ответе отсчитай это число <strong>справа</strong> и поставь запятую</p>
+                </div>
+
+                <!-- ПРИМЕР С ПОДРОБНЫМ РАЗБОРОМ 1 -->
+                <div class="note-card" style="border-left:4px solid #58a6ff;">
+                    <h3 style="color:#58a6ff;">&#x1F4D6; Разбор примера: 2,5 &middot; 3,4</h3>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 1.</strong> Убираем запятые, умножаем как целые:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">25 &middot; 34</span> = <span style="color:#3fb950;">850</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 2.</strong> Считаем знаки после запятой в исходных числах:</p>
+                    <div class="komma-demo" style="font-size:1.1rem;">
+                        <span style="color:#58a6ff;">2<span style="color:#f85149;">,</span>5</span> &mdash; <span style="color:#f1c40f;">1 знак</span><br>
+                        <span style="color:#58a6ff;">3<span style="color:#f85149;">,</span>4</span> &mdash; <span style="color:#f1c40f;">1 знак</span><br>
+                        <span style="font-size:1.3rem; color:#f1c40f;">Всего: 1 + 1 = 2 знака</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 3.</strong> В числе <code>850</code> отсчитываем 2 знака справа и ставим запятую:</p>
+                    <div class="komma-demo" style="font-size:1.4rem;">
+                        <span style="color:#58a6ff;">8</span><span style="color:#f85149;">,</span><span style="color:#58a6ff;">50</span> = <span style="color:#3fb950; font-weight:900;">8,5</span>
+                        <span class="label" style="font-size:0.55em; color:var(--color-text-muted);">(нули в конце дробной части можно убрать)</span>
+                    </div>
+                </div>
+
+                <!-- ПРИМЕР С ПОДРОБНЫМ РАЗБОРОМ 2 -->
+                <div class="note-card" style="border-left:4px solid #f1c40f;">
+                    <h3 style="color:#f1c40f;">&#x1F4D6; Разбор примера: 0,3 &middot; 0,4 (где все ошибаются!)</h3>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 1.</strong> Без запятых:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">3 &middot; 4</span> = <span style="color:#3fb950;">12</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 2.</strong> Знаков после запятой:</p>
+                    <div class="komma-demo" style="font-size:1.1rem;">
+                        <span style="color:#58a6ff;">0<span style="color:#f85149;">,</span>3</span> &mdash; <span style="color:#f1c40f;">1 знак</span><br>
+                        <span style="color:#58a6ff;">0<span style="color:#f85149;">,</span>4</span> &mdash; <span style="color:#f1c40f;">1 знак</span><br>
+                        <span style="font-size:1.3rem; color:#f1c40f;">Всего: 2 знака</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 3.</strong> В числе <code>12</code> нужно отсчитать 2 знака справа &mdash; но цифр только 2! Дописываем <strong>ноль слева</strong>:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">12</span> &rarr; <span style="color:#58a6ff;">0<span style="color:#f85149;">,</span>12</span> = <span style="color:#3fb950; font-weight:900;">0,12</span>
+                    </div>
+
+                    <div class="mistake-box" style="margin-top:0.8rem;">
+                        <h4>&#x26A0;&#xFE0F; Главная ошибка тут</h4>
+                        <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 1,2</span> &mdash; забыли что нужно 2 знака</p>
+                        <p style="font-size:0.9rem;"><span class="right">&#x2705; 0,12</span> &mdash; дописали ноль слева чтобы было 2 знака</p>
+                    </div>
+                </div>
+
+                <!-- ПРИМЕР С ПОДРОБНЫМ РАЗБОРОМ 3 -->
+                <div class="note-card" style="border-left:4px solid #ec4899;">
+                    <h3 style="color:#ec4899;">&#x1F4D6; Разбор: 1,2 &middot; 0,03</h3>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 1.</strong> Без запятых:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">12 &middot; 3</span> = <span style="color:#3fb950;">36</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 2.</strong> Знаков:</p>
+                    <div class="komma-demo" style="font-size:1.1rem;">
+                        <span style="color:#58a6ff;">1<span style="color:#f85149;">,</span>2</span> &mdash; <span style="color:#f1c40f;">1 знак</span><br>
+                        <span style="color:#58a6ff;">0<span style="color:#f85149;">,</span>03</span> &mdash; <span style="color:#f1c40f;">2 знака</span><br>
+                        <span style="font-size:1.3rem; color:#f1c40f;">Всего: 1 + 2 = 3 знака</span>
+                    </div>
+
+                    <p style="margin-top:0.8rem; font-size:0.93rem;"><strong>Шаг 3.</strong> В числе <code>36</code> отсчитываем 3 знака справа. Цифр только 2 &mdash; дописываем нули слева:</p>
+                    <div class="komma-demo" style="font-size:1.3rem;">
+                        <span style="color:#58a6ff;">36</span> &rarr; <span style="color:#58a6ff;">0<span style="color:#f85149;">,</span>036</span> = <span style="color:#3fb950; font-weight:900;">0,036</span>
+                    </div>
+                </div>
+
+                <!-- ТАБЛИЦА ДЛЯ ТРЕНИРОВКИ -->
+                <div class="note-card" style="margin-top:1rem;">
+                    <h3>&#x1F4CB; Тренировочные примеры</h3>
+                    <table class="examples-table">
+                        <tr><th>Пример</th><th>Знаков всего</th><th>Целое &times;</th><th>Ответ</th></tr>
+                        <tr><td class="input">2,5 &middot; 3,4</td><td>1 + 1 = 2</td><td>25 &middot; 34 = 850</td><td class="result">8,5</td></tr>
+                        <tr><td class="input">0,3 &middot; 0,4</td><td>1 + 1 = 2</td><td>3 &middot; 4 = 12</td><td class="result">0,12</td></tr>
+                        <tr><td class="input">0,5 &middot; 0,4</td><td>1 + 1 = 2</td><td>5 &middot; 4 = 20</td><td class="result">0,20 = 0,2</td></tr>
+                        <tr><td class="input">1,2 &middot; 0,03</td><td>1 + 2 = 3</td><td>12 &middot; 3 = 36</td><td class="result">0,036</td></tr>
+                        <tr><td class="input">0,7 &middot; 8</td><td>1 + 0 = 1</td><td>7 &middot; 8 = 56</td><td class="result">5,6</td></tr>
+                        <tr><td class="input">1,5 &middot; 1,5</td><td>1 + 1 = 2</td><td>15 &middot; 15 = 225</td><td class="result">2,25</td></tr>
+                        <tr><td class="input">0,1 &middot; 0,1</td><td>1 + 1 = 2</td><td>1 &middot; 1 = 1</td><td class="result">0,01</td></tr>
+                        <tr><td class="input">0,02 &middot; 0,5</td><td>2 + 1 = 3</td><td>2 &middot; 5 = 10</td><td class="result">0,010 = 0,01</td></tr>
+                    </table>
+                </div>
+
+                <!-- ЛАЙФХАК ПРОВЕРКА -->
+                <div class="rule-card" style="--rule-accent:#f1c40f; --rule-from:rgba(241,196,15,0.15); --rule-to:rgba(241,196,15,0.04); --rule-border:rgba(241,196,15,0.4);">
+                    <h3>&#x1F9E0; Лайфхак для проверки</h3>
+                    <p style="margin:0.4rem 0; font-size:0.93rem;">Если умножаешь <strong>число меньше 1</strong> на что-то &mdash; ответ <strong>меньше</strong> исходного.</p>
+                    <p style="margin:0.4rem 0; font-size:0.93rem;">Если оба числа <strong>меньше 1</strong> &mdash; ответ <strong>МЕНЬШЕ обоих</strong>.</p>
+                    <p style="margin:0.6rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">Пример: <code>0,3 &middot; 0,4</code> &mdash; оба меньше 1, значит ответ должен быть меньше 0,3 и меньше 0,4. <strong>0,12</strong> подходит. А <strong>1,2</strong> &mdash; нет (больше обоих!) &rarr; это явно ошибка.</p>
+                </div>
+
+                <!-- TRICK -->
+                <div class="rule-card" style="--rule-accent:#a371f7; --rule-from:rgba(163,113,247,0.12); --rule-to:rgba(163,113,247,0.04); --rule-border:rgba(163,113,247,0.35);">
+                    <h3>&#x26A1; Trick: умножение на 0,1 / 0,01 / 0,001</h3>
+                    <p style="font-size:0.92rem; margin:0.4rem 0;">Это то же что <strong>деление</strong>:</p>
+                    <p style="font-size:0.93rem; margin:0.3rem 0;"><code>&middot; 0,1</code> = <code>&divide; 10</code> = запятая на <strong>1 влево</strong></p>
+                    <p style="font-size:0.93rem; margin:0.3rem 0;"><code>&middot; 0,01</code> = <code>&divide; 100</code> = запятая на <strong>2 влево</strong></p>
+                    <p style="font-size:0.93rem; margin:0.3rem 0;"><code>&middot; 0,001</code> = <code>&divide; 1000</code> = запятая на <strong>3 влево</strong></p>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:var(--color-text-muted);">Пример: <code>250 &middot; 0,01</code> = <code>250 &divide; 100</code> = <strong>2,5</strong></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ Tab 5: EINHEITEN ============ -->
+        <div class="tab-content" id="tab-einheiten">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CF;</span>
+                    <div>
+                        <h2>Einheiten umrechnen &mdash; полный гайд</h2>
+                        <p class="lesson-header-sub">Длина &middot; масса &middot; объём &middot; площадь &middot; время &mdash; всё по полочкам</p>
+                    </div>
+                </div>
+
+                <!-- ОБЩЕЕ ПРАВИЛО -->
+                <div class="note-card highlight-card" style="background:rgba(163,113,247,0.06); border-color:rgba(163,113,247,0.35);">
+                    <h3 style="color:#a371f7; margin-top:0;">&#x1F3AF; Универсальное правило &laquo;Einheiten-Treppe&raquo;</h3>
+                    <p style="margin:0.5rem 0; font-size:0.93rem;">Каждый тип единиц &mdash; это <strong>лестница</strong>. На каждой ступеньке стоит единица. Между ними &mdash; <strong>множитель</strong>.</p>
+                    <ul style="margin:0.4rem 0; padding-left:1.3rem; line-height:1.85; font-size:0.92rem;">
+                        <li><strong>Спускаешься</strong> вниз (к меньшей единице, например km &rarr; m) &rarr; <strong>УМНОЖАЕШЬ</strong> &rarr; запятая ВПРАВО, число РАСТЁТ</li>
+                        <li><strong>Поднимаешься</strong> вверх (к большей, m &rarr; km) &rarr; <strong>ДЕЛИШЬ</strong> &rarr; запятая ВЛЕВО, число УМЕНЬШАЕТСЯ</li>
+                    </ul>
+                    <p style="margin:0.6rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">&#x1F4A1; <strong>Здравая проверка:</strong> 2 km &mdash; это много метров (2000) или мало (0,002)? Ясно что много &rarr; значит ×, не ÷. Всегда сверяй с реальностью!</p>
+                </div>
+
+                <!-- ====== L&Auml;NGE ====== -->
+                <div class="note-card">
+                    <h3>&#x1F4CF; 1. L&auml;nge &mdash; длина (полная лестница)</h3>
+                    <div class="ladder">
+                        <div class="ladder-line">
+                            <span class="unit">km</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">hm</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">dam</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">m</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">dm</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">cm</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">mm</span>
+                        </div>
+                        <p style="margin-top:0.6rem; font-size:0.85rem; color:var(--color-text-muted);">&#x1F4A1; Каждый шаг = <strong>×10</strong>. hm и dam используются редко &mdash; запомни главные: <strong>km / m / dm / cm / mm</strong>.</p>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem; margin-top:0.7rem;">
+                        <div style="background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#58a6ff;">1 km</strong> = 1 000 m = 100 000 cm
+                        </div>
+                        <div style="background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#58a6ff;">1 m</strong> = 10 dm = 100 cm = 1 000 mm
+                        </div>
+                        <div style="background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#58a6ff;">1 dm</strong> = 10 cm = 100 mm
+                        </div>
+                        <div style="background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#58a6ff;">1 cm</strong> = 10 mm
+                        </div>
+                    </div>
+
+                    <table class="examples-table" style="margin-top:0.7rem;">
+                        <tr><th>Перевод</th><th>Как считать</th><th>Результат</th></tr>
+                        <tr><td class="input">2,5 km &rarr; m</td><td>3 шага вниз: ×10×10×10 = ×1000</td><td class="result">2 500 m</td></tr>
+                        <tr><td class="input">0,4 m &rarr; cm</td><td>2 шага вниз: ×100</td><td class="result">40 cm</td></tr>
+                        <tr><td class="input">350 cm &rarr; m</td><td>2 шага вверх: ÷100</td><td class="result">3,5 m</td></tr>
+                        <tr><td class="input">7 dm &rarr; mm</td><td>2 шага вниз: ×100</td><td class="result">700 mm</td></tr>
+                        <tr><td class="input">15 mm &rarr; cm</td><td>1 шаг вверх: ÷10</td><td class="result">1,5 cm</td></tr>
+                        <tr><td class="input">0,75 km &rarr; m</td><td>×1000</td><td class="result">750 m</td></tr>
+                        <tr><td class="input">3,2 m &rarr; mm</td><td>3 шага вниз: ×1000</td><td class="result">3 200 mm</td></tr>
+                        <tr><td class="input">25 000 mm &rarr; m</td><td>÷1000</td><td class="result">25 m</td></tr>
+                    </table>
+
+                    <div class="rule-card" style="--rule-accent:#58a6ff; --rule-from:rgba(88,166,255,0.12); --rule-to:rgba(88,166,255,0.04); --rule-border:rgba(88,166,255,0.35); margin-top:0.6rem;">
+                        <h3>&#x1F4D6; Разбор: 1 m 25 cm = ? cm (смешанная запись)</h3>
+                        <p style="margin:0.4rem 0; font-size:0.93rem;"><strong>Способ:</strong> перевести всё в одну единицу, затем сложить.</p>
+                        <p style="margin:0.4rem 0; font-size:0.93rem;">1 m = 100 cm &rarr; 1 m 25 cm = <strong>100 + 25 = 125 cm</strong></p>
+                        <p style="margin:0.4rem 0; font-size:0.93rem; color:var(--color-text-muted);">Обратно: 125 cm = 1,25 m или 1 m 25 cm</p>
+                    </div>
+                </div>
+
+                <!-- ====== MASSE ====== -->
+                <div class="note-card" style="margin-top:1rem;">
+                    <h3>&#x2696;&#xFE0F; 2. Masse &mdash; масса</h3>
+                    <div class="ladder">
+                        <div class="ladder-line">
+                            <span class="unit">t</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">kg</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">g</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">mg</span>
+                        </div>
+                        <p style="margin-top:0.6rem; font-size:0.85rem; color:#f59e0b;">&#x26A0; <strong>Внимание:</strong> между каждой парой &mdash; <strong>×1000</strong>, не ×10! Это 3 шага запятой за раз.</p>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem; margin-top:0.7rem;">
+                        <div style="background:rgba(251,146,60,0.08); border:1px solid rgba(251,146,60,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#fb923c;">1 t</strong> = 1 000 kg = 1 000 000 g
+                        </div>
+                        <div style="background:rgba(251,146,60,0.08); border:1px solid rgba(251,146,60,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#fb923c;">1 kg</strong> = 1 000 g = 1 000 000 mg
+                        </div>
+                        <div style="background:rgba(251,146,60,0.08); border:1px solid rgba(251,146,60,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#fb923c;">1 g</strong> = 1 000 mg
+                        </div>
+                    </div>
+
+                    <table class="examples-table" style="margin-top:0.7rem;">
+                        <tr><th>Перевод</th><th>Как</th><th>Результат</th></tr>
+                        <tr><td class="input">2,5 kg &rarr; g</td><td>×1000 (3 знака вправо)</td><td class="result">2 500 g</td></tr>
+                        <tr><td class="input">450 g &rarr; kg</td><td>÷1000 (3 знака влево)</td><td class="result">0,45 kg</td></tr>
+                        <tr><td class="input">3 t &rarr; kg</td><td>×1000</td><td class="result">3 000 kg</td></tr>
+                        <tr><td class="input">0,8 t &rarr; kg</td><td>×1000</td><td class="result">800 kg</td></tr>
+                        <tr><td class="input">75 mg &rarr; g</td><td>÷1000</td><td class="result">0,075 g</td></tr>
+                        <tr><td class="input">5 g &rarr; mg</td><td>×1000</td><td class="result">5 000 mg</td></tr>
+                        <tr><td class="input">1,5 t &rarr; g</td><td>×1 000 000 (2 шага)</td><td class="result">1 500 000 g</td></tr>
+                    </table>
+
+                    <div style="background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.15); border-radius:10px; padding:0.7rem 1rem; margin-top:0.7rem;">
+                        <p style="margin:0; font-size:0.85rem;">&#x1F4CF; <strong>Реальный размер:</strong></p>
+                        <ul style="margin:0.4rem 0 0; padding-left:1.3rem; font-size:0.85rem; color:var(--color-text-muted); line-height:1.7;">
+                            <li>1 mg &mdash; одна крошка соли</li>
+                            <li>1 g &mdash; банкнота 1 евро</li>
+                            <li>1 kg &mdash; пачка муки</li>
+                            <li>1 t &mdash; малолитражка</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- ====== VOLUMEN ====== -->
+                <div class="note-card" style="margin-top:1rem;">
+                    <h3>&#x1F4A7; 3. Volumen &mdash; объём (две системы!)</h3>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem;">У объёма <strong>2 параллельных системы</strong>:</p>
+
+                    <h4 style="color:#58a6ff; margin:0.5rem 0;">A) Кубические единицы (m&sup3;)</h4>
+                    <div class="ladder">
+                        <div class="ladder-line">
+                            <span class="unit">m&sup3;</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">dm&sup3;</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">cm&sup3;</span>
+                            <span class="factor">&middot;1000</span>
+                            <span class="unit">mm&sup3;</span>
+                        </div>
+                        <p style="margin-top:0.6rem; font-size:0.85rem; color:#f59e0b;">&#x26A0; Между каждой парой &mdash; <strong>×1000</strong> (это куб от ×10)</p>
+                    </div>
+
+                    <h4 style="color:#58a6ff; margin:0.7rem 0 0.4rem;">B) Литры (l)</h4>
+                    <div class="ladder">
+                        <div class="ladder-line">
+                            <span class="unit">hl</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">l</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">dl</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">cl</span>
+                            <span class="factor">&middot;10</span>
+                            <span class="unit">ml</span>
+                        </div>
+                        <p style="margin-top:0.6rem; font-size:0.85rem; color:var(--color-text-muted);">Между литрами &mdash; ×10 как у длины. l ↔ ml = ×1000.</p>
+                    </div>
+
+                    <h4 style="color:#f1c40f; margin:0.7rem 0 0.4rem;">&#x1F517; Главные мостики между системами</h4>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem;">
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f1c40f;">1 l = 1 dm&sup3;</strong>
+                        </div>
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f1c40f;">1 ml = 1 cm&sup3;</strong>
+                        </div>
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f1c40f;">1 m&sup3; = 1 000 l</strong>
+                        </div>
+                    </div>
+
+                    <table class="examples-table" style="margin-top:0.7rem;">
+                        <tr><th>Перевод</th><th>Как</th><th>Результат</th></tr>
+                        <tr><td class="input">1,5 l &rarr; ml</td><td>×1000</td><td class="result">1 500 ml</td></tr>
+                        <tr><td class="input">250 ml &rarr; l</td><td>÷1000</td><td class="result">0,25 l</td></tr>
+                        <tr><td class="input">2 l &rarr; cl</td><td>×100</td><td class="result">200 cl</td></tr>
+                        <tr><td class="input">0,5 m&sup3; &rarr; l</td><td>×1000</td><td class="result">500 l</td></tr>
+                        <tr><td class="input">3 m&sup3; &rarr; dm&sup3;</td><td>×1000</td><td class="result">3 000 dm&sup3;</td></tr>
+                        <tr><td class="input">2 500 cm&sup3; &rarr; l</td><td>1 ml = 1 cm&sup3; &rarr; ÷1000</td><td class="result">2,5 l</td></tr>
+                    </table>
+                </div>
+
+                <!-- ====== FL&Auml;CHE ====== -->
+                <div class="note-card" style="margin-top:1rem; background:rgba(241,196,15,0.04); border-color:rgba(241,196,15,0.25);">
+                    <h3 style="color:#f1c40f;">&#x1F4D0; 4. Fl&auml;che &mdash; площадь (КВАДРАТНЫЕ единицы)</h3>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem;">У <strong>m&sup2;</strong>, <strong>cm&sup2;</strong> между единицами не ×10, а <strong>×100</strong> &mdash; квадрат от обычного множителя.</p>
+
+                    <div class="ladder">
+                        <div class="ladder-line">
+                            <span class="unit">km&sup2;</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">ha</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">a</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">m&sup2;</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">dm&sup2;</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">cm&sup2;</span>
+                            <span class="factor">&middot;100</span>
+                            <span class="unit">mm&sup2;</span>
+                        </div>
+                        <p style="margin-top:0.6rem; font-size:0.85rem; color:#f59e0b;">&#x26A0; Между каждой парой &mdash; <strong>×100</strong> (2 шага запятой!)</p>
+                    </div>
+
+                    <h4 style="color:#f1c40f; margin:0.7rem 0 0.4rem;">&#x1F50D; Что такое a (Ar) и ha (Hektar)?</h4>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem;">
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#f1c40f;">1 a (Ar)</strong> = 100 m&sup2;<br><span style="color:var(--color-text-muted); font-size:0.82rem;">квадрат 10×10 m</span>
+                        </div>
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#f1c40f;">1 ha (Hektar)</strong> = 10 000 m&sup2;<br><span style="color:var(--color-text-muted); font-size:0.82rem;">квадрат 100×100 m = футбольное поле</span>
+                        </div>
+                        <div style="background:rgba(241,196,15,0.1); border:1px solid rgba(241,196,15,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.88rem;">
+                            <strong style="color:#f1c40f;">1 km&sup2;</strong> = 100 ha = 1 000 000 m&sup2;
+                        </div>
+                    </div>
+
+                    <table class="examples-table" style="margin-top:0.7rem;">
+                        <tr><th>Перевод</th><th>Как</th><th>Результат</th></tr>
+                        <tr><td class="input">2 m&sup2; &rarr; cm&sup2;</td><td>2 шага × 100 = ×10 000</td><td class="result">20 000 cm&sup2;</td></tr>
+                        <tr><td class="input">5 000 cm&sup2; &rarr; m&sup2;</td><td>÷10 000</td><td class="result">0,5 m&sup2;</td></tr>
+                        <tr><td class="input">3 ha &rarr; m&sup2;</td><td>×10 000</td><td class="result">30 000 m&sup2;</td></tr>
+                        <tr><td class="input">500 a &rarr; ha</td><td>÷100</td><td class="result">5 ha</td></tr>
+                        <tr><td class="input">2,5 km&sup2; &rarr; ha</td><td>×100</td><td class="result">250 ha</td></tr>
+                    </table>
+
+                    <div class="mistake-box" style="margin-top:0.7rem;">
+                        <h4>Главная ловушка</h4>
+                        <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 2 m&sup2; = 200 cm&sup2;</span> &mdash; как для длины ×100</p>
+                        <p style="font-size:0.9rem;"><span class="right">&#x2705; 2 m&sup2; = 20 000 cm&sup2;</span> &mdash; потому что m → cm это ×100, а m&sup2; → cm&sup2; это ×100×100 = ×10 000</p>
+                        <p style="font-size:0.83rem; color:var(--color-text-muted); margin-top:0.3rem;">&#x1F4A1; Простая визуализация: квадрат 1 m × 1 m = 100 cm × 100 cm = 10 000 cm&sup2;</p>
+                    </div>
+                </div>
+
+                <!-- ====== ZEIT ====== -->
+                <div class="note-card" style="margin-top:1rem; background:rgba(248,81,73,0.04); border-color:rgba(248,81,73,0.25);">
+                    <h3 style="color:#f85149;">&#x23F0; 5. Zeit &mdash; время (НЕ ДЕСЯТИЧНОЕ!)</h3>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem;">Время работает в системе <strong>60-ричной</strong> (для секунд и минут) и <strong>24-ричной</strong> (для часов). Komma verschieben здесь <strong>НЕ работает</strong>.</p>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem;">
+                        <div style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f85149;">1 min = 60 s</strong>
+                        </div>
+                        <div style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f85149;">1 h = 60 min</strong>
+                        </div>
+                        <div style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f85149;">1 h = 3 600 s</strong>
+                        </div>
+                        <div style="background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.3); border-radius:8px; padding:0.6rem 0.8rem; font-size:0.9rem; text-align:center;">
+                            <strong style="color:#f85149;">1 d = 24 h</strong>
+                        </div>
+                    </div>
+
+                    <h4 style="color:#f85149; margin:0.7rem 0 0.4rem;">&#x1F4D6; Переводы десятичные часы &harr; часы+минуты</h4>
+                    <p style="font-size:0.9rem;"><strong>Правило:</strong> дробная часть часов × 60 = минуты</p>
+                    <table class="examples-table" style="margin-top:0.5rem;">
+                        <tr><th>Десятичные часы</th><th>Считаем</th><th>Часы + мин</th></tr>
+                        <tr><td class="input">1,5 h</td><td>0,5 × 60 = 30</td><td class="result">1 h 30 min</td></tr>
+                        <tr><td class="input">2,25 h</td><td>0,25 × 60 = 15</td><td class="result">2 h 15 min</td></tr>
+                        <tr><td class="input">0,75 h</td><td>0,75 × 60 = 45</td><td class="result">45 min</td></tr>
+                        <tr><td class="input">3,1 h</td><td>0,1 × 60 = 6</td><td class="result">3 h 6 min</td></tr>
+                        <tr><td class="input">1,25 h</td><td>0,25 × 60 = 15</td><td class="result">1 h 15 min</td></tr>
+                    </table>
+
+                    <h4 style="color:#f85149; margin:0.7rem 0 0.4rem;">&#x1F504; Обратно: часы+минуты &rarr; десятичные</h4>
+                    <p style="font-size:0.9rem;"><strong>Правило:</strong> минуты ÷ 60 = дробная часть часов</p>
+                    <table class="examples-table" style="margin-top:0.5rem;">
+                        <tr><th>Часы + мин</th><th>Считаем</th><th>Десятичные</th></tr>
+                        <tr><td class="input">2 h 30 min</td><td>30 ÷ 60 = 0,5</td><td class="result">2,5 h</td></tr>
+                        <tr><td class="input">1 h 45 min</td><td>45 ÷ 60 = 0,75</td><td class="result">1,75 h</td></tr>
+                        <tr><td class="input">3 h 20 min</td><td>20 ÷ 60 ≈ 0,33</td><td class="result">≈ 3,33 h</td></tr>
+                        <tr><td class="input">15 min</td><td>15 ÷ 60 = 0,25</td><td class="result">0,25 h</td></tr>
+                    </table>
+
+                    <div style="background:rgba(255,255,255,0.04); border-radius:8px; padding:0.7rem 1rem; margin-top:0.7rem;">
+                        <p style="margin:0; font-size:0.88rem;">&#x1F525; <strong>Запомни эти дроби часа:</strong></p>
+                        <ul style="margin:0.4rem 0 0; padding-left:1.3rem; font-size:0.88rem; line-height:1.8;">
+                            <li><code>0,25 h</code> = 15 min (четверть часа)</li>
+                            <li><code>0,5 h</code> = 30 min (полчаса)</li>
+                            <li><code>0,75 h</code> = 45 min (три четверти)</li>
+                            <li><code>1/3 h ≈ 0,33 h</code> = 20 min</li>
+                            <li><code>1/6 h ≈ 0,17 h</code> = 10 min</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- РЕАЛЬНЫЕ ОЦЕНКИ -->
+                <div class="note-card highlight-card" style="margin-top:1rem; border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+                    <h3 style="color:#3fb950;">&#x1F4CF; Sch&auml;tzen &mdash; реальные размеры (для проверки)</h3>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem;">Если получил странный ответ &mdash; сверь с реальностью:</p>
+                    <table class="examples-table">
+                        <tr><th>Объект</th><th>Примерно</th></tr>
+                        <tr><td>Толщина страницы</td><td class="result">~ 0,1 mm</td></tr>
+                        <tr><td>Ноготь &mdash; ширина</td><td class="result">~ 1 cm</td></tr>
+                        <tr><td>Рост ученика</td><td class="result">~ 1,6 m</td></tr>
+                        <tr><td>Школьный класс &mdash; длина</td><td class="result">~ 8 m</td></tr>
+                        <tr><td>Расстояние до соседнего города</td><td class="result">~ 20 km</td></tr>
+                        <tr><td>Капля воды</td><td class="result">~ 0,05 ml</td></tr>
+                        <tr><td>Стакан</td><td class="result">~ 200 ml = 0,2 l</td></tr>
+                        <tr><td>Бутылка воды</td><td class="result">~ 1,5 l</td></tr>
+                        <tr><td>Ванна</td><td class="result">~ 150 l</td></tr>
+                        <tr><td>Яблоко</td><td class="result">~ 150 g</td></tr>
+                        <tr><td>Учебник</td><td class="result">~ 500 g</td></tr>
+                        <tr><td>Чемодан</td><td class="result">~ 20 kg</td></tr>
+                        <tr><td>Машина</td><td class="result">~ 1,5 t</td></tr>
+                        <tr><td>Лист A4</td><td class="result">~ 600 cm&sup2; ≈ 0,06 m&sup2;</td></tr>
+                        <tr><td>Футбольное поле</td><td class="result">~ 7 000 m&sup2; ≈ 1 ha</td></tr>
+                    </table>
+                </div>
+
+                <!-- УНИВЕРСАЛЬНЫЙ АЛГОРИТМ -->
+                <div class="note-card highlight-card" style="margin-top:1rem; border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#a371f7;">&#x1F3AF; Универсальный алгоритм для любой задачи</h3>
+                    <ol style="margin:0.5rem 0; padding-left:1.4rem; line-height:1.85; font-size:0.92rem;">
+                        <li><strong>Определи тип</strong>: длина / масса / объём / площадь / время</li>
+                        <li><strong>Нарисуй лесенку</strong> и найди множители между нужными единицами</li>
+                        <li><strong>Перемножь множители</strong> &mdash; если идёшь к меньшей единице. Раздели &mdash; если к большей</li>
+                        <li><strong>Двинь запятую</strong> на нужное число знаков</li>
+                        <li><strong>Проверь</strong>: ответ разумного размера? Сверь со списком реальных размеров</li>
+                    </ol>
+                </div>
+
+                <!-- ТРЕНАЖЁР -->
+                <div class="note-card" style="margin-top:1rem; background:rgba(88,166,255,0.04);">
+                    <h3 style="color:#58a6ff;">&#x1F3AF; Тренировка &mdash; провёрь себя</h3>
+                    <p style="font-size:0.9rem; color:var(--color-text-muted); margin-bottom:0.6rem;">Закрой ответы, реши сам:</p>
+                    <table class="examples-table">
+                        <tr><th>Задача</th><th>Ответ</th></tr>
+                        <tr><td class="input">4,2 km = ? m</td><td class="result">4 200 m</td></tr>
+                        <tr><td class="input">85 cm = ? m</td><td class="result">0,85 m</td></tr>
+                        <tr><td class="input">3,5 kg = ? g</td><td class="result">3 500 g</td></tr>
+                        <tr><td class="input">200 g = ? kg</td><td class="result">0,2 kg</td></tr>
+                        <tr><td class="input">2,5 l = ? ml</td><td class="result">2 500 ml</td></tr>
+                        <tr><td class="input">750 ml = ? l</td><td class="result">0,75 l</td></tr>
+                        <tr><td class="input">5 m&sup2; = ? cm&sup2;</td><td class="result">50 000 cm&sup2;</td></tr>
+                        <tr><td class="input">2 h 45 min = ? h (десятичные)</td><td class="result">2,75 h</td></tr>
+                        <tr><td class="input">3,5 h = ? h ? min</td><td class="result">3 h 30 min</td></tr>
+                        <tr><td class="input">90 min = ? h</td><td class="result">1,5 h</td></tr>
+                        <tr><td class="input">2 ha = ? m&sup2;</td><td class="result">20 000 m&sup2;</td></tr>
+                        <tr><td class="input">1 m&sup3; = ? l</td><td class="result">1 000 l</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ Tab 6: FEHLER ============ -->
+        <div class="tab-content" id="tab-fehler">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x26A0;&#xFE0F;</span>
+                    <div>
+                        <h2>Typische Fehler &mdash; типичные ошибки</h2>
+                        <p class="lesson-header-sub">Здесь все теряют баллы. Проверь себя!</p>
+                    </div>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>1. Перепутал направление</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>2,5 &middot; 100</code> = ?</p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 0,025</span> &mdash; запятая поехала ВЛЕВО (как при делении)</p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 250</span> &mdash; умножение = запятая ВПРАВО</p>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.3rem;">&#x1F4A1; <strong>Mnemonic:</strong> &laquo;УМ&raquo;ножение &mdash; число РОСТЁТ &rarr; запятая идёт ВПРАВО к большим разрядам.</p>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>2. Забыл дописать нули</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>3,4 &middot; 1000</code> = ?</p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 34</span> &mdash; передвинул только на 1 знак</p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 3 400</span> &mdash; нужно 3 знака, дописал 2 нуля</p>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>3. Забыл ноль перед запятой</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>5 &divide; 100</code> = ?</p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; ,05</span> или <span class="wrong">,5</span> &mdash; нет нуля слева</p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 0,05</span> &mdash; всегда пиши ноль перед запятой!</p>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>4. Применил &laquo;Komma verschieben&raquo; к времени</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>2,5 h в минуты</code></p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 250 min</span> или <span class="wrong">2,5 &middot; 100</span></p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 150 min</span> (потому что 2 h = 120 min, 0,5 h = 30 min &rarr; 120 + 30 = 150)</p>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.3rem;">&#x1F4A1; Время &mdash; <strong>60-ричное</strong>, не десятичное.</p>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>5. Площадь / Объём посчитал как длину</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>3 m&sup2; в cm&sup2;</code></p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 300 cm&sup2;</span> (как для длины &times;100)</p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 30 000 cm&sup2;</span> (для m&sup2; нужно &times;10 000)</p>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.3rem;">&#x1F4A1; Квадрат от множителя: для m&sup2; &mdash; 100&sup2; = 10 000. Для m&sup3; &mdash; 100&sup3; = 1 000 000.</p>
+                </div>
+
+                <div class="mistake-box">
+                    <h4>6. Умножение десятичных &mdash; забыл сложить знаки</h4>
+                    <p style="font-size:0.92rem; margin-bottom:0.3rem;"><code>0,3 &middot; 0,4</code> = ?</p>
+                    <p style="font-size:0.9rem;"><span class="wrong">&#x274C; 1,2</span> (просто 3 &middot; 4 = 12)</p>
+                    <p style="font-size:0.9rem;"><span class="right">&#x2705; 0,12</span> (2 знака после запятой в сумме)</p>
+                </div>
+
+                <!-- CHECKLIST -->
+                <div class="note-card highlight-card" style="margin-top:1.5rem; border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+                    <h3 style="color:#3fb950;">&#x2705; Чек-лист перед ответом</h3>
+                    <ul style="margin:0.5rem 0; padding-left:1.3rem; line-height:1.9; font-size:0.92rem;">
+                        <li>Я правильно посчитал нули в множителе/делителе?</li>
+                        <li>Направление: <strong>умножение &rarr; вправо</strong>, <strong>деление &rarr; влево</strong></li>
+                        <li>Если не хватает цифр &mdash; дописал нули?</li>
+                        <li>Перед запятой есть ноль (если число &lt; 1)?</li>
+                        <li>Если это время &mdash; я НЕ использовал десятичные правила?</li>
+                        <li>Если это площадь/объём &mdash; я возвёл множитель в квадрат/куб?</li>
+                        <li>Здравая проверка: результат разумного размера?</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: document.querySelector('.tabs').offsetTop - 10, behavior: 'smooth' });
+            });
+        });
+    </script>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>

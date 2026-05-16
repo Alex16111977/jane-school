@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Wörter | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .my-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .my-table th, .my-table td {
+            padding: 0.45rem 0.55rem;
+            border: 1px solid rgba(255,255,255,0.07);
+            text-align: left;
+            vertical-align: middle;
+        }
+        .my-table th {
+            background: rgba(255,255,255,0.04);
+            font-weight: 700;
+            color: var(--color-text-muted);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .my-table td.pri {
+            width: 38px;
+            text-align: center;
+            padding: 0.4rem 0.25rem;
+            background: rgba(255,255,255,0.02);
+        }
+        .my-table td.en { font-weight: 700; font-family: 'Georgia', serif; color: #58a6ff; }
+        .my-table td.tr {
+            font-family: 'Menlo', monospace;
+            color: #fbbf24;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .my-table td.de { color: #c9b3ff; font-size: 0.82rem; }
+        .my-table td.ua { color: #86efac; font-size: 0.82rem; }
+        .my-table td.ru { color: var(--color-text-muted); font-size: 0.82rem; }
+        .my-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .my-table tr:hover td.pri { background: rgba(255,255,255,0.05); }
+
+        .priority {
+            display: inline-block;
+            font-size: 0.66rem;
+            font-weight: 900;
+            padding: 0.16rem 0.45rem;
+            border-radius: 10px;
+            letter-spacing: 0.04em;
+            min-width: 22px;
+            text-align: center;
+        }
+        .p1 { background: #f85149; color: #fff; }
+        .p2 { background: #f1c40f; color: #0a0a14; }
+        .p3 { background: rgba(255,255,255,0.1); color: var(--color-text-muted); }
+
+        .group-header {
+            background: linear-gradient(135deg, var(--group-from, rgba(163,113,247,0.15)), var(--group-to, rgba(163,113,247,0.04)));
+            border: 1px solid var(--group-border, rgba(163,113,247,0.3));
+            border-left: 4px solid var(--group-accent, #a371f7);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            margin: 1.5rem 0 0.6rem;
+        }
+        .group-header h3 {
+            margin: 0;
+            color: var(--group-accent, #a371f7);
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .group-header .group-count {
+            background: var(--group-accent, #a371f7);
+            color: #0a0a14;
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 0.15rem 0.55rem;
+            border-radius: 12px;
+        }
+        .group-header p {
+            margin: 0.3rem 0 0;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .stat-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .stat-bar > div {
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .stat-p1 { background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.35); color: #ff8b85; }
+        .stat-p2 { background: rgba(241,196,15,0.15); border: 1px solid rgba(241,196,15,0.35); color: #f1c40f; }
+        .stat-p3 { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--color-text-muted); }
+        .stat-total { background: linear-gradient(135deg, rgba(63,185,80,0.2), rgba(88,166,255,0.2)); border: 1px solid rgba(63,185,80,0.4); color: #3fb950; }
+
+        .table-wrapper { overflow-x: auto; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Meine W&ouml;rter</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Meine W&ouml;rter</h1>
+            <p class="page-subtitle">~85 слов &mdash; с произношением и переводами на 3 языка</p>
+        </div>
+
+        <div class="note-card highlight-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.06);">
+            <p style="margin:0;"><strong style="color:#a371f7;">&#x1F4DA;</strong> 6 столбцов: <strong>P</strong> &middot; <span style="color:#58a6ff;">English</span> &middot; <span style="color:#fbbf24;">читать</span> &middot; <span style="color:#c9b3ff;">Deutsch</span> &middot; <span style="color:#86efac;">Українська</span> &middot; Русский</p>
+        </div>
+
+        <div class="note-card" style="border-left:3px solid #fbbf24; background:rgba(251,191,36,0.04);">
+            <p style="margin:0; font-size:0.85rem;"><strong style="color:#fbbf24;">&#x1F4A1;</strong> Ударение через <strong>́</strong> после ударной гласной, длинный звук &mdash; через <strong>:</strong>. <em>th</em> &mdash; язык между зубами (между «т» и «с»). <em>w</em> &mdash; губное «у».</p>
+        </div>
+
+        <div class="stat-bar">
+            <div class="stat-p1">&#x1F525; P1: ~30</div>
+            <div class="stat-p2">&#x26A0;&#xFE0F; P2: ~30</div>
+            <div class="stat-p3">&#x1F4D6; P3: ~25</div>
+            <div class="stat-total">&#x1F4DA; Всего: ~85</div>
+        </div>
+
+        <!-- ============ 1. EMOTIONS & STATES ============ -->
+        <div class="group-header" style="--group-accent:#f1c40f; --group-from:rgba(241,196,15,0.15); --group-to:rgba(241,196,15,0.04); --group-border:rgba(241,196,15,0.3);">
+            <h3>&#x1F60A; 1. Эмоции и состояния <span class="group-count">10</span></h3>
+            <p>Полезно для Story Continuation и Comment</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">cheerful</td><td class="tr">чи́эрфул</td><td class="de">fr&ouml;hlich</td><td class="ua">веселий</td><td class="ru">весёлый</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">awful</td><td class="tr">о́:фул</td><td class="de">schrecklich, furchtbar</td><td class="ua">жахливий</td><td class="ru">ужасный</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">unsatisfied</td><td class="tr">анса́тисфайд</td><td class="de">unzufrieden</td><td class="ua">незадоволений</td><td class="ru">недовольный</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">puzzled</td><td class="tr">па́злд</td><td class="de">verwirrt, ratlos</td><td class="ua">спантеличений</td><td class="ru">озадаченный</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">patience</td><td class="tr">пэ́йшэнс</td><td class="de">die Geduld</td><td class="ua">терпіння</td><td class="ru">терпение</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">fret</td><td class="tr">фрет</td><td class="de">sich Sorgen machen</td><td class="ua">хвилюватися</td><td class="ru">волноваться</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">out of sorts</td><td class="tr">а́ут оф со́:тс</td><td class="de">schlecht gelaunt, neben sich sein</td><td class="ua">не в настрої</td><td class="ru">не в настроении</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">in suspense</td><td class="tr">ин саспэ́нс</td><td class="de">in Spannung</td><td class="ua">у напрузі</td><td class="ru">в напряжении</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">enchanted</td><td class="tr">энча́:нтид</td><td class="de">bezaubert</td><td class="ua">зачарований</td><td class="ru">очарованный</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">in condition</td><td class="tr">ин конди́шн</td><td class="de">in Form</td><td class="ua">у формі</td><td class="ru">в форме, состояние</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 2. CONNECTORS ============ -->
+        <div class="group-header" style="--group-accent:#a371f7; --group-from:rgba(163,113,247,0.15); --group-to:rgba(163,113,247,0.04); --group-border:rgba(163,113,247,0.3);">
+            <h3>&#x1F517; 2. Связки и наречия <span class="group-count">14</span></h3>
+            <p>Это золото для Writing. Учи в первую очередь!</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">in fact</td><td class="tr">ин фэкт</td><td class="de">tats&auml;chlich</td><td class="ua">власне, насправді</td><td class="ru">на самом деле</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">after all</td><td class="tr">а́:фтэр о́:л</td><td class="de">schlie&szlig;lich</td><td class="ua">зрештою</td><td class="ru">в конце концов</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">certainly</td><td class="tr">сэ́:тнли</td><td class="de">bestimmt</td><td class="ua">звичайно</td><td class="ru">конечно</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">otherwise</td><td class="tr">а́зэрвайз</td><td class="de">sonst</td><td class="ua">інакше</td><td class="ru">иначе</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">probably</td><td class="tr">про́бабли</td><td class="de">vermutlich</td><td class="ua">мабуть</td><td class="ru">вероятно</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">perhaps</td><td class="tr">пэха́пс</td><td class="de">m&ouml;glicherweise, vielleicht</td><td class="ua">можливо</td><td class="ru">возможно</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">unless</td><td class="tr">анле́с</td><td class="de">au&szlig;er wenn</td><td class="ua">якщо не</td><td class="ru">если не</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">remarkably</td><td class="tr">рима́:кэбли</td><td class="de">erstaunlich, auffallend</td><td class="ua">помітно</td><td class="ru">заметно</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">in such cases</td><td class="tr">ин сач кэ́йсиз</td><td class="de">in solchen F&auml;llen</td><td class="ua">у таких випадках</td><td class="ru">в таких случаях</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">a tad</td><td class="tr">э тэд</td><td class="de">ein wenig</td><td class="ua">трішки</td><td class="ru">чуть-чуть</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">be out there</td><td class="tr">би а́ут зэ́эр</td><td class="de">drau&szlig;en sein</td><td class="ua">бути десь там</td><td class="ru">быть где-то там</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">in here</td><td class="tr">ин хи́эр</td><td class="de">hier drin</td><td class="ua">тут</td><td class="ru">здесь</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">lovely day</td><td class="tr">ла́вли дэй</td><td class="de">sch&ouml;ner Tag</td><td class="ua">чудовий день</td><td class="ru">прекрасный день</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">honest to admit</td><td class="tr">о́нэст ту адми́т</td><td class="de">ehrlich zugeben</td><td class="ua">визнавати чесно</td><td class="ru">честно признать</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 3. VERBS ============ -->
+        <div class="group-header" style="--group-accent:#58a6ff; --group-from:rgba(88,166,255,0.15); --group-to:rgba(88,166,255,0.04); --group-border:rgba(88,166,255,0.3);">
+            <h3>&#x1F3AC; 3. Глаголы / Verben <span class="group-count">26</span></h3>
+            <p>Для Story и Reading. Action-verbs дают +1 балл за Sprachliche Mittel.</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">spot / spotted</td><td class="tr">спот / спо́тид</td><td class="de">bemerken, entdecken</td><td class="ua">помітити</td><td class="ru">заметить</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">suspect</td><td class="tr">саспэ́кт</td><td class="de">verd&auml;chtigen</td><td class="ua">підозрювати</td><td class="ru">подозревать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">consider</td><td class="tr">конси́дэр</td><td class="de">&uuml;berlegen, halten f&uuml;r</td><td class="ua">вважати</td><td class="ru">считать, рассматривать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">interrupt</td><td class="tr">интэра́пт</td><td class="de">unterbrechen</td><td class="ua">переривати</td><td class="ru">перебивать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">proceed</td><td class="tr">проси́:д</td><td class="de">fortfahren, weitermachen</td><td class="ua">продовжувати</td><td class="ru">продолжать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">bother</td><td class="tr">бо́зэр</td><td class="de">st&ouml;ren, nerven</td><td class="ua">дратувати</td><td class="ru">беспокоить, раздражать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">catch a cold / caught</td><td class="tr">кэч э коулд / кот</td><td class="de">sich erk&auml;lten</td><td class="ua">застудитися</td><td class="ru">простудиться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">run out</td><td class="tr">ран а́ут</td><td class="de">ausgehen</td><td class="ua">закінчуватися</td><td class="ru">заканчиваться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">scratch</td><td class="tr">скрэч</td><td class="de">kratzen, zerkratzen</td><td class="ua">дряпати</td><td class="ru">царапать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">interpret</td><td class="tr">интэ́:прит</td><td class="de">deuten</td><td class="ua">тлумачити</td><td class="ru">толковать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">capture</td><td class="tr">кэ́пчэр</td><td class="de">fangen, erfassen</td><td class="ua">ловити</td><td class="ru">ловить, захватывать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">gather (round)</td><td class="tr">гэ́зэр (ра́унд)</td><td class="de">sich versammeln</td><td class="ua">збиратися</td><td class="ru">собираться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">get off</td><td class="tr">гет оф</td><td class="de">aussteigen, loslassen</td><td class="ua">виходити, злазити</td><td class="ru">выходить, слезать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">stick with</td><td class="tr">стик виз</td><td class="de">bei etw bleiben</td><td class="ua">триматися чогось</td><td class="ru">держаться чего-то</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">have a knack for</td><td class="tr">хэв э нэк фо:</td><td class="de">ein H&auml;ndchen f&uuml;r etwas haben</td><td class="ua">мати талант</td><td class="ru">иметь талант к</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">have a contest</td><td class="tr">хэв э ко́нтэст</td><td class="de">einen Wettbewerb veranstalten</td><td class="ua">проводити змагання</td><td class="ru">проводить соревнование</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">account for</td><td class="tr">эка́унт фо:</td><td class="de">erkl&auml;ren</td><td class="ua">пояснювати</td><td class="ru">объяснять</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">heed</td><td class="tr">хи:д</td><td class="de">beachten</td><td class="ua">звертати увагу</td><td class="ru">обращать внимание</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">put up</td><td class="tr">пут ап</td><td class="de">aufh&auml;ngen, unterbringen</td><td class="ua">повісити</td><td class="ru">повесить, разместить</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">scare off</td><td class="tr">скэ́эр оф</td><td class="de">verscheuchen, abschrecken</td><td class="ua">відлякувати</td><td class="ru">отпугивать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">bounce</td><td class="tr">ба́унс</td><td class="de">abrollen, h&uuml;pfen</td><td class="ua">підстрибувати</td><td class="ru">подпрыгивать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">exhibit</td><td class="tr">игзи́бит</td><td class="de">das Exponat, ausstellen</td><td class="ua">виставляти</td><td class="ru">выставлять</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">lie about</td><td class="tr">лай эба́ут</td><td class="de">herumliegen</td><td class="ua">валятися без діла</td><td class="ru">валяться без дела</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">carve</td><td class="tr">ка:в</td><td class="de">schnitzen, schneiden</td><td class="ua">вирізати</td><td class="ru">вырезать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">unravel</td><td class="tr">анра́вэл</td><td class="de">entwirren, aufdecken</td><td class="ua">розплутувати</td><td class="ru">распутывать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">decipher</td><td class="tr">диса́йфэр</td><td class="de">entschl&uuml;sseln</td><td class="ua">розшифровувати</td><td class="ru">расшифровывать</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 4. ACTION/MOVEMENT VERBS ============ -->
+        <div class="group-header" style="--group-accent:#3fb950; --group-from:rgba(63,185,80,0.15); --group-to:rgba(63,185,80,0.04); --group-border:rgba(63,185,80,0.3);">
+            <h3>&#x1F3C3; 4. Глаголы движения для Story <span class="group-count">5</span></h3>
+            <p>Для приключенческих сцен в Story Continuation</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">leap out</td><td class="tr">ли:п а́ут</td><td class="de">herausspringen</td><td class="ua">вистрибувати</td><td class="ru">выпрыгивать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">pounce</td><td class="tr">па́унс</td><td class="de">anspringen</td><td class="ua">накидатися</td><td class="ru">набрасываться</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">sneak up</td><td class="tr">сни:к ап</td><td class="de">sich anschleichen</td><td class="ua">підкрадатися</td><td class="ru">подкрадываться</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">befall / befell</td><td class="tr">биф́о:л / биф́эл</td><td class="de">widerfahren, zusto&szlig;en</td><td class="ua">траплятися</td><td class="ru">случаться</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">pen / pencil (Verb)</td><td class="tr">пэн / пэ́нсил</td><td class="de">schreiben, kritzeln</td><td class="ua">писати, надряпати</td><td class="ru">писать, нацарапать</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 5. ADJECTIVES ============ -->
+        <div class="group-header" style="--group-accent:#ec4899; --group-from:rgba(236,72,153,0.15); --group-to:rgba(236,72,153,0.04); --group-border:rgba(236,72,153,0.3);">
+            <h3>&#x1F3A8; 5. Прилагательные / Adjektive <span class="group-count">10</span></h3>
+            <p>Описание объектов и сцен</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">wide</td><td class="tr">ва́йд</td><td class="de">weit, breit</td><td class="ua">широко</td><td class="ru">широкий</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">steady</td><td class="tr">стэ́ди</td><td class="de">stabil</td><td class="ua">стійкий</td><td class="ru">устойчивый</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">humble</td><td class="tr">ха́мбл</td><td class="de">bescheiden</td><td class="ua">скромний</td><td class="ru">скромный</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">grand</td><td class="tr">грэнд</td><td class="de">pr&auml;chtig, gro&szlig;artig</td><td class="ua">величезний</td><td class="ru">грандиозный</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">slippery</td><td class="tr">сли́пэри</td><td class="de">rutschig</td><td class="ua">слизький</td><td class="ru">скользкий</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">gooey</td><td class="tr">гу́:и</td><td class="de">klebrig, z&auml;hfl&uuml;ssig</td><td class="ua">липкий</td><td class="ru">липкий, вязкий</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">arcane</td><td class="tr">а:ќэйн</td><td class="de">geheimnisvoll</td><td class="ua">загадковий</td><td class="ru">загадочный</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">infernal</td><td class="tr">инф́э:нэл</td><td class="de">h&ouml;llisch, schrecklich</td><td class="ua">пекельний</td><td class="ru">адский</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">crumbly</td><td class="tr">кра́мбли</td><td class="de">br&ouml;ckelig</td><td class="ua">крихкий</td><td class="ru">крошащийся</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">enchanted</td><td class="tr">энча́:нтид</td><td class="de">bezaubert</td><td class="ua">зачарований</td><td class="ru">очарованный</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 6. BODY PARTS ============ -->
+        <div class="group-header" style="--group-accent:#fb923c; --group-from:rgba(251,146,60,0.15); --group-to:rgba(251,146,60,0.04); --group-border:rgba(251,146,60,0.3);">
+            <h3>&#x1F464; 6. Части тела <span class="group-count">4</span></h3>
+            <p>Для описаний и медицинских ситуаций</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">throat</td><td class="tr">троу́т</td><td class="de">der Hals</td><td class="ua">горло</td><td class="ru">горло</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">tummy</td><td class="tr">та́ми</td><td class="de">der Bauch</td><td class="ua">живіт</td><td class="ru">животик</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">tail</td><td class="tr">тэйл</td><td class="de">der Schwanz</td><td class="ua">хвіст</td><td class="ru">хвост</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">rear end</td><td class="tr">ри́эр энд</td><td class="de">das Hinterteil</td><td class="ua">дупа, зад</td><td class="ru">зад, попа</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 7. STORY NOUNS ============ -->
+        <div class="group-header" style="--group-accent:#06b6d4; --group-from:rgba(6,182,212,0.15); --group-to:rgba(6,182,212,0.04); --group-border:rgba(6,182,212,0.3);">
+            <h3>&#x1F4D6; 7. Существительные из истории <span class="group-count">12</span></h3>
+            <p>Похоже, из книги. Для ZP10 не критично, но полезно для понимания</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">chapter</td><td class="tr">чэ́птэр</td><td class="de">das Kapitel</td><td class="ua">глава</td><td class="ru">глава</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">issue</td><td class="tr">и́шу:</td><td class="de">das Problem, ausl&ouml;sen</td><td class="ua">проблема, питання</td><td class="ru">проблема, вопрос</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">replacement</td><td class="tr">рипл́эйсмэнт</td><td class="de">der Ersatz</td><td class="ua">заміна</td><td class="ru">замена</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">creature</td><td class="tr">кри́:чэр</td><td class="de">die Kreatur, das Wesen</td><td class="ua">істота</td><td class="ru">существо</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">plea</td><td class="tr">пли:</td><td class="de">das Flehen, die Bitte</td><td class="ua">прохання</td><td class="ru">просьба</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">fallout</td><td class="tr">ф́о:лаут</td><td class="de">Folgen, Auswirkungen</td><td class="ua">наслідки</td><td class="ru">последствия</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">sidekick</td><td class="tr">са́йдкик</td><td class="de">der Kumpel</td><td class="ua">напарник</td><td class="ru">напарник</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">claw</td><td class="tr">кло:</td><td class="de">die Klaue</td><td class="ua">кіготь</td><td class="ru">коготь</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">furrow</td><td class="tr">ф́эроу</td><td class="de">die Furche</td><td class="ua">борозна</td><td class="ru">борозда</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">fluff (up)</td><td class="tr">флаф (ап)</td><td class="de">der Flaum</td><td class="ua">пух</td><td class="ru">пух</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">remuneration</td><td class="tr">рим̃юнэр́эйшн</td><td class="de">die Verg&uuml;tung</td><td class="ua">винагорода</td><td class="ru">вознаграждение</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">sport area</td><td class="tr">спо:т э́:риа</td><td class="de">der Sportplatz</td><td class="ua">спортмайданчик</td><td class="ru">спортплощадка</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 8. RARE OBJECTS ============ -->
+        <div class="group-header" style="--group-accent:#94a3b8; --group-from:rgba(148,163,184,0.12); --group-to:rgba(148,163,184,0.04); --group-border:rgba(148,163,184,0.3);">
+            <h3>&#x1F381; 8. Редкие предметы <span class="group-count">4</span></h3>
+            <p>Из книги. Для ZP10 почти бесполезно &mdash; учи только если есть время</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">firecracker</td><td class="tr">ф́айэркрэкэр</td><td class="de">der Knallk&ouml;rper</td><td class="ua">петарда</td><td class="ru">петарда</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">shears</td><td class="tr">ши́эрз</td><td class="de">die Schere</td><td class="ua">ножиці</td><td class="ru">ножницы (большие)</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">pot</td><td class="tr">пот</td><td class="de">der Topf</td><td class="ua">горщик</td><td class="ru">горшок</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">pine cone</td><td class="tr">па́йн ко́ун</td><td class="de">der Tannenzapfen</td><td class="ua">шишка</td><td class="ru">шишка</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ============ PART 2 — NEW WORDS ============ -->
+        <!-- ============================================ -->
+        <div style="margin-top:3rem; padding:1.2rem 1.4rem; background:linear-gradient(135deg, rgba(244,63,94,0.15), rgba(244,63,94,0.04)); border:2px solid rgba(244,63,94,0.4); border-radius:14px; text-align:center;">
+            <h2 style="margin:0; color:#fda4af; font-size:1.3rem; letter-spacing:0.05em;">&#x1F4D6; PART 2 &mdash; новые слова</h2>
+            <p style="margin:0.3rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">~38 слов из новой книги &mdash; организованы по группам</p>
+        </div>
+
+        <!-- ============ 9. NEW ADJECTIVES ============ -->
+        <div class="group-header" style="--group-accent:#ec4899; --group-from:rgba(236,72,153,0.15); --group-to:rgba(236,72,153,0.04); --group-border:rgba(236,72,153,0.3);">
+            <h3>&#x1F3A8; 9. Прилагательные (часть 2) <span class="group-count">5</span></h3>
+            <p>Сильные слова для характеров и описаний &mdash; пригодятся для Story</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">tidy</td><td class="tr">та́йді</td><td class="de">ordentlich</td><td class="ua">охайний</td><td class="ru">аккуратный, опрятный</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">malicious</td><td class="tr">меля́шес</td><td class="de">b&ouml;swillig</td><td class="ua">зловмисний</td><td class="ru">злонамеренный, злой</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">ferocious</td><td class="tr">феро́ушес</td><td class="de">wild, grausam</td><td class="ua">лютий, жорстокий</td><td class="ru">свирепый, жестокий</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">shaggy</td><td class="tr">шэ́ґі</td><td class="de">struppig</td><td class="ua">кудлатий</td><td class="ru">лохматый, косматый</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">surly</td><td class="tr">сэ́:рлі</td><td class="de">m&uuml;rrisch</td><td class="ua">похмурий, грубий</td><td class="ru">угрюмый, грубый</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 10. NEW PHRASES ============ -->
+        <div class="group-header" style="--group-accent:#a371f7; --group-from:rgba(163,113,247,0.15); --group-to:rgba(163,113,247,0.04); --group-border:rgba(163,113,247,0.3);">
+            <h3>&#x1F4AC; 10. Фразы и связки (часть 2) <span class="group-count">5</span></h3>
+            <p>Готовые выражения &mdash; учи целыми кусками</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">ahead of</td><td class="tr">эхэ́д ов</td><td class="de">vor, voraus</td><td class="ua">попереду, перед</td><td class="ru">впереди, перед</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">partial to</td><td class="tr">па́:шл ту</td><td class="de">eine Vorliebe haben f&uuml;r</td><td class="ua">мати слабкість до</td><td class="ru">иметь слабость к</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">for scale</td><td class="tr">фо: скэйл</td><td class="de">zum Gr&ouml;&szlig;envergleich</td><td class="ua">для масштабу</td><td class="ru">для масштаба</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">you&rsquo;re on a roll</td><td class="tr">йо:р он э ро́ул</td><td class="de">du hast einen Lauf</td><td class="ua">ти в ударі</td><td class="ru">ты в ударе, у тебя пошло</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">dash it all</td><td class="tr">дэш ит о́:л</td><td class="de">Verdammt!</td><td class="ua">чорт забирай</td><td class="ru">чёрт побери (старомодное)</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 11. NEW VERBS ============ -->
+        <div class="group-header" style="--group-accent:#58a6ff; --group-from:rgba(88,166,255,0.15); --group-to:rgba(88,166,255,0.04); --group-border:rgba(88,166,255,0.3);">
+            <h3>&#x1F3AC; 11. Глаголы (часть 2) <span class="group-count">11</span></h3>
+            <p>Действия &mdash; для Story и описаний</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">hide</td><td class="tr">ха́йд</td><td class="de">verstecken</td><td class="ua">ховати</td><td class="ru">прятать(ся)</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">beg</td><td class="tr">бэг</td><td class="de">bitten, flehen</td><td class="ua">благати</td><td class="ru">умолять, просить</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">spill</td><td class="tr">спил</td><td class="de">versch&uuml;tten</td><td class="ua">проливати</td><td class="ru">проливать, разливать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">spoil</td><td class="tr">спо́йл</td><td class="de">verderben</td><td class="ua">псувати, балувати</td><td class="ru">портить, баловать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">sneak into</td><td class="tr">сни:к и́нту</td><td class="de">sich hineinschleichen</td><td class="ua">прокрастися в</td><td class="ru">прокрасться в</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">tangle up</td><td class="tr">тэ́нгл ап</td><td class="de">verheddern</td><td class="ua">заплутати</td><td class="ru">запутать(ся)</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">swipe</td><td class="tr">сва́йп</td><td class="de">wischen</td><td class="ua">провести пальцем</td><td class="ru">смахнуть, провести пальцем</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">dig up</td><td class="tr">диг ап</td><td class="de">ausgraben</td><td class="ua">викопати, відшукати</td><td class="ru">выкопать, раскопать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">scribble in</td><td class="tr">скри́бл ин</td><td class="de">hineinkritzeln</td><td class="ua">нашвидкуруч вписати</td><td class="ru">нацарапать, наспех вписать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">muddy up</td><td class="tr">ма́ди ап</td><td class="de">schmutzig machen</td><td class="ua">забруднити, заплутати</td><td class="ru">испачкать, запутать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">clog</td><td class="tr">клог</td><td class="de">verstopfen</td><td class="ua">засмічувати</td><td class="ru">засорять, забивать</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 12. NEW NOUNS ============ -->
+        <div class="group-header" style="--group-accent:#06b6d4; --group-from:rgba(6,182,212,0.15); --group-to:rgba(6,182,212,0.04); --group-border:rgba(6,182,212,0.3);">
+            <h3>&#x1F4E6; 12. Существительные (часть 2) <span class="group-count">17</span></h3>
+            <p>Предметы и понятия из книги. Многие &mdash; редкие, но забавные</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">mess</td><td class="tr">мэс</td><td class="de">das Chaos</td><td class="ua">безлад</td><td class="ru">беспорядок, бардак</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">lead</td><td class="tr">ли:д / лэд</td><td class="de">f&uuml;hren / das Blei</td><td class="ua">вести / свинець</td><td class="ru">вести / свинец</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">stripe</td><td class="tr">стра́йп</td><td class="de">der Streifen</td><td class="ua">смуга</td><td class="ru">полоска</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">rug</td><td class="tr">раг</td><td class="de">der Teppich</td><td class="ua">килим</td><td class="ru">ковёр</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">mug</td><td class="tr">маг</td><td class="de">der Becher</td><td class="ua">кружка</td><td class="ru">кружка</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">horn</td><td class="tr">хо:н</td><td class="de">das Horn</td><td class="ua">ріг, гудок</td><td class="ru">рог, гудок</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">fur</td><td class="tr">фё:р</td><td class="de">das Fell</td><td class="ua">хутро</td><td class="ru">мех, шерсть</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">chip</td><td class="tr">чип</td><td class="de">der Chip</td><td class="ua">чіп, шматочок</td><td class="ru">чип, кусочек</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">chalk</td><td class="tr">чо:к</td><td class="de">die Kreide</td><td class="ua">крейда</td><td class="ru">мел</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">crayon</td><td class="tr">крэ́йон</td><td class="de">der Wachsmalstift</td><td class="ua">воскова крейда</td><td class="ru">восковой мелок</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">mop</td><td class="tr">моп</td><td class="de">der Mopp</td><td class="ua">швабра</td><td class="ru">швабра</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">mould</td><td class="tr">мо́улд</td><td class="de">der Schimmel, die Form</td><td class="ua">пліснява, форма</td><td class="ru">плесень, форма</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">hooks</td><td class="tr">хукс</td><td class="de">die Haken</td><td class="ua">гачки</td><td class="ru">крючки</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">pipe</td><td class="tr">па́йп</td><td class="de">das Rohr</td><td class="ua">труба</td><td class="ru">труба, трубка</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">pit</td><td class="tr">пит</td><td class="de">die Grube, der Kern</td><td class="ua">яма, кісточка</td><td class="ru">яма, косточка (плода)</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">barnacle</td><td class="tr">ба́:некл</td><td class="de">die Seepocke</td><td class="ua">морський жолудь</td><td class="ru">морской жёлудь, балянус</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">stampede</td><td class="tr">стэмпи́:д</td><td class="de">die Stampede</td><td class="ua">тиснява, панічна втеча</td><td class="ru">давка, паническое бегство</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ============ PART 3 — NEW WORDS ============ -->
+        <!-- ============================================ -->
+        <div style="margin-top:3rem; padding:1.2rem 1.4rem; background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.04)); border:2px solid rgba(6,182,212,0.4); border-radius:14px; text-align:center;">
+            <h2 style="margin:0; color:#67e8f9; font-size:1.3rem; letter-spacing:0.05em;">&#x1F4D6; PART 3 &mdash; ещё новые слова</h2>
+            <p style="margin:0.3rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">~35 слов из третьего списка. <em>&laquo;certainly&raquo;</em> уже есть в Part 1 (Группа 2)</p>
+        </div>
+
+        <!-- ============ 13. NEW ADJECTIVES (Part 3) ============ -->
+        <div class="group-header" style="--group-accent:#ec4899; --group-from:rgba(236,72,153,0.15); --group-to:rgba(236,72,153,0.04); --group-border:rgba(236,72,153,0.3);">
+            <h3>&#x1F3A8; 13. Прилагательные (часть 3) <span class="group-count">6</span></h3>
+            <p>Описания эмоций и состояний &mdash; полезно для Story и Character</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">pale</td><td class="tr">пэйл</td><td class="de">blass</td><td class="ua">блідий</td><td class="ru">бледный</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">gloomy</td><td class="tr">глу́:ми</td><td class="de">d&uuml;ster</td><td class="ua">похмурий</td><td class="ru">мрачный, угрюмый</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">ridiculous</td><td class="tr">риди́кьюлэс</td><td class="de">l&auml;cherlich</td><td class="ua">безглуздий</td><td class="ru">смешной, нелепый</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">horrendous</td><td class="tr">хорэ́ндэс</td><td class="de">schrecklich</td><td class="ua">жахливий</td><td class="ru">ужасный, кошмарный</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">bare-knuckled</td><td class="tr">бэа на́клд</td><td class="de">mit blo&szlig;en F&auml;usten</td><td class="ua">з голими кулаками</td><td class="ru">голыми кулаками</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">tiggerized</td><td class="tr">ти́гэрайзд</td><td class="de">sich wie Tigger verhalten</td><td class="ua">гіперактивний</td><td class="ru">гиперактивный (как Тигра)</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 14. NEW PHRASES (Part 3) ============ -->
+        <div class="group-header" style="--group-accent:#a371f7; --group-from:rgba(163,113,247,0.15); --group-to:rgba(163,113,247,0.04); --group-border:rgba(163,113,247,0.3);">
+            <h3>&#x1F4AC; 14. Фразы и связки (часть 3) <span class="group-count">5</span></h3>
+            <p>Готовые выражения из разговорной речи</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">shall</td><td class="tr">шэл</td><td class="de">sollen</td><td class="ua">будемо?, повинен</td><td class="ru">будем?, должен</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">light lunch</td><td class="tr">лайт ланч</td><td class="de">leichtes Mittagessen</td><td class="ua">легкий обід</td><td class="ru">лёгкий обед</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">look out!</td><td class="tr">лук а́ут</td><td class="de">Pass auf!</td><td class="ua">обережно!</td><td class="ru">осторожно!</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">keep it down</td><td class="tr">ки:п ит да́ун</td><td class="de">leise sein</td><td class="ua">тихіше</td><td class="ru">потише, тише</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">headlong</td><td class="tr">хэ́длонг</td><td class="de">kopf&uuml;ber</td><td class="ua">стрімголов</td><td class="ru">стремглав, очертя голову</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 15. NEW VERBS (Part 3) ============ -->
+        <div class="group-header" style="--group-accent:#58a6ff; --group-from:rgba(88,166,255,0.15); --group-to:rgba(88,166,255,0.04); --group-border:rgba(88,166,255,0.3);">
+            <h3>&#x1F3AC; 15. Глаголы (часть 3) <span class="group-count">15</span></h3>
+            <p>Самая большая группа &mdash; учи в первую очередь P1</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">gather</td><td class="tr">гэ́зэр</td><td class="de">sammeln</td><td class="ua">збирати</td><td class="ru">собирать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">afford</td><td class="tr">эфо́:д</td><td class="de">sich leisten k&ouml;nnen</td><td class="ua">дозволити собі</td><td class="ru">позволить себе</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">fool</td><td class="tr">фу:л</td><td class="de">der Narr / t&auml;uschen</td><td class="ua">дурень, обдурювати</td><td class="ru">дурак, обманывать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">hunt</td><td class="tr">хант</td><td class="de">jagen</td><td class="ua">полювати</td><td class="ru">охотиться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">dive</td><td class="tr">да́йв</td><td class="de">tauchen</td><td class="ua">пірнати</td><td class="ru">нырять</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">persevere</td><td class="tr">пё:сэви́эр</td><td class="de">durchhalten</td><td class="ua">не здаватися</td><td class="ru">упорствовать, не сдаваться</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">supervise</td><td class="tr">су́:первайз</td><td class="de">beaufsichtigen</td><td class="ua">наглядати</td><td class="ru">контролировать, надзирать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">whimper</td><td class="tr">ви́мпэр</td><td class="de">winseln</td><td class="ua">скиглити</td><td class="ru">хныкать, скулить</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">grunt</td><td class="tr">грант</td><td class="de">grunzen</td><td class="ua">бурчати</td><td class="ru">ворчать, хрюкать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">groan</td><td class="tr">гро́ун</td><td class="de">st&ouml;hnen</td><td class="ua">стогнати</td><td class="ru">стонать</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">journeyed</td><td class="tr">джё́:нид</td><td class="de">reiste</td><td class="ua">подорожував</td><td class="ru">путешествовал</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">strike down</td><td class="tr">стра́йк да́ун</td><td class="de">niederschlagen</td><td class="ua">повалити</td><td class="ru">сразить, повалить</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">gear on</td><td class="tr">гиэ́р он</td><td class="de">ausrichten auf</td><td class="ua">орієнтувати на</td><td class="ru">направить на</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">get left</td><td class="tr">гет лефт</td><td class="de">zur&uuml;ckgelassen werden</td><td class="ua">залишитися позаду</td><td class="ru">остаться позади</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">fix you up</td><td class="tr">фикс ю ап</td><td class="de">helfen</td><td class="ua">допомогти, владнати</td><td class="ru">помочь, всё уладить</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 16. NEW NOUNS (Part 3) ============ -->
+        <div class="group-header" style="--group-accent:#06b6d4; --group-from:rgba(6,182,212,0.15); --group-to:rgba(6,182,212,0.04); --group-border:rgba(6,182,212,0.3);">
+            <h3>&#x1F4E6; 16. Существительные (часть 3) <span class="group-count">8</span></h3>
+            <p>Объекты, понятия и абстрактные слова</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">closet</td><td class="tr">кло́зэт</td><td class="de">der Schrank</td><td class="ua">шафа</td><td class="ru">шкаф</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">fate</td><td class="tr">фэйт</td><td class="de">das Schicksal</td><td class="ua">доля</td><td class="ru">судьба</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">spirit</td><td class="tr">спи́рит</td><td class="de">der Geist</td><td class="ua">дух</td><td class="ru">дух</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">trail</td><td class="tr">трэйл</td><td class="de">der Pfad</td><td class="ua">стежка, слід</td><td class="ru">тропа, след</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">disguise</td><td class="tr">дисга́йз</td><td class="de">die Verkleidung</td><td class="ua">маскування</td><td class="ru">маскировка, переодевание</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">buddy</td><td class="tr">ба́ди</td><td class="de">der Kumpel</td><td class="ua">приятель</td><td class="ru">приятель, дружище</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">combat</td><td class="tr">ко́мбэт / кэмбэ́т</td><td class="de">der Kampf</td><td class="ua">бій, боротися</td><td class="ru">бой, бороться</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">rumination</td><td class="tr">ру:мине́йшн</td><td class="de">Gr&uuml;beln</td><td class="ua">нав&rsquo;язливі роздуми</td><td class="ru">навязчивые размышления</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">from a squat</td><td class="tr">фром э скво́т</td><td class="de">aus der Hocke</td><td class="ua">з присіду</td><td class="ru">из приседа</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ============ PART 4 — NEW WORDS ============ -->
+        <!-- ============================================ -->
+        <div style="margin-top:3rem; padding:1.2rem 1.4rem; background:linear-gradient(135deg, rgba(63,185,80,0.15), rgba(63,185,80,0.04)); border:2px solid rgba(63,185,80,0.4); border-radius:14px; text-align:center;">
+            <h2 style="margin:0; color:#86efac; font-size:1.3rem; letter-spacing:0.05em;">&#x1F4D6; PART 4 &mdash; четвёртый список</h2>
+            <p style="margin:0.3rem 0 0; font-size:0.88rem; color:var(--color-text-muted);">~43 слова. <em>&laquo;certainly&raquo;</em> и <em>&laquo;gather&raquo;</em> &mdash; дубли, пропущены</p>
+        </div>
+
+        <!-- ============ 17. NEW ADJECTIVES (Part 4) ============ -->
+        <div class="group-header" style="--group-accent:#ec4899; --group-from:rgba(236,72,153,0.15); --group-to:rgba(236,72,153,0.04); --group-border:rgba(236,72,153,0.3);">
+            <h3>&#x1F3A8; 17. Прилагательные (часть 4) <span class="group-count">10</span></h3>
+            <p>Описания состояний и характеристик</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">pleased</td><td class="tr">пли:зд</td><td class="de">zufrieden</td><td class="ua">задоволений</td><td class="ru">довольный</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">gentle</td><td class="tr">дже́нтл</td><td class="de">sanft</td><td class="ua">ніжний</td><td class="ru">нежный, мягкий</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">cheeky</td><td class="tr">чи́:ки</td><td class="de">frech</td><td class="ua">зухвалий</td><td class="ru">дерзкий, нахальный</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">gracious</td><td class="tr">грэ́йшэс</td><td class="de">freundlich</td><td class="ua">люб&rsquo;язний</td><td class="ru">любезный, милостивый</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">better off</td><td class="tr">бэ́тэр оф</td><td class="de">besser dran</td><td class="ua">у кращому становищі</td><td class="ru">в лучшем положении</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">fraught</td><td class="tr">фро:т</td><td class="de">belastet</td><td class="ua">сповнений проблем</td><td class="ru">полный (проблем)</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">aerial</td><td class="tr">э́эриэл</td><td class="de">Luft-, Antenne</td><td class="ua">повітряний, антена</td><td class="ru">воздушный, антенна</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">inconclusive</td><td class="tr">инкэнклу́:сив</td><td class="de">nicht eindeutig</td><td class="ua">непереконливий</td><td class="ru">неубедительный</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">perennial</td><td class="tr">пэрэ́ниэл</td><td class="de">mehrj&auml;hrig</td><td class="ua">багаторічний</td><td class="ru">многолетний, вечный</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">licky</td><td class="tr">ли́ки</td><td class="de">schleckend</td><td class="ua">той, що лиже</td><td class="ru">лижущий</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 18. NEW PHRASES (Part 4) ============ -->
+        <div class="group-header" style="--group-accent:#a371f7; --group-from:rgba(163,113,247,0.15); --group-to:rgba(163,113,247,0.04); --group-border:rgba(163,113,247,0.3);">
+            <h3>&#x1F4AC; 18. Фразы и связки (часть 4) <span class="group-count">10</span></h3>
+            <p>Разговорные выражения и предлоги</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">indeed</td><td class="tr">инди́:д</td><td class="de">tats&auml;chlich</td><td class="ua">справді</td><td class="ru">действительно, и правда</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">either</td><td class="tr">а́йзэр / и́:зэр</td><td class="de">entweder</td><td class="ua">або, теж ні</td><td class="ru">либо, тоже не</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">towards</td><td class="tr">туво́:дз</td><td class="de">in Richtung</td><td class="ua">до, у напрямку</td><td class="ru">к, в направлении</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">hand me</td><td class="tr">хэнд ми</td><td class="de">gib mir</td><td class="ua">передай мені</td><td class="ru">передай мне</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">it&rsquo;s no use</td><td class="tr">итс но́у ю:с</td><td class="de">es hat keinen Sinn</td><td class="ua">це марно</td><td class="ru">это бесполезно</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">spot on</td><td class="tr">спот он</td><td class="de">genau richtig</td><td class="ua">прямо в точку</td><td class="ru">в точку, точно</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">off you go</td><td class="tr">оф ю го́у</td><td class="de">los geht&rsquo;s</td><td class="ua">вперед, іди</td><td class="ru">давай, иди</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">silly of someone</td><td class="tr">си́ли ов</td><td class="de">dumm von jemandem</td><td class="ua">нерозумно з чийогось боку</td><td class="ru">глупо с чьей-то стороны</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">for crying out loud</td><td class="tr">фо: кра́йинг а́ут ла́уд</td><td class="de">um Himmels willen</td><td class="ua">та боже ж мій</td><td class="ru">да боже мой!</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">flow inside</td><td class="tr">фло́у инса́йд</td><td class="de">hineinflie&szlig;en</td><td class="ua">текти всередині</td><td class="ru">течь внутри</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 19. NEW VERBS (Part 4) ============ -->
+        <div class="group-header" style="--group-accent:#58a6ff; --group-from:rgba(88,166,255,0.15); --group-to:rgba(88,166,255,0.04); --group-border:rgba(88,166,255,0.3);">
+            <h3>&#x1F3AC; 19. Глаголы (часть 4) <span class="group-count">12</span></h3>
+            <p>Action verbs + phrasal verbs (get out, mess up, think through)</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">get up</td><td class="tr">гет ап</td><td class="de">aufstehen</td><td class="ua">вставати</td><td class="ru">вставать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">get out</td><td class="tr">гет а́ут</td><td class="de">hinausgehen</td><td class="ua">виходити</td><td class="ru">выходить, убираться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">suppose</td><td class="tr">сэпо́уз</td><td class="de">annehmen</td><td class="ua">припускати</td><td class="ru">предполагать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">rescue</td><td class="tr">рэ́скью:</td><td class="de">retten</td><td class="ua">рятувати</td><td class="ru">спасать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">pack</td><td class="tr">пэк</td><td class="de">packen</td><td class="ua">пакувати</td><td class="ru">паковать</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">tie</td><td class="tr">тай</td><td class="de">binden</td><td class="ua">зав&rsquo;язувати, нічия</td><td class="ru">завязывать, ничья</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">mess up</td><td class="tr">мэс ап</td><td class="de">vermasseln</td><td class="ua">зіпсувати</td><td class="ru">испортить, облажаться</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">think through</td><td class="tr">синк сру</td><td class="de">durchdenken</td><td class="ua">добре обдумати</td><td class="ru">всё обдумать</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">move along</td><td class="tr">му:в эло́нг</td><td class="de">weitergehen</td><td class="ua">рухатися далі</td><td class="ru">двигаться дальше</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">bow</td><td class="tr">бо́у / ба́у</td><td class="de">Schleife / sich verbeugen</td><td class="ua">бант / кланятися</td><td class="ru">бант (boʊ) / кланяться (baʊ)</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">lag</td><td class="tr">лэг</td><td class="de">hinterherhinken</td><td class="ua">відставати</td><td class="ru">отставать, тормозить</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">pick off</td><td class="tr">пик оф</td><td class="de">ausschalten</td><td class="ua">збивати по одному</td><td class="ru">снимать по одному</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 20. NEW NOUNS (Part 4) ============ -->
+        <div class="group-header" style="--group-accent:#06b6d4; --group-from:rgba(6,182,212,0.15); --group-to:rgba(6,182,212,0.04); --group-border:rgba(6,182,212,0.3);">
+            <h3>&#x1F4E6; 20. Существительные (часть 4) <span class="group-count">11</span></h3>
+            <p>От повседневных до возвышенных понятий</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="my-table">
+                <tr><th style="width:42px;">P</th><th>English</th><th>Читать</th><th>Deutsch</th><th>Українська</th><th>Русский</th></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">movement</td><td class="tr">му́:вмэнт</td><td class="de">die Bewegung</td><td class="ua">рух</td><td class="ru">движение</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">stream</td><td class="tr">стри:м</td><td class="de">der Strom</td><td class="ua">потік, струмок</td><td class="ru">поток, ручей</td></tr>
+                <tr><td class="pri"><span class="priority p1">P1</span></td><td class="en">boat</td><td class="tr">бо́ут</td><td class="de">das Boot</td><td class="ua">човен</td><td class="ru">лодка, корабль</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">peril</td><td class="tr">пэ́рил</td><td class="de">die Gefahr</td><td class="ua">небезпека</td><td class="ru">опасность</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">complexity</td><td class="tr">кэмплэ́ксити</td><td class="de">die Komplexit&auml;t</td><td class="ua">складність</td><td class="ru">сложность</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">venture</td><td class="tr">вэ́нчэр</td><td class="de">das Wagnis</td><td class="ua">ризикована справа</td><td class="ru">рискованное предприятие</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">abyss</td><td class="tr">эби́с</td><td class="de">der Abgrund</td><td class="ua">безодня</td><td class="ru">бездна, пропасть</td></tr>
+                <tr><td class="pri"><span class="priority p2">P2</span></td><td class="en">predicament</td><td class="tr">приди́кэмэнт</td><td class="de">missliche Lage</td><td class="ua">скрутне становище</td><td class="ru">затруднительное положение</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">swine</td><td class="tr">сва́йн</td><td class="de">das Schwein</td><td class="ua">свиня, мерзотник</td><td class="ru">свинья, мерзавец</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">beehive</td><td class="tr">би́:хайв</td><td class="de">der Bienenstock</td><td class="ua">вулик</td><td class="ru">улей</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">naught</td><td class="tr">но:т</td><td class="de">nichts</td><td class="ua">ніщо</td><td class="ru">ничто, ноль</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">humming</td><td class="tr">ха́минг</td><td class="de">summen</td><td class="ua">гудіння, наспівування</td><td class="ru">гудение, напевание</td></tr>
+                <tr><td class="pri"><span class="priority p3">P3</span></td><td class="en">honeying</td><td class="tr">ха́нинг</td><td class="de">mit Honig bestreichen</td><td class="ua">змащувати медом</td><td class="ru">смазывать мёдом</td></tr>
+            </table></div>
+        </div>
+
+        <!-- ============ STRATEGY ============ -->
+        <div class="note-card highlight-card" style="margin-top:2rem; border-color:rgba(63,185,80,0.4); background:rgba(63,185,80,0.06);">
+            <h3 style="color:#3fb950; margin-top:0;">&#x1F3AF; Как учить эту страницу</h3>
+            <ol style="margin:0.5rem 0; padding-left:1.4rem; line-height:1.85;">
+                <li><strong>День 1-2:</strong> только <span class="priority p1">P1</span> &mdash; группы 1, 2, 3, 5, 6 (~30 слов)</li>
+                <li><strong>День 3-4:</strong> <span class="priority p2">P2</span> в тех же группах (~30 слов)</li>
+                <li><strong>День 5-6:</strong> если успеешь &mdash; <span class="priority p3">P3</span> (книжные слова)</li>
+            </ol>
+            <p style="margin:0.7rem 0 0; font-size:0.9rem;">&#x1F4A1; <strong>Группы 1, 2, 5</strong> &mdash; реально полезное для ZP10. <strong>Группы 7, 8</strong> &mdash; больше для самой книги.</p>
+            <p style="margin:0.5rem 0 0; font-size:0.85rem; color:var(--color-text-muted);">&#x1F4A1; <strong>Произношение:</strong> вбей слово в Google Translate &mdash; нажми 🔊 чтобы услышать. Транскрипция &mdash; для быстрого ориентира.</p>
+        </div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>
