@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesetexte | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========== FONTS & RESET ========== */
+        .lese-page {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: rgba(248, 250, 252, 0.96);
+        }
+        .lese-page * { box-sizing: border-box; }
+
+        /* ========== HERO ========== */
+        .lese-hero {
+            position: relative;
+            padding: 3.5rem 2rem 2.5rem;
+            margin-bottom: 2rem;
+            border-radius: 24px;
+            background:
+                radial-gradient(ellipse at top left, rgba(251, 191, 36, 0.18) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(236, 72, 153, 0.15) 0%, transparent 55%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 27, 75, 0.85) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        .lese-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 30%);
+            pointer-events: none;
+        }
+        .lese-hero .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 0.4rem 0.85rem;
+            border-radius: 100px;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        .lese-hero h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.8rem;
+            background: linear-gradient(135deg, #fff 0%, #fde047 50%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+        .lese-hero p {
+            font-size: 1.05rem;
+            max-width: 640px;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* ========== TOPIC PICKER ========== */
+        .topic-picker {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 2rem 0 1.5rem;
+        }
+        .topic-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.7rem 1.2rem;
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topic-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        .topic-pill.active {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(236, 72, 153, 0.15));
+            border-color: rgba(251, 191, 36, 0.5);
+            color: #fde047;
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.15);
+        }
+        .topic-pill .pill-level {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.1rem 0.45rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            letter-spacing: 0.05em;
+        }
+        .topic-pill.active .pill-level {
+            background: rgba(15, 23, 42, 0.5);
+            color: #fde047;
+        }
+
+        /* ========== ARTICLE LAYOUT ========== */
+        .article-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 980px) {
+            .article-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+        }
+
+        /* ========== READING CARD ========== */
+        .reading-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem 2.2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .reading-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fbbf24 0%, #ec4899 50%, #a78bfa 100%);
+            opacity: 0.7;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        .article-meta .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .chip-level {
+            background: linear-gradient(135deg, #58a6ff, #a78bfa);
+            color: #0f172a;
+        }
+        .chip-topic {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fde047;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        .chip-stat {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .article-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+        .article-deck {
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.55);
+            font-style: italic;
+            margin: 0 0 1.5rem;
+            padding-bottom: 1.3rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .article-body {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: rgba(248, 250, 252, 0.92);
+        }
+        .article-body p {
+            margin: 0 0 1.2rem;
+        }
+        .article-body p:first-of-type::first-letter {
+            font-size: 3.5em;
+            float: left;
+            line-height: 0.85;
+            padding: 0.1em 0.08em 0 0;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Fraunces', serif;
+        }
+        .article-body .vw {
+            color: #fde047;
+            font-weight: 600;
+            text-decoration: none;
+            background-image: linear-gradient(180deg, transparent 65%, rgba(251, 191, 36, 0.4) 65%);
+            background-size: 100% 100%;
+            padding: 0 1px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .article-body .vw:hover {
+            background-image: linear-gradient(180deg, transparent 0%, rgba(251, 191, 36, 0.55) 0%);
+            color: #fff;
+        }
+
+        /* ========== SIDEBAR (vocab) ========== */
+        .vocab-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+        @media (min-width: 980px) {
+            .vocab-sidebar { position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem); overflow-y: auto; padding-right: 0.4rem; }
+            .vocab-sidebar::-webkit-scrollbar { width: 6px; }
+            .vocab-sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 8px; }
+            .vocab-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 8px; }
+        }
+
+        .sidebar-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 700;
+            margin: 0 0 0.6rem;
+            padding-left: 0.4rem;
+        }
+
+        .word-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            scroll-margin-top: 1rem;
+        }
+        .word-card:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
+            border-color: rgba(251, 191, 36, 0.25);
+            transform: translateX(2px);
+        }
+        .word-card:target {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.03));
+            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.3), 0 12px 32px rgba(251, 191, 36, 0.1);
+            animation: pulse-glow 1.5s ease-out;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5); }
+            100% { box-shadow: 0 0 0 16px rgba(251, 191, 36, 0); }
+        }
+
+        .word-card .word-num {
+            position: absolute;
+            top: 0.85rem;
+            right: 1.1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+        }
+        .word-card .word-en {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fde047;
+            margin: 0 0 0.15rem;
+            letter-spacing: -0.01em;
+        }
+        .word-card .word-tr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: rgba(251, 191, 36, 0.7);
+            margin: 0 0 0.6rem;
+            font-weight: 500;
+        }
+        .word-card .word-trans {
+            display: grid;
+            gap: 0.25rem;
+            margin-bottom: 0.6rem;
+        }
+        .word-card .word-trans > div {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+        }
+        .word-card .word-trans .flag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.4);
+            min-width: 22px;
+            letter-spacing: 0.05em;
+        }
+        .word-card .word-trans .text-de { color: #c4b5fd; }
+        .word-card .word-trans .text-ru { color: rgba(248, 250, 252, 0.92); font-weight: 500; }
+        .word-card .word-quote {
+            margin: 0.6rem 0 0;
+            padding: 0.55rem 0.8rem 0.55rem 0.8rem;
+            background: rgba(134, 239, 172, 0.06);
+            border-left: 2px solid #4ade80;
+            border-radius: 6px;
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-size: 0.83rem;
+            color: rgba(134, 239, 172, 0.85);
+            line-height: 1.5;
+        }
+
+        /* ========== QUESTIONS ========== */
+        .questions-section {
+            margin-top: 2.5rem;
+        }
+        .questions-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 0.3rem;
+            letter-spacing: -0.01em;
+        }
+        .questions-sub {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.55);
+            margin: 0 0 1.2rem;
+        }
+        .q-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+        .q-card {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.06), rgba(167, 139, 250, 0.02));
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            transition: border-color 0.2s ease;
+        }
+        .q-card:hover { border-color: rgba(167, 139, 250, 0.3); }
+        .q-card .q-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #c4b5fd;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .q-card .q-text {
+            font-size: 0.96rem;
+            line-height: 1.5;
+            color: #fff;
+            font-weight: 500;
+            margin: 0 0 0.7rem;
+        }
+        .q-card details summary {
+            list-style: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.12);
+            border: 1px solid rgba(167, 139, 250, 0.25);
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .q-card details summary::before {
+            content: '◗';
+            transition: transform 0.2s ease;
+            font-size: 0.7rem;
+        }
+        .q-card details[open] summary::before { transform: rotate(90deg); }
+        .q-card details summary:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.4);
+        }
+        .q-card details > p {
+            margin: 0.7rem 0 0;
+            padding: 0.7rem 0.9rem;
+            background: rgba(74, 222, 128, 0.06);
+            border-left: 3px solid #4ade80;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        /* ========== SELFCHECK ========== */
+        .selfcheck-section {
+            margin-top: 2.5rem;
+            padding: 1.8rem 2rem;
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.08), rgba(74, 222, 128, 0.02));
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 20px;
+        }
+        .selfcheck-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #86efac;
+            margin: 0 0 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .selfcheck-sub {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.55);
+            margin: 0 0 1.2rem;
+        }
+        .check-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.6rem;
+        }
+        .check-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+        .check-item:hover {
+            background: rgba(74, 222, 128, 0.08);
+            border-color: rgba(74, 222, 128, 0.3);
+        }
+        .check-item .ci-word {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #fde047;
+            margin-bottom: 0.15rem;
+        }
+        .check-item .ci-hint {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        /* ========== WRITING TASK ========== */
+        .writing-task {
+            margin-top: 2.5rem;
+            padding: 1.8rem 2rem;
+            background:
+                radial-gradient(ellipse at top right, rgba(251, 146, 60, 0.18) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(251, 146, 60, 0.08), rgba(251, 146, 60, 0.02));
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .writing-task .wt-eyebrow {
+            display: inline-block;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #fdba74;
+            margin-bottom: 0.5rem;
+        }
+        .writing-task h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 0.6rem;
+        }
+        .writing-task p {
+            margin: 0 0 0.6rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .writing-task .starter {
+            margin-top: 0.8rem;
+            padding: 0.9rem 1.1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            border-left: 3px solid #fb923c;
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            color: rgba(253, 186, 116, 0.9);
+            font-size: 0.92rem;
+        }
+
+        /* ========== FUTURE NOTE ========== */
+        .future-note {
+            margin-top: 2.5rem;
+            padding: 1.2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+        .future-note strong { color: #fde047; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg lese-page">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Lesetexte</span>
+        </nav>
+
+        <!-- HERO -->
+        <header class="lese-hero">
+            <span class="eyebrow">&#x2728; Lesetexte mit Vokabeln</span>
+            <h1>Read. Highlight. Remember.</h1>
+            <p>Тексты, в которых живут слова из Vokabeln-страницы. Учи лексику в реальном контексте &mdash; так она остаётся в голове.</p>
+        </header>
+
+        <!-- TOPIC PICKER -->
+        <div class="topic-picker">
+            <button class="topic-pill active" data-tab="b1-everyday">
+                <span class="pill-level">B1</span>
+                Everyday Life
+            </button>
+            <button class="topic-pill" data-tab="b2-everyday">
+                <span class="pill-level">B2</span>
+                Everyday Life
+            </button>
+            <button class="topic-pill" data-tab="c1-everyday">
+                <span class="pill-level">C1</span>
+                Everyday Life
+            </button>
+            <button class="topic-pill" data-tab="b1-env">
+                <span class="pill-level">B1</span>
+                Environment
+            </button>
+            <button class="topic-pill" data-tab="b2-env">
+                <span class="pill-level">B2</span>
+                Environment
+            </button>
+            <button class="topic-pill" data-tab="c1-env">
+                <span class="pill-level">C1</span>
+                Environment
+            </button>
+        </div>
+
+        <!-- ============ TAB: B1 EVERYDAY LIFE ============ -->
+        <div class="tab-content active" id="tab-b1-everyday">
+
+            <div class="article-grid">
+
+                <!-- READING ARTICLE -->
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">B1 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F3E0; EVERYDAY LIFE</span>
+                        <span class="chip chip-stat">~210 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">My Life as a Teenager</h2>
+                    <p class="article-deck">A short story about growing up in a small place &mdash; with all the highs and lows.</p>
+
+                    <div class="article-body">
+                        <p>Living in a small <a href="#w2" class="vw">neighbourhood</a> has many <a href="#w9" class="vw">advantages</a>. Everyone knows each other, and people <a href="#w6" class="vw">support</a> each other when something happens &mdash; a broken pipe, a sick neighbour, a lost cat. Of course, there are also some <a href="#w9" class="vw">disadvantages</a>. Sometimes I want more privacy, and on weekends there isn&rsquo;t much to do here.</p>
+
+                        <p>I&rsquo;m 15 years old, and this year I have learned a lot about <a href="#w5" class="vw">responsibility</a>. My parents both work full-time, so I have to take care of my little brother after school. At first, I used to <a href="#w3" class="vw">complain</a> about it &mdash; I thought it was unfair. But now I understand that it&rsquo;s just part of growing up, and honestly, I like spending time with him.</p>
+
+                        <p>School is going well, but I want to <a href="#w8" class="vw">improve</a> my English before the next exam. So I read books in English every evening, even when I&rsquo;m tired. It isn&rsquo;t always <a href="#w4" class="vw">convenient</a>, but I know it will give me better <a href="#w11" class="vw">opportunities</a> in the future &mdash; for university, for a job, for travelling.</p>
+
+                        <p>My family can&rsquo;t always <a href="#w1" class="vw">afford</a> expensive holidays abroad, but we still have great <a href="#w7" class="vw">experiences</a> together. Last summer we went camping in the mountains. The weather was terrible &mdash; it rained for two days &mdash; but it was one of the best weeks of my life.</p>
+
+                        <p>One thing I try to do at school is <a href="#w10" class="vw">avoid</a> people with bad <a href="#w12" class="vw">behaviour</a>. There are always some students who make fun of others or start drama for no reason. I prefer to stay with my real friends &mdash; people I can trust.</p>
+                    </div>
+                </article>
+
+                <!-- SIDEBAR: VOCAB CARDS -->
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words</h3>
+
+                    <div class="word-card" id="w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">to afford</div>
+                        <div class="word-tr">/tə əˈfɔːd/ &middot; ту эфо́:д</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich etw. leisten k&ouml;nnen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">позволить себе (финансово)</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;My family can&rsquo;t always afford expensive holidays.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">neighbourhood</div>
+                        <div class="word-tr">/ˈneɪbəhʊd/ &middot; нэ́йбэхуд</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Nachbarschaft, das Viertel</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">район, соседство</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Living in a small neighbourhood has many advantages.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">to complain</div>
+                        <div class="word-tr">/tə kəmˈpleɪn/ &middot; ту кэмплэ́йн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich beschweren, sich beklagen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">жаловаться</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;At first, I used to complain about it.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">convenient</div>
+                        <div class="word-tr">/kənˈviːniənt/ &middot; кэнви́:ньент</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">bequem, praktisch</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">удобный</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;It isn&rsquo;t always convenient, but I know it will help.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">responsibility</div>
+                        <div class="word-tr">/rɪˌspɒnsəˈbɪləti/ &middot; риспонсиби́лити</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Verantwortung</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">ответственность</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;This year I have learned a lot about responsibility.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">to support</div>
+                        <div class="word-tr">/tə səˈpɔːt/ &middot; ту сэпо́:т</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">unterst&uuml;tzen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">поддерживать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;People support each other when something happens.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">experience</div>
+                        <div class="word-tr">/ɪkˈspɪəriəns/ &middot; икспи́эриенс</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Erfahrung, das Erlebnis</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">опыт / переживание</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We still have great experiences together.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">to improve</div>
+                        <div class="word-tr">/tə ɪmˈpruːv/ &middot; ту импру́:в</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">verbessern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">улучшать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;I want to improve my English before the next exam.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">advantage / disadvantage</div>
+                        <div class="word-tr">/ədˈvɑːntɪdʒ/ &middot; эдва́нтидж</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der Vorteil / der Nachteil</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">преимущество / недостаток</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Many advantages &hellip; also some disadvantages.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">to avoid</div>
+                        <div class="word-tr">/tə əˈvɔɪd/ &middot; ту эво́йд</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">vermeiden</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">избегать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;I try to avoid people with bad behaviour.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">opportunity</div>
+                        <div class="word-tr">/ˌɒpəˈtjuːnəti/ &middot; опэтью́нити</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Gelegenheit, die M&ouml;glichkeit</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">возможность, шанс</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;It will give me better opportunities in the future.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">behaviour</div>
+                        <div class="word-tr">/bɪˈheɪvjə/ &middot; бихэ́йвьэ(р)</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">das Verhalten</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">поведение</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;I try to avoid people with bad behaviour.&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <!-- QUESTIONS -->
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">Why does the narrator like living in a small neighbourhood?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Because everyone knows each other and people support each other when something happens (a broken pipe, a sick neighbour, a lost cat).</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">What responsibility does the narrator have at home?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Both parents work full-time, so the narrator has to take care of the little brother after school.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">Why does the narrator read English books every evening?</p>
+                        <details><summary>Show answer</summary>
+                        <p>To improve English before the next exam &mdash; because better English will give better opportunities for university, jobs and travelling.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">Why was the camping trip memorable, even though the weather was bad?</p>
+                        <details><summary>Show answer</summary>
+                        <p>The family can&rsquo;t afford expensive holidays, but they have great experiences together. It rained for two days, but it was still one of the best weeks of the narrator&rsquo;s life.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 05</div>
+                        <p class="q-text">What kind of people does the narrator avoid at school?</p>
+                        <details><summary>Show answer</summary>
+                        <p>People with bad behaviour &mdash; students who make fun of others or start drama for no reason.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SELF CHECK -->
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение каждого слова по подсказке:</p>
+
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">to afford</div><div class="ci-hint">finanziell mglich</div></div>
+                    <div class="check-item"><div class="ci-word">neighbourhood</div><div class="ci-hint">wo du wohnst</div></div>
+                    <div class="check-item"><div class="ci-word">to complain</div><div class="ci-hint">unzufrieden sagen</div></div>
+                    <div class="check-item"><div class="ci-word">convenient</div><div class="ci-hint">passt gut</div></div>
+                    <div class="check-item"><div class="ci-word">responsibility</div><div class="ci-hint">deine Pflicht</div></div>
+                    <div class="check-item"><div class="ci-word">to support</div><div class="ci-hint">helfen</div></div>
+                    <div class="check-item"><div class="ci-word">experience</div><div class="ci-hint">was du erlebt hast</div></div>
+                    <div class="check-item"><div class="ci-word">to improve</div><div class="ci-hint">besser machen</div></div>
+                    <div class="check-item"><div class="ci-word">advantage</div><div class="ci-hint">+ Plus</div></div>
+                    <div class="check-item"><div class="ci-word">to avoid</div><div class="ci-hint">nicht machen wollen</div></div>
+                    <div class="check-item"><div class="ci-word">opportunity</div><div class="ci-hint">gute Chance</div></div>
+                    <div class="check-item"><div class="ci-word">behaviour</div><div class="ci-hint">wie jemand handelt</div></div>
+                </div>
+            </section>
+
+            <!-- WRITING TASK -->
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write your own version</h3>
+                <p>Напиши <strong>свой текст</strong> о твоей жизни (~150 слов), используя <strong>хотя бы 6 слов</strong> из списка. Тема: район, школа, семья, что улучшаешь, что избегаешь.</p>
+                <div class="starter">&ldquo;I live in a [big/small] neighbourhood in&hellip; My biggest responsibility is&hellip;&rdquo;</div>
+            </section>
+
+            <!-- FUTURE -->
+            <div class="future-note">
+                &#x1F4A1; <strong>Coming soon:</strong> Environment &middot; Media &amp; Technology &middot; School &amp; Future &middot; Health &middot; Travel. Скажи, какую тему сделать следующей &mdash; добавлю по тому же шаблону.
+            </div>
+
+        </div>
+
+        <!-- ============ TAB: B2 EVERYDAY LIFE ============ -->
+        <div class="tab-content" id="tab-b2-everyday">
+
+            <div class="article-grid">
+
+                <!-- READING ARTICLE -->
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">B2 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F3E0; EVERYDAY LIFE</span>
+                        <span class="chip chip-stat">~195 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">Growing Up in a Digital World</h2>
+                    <p class="article-deck">A look at the pressures and possibilities that shape today&rsquo;s teenagers.</p>
+
+                    <div class="article-body">
+                        <p>Being a teenager today is not easy. We have to <a href="#b2w1" class="vw">cope with</a> so many things at once &mdash; school, social media, family expectations, and the constant feeling that we have to be perfect all the time. The <a href="#b2w9" class="vw">current</a> generation faces challenges our parents never had to <a href="#b2w10" class="vw">deal with</a>.</p>
+
+                        <p>One major <a href="#b2w11" class="vw">issue</a> that <a href="#b2w6" class="vw">has a huge impact on</a> young people is social media. Of course, it has some good sides &mdash; it helps us stay in touch with friends and <a href="#b2w12" class="vw">encourages</a> creativity. But there are also serious <a href="#b2w3" class="vw">drawbacks</a>. Many teenagers compare themselves to influencers and feel bad about their own lives. We must <a href="#b2w5" class="vw">be aware of</a> how much time we spend online and how it makes us feel afterwards.</p>
+
+                        <p>I think parents and teachers don&rsquo;t always <a href="#b2w4" class="vw">take into account</a> how much pressure we are under. A <a href="#b2w7" class="vw">significant</a> part of our stress comes from school: too much homework, too many tests, and not enough time to just <em>be</em> young.</p>
+
+                        <p>At the same time, we cannot just <a href="#b2w2" class="vw">rely on</a> adults to solve everything for us. We also have to <a href="#b2w8" class="vw">contribute to</a> the solution &mdash; by being honest about how we feel, asking for help when we need it, and supporting each other instead of competing.</p>
+                    </div>
+                </article>
+
+                <!-- SIDEBAR: VOCAB CARDS -->
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words &middot; B2</h3>
+
+                    <div class="word-card" id="b2w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">to cope with</div>
+                        <div class="word-tr">/tə ˈkəʊp wɪð/ &middot; ту ко́уп виз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">bew&auml;ltigen, zurechtkommen mit</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">справляться с</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We have to cope with so many things at once.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">to rely on</div>
+                        <div class="word-tr">/tə rɪˈlaɪ ɒn/ &middot; ту рила́й он</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich verlassen auf</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">полагаться на, рассчитывать на</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We cannot just rely on adults to solve everything.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">drawback</div>
+                        <div class="word-tr">/ˈdrɔːbæk/ &middot; дро́:бэк</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der Nachteil, der Haken</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">недостаток, минус</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;There are also serious drawbacks.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">to take into account</div>
+                        <div class="word-tr">/tə teɪk ˈɪntə əˈkaʊnt/ &middot; ту тэйк и́нту эка́унт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">ber&uuml;cksichtigen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">учитывать, принимать во внимание</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Parents don&rsquo;t always take into account how much pressure we are under.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">to be aware of</div>
+                        <div class="word-tr">/tə bi əˈweə(r) ɒv/ &middot; ту би эуэ́э ов</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich bewusst sein &uuml;ber</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">осознавать, быть в курсе</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We must be aware of how much time we spend online.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">to have an impact on</div>
+                        <div class="word-tr">/tə hæv ən ˈɪmpækt ɒn/ &middot; ту хэв эн и́мпэкт он</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">Einfluss haben auf</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">оказывать влияние на</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Social media has a huge impact on young people.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">significant</div>
+                        <div class="word-tr">/sɪɡˈnɪfɪkənt/ &middot; сигни́фикэнт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">bedeutend, erheblich</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">значительный, существенный</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;A significant part of our stress comes from school.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">to contribute to</div>
+                        <div class="word-tr">/tə kənˈtrɪbjuːt tə/ &middot; ту кэнтри́бьют ту</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">beitragen zu</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">способствовать, вносить вклад</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We have to contribute to the solution.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">current</div>
+                        <div class="word-tr">/ˈkʌrənt/ &middot; ка́рэнт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">aktuell, derzeitig</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">текущий, нынешний</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;The current generation faces new challenges.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">to deal with</div>
+                        <div class="word-tr">/tə diːl wɪð/ &middot; ту ди́:л виз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich befassen mit, umgehen mit</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">иметь дело с, решать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Challenges our parents never had to deal with.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">issue</div>
+                        <div class="word-tr">/ˈɪʃuː/ &middot; и́шу:</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">das Problem, die Frage</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">проблема, вопрос</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;One major issue is social media.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="b2w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">to encourage</div>
+                        <div class="word-tr">/tə ɪnˈkʌrɪdʒ/ &middot; ту инкэ́ридж</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">ermutigen, f&ouml;rdern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">поощрять, поддерживать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;It encourages creativity.&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <!-- QUESTIONS -->
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">What are the main pressures the &ldquo;current generation&rdquo; has to deal with, according to the text?</p>
+                        <details><summary>Show answer</summary>
+                        <p>School, social media, family expectations, and the constant feeling of needing to be perfect.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">What are the positive and negative sides of social media mentioned in the article?</p>
+                        <details><summary>Show answer</summary>
+                        <p><strong>Positive:</strong> staying in touch with friends, encouraging creativity. <strong>Negative:</strong> teenagers compare themselves to influencers and feel bad about their lives.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">What do parents and teachers often fail to take into account?</p>
+                        <details><summary>Show answer</summary>
+                        <p>How much pressure teenagers are under &mdash; a significant part of it comes from school (too much homework, too many tests, not enough time).</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">How can teenagers themselves contribute to the solution?</p>
+                        <details><summary>Show answer</summary>
+                        <p>By being honest about how they feel, asking for help when they need it, and supporting each other instead of competing.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SELF CHECK -->
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение по подсказке:</p>
+
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">to cope with</div><div class="ci-hint">schwierige Situation meistern</div></div>
+                    <div class="check-item"><div class="ci-word">to rely on</div><div class="ci-hint">jemandem vertrauen</div></div>
+                    <div class="check-item"><div class="ci-word">drawback</div><div class="ci-hint">offizieller f&uuml;r &ldquo;Nachteil&rdquo;</div></div>
+                    <div class="check-item"><div class="ci-word">to take into account</div><div class="ci-hint">in Betracht ziehen</div></div>
+                    <div class="check-item"><div class="ci-word">to be aware of</div><div class="ci-hint">etwas wissen / bewusst sein</div></div>
+                    <div class="check-item"><div class="ci-word">to have an impact on</div><div class="ci-hint">stark wirken auf</div></div>
+                    <div class="check-item"><div class="ci-word">significant</div><div class="ci-hint">wichtig, gro&szlig;</div></div>
+                    <div class="check-item"><div class="ci-word">to contribute to</div><div class="ci-hint">Teil der L&ouml;sung sein</div></div>
+                    <div class="check-item"><div class="ci-word">current</div><div class="ci-hint">jetzt, heute</div></div>
+                    <div class="check-item"><div class="ci-word">to deal with</div><div class="ci-hint">Problem angehen</div></div>
+                    <div class="check-item"><div class="ci-word">issue</div><div class="ci-hint">Thema / Problem</div></div>
+                    <div class="check-item"><div class="ci-word">to encourage</div><div class="ci-hint">motivieren</div></div>
+                </div>
+            </section>
+
+            <!-- WRITING TASK -->
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write a short comment (~120 words)</h3>
+                <p>Используй <strong>хотя бы 6 слов</strong> из списка. Тема: <em>Social media has more drawbacks than benefits for teenagers. Do you agree?</em></p>
+                <div class="starter">&ldquo;In my opinion, social media has a significant impact on young people because&hellip;&rdquo;</div>
+            </section>
+
+        </div>
+
+        <!-- ============ TAB: C1 EVERYDAY LIFE ============ -->
+        <div class="tab-content" id="tab-c1-everyday">
+
+            <div class="article-grid">
+
+                <!-- READING ARTICLE -->
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">C1 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F3E0; EVERYDAY LIFE</span>
+                        <span class="chip chip-stat">~210 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">Modern Life: Pressures and Possibilities</h2>
+                    <p class="article-deck">A more academic look at the realities of growing up today.</p>
+
+                    <div class="article-body">
+                        <p>Modern life <a href="#c1w1" class="vw">encompasses</a> many challenges that previous generations did not face. From digital overload to climate anxiety, today&rsquo;s youth must navigate a world full of complexity. The long-term <a href="#c1w2" class="vw">implications</a> of growing up in this environment are still not fully understood.</p>
+
+                        <p>Researchers have begun to <a href="#c1w11" class="vw">scrutinize</a> the link between social media use and mental health, and the early results are concerning. Excessive screen time can <a href="#c1w6" class="vw">exacerbate</a> existing anxiety and <a href="#c1w3" class="vw">undermine</a> a young person&rsquo;s self-esteem &mdash; especially when comparison with others becomes constant. These issues are particularly <a href="#c1w8" class="vw">prevalent</a> in urban areas, where the social comparison rarely stops.</p>
+
+                        <p>Yet, technology also has <a href="#c1w5" class="vw">inherent</a> benefits. It can <a href="#c1w7" class="vw">facilitate</a> learning, connect us across continents, and give a voice to those who would otherwise be silent. To <a href="#c1w10" class="vw">substantiate</a> any claim about whether technology is &ldquo;good&rdquo; or &ldquo;bad&rdquo;, one must look at <em>how</em> it is used, not just whether it is used.</p>
+
+                        <p>If we want to <a href="#c1w12" class="vw">mitigate</a> the negative effects, the approach is surprisingly simple: set clear boundaries, take real breaks, and <a href="#c1w4" class="vw">elaborate on</a> your feelings with people you trust. Don&rsquo;t let your sense of self <a href="#c1w9" class="vw">diminish</a> just because someone else&rsquo;s online life looks &ldquo;perfect&rdquo; &mdash; most of the time, it isn&rsquo;t.</p>
+                    </div>
+                </article>
+
+                <!-- SIDEBAR: VOCAB CARDS -->
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words &middot; C1</h3>
+
+                    <div class="word-card" id="c1w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">to encompass</div>
+                        <div class="word-tr">/tə ɪnˈkʌmpəs/ &middot; ту инко́мпэс</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">umfassen, einschlie&szlig;en</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">охватывать, включать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Modern life encompasses many challenges.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">implications</div>
+                        <div class="word-tr">/ˌɪmplɪˈkeɪʃnz/ &middot; импликэ́йшнз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Implikationen, Auswirkungen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">последствия, значение</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;The long-term implications are still not fully understood.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">to undermine</div>
+                        <div class="word-tr">/tə ˌʌndəˈmaɪn/ &middot; ту андэма́йн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">untergraben</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">подрывать, ослаблять</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Screen time can undermine self-esteem.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">to elaborate on</div>
+                        <div class="word-tr">/tə ɪˈlæbəreɪt ɒn/ &middot; ту илэ́бэрэйт он</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">n&auml;her ausf&uuml;hren, erl&auml;utern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">подробнее объяснить</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Elaborate on your feelings with people you trust.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">inherent</div>
+                        <div class="word-tr">/ɪnˈhɪərənt/ &middot; инхи́эрэнт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">inh&auml;rent, innewohnend</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">присущий, свойственный</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Technology also has inherent benefits.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">to exacerbate</div>
+                        <div class="word-tr">/tə ɪɡˈzæsəbeɪt/ &middot; ту игзэ́сэбэйт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">versch&auml;rfen, verschlimmern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">ухудшать, обострять</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Excessive screen time can exacerbate existing anxiety.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">to facilitate</div>
+                        <div class="word-tr">/tə fəˈsɪlɪteɪt/ &middot; ту фэси́литэйт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">erleichtern, erm&ouml;glichen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">способствовать, облегчать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;It can facilitate learning and connect us across continents.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">prevalent</div>
+                        <div class="word-tr">/ˈprevələnt/ &middot; прэ́вэлэнт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">verbreitet, vorherrschend</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">распространённый</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;These issues are particularly prevalent in urban areas.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">to diminish</div>
+                        <div class="word-tr">/tə dɪˈmɪnɪʃ/ &middot; ту дими́ниш</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">abnehmen, verringern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">уменьшаться, ослабевать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Don&rsquo;t let your sense of self diminish.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">to substantiate</div>
+                        <div class="word-tr">/tə səbˈstænʃieɪt/ &middot; ту сэбстэ́ншиэйт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">untermauern, belegen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">подтверждать фактами</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;To substantiate any claim&hellip; one must look at how it is used.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">to scrutinize</div>
+                        <div class="word-tr">/tə ˈskruːtɪnaɪz/ &middot; ту скру́:тинайз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">genau pr&uuml;fen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">тщательно исследовать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Researchers have begun to scrutinize the link.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="c1w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">to mitigate</div>
+                        <div class="word-tr">/tə ˈmɪtɪɡeɪt/ &middot; ту ми́тигэйт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">abmildern, abschw&auml;chen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">смягчать, уменьшать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;If we want to mitigate the negative effects&hellip;&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <!-- QUESTIONS -->
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">What two examples of modern challenges does the author give in the first paragraph?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Digital overload and climate anxiety. Together they make today&rsquo;s world &ldquo;full of complexity&rdquo; for young people.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">According to the article, what negative effects can excessive screen time have?</p>
+                        <details><summary>Show answer</summary>
+                        <p>It can exacerbate existing anxiety and undermine self-esteem, especially when comparison with others becomes constant. The effects are particularly prevalent in urban areas.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">What are the inherent benefits of technology mentioned?</p>
+                        <details><summary>Show answer</summary>
+                        <p>It can facilitate learning, connect people across continents, and give a voice to those who would otherwise be silent.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">According to the author, what is the key question when judging technology?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Not <em>whether</em> it is used, but <em>how</em> it is used. The author argues that to substantiate any claim, you must look at the way technology is being used.</p>
+                        </details>
+                    </div>
+
+                    <div class="q-card">
+                        <div class="q-num">Question 05</div>
+                        <p class="q-text">What three practical steps does the author suggest to mitigate the negative effects?</p>
+                        <details><summary>Show answer</summary>
+                        <p>(1) Set clear boundaries, (2) take real breaks, (3) elaborate on your feelings with people you trust.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SELF CHECK -->
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение по подсказке:</p>
+
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">to encompass</div><div class="ci-hint">alles drumherum einschlie&szlig;en</div></div>
+                    <div class="check-item"><div class="ci-word">implications</div><div class="ci-hint">langfristige Folgen</div></div>
+                    <div class="check-item"><div class="ci-word">to undermine</div><div class="ci-hint">leise zerst&ouml;ren</div></div>
+                    <div class="check-item"><div class="ci-word">to elaborate on</div><div class="ci-hint">mehr Details geben</div></div>
+                    <div class="check-item"><div class="ci-word">inherent</div><div class="ci-hint">von Natur aus dabei</div></div>
+                    <div class="check-item"><div class="ci-word">to exacerbate</div><div class="ci-hint">noch schlechter machen</div></div>
+                    <div class="check-item"><div class="ci-word">to facilitate</div><div class="ci-hint">leichter machen</div></div>
+                    <div class="check-item"><div class="ci-word">prevalent</div><div class="ci-hint">&uuml;berall, h&auml;ufig</div></div>
+                    <div class="check-item"><div class="ci-word">to diminish</div><div class="ci-hint">kleiner werden</div></div>
+                    <div class="check-item"><div class="ci-word">to substantiate</div><div class="ci-hint">mit Beweisen st&uuml;tzen</div></div>
+                    <div class="check-item"><div class="ci-word">to scrutinize</div><div class="ci-hint">unter die Lupe nehmen</div></div>
+                    <div class="check-item"><div class="ci-word">to mitigate</div><div class="ci-hint">abschw&auml;chen</div></div>
+                </div>
+            </section>
+
+            <!-- WRITING TASK -->
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write an academic-style paragraph (~150 words)</h3>
+                <p>Используй <strong>хотя бы 6 C1-слов</strong>. Тема: <em>To what extent does social media undermine young people&rsquo;s well-being?</em></p>
+                <div class="starter">&ldquo;The implications of widespread social media use are still being scrutinized, yet several patterns are already evident&hellip;&rdquo;</div>
+            </section>
+
+        </div>
+
+        <!-- ============ TAB: B1 ENVIRONMENT ============ -->
+        <div class="tab-content" id="tab-b1-env">
+
+            <div class="article-grid">
+
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">B1 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F30D; ENVIRONMENT</span>
+                        <span class="chip chip-stat">~210 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">Our Planet, Our Responsibility</h2>
+                    <p class="article-deck">A teenager&rsquo;s honest take on small actions that can change the bigger picture.</p>
+
+                    <div class="article-body">
+                        <p>Last year I started thinking more about <a href="#e1w1" class="vw">climate change</a> and how it affects our future. It scares me sometimes &mdash; <a href="#e1w9" class="vw">global warming</a> is making summers hotter, animals are losing their homes, and air <a href="#e1w2" class="vw">pollution</a> in big cities is getting worse every year.</p>
+
+                        <p>My friends and I decided to make small changes. We don&rsquo;t always need to fly on holidays &mdash; flying massively increases our <a href="#e1w12" class="vw">carbon footprint</a>. Now we travel by train when we can. It&rsquo;s slower, but the views are amazing.</p>
+
+                        <p>At home, my family started to <a href="#e1w6" class="vw">recycle</a> everything we can: paper, plastic, glass. We also try to <a href="#e1w7" class="vw">reduce</a> how much we <a href="#e1w5" class="vw">waste</a> &mdash; both food and energy. Mum even bought reusable shopping bags. It took some getting used to, but now it feels normal.</p>
+
+                        <p>I&rsquo;m especially worried about <a href="#e1w8" class="vw">endangered</a> animals. So many species are disappearing because we <a href="#e1w10" class="vw">damage</a> their habitats for farms and cities. That&rsquo;s why I support organizations that <a href="#e1w3" class="vw">protect</a> rainforests and oceans.</p>
+
+                        <p>Of course, big change has to come from governments and companies. Switching to <a href="#e1w4" class="vw">renewable energy</a> like solar and wind is the most important step. But I still believe small actions add up. If everyone tries to live a more <a href="#e1w11" class="vw">sustainable</a> life, we can make a real difference.</p>
+                    </div>
+                </article>
+
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words &middot; B1</h3>
+
+                    <div class="word-card" id="e1w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">climate change</div>
+                        <div class="word-tr">/ˈklaɪmət tʃeɪndʒ/ &middot; кла́ймэт чейндж</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der Klimawandel</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">изменение климата</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Started thinking more about climate change and how it affects our future.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">pollution</div>
+                        <div class="word-tr">/pəˈluːʃn/ &middot; пэлю́шн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Umweltverschmutzung</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">загрязнение</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Air pollution in big cities is getting worse.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">to protect</div>
+                        <div class="word-tr">/tə prəˈtekt/ &middot; ту прэтэ́кт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sch&uuml;tzen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">защищать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Organizations that protect rainforests and oceans.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">renewable energy</div>
+                        <div class="word-tr">/rɪˈnjuːəbl ˈenədʒi/ &middot; риню́эбл э́нэджи</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">erneuerbare Energie</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">возобновляемая энергия</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Switching to renewable energy like solar and wind.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">to waste</div>
+                        <div class="word-tr">/tə weɪst/ &middot; ту уэ́йст</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">verschwenden</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">тратить впустую, расточать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Reduce how much we waste &mdash; both food and energy.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">to recycle</div>
+                        <div class="word-tr">/tə ˌriːˈsaɪkl/ &middot; ту риса́йкл</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">recyceln, wiederverwerten</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">перерабатывать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;My family started to recycle everything we can.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">to reduce</div>
+                        <div class="word-tr">/tə rɪˈdjuːs/ &middot; ту ридью́:с</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">reduzieren, verringern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">уменьшать, сокращать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We also try to reduce how much we waste.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">endangered</div>
+                        <div class="word-tr">/ɪnˈdeɪndʒəd/ &middot; индэ́йнджэд</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">gef&auml;hrdet, vom Aussterben bedroht</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">вымирающий, под угрозой</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;I&rsquo;m especially worried about endangered animals.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">global warming</div>
+                        <div class="word-tr">/ˈɡləʊbl ˈwɔːmɪŋ/ &middot; гло́убл уо́:минг</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die globale Erw&auml;rmung</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">глобальное потепление</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Global warming is making summers hotter.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">to damage</div>
+                        <div class="word-tr">/tə ˈdæmɪdʒ/ &middot; ту дэ́мидж</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">besch&auml;digen, sch&auml;digen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">повреждать, вредить</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Because we damage their habitats for farms and cities.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">sustainable</div>
+                        <div class="word-tr">/səˈsteɪnəbl/ &middot; сэстэ́йнэбл</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">nachhaltig</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">устойчивый, экологичный</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;If everyone tries to live a more sustainable life.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e1w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">carbon footprint</div>
+                        <div class="word-tr">/ˈkɑːbən ˈfʊtprɪnt/ &middot; ка́:бэн фу́тпринт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der CO2-Fu&szlig;abdruck</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">углеродный след</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Flying massively increases our carbon footprint.&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">What three effects of climate change does the narrator mention at the beginning?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Summers are getting hotter, animals are losing their homes, and air pollution in big cities is getting worse.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">How did the narrator and friends reduce their carbon footprint?</p>
+                        <details><summary>Show answer</summary>
+                        <p>They stopped flying on holidays whenever possible and started travelling by train instead. It&rsquo;s slower but the views are amazing.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">What changes did the narrator&rsquo;s family make at home?</p>
+                        <details><summary>Show answer</summary>
+                        <p>They started to recycle paper, plastic, and glass; to reduce food and energy waste; and the mother bought reusable shopping bags.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">According to the narrator, who needs to make the biggest change?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Governments and companies &mdash; especially by switching to renewable energy like solar and wind. But small actions by individuals also add up.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение по подсказке:</p>
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">climate change</div><div class="ci-hint">die Welt wird w&auml;rmer</div></div>
+                    <div class="check-item"><div class="ci-word">pollution</div><div class="ci-hint">schmutzig machen (Luft, Wasser)</div></div>
+                    <div class="check-item"><div class="ci-word">to protect</div><div class="ci-hint">vor Schaden bewahren</div></div>
+                    <div class="check-item"><div class="ci-word">renewable energy</div><div class="ci-hint">Sonne, Wind, Wasser</div></div>
+                    <div class="check-item"><div class="ci-word">to waste</div><div class="ci-hint">zu viel benutzen / wegwerfen</div></div>
+                    <div class="check-item"><div class="ci-word">to recycle</div><div class="ci-hint">alt &rarr; neu</div></div>
+                    <div class="check-item"><div class="ci-word">to reduce</div><div class="ci-hint">weniger benutzen</div></div>
+                    <div class="check-item"><div class="ci-word">endangered</div><div class="ci-hint">k&ouml;nnte aussterben</div></div>
+                    <div class="check-item"><div class="ci-word">global warming</div><div class="ci-hint">die Erde wird w&auml;rmer</div></div>
+                    <div class="check-item"><div class="ci-word">to damage</div><div class="ci-hint">kaputt machen</div></div>
+                    <div class="check-item"><div class="ci-word">sustainable</div><div class="ci-hint">f&uuml;r die Zukunft gut</div></div>
+                    <div class="check-item"><div class="ci-word">carbon footprint</div><div class="ci-hint">wie viel CO2 du machst</div></div>
+                </div>
+            </section>
+
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write a short text (~150 words)</h3>
+                <p>Используй <strong>хотя бы 6 слов</strong> из списка. Тема: <em>What can teenagers do every day to protect the environment?</em></p>
+                <div class="starter">&ldquo;I think there are many small things teenagers can do. First, we can recycle&hellip;&rdquo;</div>
+            </section>
+
+        </div>
+
+        <!-- ============ TAB: B2 ENVIRONMENT ============ -->
+        <div class="tab-content" id="tab-b2-env">
+
+            <div class="article-grid">
+
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">B2 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F30D; ENVIRONMENT</span>
+                        <span class="chip chip-stat">~210 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">The Hidden Cost of Modern Life</h2>
+                    <p class="article-deck">Behind every product, every flight, every meal &mdash; a planet quietly paying the bill.</p>
+
+                    <div class="article-body">
+                        <p>We rarely stop to think about it, but our daily <a href="#e2w10" class="vw">consumption</a> has a serious environmental cost. Every car, every flight, every burger contributes to a system that is slowly destroying our planet.</p>
+
+                        <p>The numbers are alarming. Industries around the world still rely heavily on <a href="#e2w6" class="vw">fossil fuels</a> &mdash; coal, oil and gas &mdash; which <a href="#e2w4" class="vw">emit</a> huge amounts of <a href="#e2w2" class="vw">greenhouse gases</a> into the atmosphere. These gases trap heat and accelerate climate change. As a result, we see more extreme weather: longer <a href="#e2w7" class="vw">droughts</a>, stronger storms, melting glaciers.</p>
+
+                        <p>Equally serious is the loss of <a href="#e2w1" class="vw">biodiversity</a>. Many animals are now close to <a href="#e2w9" class="vw">extinction</a> because we keep damaging their habitats. <a href="#e2w3" class="vw">Deforestation</a> in tropical regions is one of the worst offenders &mdash; every minute, an area of rainforest the size of a football field disappears. Entire <a href="#e2w5" class="vw">ecosystems</a> collapse when their key species vanish.</p>
+
+                        <p>If we continue at this pace, we will rapidly <a href="#e2w12" class="vw">deplete</a> the natural resources our planet provides &mdash; fresh water, healthy soil, clean air. Governments must act faster, but consumers also have power. By choosing local food, repairing instead of throwing away, and pressuring companies to cut their <a href="#e2w11" class="vw">emissions</a>, we can help <a href="#e2w8" class="vw">preserve</a> what remains. The clock is ticking.</p>
+                    </div>
+                </article>
+
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words &middot; B2</h3>
+
+                    <div class="word-card" id="e2w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">biodiversity</div>
+                        <div class="word-tr">/ˌbaɪəʊdaɪˈvɜːsəti/ &middot; байоудайвё́:сити</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Artenvielfalt, Biodiversit&auml;t</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">биоразнообразие</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Equally serious is the loss of biodiversity.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">greenhouse gases</div>
+                        <div class="word-tr">/ˈɡriːnhaʊs ˈɡæsɪz/ &middot; гри́:нхаус гэ́сиз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Treibhausgase</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">парниковые газы</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Emit huge amounts of greenhouse gases into the atmosphere.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">deforestation</div>
+                        <div class="word-tr">/ˌdiːˌfɒrɪˈsteɪʃn/ &middot; дифористэ́йшн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Abholzung, Entwaldung</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">вырубка лесов</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Deforestation in tropical regions is one of the worst offenders.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">to emit</div>
+                        <div class="word-tr">/tə ɪˈmɪt/ &middot; ту ими́т</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">aussto&szlig;en, emittieren</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">выпускать, выбрасывать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Coal, oil and gas emit huge amounts of greenhouse gases.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">ecosystem</div>
+                        <div class="word-tr">/ˈiːkəʊsɪstəm/ &middot; и́:коусистэм</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">das &Ouml;kosystem</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">экосистема</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Entire ecosystems collapse when their key species vanish.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">fossil fuels</div>
+                        <div class="word-tr">/ˈfɒsl ˈfjuːəlz/ &middot; фо́сл фью́элз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">fossile Brennstoffe</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">ископаемое топливо</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Industries still rely heavily on fossil fuels.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">drought</div>
+                        <div class="word-tr">/draʊt/ &middot; дра́ут</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die D&uuml;rre, Trockenheit</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">засуха</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Longer droughts, stronger storms, melting glaciers.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">to preserve</div>
+                        <div class="word-tr">/tə prɪˈzɜːv/ &middot; ту призё́:в</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">bewahren, erhalten</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">сохранять, оберегать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We can help preserve what remains.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">extinction</div>
+                        <div class="word-tr">/ɪkˈstɪŋkʃn/ &middot; икстинкшн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">das Aussterben</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">вымирание</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Many animals are now close to extinction.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">consumption</div>
+                        <div class="word-tr">/kənˈsʌmpʃn/ &middot; кэнса́мпшн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der Verbrauch, Konsum</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">потребление</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Our daily consumption has a serious environmental cost.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">emissions</div>
+                        <div class="word-tr">/ɪˈmɪʃnz/ &middot; ими́шнз</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Emissionen, Aussto&szlig;</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">выбросы</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Pressuring companies to cut their emissions.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e2w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">to deplete</div>
+                        <div class="word-tr">/tə dɪˈpliːt/ &middot; ту дипли́:т</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">ersch&ouml;pfen, aufbrauchen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">исчерпывать, истощать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;We will rapidly deplete the natural resources our planet provides.&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">Why are fossil fuels described as a problem?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Because coal, oil and gas emit huge amounts of greenhouse gases that trap heat in the atmosphere and accelerate climate change.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">What three examples of extreme weather are mentioned?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Longer droughts, stronger storms, and melting glaciers.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">Why is deforestation called &ldquo;one of the worst offenders&rdquo;?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Every minute, an area of rainforest the size of a football field disappears, pushing many species towards extinction and causing entire ecosystems to collapse.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">What three things can consumers do, according to the text?</p>
+                        <details><summary>Show answer</summary>
+                        <p>(1) Choose local food, (2) repair things instead of throwing them away, and (3) pressure companies to cut their emissions.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение по подсказке:</p>
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">biodiversity</div><div class="ci-hint">viele Arten zusammen</div></div>
+                    <div class="check-item"><div class="ci-word">greenhouse gases</div><div class="ci-hint">CO2, Methan &amp; Co.</div></div>
+                    <div class="check-item"><div class="ci-word">deforestation</div><div class="ci-hint">W&auml;lder werden zerst&ouml;rt</div></div>
+                    <div class="check-item"><div class="ci-word">to emit</div><div class="ci-hint">in die Luft schicken</div></div>
+                    <div class="check-item"><div class="ci-word">ecosystem</div><div class="ci-hint">Lebensraum als System</div></div>
+                    <div class="check-item"><div class="ci-word">fossil fuels</div><div class="ci-hint">Kohle, &Ouml;l, Gas</div></div>
+                    <div class="check-item"><div class="ci-word">drought</div><div class="ci-hint">lange kein Regen</div></div>
+                    <div class="check-item"><div class="ci-word">to preserve</div><div class="ci-hint">erhalten, sch&uuml;tzen</div></div>
+                    <div class="check-item"><div class="ci-word">extinction</div><div class="ci-hint">f&uuml;r immer weg</div></div>
+                    <div class="check-item"><div class="ci-word">consumption</div><div class="ci-hint">wie viel wir benutzen</div></div>
+                    <div class="check-item"><div class="ci-word">emissions</div><div class="ci-hint">was in die Luft kommt</div></div>
+                    <div class="check-item"><div class="ci-word">to deplete</div><div class="ci-hint">komplett verbrauchen</div></div>
+                </div>
+            </section>
+
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write a short comment (~150 words)</h3>
+                <p>Используй <strong>хотя бы 6 слов</strong> из списка. Тема: <em>What is the biggest threat to our planet today, and what can be done about it?</em></p>
+                <div class="starter">&ldquo;In my opinion, the most serious problem is the loss of biodiversity, because&hellip;&rdquo;</div>
+            </section>
+
+        </div>
+
+        <!-- ============ TAB: C1 ENVIRONMENT ============ -->
+        <div class="tab-content" id="tab-c1-env">
+
+            <div class="article-grid">
+
+                <article class="reading-card">
+                    <div class="article-meta">
+                        <span class="chip chip-level">C1 LEVEL</span>
+                        <span class="chip chip-topic">&#x1F30D; ENVIRONMENT</span>
+                        <span class="chip chip-stat">~230 words</span>
+                        <span class="chip chip-stat">12 vocab</span>
+                    </div>
+
+                    <h2 class="article-title">Climate Justice and the Road Ahead</h2>
+                    <p class="article-deck">Why decarbonization is no longer a choice &mdash; and what justice demands of our generation.</p>
+
+                    <div class="article-body">
+                        <p>The climate crisis has reached a stage at which inaction is no longer defensible. Scientists warn that some of the most severe consequences &mdash; melting ice caps, ecosystem collapse, mass extinctions &mdash; are now effectively <a href="#e3w4" class="vw">irreversible</a>. The question is no longer whether change is needed, but how quickly we can deliver it.</p>
+
+                        <p>At the centre of the debate stands <a href="#e3w1" class="vw">decarbonization</a>. Most major economies have committed to achieving <a href="#e3w2" class="vw">carbon neutrality</a> by the middle of the century, yet very few are on track. To <a href="#e3w8" class="vw">phase out</a> coal and oil while building reliable alternatives requires unprecedented coordination between governments, businesses, and citizens.</p>
+
+                        <p>A growing number of activists <a href="#e3w5" class="vw">advocate for</a> a broader vision: <a href="#e3w9" class="vw">the circular economy</a>. Rather than the current linear model of &ldquo;take, make, throw away&rdquo;, a circular system focuses on reuse and repair, sharply reducing the <a href="#e3w10" class="vw">ecological footprint</a> of everyday life.</p>
+
+                        <p>Yet technology alone will not be enough. Urbanization, overconsumption and inequality continue to <a href="#e3w11" class="vw">exacerbate</a> the <a href="#e3w6" class="vw">degradation</a> of natural systems. Building climate <a href="#e3w7" class="vw">resilience</a> in the most vulnerable communities &mdash; those least responsible for emissions &mdash; is now a moral imperative.</p>
+
+                        <p>This is where the principle of <a href="#e3w12" class="vw">intergenerational justice</a> becomes central. We must not pass on a damaged planet to children who never had a vote in how we chose to <a href="#e3w3" class="vw">offset</a> &mdash; or refused to offset &mdash; our own pollution.</p>
+                    </div>
+                </article>
+
+                <aside class="vocab-sidebar">
+                    <h3 class="sidebar-title">&#x1F4DA; Vocabulary &middot; 12 words &middot; C1</h3>
+
+                    <div class="word-card" id="e3w1">
+                        <span class="word-num">01</span>
+                        <div class="word-en">decarbonization</div>
+                        <div class="word-tr">/diːˌkɑːbənaɪˈzeɪʃn/ &middot; диика:бэнайзэ́йшн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Dekarbonisierung</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">декарбонизация</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;At the centre of the debate stands decarbonization.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w2">
+                        <span class="word-num">02</span>
+                        <div class="word-en">carbon neutrality</div>
+                        <div class="word-tr">/ˈkɑːbən njuːˈtræləti/ &middot; ка́:бэн нютра́лити</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Klimaneutralit&auml;t</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">углеродная нейтральность</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Most economies have committed to achieving carbon neutrality.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w3">
+                        <span class="word-num">03</span>
+                        <div class="word-en">to offset</div>
+                        <div class="word-tr">/tə ˈɒfset/ &middot; ту о́фсэт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">ausgleichen, kompensieren</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">компенсировать</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;How we chose to offset &mdash; or refused to offset &mdash; our own pollution.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w4">
+                        <span class="word-num">04</span>
+                        <div class="word-en">irreversible</div>
+                        <div class="word-tr">/ˌɪrɪˈvɜːsəbl/ &middot; ирэвё́:сибл</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">unumkehrbar, irreversibel</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">необратимый</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Mass extinctions &mdash; are now effectively irreversible.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w5">
+                        <span class="word-num">05</span>
+                        <div class="word-en">to advocate for</div>
+                        <div class="word-tr">/tə ˈædvəkeɪt fɔː/ &middot; ту э́двэкэйт фо:</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">sich einsetzen f&uuml;r</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">отстаивать, выступать за</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Activists advocate for a broader vision.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w6">
+                        <span class="word-num">06</span>
+                        <div class="word-en">degradation</div>
+                        <div class="word-tr">/ˌdeɡrəˈdeɪʃn/ &middot; дэгрэдэ́йшн</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Verschlechterung, Degradation</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">деградация, ухудшение</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Exacerbate the degradation of natural systems.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w7">
+                        <span class="word-num">07</span>
+                        <div class="word-en">resilience</div>
+                        <div class="word-tr">/rɪˈzɪliəns/ &middot; ризи́льенс</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Widerstandsf&auml;higkeit, Resilienz</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">устойчивость, способность восстанавливаться</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Building climate resilience in the most vulnerable communities.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w8">
+                        <span class="word-num">08</span>
+                        <div class="word-en">to phase out</div>
+                        <div class="word-tr">/tə feɪz aʊt/ &middot; ту фэйз а́ут</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">schrittweise abschaffen</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">постепенно отказываться от</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;To phase out coal and oil while building reliable alternatives.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w9">
+                        <span class="word-num">09</span>
+                        <div class="word-en">the circular economy</div>
+                        <div class="word-tr">/ðə ˈsɜːkjələ(r) ɪˈkɒnəmi/ &middot; зэ сё́:кьюлэ ико́нэми</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">die Kreislaufwirtschaft</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">циркулярная экономика</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;A broader vision: the circular economy.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w10">
+                        <span class="word-num">10</span>
+                        <div class="word-en">ecological footprint</div>
+                        <div class="word-tr">/ˌiːkəˈlɒdʒɪkl ˈfʊtprɪnt/ &middot; икэло́джикл фу́тпринт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">der &ouml;kologische Fu&szlig;abdruck</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">экологический след</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Sharply reducing the ecological footprint of everyday life.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w11">
+                        <span class="word-num">11</span>
+                        <div class="word-en">to exacerbate</div>
+                        <div class="word-tr">/tə ɪɡˈzæsəbeɪt/ &middot; ту игзэ́сэбэйт</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">versch&auml;rfen, verschlimmern</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">ухудшать, обострять</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;Urbanization and inequality continue to exacerbate the degradation.&rdquo;</p>
+                    </div>
+
+                    <div class="word-card" id="e3w12">
+                        <span class="word-num">12</span>
+                        <div class="word-en">intergenerational justice</div>
+                        <div class="word-tr">/ˌɪntədʒenəˈreɪʃnl ˈdʒʌstɪs/ &middot; интэдженэрэ́йшнл джа́стис</div>
+                        <div class="word-trans">
+                            <div><span class="flag">DE</span><span class="text-de">Generationengerechtigkeit</span></div>
+                            <div><span class="flag">RU</span><span class="text-ru">справедливость между поколениями</span></div>
+                        </div>
+                        <p class="word-quote">&ldquo;The principle of intergenerational justice becomes central.&rdquo;</p>
+                    </div>
+                </aside>
+
+            </div>
+
+            <section class="questions-section">
+                <h2 class="questions-title">Comprehension</h2>
+                <p class="questions-sub">Ответь на вопросы. Нажми &laquo;Show answer&raquo; только после своей попытки.</p>
+                <div class="q-grid">
+                    <div class="q-card">
+                        <div class="q-num">Question 01</div>
+                        <p class="q-text">According to the author, why is inaction &ldquo;no longer defensible&rdquo;?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Because some of the most severe consequences &mdash; melting ice caps, ecosystem collapse, mass extinctions &mdash; are now effectively irreversible.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 02</div>
+                        <p class="q-text">What is required to phase out fossil fuels successfully?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Unprecedented coordination between governments, businesses, and citizens &mdash; while at the same time building reliable alternatives.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 03</div>
+                        <p class="q-text">How does the circular economy differ from the current model?</p>
+                        <details><summary>Show answer</summary>
+                        <p>The current model is linear &mdash; &ldquo;take, make, throw away&rdquo;. The circular economy focuses on reuse and repair, sharply reducing the ecological footprint of everyday life.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 04</div>
+                        <p class="q-text">Why does the author say technology alone is not enough?</p>
+                        <details><summary>Show answer</summary>
+                        <p>Because urbanization, overconsumption and inequality continue to exacerbate environmental degradation &mdash; problems that cannot be solved by new technology alone.</p>
+                        </details>
+                    </div>
+                    <div class="q-card">
+                        <div class="q-num">Question 05</div>
+                        <p class="q-text">What does the principle of intergenerational justice demand?</p>
+                        <details><summary>Show answer</summary>
+                        <p>That we do not pass on a damaged planet to future generations who had no vote in the decisions about how to offset (or not offset) today&rsquo;s pollution.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="selfcheck-section">
+                <h2 class="selfcheck-title">&#x1F9E0; Self-check</h2>
+                <p class="selfcheck-sub">Закрой словарь сверху и попробуй вспомнить значение по подсказке:</p>
+                <div class="check-grid">
+                    <div class="check-item"><div class="ci-word">decarbonization</div><div class="ci-hint">weg vom Kohlenstoff</div></div>
+                    <div class="check-item"><div class="ci-word">carbon neutrality</div><div class="ci-hint">CO2-Bilanz = Null</div></div>
+                    <div class="check-item"><div class="ci-word">to offset</div><div class="ci-hint">ausbalancieren</div></div>
+                    <div class="check-item"><div class="ci-word">irreversible</div><div class="ci-hint">nicht r&uuml;ckg&auml;ngig</div></div>
+                    <div class="check-item"><div class="ci-word">to advocate for</div><div class="ci-hint">aktiv f&uuml;r etwas k&auml;mpfen</div></div>
+                    <div class="check-item"><div class="ci-word">degradation</div><div class="ci-hint">langsamer Verfall</div></div>
+                    <div class="check-item"><div class="ci-word">resilience</div><div class="ci-hint">wieder hochkommen k&ouml;nnen</div></div>
+                    <div class="check-item"><div class="ci-word">to phase out</div><div class="ci-hint">Schritt f&uuml;r Schritt beenden</div></div>
+                    <div class="check-item"><div class="ci-word">the circular economy</div><div class="ci-hint">Kreislauf statt Wegwerfen</div></div>
+                    <div class="check-item"><div class="ci-word">ecological footprint</div><div class="ci-hint">wie viel Erde du brauchst</div></div>
+                    <div class="check-item"><div class="ci-word">to exacerbate</div><div class="ci-hint">noch schlimmer machen</div></div>
+                    <div class="check-item"><div class="ci-word">intergenerational justice</div><div class="ci-hint">fair zu k&uuml;nftigen Generationen</div></div>
+                </div>
+            </section>
+
+            <section class="writing-task">
+                <span class="wt-eyebrow">&#x270D;&#xFE0F; Practice</span>
+                <h3>Write an academic-style paragraph (~180 words)</h3>
+                <p>Используй <strong>хотя бы 7 C1-слов</strong>. Тема: <em>Why should the principle of intergenerational justice guide today&rsquo;s climate policy?</em></p>
+                <div class="starter">&ldquo;The case for intergenerational justice rests on a simple observation: many of the climate trends now underway are effectively irreversible&hellip;&rdquo;</div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.topic-pill').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.topic-pill').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Smooth scroll on vocab link click
+        document.querySelectorAll('.article-body .vw').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // re-trigger :target by removing and re-adding hash
+                    history.replaceState(null, '', ' ');
+                    history.replaceState(null, '', link.getAttribute('href'));
+                }
+            });
+        });
+    </script>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>

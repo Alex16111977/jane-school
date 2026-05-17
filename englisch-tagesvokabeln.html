@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== DAY HEADER ===== */
+        .day-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            background: linear-gradient(135deg, rgba(68,147,248,0.18), rgba(68,147,248,0.06));
+            border: 1px solid rgba(68,147,248,0.35);
+            border-radius: 50px;
+            padding: 0.45rem 1.1rem;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #79b8ff;
+            margin-bottom: 0.6rem;
+        }
+        .day-badge .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4493f8;
+            box-shadow: 0 0 6px rgba(68,147,248,0.8);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; } 50% { opacity:0.4; }
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 8px;
+            margin: 0.5rem 0 0.3rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #4493f8, #a371f7);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-label {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1.2rem;
+        }
+        .progress-label span { color: #79b8ff; font-weight: 700; }
+
+        /* ===== CONTROLS ===== */
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.4rem;
+        }
+        .ctrl-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary {
+            background: rgba(68,147,248,0.15);
+            border-color: rgba(68,147,248,0.4);
+            color: #79b8ff;
+        }
+        .ctrl-btn.primary:hover { background: rgba(68,147,248,0.25); color: #fff; }
+
+        /* ===== CARD GRID ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 0.75rem;
+        }
+
+        /* ===== FLASHCARD ===== */
+        .fcard {
+            position: relative;
+            min-height: 140px;
+            border-radius: 14px;
+            background: rgba(13,17,23,0.82);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+            overflow: hidden;
+        }
+        .fcard::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 14px 0 0 14px;
+            background: #4493f8;
+            transition: background 0.3s;
+        }
+        .fcard::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 4px; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(68,147,248,0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.22s;
+        }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.35); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known {
+            border-color: rgba(63,185,80,0.35);
+            background: rgba(13,23,17,0.85);
+        }
+        .fcard.known::before { background: #3fb950; }
+
+        /* ===== FRONT ===== */
+        .fcard-front {
+            padding: 1.1rem 1.1rem 0.9rem 1.3rem;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(68,147,248,0.55);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+        .fcard-word {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+        .fcard-hint {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 0.4rem;
+        }
+        .flip-tip {
+            position: absolute;
+            bottom: 0.55rem; right: 0.75rem;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.22);
+            pointer-events: none;
+        }
+        .fcard.flipped .flip-tip { display: none; }
+
+        /* ===== BACK ===== */
+        .fcard-back {
+            display: none;
+            padding: 1.1rem 1.1rem 0.9rem 1.3rem;
+            min-height: 140px;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #86efac;
+            line-height: 1.3;
+        }
+        .fcard-de {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.65);
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .fcard-de::before {
+            content: 'DE';
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 0.05rem 0.32rem;
+            border-radius: 5px;
+            background: rgba(255,204,0,0.15);
+            color: #ffd54f;
+            border: 1px solid rgba(255,204,0,0.28);
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .fcard-example {
+            font-size: 0.77rem;
+            font-style: italic;
+            color: rgba(255,255,255,0.38);
+            margin-top: 0.5rem;
+            line-height: 1.45;
+        }
+        .know-btn {
+            display: inline-block;
+            margin-top: 0.7rem;
+            padding: 0.28rem 0.75rem;
+            border-radius: 8px;
+            background: rgba(63,185,80,0.12);
+            border: 1px solid rgba(63,185,80,0.3);
+            color: #3fb950;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: fit-content;
+            transition: all 0.2s;
+            align-self: flex-start;
+        }
+        .know-btn:hover { background: rgba(63,185,80,0.22); }
+        .fcard.known .know-btn {
+            background: rgba(63,185,80,0.25);
+            border-color: #3fb950;
+            color: #fff;
+        }
+
+        /* ===== GROUP DIVIDER ===== */
+        .group-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 1.6rem 0 0.7rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--color-text-muted);
+        }
+        .group-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+
+        /* ===== DONE SCREEN ===== */
+        .done-screen {
+            display: none;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            border-radius: 18px;
+            background: rgba(13,23,17,0.6);
+            border: 1px solid rgba(63,185,80,0.3);
+            margin-top: 1.5rem;
+        }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3.5rem; margin-bottom: 0.8rem; }
+        .done-screen h2 { color: #3fb950; margin: 0 0 0.5rem; font-size: 1.5rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.95rem; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+            .fcard-front, .fcard-back { min-height: 120px; padding: 0.9rem 0.8rem 0.8rem 1rem; }
+            .fcard-word { font-size: 0.97rem; }
+        }
+        @media (max-width: 360px) {
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Daily Words</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.7rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="day-badge"><span class="dot"></span> 17.05.2026 &mdash; Tag 1</div>
+
+        <div class="page-header" style="text-align:left; padding-top:0.5rem; margin-bottom:0.3rem;">
+            <h1 style="margin-bottom:0.2rem;">Daily Words</h1>
+            <p class="page-subtitle">20 B1-Phrasen &mdash; klick, um zu &uuml;bersetzen &bull; gr&uuml;n = gelernt</p>
+        </div>
+
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progBar"></div></div>
+        <div class="progress-label">Gelernt: <span id="progNum">0</span> / 20</div>
+
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Alle aufdecken</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Zur&uuml;cksetzen</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Mischen</button>
+        </div>
+
+        <div id="cardArea">
+
+            <!-- GROUP 1 -->
+            <div class="group-label">&#x1F4AC; Meinungen &amp; Entscheidungen</div>
+            <div class="card-grid">
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#01</div>
+                        <div class="fcard-word">take part in sth</div>
+                        <div class="fcard-hint">verb phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">брати участь у чомусь</div>
+                        <div class="fcard-de">teilnehmen an etw.</div>
+                        <div class="fcard-example">"She takes part in every school event."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#02</div>
+                        <div class="fcard-word">be in favour of</div>
+                        <div class="fcard-hint">verb phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">бути за щось / підтримувати</div>
+                        <div class="fcard-de">daf&uuml;r sein / bef&uuml;rworten</div>
+                        <div class="fcard-example">"Most students are in favour of longer breaks."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#03</div>
+                        <div class="fcard-word">make up one's mind</div>
+                        <div class="fcard-hint">idiom &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">прийняти рішення / визначитися</div>
+                        <div class="fcard-de">sich entscheiden</div>
+                        <div class="fcard-example">"I can't make up my mind which one to choose."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#04</div>
+                        <div class="fcard-word">come up with sth</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">придумати / знайти ідею</div>
+                        <div class="fcard-de">sich etw. ausdenken / auf etw. kommen</div>
+                        <div class="fcard-example">"Can you come up with a better solution?"</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#05</div>
+                        <div class="fcard-word">give up</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">здаватися / кидати (звичку)</div>
+                        <div class="fcard-de">aufgeben</div>
+                        <div class="fcard-example">"Don't give up — you're almost there!"</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+            </div>
+
+            <!-- GROUP 2 -->
+            <div class="group-label">&#x1F91D; Люди &amp; стосунки</div>
+            <div class="card-grid">
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#06</div>
+                        <div class="fcard-word">get along with sb</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">ладнати з кимось / добре спілкуватися</div>
+                        <div class="fcard-de">mit jdm. auskommen</div>
+                        <div class="fcard-example">"Do you get along with your classmates?"</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#07</div>
+                        <div class="fcard-word">let sb down</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">підвести когось / розчарувати</div>
+                        <div class="fcard-de">jdn. entt&auml;uschen / im Stich lassen</div>
+                        <div class="fcard-example">"I promised I wouldn't let you down."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#08</div>
+                        <div class="fcard-word">be keen on sth</div>
+                        <div class="fcard-hint">adjective phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">захоплюватися чимось / любити</div>
+                        <div class="fcard-de">begeistert sein von / m&ouml;gen</div>
+                        <div class="fcard-example">"She's really keen on photography."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#09</div>
+                        <div class="fcard-word">look after sb/sth</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">піклуватися про когось / доглядати</div>
+                        <div class="fcard-de">sich k&uuml;mmern um</div>
+                        <div class="fcard-example">"She looks after her younger brother."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#10</div>
+                        <div class="fcard-word">make a difference</div>
+                        <div class="fcard-hint">collocation &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">мати значення / щось змінювати</div>
+                        <div class="fcard-de">einen Unterschied machen / etw. ver&auml;ndern</div>
+                        <div class="fcard-example">"Even small actions can make a difference."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+            </div>
+
+            <!-- GROUP 3 -->
+            <div class="group-label">&#x1F30D; Суспільство &amp; довкілля</div>
+            <div class="card-grid">
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#11</div>
+                        <div class="fcard-word">deal with sth</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">справлятися з чимось / вирішувати</div>
+                        <div class="fcard-de">umgehen mit / bew&auml;ltigen</div>
+                        <div class="fcard-example">"How do you deal with stress?"</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#12</div>
+                        <div class="fcard-word">run out of sth</div>
+                        <div class="fcard-hint">phrasal verb &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">вичерпати запаси / закінчитися</div>
+                        <div class="fcard-de">etw. ausgehen (Dat.) / verbrauchen</div>
+                        <div class="fcard-example">"We're running out of time."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#13</div>
+                        <div class="fcard-word">be responsible for</div>
+                        <div class="fcard-hint">adjective phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">відповідати за щось</div>
+                        <div class="fcard-de">verantwortlich sein f&uuml;r</div>
+                        <div class="fcard-example">"Everyone is responsible for their own actions."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#14</div>
+                        <div class="fcard-word">raise awareness</div>
+                        <div class="fcard-hint">collocation &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">підвищувати обізнаність / привертати увагу</div>
+                        <div class="fcard-de">Bewusstsein schaffen / aufmerksam machen</div>
+                        <div class="fcard-example">"The campaign aims to raise awareness of climate change."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#15</div>
+                        <div class="fcard-word">take advantage of sth</div>
+                        <div class="fcard-hint">collocation &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">скористатися чимось / використати можливість</div>
+                        <div class="fcard-de">etw. nutzen / ausnutzen</div>
+                        <div class="fcard-example">"Take advantage of every opportunity to practise."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+            </div>
+
+            <!-- GROUP 4 -->
+            <div class="group-label">&#x1F4AC; Корисні сполучення</div>
+            <div class="card-grid">
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#16</div>
+                        <div class="fcard-word">on purpose</div>
+                        <div class="fcard-hint">adverb phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">навмисно / спеціально</div>
+                        <div class="fcard-de">absichtlich / mit Absicht</div>
+                        <div class="fcard-example">"Did you do that on purpose?"</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#17</div>
+                        <div class="fcard-word">in spite of</div>
+                        <div class="fcard-hint">preposition &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">незважаючи на / попри</div>
+                        <div class="fcard-de">trotz (+ Genitiv)</div>
+                        <div class="fcard-example">"In spite of the rain, we went outside."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#18</div>
+                        <div class="fcard-word">at first sight</div>
+                        <div class="fcard-hint">adverb phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">з першого погляду</div>
+                        <div class="fcard-de">auf den ersten Blick</div>
+                        <div class="fcard-example">"It may seem easy at first sight, but it's not."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#19</div>
+                        <div class="fcard-word">as a result</div>
+                        <div class="fcard-hint">connector &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">у результаті / внаслідок цього</div>
+                        <div class="fcard-de">als Ergebnis / infolgedessen / daher</div>
+                        <div class="fcard-example">"As a result, the project was a huge success."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+                <div class="fcard" onclick="flipCard(this)">
+                    <div class="fcard-front">
+                        <div class="fcard-num">#20</div>
+                        <div class="fcard-word">in the long run</div>
+                        <div class="fcard-hint">adverb phrase &bull; B1</div>
+                    </div>
+                    <div class="fcard-back">
+                        <div class="fcard-ua">у довгостроковій перспективі / зрештою</div>
+                        <div class="fcard-de">auf lange Sicht / langfristig</div>
+                        <div class="fcard-example">"In the long run, it's worth the effort."</div>
+                        <div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div>
+                    </div>
+                    <div class="flip-tip">tap to flip</div>
+                </div>
+
+            </div>
+        </div><!-- #cardArea -->
+
+        <div class="done-screen" id="doneScreen">
+            <div class="done-icon">&#x1F389;</div>
+            <h2>Alle 20 gelernt!</h2>
+            <p>Morgen kommen 20 neue W&ouml;rter. Du schaffst das!</p>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        const TOTAL = 20;
+        let knownCount = 0;
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) {
+                card.classList.remove('known');
+                btn.textContent = '✓ Ich kenne es';
+                knownCount = Math.max(0, knownCount - 1);
+            } else {
+                card.classList.add('known');
+                btn.textContent = '✓ Gelernt!';
+                knownCount++;
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const pct = (knownCount / TOTAL) * 100;
+            document.getElementById('progBar').style.width = pct + '%';
+            document.getElementById('progNum').textContent = knownCount;
+            document.getElementById('doneScreen').classList.toggle('show', knownCount === TOTAL);
+        }
+
+        function flipAll() {
+            document.querySelectorAll('.fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+        }
+
+        function resetAll() {
+            document.querySelectorAll('.fcard').forEach(c => {
+                c.classList.remove('flipped', 'known');
+            });
+            document.querySelectorAll('.know-btn').forEach(b => {
+                b.textContent = '✓ Ich kenne es';
+            });
+            knownCount = 0;
+            updateProgress();
+        }
+
+        function shuffleCards() {
+            document.querySelectorAll('.card-grid').forEach(grid => {
+                const cards = [...grid.children];
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+    </script>
+</body>
+</html>
