@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tageswörter | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== DAY TABS ===== */
+        .day-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.8rem 0 1.4rem;
+        }
+        .day-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.65rem 1.1rem;
+            border-radius: 14px;
+            background: rgba(13,17,23,0.75);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            color: var(--color-text-muted);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            min-width: 80px;
+            text-align: center;
+            position: relative;
+        }
+        .day-tab:hover { border-color: rgba(245,158,11,0.4); color: #fff; }
+        .day-tab.active {
+            background: linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.07));
+            border-color: #f59e0b;
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(245,158,11,0.22);
+        }
+        .day-tab .tab-date { font-size: 1rem; font-weight: 800; line-height: 1.1; }
+        .day-tab .tab-label { font-size: 0.7rem; font-weight: 500; opacity: 0.65; margin-top: 0.2rem; }
+        .day-tab .tab-prog {
+            font-size: 0.68rem;
+            font-weight: 700;
+            margin-top: 0.3rem;
+            color: #3fb950;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .day-tab.active .tab-prog,
+        .day-tab.done .tab-prog { opacity: 1; }
+        .day-tab.done { border-color: rgba(63,185,80,0.45); }
+        .day-tab.done .tab-date { color: #3fb950; }
+
+        /* ===== DAY PANEL ===== */
+        .day-panel { display: none; }
+        .day-panel.active { display: block; }
+
+        /* ===== DAY HEADER ===== */
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .day-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(245,158,11,0.06));
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 50px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .day-badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #f59e0b;
+            box-shadow: 0 0 5px rgba(245,158,11,0.9);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+        /* ===== LEVEL BADGE ===== */
+        .level-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.35);
+            color: #fbbf24;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            letter-spacing: 0.06em;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 7px;
+            margin: 0.5rem 0 0.25rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #f59e0b, #f85149);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+        }
+        .progress-label span { color: #fbbf24; font-weight: 700; }
+
+        /* ===== CONTROLS ===== */
+        .controls {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.3rem;
+        }
+        .ctrl-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary {
+            background: rgba(245,158,11,0.15);
+            border-color: rgba(245,158,11,0.4);
+            color: #fbbf24;
+        }
+        .ctrl-btn.primary:hover { background: rgba(245,158,11,0.25); color: #fff; }
+
+        /* ===== CARD GRID ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 0.65rem;
+        }
+
+        /* ===== FLASHCARD ===== */
+        .fcard {
+            position: relative;
+            min-height: 135px;
+            border-radius: 13px;
+            background: rgba(13,17,23,0.82);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .fcard::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 13px 0 0 13px;
+            background: #f59e0b;
+        }
+        .fcard::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 4px; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(245,158,11,0.45), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+
+        .fcard-front {
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 135px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 0.67rem; font-weight: 700; color: rgba(245,158,11,0.55); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.05rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.68rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+
+        .fcard-back {
+            display: none;
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 135px;
+            flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en {
+            font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.62);
+            margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .fcard-en::before {
+            content: 'EN'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem;
+            border-radius: 5px; background: rgba(88,166,255,0.15); color: #79b8ff;
+            border: 1px solid rgba(88,166,255,0.28); letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .fcard-example { font-size: 0.75rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .know-btn {
+            display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem;
+            border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28);
+            color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer;
+            width: fit-content; transition: all 0.2s; align-self: flex-start;
+        }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+
+        /* ===== GROUP DIVIDER ===== */
+        .group-label {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin: 1.5rem 0 0.65rem;
+            font-size: 0.77rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--color-text-muted);
+        }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+        /* ===== DONE SCREEN ===== */
+        .done-screen {
+            display: none; text-align: center; padding: 2rem 1rem;
+            border-radius: 16px; background: rgba(23,17,13,0.6);
+            border: 1px solid rgba(245,158,11,0.3); margin-top: 1.5rem;
+        }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #fbbf24; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .fcard-front, .fcard-back { min-height: 115px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; }
+            .fcard-word { font-size: 0.93rem; }
+        }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Tagesw&ouml;rter</span>
+        </nav>
+
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.93rem;margin-bottom:0.6rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:0.4rem; margin-bottom:0.2rem;">
+            <h1 style="margin-bottom:0.15rem;">Tagesw&ouml;rter <span class="level-pill">B1 &rarr; B2</span></h1>
+            <p class="page-subtitle">20 W&ouml;rter pro Tag &mdash; UA + EN auf der R&uuml;ckseite</p>
+        </div>
+
+        <!-- DAY TABS -->
+        <div class="day-tabs" id="dayTabs">
+            <div class="day-tab active" data-day="d1705" onclick="switchDay('d1705')">
+                <div class="tab-date">17.05</div>
+                <div class="tab-label">Gef&uuml;hle</div>
+                <div class="tab-prog" id="tab-prog-d1705">0/20</div>
+            </div>
+            <div class="day-tab" data-day="d1805" onclick="switchDay('d1805')">
+                <div class="tab-date">18.05</div>
+                <div class="tab-label">Redewendungen</div>
+                <div class="tab-prog" id="tab-prog-d1805">0/20</div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             DAY 17.05 — Gefühle & Charakter
+        ══════════════════════════════════════════ -->
+        <div class="day-panel active" id="panel-d1705">
+            <div class="day-header">
+                <div class="day-badge"><span class="dot"></span> 17.05.2026 &mdash; Tag 1 &bull; Gef&uuml;hle &amp; Charakter &#x1F3AD;</div>
+            </div>
+
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-d1705"></div></div>
+            <div class="progress-label">Gelernt: <span id="num-d1705">0</span> / 20</div>
+
+            <div class="controls">
+                <button class="ctrl-btn primary" onclick="flipAll('d1705')">&#x1F501; Alle aufdecken</button>
+                <button class="ctrl-btn" onclick="resetAll('d1705')">&#x21BA; Zur&uuml;cksetzen</button>
+                <button class="ctrl-btn" onclick="shuffleCards('d1705')">&#x1F500; Mischen</button>
+            </div>
+
+            <div id="cards-d1705">
+
+                <div class="group-label">&#x1F60A; Positive Gef&uuml;hle</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">sich freuen auf (+ Akk.)</div><div class="fcard-hint">reflexiv &bull; Vorfreude</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">з нетерпінням чекати <span style="color:var(--color-text-muted);">(майбутнє)</span></div><div class="fcard-en">to look forward to</div><div class="fcard-example">"Ich freue mich auf die Ferien!"</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">begeistert sein von</div><div class="fcard-hint">Adjektiv + Dativ</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">бути в захваті від</div><div class="fcard-en">to be enthusiastic / thrilled about</div><div class="fcard-example">"Sie ist von dem neuen Film total begeistert."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">stolz auf etw./jdn. sein</div><div class="fcard-hint">Adjektiv + Akk.</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">пишатися чимось / кимось</div><div class="fcard-en">to be proud of</div><div class="fcard-example">"Meine Eltern sind stolz auf mich."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">erleichtert</div><div class="fcard-hint">Adjektiv &bull; B1+</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">з полегшенням <span style="color:var(--color-text-muted);">(коли все нарешті ок)</span></div><div class="fcard-en">relieved</div><div class="fcard-example">"Nach der Pr&uuml;fung war ich richtig erleichtert."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">&uuml;berrascht sein</div><div class="fcard-hint">Adjektiv &bull; Reaktion</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">бути здивованим</div><div class="fcard-en">to be surprised</div><div class="fcard-example">"Ich war total &uuml;berrascht, dass er gekommen ist."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F624; Negative Gef&uuml;hle &amp; Reaktionen</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">entt&auml;uscht sein von</div><div class="fcard-hint">Adjektiv + Dativ</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">бути розчарованим у/в</div><div class="fcard-en">to be disappointed in/by</div><div class="fcard-example">"Ich war von dem Konzert sehr entt&auml;uscht."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">genervt sein</div><div class="fcard-hint">Umgangssprache</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">бути роздратованим / &laquo;дістали&raquo;</div><div class="fcard-en">to be annoyed / fed up</div><div class="fcard-example">"Ich bin so genervt von dem L&auml;rm!"</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">sich Sorgen machen um</div><div class="fcard-hint">reflexiv + Akk.</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">хвилюватися за / переживати про</div><div class="fcard-en">to worry about</div><div class="fcard-example">"Mama macht sich immer Sorgen um mich."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">peinlich</div><div class="fcard-hint">Adjektiv &bull; super oft</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">соромно / незручно <span style="color:var(--color-text-muted);">(&laquo;Das ist mir peinlich&raquo;)</span></div><div class="fcard-en">embarrassing / awkward</div><div class="fcard-example">"Es war mir total peinlich, als ich hingefallen bin."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">neidisch (auf)</div><div class="fcard-hint">Adjektiv + Akk.</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">заздрісний (на)</div><div class="fcard-en">envious / jealous (of)</div><div class="fcard-example">"Sie ist neidisch auf meine neuen Schuhe."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F31F; Charakter &mdash; positive Eigenschaften</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">zuverl&auml;ssig</div><div class="fcard-hint">Adjektiv &bull; Top-CV-Wort</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">надійний <span style="color:var(--color-text-muted);">(можна покластися)</span></div><div class="fcard-en">reliable / dependable</div><div class="fcard-example">"Tom ist mein zuverl&auml;ssigster Freund."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">ehrgeizig</div><div class="fcard-hint">Adjektiv &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">амбітний / честолюбний</div><div class="fcard-en">ambitious</div><div class="fcard-example">"Sie ist sehr ehrgeizig &mdash; sie will immer die Beste sein."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">einf&uuml;hlsam</div><div class="fcard-hint">Adjektiv &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">емпатичний / чуйний</div><div class="fcard-en">empathetic / sensitive</div><div class="fcard-example">"Ein guter Freund ist einf&uuml;hlsam und h&ouml;rt zu."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">gro&szlig;z&uuml;gig</div><div class="fcard-hint">Adjektiv &bull; B1+</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">щедрий <span style="color:var(--color-text-muted);">(не жадібний)</span></div><div class="fcard-en">generous</div><div class="fcard-example">"Oma ist immer gro&szlig;z&uuml;gig mit Geschenken."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">selbstbewusst</div><div class="fcard-hint">Adjektiv &bull; oft im Profil</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">впевнений у собі</div><div class="fcard-en">self-confident</div><div class="fcard-example">"Sie ist sehr selbstbewusst und spricht klar."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F3AD; Charakter &mdash; Minus &amp; Alltags-Filler</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">eingebildet</div><div class="fcard-hint">Adjektiv &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">зарозумілий / пихатий</div><div class="fcard-en">arrogant / conceited</div><div class="fcard-example">"Er ist so eingebildet, seit er gewonnen hat."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">stur</div><div class="fcard-hint">Adjektiv &bull; kurz &amp; stark</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">упертий <span style="color:var(--color-text-muted);">(не передумає)</span></div><div class="fcard-en">stubborn</div><div class="fcard-example">"Sei nicht so stur, h&ouml;r mir mal zu!"</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">sch&uuml;chtern</div><div class="fcard-hint">Adjektiv &bull; B1</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">сором'язливий</div><div class="fcard-en">shy</div><div class="fcard-example">"Als Kind war ich sehr sch&uuml;chtern."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">ehrlich gesagt</div><div class="fcard-hint">Filler &bull; klingt nat&uuml;rlich</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">чесно кажучи</div><div class="fcard-en">honestly / to be honest</div><div class="fcard-example">"Ehrlich gesagt habe ich keine Lust darauf."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">jdm. auf die Nerven gehen</div><div class="fcard-hint">Redewendung &bull; B1+</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">діяти на нерви / дратувати когось</div><div class="fcard-en">to get on someone's nerves</div><div class="fcard-example">"Mein kleiner Bruder geht mir total auf die Nerven."</div><div class="know-btn" onclick="markKnown(event,this,'d1705')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+            </div><!-- cards-d1705 -->
+
+            <div class="done-screen" id="done-d1705">
+                <div class="done-icon">&#x1F389;</div>
+                <h2>Alle 20 gelernt!</h2>
+                <p>Tag 1 geschafft &mdash; weiter zu Tag 2!</p>
+            </div>
+        </div><!-- panel-d1705 -->
+
+        <!-- ══════════════════════════════════════════
+             DAY 18.05 — Redewendungen & Alltag
+        ══════════════════════════════════════════ -->
+        <div class="day-panel" id="panel-d1805">
+            <div class="day-header">
+                <div class="day-badge"><span class="dot"></span> 18.05.2026 &mdash; Tag 2 &bull; Redewendungen &amp; Alltag &#x1F3B2;</div>
+            </div>
+
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-d1805"></div></div>
+            <div class="progress-label">Gelernt: <span id="num-d1805">0</span> / 20</div>
+
+            <div class="controls">
+                <button class="ctrl-btn primary" onclick="flipAll('d1805')">&#x1F501; Alle aufdecken</button>
+                <button class="ctrl-btn" onclick="resetAll('d1805')">&#x21BA; Zur&uuml;cksetzen</button>
+                <button class="ctrl-btn" onclick="shuffleCards('d1805')">&#x1F500; Mischen</button>
+            </div>
+
+            <div id="cards-d1805">
+
+                <div class="group-label">&#x1F340; Gl&uuml;ck, Pech &amp; Schicksal</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">jdm. die Daumen dr&uuml;cken</div><div class="fcard-hint">Redewendung &bull; Top-3</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">тримати кулачки за когось</div><div class="fcard-en">to keep one's fingers crossed</div><div class="fcard-example">"Ich dr&uuml;cke dir die Daumen f&uuml;r die Pr&uuml;fung!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">Schwein haben</div><div class="fcard-hint">Redewendung &bull; super oft</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">мати неймовірну удачу <span style="color:var(--color-text-muted);">(не &laquo;свиню&raquo;!)</span></div><div class="fcard-en">to have a stroke of luck</div><div class="fcard-example">"Du hast Schwein gehabt, dass der Bus noch da war!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">Pech haben</div><div class="fcard-hint">Redewendung &bull; t&auml;glich</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">не пощастило <span style="color:var(--color-text-muted);">(Pech = смола, &laquo;невезіння&raquo;)</span></div><div class="fcard-en">to be unlucky / out of luck</div><div class="fcard-example">"Heute hatte ich Pech: kein Bus, Regen, Note 4."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">ins Wasser fallen</div><div class="fcard-hint">Redewendung &bull; B1+</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">зірватися / не відбутися <span style="color:var(--color-text-muted);">(про плани)</span></div><div class="fcard-en">to fall through</div><div class="fcard-example">"Unsere Reise ist leider ins Wasser gefallen."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">mit M&uuml;h und Not</div><div class="fcard-hint">Wendung &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">на превелику силу / ледве-ледве</div><div class="fcard-en">barely / with great difficulty</div><div class="fcard-example">"Ich habe mit M&uuml;h und Not die Pr&uuml;fung bestanden."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F4AC; Schnelle Reaktionen &mdash; Alltag</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">Mir reicht's!</div><div class="fcard-hint">Ausruf &bull; emotional</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">З мене досить! / Дістало!</div><div class="fcard-en">That's enough! / I've had it!</div><div class="fcard-example">"Mir reicht's, ich gehe nach Hause."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">Auf keinen Fall!</div><div class="fcard-hint">Ablehnung &bull; klar</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">В жодному разі!</div><div class="fcard-en">No way! / Under no circumstances!</div><div class="fcard-example">"Auf keinen Fall mache ich das nochmal!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">Das macht nichts.</div><div class="fcard-hint">Reaktion &bull; freundlich</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">Нічого страшного. / Не страшно.</div><div class="fcard-en">It doesn't matter / no problem</div><div class="fcard-example">"Sorry, ich bin zu sp&auml;t. &mdash; Das macht nichts."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">Mach dir keine Sorgen.</div><div class="fcard-hint">Trost &bull; B1</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">Не хвилюйся.</div><div class="fcard-en">Don't worry.</div><div class="fcard-example">"Mach dir keine Sorgen, alles wird gut."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">Das ist mir egal.</div><div class="fcard-hint">Reaktion &bull; neutral</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">Мені байдуже.</div><div class="fcard-en">I don't care.</div><div class="fcard-example">"Pizza oder Pasta? &mdash; Mir egal."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F91D; Im Gespr&auml;ch &mdash; Filler &amp; Bestätigung</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">&uuml;brigens</div><div class="fcard-hint">Adverb &bull; t&auml;glich</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">між іншим / до речі</div><div class="fcard-en">by the way</div><div class="fcard-example">"&Uuml;brigens, ich habe heute Geburtstag."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">Ach so!</div><div class="fcard-hint">Reaktion &bull; Verstehen</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">а, ясно! / зрозуміло!</div><div class="fcard-en">oh, I see!</div><div class="fcard-example">"Wir treffen uns um 18 Uhr. &mdash; Ach so, danke!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">Genau!</div><div class="fcard-hint">Best&auml;tigung &bull; sehr h&auml;ufig</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">саме так! / точно!</div><div class="fcard-en">exactly!</div><div class="fcard-example">"Du meinst, wir m&uuml;ssen jetzt los? &mdash; Genau!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">unter vier Augen</div><div class="fcard-hint">Redewendung &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">наодинці / віч-на-віч</div><div class="fcard-en">in private / one on one</div><div class="fcard-example">"K&ouml;nnen wir das unter vier Augen besprechen?"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">auf der Zunge liegen</div><div class="fcard-hint">Redewendung &bull; B2</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">крутиться на язиці</div><div class="fcard-en">on the tip of one's tongue</div><div class="fcard-example">"Sein Name liegt mir auf der Zunge, aber ich komm nicht drauf!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+                <div class="group-label">&#x1F3AF; Modalpartikeln &mdash; B2-Magic</div>
+                <div class="card-grid">
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">eigentlich</div><div class="fcard-hint">Modalpartikel &bull; B1+</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">взагалі-то / по суті</div><div class="fcard-en">actually / really</div><div class="fcard-example">"Eigentlich wollte ich nicht kommen, aber..."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">wohl</div><div class="fcard-hint">Modalpartikel &bull; Vermutung</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">мабуть / напевно <span style="color:var(--color-text-muted);">(припущення)</span></div><div class="fcard-en">probably / I suppose</div><div class="fcard-example">"Er ist wohl zu Hause geblieben."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">halt / eben</div><div class="fcard-hint">Modalpartikel &bull; Resignation</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">просто / ну так <span style="color:var(--color-text-muted);">(спокійне прийняття)</span></div><div class="fcard-en">just (resignation) / that's just how it is</div><div class="fcard-example">"Das ist halt so. / Das ist eben so."</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">denn (in Fragen)</div><div class="fcard-hint">Modalpartikel &bull; freundlich</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">же <span style="color:var(--color-text-muted);">(пом'якшує / зацікавлює питання)</span></div><div class="fcard-en">makes the question friendlier</div><div class="fcard-example">"Was machst du denn da? / Wo bist du denn?"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                    <div class="fcard" onclick="flipCard(this)">
+                        <div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">doch (Best&auml;tigung)</div><div class="fcard-hint">Modalpartikel &bull; super wichtig</div></div>
+                        <div class="fcard-back"><div class="fcard-ua">таки / ж <span style="color:var(--color-text-muted);">(контр-ствердження після заперечення)</span></div><div class="fcard-en">yes, on the contrary / actually yes</div><div class="fcard-example">"Du kommst nicht. &mdash; Doch, ich komme!"</div><div class="know-btn" onclick="markKnown(event,this,'d1805')">&#x2713; Ich kenne es</div></div>
+                        <div class="flip-tip">tap to flip</div>
+                    </div>
+                </div>
+
+            </div><!-- cards-d1805 -->
+
+            <div class="done-screen" id="done-d1805">
+                <div class="done-icon">&#x1F389;</div>
+                <h2>Tag 2 geschafft!</h2>
+                <p>Jetzt klingst du wie ein echter Deutscher &mdash; halt eben &#x1F60E;</p>
+            </div>
+        </div><!-- panel-d1805 -->
+
+    </div><!-- .page-content -->
+
+    <script>
+        const counts = { d1705: 0, d1805: 0 };
+        const TOTAL = 20;
+
+        function switchDay(day) {
+            document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('panel-' + day).classList.add('active');
+            document.querySelector('[data-day="' + day + '"]').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function markKnown(e, btn, day) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) {
+                card.classList.remove('known');
+                btn.textContent = '✓ Ich kenne es';
+                counts[day] = Math.max(0, counts[day] - 1);
+            } else {
+                card.classList.add('known');
+                btn.textContent = '✓ Gelernt!';
+                counts[day]++;
+            }
+            updateProgress(day);
+        }
+
+        function updateProgress(day) {
+            const n = counts[day];
+            const pct = (n / TOTAL) * 100;
+            document.getElementById('bar-' + day).style.width = pct + '%';
+            document.getElementById('num-' + day).textContent = n;
+            document.getElementById('tab-prog-' + day).textContent = n + '/' + TOTAL;
+            const tab = document.querySelector('[data-day="' + day + '"]');
+            tab.classList.toggle('done', n === TOTAL);
+            document.getElementById('done-' + day).classList.toggle('show', n === TOTAL);
+        }
+
+        function flipAll(day) {
+            document.querySelectorAll('#cards-' + day + ' .fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+        }
+
+        function resetAll(day) {
+            document.querySelectorAll('#cards-' + day + ' .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('#cards-' + day + ' .know-btn').forEach(b => b.textContent = '✓ Ich kenne es');
+            counts[day] = 0;
+            updateProgress(day);
+        }
+
+        function shuffleCards(day) {
+            document.querySelectorAll('#cards-' + day + ' .card-grid').forEach(grid => {
+                const cards = [...grid.children];
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll(day);
+        }
+    </script>
+</body>
+</html>
