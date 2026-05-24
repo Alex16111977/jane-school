@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Message | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .book-container { max-width: 720px; margin: 0 auto; }
+        .chapter { display: none; }
+        .chapter.active { display: block; }
+
+        .book-text {
+            font-size: 1.04rem;
+            line-height: 1.9;
+            color: rgba(230,230,240,0.92);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.8rem 2rem;
+            margin-bottom: 1.4rem;
+        }
+        .book-text p { margin-bottom: 1rem; }
+        .book-text p:last-child { margin-bottom: 0; }
+
+        /* vocab spans */
+        .vocab {
+            color: #79b8ff;
+            border-bottom: 1px dashed rgba(121,184,255,0.5);
+            cursor: pointer;
+            position: relative;
+        }
+        .vocab:hover { color: #a5d6ff; }
+        .vocab-tooltip {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15,20,35,0.98);
+            border: 1px solid rgba(121,184,255,0.4);
+            border-radius: 9px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.77rem;
+            white-space: nowrap;
+            z-index: 200;
+            pointer-events: none;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.6);
+        }
+        .vocab-tooltip .tr-de { color: #fbbf24; display: block; font-style: normal; }
+        .vocab-tooltip .tr-ua { color: #a78bfa; display: block; font-style: normal; }
+        .vocab.show-tip .vocab-tooltip { display: block; }
+
+        /* nav */
+        .chapter-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1.1rem 0;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            padding: 0.55rem 1.2rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.13); border-color: rgba(121,184,255,0.4); color: #fff; }
+        .nav-btn:disabled { opacity: 0.28; cursor: default; }
+        .chapter-counter { font-size: 0.82rem; color: rgba(255,255,255,0.38); font-weight: 700; letter-spacing: 0.04em; }
+
+        .chapter-title { font-size: 1.22rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+        .chapter-sub { font-size: 0.81rem; color: rgba(121,184,255,0.7); margin-bottom: 1.2rem; font-weight: 600; letter-spacing: 0.03em; font-style: italic; }
+
+        /* vocab box */
+        .vocab-box {
+            background: rgba(121,184,255,0.05);
+            border: 1px solid rgba(121,184,255,0.18);
+            border-radius: 13px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.2rem;
+        }
+        .vocab-box h4 { font-size: 0.75rem; font-weight: 800; color: rgba(121,184,255,0.75); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 0.75rem; }
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.38rem 1rem; }
+        .vocab-entry { font-size: 0.81rem; color: rgba(220,225,240,0.72); }
+        .vocab-entry strong { color: #79b8ff; }
+
+        /* question box */
+        .q-box {
+            background: rgba(163,113,247,0.06);
+            border: 1px solid rgba(163,113,247,0.22);
+            border-radius: 13px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .q-box h4 { font-size: 0.75rem; font-weight: 800; color: rgba(163,113,247,0.75); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 0.65rem; }
+        .q-box ol { margin: 0; padding-left: 1.3rem; font-size: 0.87rem; color: rgba(225,225,240,0.78); line-height: 1.75; }
+
+        /* progress */
+        .progress-bar-wrap { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; margin-bottom: 1.3rem; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#4493f8,#79b8ff); border-radius: 2px; transition: width 0.4s ease; }
+
+        /* toc */
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 0.45rem; margin-bottom: 1.4rem; }
+        .toc-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 9px;
+            color: rgba(255,255,255,0.48);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.76rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+            line-height: 1.35;
+        }
+        .toc-btn:hover { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(121,184,255,0.3); }
+        .toc-btn.done { border-color: rgba(63,185,80,0.3); color: rgba(63,185,80,0.75); }
+        .toc-btn.current { border-color: rgba(121,184,255,0.55); color: #79b8ff; background: rgba(121,184,255,0.08); }
+
+        .diff-badge { display: inline-block; font-size: 0.62rem; font-weight: 800; padding: 0.1rem 0.42rem; border-radius: 20px; letter-spacing: 0.04em; vertical-align: middle; margin-left: 0.4rem; }
+        .diff-a2 { background: rgba(63,185,80,0.18); color: #3fb950; border: 1px solid rgba(63,185,80,0.35); }
+        .diff-b1 { background: rgba(121,184,255,0.13); color: #79b8ff; border: 1px solid rgba(121,184,255,0.3); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Reader</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem; margin-bottom:1.4rem;">
+            <h1>&#x1F4D6; The Last Message</h1>
+            <p class="page-subtitle">A2 &rarr; B1 Reader &bull; 8 chapters &bull; Tap <span style="color:#79b8ff;border-bottom:1px dashed rgba(121,184,255,0.5);">blue words</span> for translation</p>
+        </div>
+
+        <div class="book-container">
+
+            <!-- progress bar -->
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressFill" style="width:12.5%"></div>
+            </div>
+
+            <!-- table of contents -->
+            <div class="toc-grid" id="tocGrid"></div>
+
+            <!-- nav top -->
+            <div class="chapter-nav">
+                <button class="nav-btn" id="prevBtnTop" onclick="changeCh(-1)" disabled>&#x2190; Back</button>
+                <span class="chapter-counter" id="chCounterTop">Chapter 1 / 8</span>
+                <button class="nav-btn" id="nextBtnTop" onclick="changeCh(1)">Next &#x2192;</button>
+            </div>
+
+            <!-- ===== CHAPTER 1 ===== -->
+            <div class="chapter active" data-ch="1">
+                <div class="chapter-title">Chapter 1: The Old Phone <span class="diff-badge diff-a2">A2</span></div>
+                <div class="chapter-sub">Maya finds something unexpected in a second-hand shop</div>
+                <div class="book-text">
+                    <p>Maya loved Saturdays. On Saturdays, she didn't have to go to school. She could <span class="vocab" data-de="schlendern" data-ua="блукати">wander</span> around the city and look at things in shop windows. Her <span class="vocab" data-de="Lieblingsort" data-ua="улюблене місце">favourite place</span> was a small second-hand shop on Green Street. The shop had old books, <span class="vocab" data-de="merkwürdig" data-ua="дивний">strange</span> jewellery, and things that people didn't need anymore.</p>
+
+                    <p>On this Saturday, Maya was looking at a box of old electronics. There were broken headphones and cables <span class="vocab" data-de="zu nichts nütze" data-ua="ні для чого">good for nothing</span>. Then she saw it — a small phone. It was old, but not too old. The screen was <span class="vocab" data-de="gerissen, gesprungen" data-ua="тріснутий">cracked</span> in one corner, but the phone looked like it could still work.</p>
+
+                    <p>"How much is this?" Maya asked the old man behind the counter.</p>
+
+                    <p>He <span class="vocab" data-de="blinzelte" data-ua="кліпнув очима">blinked</span> at her through his thick glasses. "One euro," he said. "Maybe two. It probably doesn't work."</p>
+
+                    <p>"I'll take it for one," said Maya. She liked a good <span class="vocab" data-de="Schnäppchen" data-ua="вигідна покупка">bargain</span>.</p>
+
+                    <p>At home, she <span class="vocab" data-de="angeschlossen, geladen" data-ua="під'єднала">plugged in</span> the phone. After ten minutes, the screen <span class="vocab" data-de="hell wurde" data-ua="засвітився">lit up</span>. The phone was working. No password. Someone had forgotten to lock it.</p>
+
+                    <p>There were apps, old photos, and — messages. Many unread messages. The last one was sent two years ago. Maya looked at the name of the person who had sent it.</p>
+
+                    <p><em>Kai.</em></p>
+
+                    <p>She didn't know any Kai. But she was very <span class="vocab" data-de="neugierig" data-ua="цікава">curious</span>.</p>
+
+                    <p>She pressed the message.</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 1 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>wander</strong> — блукати / schlendern</div>
+                        <div class="vocab-entry"><strong>cracked</strong> — тріснутий / gerissen</div>
+                        <div class="vocab-entry"><strong>bargain</strong> — вигідна покупка / Schnäppchen</div>
+                        <div class="vocab-entry"><strong>plugged in</strong> — під'єднала / angeschlossen</div>
+                        <div class="vocab-entry"><strong>curious</strong> — цікавий / neugierig</div>
+                        <div class="vocab-entry"><strong>lit up</strong> — засвітився / wurde hell</div>
+                        <div class="vocab-entry"><strong>good for nothing</strong> — ні для чого / nutzlos</div>
+                        <div class="vocab-entry"><strong>blinked</strong> — кліпнув очима / blinzelte</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>Where did Maya find the phone?</li>
+                        <li>How much did she pay for it?</li>
+                        <li>Why was she able to open the phone without a password?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 2 ===== -->
+            <div class="chapter" data-ch="2">
+                <div class="chapter-title">Chapter 2: The Messages <span class="diff-badge diff-a2">A2</span></div>
+                <div class="chapter-sub">Maya reads and discovers something strange</div>
+                <div class="book-text">
+                    <p>The message from Kai was short: <em>"I found it. I know where it is. Don't tell anyone — especially not him. I'll explain everything tomorrow. — K"</em></p>
+
+                    <p>Maya read it three times. <em>Found what? Who is "him"?</em> The message was <span class="vocab" data-de="geheimnisvoll" data-ua="загадковий">mysterious</span>. And it was sent two years ago. Nobody had <span class="vocab" data-de="geantwortet" data-ua="відповів">replied</span>.</p>
+
+                    <p>She <span class="vocab" data-de="scrollte" data-ua="прокрутила">scrolled</span> through the other messages. Most were from someone called <em>Lena</em>. Lena and the phone's owner were clearly good friends. They talked about school, teachers, a dog called Biscuit, and a boy they didn't like. Normal stuff.</p>
+
+                    <p>But between the normal messages, there were others from Kai that <span class="vocab" data-de="herausstachen" data-ua="виділялись">stood out</span>. Kai kept talking about something he had found — something important. He used words like <em>"secret"</em>, <em>"proof"</em>, and <em>"dangerous"</em>.</p>
+
+                    <p><em>Dangerous?</em> Maya felt a small <span class="vocab" data-de="Schauer" data-ua="озноб">shiver</span> go down her back. She looked at the photos. Most were selfies of a girl with short dark hair. But there was one photo that was different — an old, grey building with <span class="vocab" data-de="Holzbretter" data-ua="дошки">wooden boards</span> on the windows. Under it someone had written: <em>"This is where it all started."</em></p>
+
+                    <p>Maya <span class="vocab" data-de="zoomte heran" data-ua="збільшила">zoomed in</span>. She could see a street sign in the corner. <em>Blackwood Road.</em> She knew that road — only fifteen minutes from her house.</p>
+
+                    <p>She should probably <span class="vocab" data-de="abgeben" data-ua="здати">hand it in</span> to the police. But she didn't want to. Not yet.</p>
+
+                    <p>She wanted to know more about Kai.</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 2 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>mysterious</strong> — загадковий / geheimnisvoll</div>
+                        <div class="vocab-entry"><strong>replied</strong> — відповів / geantwortet</div>
+                        <div class="vocab-entry"><strong>scrolled</strong> — прокрутила / scrollte</div>
+                        <div class="vocab-entry"><strong>stood out</strong> — виділялись / stachen heraus</div>
+                        <div class="vocab-entry"><strong>shiver</strong> — озноб / Schauer</div>
+                        <div class="vocab-entry"><strong>zoomed in</strong> — збільшила / herrangezoomt</div>
+                        <div class="vocab-entry"><strong>hand it in</strong> — здати / abgeben</div>
+                        <div class="vocab-entry"><strong>proof</strong> — доказ / Beweis</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>What did Kai's message say?</li>
+                        <li>What was in the unusual photo?</li>
+                        <li>What did Maya decide to do — and why didn't she go to the police?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 3 ===== -->
+            <div class="chapter" data-ch="3">
+                <div class="chapter-title">Chapter 3: Searching Online <span class="diff-badge diff-a2">A2/B1</span></div>
+                <div class="chapter-sub">Maya tries to find information about Kai</div>
+                <div class="book-text">
+                    <p>That evening, Maya opened her laptop and typed the name "Kai" into a social media search. There were thousands of results. She needed more information.</p>
+
+                    <p>She went back to the phone and looked carefully at the photos. There was a boy with <span class="vocab" data-de="lockigem" data-ua="кучерявим">curly</span> red hair and freckles, always smiling. In one photo, he was wearing a school <span class="vocab" data-de="Hoodie" data-ua="куртка">hoodie</span> with the word <em>"Riverside"</em> on it.</p>
+
+                    <p><em>Riverside School.</em> That was in her town. Maya typed "Kai Riverside School" into the search bar and <span class="vocab" data-de="scrollte durch" data-ua="пролистала">scrolled through</span> the results.</p>
+
+                    <p>Then she found something. A small news article. The <span class="vocab" data-de="Überschrift" data-ua="заголовок">headline</span> read: <em>"Local Student Kai Fletcher Missing — Family Asks for Help."</em></p>
+
+                    <p>Maya's heart <span class="vocab" data-de="sank" data-ua="опустилось">sank</span>. Missing. Kai was missing.</p>
+
+                    <p>She read carefully. Kai Fletcher, 15 years old, had <span class="vocab" data-de="verschwunden" data-ua="зник">disappeared</span> in October two years ago. He had left home for school but never <span class="vocab" data-de="angekommen" data-ua="добрався">arrived</span>. The police had searched but found nothing. The case was still <span class="vocab" data-de="offen" data-ua="відкрита">open</span>.</p>
+
+                    <p>Under the article, there were comments. One caught Maya's <span class="vocab" data-de="Aufmerksamkeit" data-ua="увагу">attention</span>: <em>"Kai was my best friend. If anyone has information, contact me — Leo."</em> He had left an email address.</p>
+
+                    <p>Maya <span class="vocab" data-de="starrte auf" data-ua="дивилась на">stared at</span> the screen. This wasn't just an interesting mystery anymore. This was a real person. A real boy who had gone missing.</p>
+
+                    <p>And she was holding his phone.</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 3 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>curly</strong> — кучерявий / lockig</div>
+                        <div class="vocab-entry"><strong>headline</strong> — заголовок / Überschrift</div>
+                        <div class="vocab-entry"><strong>sank</strong> — опустилось / sank</div>
+                        <div class="vocab-entry"><strong>disappeared</strong> — зник / verschwunden</div>
+                        <div class="vocab-entry"><strong>arrived</strong> — прибув / angekommen</div>
+                        <div class="vocab-entry"><strong>attention</strong> — увага / Aufmerksamkeit</div>
+                        <div class="vocab-entry"><strong>stared at</strong> — дивилась на / starrte auf</div>
+                        <div class="vocab-entry"><strong>open (case)</strong> — відкрита (справа) / offen</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>How did Maya find out more about Kai?</li>
+                        <li>What had happened to Kai two years ago?</li>
+                        <li>Who is Leo, and why is he important?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 4 ===== -->
+            <div class="chapter" data-ch="4">
+                <div class="chapter-title">Chapter 4: Writing to Leo <span class="diff-badge diff-b1">B1</span></div>
+                <div class="chapter-sub">Maya decides to contact Kai's best friend</div>
+                <div class="book-text">
+                    <p>Maya <span class="vocab" data-de="zögerte" data-ua="вагалась">hesitated</span> for a long time before she opened her email. What could she even say? <em>Hi, I found a phone that might belong to your missing friend.</em> It sounded strange, even in her head.</p>
+
+                    <p>But she wrote the email anyway — short and honest. She explained she had bought an old phone and found messages that <span class="vocab" data-de="erwähnten" data-ua="згадували">mentioned</span> someone named Kai. She said she wasn't sure if it was the same Kai, but wanted to check. She <span class="vocab" data-de="unterschrieb" data-ua="підписалась">signed off</span> with her name and phone number.</p>
+
+                    <p>She pressed send, closed her laptop, and tried to do her homework. She couldn't <span class="vocab" data-de="sich konzentrieren" data-ua="зосередитись">concentrate</span>. She kept thinking about the building on Blackwood Road. What had Kai found there?</p>
+
+                    <p>The next morning, she had a reply. It was from Leo.</p>
+
+                    <p>His message was long. He said yes — Kai Fletcher had owned a phone like that. He said Kai had bought it second-hand himself, which Maya found <span class="vocab" data-de="ironisch" data-ua="іронічним">ironic</span>. He said that before Kai disappeared, Kai had been <span class="vocab" data-de="besessen von" data-ua="одержимим">obsessed with</span> something — something in an old building near the river. He wouldn't say exactly what, but kept <span class="vocab" data-de="andeutend" data-ua="натякаючи">hinting</span> it was important. Dangerous, even.</p>
+
+                    <p>At the end, Leo wrote: <em>"Could we meet? I've been looking for this phone for two years."</em></p>
+
+                    <p>Maya wrote back immediately: <em>"Yes. When and where?"</em></p>
+
+                    <p>They <span class="vocab" data-de="vereinbarten" data-ua="домовились">agreed</span> to meet at the café on Park Street the next afternoon. Maya put the phone carefully in her bag. She had a feeling that tomorrow would be <span class="vocab" data-de="bedeutsam" data-ua="важливим">significant</span>.</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 4 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>hesitated</strong> — вагалась / zögerte</div>
+                        <div class="vocab-entry"><strong>mentioned</strong> — згадували / erwähnten</div>
+                        <div class="vocab-entry"><strong>concentrate</strong> — зосередитись / konzentrieren</div>
+                        <div class="vocab-entry"><strong>ironic</strong> — іронічний / ironisch</div>
+                        <div class="vocab-entry"><strong>obsessed with</strong> — одержимий / besessen von</div>
+                        <div class="vocab-entry"><strong>hinting</strong> — натякати / andeuten</div>
+                        <div class="vocab-entry"><strong>agreed</strong> — домовились / vereinbarten</div>
+                        <div class="vocab-entry"><strong>significant</strong> — важливий / bedeutsam</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>Why did Maya hesitate before writing the email?</li>
+                        <li>What did Leo say in his reply about Kai's behaviour?</li>
+                        <li>What do you think Kai found in the old building?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 5 ===== -->
+            <div class="chapter" data-ch="5">
+                <div class="chapter-title">Chapter 5: Meeting Leo <span class="diff-badge diff-b1">B1</span></div>
+                <div class="chapter-sub">Two strangers talk about a boy they both care about</div>
+                <div class="book-text">
+                    <p>Leo was already in the café when Maya arrived. He was tall and serious-looking, with dark circles under his eyes. But he stood up when he saw her and gave her a <span class="vocab" data-de="nervöses" data-ua="нервове">nervous</span> smile.</p>
+
+                    <p>She sat down and placed the phone on the table between them. Leo looked at it for a long moment without touching it. Then he picked it up slowly, like it might <span class="vocab" data-de="zerbrechen" data-ua="зламатись">break</span>.</p>
+
+                    <p>"That's his," he said quietly. "I remember this <span class="vocab" data-de="Riss" data-ua="тріщина">crack</span> in the corner. He dropped it once when we were cycling." He looked up. "Where did you find it?"</p>
+
+                    <p>Maya explained. Leo listened without <span class="vocab" data-de="unterbrechend" data-ua="перебиваючи">interrupting</span>. When she finished, he was quiet.</p>
+
+                    <p>"He didn't just disappear, you know," Leo said finally. "I think he left <span class="vocab" data-de="absichtlich" data-ua="навмисно">on purpose</span>. I think he was scared."</p>
+
+                    <p>"Scared of what?" Maya asked.</p>
+
+                    <p>Leo <span class="vocab" data-de="lehnte sich vor" data-ua="нахилився вперед">leaned forward</span>. "Before he disappeared, he kept talking about someone he called 'The Manager'. He said this person was doing something wrong — stealing money that <span class="vocab" data-de="gehörte" data-ua="належало">belonged to</span> the community centre on Blackwood Road. And Kai had found <span class="vocab" data-de="Beweise" data-ua="докази">evidence</span>."</p>
+
+                    <p>"The building in the photo," said Maya.</p>
+
+                    <p>Leo stared at her. "You saw it?"</p>
+
+                    <p>"Yes. And the message: <em>I found it. Don't tell anyone.</em>"</p>
+
+                    <p>Leo was silent. Then: "That was probably the last message he ever sent. Next morning, he was gone." He <span class="vocab" data-de="schluckte" data-ua="ковтнув">swallowed</span>. "What if he was in danger? What if something happened because he knew too much?"</p>
+
+                    <p>Maya thought. "Or — what if he left <span class="vocab" data-de="freiwillig" data-ua="добровільно">voluntarily</span> to protect himself? And maybe… he's still out there?"</p>
+
+                    <p>Leo looked at her with something like hope in his eyes. "Do you really think so?"</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 5 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>interrupting</strong> — перебиваючи / unterbrechend</div>
+                        <div class="vocab-entry"><strong>on purpose</strong> — навмисно / absichtlich</div>
+                        <div class="vocab-entry"><strong>leaned forward</strong> — нахилився вперед / lehnte sich vor</div>
+                        <div class="vocab-entry"><strong>evidence</strong> — докази / Beweise</div>
+                        <div class="vocab-entry"><strong>swallowed</strong> — ковтнув / schluckte</div>
+                        <div class="vocab-entry"><strong>voluntarily</strong> — добровільно / freiwillig</div>
+                        <div class="vocab-entry"><strong>crack</strong> — тріщина / Riss</div>
+                        <div class="vocab-entry"><strong>belonged to</strong> — належало / gehörte zu</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>What does Leo think really happened to Kai?</li>
+                        <li>Who is "The Manager"? What did Kai find out about him?</li>
+                        <li>What is Maya's theory? Do you agree with her or Leo?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 6 ===== -->
+            <div class="chapter" data-ch="6">
+                <div class="chapter-title">Chapter 6: Blackwood Road <span class="diff-badge diff-b1">B1</span></div>
+                <div class="chapter-sub">Maya and Leo visit the old building</div>
+                <div class="book-text">
+                    <p>It was Leo's idea to visit the community centre on Blackwood Road. Maya said yes before he finished asking. To be honest, she had been thinking about it since she first saw the photo.</p>
+
+                    <p>They went on a Sunday morning. The building looked exactly like the photo — grey walls, boards on the windows, a sign so <span class="vocab" data-de="verblasst" data-ua="вицвілий">faded</span> you couldn't read it anymore. There was a chain on the front door, but the side door was open.</p>
+
+                    <p>"We probably shouldn't go in," said Leo, already stepping inside.</p>
+
+                    <p>Maya followed. Inside it was dark and smelled of <span class="vocab" data-de="Feuchtigkeit" data-ua="вогкість">damp</span> and old wood. Broken chairs were <span class="vocab" data-de="gestapelt" data-ua="складені">stacked</span> in a corner. Old <span class="vocab" data-de="Plakate" data-ua="плакати">posters</span> covered the walls — community dinners, youth clubs, art <span class="vocab" data-de="Ausstellungen" data-ua="виставки">exhibitions</span>.</p>
+
+                    <p>"This was once a really nice place," said Leo quietly. "My mum used to bring me here."</p>
+
+                    <p>At the back they found a small office with a door <span class="vocab" data-de="leicht angelehnt" data-ua="трохи прочинені">slightly ajar</span>. Inside were old filing cabinets. Most were empty. But in one drawer, Maya found a folder full of papers.</p>
+
+                    <p>She <span class="vocab" data-de="blätterte durch" data-ua="гортала">flicked through</span> them — financial documents. She wasn't an expert, but even she could see the numbers didn't <span class="vocab" data-de="stimmen" data-ua="сходитись">add up</span>. Thousands of euros listed as "management fees" with no <span class="vocab" data-de="Erklärung" data-ua="пояснення">explanation</span>.</p>
+
+                    <p>"Is this what Kai found?" she asked.</p>
+
+                    <p>Leo stared at the papers. "It must be. This proves someone was <span class="vocab" data-de="stahl" data-ua="крав">stealing</span> from the community centre. That's why it closed." He lowered his voice. "That's what Kai knew."</p>
+
+                    <p>Maya photographed every page. "Let's keep these safe," she said. "And then — I think we need to talk to Kai directly."</p>
+
+                    <p>Leo looked at her. "You still think he's alive?"</p>
+
+                    <p>"I do," said Maya. "And I think he's been waiting for someone to find this."</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 6 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>faded</strong> — вицвілий / verblasst</div>
+                        <div class="vocab-entry"><strong>damp</strong> — вогкість / Feuchtigkeit</div>
+                        <div class="vocab-entry"><strong>stacked</strong> — складені / gestapelt</div>
+                        <div class="vocab-entry"><strong>slightly ajar</strong> — трохи відчинені / leicht angelehnt</div>
+                        <div class="vocab-entry"><strong>flicked through</strong> — гортала / blätterte durch</div>
+                        <div class="vocab-entry"><strong>add up</strong> — сходитись / stimmen</div>
+                        <div class="vocab-entry"><strong>explanation</strong> — пояснення / Erklärung</div>
+                        <div class="vocab-entry"><strong>stealing</strong> — красти / stehlen</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>What did Maya and Leo find in the office?</li>
+                        <li>What do the documents prove?</li>
+                        <li>What does Maya plan to do next?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 7 ===== -->
+            <div class="chapter" data-ch="7">
+                <div class="chapter-title">Chapter 7: Finding Kai <span class="diff-badge diff-b1">B1</span></div>
+                <div class="chapter-sub">A message from the past finally gets an answer</div>
+                <div class="book-text">
+                    <p>That night, Maya had an idea. She opened Kai's phone and went to the contact list. There was a number saved as <em>"Mum"</em>. She hesitated. Then she sent a message:</p>
+
+                    <p><em>"Hi. This isn't Kai. My name is Maya. I found this phone. I'm trying to find Kai. Please don't be scared — I just want to help."</em></p>
+
+                    <p>She put down the phone and went to bed. She didn't <span class="vocab" data-de="erwarten" data-ua="очікувала">expect</span> a reply that night.</p>
+
+                    <p>But in the morning, there were three messages from Kai's mother. The first two were <span class="vocab" data-de="misstrauisch" data-ua="підозрілі">suspicious</span> and <span class="vocab" data-de="ängstlich" data-ua="тривожні">anxious</span> — who was Maya, how had she got the phone? But the third said something different:</p>
+
+                    <p><em>"Kai is safe. He has been living with his aunt in Edinburgh for two years. He <span class="vocab" data-de="floh" data-ua="втік">fled</span> because he was scared. He thinks about what happened every day. If you really want to help — talk to him yourself. Here is his new number."</em></p>
+
+                    <p>Maya read it four times. Then she sent a screenshot to Leo.</p>
+
+                    <p>His reply came in seconds: <em>"HE'S ALIVE. Oh my god. Maya."</em></p>
+
+                    <p>She called the number. It rang twice. Then a boy's voice answered — a little <span class="vocab" data-de="vorsichtig" data-ua="обережний">cautious</span>, a little tired, but real.</p>
+
+                    <p>"Hello?"</p>
+
+                    <p>"Hi," said Maya. "My name is Maya. I found your phone in a second-hand shop." She <span class="vocab" data-de="pausierte" data-ua="зробила паузу">paused</span>. "And I think I found your proof."</p>
+
+                    <p>Silence. Then: <em>"The documents in the old office?"</em></p>
+
+                    <p>"Yes. They're safe. I photographed everything."</p>
+
+                    <p>Another silence. And then she heard something she didn't expect. Kai — this boy she had never met, this name on an old phone — was <span class="vocab" data-de="weinte" data-ua="плакав">crying</span>.</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 7 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>expect</strong> — очікувати / erwarten</div>
+                        <div class="vocab-entry"><strong>suspicious</strong> — підозрілий / misstrauisch</div>
+                        <div class="vocab-entry"><strong>anxious</strong> — тривожний / ängstlich</div>
+                        <div class="vocab-entry"><strong>fled</strong> — втік / floh</div>
+                        <div class="vocab-entry"><strong>cautious</strong> — обережний / vorsichtig</div>
+                        <div class="vocab-entry"><strong>paused</strong> — зробила паузу / pausierte</div>
+                        <div class="vocab-entry"><strong>crying</strong> — плакав / weinte</div>
+                        <div class="vocab-entry"><strong>proof</strong> — доказ / Beweis</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>How did Maya contact Kai's mother?</li>
+                        <li>Where had Kai been for two years?</li>
+                        <li>Why do you think Kai was crying at the end of the call?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== CHAPTER 8 ===== -->
+            <div class="chapter" data-ch="8">
+                <div class="chapter-title">Chapter 8: The Truth Comes Out <span class="diff-badge diff-b1">B1</span></div>
+                <div class="chapter-sub">The end — and a new beginning</div>
+                <div class="book-text">
+                    <p>A month later, Maya sat in the same café where she had first met Leo. This time, there was a third person at the table — a boy with curly red hair and freckles, who looked a bit thinner and older than in the photos, but had the same <span class="vocab" data-de="Energie" data-ua="енергія">energy</span> in his eyes.</p>
+
+                    <p>Kai Fletcher had come back to his hometown for the first time in two years.</p>
+
+                    <p>The documents Maya had found were now with a <span class="vocab" data-de="Journalist" data-ua="журналіст">journalist</span> who worked for the local newspaper. The journalist had <span class="vocab" data-de="untersucht" data-ua="розслідував">investigated</span>, found more evidence, and published an article that <span class="vocab" data-de="erschütterte" data-ua="сколихнула">shook</span> the whole community. "The Manager" — a man named Derek Hollis — had stolen over eighty thousand euros from the community centre. The police had opened a formal <span class="vocab" data-de="Ermittlung" data-ua="розслідування">investigation</span>.</p>
+
+                    <p>"You could have just gone to the police yourself," Maya told Kai. "Two years ago."</p>
+
+                    <p>"I know," said Kai. He <span class="vocab" data-de="rührte in" data-ua="помішував">stirred</span> his coffee. "But I was fifteen. Derek Hollis was a powerful man here. I thought nobody would <span class="vocab" data-de="glauben" data-ua="повірити">believe</span> me." He paused. "I thought the easiest thing was to just… disappear."</p>
+
+                    <p>"And was it easy?" Leo asked quietly.</p>
+
+                    <p>Kai shook his head. "No. It was the hardest two years of my life. I missed everyone." He looked at Leo. "I missed you most."</p>
+
+                    <p>Leo looked at the table. Maya pretended to be very interested in her hot chocolate.</p>
+
+                    <p>Later, walking home alone, Maya thought about everything that had happened because of one <span class="vocab" data-de="Entscheidung" data-ua="рішення">decision</span> — her decision to spend one euro on a broken phone. She thought about how a small act of <span class="vocab" data-de="Neugier" data-ua="цікавість">curiosity</span> could <span class="vocab" data-de="verändern" data-ua="змінити">change</span> everything.</p>
+
+                    <p>Her phone <span class="vocab" data-de="summte" data-ua="задзижчав">buzzed</span>. A message from Kai: <em>"Thank you for not giving up. And for not giving the phone back to the shop."</em></p>
+
+                    <p>She smiled and wrote back: <em>"It was only one euro. Best purchase I ever made."</em></p>
+
+                    <p style="text-align:center; margin-top:2.2rem; font-style:italic; color:rgba(121,184,255,0.65); font-size:1.1rem; letter-spacing:0.03em;">— The End —</p>
+                </div>
+                <div class="vocab-box">
+                    <h4>&#x1F4CB; Chapter 8 — New Words</h4>
+                    <div class="vocab-grid">
+                        <div class="vocab-entry"><strong>journalist</strong> — журналіст / Journalist</div>
+                        <div class="vocab-entry"><strong>investigated</strong> — розслідував / untersucht</div>
+                        <div class="vocab-entry"><strong>shook</strong> — сколихнула / erschütterte</div>
+                        <div class="vocab-entry"><strong>investigation</strong> — розслідування / Ermittlung</div>
+                        <div class="vocab-entry"><strong>stirred</strong> — помішував / rührte</div>
+                        <div class="vocab-entry"><strong>decision</strong> — рішення / Entscheidung</div>
+                        <div class="vocab-entry"><strong>curiosity</strong> — цікавість / Neugier</div>
+                        <div class="vocab-entry"><strong>buzzed</strong> — задзижчав / summte</div>
+                    </div>
+                </div>
+                <div class="q-box">
+                    <h4>&#x1F4AC; Think about it</h4>
+                    <ol>
+                        <li>What happened to Derek Hollis?</li>
+                        <li>Why did Kai choose to disappear instead of going to the police?</li>
+                        <li>What do you think Maya learned from this whole experience?</li>
+                    </ol>
+                </div>
+
+                <!-- finished banner -->
+                <div style="margin-top:1.5rem; background:linear-gradient(135deg,rgba(63,185,80,0.12),rgba(88,166,255,0.06)); border:1.5px solid rgba(63,185,80,0.35); border-radius:14px; padding:1.1rem 1.3rem; text-align:center;">
+                    <div style="font-size:1.6rem; margin-bottom:0.4rem;">&#x1F389;</div>
+                    <div style="font-size:0.95rem; font-weight:800; color:#3fb950; margin-bottom:0.3rem;">You finished the book!</div>
+                    <div style="font-size:0.82rem; color:rgba(220,220,230,0.6);">64 new words &bull; 8 chapters &bull; A2 &rarr; B1 level &bull; Well done!</div>
+                </div>
+            </div>
+
+            <!-- nav bottom -->
+            <div class="chapter-nav" style="margin-top:1.4rem;">
+                <button class="nav-btn" id="prevBtn" onclick="changeCh(-1)" disabled>&#x2190; Back</button>
+                <span class="chapter-counter" id="chCounter">Chapter 1 / 8</span>
+                <button class="nav-btn" id="nextBtn" onclick="changeCh(1)">Next &#x2192;</button>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+    (function() {
+        const chapters = document.querySelectorAll('.chapter');
+        const total = chapters.length;
+        let current = 0;
+
+        const tocTitles = [
+            "Ch.1 — The Old Phone",
+            "Ch.2 — The Messages",
+            "Ch.3 — Searching Online",
+            "Ch.4 — Writing to Leo",
+            "Ch.5 — Meeting Leo",
+            "Ch.6 — Blackwood Road",
+            "Ch.7 — Finding Kai",
+            "Ch.8 — The Truth"
+        ];
+
+        const tocGrid = document.getElementById('tocGrid');
+        tocTitles.forEach(function(title, i) {
+            var btn = document.createElement('button');
+            btn.className = 'toc-btn' + (i === 0 ? ' current' : '');
+            btn.textContent = title;
+            btn.onclick = function() { goTo(i); };
+            tocGrid.appendChild(btn);
+        });
+
+        function updateUI() {
+            chapters.forEach(function(ch, i) {
+                ch.classList.toggle('active', i === current);
+            });
+            var tocBtns = tocGrid.querySelectorAll('.toc-btn');
+            tocBtns.forEach(function(btn, i) {
+                btn.classList.remove('current', 'done');
+                if (i === current) btn.classList.add('current');
+                else if (i < current) btn.classList.add('done');
+            });
+            document.getElementById('progressFill').style.width = ((current + 1) / total * 100) + '%';
+            var label = 'Chapter ' + (current + 1) + ' / ' + total;
+            document.getElementById('chCounter').textContent = label;
+            document.getElementById('chCounterTop').textContent = label;
+            document.getElementById('prevBtn').disabled = current === 0;
+            document.getElementById('prevBtnTop').disabled = current === 0;
+            document.getElementById('nextBtn').disabled = current === total - 1;
+            document.getElementById('nextBtnTop').disabled = current === total - 1;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goTo(i) { current = i; updateUI(); }
+        window.changeCh = function(dir) {
+            var n = current + dir;
+            if (n >= 0 && n < total) goTo(n);
+        };
+
+        // vocab tooltips
+        document.querySelectorAll('.vocab').forEach(function(el) {
+            var de = el.dataset.de || '';
+            var ua = el.dataset.ua || '';
+            var tip = document.createElement('span');
+            tip.className = 'vocab-tooltip';
+            tip.innerHTML = (de ? '<span class="tr-de">&#x1F1E9;&#x1F1EA; ' + de + '</span>' : '') +
+                            (ua ? '<span class="tr-ua">&#x1F1FA;&#x1F1E6; ' + ua + '</span>' : '');
+            el.appendChild(tip);
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var wasOpen = el.classList.contains('show-tip');
+                document.querySelectorAll('.vocab.show-tip').forEach(function(v) { v.classList.remove('show-tip'); });
+                if (!wasOpen) el.classList.add('show-tip');
+            });
+        });
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.vocab.show-tip').forEach(function(v) { v.classList.remove('show-tip'); });
+        });
+    })();
+    </script>
+</body>
+</html>

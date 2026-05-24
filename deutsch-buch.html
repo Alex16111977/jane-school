@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miras Jahr — Deutsche Lektüre | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900;9..144,900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .buch-page { font-family: 'Inter', -apple-system, sans-serif; color: rgba(248, 250, 252, 0.96); }
+        .buch-page * { box-sizing: border-box; }
+
+        /* ========== BOOK COVER ========== */
+        .book-cover {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 3rem 2.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 28px;
+            background:
+                radial-gradient(ellipse at top left, rgba(192, 132, 252, 0.2) 0%, transparent 55%),
+                radial-gradient(ellipse at bottom right, rgba(251, 113, 133, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(46, 16, 101, 0.6) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        @media (min-width: 720px) {
+            .book-cover { grid-template-columns: 200px 1fr; align-items: center; padding: 3.5rem 3rem; }
+        }
+        .cover-book {
+            width: 180px;
+            height: 240px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 6px 14px 14px 6px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #831843 100%);
+            box-shadow:
+                0 30px 60px rgba(0,0,0,0.5),
+                -3px 0 0 rgba(255,255,255,0.05),
+                inset 4px 0 0 rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            text-align: center;
+            transform: rotate(-3deg);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cover-book:hover { transform: rotate(0deg) scale(1.04); }
+        .cover-book::before {
+            content: '';
+            position: absolute;
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        .cover-book .ct-1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+        .cover-book .ct-2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            background: linear-gradient(180deg, #fff 0%, #fbcfe8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+        .cover-book .ct-3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .cover-book .ct-corner {
+            position: absolute;
+            bottom: 16px;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .cover-info .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #c4b5fd;
+            background: rgba(192, 132, 252, 0.1);
+            padding: 0.4rem 0.85rem;
+            border-radius: 100px;
+            border: 1px solid rgba(192, 132, 252, 0.25);
+            margin-bottom: 1.2rem;
+        }
+        .cover-info h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+        .cover-info .subtitle {
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            margin: 0 0 1.2rem;
+        }
+        .cover-info p {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+            margin: 0 0 1.2rem;
+            line-height: 1.6;
+            max-width: 540px;
+        }
+        .cover-stats {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .cover-stat {
+            font-size: 0.78rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.75);
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+        .cover-stat strong { color: #fff; }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            margin: 0 0 1.2rem;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .progress-bar .pb-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+        .progress-bar .pb-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+        .progress-bar .pb-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c084fc 0%, #ec4899 100%);
+            border-radius: 100px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 5%;
+        }
+        .progress-bar .pb-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #c4b5fd;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* ========== CHAPTER NAV ========== */
+        .chapter-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+            gap: 0.4rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+        }
+        .chapter-nav button {
+            aspect-ratio: 1;
+            min-height: 40px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chapter-nav button:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .chapter-nav button.active {
+            background: linear-gradient(135deg, #c084fc, #ec4899);
+            border-color: transparent;
+            color: #0f172a;
+            box-shadow: 0 8px 24px rgba(192, 132, 252, 0.3);
+        }
+        .chapter-nav button.read {
+            border-color: rgba(192, 132, 252, 0.3);
+            color: #c4b5fd;
+        }
+
+        /* ========== READING SPREAD ========== */
+        .reading-spread {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        @media (min-width: 980px) {
+            .reading-spread { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+        }
+
+        /* ========== CHAPTER CARD ========== */
+        .chapter-card {
+            background: linear-gradient(180deg, rgba(252, 250, 245, 0.04) 0%, rgba(252, 250, 245, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2.4rem 2.4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #c084fc 0%, #ec4899 50%, #f97316 100%);
+            opacity: 0.7;
+        }
+        .chapter-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-num { color: #c4b5fd; font-weight: 700; }
+        .chapter-date { color: rgba(255,255,255,0.5); }
+        .chapter-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+            margin: 0 0 1.5rem;
+            color: #fff;
+        }
+        .chapter-body {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.1rem;
+            line-height: 1.85;
+            color: rgba(248, 250, 252, 0.92);
+        }
+        .chapter-body p { margin: 0 0 1.1rem; }
+        .chapter-body p:first-of-type::first-letter {
+            font-size: 3.8em;
+            float: left;
+            line-height: 0.85;
+            padding: 0.1em 0.1em 0 0;
+            font-weight: 900;
+            background: linear-gradient(135deg, #c084fc, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Fraunces', serif;
+        }
+        .chapter-body .vw {
+            color: #fde68a;
+            font-weight: 600;
+            background-image: linear-gradient(180deg, transparent 65%, rgba(251, 191, 36, 0.35) 65%);
+            padding: 0 1px;
+            border-radius: 2px;
+            cursor: help;
+        }
+
+        /* ========== VOCAB SIDEBAR ========== */
+        .vocab-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        @media (min-width: 980px) {
+            .vocab-sidebar { position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem); overflow-y: auto; padding-right: 0.4rem; }
+            .vocab-sidebar::-webkit-scrollbar { width: 6px; }
+            .vocab-sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 8px; }
+            .vocab-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 8px; }
+        }
+        .sidebar-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: rgba(255,255,255,0.5);
+            font-weight: 700;
+            margin: 0 0 0.4rem;
+            padding-left: 0.4rem;
+        }
+        .word-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            transition: all 0.2s ease;
+        }
+        .word-card:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+            border-color: rgba(192, 132, 252, 0.25);
+        }
+        .word-card .word-en {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fde68a;
+            margin-bottom: 0.1rem;
+            letter-spacing: -0.005em;
+        }
+        .word-card .word-trans {
+            display: grid;
+            gap: 0.1rem;
+            font-size: 0.82rem;
+        }
+        .word-card .word-trans .text-ru { color: rgba(248, 250, 252, 0.88); font-weight: 500; }
+        .word-card .word-trans .text-en {
+            color: rgba(167, 139, 250, 0.85);
+            font-style: italic;
+            font-size: 0.78rem;
+        }
+
+        /* ========== NAVIGATION (PREV/NEXT) ========== */
+        .reading-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .reading-nav button {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+            text-align: left;
+        }
+        .reading-nav button.next {
+            align-items: flex-end;
+            text-align: right;
+        }
+        .reading-nav button:hover:not(:disabled) {
+            background: rgba(192, 132, 252, 0.1);
+            border-color: rgba(192, 132, 252, 0.3);
+            transform: translateY(-2px);
+        }
+        .reading-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .reading-nav .nav-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            font-weight: 700;
+        }
+        .reading-nav .nav-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1rem;
+        }
+
+        /* ========== HIDE INACTIVE CHAPTERS ========== */
+        .chapter[data-active="false"] { display: none; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg buch-page">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Miras Jahr</span>
+        </nav>
+
+        <!-- BOOK COVER -->
+        <header class="book-cover">
+            <div class="cover-book">
+                <div class="ct-1">Tagebuch</div>
+                <div class="ct-2">Miras<br>Jahr</div>
+                <div class="ct-3">in 20 Tagen</div>
+                <div class="ct-corner">B1 &rarr; B2</div>
+            </div>
+            <div class="cover-info">
+                <span class="eyebrow">&#x1F4D5; Deutsche Lekt&uuml;re</span>
+                <h1>Miras Jahr</h1>
+                <p class="subtitle">Ein Jahr aus dem Leben einer 16-J&auml;hrigen &mdash; in 20 Kapiteln.</p>
+                <p>Mira ist 16, geht in die zehnte Klasse und schreibt Tagebuch. Jedes Kapitel ist ein Eintrag: &uuml;ber Familie, Freundschaften, Schule, erste Liebe und die kleinen Momente, in denen man pl&ouml;tzlich erwachsener wird.</p>
+                <div class="cover-stats">
+                    <span class="cover-stat"><strong>20</strong> Kapitel</span>
+                    <span class="cover-stat"><strong>B1 &rarr; B2</strong> Niveau</span>
+                    <span class="cover-stat"><strong>~120</strong> Vokabeln</span>
+                    <span class="cover-stat"><strong>~2000</strong> W&ouml;rter</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROGRESS -->
+        <div class="progress-bar">
+            <span class="pb-label">Fortschritt</span>
+            <div class="pb-track"><div class="pb-fill" id="pbFill"></div></div>
+            <span class="pb-count" id="pbCount">1 / 20</span>
+        </div>
+
+        <!-- CHAPTER NAVIGATOR -->
+        <div class="chapter-nav" id="chapterNav"></div>
+
+        <!-- CHAPTERS -->
+        <div id="chaptersContainer">
+
+            <!-- ========== CHAPTER 1 ========== -->
+            <div class="chapter" data-num="1" data-active="true">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta">
+                            <span class="chapter-num">Kapitel 01</span>
+                            <span class="chapter-date">1. September</span>
+                        </div>
+                        <h2 class="chapter-title">Der erste Tag</h2>
+                        <div class="chapter-body">
+                            <p>Mein neues Schuljahr beginnt heute. Ich konnte die ganze Nacht nicht schlafen, weil ich so <span class="vw">aufgeregt</span> war. <span class="vw">Eigentlich</span> freue ich mich auf die zehnte Klasse, aber ich habe auch ein bisschen Angst. Was, wenn ich neue Lehrer bekomme, die <span class="vw">streng</span> sind?</p>
+                            <p>Mama hat mir heute Morgen mein Lieblingsfr&uuml;hst&uuml;ck gemacht &mdash; Pancakes mit Beeren. Sie <span class="vw">merkte</span>, dass ich nerv&ouml;s war, sagte aber nichts. Manchmal versteht sie mich besser, als ich denke.</p>
+                            <p>Auf dem Weg zur Schule traf ich Lisa. Sie erz&auml;hlte mir, dass es eine neue <span class="vw">Mitsch&uuml;lerin</span> geben soll &mdash; aus Spanien. Ich war <span class="vw">neugierig</span>, wer das sein w&uuml;rde. Vielleicht wird dieses Jahr doch interessanter, als ich dachte.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">aufgeregt</div><div class="word-trans"><span class="text-ru">взволнованный</span><span class="text-en">excited / nervous</span></div></div>
+                        <div class="word-card"><div class="word-en">eigentlich</div><div class="word-trans"><span class="text-ru">вообще-то, на самом деле</span><span class="text-en">actually</span></div></div>
+                        <div class="word-card"><div class="word-en">streng</div><div class="word-trans"><span class="text-ru">строгий</span><span class="text-en">strict</span></div></div>
+                        <div class="word-card"><div class="word-en">merken</div><div class="word-trans"><span class="text-ru">замечать</span><span class="text-en">to notice</span></div></div>
+                        <div class="word-card"><div class="word-en">die Mitsch&uuml;lerin</div><div class="word-trans"><span class="text-ru">одноклассница</span><span class="text-en">classmate (f.)</span></div></div>
+                        <div class="word-card"><div class="word-en">neugierig</div><div class="word-trans"><span class="text-ru">любопытный</span><span class="text-en">curious</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 2 ========== -->
+            <div class="chapter" data-num="2" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 02</span><span class="chapter-date">3. September</span></div>
+                        <h2 class="chapter-title">Die Neue</h2>
+                        <div class="chapter-body">
+                            <p>Sie hei&szlig;t Marta. Marta Garc&iacute;a. Sie kommt aus Valencia und ist seit zwei Monaten in Deutschland. Ihr Deutsch ist nicht perfekt, aber sie <span class="vw">versucht</span> es &mdash; und das finde ich <span class="vw">beeindruckend</span>.</p>
+                            <p>Heute hat sie sich neben mich gesetzt. Ich habe ihr ein paar deutsche W&ouml;rter erkl&auml;rt, und sie hat mir spanische W&ouml;rter <span class="vw">beigebracht</span>. &bdquo;Hola&ldquo;, &bdquo;gracias&ldquo;, &bdquo;amiga&ldquo; &mdash; das bedeutet Freundin. Sie <span class="vw">l&auml;chelte</span>, als sie das sagte.</p>
+                            <p>Lisa war komisch heute. Vielleicht ist sie <span class="vw">eifers&uuml;chtig</span>, weil ich mich mit Marta <span class="vw">unterhalten</span> habe. Es ist doch genug Platz f&uuml;r drei Freundinnen, oder?</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">versuchen</div><div class="word-trans"><span class="text-ru">пытаться</span><span class="text-en">to try</span></div></div>
+                        <div class="word-card"><div class="word-en">beeindruckend</div><div class="word-trans"><span class="text-ru">впечатляющий</span><span class="text-en">impressive</span></div></div>
+                        <div class="word-card"><div class="word-en">beibringen</div><div class="word-trans"><span class="text-ru">учить кого-то</span><span class="text-en">to teach (sb sth)</span></div></div>
+                        <div class="word-card"><div class="word-en">l&auml;cheln</div><div class="word-trans"><span class="text-ru">улыбаться</span><span class="text-en">to smile</span></div></div>
+                        <div class="word-card"><div class="word-en">eifers&uuml;chtig</div><div class="word-trans"><span class="text-ru">ревнивый</span><span class="text-en">jealous</span></div></div>
+                        <div class="word-card"><div class="word-en">sich unterhalten</div><div class="word-trans"><span class="text-ru">общаться, беседовать</span><span class="text-en">to chat / have a conversation</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 3 ========== -->
+            <div class="chapter" data-num="3" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 03</span><span class="chapter-date">10. September</span></div>
+                        <h2 class="chapter-title">Streit mit Mama</h2>
+                        <div class="chapter-body">
+                            <p>Heute hat Mama mir das Handy weggenommen. Ich war so <span class="vw">w&uuml;tend</span>, dass ich fast geweint habe. Sie sagt, ich verbringe zu viel Zeit am <span class="vw">Bildschirm</span> und meine Noten w&uuml;rden darunter <span class="vw">leiden</span>. Aber das stimmt doch gar nicht!</p>
+                            <p>Ich verstehe ihre <span class="vw">Sorge</span> nicht. Ohne mein Handy f&uuml;hle ich mich isoliert &mdash; fast einsam.</p>
+                            <p>Nach einer Stunde habe ich versucht, ruhig mit ihr zu sprechen. Ich habe ihr <span class="vw">versprochen</span>, das Handy nach 21 Uhr auszuschalten. Sie hat <span class="vw">zugestimmt</span> &mdash; vorerst. Manchmal ist es schwer, mit Eltern zu reden. Aber wenn man <span class="vw">geduldig</span> bleibt, l&auml;sst sich viel erreichen.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">w&uuml;tend</div><div class="word-trans"><span class="text-ru">в ярости, разозлённый</span><span class="text-en">furious / angry</span></div></div>
+                        <div class="word-card"><div class="word-en">der Bildschirm</div><div class="word-trans"><span class="text-ru">экран</span><span class="text-en">screen</span></div></div>
+                        <div class="word-card"><div class="word-en">leiden (unter)</div><div class="word-trans"><span class="text-ru">страдать (от)</span><span class="text-en">to suffer (from)</span></div></div>
+                        <div class="word-card"><div class="word-en">die Sorge</div><div class="word-trans"><span class="text-ru">беспокойство, забота</span><span class="text-en">worry / concern</span></div></div>
+                        <div class="word-card"><div class="word-en">versprechen</div><div class="word-trans"><span class="text-ru">обещать</span><span class="text-en">to promise</span></div></div>
+                        <div class="word-card"><div class="word-en">zustimmen</div><div class="word-trans"><span class="text-ru">соглашаться</span><span class="text-en">to agree</span></div></div>
+                        <div class="word-card"><div class="word-en">geduldig</div><div class="word-trans"><span class="text-ru">терпеливый</span><span class="text-en">patient</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 4 ========== -->
+            <div class="chapter" data-num="4" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 04</span><span class="chapter-date">15. September</span></div>
+                        <h2 class="chapter-title">Tom</h2>
+                        <div class="chapter-body">
+                            <p>Es gibt diesen Jungen in meiner Klasse. Tom. Er ist nicht besonders <span class="vw">auff&auml;llig</span> &mdash; keine coolen Klamotten, kein Influencer-Style. Aber er ist <span class="vw">klug</span>. Wenn der Lehrer eine schwierige Frage stellt, hebt er die Hand und antwortet ruhig, ohne zu <span class="vw">prahlen</span>.</p>
+                            <p>Heute haben wir zusammen in der Bibliothek gesessen. Ich brauchte Hilfe in Mathe, und er erkl&auml;rte mir eine Stunde lang die <span class="vw">Gleichungen</span>. Er hatte Geduld, sogar als ich denselben <span class="vw">Fehler</span> dreimal machte.</p>
+                            <p>Beim Abschied fragte er, ob wir morgen wieder zusammen lernen wollen. Mein Herz schlug wie verr&uuml;ckt. Ich hoffe, ich war nicht zu <span class="vw">offensichtlich</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">auff&auml;llig</div><div class="word-trans"><span class="text-ru">заметный, бросающийся в глаза</span><span class="text-en">noticeable / flashy</span></div></div>
+                        <div class="word-card"><div class="word-en">klug</div><div class="word-trans"><span class="text-ru">умный</span><span class="text-en">smart / clever</span></div></div>
+                        <div class="word-card"><div class="word-en">prahlen</div><div class="word-trans"><span class="text-ru">хвастаться</span><span class="text-en">to brag / show off</span></div></div>
+                        <div class="word-card"><div class="word-en">die Gleichung</div><div class="word-trans"><span class="text-ru">уравнение</span><span class="text-en">equation</span></div></div>
+                        <div class="word-card"><div class="word-en">der Fehler</div><div class="word-trans"><span class="text-ru">ошибка</span><span class="text-en">mistake</span></div></div>
+                        <div class="word-card"><div class="word-en">offensichtlich</div><div class="word-trans"><span class="text-ru">очевидный</span><span class="text-en">obvious</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 5 ========== -->
+            <div class="chapter" data-num="5" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 05</span><span class="chapter-date">22. September</span></div>
+                        <h2 class="chapter-title">Lisas Geheimnis</h2>
+                        <div class="chapter-body">
+                            <p>Heute hat Lisa mir etwas Wichtiges erz&auml;hlt. Sie war traurig &mdash; ihre Eltern wollen sich vielleicht <span class="vw">trennen</span>. Sie wollen es Lisa noch nicht offiziell sagen, aber sie hat alles <span class="vw">mitgeh&ouml;rt</span>.</p>
+                            <p>Ich wusste nicht, was ich sagen soll. &bdquo;Es wird alles gut&ldquo; w&auml;re zu einfach gewesen. Stattdessen habe ich sie einfach <span class="vw">umarmt</span> und gesagt: &bdquo;Ich bin f&uuml;r dich da, was auch immer passiert.&ldquo;</p>
+                            <p>Sie hat geweint, aber dann gel&auml;chelt. &bdquo;Danke, dass du nichts Falsches gesagt hast&ldquo;, <span class="vw">fl&uuml;sterte</span> sie. Jetzt f&uuml;hle ich mich <span class="vw">schuldig</span>, dass ich &uuml;ber sie so streng <span class="vw">geurteilt</span> habe. Echte Freundschaft bedeutet, geduldig zu sein, auch wenn man nicht alles versteht.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">sich trennen</div><div class="word-trans"><span class="text-ru">расстаться, развестись</span><span class="text-en">to separate / split up</span></div></div>
+                        <div class="word-card"><div class="word-en">mith&ouml;ren</div><div class="word-trans"><span class="text-ru">подслушать</span><span class="text-en">to overhear</span></div></div>
+                        <div class="word-card"><div class="word-en">umarmen</div><div class="word-trans"><span class="text-ru">обнять</span><span class="text-en">to hug</span></div></div>
+                        <div class="word-card"><div class="word-en">fl&uuml;stern</div><div class="word-trans"><span class="text-ru">шептать</span><span class="text-en">to whisper</span></div></div>
+                        <div class="word-card"><div class="word-en">schuldig</div><div class="word-trans"><span class="text-ru">виноватый</span><span class="text-en">guilty</span></div></div>
+                        <div class="word-card"><div class="word-en">urteilen</div><div class="word-trans"><span class="text-ru">судить, осуждать</span><span class="text-en">to judge</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 6 ========== -->
+            <div class="chapter" data-num="6" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 06</span><span class="chapter-date">5. Oktober</span></div>
+                        <h2 class="chapter-title">Mathe-Stress</h2>
+                        <div class="chapter-body">
+                            <p>Diese Woche war eine Katastrophe. Wir haben drei Tests in vier Tagen geschrieben, und in Mathe war ich <span class="vw">&uuml;berfordert</span>. Frau Beckmann hat ein Thema in einer Stunde erkl&auml;rt, das ich eine Woche brauchen w&uuml;rde, um es zu <span class="vw">verstehen</span>.</p>
+                            <p>Tom hat mir wieder geholfen. Er sagt, ich muss nicht alles auf einmal lernen &mdash; lieber jeden Tag eine halbe Stunde, ruhig und ohne Druck. &bdquo;Du <span class="vw">untersch&auml;tzt</span> dich&ldquo;, sagte er.</p>
+                            <p>Ich glaube, das war das Netteste, was jemand seit Langem zu mir gesagt hat. Vielleicht <span class="vw">schaffe</span> ich es ja doch. Ich muss nur <span class="vw">aufh&ouml;ren</span>, mich mit den besten Sch&uuml;lern zu vergleichen, und meinen eigenen <span class="vw">Fortschritt</span> sehen.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">&uuml;berfordert</div><div class="word-trans"><span class="text-ru">перегруженный, не справляющийся</span><span class="text-en">overwhelmed</span></div></div>
+                        <div class="word-card"><div class="word-en">verstehen</div><div class="word-trans"><span class="text-ru">понимать</span><span class="text-en">to understand</span></div></div>
+                        <div class="word-card"><div class="word-en">untersch&auml;tzen</div><div class="word-trans"><span class="text-ru">недооценивать</span><span class="text-en">to underestimate</span></div></div>
+                        <div class="word-card"><div class="word-en">schaffen</div><div class="word-trans"><span class="text-ru">справиться, осилить</span><span class="text-en">to manage / pull off</span></div></div>
+                        <div class="word-card"><div class="word-en">aufh&ouml;ren</div><div class="word-trans"><span class="text-ru">прекратить</span><span class="text-en">to stop</span></div></div>
+                        <div class="word-card"><div class="word-en">der Fortschritt</div><div class="word-trans"><span class="text-ru">прогресс</span><span class="text-en">progress</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 7 ========== -->
+            <div class="chapter" data-num="7" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 07</span><span class="chapter-date">20. Oktober</span></div>
+                        <h2 class="chapter-title">Krank</h2>
+                        <div class="chapter-body">
+                            <p>Seit gestern Abend habe ich Fieber. Mama hat mir Tee gemacht und mich ins Bett geschickt. Mein Hals tut weh, ich kann kaum schlucken, und ich f&uuml;hle mich so <span class="vw">ersch&ouml;pft</span>.</p>
+                            <p>Komischerweise mag ich kranke Tage. Nicht weil ich gerne <span class="vw">leide</span>, sondern weil sie mir eine Pause <span class="vw">erlauben</span>. Niemand <span class="vw">erwartet</span> etwas von mir. Ich kann lesen, schlafen oder Filme schauen, ohne ein schlechtes Gewissen zu haben.</p>
+                            <p>Marta hat mir eine Nachricht geschickt: &bdquo;Gute Besserung! Ich bringe dir morgen die Hausaufgaben.&ldquo; Das hat mich ger&uuml;hrt. Vor zwei Monaten kannte sie mich noch gar nicht. Jetzt <span class="vw">k&uuml;mmert</span> sie sich um mich. So entstehen Freundschaften &mdash; aus kleinen, <span class="vw">unerwarteten</span> Momenten.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">ersch&ouml;pft</div><div class="word-trans"><span class="text-ru">измотанный</span><span class="text-en">exhausted</span></div></div>
+                        <div class="word-card"><div class="word-en">leiden</div><div class="word-trans"><span class="text-ru">страдать</span><span class="text-en">to suffer</span></div></div>
+                        <div class="word-card"><div class="word-en">erlauben</div><div class="word-trans"><span class="text-ru">позволять</span><span class="text-en">to allow</span></div></div>
+                        <div class="word-card"><div class="word-en">erwarten</div><div class="word-trans"><span class="text-ru">ожидать</span><span class="text-en">to expect</span></div></div>
+                        <div class="word-card"><div class="word-en">sich k&uuml;mmern um</div><div class="word-trans"><span class="text-ru">заботиться о</span><span class="text-en">to take care of</span></div></div>
+                        <div class="word-card"><div class="word-en">unerwartet</div><div class="word-trans"><span class="text-ru">неожиданный</span><span class="text-en">unexpected</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 8 ========== -->
+            <div class="chapter" data-num="8" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 08</span><span class="chapter-date">1. November</span></div>
+                        <h2 class="chapter-title">Online-Drama</h2>
+                        <div class="chapter-body">
+                            <p>Jemand hat ein Foto von Anna in unserer Klassengruppe gepostet. Ein peinliches Foto, das auf einer Party gemacht wurde. Es hat sich in einer Stunde &uuml;berall <span class="vw">verbreitet</span>. Anna war heute nicht in der Schule. Ich glaube, sie <span class="vw">schuldigt</span> sich.</p>
+                            <p>Niemand wei&szlig;, wer das Foto gepostet hat. Aber alle haben gelacht. Niemand hat gesagt: &bdquo;Stopp. Das ist gemein.&ldquo; Auch ich nicht. Und jetzt schaue ich mich im Spiegel an und f&uuml;hle mich furchtbar.</p>
+                            <p>Tom hat mir gesagt, dass <span class="vw">Schweigen</span> manchmal genauso schlimm ist wie Mitmachen. Er hat recht. Morgen werde ich Anna eine Nachricht schreiben und mich <span class="vw">entschuldigen</span>, dass ich nichts gesagt habe. Es f&uuml;hlt sich klein an, aber es ist ein <span class="vw">Anfang</span>. <span class="vw">Mut</span> beginnt mit den unbequemen Momenten.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">sich verbreiten</div><div class="word-trans"><span class="text-ru">распространяться</span><span class="text-en">to spread</span></div></div>
+                        <div class="word-card"><div class="word-en">sich beschuldigen</div><div class="word-trans"><span class="text-ru">винить себя</span><span class="text-en">to blame oneself</span></div></div>
+                        <div class="word-card"><div class="word-en">das Schweigen</div><div class="word-trans"><span class="text-ru">молчание</span><span class="text-en">silence</span></div></div>
+                        <div class="word-card"><div class="word-en">sich entschuldigen</div><div class="word-trans"><span class="text-ru">извиняться</span><span class="text-en">to apologize</span></div></div>
+                        <div class="word-card"><div class="word-en">der Anfang</div><div class="word-trans"><span class="text-ru">начало</span><span class="text-en">beginning</span></div></div>
+                        <div class="word-card"><div class="word-en">der Mut</div><div class="word-trans"><span class="text-ru">мужество, смелость</span><span class="text-en">courage</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 9 ========== -->
+            <div class="chapter" data-num="9" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 09</span><span class="chapter-date">15. November</span></div>
+                        <h2 class="chapter-title">Die Klima-Demo</h2>
+                        <div class="chapter-body">
+                            <p>Heute war meine erste Klima-Demo. Lisa, Marta und ich sind in die Stadtmitte gefahren. Es waren tausende Sch&uuml;ler dort, mit selbstgemachten Schildern. Ich war erst <span class="vw">unsicher</span>, ob ich wirklich etwas <span class="vw">bewirken</span> kann. Aber dann hat eine Frau im Megafon gesprochen, und ich habe <span class="vw">G&auml;nsehaut</span> bekommen.</p>
+                            <p>&bdquo;Wir sind nicht die Zukunft&ldquo;, sagte sie. &bdquo;Wir sind die Gegenwart.&ldquo;</p>
+                            <p>Mama war nicht <span class="vw">begeistert</span>, dass ich die Schule schwa&szlig;nzte. Aber als ich ihr abends von der Stimmung erz&auml;hlte, von den Liedern und Reden, sah ich, wie sich ihr Gesicht <span class="vw">ver&auml;nderte</span>. &bdquo;Ich verstehe&ldquo;, sagte sie leise. &bdquo;Das ist wichtiger als ein Schultag.&ldquo; Manchmal &uuml;berraschen mich meine Eltern doch.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">unsicher</div><div class="word-trans"><span class="text-ru">неуверенный</span><span class="text-en">unsure / insecure</span></div></div>
+                        <div class="word-card"><div class="word-en">bewirken</div><div class="word-trans"><span class="text-ru">сделать так, чтобы что-то изменилось</span><span class="text-en">to bring about / achieve</span></div></div>
+                        <div class="word-card"><div class="word-en">die G&auml;nsehaut</div><div class="word-trans"><span class="text-ru">мурашки по коже</span><span class="text-en">goosebumps</span></div></div>
+                        <div class="word-card"><div class="word-en">begeistert</div><div class="word-trans"><span class="text-ru">в восторге</span><span class="text-en">excited / thrilled</span></div></div>
+                        <div class="word-card"><div class="word-en">sich ver&auml;ndern</div><div class="word-trans"><span class="text-ru">меняться</span><span class="text-en">to change</span></div></div>
+                        <div class="word-card"><div class="word-en">&uuml;berraschen</div><div class="word-trans"><span class="text-ru">удивлять</span><span class="text-en">to surprise</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 10 ========== -->
+            <div class="chapter" data-num="10" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 10</span><span class="chapter-date">28. November</span></div>
+                        <h2 class="chapter-title">Mein Geburtstag</h2>
+                        <div class="chapter-body">
+                            <p>Heute werde ich siebzehn. Es f&uuml;hlt sich <span class="vw">seltsam</span> an. Mit f&uuml;nfzehn dachte ich, mit siebzehn w&auml;re ich erwachsen. Jetzt wei&szlig; ich, dass das nicht stimmt.</p>
+                            <p>Lisa hat mir ein Tagebuch geschenkt. &bdquo;Damit du auch n&auml;chstes Jahr alles aufschreibst&ldquo;, sagte sie. Marta hat mir eine spanische Postkarte gemacht. Tom hat einen Brief geschrieben. <span class="vw">Tats&auml;chlich</span> einen Brief, von Hand. &bdquo;Ich finde dich besonders&ldquo;, stand am Ende. Ich habe ihn dreimal gelesen, um sicher zu sein.</p>
+                            <p>Mama hat geweint, als ich die Kerzen ausgeblasen habe. &bdquo;Du wirst so schnell gro&szlig;&ldquo;, sagte sie. Ich glaube, sie hat sich an mein erstes Geburtstag <span class="vw">erinnert</span>. Manchmal vergesse ich, dass auch Eltern <span class="vw">Gef&uuml;hle</span> haben, die nicht nur mit uns zu tun haben. Sie haben ihr eigenes Leben, ihre eigene <span class="vw">Trauer</span>, ihren eigenen <span class="vw">Stolz</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">seltsam</div><div class="word-trans"><span class="text-ru">странный</span><span class="text-en">strange / odd</span></div></div>
+                        <div class="word-card"><div class="word-en">tats&auml;chlich</div><div class="word-trans"><span class="text-ru">на самом деле, правда</span><span class="text-en">actually / indeed</span></div></div>
+                        <div class="word-card"><div class="word-en">sich erinnern an</div><div class="word-trans"><span class="text-ru">помнить о</span><span class="text-en">to remember</span></div></div>
+                        <div class="word-card"><div class="word-en">das Gef&uuml;hl</div><div class="word-trans"><span class="text-ru">чувство</span><span class="text-en">feeling</span></div></div>
+                        <div class="word-card"><div class="word-en">die Trauer</div><div class="word-trans"><span class="text-ru">печаль, грусть</span><span class="text-en">sorrow / grief</span></div></div>
+                        <div class="word-card"><div class="word-en">der Stolz</div><div class="word-trans"><span class="text-ru">гордость</span><span class="text-en">pride</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 11 ========== -->
+            <div class="chapter" data-num="11" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 11</span><span class="chapter-date">24. Dezember</span></div>
+                        <h2 class="chapter-title">Weihnachten</h2>
+                        <div class="chapter-body">
+                            <p>Oma ist gekommen. Sie wohnt sechs Stunden entfernt, und wir sehen sie nur drei- oder viermal im Jahr. Sie ist <span class="vw">altmodisch</span>, kocht zu viel, fragt zu oft &mdash; aber ihre Umarmungen sind die besten der Welt.</p>
+                            <p>Beim Essen hat Papa eine Geschichte aus seiner Kindheit erz&auml;hlt, die ich noch nie geh&ouml;rt hatte. Er war als Kind in einem Sommerlager, und ein Junge hat ihn so sehr <span class="vw">ge&auml;rgert</span>, dass er weglief. Drei Stunden lang. Bis ihn der Lehrer fand.</p>
+                            <p>&bdquo;Ich war auch mal ein <span class="vw">Au&szlig;enseiter</span>, wei&szlig;t du&ldquo;, sagte er und l&auml;chelte. Ich war &uuml;berrascht. Mein Papa, der immer so <span class="vw">selbstbewusst</span> wirkt, war als Junge unsicher. Vielleicht <span class="vw">f&uuml;hlen</span> sich alle Menschen manchmal so. Vielleicht ist es ein Teil davon, ein Mensch zu sein. Heute habe ich meinen Papa zum ersten Mal als jemand gesehen, der auch mal jung war &mdash; und <span class="vw">verletzlich</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">altmodisch</div><div class="word-trans"><span class="text-ru">старомодный</span><span class="text-en">old-fashioned</span></div></div>
+                        <div class="word-card"><div class="word-en">&auml;rgern</div><div class="word-trans"><span class="text-ru">злить, дразнить</span><span class="text-en">to annoy / tease</span></div></div>
+                        <div class="word-card"><div class="word-en">der Au&szlig;enseiter</div><div class="word-trans"><span class="text-ru">аутсайдер, изгой</span><span class="text-en">outsider</span></div></div>
+                        <div class="word-card"><div class="word-en">selbstbewusst</div><div class="word-trans"><span class="text-ru">уверенный в себе</span><span class="text-en">self-confident</span></div></div>
+                        <div class="word-card"><div class="word-en">sich f&uuml;hlen</div><div class="word-trans"><span class="text-ru">чувствовать себя</span><span class="text-en">to feel</span></div></div>
+                        <div class="word-card"><div class="word-en">verletzlich</div><div class="word-trans"><span class="text-ru">уязвимый, ранимый</span><span class="text-en">vulnerable</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 12 ========== -->
+            <div class="chapter" data-num="12" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 12</span><span class="chapter-date">5. Januar</span></div>
+                        <h2 class="chapter-title">Winter-Tief</h2>
+                        <div class="chapter-body">
+                            <p>Es ist dunkel, wenn ich aufstehe. Es ist dunkel, wenn ich aus der Schule komme. Drei Wochen kein Sonnenschein, und ich f&uuml;hle mich <span class="vw">trostlos</span>. Alles f&uuml;hlt sich anstrengend an &mdash; sogar das, was ich normalerweise mag.</p>
+                            <p>Mama sagt, das nennt man &bdquo;Winterdepression&ldquo;. Sie passiert vielen Menschen, weil das Licht <span class="vw">fehlt</span>. &bdquo;Beweg dich&ldquo;, sagt sie. &bdquo;Geh raus, auch wenn dir nicht danach ist.&ldquo;</p>
+                            <p>Heute habe ich es <span class="vw">versucht</span>. Ich bin eine halbe Stunde im Park spazieren gegangen, mit Kopfh&ouml;rern und meiner Lieblingsmusik. Es war kalt. Aber als ich zur&uuml;ck kam, f&uuml;hlte ich mich ein klein wenig besser. Vielleicht ist das die <span class="vw">L&ouml;sung</span> manchmal &mdash; einfach den ersten Schritt machen, ohne zu warten, bis die <span class="vw">Stimmung</span> sich von selbst <span class="vw">verbessert</span>. Manchmal kommt die <span class="vw">Energie</span> erst nach der Aktion, nicht davor.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">trostlos</div><div class="word-trans"><span class="text-ru">безотрадный, угрюмый</span><span class="text-en">bleak / dreary</span></div></div>
+                        <div class="word-card"><div class="word-en">fehlen</div><div class="word-trans"><span class="text-ru">не хватать</span><span class="text-en">to be missing / lacking</span></div></div>
+                        <div class="word-card"><div class="word-en">versuchen</div><div class="word-trans"><span class="text-ru">пытаться</span><span class="text-en">to try</span></div></div>
+                        <div class="word-card"><div class="word-en">die L&ouml;sung</div><div class="word-trans"><span class="text-ru">решение</span><span class="text-en">solution</span></div></div>
+                        <div class="word-card"><div class="word-en">die Stimmung</div><div class="word-trans"><span class="text-ru">настроение</span><span class="text-en">mood</span></div></div>
+                        <div class="word-card"><div class="word-en">sich verbessern</div><div class="word-trans"><span class="text-ru">улучшаться</span><span class="text-en">to improve</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 13 ========== -->
+            <div class="chapter" data-num="13" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 13</span><span class="chapter-date">12. Januar</span></div>
+                        <h2 class="chapter-title">Vors&auml;tze</h2>
+                        <div class="chapter-body">
+                            <p>Ich mag keine Neujahrsvors&auml;tze. Sie sind meistens unrealistisch und werden bis Februar vergessen. Aber dieses Jahr habe ich drei <span class="vw">konkrete</span> Ziele aufgeschrieben:</p>
+                            <p>Erstens: jeden Tag zehn Minuten lesen &mdash; ein Buch, nicht ein Handy. Zweitens: meine Familie h&auml;ufiger fragen, wie es ihnen geht. Drittens: nicht l&uuml;gen, auch wenn die Wahrheit <span class="vw">unangenehm</span> ist.</p>
+                            <p>Tom hat mich gefragt, warum ich gerade diese drei. Ich habe lange dar&uuml;ber nachgedacht. Vielleicht weil sie alle mit derselben Sache zu tun haben &mdash; <span class="vw">Verbindung</span>. Mit B&uuml;chern, mit Menschen, mit mir selbst.</p>
+                            <p>Wir werden sehen, ob ich es <span class="vw">durchhalte</span>. Aber ich glaube, kleine, klare Schritte sind besser als gro&szlig;e, vage Pl&auml;ne. <span class="vw">Disziplin</span> ist keine Strafe &mdash; sie ist ein Geschenk an mich selbst.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">konkret</div><div class="word-trans"><span class="text-ru">конкретный</span><span class="text-en">concrete / specific</span></div></div>
+                        <div class="word-card"><div class="word-en">l&uuml;gen</div><div class="word-trans"><span class="text-ru">врать</span><span class="text-en">to lie</span></div></div>
+                        <div class="word-card"><div class="word-en">unangenehm</div><div class="word-trans"><span class="text-ru">неприятный</span><span class="text-en">unpleasant</span></div></div>
+                        <div class="word-card"><div class="word-en">die Verbindung</div><div class="word-trans"><span class="text-ru">связь, соединение</span><span class="text-en">connection</span></div></div>
+                        <div class="word-card"><div class="word-en">durchhalten</div><div class="word-trans"><span class="text-ru">выдержать, дотянуть</span><span class="text-en">to keep going / endure</span></div></div>
+                        <div class="word-card"><div class="word-en">die Disziplin</div><div class="word-trans"><span class="text-ru">дисциплина</span><span class="text-en">discipline</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 14 ========== -->
+            <div class="chapter" data-num="14" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 14</span><span class="chapter-date">25. Januar</span></div>
+                        <h2 class="chapter-title">Der Mathetest</h2>
+                        <div class="chapter-body">
+                            <p>Heute war der gro&szlig;e Mathetest. Vier Wochen lang habe ich jeden Tag eine halbe Stunde ge&uuml;bt, wie Tom es mir <span class="vw">empfohlen</span> hat. Trotzdem war ich vorher furchtbar nerv&ouml;s.</p>
+                            <p>Als Frau Beckmann die Bl&auml;tter <span class="vw">austeilte</span>, zitterten meine H&auml;nde. Aber dann las ich die erste Aufgabe &mdash; und ich verstand sie. Die zweite auch. Plötzlich war ich ruhig.</p>
+                            <p>Ich wei&szlig; noch nicht, wie ich abgeschnitten habe. Aber das ist eigentlich egal. Heute habe ich etwas Neues gelernt: dass Angst nicht dasselbe ist wie Unf&auml;higkeit. Ich kann nerv&ouml;s sein und <span class="vw">trotzdem</span> gut sein. Ich kann Zweifel haben und trotzdem <span class="vw">handeln</span>. <span class="vw">Selbstvertrauen</span> bedeutet nicht, dass man keine Angst hat. Es bedeutet, dass man trotz der Angst weitermacht. Das ist eine wichtige <span class="vw">Erkenntnis</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">empfehlen</div><div class="word-trans"><span class="text-ru">рекомендовать</span><span class="text-en">to recommend</span></div></div>
+                        <div class="word-card"><div class="word-en">austeilen</div><div class="word-trans"><span class="text-ru">раздавать</span><span class="text-en">to hand out</span></div></div>
+                        <div class="word-card"><div class="word-en">trotzdem</div><div class="word-trans"><span class="text-ru">всё равно, тем не менее</span><span class="text-en">nevertheless</span></div></div>
+                        <div class="word-card"><div class="word-en">handeln</div><div class="word-trans"><span class="text-ru">действовать</span><span class="text-en">to act</span></div></div>
+                        <div class="word-card"><div class="word-en">das Selbstvertrauen</div><div class="word-trans"><span class="text-ru">уверенность в себе</span><span class="text-en">self-confidence</span></div></div>
+                        <div class="word-card"><div class="word-en">die Erkenntnis</div><div class="word-trans"><span class="text-ru">осознание, понимание</span><span class="text-en">realization / insight</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 15 ========== -->
+            <div class="chapter" data-num="15" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 15</span><span class="chapter-date">8. Februar</span></div>
+                        <h2 class="chapter-title">Mama und ich</h2>
+                        <div class="chapter-body">
+                            <p>Mama hat heute gesagt, dass sie sich Sorgen um mich macht. Nicht wegen meiner Noten, sondern wegen mir &mdash; meiner <span class="vw">Stimmung</span>, meines Schweigens.</p>
+                            <p>Wir haben uns zwei Stunden lang unterhalten. Ich habe ihr von Tom erz&auml;hlt, von Anna, von Lisa, von dem Druck in der Schule. Sie hat einfach <span class="vw">zugeh&ouml;rt</span>. Keine Vorw&uuml;rfe, keine Belehrungen, nur Zuh&ouml;ren.</p>
+                            <p>Am Ende sagte sie etwas, das ich nie vergessen werde: &bdquo;Mira, du musst nicht alles allein <span class="vw">tragen</span>. Ich war auch mal sechzehn. Ich habe vieles falsch gemacht. Aber ich werde dich nie <span class="vw">verurteilen</span>, wenn du zu mir kommst.&ldquo;</p>
+                            <p>Ich habe geweint. Sie auch. Dann haben wir hei&szlig;e Schokolade getrunken. Ich dachte immer, erwachsen werden <span class="vw">bedeute</span>, alles selbst zu schaffen. Aber vielleicht bedeutet es, zu wissen, wann man Hilfe braucht. Und sich nicht zu <span class="vw">sch&auml;men</span>, sie anzunehmen.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">die Stimmung</div><div class="word-trans"><span class="text-ru">настроение</span><span class="text-en">mood</span></div></div>
+                        <div class="word-card"><div class="word-en">zuh&ouml;ren</div><div class="word-trans"><span class="text-ru">слушать (внимательно)</span><span class="text-en">to listen</span></div></div>
+                        <div class="word-card"><div class="word-en">tragen</div><div class="word-trans"><span class="text-ru">нести (груз, ответственность)</span><span class="text-en">to bear / carry</span></div></div>
+                        <div class="word-card"><div class="word-en">verurteilen</div><div class="word-trans"><span class="text-ru">осуждать</span><span class="text-en">to condemn / judge</span></div></div>
+                        <div class="word-card"><div class="word-en">bedeuten</div><div class="word-trans"><span class="text-ru">значить</span><span class="text-en">to mean</span></div></div>
+                        <div class="word-card"><div class="word-en">sich sch&auml;men</div><div class="word-trans"><span class="text-ru">стыдиться</span><span class="text-en">to be ashamed</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 16 ========== -->
+            <div class="chapter" data-num="16" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 16</span><span class="chapter-date">22. Februar</span></div>
+                        <h2 class="chapter-title">Das Volleyball-Spiel</h2>
+                        <div class="chapter-body">
+                            <p>Unsere Schul-Mannschaft hat heute gegen das Gymnasium aus Bremen gespielt. Ich hatte Angst, dass wir <span class="vw">verlieren</span>. Sie sind seit zwei Jahren ungeschlagen.</p>
+                            <p>Im zweiten Satz lagen wir 18:24 zur&uuml;ck. Es sah hoffnungslos aus. Aber unser Trainer rief uns zusammen und sagte: &bdquo;Wenn ihr <span class="vw">aufgebt</span>, habt ihr verloren. Wenn ihr weiterk&auml;mpft, m&uuml;sst ihr trotzdem vielleicht verlieren &mdash; aber dann wisst ihr, dass ihr alles gegeben habt.&ldquo;</p>
+                            <p>Wir haben den Satz noch gewonnen. Und am Ende das ganze Spiel. Beim Schlusspfiff sind wir alle aufeinander gesprungen. Ich habe <span class="vw">geschrien</span> wie nie zuvor.</p>
+                            <p>Heute Abend f&uuml;hle ich mich <span class="vw">stolz</span>. Nicht nur wegen des Sieges, sondern weil ich gesehen habe, was passieren kann, wenn man nicht aufgibt. <span class="vw">Beharrlichkeit</span> ist das wichtigste Talent. Vielleicht das einzige <span class="vw">echte</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">verlieren</div><div class="word-trans"><span class="text-ru">проигрывать</span><span class="text-en">to lose</span></div></div>
+                        <div class="word-card"><div class="word-en">aufgeben</div><div class="word-trans"><span class="text-ru">сдаваться</span><span class="text-en">to give up</span></div></div>
+                        <div class="word-card"><div class="word-en">schreien</div><div class="word-trans"><span class="text-ru">кричать</span><span class="text-en">to shout / scream</span></div></div>
+                        <div class="word-card"><div class="word-en">stolz</div><div class="word-trans"><span class="text-ru">гордый</span><span class="text-en">proud</span></div></div>
+                        <div class="word-card"><div class="word-en">die Beharrlichkeit</div><div class="word-trans"><span class="text-ru">упорство, настойчивость</span><span class="text-en">persistence</span></div></div>
+                        <div class="word-card"><div class="word-en">echt</div><div class="word-trans"><span class="text-ru">настоящий</span><span class="text-en">real / genuine</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 17 ========== -->
+            <div class="chapter" data-num="17" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 17</span><span class="chapter-date">10. M&auml;rz</span></div>
+                        <h2 class="chapter-title">Mein Kunstprojekt</h2>
+                        <div class="chapter-body">
+                            <p>Wir mussten f&uuml;r den Kunstunterricht ein &bdquo;Selbstportr&auml;t&ldquo; machen. Aber Herr Petersen sagte: &bdquo;Es muss nicht euer Gesicht sein. Zeigt mir, wer ihr <span class="vw">wirklich</span> seid.&ldquo;</p>
+                            <p>Ich habe drei Tage lang &uuml;berlegt. Was bin ich? Ich bin nicht meine Noten. Ich bin nicht mein Aussehen. Ich bin auch nicht das, was andere &uuml;ber mich sagen.</p>
+                            <p>Am Ende habe ich ein Bild gemalt von einer offenen T&uuml;r. Dahinter ist Licht. Ich glaube, ich bin im Moment wie diese T&uuml;r &mdash; ich weiss noch nicht ganz, wohin ich gehen will, aber ich bin <span class="vw">bereit</span>, alles zu <span class="vw">entdecken</span>.</p>
+                            <p>Herr Petersen hat lange auf das Bild geschaut und gesagt: &bdquo;Mira, das ist ehrlich.&ldquo; Mehr nicht. Aber das war genug. Ich glaube, das war das beste Kompliment, das ein Lehrer mir je gegeben hat. <span class="vw">Ehrlichkeit</span> ist seltener als <span class="vw">Talent</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">wirklich</div><div class="word-trans"><span class="text-ru">по-настоящему, правда</span><span class="text-en">really / truly</span></div></div>
+                        <div class="word-card"><div class="word-en">bereit</div><div class="word-trans"><span class="text-ru">готовый</span><span class="text-en">ready</span></div></div>
+                        <div class="word-card"><div class="word-en">entdecken</div><div class="word-trans"><span class="text-ru">открывать, обнаруживать</span><span class="text-en">to discover</span></div></div>
+                        <div class="word-card"><div class="word-en">ehrlich</div><div class="word-trans"><span class="text-ru">честный</span><span class="text-en">honest</span></div></div>
+                        <div class="word-card"><div class="word-en">die Ehrlichkeit</div><div class="word-trans"><span class="text-ru">честность</span><span class="text-en">honesty</span></div></div>
+                        <div class="word-card"><div class="word-en">das Talent</div><div class="word-trans"><span class="text-ru">талант</span><span class="text-en">talent</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 18 ========== -->
+            <div class="chapter" data-num="18" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 18</span><span class="chapter-date">15. April</span></div>
+                        <h2 class="chapter-title">Sommerpl&auml;ne</h2>
+                        <div class="chapter-body">
+                            <p>Marta, Lisa und ich planen einen Sommer zusammen. Wir wollen mit dem Interrail-Ticket durch Europa fahren &mdash; Prag, Budapest, Wien, Krakau. Vier Wochen, vier M&auml;dchen, viele Z&uuml;ge.</p>
+                            <p>Mama war zuerst <span class="vw">skeptisch</span>. Wir sind erst siebzehn, und Europa ist gro&szlig;. Aber Papa hat sie &uuml;berzeugt: &bdquo;Lass sie. Wir haben sie gut <span class="vw">erzogen</span>. Sie schaffen das.&ldquo;</p>
+                            <p>Wir haben einen Plan gemacht. Wo wir schlafen. Wie viel Geld wir brauchen. Was wir tun, wenn etwas <span class="vw">schiefgeht</span>. Es war anstrengend, aber auch <span class="vw">aufregend</span>. Zum ersten Mal in meinem Leben plane ich etwas Gro&szlig;es &mdash; nicht meine Eltern, sondern ich.</p>
+                            <p>Ich glaube, das ist der Moment, in dem Erwachsensein anf&auml;ngt. Nicht mit einem Geburtstag, sondern wenn du Verantwortung f&uuml;r deine eigenen Pl&auml;ne <span class="vw">&uuml;bernimmst</span>. Es ist <span class="vw">aufregend</span> &mdash; und auch ein bisschen <span class="vw">beunruhigend</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">skeptisch</div><div class="word-trans"><span class="text-ru">скептический</span><span class="text-en">sceptical</span></div></div>
+                        <div class="word-card"><div class="word-en">erziehen</div><div class="word-trans"><span class="text-ru">воспитывать</span><span class="text-en">to raise / bring up</span></div></div>
+                        <div class="word-card"><div class="word-en">schiefgehen</div><div class="word-trans"><span class="text-ru">пойти не так</span><span class="text-en">to go wrong</span></div></div>
+                        <div class="word-card"><div class="word-en">aufregend</div><div class="word-trans"><span class="text-ru">волнующий, захватывающий</span><span class="text-en">exciting</span></div></div>
+                        <div class="word-card"><div class="word-en">Verantwortung &uuml;bernehmen</div><div class="word-trans"><span class="text-ru">взять на себя ответственность</span><span class="text-en">to take responsibility</span></div></div>
+                        <div class="word-card"><div class="word-en">beunruhigend</div><div class="word-trans"><span class="text-ru">тревожный</span><span class="text-en">unsettling / worrying</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 19 ========== -->
+            <div class="chapter" data-num="19" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 19</span><span class="chapter-date">5. Mai</span></div>
+                        <h2 class="chapter-title">Marta geht zur&uuml;ck</h2>
+                        <div class="chapter-body">
+                            <p>Marta hat uns heute eine Nachricht <span class="vw">geschickt</span>: Ihre Familie zieht zur&uuml;ck nach Valencia. Ihr Vater hat eine neue Stelle bekommen. Sie f&auml;hrt in drei Wochen.</p>
+                            <p>Ich konnte es zuerst nicht glauben. Wir sind so eng geworden. Wie kann sie einfach gehen?</p>
+                            <p>Sie hat geweint, als sie es uns sagte. &bdquo;Es ist nicht meine Entscheidung&ldquo;, sagte sie. Ich habe verstanden, dass sie genauso traurig ist wie wir. Vielleicht sogar trauriger, weil sie jetzt alles wieder neu lernen muss &mdash; eine neue Stadt, neue Freunde, ein neues Leben.</p>
+                            <p>Wir haben <span class="vw">versprochen</span>, in Kontakt zu bleiben. Videoanrufe, Nachrichten, Besuche im Sommer. Aber ich wei&szlig;, dass es nicht dasselbe sein wird. <span class="vw">Abschiede</span> sind hart, auch wenn man sich wieder <span class="vw">trifft</span>. Manche Freundschaften brauchen <span class="vw">N&auml;he</span>, und manche &uuml;berleben jede <span class="vw">Entfernung</span> &mdash; ich glaube, unsere ist eine von den zweiten.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">schicken</div><div class="word-trans"><span class="text-ru">отправлять</span><span class="text-en">to send</span></div></div>
+                        <div class="word-card"><div class="word-en">die Entscheidung</div><div class="word-trans"><span class="text-ru">решение</span><span class="text-en">decision</span></div></div>
+                        <div class="word-card"><div class="word-en">versprechen</div><div class="word-trans"><span class="text-ru">обещать</span><span class="text-en">to promise</span></div></div>
+                        <div class="word-card"><div class="word-en">der Abschied</div><div class="word-trans"><span class="text-ru">прощание</span><span class="text-en">farewell / goodbye</span></div></div>
+                        <div class="word-card"><div class="word-en">sich treffen</div><div class="word-trans"><span class="text-ru">встречаться</span><span class="text-en">to meet</span></div></div>
+                        <div class="word-card"><div class="word-en">die N&auml;he</div><div class="word-trans"><span class="text-ru">близость</span><span class="text-en">closeness</span></div></div>
+                        <div class="word-card"><div class="word-en">die Entfernung</div><div class="word-trans"><span class="text-ru">расстояние</span><span class="text-en">distance</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== CHAPTER 20 ========== -->
+            <div class="chapter" data-num="20" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta"><span class="chapter-num">Kapitel 20</span><span class="chapter-date">28. Juni &mdash; FINALE</span></div>
+                        <h2 class="chapter-title">Was ich gelernt habe</h2>
+                        <div class="chapter-body">
+                            <p>Heute war der letzte Schultag des Jahres. Ich habe mein Tagebuch durchgebl&auml;ttert &mdash; vom ersten Eintrag im September bis heute. Was f&uuml;r ein Jahr.</p>
+                            <p>Ich war w&uuml;tend, ver&auml;ngstigt, verliebt, einsam, stolz, traurig, mutig. Manchmal alles an einem Tag. Ich habe Freunde gefunden, einen verloren, mit Mama gestritten und mich wieder mit ihr <span class="vw">vers&ouml;hnt</span>. Ich habe gelernt, dass es okay ist, Hilfe zu brauchen. Und dass <span class="vw">Ehrlichkeit</span> oft schwerer ist als L&uuml;gen &mdash; aber immer besser.</p>
+                            <p>Ich glaube, ich bin nicht mehr dieselbe Mira wie im September. Etwas hat sich <span class="vw">ver&auml;ndert</span>. Nicht alles auf einmal, sondern leise, &uuml;ber Monate hinweg.</p>
+                            <p>N&auml;chstes Jahr wird wieder etwas Neues bringen. Aber heute sitze ich auf der Wiese mit Lisa, und die Sonne scheint, und das <span class="vw">gen&uuml;gt</span> mir. Vielleicht ist Erwachsensein gar nicht ein <span class="vw">Ziel</span>, das man erreicht. Vielleicht ist es nur das langsame <span class="vw">Lernen</span>, was wichtig ist &mdash; und was nicht.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">sich vers&ouml;hnen</div><div class="word-trans"><span class="text-ru">помириться</span><span class="text-en">to reconcile / make up</span></div></div>
+                        <div class="word-card"><div class="word-en">die Ehrlichkeit</div><div class="word-trans"><span class="text-ru">честность</span><span class="text-en">honesty</span></div></div>
+                        <div class="word-card"><div class="word-en">sich ver&auml;ndern</div><div class="word-trans"><span class="text-ru">меняться</span><span class="text-en">to change</span></div></div>
+                        <div class="word-card"><div class="word-en">gen&uuml;gen</div><div class="word-trans"><span class="text-ru">быть достаточным</span><span class="text-en">to be enough</span></div></div>
+                        <div class="word-card"><div class="word-en">das Ziel</div><div class="word-trans"><span class="text-ru">цель</span><span class="text-en">goal / aim</span></div></div>
+                        <div class="word-card"><div class="word-en">das Lernen</div><div class="word-trans"><span class="text-ru">учение, обучение</span><span class="text-en">learning</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- READING NAV -->
+        <div class="reading-nav">
+            <button id="prevBtn" disabled>
+                <span class="nav-label">&larr; Vorheriges</span>
+                <span class="nav-title" id="prevTitle">&mdash;</span>
+            </button>
+            <button id="nextBtn" class="next">
+                <span class="nav-label">N&auml;chstes &rarr;</span>
+                <span class="nav-title" id="nextTitle">Die Neue</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chapters = Array.from(document.querySelectorAll('.chapter'));
+        const total = chapters.length;
+        const titles = chapters.map(ch => ch.querySelector('.chapter-title').textContent);
+        const nav = document.getElementById('chapterNav');
+        const pbFill = document.getElementById('pbFill');
+        const pbCount = document.getElementById('pbCount');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevTitle = document.getElementById('prevTitle');
+        const nextTitle = document.getElementById('nextTitle');
+
+        // Build chapter nav buttons
+        const readSet = new Set([1]);
+        chapters.forEach((_, i) => {
+            const btn = document.createElement('button');
+            btn.textContent = String(i + 1).padStart(2, '0');
+            btn.dataset.num = i + 1;
+            if (i === 0) btn.classList.add('active');
+            btn.addEventListener('click', () => goToChapter(i + 1));
+            nav.appendChild(btn);
+        });
+
+        function goToChapter(n) {
+            n = Math.max(1, Math.min(total, n));
+            chapters.forEach(ch => ch.dataset.active = (Number(ch.dataset.num) === n) ? 'true' : 'false');
+            readSet.add(n);
+
+            // Update nav buttons
+            nav.querySelectorAll('button').forEach(b => {
+                const num = Number(b.dataset.num);
+                b.classList.toggle('active', num === n);
+                b.classList.toggle('read', readSet.has(num) && num !== n);
+            });
+
+            // Progress bar
+            pbFill.style.width = ((n / total) * 100) + '%';
+            pbCount.textContent = n + ' / ' + total;
+
+            // Prev/Next
+            prevBtn.disabled = (n <= 1);
+            nextBtn.disabled = (n >= total);
+            prevTitle.textContent = (n > 1) ? titles[n - 2] : '—';
+            nextTitle.textContent = (n < total) ? titles[n] : 'Ende';
+
+            // Scroll to top of chapter
+            window.scrollTo({ top: document.querySelector('.chapter-nav').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        prevBtn.addEventListener('click', () => {
+            const active = chapters.findIndex(ch => ch.dataset.active === 'true') + 1;
+            goToChapter(active - 1);
+        });
+        nextBtn.addEventListener('click', () => {
+            const active = chapters.findIndex(ch => ch.dataset.active === 'true') + 1;
+            goToChapter(active + 1);
+        });
+
+        // Initialize
+        goToChapter(1);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') prevBtn.click();
+            if (e.key === 'ArrowRight') nextBtn.click();
+        });
+    </script>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>

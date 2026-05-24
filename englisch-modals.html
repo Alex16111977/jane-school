@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modals & Informal | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .inf-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 0.9rem 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .inf-word {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #4493f8;
+            min-width: 80px;
+        }
+        .inf-arrow {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.35);
+            flex-shrink: 0;
+        }
+        .inf-full {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.75);
+        }
+        .inf-full strong { color: #fff; }
+        .inf-full em { color: rgba(255,255,255,0.45); font-style: normal; font-size: 0.82rem; }
+        .inf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+        .modal-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 1fr;
+            gap: 0.5rem 1rem;
+            align-items: start;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-word {
+            font-weight: 800;
+            color: #4493f8;
+            font-size: 1rem;
+        }
+        .modal-use {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.2rem;
+        }
+        .modal-ex {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+        .modal-ex em { color: #79b8ff; font-style: normal; }
+        .flip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.7rem;
+            margin-top: 0.9rem;
+        }
+        .flip-card {
+            perspective: 600px;
+            height: 90px;
+            cursor: pointer;
+        }
+        .flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.35s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .flip-front {
+            background: rgba(68,147,248,0.1);
+            border: 1px solid rgba(68,147,248,0.3);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        .flip-back {
+            background: rgba(121,184,255,0.08);
+            border: 1px solid rgba(121,184,255,0.2);
+            transform: rotateY(180deg);
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.4;
+        }
+        .flip-back strong { color: #79b8ff; display: block; font-size: 0.85rem; margin-bottom: 0.2rem; }
+        .section-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4493f8;
+            margin-bottom: 0.5rem;
+        }
+        .warn-card {
+            border-left: 3px solid #f85149;
+            background: rgba(248,81,73,0.06);
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Modals &amp; Informal</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Modals &amp; Informal Speech</h1>
+            <p class="page-subtitle">gonna &bull; wanna &bull; could &bull; would &bull; should &mdash; wie native speakers reden</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="informal">Informal Speech</button>
+            <button class="tab" data-tab="modals">Modals</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+        <!-- ===== Tab 1: Informal Speech ===== -->
+        <div class="tab-content active" id="tab-informal">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E3;&#xFE0F;</span>
+                    <div>
+                        <h2>Informal Contractions</h2>
+                        <p class="lesson-header-sub">Как носители языка реально говорят &mdash; сокращения в разговорной речи</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Что это такое?</strong> Когда люди говорят быстро, они сокращают слова. <em>going to</em> &rarr; <strong>gonna</strong>, <em>want to</em> &rarr; <strong>wanna</strong>. Это <strong>только в разговорной речи</strong> — в formal writing (email, essay) их не используют.</p>
+                </div>
+
+                <!-- Main contractions grid -->
+                <div class="note-card">
+                    <h3>&#x1F4AC; Основные сокращения &mdash; нажми на карточку</h3>
+                    <div class="flip-grid">
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">gonna</div>
+                                <div class="flip-back"><strong>going to</strong>I'm gonna call you. <em>(планы, будущее)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">wanna</div>
+                                <div class="flip-back"><strong>want to</strong>I wanna go home. <em>(желание)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">gotta</div>
+                                <div class="flip-back"><strong>got to / have got to</strong>I gotta study. <em>(нужно, обязан)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">kinda</div>
+                                <div class="flip-back"><strong>kind of</strong>It's kinda weird. <em>(немного, типа)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">sorta</div>
+                                <div class="flip-back"><strong>sort of</strong>I sorta like it. <em>(вроде, как бы)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">lemme</div>
+                                <div class="flip-back"><strong>let me</strong>Lemme think. <em>(дай мне подумать)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">dunno</div>
+                                <div class="flip-back"><strong>don't know</strong>I dunno what to say. <em>(не знаю)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">gimme</div>
+                                <div class="flip-back"><strong>give me</strong>Gimme a second. <em>(дай мне секунду)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">ain't</div>
+                                <div class="flip-back"><strong>am/is/are not<br>has/have not</strong>I ain't got time. <em>(нету, не...)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">gonna</div>
+                                <div class="flip-back"><strong>going to</strong>It's gonna rain. <em>(прогноз)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">hafta</div>
+                                <div class="flip-back"><strong>have to</strong>I hafta go now. <em>(должна идти)</em></div>
+                            </div>
+                        </div>
+                        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-inner">
+                                <div class="flip-front">y'all</div>
+                                <div class="flip-back"><strong>you all</strong>Y'all ready? <em>(вы все — американский)</em></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full list -->
+                <div class="note-card">
+                    <h3>&#x1F4CB; Полный список с примерами</h3>
+                    <div class="inf-grid">
+                        <div class="inf-card">
+                            <div class="inf-word">gonna</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>going to</strong><br><em>I'm gonna text you.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">wanna</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>want to</strong><br><em>Do you wanna hang out?</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">gotta</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>got to / have got to</strong><br><em>I gotta be honest.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">kinda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>kind of</strong><br><em>That's kinda funny.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">sorta</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>sort of</strong><br><em>I'm sorta busy right now.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">lemme</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>let me</strong><br><em>Lemme check real quick.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">dunno</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>don't know</strong><br><em>I dunno, maybe?</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">gimme</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>give me</strong><br><em>Gimme five minutes.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">ain't</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>am/is/are/has/have not</strong><br><em>She ain't wrong.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">hafta</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>have to</strong><br><em>I hafta finish this.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">coulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>could have</strong><br><em>I coulda done better.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">shoulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>should have</strong><br><em>You shoulda told me!</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">woulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>would have</strong><br><em>I woulda helped you.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word">innit</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>isn't it</strong><br><em>Nice weather, innit?</em> <em>(British)</em></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formal vs Informal -->
+                <div class="note-card warn-card">
+                    <h3>&#x26A0;&#xFE0F; Formal vs. Informal &mdash; wann benutzen?</h3>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>Situation</th><th>Formal &#x2705;</th><th>Informal &#x1F4AC;</th></tr>
+                        <tr><td>Email an Lehrer</td><td>I am going to hand it in.</td><td>&#x274C; gonna — nicht hier!</td></tr>
+                        <tr><td>Essay / Comment</td><td>I want to argue that&hellip;</td><td>&#x274C; wanna — nicht hier!</td></tr>
+                        <tr><td>Chat mit Freund</td><td>&#x2705; formal geht auch</td><td>&#x2705; gonna / wanna OK</td></tr>
+                        <tr><td>Gespräch / Speaking</td><td>&#x2705; formal geht auch</td><td>&#x2705; klingt natürlicher</td></tr>
+                    </table>
+                    <p style="margin-top:0.7rem; font-size:0.86rem; color:rgba(255,255,255,0.55);">&#x1F4A1; In der ZP oder in Briefen — immer formal. Im echten Leben — informal klingt natürlicher.</p>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ===== Tab 2: Modals ===== -->
+        <div class="tab-content" id="tab-modals">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F511;</span>
+                    <div>
+                        <h2>Modal Verbs &mdash; in echten S&auml;tzen</h2>
+                        <p class="lesson-header-sub">could / would / should / might / must &mdash; практические ситуации</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Правило:</strong> После модального глагола всегда <strong>инфинитив без to</strong>. <em>I could go</em> &#x2705; — <em>I could to go</em> &#x274C;. И никакого <strong>-s</strong> в третьем лице: <em>She can</em>, не <em>She cans</em>.</p>
+                </div>
+
+                <!-- Could -->
+                <div class="note-card">
+                    <div class="section-label">could</div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">could</div><div class="modal-use">вежливая просьба</div></div>
+                        <div class="modal-ex"><em>Could you pass the salt?</em><br>Мог бы ты передать соль?</div>
+                        <div class="modal-ex"><em>Could I borrow your pen?</em><br>Можно взять ручку?</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">could</div><div class="modal-use">возможность</div></div>
+                        <div class="modal-ex"><em>It could rain later.</em><br>Может пойти дождь.</div>
+                        <div class="modal-ex"><em>She could be at home.</em><br>Возможно, она дома.</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">could</div><div class="modal-use">прошлая способность</div></div>
+                        <div class="modal-ex"><em>He could swim at age 5.</em><br>Он умел плавать в 5 лет.</div>
+                        <div class="modal-ex"><em>I couldn't sleep last night.</em><br>Я не могла спать.</div>
+                    </div>
+                </div>
+
+                <!-- Would -->
+                <div class="note-card">
+                    <div class="section-label">would</div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">would</div><div class="modal-use">вежливая просьба</div></div>
+                        <div class="modal-ex"><em>Would you like some tea?</em><br>Хотите чаю?</div>
+                        <div class="modal-ex"><em>Would you mind closing the door?</em><br>Не могли бы закрыть дверь?</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">would</div><div class="modal-use">условие (if)</div></div>
+                        <div class="modal-ex"><em>I would travel if I had money.</em><br>Я бы путешествовала, если бы были деньги.</div>
+                        <div class="modal-ex"><em>She would help if she could.</em><br>Она бы помогла, если бы могла.</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">would like</div><div class="modal-use">= want to (вежливо)</div></div>
+                        <div class="modal-ex"><em>I would like to apply.</em><br>Я хотела бы подать заявку.</div>
+                        <div class="modal-ex"><em>She'd like to know more.</em><br>Она хотела бы узнать больше.</div>
+                    </div>
+                </div>
+
+                <!-- Should -->
+                <div class="note-card">
+                    <div class="section-label">should</div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">should</div><div class="modal-use">совет</div></div>
+                        <div class="modal-ex"><em>You should drink more water.</em><br>Тебе стоит пить больше воды.</div>
+                        <div class="modal-ex"><em>We should talk.</em><br>Нам нужно поговорить.</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">shouldn't</div><div class="modal-use">антисовет</div></div>
+                        <div class="modal-ex"><em>You shouldn't eat that.</em><br>Тебе не стоит это есть.</div>
+                        <div class="modal-ex"><em>She shouldn't be late.</em><br>Ей не следует опаздывать.</div>
+                    </div>
+                </div>
+
+                <!-- Might -->
+                <div class="note-card">
+                    <div class="section-label">might</div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">might</div><div class="modal-use">возможно (~30%)</div></div>
+                        <div class="modal-ex"><em>I might come to the party.</em><br>Возможно, приду на вечеринку.</div>
+                        <div class="modal-ex"><em>It might be true.</em><br>Это может быть правдой.</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">might not</div><div class="modal-use">возможно нет</div></div>
+                        <div class="modal-ex"><em>She might not show up.</em><br>Она может и не прийти.</div>
+                        <div class="modal-ex"><em>It might not work.</em><br>Может не сработать.</div>
+                    </div>
+                </div>
+
+                <!-- Must -->
+                <div class="note-card">
+                    <div class="section-label">must / can't</div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">must</div><div class="modal-use">логический вывод (~95%)</div></div>
+                        <div class="modal-ex"><em>She must be tired.</em><br>Она, наверное, устала.</div>
+                        <div class="modal-ex"><em>He must know her.</em><br>Он явно её знает.</div>
+                    </div>
+                    <div class="modal-row">
+                        <div><div class="modal-word">can't</div><div class="modal-use">невозможно</div></div>
+                        <div class="modal-ex"><em>It can't be true!</em><br>Этого не может быть!</div>
+                        <div class="modal-ex"><em>She can't be 30 already.</em><br>Ей не может быть уже 30.</div>
+                    </div>
+                </div>
+
+                <!-- Шпаргалка -->
+                <div class="note-card highlight-card" style="border-color:rgba(68,147,248,0.4); background:rgba(68,147,248,0.06);">
+                    <h3>&#x26A1; Быстрая шпаргалка</h3>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>Ситуация</th><th>Модальный</th><th>Пример</th></tr>
+                        <tr><td>Вежливо попросить</td><td><strong>could / would</strong></td><td>Could you help me?</td></tr>
+                        <tr><td>Дать совет</td><td><strong>should</strong></td><td>You should sleep more.</td></tr>
+                        <tr><td>Что-то возможно</td><td><strong>might / could</strong></td><td>It might snow.</td></tr>
+                        <tr><td>Точно так (вывод)</td><td><strong>must</strong></td><td>He must be home.</td></tr>
+                        <tr><td>Точно нет (вывод)</td><td><strong>can't</strong></td><td>That can't be right.</td></tr>
+                        <tr><td>Сожаление о прошлом</td><td><strong>should have / could have</strong></td><td>I should have called.</td></tr>
+                        <tr><td>Хотеть вежливо</td><td><strong>would like</strong></td><td>I'd like to know.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Coulda shoulda woulda -->
+                <div class="note-card">
+                    <h3>&#x1F4AC; &laquo;Coulda shoulda woulda&raquo; &mdash; сожаление о прошлом</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:0.85rem; margin-bottom:0.7rem;">Неформально + формально — modal + have + past participle</p>
+                    <div class="inf-grid">
+                        <div class="inf-card">
+                            <div class="inf-word" style="font-size:1rem;">coulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>could have</strong><br><em>I coulda won.</em><br><em>I could have won.</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word" style="font-size:1rem;">shoulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>should have</strong><br><em>You shoulda told me!</em><br><em>You should have told me!</em></div>
+                        </div>
+                        <div class="inf-card">
+                            <div class="inf-word" style="font-size:1rem;">woulda</div>
+                            <div class="inf-arrow">=</div>
+                            <div class="inf-full"><strong>would have</strong><br><em>I woulda helped.</em><br><em>I would have helped.</em></div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ===== Tab 3: Quiz ===== -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Quiz &mdash; Informal &amp; Modals</h2>
+                        <p class="lesson-header-sub">Wähle die richtige Antwort</p>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+
+                    <div class="quiz-question" data-answer="gonna">
+                        <p><strong>1.</strong> "I'm _____ call you later." — What's the informal form of <em>going to</em>?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'gonna')">gonna</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'wanna')">wanna</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'gotta')">gotta</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="could">
+                        <p><strong>2.</strong> You want to politely ask someone for help. Which modal is best?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'must')">Must you help me?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'could')">Could you help me?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'shall')">Shall you help me?</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="shoulda">
+                        <p><strong>3.</strong> "You _____ told me!" — informal = regret about the past</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'woulda')">woulda</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'coulda')">coulda</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'shoulda')">shoulda</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="must">
+                        <p><strong>4.</strong> "She hasn't slept in 2 days. She _____ be exhausted." — logical deduction</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'might')">might</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'must')">must</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'could')">could</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="wanna">
+                        <p><strong>5.</strong> Informal: "Do you _____ grab some food?" = <em>want to</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'gonna')">gonna</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'gotta')">gotta</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'wanna')">wanna</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="cant">
+                        <p><strong>6.</strong> "That _____ be right — we checked twice!" — impossible conclusion</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'cant')">can't</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'mustn')">mustn't</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'might')">might not</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="should">
+                        <p><strong>7.</strong> "You look pale. You _____ see a doctor." — giving advice</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'must')">must</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'should')">should</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'would')">would</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="gotta">
+                        <p><strong>8.</strong> Informal: "I _____ go, my mom's calling." = <em>have got to</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'gonna')">gonna</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'gotta')">gotta</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'dunno')">dunno</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="modal-quiz-score"></p>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Quiz
+        let qScore = 0, qTotal = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            const btns = q.querySelectorAll('.quiz-btn');
+            btns.forEach(b => b.disabled = true);
+            qTotal++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! ✅';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite ❌';
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('modal-quiz-score');
+            if (qTotal === 8) {
+                if (qScore === 8) scoreEl.innerHTML = '🌟 ' + qScore + '/8 — Perfect!';
+                else if (qScore >= 6) scoreEl.innerHTML = '✅ ' + qScore + '/8 — Great job!';
+                else if (qScore >= 4) scoreEl.innerHTML = qScore + '/8 — Good, review the tables above!';
+                else scoreEl.innerHTML = qScore + '/8 — Read through the tabs again 💪';
+                scoreEl.style.color = qScore >= 6 ? 'var(--color-green)' : qScore >= 4 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>

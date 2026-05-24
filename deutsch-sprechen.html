@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprechen üben | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .speak-question-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .speak-question-card:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(163,113,247,0.4);
+        }
+        .speak-q-num {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: rgba(163,113,247,0.7);
+            min-width: 1.6rem;
+            padding-top: 0.1rem;
+        }
+        .speak-q-text {
+            font-size: 0.97rem;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+        }
+        .speak-q-hint {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.38);
+            margin-top: 0.3rem;
+        }
+        .random-box {
+            background: rgba(163,113,247,0.12);
+            border: 2px solid rgba(163,113,247,0.4);
+            border-radius: 18px;
+            padding: 1.8rem 1.5rem 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .random-question-display {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            min-height: 3rem;
+            line-height: 1.55;
+            margin: 1rem 0 1.3rem;
+            padding: 0 0.5rem;
+        }
+        .btn-random {
+            background: linear-gradient(135deg, #a371f7, #c8a5ff);
+            color: #0e0a1a;
+            border: none;
+            border-radius: 10px;
+            padding: 0.65rem 1.6rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-random:hover { opacity: 0.85; transform: scale(1.03); }
+        .btn-random:active { transform: scale(0.97); }
+
+        /* Timer */
+        .timer-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 18px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            max-width: 420px;
+            margin: 0 auto 2rem;
+        }
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin: 1rem 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-display.running { color: #7ee787; }
+        .timer-display.warning { color: #f0883e; }
+        .timer-display.done { color: #f85149; }
+        .timer-label {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 0.3rem;
+        }
+        .timer-btns {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 1.2rem;
+        }
+        .btn-timer {
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.4rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-start { background: linear-gradient(135deg,#238636,#3fb950); color: #fff; }
+        .btn-pause { background: rgba(255,255,255,0.12); color: #fff; }
+        .btn-reset { background: rgba(248,81,73,0.2); color: #f85149; border: 1px solid rgba(248,81,73,0.4); }
+        .btn-timer:hover { opacity: 0.8; }
+
+        .duration-btns {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-dur {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.83rem;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-dur.active, .btn-dur:hover {
+            background: rgba(163,113,247,0.22);
+            border-color: rgba(163,113,247,0.55);
+            color: #fff;
+        }
+
+        /* Redemittel */
+        .redemittel-group {
+            margin-bottom: 1.5rem;
+        }
+        .redemittel-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.65rem;
+        }
+        .rm-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .rm-chip {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 20px;
+            padding: 0.3rem 0.85rem;
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.82);
+        }
+        .rm-chip.purple { border-color: rgba(163,113,247,0.4); background: rgba(163,113,247,0.1); }
+        .rm-chip.green { border-color: rgba(63,185,80,0.4); background: rgba(63,185,80,0.08); }
+        .rm-chip.blue { border-color: rgba(88,166,255,0.4); background: rgba(88,166,255,0.08); }
+        .rm-chip.orange { border-color: rgba(240,136,62,0.4); background: rgba(240,136,62,0.08); }
+        .rm-chip.pink { border-color: rgba(244,167,185,0.4); background: rgba(244,167,185,0.08); }
+
+        .section-label {
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            margin: 1.8rem 0 0.7rem;
+        }
+        .section-label span {
+            font-size: 1rem;
+            margin-right: 0.35rem;
+        }
+
+        /* ===== ROLE-PLAY CARD ===== */
+        .role-card {
+            background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02));
+            border: 1.5px solid rgba(163,113,247,0.3);
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+        }
+        .role-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #c9b3ff;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .role-situation {
+            font-size: 0.88rem;
+            color: rgba(230,230,235,0.65);
+            margin-bottom: 0.9rem;
+            font-style: italic;
+        }
+        .dialog-line {
+            display: flex;
+            gap: 0.7rem;
+            margin: 0.55rem 0;
+            line-height: 1.55;
+            align-items: flex-start;
+        }
+        .dialog-line .speaker {
+            flex-shrink: 0;
+            font-weight: 800;
+            font-size: 0.82rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 6px;
+            min-width: 2.2rem;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+        .speaker.a {
+            background: rgba(245,158,11,0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245,158,11,0.35);
+        }
+        .speaker.b {
+            background: rgba(88,166,255,0.18);
+            color: #79b8ff;
+            border: 1px solid rgba(88,166,255,0.35);
+        }
+        .dialog-line .line-text {
+            color: rgba(230,230,235,0.92);
+            font-size: 0.94rem;
+        }
+
+        /* ===== TEMPLATE CARD ===== */
+        .template-card {
+            background: rgba(13,17,23,0.72);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid #f59e0b;
+            border-radius: 13px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 0.9rem;
+        }
+        .template-card h4 {
+            margin: 0 0 0.6rem;
+            color: #fbbf24;
+            font-size: 0.98rem;
+        }
+        .template-card p {
+            margin: 0.3rem 0;
+            font-size: 0.93rem;
+            line-height: 1.75;
+            color: rgba(230,230,235,0.88);
+        }
+        .blank {
+            background: rgba(245,158,11,0.13);
+            border: 1px dashed rgba(245,158,11,0.5);
+            padding: 0.05rem 0.5rem;
+            border-radius: 5px;
+            color: #fbbf24;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        /* ===== TIP GRID ===== */
+        .tip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+        .tip-card {
+            background: linear-gradient(145deg, rgba(63,185,80,0.07), rgba(63,185,80,0.02));
+            border: 1px solid rgba(63,185,80,0.28);
+            border-radius: 13px;
+            padding: 1rem 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .tip-card .tip-num {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.9rem;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: rgba(63,185,80,0.16);
+            line-height: 1;
+            font-family: Georgia, serif;
+        }
+        .tip-card h4 {
+            margin: 0 0 0.4rem;
+            color: #86efac;
+            font-size: 0.96rem;
+            position: relative;
+            z-index: 1;
+        }
+        .tip-card p {
+            margin: 0;
+            font-size: 0.86rem;
+            line-height: 1.55;
+            color: rgba(230,230,235,0.85);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SUBSECTION HEADER inside tab ===== */
+        .subsec {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 1.8rem 0 0.9rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .subsec .ss-ico {
+            font-size: 1.4rem;
+        }
+        .subsec h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700;
+        }
+        .subsec .ss-sub {
+            color: var(--color-text-muted);
+            font-size: 0.82rem;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Sprechen &uuml;ben</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Sprechen &uuml;ben &#x1F5E3;&#xFE0F;</h1>
+            <p class="page-subtitle">Alleine sprechen &bull; B1&rarr;B2 &bull; Fragen, Timer &amp; Redemittel</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="zufall">&#x1F3B2; Zufallsfrage</button>
+            <button class="tab" data-tab="fragen">&#x1F4CB; Alle Fragen</button>
+            <button class="tab" data-tab="timer">&#x23F1;&#xFE0F; Timer</button>
+            <button class="tab" data-tab="redemittel">&#x1F4AC; Redemittel</button>
+            <button class="tab" data-tab="rollen">&#x1F3AD; Rollenspiele &amp; Tipps</button>
+        </div>
+
+        <!-- ===== TAB: ZUFALLSFRAGE ===== -->
+        <div class="tab-content active" id="tab-zufall">
+            <div class="random-box">
+                <div style="font-size:0.82rem;color:rgba(255,255,255,0.45);">Drücke den Knopf &mdash; sprich 2 Minuten auf Deutsch</div>
+                <div class="random-question-display" id="randomQ">
+                    &#x1F4A1; Klick auf &ldquo;Neue Frage&rdquo;
+                </div>
+                <button class="btn-random" onclick="newQuestion()">&#x1F3B2; Neue Frage</button>
+                <div id="randomCat" style="margin-top:0.9rem;font-size:0.78rem;color:rgba(163,113,247,0.7);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;"></div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.05);">
+                <h3 style="color:#7ee787;">&#x1F4A1; So trainierst du</h3>
+                <ul style="padding-left:1.2rem;color:rgba(255,255,255,0.8);font-size:0.9rem;line-height:1.9;">
+                    <li>Drücke <strong>Neue Frage</strong> &rarr; stell den <strong>2-Minuten-Timer</strong></li>
+                    <li>Sprich laut &mdash; auf Deutsch, alleine, ohne Skript</li>
+                    <li>Stockst du? Sag: <em>„Also&hellip;", „Ich meine&hellip;", „Moment mal&hellip;"</em></li>
+                    <li>Keine Angst vor Fehlern &mdash; Flüssigkeit &gt; Perfektion</li>
+                    <li>Mach das <strong>täglich 5&ndash;10 Minuten</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== TAB: ALLE FRAGEN ===== -->
+        <div class="tab-content" id="tab-fragen">
+
+            <div class="section-label"><span>&#x1F6B6;</span> Alltag &amp; ich</div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">1</span>
+                <div>
+                    <div class="speak-q-text">Wie w&uuml;rdest du deinen typischen Tag beschreiben?</div>
+                    <div class="speak-q-hint">Beschreibung &bull; Pr&auml;sens &bull; Zeitangaben nutzen</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">2</span>
+                <div>
+                    <div class="speak-q-text">Was machst du, wenn du schlechte Laune hast?</div>
+                    <div class="speak-q-hint">Wenn-Satz &bull; Emotionen &bull; Alltagssprache</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">3</span>
+                <div>
+                    <div class="speak-q-text">Was sind deine drei wichtigsten Gewohnheiten?</div>
+                    <div class="speak-q-hint">Liste &bull; Begr&uuml;ndung &bull; erstens / zweitens...</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">4</span>
+                <div>
+                    <div class="speak-q-text">Beschreib deinen Lieblingsort. Was machst du dort?</div>
+                    <div class="speak-q-hint">Adjektive &bull; Pr&auml;positionen &bull; Atmosphäre</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">5</span>
+                <div>
+                    <div class="speak-q-text">Was ist dir im Leben besonders wichtig? Warum?</div>
+                    <div class="speak-q-hint">Werte &bull; weil / denn &bull; Beispiele geben</div>
+                </div>
+            </div>
+
+            <div class="section-label"><span>&#x1F4AD;</span> Meinung &amp; Gesellschaft</div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">6</span>
+                <div>
+                    <div class="speak-q-text">Was denkst du &uuml;ber soziale Medien? Mehr Vorteile oder Nachteile?</div>
+                    <div class="speak-q-hint">Meinung &auml;u&szlig;ern &bull; Einerseits&hellip; andererseits&hellip;</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">7</span>
+                <div>
+                    <div class="speak-q-text">Sollten Handys in der Schule verboten sein?</div>
+                    <div class="speak-q-hint">Debatte &bull; daf&uuml;r / dagegen &bull; Argumente</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">8</span>
+                <div>
+                    <div class="speak-q-text">Wie wichtig ist Umweltschutz f&uuml;r dich pers&ouml;nlich?</div>
+                    <div class="speak-q-hint">Grad der Wichtigkeit &bull; pers&ouml;nliche Ma&szlig;nahmen</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">9</span>
+                <div>
+                    <div class="speak-q-text">Was sind Vorteile und Nachteile von Homeoffice?</div>
+                    <div class="speak-q-hint">Vor- und Nachteile &bull; einerseits / andererseits</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">10</span>
+                <div>
+                    <div class="speak-q-text">Muss man f&uuml;r Erfolg hart arbeiten, oder spielt Gl&uuml;ck die gr&ouml;&szlig;ere Rolle?</div>
+                    <div class="speak-q-hint">These + Gegenthese &bull; Beispiele &bull; pers&ouml;nliche Meinung</div>
+                </div>
+            </div>
+
+            <div class="section-label"><span>&#x1F52E;</span> Hypothetisch (Konjunktiv II)</div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">11</span>
+                <div>
+                    <div class="speak-q-text">Wenn du eine Million Euro h&auml;ttest, was w&uuml;rdest du damit machen?</div>
+                    <div class="speak-q-hint">h&auml;tte / w&uuml;rde + Infinitiv &bull; Pl&auml;ne erkl&auml;ren</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">12</span>
+                <div>
+                    <div class="speak-q-text">Wenn du eine Zeitmaschine h&auml;ttest, wohin w&uuml;rdest du reisen?</div>
+                    <div class="speak-q-hint">Vergangenheit / Zukunft &bull; Begr&uuml;ndung</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">13</span>
+                <div>
+                    <div class="speak-q-text">Was w&uuml;rdest du &auml;ndern, wenn du Bundeskanzler/in w&auml;rst?</div>
+                    <div class="speak-q-hint">Politik &bull; w&auml;re / h&auml;tte &bull; Priorit&auml;ten nennen</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">14</span>
+                <div>
+                    <div class="speak-q-text">Wenn du ein Jahr lang kein Internet nutzen d&uuml;rftest, wie w&uuml;rde sich dein Leben &auml;ndern?</div>
+                    <div class="speak-q-hint">Konsequenzen &bull; Vor- und Nachteile &bull; Gewohnheiten</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">15</span>
+                <div>
+                    <div class="speak-q-text">Wenn du einen ber&uuml;hmten Menschen treffen k&ouml;nntest, wen w&uuml;rdest du w&auml;hlen?</div>
+                    <div class="speak-q-hint">k&ouml;nnte / w&uuml;rde &bull; Begr&uuml;ndung &bull; was fragst du?</div>
+                </div>
+            </div>
+
+            <div class="section-label"><span>&#x1F4DA;</span> Erz&auml;hlen &amp; beschreiben</div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">16</span>
+                <div>
+                    <div class="speak-q-text">Erz&auml;hl von einem unvergesslichen Erlebnis.</div>
+                    <div class="speak-q-hint">Perfekt &bull; damals / zuerst / dann / am Ende</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">17</span>
+                <div>
+                    <div class="speak-q-text">Beschreib eine Person, die dir wichtig ist. Was macht sie besonders?</div>
+                    <div class="speak-q-hint">Adjektive &bull; Charaktereigenschaften &bull; Beispiele</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">18</span>
+                <div>
+                    <div class="speak-q-text">Erz&auml;hl von deinem Lieblingsfilm, deiner Lieblingsserie oder deinem Lieblingsbuch.</div>
+                    <div class="speak-q-hint">Inhalt &bull; Charaktere &bull; warum m&ouml;gst du es?</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">19</span>
+                <div>
+                    <div class="speak-q-text">Beschreib deine Heimatstadt oder deinen Heimatort. Was magst du daran, was nicht?</div>
+                    <div class="speak-q-hint">Pr&auml;positionen &bull; Vergleiche &bull; Vor- und Nachteile</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">20</span>
+                <div>
+                    <div class="speak-q-text">Was war das Schwierigste, was du je gelernt oder getan hast?</div>
+                    <div class="speak-q-hint">Perfekt &bull; Emotionen &bull; Reflexion</div>
+                </div>
+            </div>
+
+            <div class="section-label"><span>&#x2696;&#xFE0F;</span> Vergleichen &amp; diskutieren</div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">21</span>
+                <div>
+                    <div class="speak-q-text">Was ist besser: in der Stadt oder auf dem Land leben?</div>
+                    <div class="speak-q-hint">Komparativ &bull; Vergleiche &bull; einerseits&hellip; andererseits</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">22</span>
+                <div>
+                    <div class="speak-q-text">Fr&uuml;her und heute: Wie hat sich das Leben in den letzten 20 Jahren ver&auml;ndert?</div>
+                    <div class="speak-q-hint">Vergangenheit &bull; Gegenwart &bull; Vergleichss&auml;tze</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">23</span>
+                <div>
+                    <div class="speak-q-text">Arbeiten f&uuml;r viel Geld oder wenig Geld f&uuml;r eine Arbeit, die du liebst?</div>
+                    <div class="speak-q-hint">These &bull; Begr&uuml;ndung &bull; pers&ouml;nliche Werte</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">24</span>
+                <div>
+                    <div class="speak-q-text">Online-Freundschaften vs. echte Freundschaften &mdash; gibt es einen Unterschied?</div>
+                    <div class="speak-q-hint">Definition &bull; Vergleich &bull; pers&ouml;nliche Erfahrung</div>
+                </div>
+            </div>
+            <div class="speak-question-card">
+                <span class="speak-q-num">25</span>
+                <div>
+                    <div class="speak-q-text">Soll die Schule mehr praktische F&auml;hligkeiten lehren oder mehr Theorie?</div>
+                    <div class="speak-q-hint">Argumente &bull; Beispiele &bull; Schlussfolgerung</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== TAB: TIMER ===== -->
+        <div class="tab-content" id="tab-timer">
+            <div class="timer-box">
+                <div class="timer-label">Sprechdauer w&auml;hlen</div>
+                <div class="duration-btns">
+                    <button class="btn-dur active" onclick="setDuration(60,this)">1 min</button>
+                    <button class="btn-dur" onclick="setDuration(120,this)">2 min</button>
+                    <button class="btn-dur" onclick="setDuration(180,this)">3 min</button>
+                    <button class="btn-dur" onclick="setDuration(300,this)">5 min</button>
+                </div>
+                <div class="timer-display" id="timerDisplay">1:00</div>
+                <div id="timerStatus" style="font-size:0.82rem;color:rgba(255,255,255,0.35);min-height:1.2rem;">Bereit</div>
+                <div class="timer-btns">
+                    <button class="btn-timer btn-start" id="btnStart" onclick="startTimer()">&#x25B6; Start</button>
+                    <button class="btn-timer btn-pause" id="btnPause" onclick="pauseTimer()" style="display:none;">&#x23F8; Pause</button>
+                    <button class="btn-timer btn-reset" onclick="resetTimer()">&#x21BA; Reset</button>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.05);max-width:500px;margin:0 auto;">
+                <h3 style="color:#79c0ff;">&#x1F3AF; Wie nutze ich den Timer?</h3>
+                <ol style="padding-left:1.2rem;color:rgba(255,255,255,0.8);font-size:0.9rem;line-height:2;">
+                    <li>W&auml;hle eine Frage aus <strong>Alle Fragen</strong> oder nutze <strong>Zufallsfrage</strong></li>
+                    <li>Stell den Timer auf <strong>2 Minuten</strong></li>
+                    <li>Sprich laut auf Deutsch bis der Timer klingelt</li>
+                    <li>Stockst du? Mach weiter &mdash; auch mit Fehlern</li>
+                    <li>Wiederhol dieselbe Frage beim n&auml;chsten Mal &mdash; wird jedes Mal besser</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- ===== TAB: REDEMITTEL ===== -->
+        <div class="tab-content" id="tab-redemittel">
+            <div class="zp-notes">
+                <section class="note-section">
+                    <div class="lesson-header-block">
+                        <span class="lesson-header-icon">&#x1F4AC;</span>
+                        <div>
+                            <h2>Redemittel f&uuml;rs Sprechen</h2>
+                            <p class="lesson-header-sub">Feste Phrasen, die du beim Sprechen immer wieder brauchst &mdash; lern sie auswendig</p>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x1F4AD; Meinung &auml;u&szlig;ern</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip purple">Ich finde, dass…</span>
+                            <span class="rm-chip purple">Ich meine, dass…</span>
+                            <span class="rm-chip purple">Meiner Meinung nach…</span>
+                            <span class="rm-chip purple">Ich bin der Meinung, dass…</span>
+                            <span class="rm-chip purple">Ich bin &uuml;berzeugt, dass…</span>
+                            <span class="rm-chip purple">Pers&ouml;nlich glaube ich…</span>
+                            <span class="rm-chip purple">F&uuml;r mich ist wichtig, dass…</span>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x1F9F5; Begr&uuml;nden &amp; Erkl&auml;ren</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip green">Das liegt daran, dass…</span>
+                            <span class="rm-chip green">Das bedeutet, dass…</span>
+                            <span class="rm-chip green">Ein Grund daf&uuml;r ist…</span>
+                            <span class="rm-chip green">Zum Beispiel…</span>
+                            <span class="rm-chip green">Das zeigt, dass…</span>
+                            <span class="rm-chip green">weil / denn / deshalb</span>
+                            <span class="rm-chip green">Ich sage das, weil…</span>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x2696;&#xFE0F; Vorteile &amp; Nachteile</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip blue">Einerseits… andererseits…</span>
+                            <span class="rm-chip blue">Ein Vorteil ist…</span>
+                            <span class="rm-chip blue">Ein Nachteil ist…</span>
+                            <span class="rm-chip blue">Auf der einen Seite… auf der anderen Seite…</span>
+                            <span class="rm-chip blue">Trotzdem / Dennoch</span>
+                            <span class="rm-chip blue">Obwohl… / Auch wenn…</span>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x1F504; &Uuml;berleiten &amp; Strukturieren</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip orange">Zuerst m&ouml;chte ich sagen…</span>
+                            <span class="rm-chip orange">Au&szlig;erdem…</span>
+                            <span class="rm-chip orange">Dar&uuml;ber hinaus…</span>
+                            <span class="rm-chip orange">Zum Schluss…</span>
+                            <span class="rm-chip orange">Zusammenfassend kann ich sagen…</span>
+                            <span class="rm-chip orange">Was mich noch interessiert…</span>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x23F3; Zeit gewinnen (nie schweigen!)</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip pink">Also…</span>
+                            <span class="rm-chip pink">Hmm, ich &uuml;berlege&hellip;</span>
+                            <span class="rm-chip pink">Moment mal&hellip;</span>
+                            <span class="rm-chip pink">Das ist eine gute Frage&hellip;</span>
+                            <span class="rm-chip pink">Ich w&uuml;rde sagen&hellip;</span>
+                            <span class="rm-chip pink">Wie soll ich das erkl&auml;ren&hellip;</span>
+                            <span class="rm-chip pink">Na ja&hellip;</span>
+                            <span class="rm-chip pink">Eigentlich&hellip;</span>
+                        </div>
+                    </div>
+
+                    <div class="redemittel-group">
+                        <div class="redemittel-title">&#x1F52E; Hypothetisch sprechen (Konj. II)</div>
+                        <div class="rm-chips">
+                            <span class="rm-chip purple">Wenn ich&hellip; w&auml;re / h&auml;tte…</span>
+                            <span class="rm-chip purple">Ich w&uuml;rde&hellip;</span>
+                            <span class="rm-chip purple">Das w&auml;re&hellip;</span>
+                            <span class="rm-chip purple">Ich h&auml;tte gerne&hellip;</span>
+                            <span class="rm-chip purple">An deiner Stelle w&uuml;rde ich&hellip;</span>
+                            <span class="rm-chip purple">Man k&ouml;nnte&hellip;</span>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+
+        <!-- ===== TAB: ROLLENSPIELE & TIPPS ===== -->
+        <div class="tab-content" id="tab-rollen">
+
+            <!-- INTRO -->
+            <div style="background:linear-gradient(135deg,rgba(163,113,247,0.13),rgba(245,158,11,0.05));border:1.5px solid rgba(163,113,247,0.35);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+                <p style="margin:0;font-size:0.93rem;line-height:1.6;color:rgba(230,230,235,0.9);">
+                    &#x1F4A1; <strong>Drei Werkzeuge f&uuml;r Selbsttraining:</strong> &laquo;Rollenspiele&raquo; &mdash; sprich beide Rollen laut. &laquo;Templates&raquo; &mdash; f&uuml;ll die L&uuml;cken und erz&auml;hl &uuml;ber dich. &laquo;Tipps&raquo; &mdash; konkrete Techniken f&uuml;r Selbsttraining ohne Partner.
+                </p>
+            </div>
+
+            <!-- ROLLENSPIELE -->
+            <div class="subsec">
+                <span class="ss-ico">&#x1F3AD;</span>
+                <h3>5 Rollenspiele &mdash; lies beide Rollen laut</h3>
+                <span class="ss-sub">A2&rarr;B1 &middot; Alltagssituationen</span>
+            </div>
+
+            <div class="role-card">
+                <div class="role-title">&#x2615; 1. Im Caf&eacute; bestellen</div>
+                <div class="role-situation">Du sitzt in einem Caf&eacute;. Der Kellner kommt zu dir.</div>
+                <div class="dialog-line"><span class="speaker b">K</span><span class="line-text">Guten Tag! Was darf ich Ihnen bringen?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Hallo. Ich h&auml;tte gerne einen Cappuccino, bitte. Und ein St&uuml;ck Schokoladenkuchen.</span></div>
+                <div class="dialog-line"><span class="speaker b">K</span><span class="line-text">Sehr gerne. M&ouml;chten Sie den Kuchen mit Sahne?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Ja, gerne. Und k&ouml;nnte ich auch ein Glas Wasser bekommen?</span></div>
+                <div class="dialog-line"><span class="speaker b">K</span><span class="line-text">Nat&uuml;rlich. Kommt sofort.</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Danke sch&ouml;n!</span></div>
+            </div>
+
+            <div class="role-card">
+                <div class="role-title">&#x1F3E5; 2. Beim Arzt</div>
+                <div class="role-situation">Du f&uuml;hlst dich nicht gut und gehst zum Arzt.</div>
+                <div class="dialog-line"><span class="speaker b">A</span><span class="line-text">Guten Tag, was kann ich f&uuml;r Sie tun?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Guten Tag. Ich f&uuml;hle mich seit drei Tagen nicht gut. Ich habe Halsschmerzen und Kopfschmerzen.</span></div>
+                <div class="dialog-line"><span class="speaker b">A</span><span class="line-text">Haben Sie auch Fieber?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Ja, gestern hatte ich 38,5 Grad.</span></div>
+                <div class="dialog-line"><span class="speaker b">A</span><span class="line-text">Sie haben wahrscheinlich eine Erk&auml;ltung. Ich verschreibe Ihnen ein Medikament. Trinken Sie viel Tee und bleiben Sie zu Hause.</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Vielen Dank, Frau Doktor!</span></div>
+            </div>
+
+            <div class="role-card">
+                <div class="role-title">&#x1F4DE; 3. Einen Termin vereinbaren</div>
+                <div class="role-situation">Du rufst beim Friseur an und willst einen Termin.</div>
+                <div class="dialog-line"><span class="speaker b">F</span><span class="line-text">Friseur Kunz, guten Tag!</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Hallo, ich h&auml;tte gerne einen Termin n&auml;chste Woche, am liebsten Donnerstag.</span></div>
+                <div class="dialog-line"><span class="speaker b">F</span><span class="line-text">Donnerstag... w&auml;re 14 Uhr m&ouml;glich?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">14 Uhr passt mir leider nicht. Geht es vielleicht um 16 Uhr?</span></div>
+                <div class="dialog-line"><span class="speaker b">F</span><span class="line-text">Ja, 16 Uhr ist frei. Auf welchen Namen darf ich buchen?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Auf <em>[mein Name]</em>. Vielen Dank!</span></div>
+            </div>
+
+            <div class="role-card">
+                <div class="role-title">&#x1F6CD;&#xFE0F; 4. Im Gesch&auml;ft &mdash; etwas umtauschen</div>
+                <div class="role-situation">Du hast einen Pullover gekauft, aber er ist zu klein.</div>
+                <div class="dialog-line"><span class="speaker b">V</span><span class="line-text">Guten Tag, kann ich Ihnen helfen?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Ja, hallo. Ich habe vorgestern diesen Pullover gekauft, aber er ist mir leider zu klein.</span></div>
+                <div class="dialog-line"><span class="speaker b">V</span><span class="line-text">Haben Sie den Kassenbon dabei?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Ja, hier ist er.</span></div>
+                <div class="dialog-line"><span class="speaker b">V</span><span class="line-text">M&ouml;chten Sie eine andere Gr&ouml;&szlig;e oder das Geld zur&uuml;ck?</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Eine Nummer gr&ouml;&szlig;er, bitte. Haben Sie ihn in Gr&ouml;&szlig;e M?</span></div>
+            </div>
+
+            <div class="role-card">
+                <div class="role-title">&#x1F5FA;&#xFE0F; 5. Nach dem Weg fragen</div>
+                <div class="role-situation">Du bist in einer fremden Stadt und suchst den Bahnhof.</div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Entschuldigung, k&ouml;nnen Sie mir helfen? Ich suche den Hauptbahnhof.</span></div>
+                <div class="dialog-line"><span class="speaker b">P</span><span class="line-text">Klar, gerne. Sie gehen hier geradeaus, dann an der zweiten Ampel links.</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Geradeaus und dann links. Wie lange brauche ich zu Fu&szlig;?</span></div>
+                <div class="dialog-line"><span class="speaker b">P</span><span class="line-text">Ungef&auml;hr 10 Minuten. Oder Sie nehmen die Tram, Linie 4 &mdash; das geht schneller.</span></div>
+                <div class="dialog-line"><span class="speaker a">DU</span><span class="line-text">Vielen Dank f&uuml;r die Hilfe!</span></div>
+            </div>
+
+            <!-- TEMPLATES -->
+            <div class="subsec">
+                <span class="ss-ico">&#x1F4DD;</span>
+                <h3>5 Selbstgespr&auml;ch-Templates</h3>
+                <span class="ss-sub">F&uuml;ll die L&uuml;cken &amp; sprich laut</span>
+            </div>
+
+            <div class="template-card">
+                <h4>&#x1F305; Template 1: Mein heutiger Morgen</h4>
+                <p>Heute bin ich um <span class="blank">Uhrzeit</span> Uhr aufgewacht. Zum Fr&uuml;hst&uuml;ck habe ich <span class="blank">was gegessen</span> gegessen und <span class="blank">was getrunken</span> getrunken. Danach bin ich <span class="blank">wohin gegangen</span> gegangen. Das Wetter war <span class="blank">wie</span>. Auf dem Weg habe ich <span class="blank">was gesehen</span>.</p>
+            </div>
+
+            <div class="template-card">
+                <h4>&#x1F4C5; Template 2: Mein letztes Wochenende</h4>
+                <p>Am Samstag bin ich erst um <span class="blank">Uhrzeit</span> aufgestanden. Vormittags habe ich <span class="blank">Aktivit&auml;t</span> gemacht. Mittags habe ich <span class="blank">Essen</span> gegessen. Nachmittags war ich <span class="blank">wo</span> mit <span class="blank">mit wem</span>. Wir haben <span class="blank">was gemacht</span>. Es war total <span class="blank">Adjektiv</span>. Am Sonntag habe ich vor allem <span class="blank">Aktivit&auml;t</span>.</p>
+            </div>
+
+            <div class="template-card">
+                <h4>&#x1F3A8; Template 3: Mein Lieblings-Hobby</h4>
+                <p>Mein gr&ouml;&szlig;tes Hobby ist <span class="blank">Hobby</span>. Ich mache es seit <span class="blank">wie lange</span>. Angefangen habe ich, weil <span class="blank">Grund</span>. Ich mache es meistens <span class="blank">wann</span>, oft mit <span class="blank">mit wem</span>. Das Beste daran ist, dass <span class="blank">positiver Punkt</span>. Manchmal ist es aber auch <span class="blank">Nachteil</span>.</p>
+            </div>
+
+            <div class="template-card">
+                <h4>&#x1F4AD; Template 4: Meine Meinung zu... (Pro &amp; Contra)</h4>
+                <p>Heute m&ouml;chte ich &uuml;ber <span class="blank">Thema</span> sprechen. Einerseits ist es gut, weil <span class="blank">Vorteil 1</span> und au&szlig;erdem <span class="blank">Vorteil 2</span>. Andererseits gibt es Probleme: <span class="blank">Nachteil 1</span> und <span class="blank">Nachteil 2</span>. Meiner Meinung nach <span class="blank">deine Position</span>, weil <span class="blank">Begr&uuml;ndung</span>. Zusammenfassend kann man sagen, dass <span class="blank">Schluss</span>.</p>
+            </div>
+
+            <div class="template-card">
+                <h4>&#x1F31F; Template 5: Mein Lieblingsmensch beschreiben</h4>
+                <p>Ich m&ouml;chte heute &uuml;ber <span class="blank">Name</span> sprechen. Er/Sie ist <span class="blank">Verwandte/Freund</span> und ich kenne ihn/sie seit <span class="blank">wie lange</span>. Er/Sie ist <span class="blank">Alter</span> Jahre alt und wohnt in <span class="blank">Ort</span>. Charakterlich ist er/sie <span class="blank">3 Adjektive</span>. Was ich besonders mag, ist <span class="blank">positive Eigenschaft</span>. Mit ihm/ihr mache ich gerne <span class="blank">Aktivit&auml;t</span>.</p>
+            </div>
+
+            <!-- TIPPS -->
+            <div class="subsec">
+                <span class="ss-ico">&#x1F3AF;</span>
+                <h3>8 Tipps &mdash; wie du allein effektiv &uuml;bst</h3>
+                <span class="ss-sub">Ohne Partner, ohne Lehrer</span>
+            </div>
+
+            <div class="tip-grid">
+                <div class="tip-card">
+                    <span class="tip-num">1</span>
+                    <h4>&#x1F4F1; Nimm dich auf</h4>
+                    <p>&Ouml;ffne die Sprachmemos-App und nimm 1&ndash;2 Minuten auf, wie du eine Frage beantwortest. H&ouml;r es dir an &mdash; du wirst dich erschrecken, aber so siehst du deine Fehler sofort.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">2</span>
+                    <h4>&#x1FA9E; Spiegel-Methode</h4>
+                    <p>Stell dich vor den Spiegel und f&uuml;hr ein Gespr&auml;ch mit dir selbst. Schau dir in die Augen, l&auml;chle &mdash; das trainiert auch K&ouml;rpersprache und Selbstvertrauen.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">3</span>
+                    <h4>&#x23F1;&#xFE0F; 5-Minuten-Regel</h4>
+                    <p>Jeden Tag genau 5 Minuten laut Deutsch sprechen &mdash; egal &uuml;ber was. Lieber jeden Tag 5 Minuten als einmal pro Woche eine ganze Stunde.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">4</span>
+                    <h4>&#x1F4DA; Beschreib alles um dich</h4>
+                    <p>&laquo;Das ist eine Tasse. Sie ist wei&szlig; und steht auf dem Tisch.&raquo; Beschreibe alles im Zimmer auf Deutsch. Klingt komisch, hilft aber riesig f&uuml;rs Vokabular.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">5</span>
+                    <h4>&#x1F914; Frag und antworte selbst</h4>
+                    <p>Stell dir eine Frage und antworte sofort. &laquo;Was habe ich heute gemacht?&raquo; &mdash; und sprich los, ohne nachzudenken. Fehler sind okay!</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">6</span>
+                    <h4>&#x1F4FA; Shadow-Technik</h4>
+                    <p>Schau eine deutsche Serie mit Untertiteln. Pausiere nach jedem Satz und wiederhole genau so, wie der Schauspieler &mdash; Tempo, Tonfall, Pause. Trainiert Aussprache wie sonst nichts.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">7</span>
+                    <h4>&#x1F3B5; Sing mit!</h4>
+                    <p>W&auml;hle ein deutsches Lied, lerne den Text und sing mit. Hilft enorm bei Aussprache, Rhythmus und Wortschatz &mdash; und macht richtig Spa&szlig;.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-num">8</span>
+                    <h4>&#x1F4AC; Fehler &gt; Schweigen</h4>
+                    <p>Lieber 10 Fehler machen und sprechen, als 0 Fehler und schweigen. Jeder Fehler ist ein Schritt n&auml;her zur Fl&uuml;ssigkeit.</p>
+                </div>
+            </div>
+
+            <!-- WOCHENPLAN -->
+            <div style="background:linear-gradient(135deg,rgba(63,185,80,0.10),rgba(88,166,255,0.05));border:1.5px solid rgba(63,185,80,0.35);border-radius:14px;padding:1.2rem 1.4rem;margin-top:2rem;">
+                <h3 style="margin:0 0 0.5rem;color:#86efac;font-size:1.05rem;">&#x1F31F; Wochenplan: 10 Min/Tag</h3>
+                <p style="margin:0;font-size:0.92rem;line-height:1.65;color:rgba(230,230,235,0.9);">
+                    <strong>Mo / Mi / Fr:</strong> 3 Fragen aus Tab &laquo;Alle Fragen&raquo; laut beantworten &middot;
+                    <strong>Di / Do:</strong> 1 Rollenspiel beide Rollen lesen, dann frei nachspielen &middot;
+                    <strong>Sa:</strong> 1 Template benutzen und 2 Min. Selbstgespr&auml;ch aufnehmen &middot;
+                    <strong>So:</strong> Aufnahmen anh&ouml;ren &mdash; was war besser als letzte Woche?
+                </p>
+            </div>
+
+        </div><!-- #tab-rollen -->
+
+    </div>
+
+    <script>
+        // ===== TABS =====
+        document.querySelectorAll('.tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ===== RANDOM QUESTION =====
+        const questions = [
+            { q: 'Wie würdest du deinen typischen Tag beschreiben?', cat: 'Alltag & Ich' },
+            { q: 'Was machst du, wenn du schlechte Laune hast?', cat: 'Alltag & Ich' },
+            { q: 'Was sind deine drei wichtigsten Gewohnheiten?', cat: 'Alltag & Ich' },
+            { q: 'Beschreib deinen Lieblingsort. Was machst du dort?', cat: 'Alltag & Ich' },
+            { q: 'Was ist dir im Leben besonders wichtig? Warum?', cat: 'Alltag & Ich' },
+            { q: 'Was denkst du über soziale Medien? Mehr Vorteile oder Nachteile?', cat: 'Meinung' },
+            { q: 'Sollten Handys in der Schule verboten sein?', cat: 'Meinung' },
+            { q: 'Wie wichtig ist Umweltschutz für dich persönlich?', cat: 'Meinung' },
+            { q: 'Was sind Vorteile und Nachteile von Homeoffice?', cat: 'Meinung' },
+            { q: 'Muss man für Erfolg hart arbeiten, oder spielt Glück die größere Rolle?', cat: 'Meinung' },
+            { q: 'Wenn du eine Million Euro hättest, was würdest du damit machen?', cat: 'Konjunktiv II' },
+            { q: 'Wenn du eine Zeitmaschine hättest, wohin würdest du reisen?', cat: 'Konjunktiv II' },
+            { q: 'Was würdest du ändern, wenn du Bundeskanzler/in wärst?', cat: 'Konjunktiv II' },
+            { q: 'Wenn du ein Jahr lang kein Internet nutzen dürftest, wie würde sich dein Leben ändern?', cat: 'Konjunktiv II' },
+            { q: 'Wenn du einen berühmten Menschen treffen könntest, wen würdest du wählen?', cat: 'Konjunktiv II' },
+            { q: 'Erzähl von einem unvergesslichen Erlebnis.', cat: 'Erzählen' },
+            { q: 'Beschreib eine Person, die dir wichtig ist. Was macht sie besonders?', cat: 'Erzählen' },
+            { q: 'Erzähl von deinem Lieblingsfilm, deiner Lieblingsserie oder deinem Lieblingsbuch.', cat: 'Erzählen' },
+            { q: 'Beschreib deine Heimatstadt oder deinen Heimatort.', cat: 'Erzählen' },
+            { q: 'Was war das Schwierigste, was du je gelernt oder getan hast?', cat: 'Erzählen' },
+            { q: 'Was ist besser: in der Stadt oder auf dem Land leben?', cat: 'Vergleichen' },
+            { q: 'Früher und heute: Wie hat sich das Leben in den letzten 20 Jahren verändert?', cat: 'Vergleichen' },
+            { q: 'Arbeiten für viel Geld oder für eine Arbeit, die du liebst?', cat: 'Vergleichen' },
+            { q: 'Online-Freundschaften vs. echte Freundschaften — gibt es einen Unterschied?', cat: 'Vergleichen' },
+            { q: 'Soll die Schule mehr praktische Fähigkeiten lehren oder mehr Theorie?', cat: 'Vergleichen' },
+        ];
+
+        let lastIdx = -1;
+        function newQuestion() {
+            let idx;
+            do { idx = Math.floor(Math.random() * questions.length); } while (idx === lastIdx);
+            lastIdx = idx;
+            const item = questions[idx];
+            document.getElementById('randomQ').textContent = item.q;
+            document.getElementById('randomCat').textContent = '📂 ' + item.cat;
+        }
+
+        // ===== TIMER =====
+        let totalSeconds = 60;
+        let remaining = 60;
+        let timerInterval = null;
+        let running = false;
+
+        function fmt(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function setDuration(secs, btn) {
+            if (running) return;
+            document.querySelectorAll('.btn-dur').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            totalSeconds = secs;
+            remaining = secs;
+            updateDisplay();
+            document.getElementById('timerStatus').textContent = 'Bereit';
+        }
+
+        function updateDisplay() {
+            const el = document.getElementById('timerDisplay');
+            el.textContent = fmt(remaining);
+            el.className = 'timer-display';
+            if (running) {
+                if (remaining <= 30) el.classList.add('warning');
+                else el.classList.add('running');
+            }
+            if (remaining === 0) el.classList.add('done');
+        }
+
+        function startTimer() {
+            if (running) return;
+            running = true;
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('btnPause').style.display = '';
+            document.getElementById('timerStatus').textContent = 'Los — sprich!';
+            timerInterval = setInterval(() => {
+                remaining--;
+                updateDisplay();
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    running = false;
+                    document.getElementById('btnStart').style.display = '';
+                    document.getElementById('btnPause').style.display = 'none';
+                    document.getElementById('timerStatus').textContent = '✅ Zeit ist um!';
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            running = false;
+            document.getElementById('btnStart').style.display = '';
+            document.getElementById('btnPause').style.display = 'none';
+            document.getElementById('timerStatus').textContent = 'Pausiert';
+            updateDisplay();
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            running = false;
+            remaining = totalSeconds;
+            document.getElementById('btnStart').style.display = '';
+            document.getElementById('btnPause').style.display = 'none';
+            document.getElementById('timerStatus').textContent = 'Bereit';
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>

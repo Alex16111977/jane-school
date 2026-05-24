@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Practice | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== LEVEL PILL ===== */
+        .level-pill {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(88,166,255,0.12);
+            border: 1px solid rgba(88,166,255,0.4);
+            color: #79b8ff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            letter-spacing: 0.06em;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* ===== MODE SELECTOR ===== */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.6rem;
+            margin: 1.2rem 0 1.8rem;
+        }
+        .mode-card {
+            background: rgba(13,17,23,0.78);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1rem 1rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .mode-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(88,166,255,0.5);
+        }
+        .mode-card.active {
+            background: linear-gradient(135deg, rgba(88,166,255,0.22), rgba(163,113,247,0.10));
+            border-color: #58a6ff;
+            box-shadow: 0 4px 20px rgba(88,166,255,0.22);
+        }
+        .mode-card .mode-ico { font-size: 1.8rem; line-height: 1; margin-bottom: 0.3rem; }
+        .mode-card .mode-title { font-size: 0.92rem; font-weight: 800; color: #fff; }
+        .mode-card .mode-sub { font-size: 0.72rem; color: rgba(230,230,235,0.55); margin-top: 0.2rem; }
+        .mode-content { display: none; }
+        .mode-content.active { display: block; }
+
+        /* ===== CHALLENGE BOX (Tab 1) ===== */
+        .challenge-box {
+            background: linear-gradient(145deg, rgba(88,166,255,0.10), rgba(163,113,247,0.04));
+            border: 1.5px solid rgba(88,166,255,0.32);
+            border-radius: 18px;
+            padding: 1.6rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .challenge-prompt {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.55;
+            min-height: 3.5rem;
+            margin: 0.8rem 0 1rem;
+            padding: 0 0.5rem;
+        }
+        .ch-cat {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: #79b8ff;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            background: rgba(88,166,255,0.15);
+            border-radius: 12px;
+        }
+        .ch-timer {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0.8rem 0;
+            letter-spacing: 0.05em;
+        }
+        .ch-timer.running { color: #58a6ff; }
+        .ch-timer.done { color: #3fb950; }
+        .ch-controls {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+        .ch-btn {
+            padding: 0.55rem 1.3rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid;
+            transition: all 0.2s;
+        }
+        .ch-btn-new {
+            background: linear-gradient(135deg, #58a6ff, #79b8ff);
+            color: #0a0a14;
+            border-color: #58a6ff;
+        }
+        .ch-btn-new:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(88,166,255,0.35); }
+        .ch-btn-go {
+            background: rgba(63,185,80,0.18);
+            color: #86efac;
+            border-color: rgba(63,185,80,0.45);
+        }
+        .ch-btn-go:hover { background: rgba(63,185,80,0.3); }
+        .ch-btn-reset {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.65);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        /* Native phrases helper */
+        .phrase-bank {
+            background: rgba(13,17,23,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-top: 1rem;
+        }
+        .phrase-bank h4 {
+            margin: 0 0 0.5rem;
+            color: #fbbf24;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .phrase-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        .phrase-chips span {
+            font-size: 0.82rem;
+            background: rgba(88,166,255,0.1);
+            border: 1px solid rgba(88,166,255,0.25);
+            color: #cdd9e5;
+            padding: 0.25rem 0.65rem;
+            border-radius: 14px;
+        }
+
+        /* ===== MINI CONVERSATION (Tab 2) ===== */
+        .convo-card {
+            background: linear-gradient(145deg, rgba(163,113,247,0.07), rgba(163,113,247,0.02));
+            border: 1.5px solid rgba(163,113,247,0.28);
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+        }
+        .convo-title {
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: #c9b3ff;
+            margin-bottom: 0.4rem;
+        }
+        .convo-vibe {
+            font-size: 0.82rem;
+            color: rgba(230,230,235,0.55);
+            margin-bottom: 0.8rem;
+            font-style: italic;
+        }
+        .convo-line {
+            display: flex;
+            gap: 0.7rem;
+            margin: 0.55rem 0;
+            line-height: 1.55;
+            align-items: flex-start;
+        }
+        .convo-line .who {
+            flex-shrink: 0;
+            font-weight: 800;
+            font-size: 0.78rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 6px;
+            min-width: 2rem;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+        .who.you {
+            background: rgba(88,166,255,0.2);
+            color: #79b8ff;
+            border: 1px solid rgba(88,166,255,0.4);
+        }
+        .who.them {
+            background: rgba(245,158,11,0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245,158,11,0.35);
+        }
+        .convo-line .said {
+            color: rgba(230,230,235,0.92);
+            font-size: 0.95rem;
+        }
+        .convo-note {
+            font-size: 0.78rem;
+            color: rgba(134,239,172,0.85);
+            margin-top: 0.7rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(63,185,80,0.06);
+            border-left: 3px solid rgba(63,185,80,0.5);
+            border-radius: 5px;
+        }
+
+        /* ===== STORY STARTER ===== */
+        .story-card {
+            background: rgba(13,17,23,0.78);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 4px solid #58a6ff;
+            border-radius: 13px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.7rem;
+        }
+        .story-card .story-line {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.55;
+            font-style: italic;
+        }
+        .story-card .story-hint {
+            font-size: 0.78rem;
+            color: rgba(230,230,235,0.55);
+            margin-top: 0.4rem;
+        }
+
+        /* ===== DEBATE BOX ===== */
+        .debate-card {
+            background: linear-gradient(145deg, rgba(248,81,73,0.06), rgba(248,81,73,0.02));
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 13px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.7rem;
+        }
+        .debate-q {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ff9a93;
+            line-height: 1.5;
+        }
+        .debate-rule {
+            font-size: 0.78rem;
+            color: rgba(230,230,235,0.6);
+            margin-top: 0.4rem;
+        }
+
+        /* ===== PICTURE PROMPT ===== */
+        .pic-card {
+            background: linear-gradient(135deg, rgba(63,185,80,0.07), rgba(88,166,255,0.04));
+            border: 1px dashed rgba(63,185,80,0.4);
+            border-radius: 13px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.7rem;
+        }
+        .pic-card .pic-scene {
+            font-size: 0.95rem;
+            color: #cdd9e5;
+            line-height: 1.6;
+        }
+        .pic-card .pic-scene::before {
+            content: '\1F3A8 ';
+            margin-right: 0.3rem;
+        }
+
+        /* ===== PRONUNCIATION (Tab 4) ===== */
+        .sound-section {
+            margin-bottom: 2rem;
+        }
+        .sound-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sound-header h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: #fff;
+        }
+        .sound-header .ipa {
+            font-family: 'Cambria Math', serif;
+            color: #79b8ff;
+            font-size: 1rem;
+            background: rgba(88,166,255,0.1);
+            padding: 0.1rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        .drill-row {
+            background: rgba(13,17,23,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .drill-row .drill-text {
+            font-size: 1rem;
+            color: #fff;
+            font-weight: 600;
+        }
+        .drill-row .drill-text strong {
+            color: #79b8ff;
+            text-decoration: underline;
+            text-decoration-color: rgba(88,166,255,0.5);
+        }
+        .drill-row .drill-hint {
+            font-size: 0.78rem;
+            color: rgba(230,230,235,0.55);
+            font-style: italic;
+        }
+        .twister {
+            background: linear-gradient(135deg, rgba(245,158,11,0.10), rgba(245,158,11,0.03));
+            border: 1.5px solid rgba(245,158,11,0.35);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.7rem;
+            text-align: center;
+        }
+        .twister .twister-text {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.5;
+        }
+        .twister .twister-sound {
+            font-size: 0.78rem;
+            color: #fbbf24;
+            margin-top: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        /* native phrases highlight grid */
+        .native-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.7rem;
+            margin-top: 0.8rem;
+        }
+        .native-card {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.22);
+            border-radius: 11px;
+            padding: 0.9rem 1.1rem;
+        }
+        .native-card .nc-phrase {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #79b8ff;
+        }
+        .native-card .nc-mean {
+            font-size: 0.82rem;
+            color: rgba(230,230,235,0.78);
+            margin-top: 0.25rem;
+        }
+        .native-card .nc-ex {
+            font-size: 0.82rem;
+            color: rgba(230,230,235,0.48);
+            margin-top: 0.4rem;
+            font-style: italic;
+        }
+
+        /* generic section divider */
+        .sub-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 1.6rem 0 0.9rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .sub-divider .sd-ico { font-size: 1.4rem; }
+        .sub-divider h3 { margin: 0; font-size: 1.08rem; color: #fff; font-weight: 700; }
+        .sub-divider .sd-tag { color: var(--color-text-muted); font-size: 0.8rem; margin-left: auto; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Speaking Practice</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.93rem;margin-bottom:0.6rem;text-decoration:none;">&#8592; Back to Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:0.4rem; margin-bottom:0.4rem;">
+            <h1 style="margin-bottom:0.15rem;">Speaking Practice &#x1F3A4; <span class="level-pill">B1 &rarr; B2</span></h1>
+            <p class="page-subtitle">Sound like a native &mdash; <strong>4 modes: challenges, conversations, stories, pronunciation</strong></p>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(88,166,255,0.13),rgba(163,113,247,0.05));border:1.5px solid rgba(88,166,255,0.35);border-radius:14px;padding:1rem 1.2rem;margin:1rem 0 1.2rem;">
+            <p style="margin:0;font-size:0.92rem;line-height:1.55;color:rgba(230,230,235,0.9);">
+                &#x1F4A1; <strong>How to use this page:</strong> Pick one mode &middot; speak <strong>OUT LOUD</strong>, not in your head &middot; record yourself on your phone &middot; don't worry about mistakes &mdash; flow matters more than perfection at B1&rarr;B2.
+            </p>
+        </div>
+
+        <!-- ===== MODE SELECTOR ===== -->
+        <div class="mode-grid">
+            <div class="mode-card active" data-mode="challenge" onclick="switchMode('challenge')">
+                <div class="mode-ico">&#x23F1;&#xFE0F;</div>
+                <div class="mode-title">60-Sec Challenge</div>
+                <div class="mode-sub">Random topic + timer</div>
+            </div>
+            <div class="mode-card" data-mode="convo" onclick="switchMode('convo')">
+                <div class="mode-ico">&#x1F4AC;</div>
+                <div class="mode-title">Mini-Conversations</div>
+                <div class="mode-sub">Native-style dialogues</div>
+            </div>
+            <div class="mode-card" data-mode="story" onclick="switchMode('story')">
+                <div class="mode-ico">&#x1F4D6;</div>
+                <div class="mode-title">Stories &amp; Opinions</div>
+                <div class="mode-sub">Tell &amp; debate</div>
+            </div>
+            <div class="mode-card" data-mode="sound" onclick="switchMode('sound')">
+                <div class="mode-ico">&#x1F3B5;</div>
+                <div class="mode-title">Sound Like a Native</div>
+                <div class="mode-sub">Pronunciation drills</div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             MODE 1: 60-SEC CHALLENGE
+        ════════════════════════════════════════════ -->
+        <div class="mode-content active" id="m-challenge">
+            <div class="challenge-box">
+                <div class="ch-cat" id="chCat">PERSONAL</div>
+                <div class="challenge-prompt" id="chPrompt">Click "New topic" and start speaking!</div>
+                <div class="ch-timer" id="chTimer">1:00</div>
+                <div class="ch-controls">
+                    <button class="ch-btn ch-btn-new" onclick="newChallenge()">&#x1F500; New topic</button>
+                    <button class="ch-btn ch-btn-go" id="chGo" onclick="toggleChallenge()">&#x25B6; Start 60 sec</button>
+                    <button class="ch-btn ch-btn-reset" onclick="resetChallenge()">&#x21BA; Reset</button>
+                </div>
+            </div>
+
+            <div class="phrase-bank">
+                <h4>&#x1F4AB; Native phrases to throw in (B2 booster)</h4>
+                <div class="phrase-chips">
+                    <span>Well, basically...</span>
+                    <span>I'd say...</span>
+                    <span>To be honest...</span>
+                    <span>The thing is,...</span>
+                    <span>What I mean is...</span>
+                    <span>For me personally,...</span>
+                    <span>It really depends on...</span>
+                    <span>That reminds me of...</span>
+                    <span>I'd rather...</span>
+                    <span>Speaking of which...</span>
+                </div>
+            </div>
+
+            <div style="background:rgba(13,17,23,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.2rem;margin-top:1.2rem;">
+                <h4 style="margin:0 0 0.5rem;color:#fbbf24;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;">&#x1F3AF; Rules of the challenge</h4>
+                <ol style="margin:0;padding-left:1.2rem;font-size:0.88rem;line-height:1.7;color:rgba(230,230,235,0.85);">
+                    <li>Click <em>New topic</em> &rarr; read it out loud</li>
+                    <li>Click <em>Start 60 sec</em> &rarr; talk non-stop until the timer ends</li>
+                    <li><strong>Don't stop. Don't translate. Don't worry about grammar.</strong></li>
+                    <li>If you blank &mdash; say "umm, what I mean is..." and keep going</li>
+                    <li>Record yourself the first try &amp; the third try &mdash; compare!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             MODE 2: MINI-CONVERSATIONS
+        ════════════════════════════════════════════ -->
+        <div class="mode-content" id="m-convo">
+            <p style="font-size:0.92rem;color:rgba(230,230,235,0.7);margin:0 0 1.2rem;">
+                &#x1F4AC; <strong>Read both sides aloud</strong> &mdash; YOU = blue, THEM = orange. Then close your eyes and improvise the same conversation in your own words.
+            </p>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F4F1; 1. Texting in person &mdash; "Did you see her post?"</div>
+                <div class="convo-vibe">Two friends checking phones at a café.</div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Wait &mdash; did you see Anna's new post?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">No way &mdash; what did she post?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">She literally moved to Berlin without telling anyone!</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Hold on, let me check... oh wow, that's huge. Are you serious?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Yeah, I literally just saw it. Should we text her?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Definitely. I'll send her a voice message right now.</span></div>
+                <div class="convo-note">&#x1F4A1; Catch the native vibes: <strong>"No way"</strong>, <strong>"hold on"</strong>, <strong>"literally"</strong>, <strong>"Are you serious?"</strong></div>
+            </div>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F62D; 2. Complaining about a grade</div>
+                <div class="convo-vibe">After school, walking home with your best friend.</div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Dude, I cannot believe I got a C on the history test.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Wait, didn't you study for like a whole week?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">I did! That's what's so frustrating &mdash; I knew all the dates by heart.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Yeah, but the essay part is tricky. He always grades it super strict.</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Honestly, I'm thinking of talking to him after class.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Go for it. The worst he can say is no.</span></div>
+                <div class="convo-note">&#x1F4A1; Catch: <strong>"Dude"</strong>, <strong>"I cannot believe"</strong>, <strong>"for like"</strong>, <strong>"Go for it"</strong>, <strong>"The worst he can say is no"</strong>.</div>
+            </div>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F3AC; 3. Planning a Netflix night</div>
+                <div class="convo-vibe">Saturday afternoon, video call with a friend.</div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">So, my place tonight? Movie night?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Yeah, totally! What are we watching?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">I'm kinda into the new Netflix thriller. Have you seen the trailer?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Looks creepy but cool. I'm in. Should I bring snacks?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Just popcorn &mdash; I'll handle the drinks. 8pm work for you?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Sounds perfect. See you then!</span></div>
+                <div class="convo-note">&#x1F4A1; Catch: <strong>"Yeah, totally"</strong>, <strong>"kinda"</strong>, <strong>"I'm in"</strong>, <strong>"I'll handle..."</strong>, <strong>"8pm work for you?"</strong></div>
+            </div>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F3B5; 4. Recommending a song</div>
+                <div class="convo-vibe">In the school hallway, between classes.</div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Have you heard that new song by &mdash; you know &mdash; the British band?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Which one? Be more specific!</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">The one with the slow guitar intro &mdash; it goes super hard at the end.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">No idea what you're talking about. Just send me the link!</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Will do. Trust me, you'll love it. It's been stuck in my head for days.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Alright, send it now &mdash; I'm bored in chemistry.</span></div>
+                <div class="convo-note">&#x1F4A1; Catch: <strong>"you know"</strong> as filler, <strong>"goes super hard"</strong>, <strong>"No idea what you're talking about"</strong>, <strong>"stuck in my head"</strong>.</div>
+            </div>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F914; 5. Making excuses</div>
+                <div class="convo-vibe">Your friend invited you to a party. You don't really want to go.</div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">So, you coming to Mike's party Saturday or what?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Ugh, I'd love to, but honestly, I'm super behind on homework.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Come on, just an hour or two!</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">I know, but my mom's been on my case lately. Maybe next time?</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Fine, fine. But you owe me one!</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Deal! I promise I'll come to the next one.</span></div>
+                <div class="convo-note">&#x1F4A1; Catch: <strong>"or what"</strong>, <strong>"Ugh"</strong>, <strong>"behind on..."</strong>, <strong>"on my case"</strong>, <strong>"you owe me one"</strong>, <strong>"Deal!"</strong></div>
+            </div>
+
+            <div class="convo-card">
+                <div class="convo-title">&#x1F4DA; 6. Asking for help with homework</div>
+                <div class="convo-vibe">Texting your smart classmate at 11pm.</div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Hey, are you still up? I'm completely lost on the math homework.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Yeah, I'm awake. Which question?</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">Number 7 &mdash; the one about percentages. I've been staring at it for 20 minutes.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">Oh, that one's actually easy once you see the trick. Take a screenshot and I'll explain.</span></div>
+                <div class="convo-line"><span class="who you">YOU</span><span class="said">You're a lifesaver. Seriously.</span></div>
+                <div class="convo-line"><span class="who them">THEM</span><span class="said">No worries &mdash; you helped me with English last week!</span></div>
+                <div class="convo-note">&#x1F4A1; Catch: <strong>"still up"</strong>, <strong>"completely lost"</strong>, <strong>"You're a lifesaver"</strong>, <strong>"No worries"</strong>.</div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             MODE 3: STORIES & OPINIONS
+        ════════════════════════════════════════════ -->
+        <div class="mode-content" id="m-story">
+
+            <!-- STORY STARTERS -->
+            <div class="sub-divider">
+                <span class="sd-ico">&#x1F4D6;</span>
+                <h3>Story Starters &mdash; finish the tale</h3>
+                <span class="sd-tag">2-min stories</span>
+            </div>
+            <p style="font-size:0.88rem;color:rgba(230,230,235,0.6);margin:-0.4rem 0 1rem;">
+                Read the opening line aloud &mdash; then improvise the next 2 minutes of the story.
+            </p>
+
+            <div class="story-card">
+                <div class="story-line">"It started as a perfectly normal Tuesday, but then I got a text from a number I didn't recognize..."</div>
+                <div class="story-hint">Use past tenses &middot; build suspense &middot; describe how you felt</div>
+            </div>
+            <div class="story-card">
+                <div class="story-line">"I'll never forget the day I missed my flight by three minutes..."</div>
+                <div class="story-hint">Sequence words: first, then, suddenly, in the end</div>
+            </div>
+            <div class="story-card">
+                <div class="story-line">"My grandma sat me down and said, 'You won't believe what happened to me when I was your age.'"</div>
+                <div class="story-hint">Use reported speech: "She told me that..." / "She said..."</div>
+            </div>
+            <div class="story-card">
+                <div class="story-line">"It was 2am, I was alone in the apartment, and that's when I heard it &mdash; a sound coming from the kitchen..."</div>
+                <div class="story-hint">Past Continuous + Past Simple: "I was sleeping when..."</div>
+            </div>
+            <div class="story-card">
+                <div class="story-line">"If I told you I once met a celebrity in the most embarrassing way possible, would you believe me?"</div>
+                <div class="story-hint">Conditional + storytelling &middot; build the embarrassment slowly</div>
+            </div>
+
+            <!-- DEBATE PROMPTS -->
+            <div class="sub-divider">
+                <span class="sd-ico">&#x2696;&#xFE0F;</span>
+                <h3>Debate yourself &mdash; agree or disagree?</h3>
+                <span class="sd-tag">Pick a side + 3 reasons</span>
+            </div>
+            <p style="font-size:0.88rem;color:rgba(230,230,235,0.6);margin:-0.4rem 0 1rem;">
+                Read the statement &middot; choose YES or NO &middot; give 3 reasons in 90 seconds &middot; then try the opposite side!
+            </p>
+
+            <div class="debate-card">
+                <div class="debate-q">Social media does more harm than good for teenagers.</div>
+                <div class="debate-rule">Use: "Firstly... Secondly... Lastly..." + "On the other hand..."</div>
+            </div>
+            <div class="debate-card">
+                <div class="debate-q">Schools should ban grades and only give feedback.</div>
+                <div class="debate-rule">Use: "I strongly believe..." / "I'm not convinced because..."</div>
+            </div>
+            <div class="debate-card">
+                <div class="debate-q">Everyone should be required to learn a second language.</div>
+                <div class="debate-rule">Modal verbs: should, must, would, could</div>
+            </div>
+            <div class="debate-card">
+                <div class="debate-q">It's better to travel alone than with friends.</div>
+                <div class="debate-rule">Comparatives: better than, more...than, the most...</div>
+            </div>
+            <div class="debate-card">
+                <div class="debate-q">Working from home is the future for everyone.</div>
+                <div class="debate-rule">Use future forms: will, is going to, might</div>
+            </div>
+            <div class="debate-card">
+                <div class="debate-q">Books are better than movies.</div>
+                <div class="debate-rule">Personal preference + reasons + examples</div>
+            </div>
+
+            <!-- PICTURE PROMPTS -->
+            <div class="sub-divider">
+                <span class="sd-ico">&#x1F5BC;&#xFE0F;</span>
+                <h3>Imagination prompts &mdash; describe the scene</h3>
+                <span class="sd-tag">Close your eyes &amp; talk</span>
+            </div>
+            <p style="font-size:0.88rem;color:rgba(230,230,235,0.6);margin:-0.4rem 0 1rem;">
+                Close your eyes &middot; picture the scene &middot; describe everything you "see" out loud for 90 seconds.
+            </p>
+
+            <div class="pic-card">
+                <div class="pic-scene">A busy coffee shop on a rainy Sunday morning &mdash; you walk in, look around, and describe what you see, hear, and smell.</div>
+            </div>
+            <div class="pic-card">
+                <div class="pic-scene">Your childhood bedroom &mdash; describe the furniture, the colors, the smell, your favorite spot.</div>
+            </div>
+            <div class="pic-card">
+                <div class="pic-scene">A beach at sunset in summer &mdash; describe the people, the light, the sounds, what's happening around you.</div>
+            </div>
+            <div class="pic-card">
+                <div class="pic-scene">The first day at a new school &mdash; describe the building, the people, your feelings during the first hour.</div>
+            </div>
+            <div class="pic-card">
+                <div class="pic-scene">A traditional family dinner in your country &mdash; describe the table, the food, who's there, what people are saying.</div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             MODE 4: SOUND LIKE A NATIVE
+        ════════════════════════════════════════════ -->
+        <div class="mode-content" id="m-sound">
+
+            <p style="font-size:0.92rem;color:rgba(230,230,235,0.7);margin:0 0 1.4rem;">
+                &#x1F3B5; <strong>Drill these out loud, slowly first, then faster.</strong> Record yourself, then a native speaker (YouTube), then compare. This is how accents get fixed.
+            </p>
+
+            <!-- TONGUE TWISTERS -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F4AB; Tongue twisters</h3>
+                    <span class="ipa">classic warm-up</span>
+                </div>
+                <div class="twister">
+                    <div class="twister-text">She sells seashells by the seashore.</div>
+                    <div class="twister-sound">&middot; s vs. sh &middot;</div>
+                </div>
+                <div class="twister">
+                    <div class="twister-text">Red lorry, yellow lorry, red lorry, yellow lorry.</div>
+                    <div class="twister-sound">&middot; r vs. l &middot;</div>
+                </div>
+                <div class="twister">
+                    <div class="twister-text">Peter Piper picked a peck of pickled peppers.</div>
+                    <div class="twister-sound">&middot; p sound &middot;</div>
+                </div>
+                <div class="twister">
+                    <div class="twister-text">How can a clam cram in a clean cream can?</div>
+                    <div class="twister-sound">&middot; c / cr &middot;</div>
+                </div>
+            </div>
+
+            <!-- TH SOUND -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F445; The TH trap</h3>
+                    <span class="ipa">/&theta;/ &amp; /&eth;/</span>
+                </div>
+                <p style="font-size:0.87rem;color:rgba(230,230,235,0.65);margin:0 0 0.7rem;">
+                    Tip: stick the tip of your tongue between your teeth, then blow air. Don't say "z" or "s" or "f"!
+                </p>
+                <div class="drill-row">
+                    <div class="drill-text"><strong>Th</strong>irty <strong>th</strong>ousand <strong>th</strong>irsty <strong>th</strong>ieves.</div>
+                    <div class="drill-hint">voiceless &theta;</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text"><strong>Th</strong>is, <strong>th</strong>at, <strong>th</strong>ese, <strong>th</strong>ose &mdash; <strong>th</strong>ey are <strong>th</strong>ere.</div>
+                    <div class="drill-hint">voiced &eth;</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">I <strong>th</strong>ink <strong>th</strong>at <strong>th</strong>e <strong>th</strong>ing in <strong>th</strong>at <strong>th</strong>ree-storey house is <strong>th</strong>ick.</div>
+                    <div class="drill-hint">mix both</div>
+                </div>
+            </div>
+
+            <!-- W vs V -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F4A8; W vs. V &mdash; the German trap</h3>
+                    <span class="ipa">/w/ vs. /v/</span>
+                </div>
+                <p style="font-size:0.87rem;color:rgba(230,230,235,0.65);margin:0 0 0.7rem;">
+                    W = round your lips like saying "oo". V = touch your top teeth to your bottom lip.
+                </p>
+                <div class="drill-row">
+                    <div class="drill-text"><strong>V</strong>ery <strong>w</strong>ell, <strong>W</strong>endy.</div>
+                    <div class="drill-hint">classic mix-up</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text"><strong>W</strong>e <strong>w</strong>ere <strong>v</strong>ery, <strong>v</strong>ery <strong>w</strong>orried.</div>
+                    <div class="drill-hint">rapid alternation</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text"><strong>V</strong>ictor <strong>w</strong>ent to <strong>V</strong>ienna and <strong>w</strong>aved at <strong>W</strong>illiam.</div>
+                    <div class="drill-hint">names</div>
+                </div>
+            </div>
+
+            <!-- ED endings -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F3AF; Past -ED endings</h3>
+                    <span class="ipa">/t/ /d/ /&#618;d/</span>
+                </div>
+                <p style="font-size:0.87rem;color:rgba(230,230,235,0.65);margin:0 0 0.7rem;">
+                    Three pronunciations: <strong>/t/</strong> after voiceless (walked) &middot; <strong>/d/</strong> after voiced (lived) &middot; <strong>/&#618;d/</strong> after t/d (wanted)
+                </p>
+                <div class="drill-row">
+                    <div class="drill-text">I wal<strong>ked</strong>, talk<strong>ed</strong>, work<strong>ed</strong>, watch<strong>ed</strong>.</div>
+                    <div class="drill-hint">all /t/</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">She liv<strong>ed</strong>, lov<strong>ed</strong>, play<strong>ed</strong>, call<strong>ed</strong>.</div>
+                    <div class="drill-hint">all /d/</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">They want<strong>ed</strong>, need<strong>ed</strong>, decid<strong>ed</strong>, start<strong>ed</strong>.</div>
+                    <div class="drill-hint">all /&#618;d/</div>
+                </div>
+            </div>
+
+            <!-- NATURAL CONNECTING -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F3A4; Sound natural &mdash; word linking</h3>
+                    <span class="ipa">gonna / wanna / gotta</span>
+                </div>
+                <p style="font-size:0.87rem;color:rgba(230,230,235,0.65);margin:0 0 0.7rem;">
+                    Native speakers blend words together. Don't say each word separately!
+                </p>
+                <div class="drill-row">
+                    <div class="drill-text">"I am going to..." &rarr; <strong>"I'm gonna..."</strong></div>
+                    <div class="drill-hint">speech blend</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">"I want to..." &rarr; <strong>"I wanna..."</strong></div>
+                    <div class="drill-hint">speech blend</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">"I have got to..." &rarr; <strong>"I gotta..."</strong></div>
+                    <div class="drill-hint">speech blend</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">"What are you doing?" &rarr; <strong>"Whatcha doin'?"</strong></div>
+                    <div class="drill-hint">very casual</div>
+                </div>
+                <div class="drill-row">
+                    <div class="drill-text">"Did you eat yet?" &rarr; <strong>"D'jeet yet?"</strong></div>
+                    <div class="drill-hint">super native!</div>
+                </div>
+            </div>
+
+            <!-- NATIVE FILLER PHRASES -->
+            <div class="sound-section">
+                <div class="sound-header">
+                    <h3>&#x1F4AC; 10 native phrases that make you sound fluent</h3>
+                    <span class="ipa">use them today</span>
+                </div>
+                <div class="native-grid">
+                    <div class="native-card">
+                        <div class="nc-phrase">"You know what I mean?"</div>
+                        <div class="nc-mean">Asking if listener follows you</div>
+                        <div class="nc-ex">"...so the whole thing was just weird, you know what I mean?"</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"Long story short..."</div>
+                        <div class="nc-mean">Skip to the point</div>
+                        <div class="nc-ex">"Long story short, we missed the train."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"To be fair..."</div>
+                        <div class="nc-mean">Acknowledge the other side</div>
+                        <div class="nc-ex">"To be fair, she did warn us."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"Now that you mention it..."</div>
+                        <div class="nc-mean">React to what someone said</div>
+                        <div class="nc-ex">"Now that you mention it, I noticed the same thing!"</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"It is what it is."</div>
+                        <div class="nc-mean">Accept reality</div>
+                        <div class="nc-ex">"We lost the match. It is what it is."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"I'm not gonna lie..."</div>
+                        <div class="nc-mean">About to say something honest</div>
+                        <div class="nc-ex">"I'm not gonna lie, I'm exhausted."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"My bad!"</div>
+                        <div class="nc-mean">Casual apology / "my fault"</div>
+                        <div class="nc-ex">"Oh, my bad &mdash; I didn't see you there."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"Pretty much."</div>
+                        <div class="nc-mean">Yes, basically / almost</div>
+                        <div class="nc-ex">"You're done? &mdash; Pretty much."</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"For real?"</div>
+                        <div class="nc-mean">Really? / Are you serious?</div>
+                        <div class="nc-ex">"She's moving to Tokyo? For real?"</div>
+                    </div>
+                    <div class="native-card">
+                        <div class="nc-phrase">"That makes sense."</div>
+                        <div class="nc-mean">I understand / logical</div>
+                        <div class="nc-ex">"...so that's why she was late. &mdash; That makes sense."</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:linear-gradient(135deg,rgba(63,185,80,0.10),rgba(88,166,255,0.05));border:1.5px solid rgba(63,185,80,0.35);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.5rem;">
+                <h3 style="margin:0 0 0.5rem;color:#86efac;font-size:1.05rem;">&#x1F31F; The fluency formula</h3>
+                <p style="margin:0;font-size:0.92rem;line-height:1.65;color:rgba(230,230,235,0.9);">
+                    <strong>10 min daily &gt; 1 hour weekly.</strong> Pick ONE mode per day:
+                    <strong>Mon</strong> &mdash; 60-sec challenge x3 &middot;
+                    <strong>Tue</strong> &mdash; 2 conversations (read + improvise) &middot;
+                    <strong>Wed</strong> &mdash; 1 story starter (2-min talk) &middot;
+                    <strong>Thu</strong> &mdash; 1 debate (both sides!) &middot;
+                    <strong>Fri</strong> &mdash; pronunciation drills + 5 native phrases &middot;
+                    <strong>Sat/Sun</strong> &mdash; describe a scene + record yourself.
+                </p>
+            </div>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        // ===== MODE SWITCH =====
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-mode="' + mode + '"]').classList.add('active');
+            document.getElementById('m-' + mode).classList.add('active');
+            window.scrollTo({ top: document.querySelector('.mode-grid').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        // ===== 60-SEC CHALLENGE =====
+        const challenges = [
+            { c: 'PERSONAL', q: 'Describe the best thing that happened to you this week.' },
+            { c: 'PERSONAL', q: 'Tell me about a friend who has changed you for the better.' },
+            { c: 'PERSONAL', q: 'What\'s a habit you\'re proud of, and one you want to break?' },
+            { c: 'PERSONAL', q: 'Describe a perfect weekend in your city.' },
+            { c: 'PERSONAL', q: 'What\'s something most people don\'t know about you?' },
+            { c: 'OPINION', q: 'Why do people argue so much about social media?' },
+            { c: 'OPINION', q: 'Should phones be banned in schools? Defend your view.' },
+            { c: 'OPINION', q: 'Is it better to be book-smart or street-smart?' },
+            { c: 'OPINION', q: 'Are reality TV shows good or bad for society?' },
+            { c: 'OPINION', q: 'Money or passion — what should drive your career?' },
+            { c: 'HYPOTHETICAL', q: 'If you could swap lives with anyone for a week, who would it be?' },
+            { c: 'HYPOTHETICAL', q: 'If you won a million euros, what would you do in the first 24 hours?' },
+            { c: 'HYPOTHETICAL', q: 'If you could solve one world problem, which one?' },
+            { c: 'HYPOTHETICAL', q: 'If you could speak any language fluently overnight, which one and why?' },
+            { c: 'HYPOTHETICAL', q: 'If you had to teach a class tomorrow, what would you teach?' },
+            { c: 'STORY', q: 'Tell about the most embarrassing moment of your life.' },
+            { c: 'STORY', q: 'Describe a trip that completely surprised you.' },
+            { c: 'STORY', q: 'Tell about a time you got lost and what happened next.' },
+            { c: 'STORY', q: 'Describe the best meal you\'ve ever had — where, with who, why.' },
+            { c: 'STORY', q: 'Tell about a movie or book that genuinely changed your mind.' },
+            { c: 'FUTURE', q: 'Where do you see yourself in 5 years? Be specific.' },
+            { c: 'FUTURE', q: 'What kind of parent do you think you\'ll be?' },
+            { c: 'FUTURE', q: 'What\'s one thing you want to learn before age 25?' },
+            { c: 'FUTURE', q: 'Describe your dream apartment in detail.' },
+            { c: 'FUTURE', q: 'What city would you love to live in for a year?' },
+            { c: 'RANDOM', q: 'What\'s the most useless skill you have?' },
+            { c: 'RANDOM', q: 'If your life had a soundtrack, what would the title song be?' },
+            { c: 'RANDOM', q: 'Describe your phone\'s home screen and what it says about you.' },
+            { c: 'RANDOM', q: 'What\'s a small thing that always makes you happy?' },
+            { c: 'RANDOM', q: 'Convince me to try your favorite food.' }
+        ];
+
+        let lastCh = -1;
+        function newChallenge() {
+            let i;
+            do { i = Math.floor(Math.random() * challenges.length); } while (i === lastCh);
+            lastCh = i;
+            document.getElementById('chPrompt').textContent = challenges[i].q;
+            document.getElementById('chCat').textContent = challenges[i].c;
+            resetChallenge();
+        }
+
+        // ===== TIMER =====
+        let chTime = 60, chRem = 60, chInt = null, chRun = false;
+        function fmtCh(s) { const m = Math.floor(s/60); const sec = s%60; return m + ':' + (sec<10?'0':'') + sec; }
+        function toggleChallenge() {
+            const tm = document.getElementById('chTimer');
+            const btn = document.getElementById('chGo');
+            if (chRun) {
+                clearInterval(chInt); chRun = false;
+                btn.innerHTML = '&#x25B6; Resume';
+                tm.classList.remove('running');
+            } else {
+                chRun = true;
+                btn.innerHTML = '&#x23F8; Pause';
+                tm.classList.add('running');
+                chInt = setInterval(() => {
+                    chRem--;
+                    tm.textContent = fmtCh(chRem);
+                    if (chRem <= 0) {
+                        clearInterval(chInt); chRun = false;
+                        tm.classList.remove('running');
+                        tm.classList.add('done');
+                        tm.textContent = '✓ DONE!';
+                        btn.innerHTML = '&#x25B6; Start 60 sec';
+                    }
+                }, 1000);
+            }
+        }
+        function resetChallenge() {
+            clearInterval(chInt); chRun = false; chRem = chTime;
+            const tm = document.getElementById('chTimer');
+            tm.textContent = fmtCh(chRem);
+            tm.classList.remove('running', 'done');
+            document.getElementById('chGo').innerHTML = '&#x25B6; Start 60 sec';
+        }
+    </script>
+</body>
+</html>
