@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Texte | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #060614; }
+        body { font-feature-settings: "ss01", "ss02", "kern"; }
+
+        /* ===== ANIMATED GRADIENT BLOBS BG ===== */
+        .bg-blobs {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.42;
+            animation: float 22s infinite ease-in-out;
+        }
+        .blob.b1 { background: #f59e0b; top: -120px; left: -150px; }
+        .blob.b2 { background: #58a6ff; top: 35%; right: -180px; animation-delay: -6s; animation-duration: 28s; }
+        .blob.b3 { background: #a371f7; bottom: -180px; left: 25%; animation-delay: -12s; animation-duration: 24s; opacity: 0.32; }
+        @keyframes float {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(60px,-40px) scale(1.12); }
+            66% { transform: translate(-40px,60px) scale(0.92); }
+        }
+
+        /* ===== HERO ===== */
+        .hero-wrap {
+            margin: 1rem 0 2rem;
+            padding: 2.2rem 2rem 1.8rem;
+            background: linear-gradient(135deg, rgba(245,158,11,0.10), rgba(88,166,255,0.08), rgba(163,113,247,0.06));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+        }
+        .hero-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 0%, rgba(245,158,11,0.18), transparent 50%),
+                        radial-gradient(circle at 80% 100%, rgba(88,166,255,0.15), transparent 50%);
+            pointer-events: none;
+        }
+        .hero-flags {
+            position: relative;
+            font-size: 2.2rem;
+            line-height: 1;
+            margin-bottom: 0.7rem;
+            letter-spacing: 0.15em;
+        }
+        .hero-title {
+            position: relative;
+            margin: 0 0 0.5rem;
+            font-size: clamp(1.9rem, 5vw, 2.7rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fbbf24 0%, #fde68a 25%, #ffffff 50%, #93c5fd 75%, #58a6ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-sub {
+            position: relative;
+            margin: 0;
+            font-size: 1rem;
+            color: rgba(230,230,235,0.78);
+            font-weight: 500;
+            line-height: 1.6;
+            max-width: 640px;
+        }
+        .hero-sub strong { color: #fff; }
+
+        .lvl-pill {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(245,158,11,0.22), rgba(88,166,255,0.22));
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            -webkit-text-fill-color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            letter-spacing: 0.12em;
+            margin-left: 0.8rem;
+            vertical-align: middle;
+            backdrop-filter: blur(8px);
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1;
+            position: relative;
+            top: -0.35rem;
+        }
+
+        /* ===== HOW-TO HINT BOX ===== */
+        .hint-box {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 1rem 1.3rem;
+            margin: 0 0 1.6rem;
+            backdrop-filter: blur(12px);
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+        .hint-box .hint-ico {
+            flex-shrink: 0;
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f59e0b, #58a6ff);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 18px rgba(245,158,11,0.25);
+        }
+        .hint-box p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: rgba(230,230,235,0.85); }
+
+        /* ===== SEGMENTED MODE TOGGLE ===== */
+        .mode-bar {
+            display: inline-flex;
+            gap: 0.3rem;
+            margin: 0 0 2rem;
+            padding: 0.35rem;
+            background: rgba(13,17,23,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .mode-bar .mb-label { display: none; }
+        .view-btn {
+            padding: 0.55rem 1.15rem;
+            border-radius: 50px;
+            background: transparent;
+            border: none;
+            color: rgba(230,230,235,0.6);
+            font-size: 0.83rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .view-btn:hover { color: #fff; }
+        .view-btn.active {
+            background: linear-gradient(135deg, #f59e0b, #58a6ff);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(245,158,11,0.4);
+            transform: scale(1.03);
+        }
+
+        /* ===== TEXT CARD (parallel) ===== */
+        .text-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 1.5rem 1.6rem 1.3rem;
+            margin-bottom: 1.4rem;
+            backdrop-filter: blur(14px);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        .text-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.08), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .text-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(245,158,11,0.3);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,158,11,0.18);
+        }
+        .text-card .tc-cat {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.75rem;
+            border-radius: 50px;
+            margin-bottom: 0.9rem;
+            backdrop-filter: blur(6px);
+        }
+        .tc-cat.brain { background: linear-gradient(135deg, rgba(163,113,247,0.22), rgba(163,113,247,0.10)); color: #d4baff; border: 1px solid rgba(163,113,247,0.4); }
+        .tc-cat.nature { background: linear-gradient(135deg, rgba(63,185,80,0.22), rgba(63,185,80,0.10)); color: #9beaa9; border: 1px solid rgba(63,185,80,0.4); }
+        .tc-cat.space { background: linear-gradient(135deg, rgba(88,166,255,0.22), rgba(88,166,255,0.10)); color: #94c2ff; border: 1px solid rgba(88,166,255,0.4); }
+        .tc-cat.curious { background: linear-gradient(135deg, rgba(248,81,73,0.18), rgba(248,81,73,0.08)); color: #ffaaa3; border: 1px solid rgba(248,81,73,0.4); }
+        .tc-cat.body { background: linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.10)); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); }
+
+        .text-card h3 {
+            margin: 0 0 1rem;
+            font-size: 1.32rem;
+            color: #fff;
+            line-height: 1.3;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+        .text-card h3 .h-de {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(245,158,11,0.15);
+        }
+        .text-card h3 .h-en {
+            background: linear-gradient(135deg, #93c5fd, #58a6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-card h3 .sep {
+            color: rgba(255,255,255,0.18);
+            font-weight: 300;
+            margin: 0 0.5rem;
+        }
+
+        /* ===== TWO-COLUMN LAYOUT ===== */
+        .lang-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.9rem;
+        }
+        .lang-col {
+            background: rgba(255,255,255,0.02);
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem 1rem;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .lang-col.de { border-left: 3px solid rgba(245,158,11,0.65); }
+        .lang-col.en { border-left: 3px solid rgba(88,166,255,0.65); }
+        .lang-col:hover { background: rgba(255,255,255,0.04); }
+        .lang-tag {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.85rem;
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            padding: 0.18rem 0.5rem;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+        }
+        .lang-tag.de { background: rgba(245,158,11,0.25); color: #fde68a; border: 1px solid rgba(245,158,11,0.5); }
+        .lang-tag.en { background: rgba(88,166,255,0.25); color: #bfdbfe; border: 1px solid rgba(88,166,255,0.5); }
+        .lang-col p {
+            margin: 0 2rem 0 0;
+            font-size: 0.94rem;
+            line-height: 1.75;
+            color: rgba(232,232,237,0.92);
+        }
+        /* ===== BILINGUAL WORD HIGHLIGHTING ===== */
+        .w1, .w2, .w3, .w4, .w5 {
+            padding: 0.05rem 6px;
+            border-radius: 6px;
+            font-weight: 700;
+            transition: transform 0.15s;
+            display: inline-block;
+        }
+        .w1:hover, .w2:hover, .w3:hover, .w4:hover, .w5:hover {
+            transform: scale(1.06);
+        }
+        .w1 { background: rgba(163,113,247,0.22); color: #d4baff; box-shadow: 0 0 12px rgba(163,113,247,0.18); }
+        .w2 { background: rgba(63,185,80,0.22); color: #9beaa9; box-shadow: 0 0 12px rgba(63,185,80,0.18); }
+        .w3 { background: rgba(248,81,73,0.2); color: #ffaaa3; box-shadow: 0 0 12px rgba(248,81,73,0.18); }
+        .w4 { background: rgba(245,158,11,0.24); color: #fcd34d; box-shadow: 0 0 12px rgba(245,158,11,0.18); }
+        .w5 { background: rgba(88,166,255,0.24); color: #94c2ff; box-shadow: 0 0 12px rgba(88,166,255,0.18); }
+
+        /* Hide based on mode */
+        body.mode-de .lang-col.en { display: none; }
+        body.mode-de .lang-grid { grid-template-columns: 1fr; }
+        body.mode-en .lang-col.de { display: none; }
+        body.mode-en .lang-grid { grid-template-columns: 1fr; }
+
+        /* ===== VOCAB STRIP ===== */
+        .vocab-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1.1rem;
+            padding-top: 1.1rem;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+        .vocab-pair {
+            background: linear-gradient(145deg, rgba(245,158,11,0.04), rgba(88,166,255,0.04));
+            padding: 0.65rem 0.85rem;
+            border-radius: 12px;
+            font-size: 0.83rem;
+            line-height: 1.45;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+        .vocab-pair:hover {
+            border-color: rgba(245,158,11,0.3);
+            transform: translateY(-2px);
+        }
+        .vocab-pair .vp-de { color: #fde68a; font-weight: 700; }
+        .vocab-pair .vp-en { color: #bfdbfe; font-weight: 700; }
+        .vocab-pair .vp-sep { color: rgba(255,255,255,0.25); margin: 0 0.35rem; }
+        .vocab-pair .vp-ua { display: block; color: rgba(134,239,172,0.95); font-size: 0.76rem; font-style: italic; margin-top: 0.3rem; }
+
+        /* ===== SECTION DIVIDER ===== */
+        .sec-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            margin: 3rem 0 1.4rem;
+            position: relative;
+        }
+        .sec-divider::before {
+            content: '';
+            position: absolute;
+            left: -1.4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 32px;
+            background: linear-gradient(180deg, #f59e0b, #58a6ff);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(245,158,11,0.5);
+        }
+        .sec-divider .sd-icon {
+            font-size: 1.8rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 14px rgba(245,158,11,0.4));
+        }
+        .sec-divider h2 {
+            margin: 0;
+            font-size: 1.55rem;
+            color: #fff;
+            font-weight: 900;
+            letter-spacing: -0.01em;
+        }
+        .sec-divider .sd-tag {
+            color: rgba(230,230,235,0.55);
+            font-size: 0.85rem;
+            margin-left: auto;
+            font-style: italic;
+            padding: 0.35rem 0.85rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        @media (max-width: 720px) {
+            .lang-grid { grid-template-columns: 1fr; }
+            .lang-col p { margin-right: 0; padding-top: 1.5rem; }
+            .lang-tag { top: 0.55rem; right: 0.65rem; }
+            .sec-divider { gap: 0.5rem; }
+            .sec-divider::before { left: -0.8rem; }
+            .sec-divider .sd-tag { display: none; }
+            .hero-wrap { padding: 1.6rem 1.4rem; }
+        }
+
+        /* ===== MIXED TEXTS (code-switching) ===== */
+        .mixed-card {
+            position: relative;
+            padding: 1.6rem 1.7rem 1.3rem;
+            margin-bottom: 1.5rem;
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(245,158,11,0.06), rgba(88,166,255,0.06), rgba(163,113,247,0.04));
+            backdrop-filter: blur(16px);
+            isolation: isolate;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .mixed-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1.5px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #f59e0b, #a371f7, #58a6ff);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.55;
+            transition: opacity 0.3s;
+        }
+        .mixed-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+        }
+        .mixed-card:hover::before { opacity: 1; }
+        .mixed-card .mx-cat {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.32rem 0.8rem;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(245,158,11,0.22), rgba(88,166,255,0.22));
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.18);
+            margin-bottom: 0.9rem;
+            backdrop-filter: blur(8px);
+        }
+        .mixed-card h3 {
+            margin: 0 0 1.1rem;
+            font-size: 1.3rem;
+            color: #fff;
+            line-height: 1.3;
+            font-weight: 900;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #fde68a 0%, #ffffff 50%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .mixed-card .mx-body {
+            font-size: 1.02rem;
+            line-height: 1.95;
+            color: rgba(232,232,237,0.95);
+            margin: 0 0 0.9rem;
+        }
+        /* German chunks inside mixed text */
+        .mx-body .de {
+            color: #fde68a;
+            background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(245,158,11,0.06));
+            padding: 0.1rem 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: 1px solid rgba(245,158,11,0.18);
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 0.05rem 0;
+        }
+        .mx-body .de:hover {
+            background: rgba(245,158,11,0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(245,158,11,0.3);
+        }
+        /* English chunks inside mixed text */
+        .mx-body .en {
+            color: #bfdbfe;
+            background: linear-gradient(135deg, rgba(88,166,255,0.16), rgba(88,166,255,0.06));
+            padding: 0.1rem 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: 1px solid rgba(88,166,255,0.18);
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 0.05rem 0;
+        }
+        .mx-body .en:hover {
+            background: rgba(88,166,255,0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(88,166,255,0.3);
+        }
+        /* Pure versions reveal */
+        .mixed-card details { margin-top: 0.7rem; }
+        .mixed-card summary {
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 0.65rem 0.95rem;
+            user-select: none;
+            list-style: none;
+            color: rgba(230,230,235,0.75);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 50px;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .mixed-card summary:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-color: rgba(255,255,255,0.18);
+        }
+        .mixed-card summary::-webkit-details-marker { display: none; }
+        .mixed-card summary::before {
+            content: '\25B6';
+            font-size: 0.62rem;
+            transition: transform 0.2s;
+        }
+        .mixed-card details[open] summary::before { transform: rotate(90deg); }
+        .pure-version {
+            margin-top: 0.6rem;
+            padding: 1.05rem 1.25rem;
+            border-radius: 14px;
+            font-size: 0.94rem;
+            line-height: 1.75;
+            color: rgba(230,230,235,0.92);
+            backdrop-filter: blur(8px);
+        }
+        .pure-version.de {
+            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02));
+            border-left: 4px solid #f59e0b;
+            border-top: 1px solid rgba(245,158,11,0.18);
+            border-right: 1px solid rgba(245,158,11,0.08);
+            border-bottom: 1px solid rgba(245,158,11,0.08);
+        }
+        .pure-version.en {
+            background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(88,166,255,0.02));
+            border-left: 4px solid #58a6ff;
+            border-top: 1px solid rgba(88,166,255,0.18);
+            border-right: 1px solid rgba(88,166,255,0.08);
+            border-bottom: 1px solid rgba(88,166,255,0.08);
+        }
+        .pure-version .pv-tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            padding: 0.18rem 0.55rem;
+            border-radius: 6px;
+            margin-right: 0.6rem;
+            vertical-align: middle;
+        }
+        .pure-version.de .pv-tag { background: rgba(245,158,11,0.28); color: #fde68a; }
+        .pure-version.en .pv-tag { background: rgba(88,166,255,0.28); color: #bfdbfe; }
+    </style>
+</head>
+<body class="dark-theme mode-both" style="background: #060614">
+    <div class="bg-blobs">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Bilingual Texte</span>
+        </nav>
+
+        <div style="display:flex; gap:0.6rem; margin-bottom:0.7rem;">
+            <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:#fbbf24;font-size:0.93rem;text-decoration:none;">&#8592; Deutsch</a>
+            <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:#79b8ff;font-size:0.93rem;text-decoration:none;">&#8592; Englisch</a>
+        </div>
+
+        <div class="hero-wrap">
+            <div class="hero-flags">&#x1F1E9;&#x1F1EA; &harr; &#x1F1EC;&#x1F1E7;</div>
+            <h1 class="hero-title">Bilingual Texts<span class="lvl-pill">B1 &rarr; B2</span></h1>
+            <p class="hero-sub">Wissenschaftliche &amp; Alltagstexte in <strong>zwei Sprachen</strong>. Mixed Code-switching oben &middot; parallele Texte unten &middot; gleiche W&ouml;rter in <span class="w1">gleicher Farbe</span>.</p>
+        </div>
+
+        <div class="hint-box">
+            <div class="hint-ico">&#x1F4A1;</div>
+            <p><strong>Wie nutzen:</strong> Lies <strong>Mixed</strong> zuerst &mdash; sieh, wie sich die Sprachen mischen. Dann scroll zu <strong>Parallel</strong> &mdash; lies eine Spalte, ohne die andere zu sehen (Knopf "DE only" / "EN only"). Pr&uuml;f dich, dann vergleich!</p>
+        </div>
+
+        <!-- VIEW TOGGLE -->
+        <div class="mode-bar">
+            <span class="mb-label">View:</span>
+            <button class="view-btn active" data-mode="both" onclick="setMode('both')">&#x1F1E9;&#x1F1EA; + &#x1F1EC;&#x1F1E7; Both</button>
+            <button class="view-btn" data-mode="de" onclick="setMode('de')">&#x1F1E9;&#x1F1EA; Deutsch only</button>
+            <button class="view-btn" data-mode="en" onclick="setMode('en')">&#x1F1EC;&#x1F1E7; English only</button>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: MIXED (DE + EN in one text)
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F500;</span>
+            <h2>Mixed Texts &mdash; Code-switching</h2>
+            <span class="sd-tag">DE &amp; EN in einem Satz</span>
+        </div>
+        <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);margin:-0.6rem 0 1.2rem;">
+            &#x1F4A1; <strong>Both languages mixed in one paragraph &mdash; like &laquo;I go in die Schule&raquo;.</strong> Englisch in <span style="color:#79b8ff;">blau</span>, Deutsch in <span style="color:#fbbf24;">orange</span>. Klick auf "Pure versions" unten in jeder Karte, um die reinen Versionen zu sehen.
+        </p>
+
+        <!-- MIXED 1: Morning -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x1F305; Alltag &middot; Daily life</span>
+            <h3>My typical morning / Mein typischer Morgen</h3>
+            <p class="mx-body">
+                <span class="en">It's 7am</span> <span class="de">und mein Wecker klingelt</span>. <span class="en">I really don't want to get up,</span> <span class="de">aber die Schule wartet</span>. <span class="en">I jump out of bed,</span> <span class="de">putze schnell die Z&auml;hne</span> <span class="en">and grab a quick coffee.</span> <span class="de">Mama ist schon in der K&uuml;che</span>, <span class="en">making pancakes &mdash; my favorite breakfast!</span> <span class="de">Drau&szlig;en ist es eiskalt</span>, <span class="en">so I bundle up</span> <span class="de">und renne zur Bushaltestelle</span>. <span class="en">The bus is</span> <span class="de">gerade angekommen</span> &mdash; <span class="en">perfect timing!</span> <span class="de">Drinnen sitzt</span> <span class="en">my best friend Anna already,</span> <span class="de">und sie winkt mir zu</span>. <span class="en">"How was</span> <span class="de">dein Wochenende</span>?" <span class="en">she asks.</span> "<span class="en">Pretty boring,</span> <span class="de">aber ich habe die neue Netflix-Serie zu Ende geguckt</span>!"
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Es ist 7 Uhr und mein Wecker klingelt. Ich will wirklich nicht aufstehen, aber die Schule wartet. Ich springe aus dem Bett, putze schnell die Z&auml;hne und schnappe mir einen schnellen Kaffee. Mama ist schon in der K&uuml;che und macht Pfannkuchen &mdash; mein Lieblingsfr&uuml;hst&uuml;ck! Drau&szlig;en ist es eiskalt, also ziehe ich mich warm an und renne zur Bushaltestelle. Der Bus ist gerade angekommen &mdash; perfektes Timing! Drinnen sitzt meine beste Freundin Anna schon, und sie winkt mir zu. &laquo;Wie war dein Wochenende?&raquo; fragt sie. &laquo;Ziemlich langweilig, aber ich habe die neue Netflix-Serie zu Ende geguckt!&raquo;</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>It's 7am and my alarm is ringing. I really don't want to get up, but school is waiting. I jump out of bed, quickly brush my teeth and grab a quick coffee. Mom is already in the kitchen, making pancakes &mdash; my favorite breakfast! Outside it's freezing cold, so I bundle up and run to the bus stop. The bus has just arrived &mdash; perfect timing! Inside, my best friend Anna is already sitting there and waves at me. "How was your weekend?" she asks. "Pretty boring, but I finished the new Netflix series!"</div>
+            </details>
+        </div>
+
+        <!-- MIXED 2: Weird Saturday -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x1F914; Story &middot; Geschichte</span>
+            <h3>A weird Saturday / Ein komischer Samstag</h3>
+            <p class="mx-body">
+                <span class="en">Last Saturday</span> <span class="de">war einer der seltsamsten Tage</span> <span class="en">of my life.</span> <span class="de">Ich wollte einfach chillen</span> <span class="en">on the couch, watch Netflix, eat snacks &mdash;</span> <span class="de">die typische faule Tag-Vibe</span>. <span class="en">But then</span> <span class="de">rief meine Mama</span> <span class="en">from work:</span> "<span class="de">Komm bitte schnell zum Supermarkt</span>!" <span class="en">I groaned,</span> <span class="de">zog einen Hoodie an</span> <span class="en">and dragged myself outside.</span> <span class="de">Im Supermarkt traf ich zuf&auml;llig</span> <span class="en">my ex-best-friend Lisa &mdash; we haven't talked</span> <span class="de">seit drei Jahren</span>! <span class="en">It was awkward at first,</span> <span class="de">aber dann redeten wir</span> <span class="en">for 30 minutes</span> <span class="de">bei der K&auml;setheke</span>. <span class="en">Honestly,</span> <span class="de">der seltsamste Samstag aller Zeiten</span> &mdash; <span class="en">but somehow really nice.</span>
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Letzten Samstag war einer der seltsamsten Tage meines Lebens. Ich wollte einfach chillen auf der Couch, Netflix schauen, Snacks essen &mdash; die typische faule Tag-Vibe. Aber dann rief meine Mama von der Arbeit an: &laquo;Komm bitte schnell zum Supermarkt!&raquo; Ich seufzte, zog einen Hoodie an und schleppte mich nach drau&szlig;en. Im Supermarkt traf ich zuf&auml;llig meine Ex-beste-Freundin Lisa &mdash; wir haben seit drei Jahren nicht mehr geredet! Am Anfang war es komisch, aber dann redeten wir 30 Minuten bei der K&auml;setheke. Ehrlich gesagt, der seltsamste Samstag aller Zeiten &mdash; aber irgendwie richtig sch&ouml;n.</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>Last Saturday was one of the weirdest days of my life. I just wanted to chill on the couch, watch Netflix, eat snacks &mdash; the typical lazy-day vibe. But then my mom called from work: "Come to the supermarket quickly, please!" I groaned, threw on a hoodie and dragged myself outside. In the supermarket I accidentally ran into my ex-best-friend Lisa &mdash; we hadn't talked in three years! It was awkward at first, but then we chatted for 30 minutes by the cheese counter. Honestly, the weirdest Saturday ever &mdash; but somehow really nice.</p></div>
+            </details>
+        </div>
+
+        <!-- MIXED 3: Music -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x1F3B5; Personal &middot; Pers&ouml;nlich</span>
+            <h3>Why I love music / Warum ich Musik liebe</h3>
+            <p class="mx-body">
+                <span class="en">Music is my therapy,</span> <span class="de">ehrlich gesagt</span>. <span class="en">When I'm sad,</span> <span class="de">mache ich meine Sad-Songs-Playlist an</span> <span class="en">and cry it out.</span> <span class="en">When I'm happy,</span> <span class="de">drehe ich laute Beats auf</span> <span class="en">and dance through</span> <span class="de">mein Zimmer wie verr&uuml;ckt</span>. <span class="en">There's this one K-Pop song &mdash;</span> <span class="de">jedes Mal, wenn ich es h&ouml;re</span>, <span class="en">I get goosebumps.</span> <span class="de">Verr&uuml;ckt, wie Musik unsere Stimmung</span> <span class="en">in 10 seconds can change.</span> <span class="de">Wissenschaftler sagen, dass Musik Dopamin im Gehirn aussch&uuml;ttet</span> &mdash; <span class="en">the same chemical</span> <span class="de">wie wenn wir verliebt sind</span>. <span class="en">Maybe that's why my favorite song</span> <span class="de">wirkt wie eine Umarmung von innen</span>.
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Musik ist meine Therapie, ehrlich gesagt. Wenn ich traurig bin, mache ich meine Sad-Songs-Playlist an und weine es heraus. Wenn ich gl&uuml;cklich bin, drehe ich laute Beats auf und tanze wie verr&uuml;ckt durch mein Zimmer. Es gibt diesen einen K-Pop-Song &mdash; jedes Mal, wenn ich es h&ouml;re, bekomme ich G&auml;nsehaut. Verr&uuml;ckt, wie Musik unsere Stimmung in 10 Sekunden &auml;ndern kann. Wissenschaftler sagen, dass Musik Dopamin im Gehirn aussch&uuml;ttet &mdash; dasselbe Chemikal wie wenn wir verliebt sind. Vielleicht deshalb wirkt mein Lieblingssong wie eine Umarmung von innen.</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>Music is my therapy, honestly. When I'm sad, I turn on my sad-songs playlist and cry it out. When I'm happy, I crank up loud beats and dance through my room like crazy. There's this one K-Pop song &mdash; every time I hear it, I get goosebumps. It's crazy how music can change our mood in 10 seconds. Scientists say that music releases dopamine in the brain &mdash; the same chemical as when we're in love. Maybe that's why my favorite song feels like a hug from inside.</div>
+            </details>
+        </div>
+
+        <!-- MIXED 4: Octopus -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x1F9EA; Science &middot; Wissenschaft</span>
+            <h3>Octopuses have nine brains! / Oktopusse haben neun Gehirne!</h3>
+            <p class="mx-body">
+                <span class="en">Did you know that octopuses have</span> <span class="de">neun Gehirne</span>? <span class="en">Yes, nine!</span> <span class="de">Ein zentrales Gehirn</span> <span class="en">and eight more,</span> <span class="de">eines in jedem Arm</span>. <span class="en">That means each arm</span> <span class="de">kann quasi unabh&auml;ngig denken und handeln</span>. <span class="de">Wissenschaftler haben beobachtet</span>, <span class="en">that an octopus can open</span> <span class="de">ein Glas mit einem Arm</span>, <span class="en">while the other arms</span> <span class="de">etwas ganz anderes tun</span>. <span class="en">Pretty wild, right?</span> <span class="de">Oktopusse k&ouml;nnen auch Puzzles l&ouml;sen</span>, <span class="en">recognize human faces,</span> <span class="de">und sogar Werkzeuge benutzen</span>. <span class="en">Sometimes I think</span> <span class="de">sie sind schlauer als manche Menschen</span> &mdash; <span class="en">but let's not say that out loud.</span>
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Wusstest du, dass Oktopusse neun Gehirne haben? Ja, neun! Ein zentrales Gehirn und acht weitere, eines in jedem Arm. Das hei&szlig;t, jeder Arm kann quasi unabh&auml;ngig denken und handeln. Wissenschaftler haben beobachtet, dass ein Oktopus ein Glas mit einem Arm &ouml;ffnen kann, w&auml;hrend die anderen Arme etwas ganz anderes tun. Ziemlich verr&uuml;ckt, oder? Oktopusse k&ouml;nnen auch Puzzles l&ouml;sen, menschliche Gesichter erkennen und sogar Werkzeuge benutzen. Manchmal denke ich, sie sind schlauer als manche Menschen &mdash; aber lasst uns das nicht laut sagen.</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>Did you know that octopuses have nine brains? Yes, nine! One central brain and eight more, one in each arm. That means each arm can practically think and act independently. Scientists have observed that an octopus can open a jar with one arm while the other arms do something completely different. Pretty wild, right? Octopuses can also solve puzzles, recognize human faces, and even use tools. Sometimes I think they are smarter than some humans &mdash; but let's not say that out loud.</div>
+            </details>
+        </div>
+
+        <!-- MIXED 5: Dream trip -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x2708;&#xFE0F; Travel &middot; Reisen</span>
+            <h3>My dream trip / Meine Traumreise</h3>
+            <p class="mx-body">
+                <span class="en">If I could go anywhere tomorrow,</span> <span class="de">w&uuml;rde ich nach Japan fliegen</span>. <span class="en">I've always dreamed of seeing</span> <span class="de">die Kirschbl&uuml;ten in Tokyo</span>, <span class="en">walking through</span> <span class="de">die kleinen Gassen von Kyoto</span>, <span class="en">eating authentic ramen at midnight.</span> <span class="de">Die Kultur ist so einzigartig</span> &mdash; <span class="en">a mix of</span> <span class="de">alten Traditionen und superm&auml;&szlig;iger Technologie</span>. <span class="en">I'd want to learn</span> <span class="de">ein bisschen Japanisch</span> <span class="en">before I go &mdash; even just</span> <span class="de">"Hallo" und "Danke"</span> <span class="en">would be nice.</span> <span class="de">Vielleicht irgendwann</span>, <span class="en">when I've saved enough money</span> <span class="de">und die Schule endlich vorbei ist</span>. <span class="en">Until then, I'll just watch Japan vlogs</span> <span class="de">auf YouTube und weitertr&auml;umen</span>.
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Wenn ich morgen &uuml;berallhin fliegen k&ouml;nnte, w&uuml;rde ich nach Japan fliegen. Ich habe schon immer davon getr&auml;umt, die Kirschbl&uuml;ten in Tokyo zu sehen, durch die kleinen Gassen von Kyoto zu spazieren und um Mitternacht authentisches Ramen zu essen. Die Kultur ist so einzigartig &mdash; eine Mischung aus alten Traditionen und superm&auml;&szlig;iger Technologie. Ich w&uuml;rde gerne ein bisschen Japanisch lernen, bevor ich hinfliege &mdash; auch nur &laquo;Hallo&raquo; und &laquo;Danke&raquo; w&auml;re sch&ouml;n. Vielleicht irgendwann, wenn ich genug Geld gespart habe und die Schule endlich vorbei ist. Bis dahin schaue ich einfach Japan-Vlogs auf YouTube und tr&auml;ume weiter.</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>If I could go anywhere tomorrow, I would fly to Japan. I've always dreamed of seeing the cherry blossoms in Tokyo, walking through the small streets of Kyoto, and eating authentic ramen at midnight. The culture is so unique &mdash; a mix of old traditions and super-modern technology. I'd want to learn a bit of Japanese before I go &mdash; even just "hello" and "thank you" would be nice. Maybe someday, when I've saved enough money and school is finally over. Until then, I'll just watch Japan vlogs on YouTube and keep dreaming.</div>
+            </details>
+        </div>
+
+        <!-- MIXED 6: Grandma advice -->
+        <div class="mixed-card">
+            <span class="mx-cat">&#x1F49A; Wisdom &middot; Weisheit</span>
+            <h3>The best advice ever / Der beste Rat ever</h3>
+            <p class="mx-body">
+                <span class="de">Meine Oma sagte einmal etwas zu mir</span>, <span class="en">that I'll never forget:</span> "<span class="de">Du musst nicht perfekt sein</span> &mdash; <span class="en">you just have to be consistent.</span>" <span class="en">At first I thought,</span> <span class="de">was bedeutet das &uuml;berhaupt</span>? <span class="en">But then I realized:</span> <span class="de">es ist egal, ob du heute eine Stunde lernst</span> <span class="en">or just five minutes.</span> <span class="de">Was z&auml;hlt</span>, <span class="en">is that you do something every day.</span> <span class="de">F&uuml;nf Minuten pro Tag &uuml;ber ein Jahr</span> <span class="en">is over 30 hours &mdash;</span> <span class="de">und das macht einen riesigen Unterschied</span>. <span class="en">Whenever I feel lazy,</span> <span class="de">denke ich an Omas Rat</span> &mdash; <span class="en">and I do at least a little bit.</span> <span class="de">Kleine Schritte ergeben gro&szlig;e Ver&auml;nderungen</span>.
+            </p>
+            <details><summary>&#x1F4D6; Pure versions</summary>
+                <div class="pure-version de"><span class="pv-tag">DE</span>Meine Oma sagte einmal etwas zu mir, das ich nie vergessen werde: &laquo;Du musst nicht perfekt sein &mdash; du musst nur konstant sein.&raquo; Am Anfang dachte ich, was bedeutet das &uuml;berhaupt? Aber dann realisierte ich: es ist egal, ob du heute eine Stunde lernst oder nur f&uuml;nf Minuten. Was z&auml;hlt, ist, dass du jeden Tag etwas tust. F&uuml;nf Minuten pro Tag &uuml;ber ein Jahr sind &uuml;ber 30 Stunden &mdash; und das macht einen riesigen Unterschied. Wann immer ich mich faul f&uuml;hle, denke ich an Omas Rat &mdash; und mache wenigstens ein bisschen. Kleine Schritte ergeben gro&szlig;e Ver&auml;nderungen.</div>
+                <div class="pure-version en"><span class="pv-tag">EN</span>My grandma once told me something that I'll never forget: "You don't have to be perfect &mdash; you just have to be consistent." At first I thought, what does that even mean? But then I realized: it doesn't matter if you study for an hour today or just five minutes. What counts is that you do something every day. Five minutes a day over a year is over 30 hours &mdash; and that makes a huge difference. Whenever I feel lazy, I think of grandma's advice &mdash; and I do at least a little. Small steps add up to big changes.</div>
+            </details>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: BRAIN & MIND
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F9E0;</span>
+            <h2>Brain &amp; Mind</h2>
+            <span class="sd-tag">Gehirn &amp; Verstand</span>
+        </div>
+
+        <!-- TEXT 1: Why we dream -->
+        <div class="text-card">
+            <span class="tc-cat brain">PSYCHOLOGY</span>
+            <h3><span class="h-de">Warum wir tr&auml;umen</span><span class="sep">&middot;</span><span class="h-en">Why we dream</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Jeden Tag erlebt unser <span class="w1">Gehirn</span> Tausende von Eindr&uuml;cken. W&auml;hrend wir <span class="w2">schlafen</span>, versucht es, diese Informationen zu sortieren. <span class="w3">Tr&auml;ume</span> entstehen meistens in der sogenannten REM-Phase &mdash; das ist die Phase mit schnellen Augenbewegungen. In dieser Zeit ist unser Gehirn fast so aktiv wie im wachen Zustand. Viele Wissenschaftler glauben, dass Tr&auml;ume unserem <span class="w4">Ged&auml;chtnis</span> helfen, wichtige Erlebnisse zu speichern. Wir <span class="w5">vergessen</span> die meisten Tr&auml;ume aber innerhalb von wenigen Minuten nach dem Aufwachen.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>Every day, our <span class="w1">brain</span> processes thousands of impressions. While we <span class="w2">sleep</span>, it tries to sort all that information. <span class="w3">Dreams</span> mostly happen during the so-called REM phase &mdash; the stage with rapid eye movements. During this time, our brain is almost as active as when we are awake. Many scientists believe that dreams help our <span class="w4">memory</span> store important experiences. However, we <span class="w5">forget</span> most dreams within minutes of waking up.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">das Gehirn</span><span class="vp-sep">&middot;</span><span class="vp-en">the brain</span><span class="vp-ua">мозок</span></div>
+                <div class="vocab-pair"><span class="vp-de">schlafen</span><span class="vp-sep">&middot;</span><span class="vp-en">to sleep</span><span class="vp-ua">спати</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Traum / die Tr&auml;ume</span><span class="vp-sep">&middot;</span><span class="vp-en">dream(s)</span><span class="vp-ua">сон / сни</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Ged&auml;chtnis</span><span class="vp-sep">&middot;</span><span class="vp-en">memory</span><span class="vp-ua">пам'ять</span></div>
+                <div class="vocab-pair"><span class="vp-de">vergessen</span><span class="vp-sep">&middot;</span><span class="vp-en">to forget</span><span class="vp-ua">забувати</span></div>
+            </div>
+        </div>
+
+        <!-- TEXT 2: D&eacute;j&agrave; vu -->
+        <div class="text-card">
+            <span class="tc-cat brain">NEUROSCIENCE</span>
+            <h3><span class="h-de">Das D&eacute;j&agrave;-vu-Gef&uuml;hl</span><span class="sep">&middot;</span><span class="h-en">The feeling of d&eacute;j&agrave; vu</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Manchmal hast du das Gef&uuml;hl, eine <span class="w1">Situation</span> schon einmal erlebt zu haben, obwohl das unm&ouml;glich ist. Das nennt man D&eacute;j&agrave;-vu &mdash; aus dem <span class="w2">Franz&ouml;sischen</span>: &laquo;schon gesehen&raquo;. Wissenschaftler erkl&auml;ren das so: das <span class="w3">Gehirn</span> bekommt Informationen zweimal, mit einer winzigen <span class="w4">Verz&ouml;gerung</span>. Es denkt dann, das erste &laquo;Mal&raquo; sei schon eine <span class="w5">Erinnerung</span> aus der Vergangenheit. Etwa 70% aller Menschen haben das schon einmal erlebt &mdash; vor allem zwischen 15 und 25 Jahren.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>Sometimes you feel like you've experienced a <span class="w1">situation</span> before, even though that's impossible. We call this d&eacute;j&agrave; vu &mdash; from <span class="w2">French</span>: "already seen". Scientists explain it this way: the <span class="w3">brain</span> receives the information twice, with a tiny <span class="w4">delay</span>. It then thinks the first "time" is already a <span class="w5">memory</span> from the past. About 70% of all people have experienced this &mdash; mostly between the ages of 15 and 25.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">die Situation</span><span class="vp-sep">&middot;</span><span class="vp-en">situation</span><span class="vp-ua">ситуація</span></div>
+                <div class="vocab-pair"><span class="vp-de">Franz&ouml;sisch</span><span class="vp-sep">&middot;</span><span class="vp-en">French</span><span class="vp-ua">французька</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Gehirn</span><span class="vp-sep">&middot;</span><span class="vp-en">brain</span><span class="vp-ua">мозок</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Verz&ouml;gerung</span><span class="vp-sep">&middot;</span><span class="vp-en">delay</span><span class="vp-ua">затримка</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Erinnerung</span><span class="vp-sep">&middot;</span><span class="vp-en">memory</span><span class="vp-ua">спогад</span></div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: NATURE & ANIMALS
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F33F;</span>
+            <h2>Nature &amp; Animals</h2>
+            <span class="sd-tag">Natur &amp; Tiere</span>
+        </div>
+
+        <!-- TEXT 3: Bees -->
+        <div class="text-card">
+            <span class="tc-cat nature">BIOLOGY</span>
+            <h3><span class="h-de">Wie Bienen miteinander &laquo;sprechen&raquo;</span><span class="sep">&middot;</span><span class="h-en">How bees "talk" to each other</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p><span class="w1">Bienen</span> haben eine erstaunliche Art zu kommunizieren: den sogenannten <span class="w2">Schwänzeltanz</span>. Wenn eine Biene eine gute Blume gefunden hat, fliegt sie zur&uuml;ck zum <span class="w3">Bienenstock</span> und tanzt in einer Acht-Form. Die <span class="w4">Richtung</span> des Tanzes zeigt den anderen Bienen, wo sie fliegen m&uuml;ssen. Die L&auml;nge zeigt die <span class="w5">Entfernung</span>. Karl von Frisch hat das 1973 entdeckt und daf&uuml;r den Nobelpreis bekommen. Bienen k&ouml;nnen also &laquo;sprechen&raquo; &mdash; nur ganz anders als wir.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p><span class="w1">Bees</span> have an amazing way of communicating: the so-called <span class="w2">waggle dance</span>. When a bee has found a good flower, she flies back to the <span class="w3">hive</span> and dances in a figure-eight shape. The <span class="w4">direction</span> of the dance tells the other bees where to fly. The length shows the <span class="w5">distance</span>. Karl von Frisch discovered this in 1973 and received the Nobel Prize for it. So bees can "talk" &mdash; just in a completely different way than we do.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">die Biene</span><span class="vp-sep">&middot;</span><span class="vp-en">the bee</span><span class="vp-ua">бджола</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Schwänzeltanz</span><span class="vp-sep">&middot;</span><span class="vp-en">waggle dance</span><span class="vp-ua">танець бджоли</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Bienenstock</span><span class="vp-sep">&middot;</span><span class="vp-en">the hive</span><span class="vp-ua">вулик</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Richtung</span><span class="vp-sep">&middot;</span><span class="vp-en">direction</span><span class="vp-ua">напрямок</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Entfernung</span><span class="vp-sep">&middot;</span><span class="vp-en">distance</span><span class="vp-ua">відстань</span></div>
+            </div>
+        </div>
+
+        <!-- TEXT 4: Tornadoes -->
+        <div class="text-card">
+            <span class="tc-cat nature">METEOROLOGY</span>
+            <h3><span class="h-de">Wie ein Tornado entsteht</span><span class="sep">&middot;</span><span class="h-en">How a tornado is formed</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Ein <span class="w1">Tornado</span> entsteht, wenn warme, feuchte <span class="w2">Luft</span> aus dem S&uuml;den auf kalte, trockene Luft aus dem Norden trifft. Die kalte Luft dr&uuml;ckt die warme Luft nach oben. Dabei beginnt sie sich schnell zu <span class="w3">drehen</span>. Wenn dieser drehende Luftschlauch den Boden ber&uuml;hrt, entsteht ein Tornado. Die st&auml;rksten Tornados erreichen <span class="w4">Geschwindigkeiten</span> &uuml;ber 480 km/h. Die meisten Tornados gibt es in den USA &mdash; in der sogenannten &laquo;<span class="w5">Tornado-Allee</span>&raquo;.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>A <span class="w1">tornado</span> forms when warm, moist <span class="w2">air</span> from the south meets cold, dry air from the north. The cold air pushes the warm air upwards. As it rises, it begins to <span class="w3">spin</span> rapidly. When this spinning column of air touches the ground, a tornado is born. The strongest tornadoes reach <span class="w4">speeds</span> of over 480 km/h. Most tornadoes occur in the USA &mdash; in the so-called "<span class="w5">Tornado Alley</span>".</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">der Tornado</span><span class="vp-sep">&middot;</span><span class="vp-en">tornado</span><span class="vp-ua">торнадо</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Luft</span><span class="vp-sep">&middot;</span><span class="vp-en">air</span><span class="vp-ua">повітря</span></div>
+                <div class="vocab-pair"><span class="vp-de">sich drehen</span><span class="vp-sep">&middot;</span><span class="vp-en">to spin</span><span class="vp-ua">обертатися</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Geschwindigkeit</span><span class="vp-sep">&middot;</span><span class="vp-en">speed</span><span class="vp-ua">швидкість</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Tornado-Allee</span><span class="vp-sep">&middot;</span><span class="vp-en">Tornado Alley</span><span class="vp-ua">торнадо-алея</span></div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: SPACE & UNIVERSE
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F30C;</span>
+            <h2>Space &amp; Universe</h2>
+            <span class="sd-tag">Weltraum &amp; Universum</span>
+        </div>
+
+        <!-- TEXT 5: Why is the sky blue -->
+        <div class="text-card">
+            <span class="tc-cat space">PHYSICS</span>
+            <h3><span class="h-de">Warum der Himmel blau ist</span><span class="sep">&middot;</span><span class="h-en">Why the sky is blue</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Das <span class="w1">Sonnenlicht</span> sieht wei&szlig; aus, besteht aber aus allen Farben des Regenbogens. Wenn das Licht durch die <span class="w2">Atmosph&auml;re</span> der Erde wandert, treffen die Lichtstrahlen auf winzige Luftmolek&uuml;le. Die blauen Strahlen haben eine kurze <span class="w3">Wellenlänge</span> und werden besonders stark in alle Richtungen gestreut. Deshalb sehen wir den <span class="w4">Himmel</span> blau. Bei <span class="w5">Sonnenuntergang</span> muss das Licht einen l&auml;ngeren Weg durch die Atmosph&auml;re &mdash; deshalb sehen wir Rot und Orange.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p><span class="w1">Sunlight</span> looks white but actually contains all the colors of the rainbow. When light travels through the Earth's <span class="w2">atmosphere</span>, the light rays hit tiny air molecules. The blue rays have a short <span class="w3">wavelength</span> and get scattered especially strongly in every direction. That's why we see the <span class="w4">sky</span> as blue. At <span class="w5">sunset</span>, the light has to travel a longer path through the atmosphere &mdash; that's why we see red and orange.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">das Sonnenlicht</span><span class="vp-sep">&middot;</span><span class="vp-en">sunlight</span><span class="vp-ua">сонячне світло</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Atmosph&auml;re</span><span class="vp-sep">&middot;</span><span class="vp-en">atmosphere</span><span class="vp-ua">атмосфера</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Wellenl&auml;nge</span><span class="vp-sep">&middot;</span><span class="vp-en">wavelength</span><span class="vp-ua">довжина хвилі</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Himmel</span><span class="vp-sep">&middot;</span><span class="vp-en">the sky</span><span class="vp-ua">небо</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Sonnenuntergang</span><span class="vp-sep">&middot;</span><span class="vp-en">sunset</span><span class="vp-ua">захід сонця</span></div>
+            </div>
+        </div>
+
+        <!-- TEXT 6: Why same side of moon -->
+        <div class="text-card">
+            <span class="tc-cat space">ASTRONOMY</span>
+            <h3><span class="h-de">Warum wir immer dieselbe Seite des Mondes sehen</span><span class="sep">&middot;</span><span class="h-en">Why we always see the same side of the moon</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Der <span class="w1">Mond</span> dreht sich um die Erde, aber er <span class="w2">rotiert</span> auch um seine eigene Achse. Das Erstaunliche: er braucht f&uuml;r beide Bewegungen genau gleich viel Zeit &mdash; ungef&auml;hr 27 <span class="w3">Tage</span>. Deshalb zeigt er uns immer dieselbe <span class="w4">Seite</span>. Die andere Seite, die wir nie sehen k&ouml;nnen, hei&szlig;t oft &laquo;dunkle Seite des Mondes&raquo; &mdash; das ist aber falsch, denn auch sie bekommt regelm&auml;&szlig;ig Sonnenlicht. Die russische <span class="w5">Raumsonde</span> Luna 3 hat 1959 zum ersten Mal Fotos der R&uuml;ckseite gemacht.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>The <span class="w1">moon</span> orbits the Earth, but it also <span class="w2">rotates</span> on its own axis. The amazing part: it takes exactly the same time for both movements &mdash; about 27 <span class="w3">days</span>. That's why it always shows us the same <span class="w4">side</span>. The other side, which we can never see, is often called "the dark side of the moon" &mdash; but that's wrong, because it also gets sunlight regularly. The Russian <span class="w5">space probe</span> Luna 3 took the first photos of the far side in 1959.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">der Mond</span><span class="vp-sep">&middot;</span><span class="vp-en">the moon</span><span class="vp-ua">місяць</span></div>
+                <div class="vocab-pair"><span class="vp-de">rotieren</span><span class="vp-sep">&middot;</span><span class="vp-en">to rotate</span><span class="vp-ua">обертатися</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Tag / Tage</span><span class="vp-sep">&middot;</span><span class="vp-en">day(s)</span><span class="vp-ua">день / дні</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Seite</span><span class="vp-sep">&middot;</span><span class="vp-en">the side</span><span class="vp-ua">сторона</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Raumsonde</span><span class="vp-sep">&middot;</span><span class="vp-en">space probe</span><span class="vp-ua">космічний зонд</span></div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: BODY & HEALTH
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F49A;</span>
+            <h2>Body &amp; Health</h2>
+            <span class="sd-tag">K&ouml;rper &amp; Gesundheit</span>
+        </div>
+
+        <!-- TEXT 7: Why music gives goosebumps -->
+        <div class="text-card">
+            <span class="tc-cat body">PSYCHOLOGY</span>
+            <h3><span class="h-de">Warum Musik G&auml;nsehaut macht</span><span class="sep">&middot;</span><span class="h-en">Why music gives us goosebumps</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Bei manchen Liedern bekommen wir pl&ouml;tzlich <span class="w1">G&auml;nsehaut</span>. Das passiert, wenn unser Gehirn etwas <span class="w2">Unerwartetes</span> in der Musik h&ouml;rt &mdash; einen sch&ouml;nen Akkord, eine starke Stimme, einen emotionalen Moment. Dann sch&uuml;ttet das Gehirn den Botenstoff <span class="w3">Dopamin</span> aus &mdash; das gleiche &laquo;Gl&uuml;ckshormon&raquo;, das wir beim Essen oder beim Verlieben sp&uuml;ren. Wissenschaftler sagen, dass nur etwa <span class="w4">zwei Drittel</span> aller Menschen diese starke Reaktion auf Musik haben. Es h&auml;ngt mit der <span class="w5">Empathie</span> einer Person zusammen.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>With some songs, we suddenly get <span class="w1">goosebumps</span>. This happens when our brain hears something <span class="w2">unexpected</span> in the music &mdash; a beautiful chord, a powerful voice, an emotional moment. The brain then releases the chemical <span class="w3">dopamine</span> &mdash; the same "happiness hormone" we feel when eating or falling in love. Scientists say that only about <span class="w4">two-thirds</span> of all people experience this strong reaction to music. It is connected to a person's level of <span class="w5">empathy</span>.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">die G&auml;nsehaut</span><span class="vp-sep">&middot;</span><span class="vp-en">goosebumps</span><span class="vp-ua">мурашки</span></div>
+                <div class="vocab-pair"><span class="vp-de">unerwartet</span><span class="vp-sep">&middot;</span><span class="vp-en">unexpected</span><span class="vp-ua">неочікуваний</span></div>
+                <div class="vocab-pair"><span class="vp-de">Dopamin</span><span class="vp-sep">&middot;</span><span class="vp-en">dopamine</span><span class="vp-ua">дофамін</span></div>
+                <div class="vocab-pair"><span class="vp-de">zwei Drittel</span><span class="vp-sep">&middot;</span><span class="vp-en">two-thirds</span><span class="vp-ua">дві третини</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Empathie</span><span class="vp-sep">&middot;</span><span class="vp-en">empathy</span><span class="vp-ua">емпатія</span></div>
+            </div>
+        </div>
+
+        <!-- TEXT 8: Placebo -->
+        <div class="text-card">
+            <span class="tc-cat body">MEDICINE</span>
+            <h3><span class="h-de">Der Placebo-Effekt</span><span class="sep">&middot;</span><span class="h-en">The placebo effect</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Ein <span class="w1">Placebo</span> ist eine Tablette ohne Wirkstoff &mdash; sie enth&auml;lt zum Beispiel nur Zucker. Aber das Erstaunliche: viele <span class="w2">Patienten</span> f&uuml;hlen sich danach trotzdem besser! Das nennt man den Placebo-Effekt. Das <span class="w3">Gehirn</span> glaubt, ein echtes <span class="w4">Medikament</span> bekommen zu haben, und sch&uuml;ttet eigene Schmerzmittel aus. Studien zeigen, dass Placebos bei Kopfschmerzen, Schlafproblemen und sogar bei Depressionen wirken k&ouml;nnen. Wichtig ist aber: der Patient muss daran <span class="w5">glauben</span>.</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>A <span class="w1">placebo</span> is a pill with no active ingredient &mdash; for example, it contains only sugar. But here's the amazing part: many <span class="w2">patients</span> still feel better after taking it! This is called the placebo effect. The <span class="w3">brain</span> thinks it has received real <span class="w4">medication</span> and releases the body's own painkillers. Studies show that placebos can work for headaches, sleep problems, and even depression. The key point, however: the patient must <span class="w5">believe</span> in it.</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">das Placebo</span><span class="vp-sep">&middot;</span><span class="vp-en">placebo</span><span class="vp-ua">плацебо</span></div>
+                <div class="vocab-pair"><span class="vp-de">der Patient</span><span class="vp-sep">&middot;</span><span class="vp-en">patient</span><span class="vp-ua">пацієнт</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Gehirn</span><span class="vp-sep">&middot;</span><span class="vp-en">the brain</span><span class="vp-ua">мозок</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Medikament</span><span class="vp-sep">&middot;</span><span class="vp-en">medication</span><span class="vp-ua">ліки</span></div>
+                <div class="vocab-pair"><span class="vp-de">glauben</span><span class="vp-sep">&middot;</span><span class="vp-en">to believe</span><span class="vp-ua">вірити</span></div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════
+             SECTION: CURIOUS FACTS
+        ════════════════════════════════════════════ -->
+        <div class="sec-divider">
+            <span class="sd-icon">&#x1F914;</span>
+            <h2>Curious Facts</h2>
+            <span class="sd-tag">Kuriose Fakten</span>
+        </div>
+
+        <!-- TEXT 9: Why time flies -->
+        <div class="text-card">
+            <span class="tc-cat curious">PSYCHOLOGY</span>
+            <h3><span class="h-de">Warum die Zeit schneller vergeht, wenn wir &auml;lter werden</span><span class="sep">&middot;</span><span class="h-en">Why time flies as we get older</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>F&uuml;r Kinder dauert ein Sommer scheinbar ewig &mdash; f&uuml;r Erwachsene rast die <span class="w1">Zeit</span> nur so vor&uuml;ber. Warum? Wissenschaftler glauben, das h&auml;ngt mit <span class="w2">Wiederholung</span> zusammen. Wenn wir <span class="w3">jung</span> sind, ist fast alles neu f&uuml;r uns &mdash; jeder Tag bringt neue Eindr&uuml;cke. Das <span class="w4">Gehirn</span> speichert viele Details, und so f&uuml;hlt sich die Zeit l&auml;nger an. Im Erwachsenenalter wiederholt sich vieles &mdash; gleiche Arbeit, gleicher Weg, gleicher Alltag. Tipp: Mach regelm&auml;&szlig;ig <span class="w5">Neues</span>, dann scheint dein Leben l&auml;nger zu sein!</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>For kids, a summer seems to last forever &mdash; for adults, <span class="w1">time</span> just rushes by. Why? Scientists believe it's connected to <span class="w2">repetition</span>. When we are <span class="w3">young</span>, almost everything is new to us &mdash; every day brings new impressions. The <span class="w4">brain</span> stores many details, and so time feels longer. In adulthood, much of life repeats &mdash; same work, same route, same routine. Tip: Try something <span class="w5">new</span> regularly &mdash; then your life will seem longer!</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">die Zeit</span><span class="vp-sep">&middot;</span><span class="vp-en">time</span><span class="vp-ua">час</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Wiederholung</span><span class="vp-sep">&middot;</span><span class="vp-en">repetition</span><span class="vp-ua">повторення</span></div>
+                <div class="vocab-pair"><span class="vp-de">jung</span><span class="vp-sep">&middot;</span><span class="vp-en">young</span><span class="vp-ua">молодий</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Gehirn</span><span class="vp-sep">&middot;</span><span class="vp-en">brain</span><span class="vp-ua">мозок</span></div>
+                <div class="vocab-pair"><span class="vp-de">Neues</span><span class="vp-sep">&middot;</span><span class="vp-en">new things</span><span class="vp-ua">щось нове</span></div>
+            </div>
+        </div>
+
+        <!-- TEXT 10: Yawning -->
+        <div class="text-card">
+            <span class="tc-cat curious">BIOLOGY</span>
+            <h3><span class="h-de">Warum wir g&auml;hnen &mdash; und es ansteckend ist</span><span class="sep">&middot;</span><span class="h-en">Why we yawn &mdash; and why it's contagious</span></h3>
+            <div class="lang-grid">
+                <div class="lang-col de">
+                    <span class="lang-tag de">DE</span>
+                    <p>Wir alle <span class="w1">g&auml;hnen</span>, aber niemand wei&szlig; genau, warum. Eine Theorie sagt: das G&auml;hnen k&uuml;hlt das <span class="w2">Gehirn</span> ab. Wenn wir m&uuml;de sind, wird unser Kopf w&auml;rmer &mdash; und ein tiefer Atemzug bringt frische, k&uuml;hle <span class="w3">Luft</span> in den K&ouml;rper. Noch verr&uuml;ckter: G&auml;hnen ist <span class="w4">ansteckend</span>. Wenn wir jemanden g&auml;hnen sehen, m&uuml;ssen wir oft auch g&auml;hnen. Das hat mit <span class="w5">Empathie</span> zu tun &mdash; je n&auml;her uns ein Mensch ist, desto eher stecken wir uns an. Selbst Hunde g&auml;hnen mit, wenn ihr Besitzer g&auml;hnt!</p>
+                </div>
+                <div class="lang-col en">
+                    <span class="lang-tag en">EN</span>
+                    <p>We all <span class="w1">yawn</span>, but nobody knows exactly why. One theory says: yawning cools down the <span class="w2">brain</span>. When we are tired, our head gets warmer &mdash; and a deep breath brings fresh, cool <span class="w3">air</span> into the body. Even crazier: yawning is <span class="w4">contagious</span>. When we see someone yawn, we often have to yawn too. This has to do with <span class="w5">empathy</span> &mdash; the closer a person is to us, the more likely we are to catch it. Even dogs yawn along when their owner yawns!</p>
+                </div>
+            </div>
+            <div class="vocab-strip">
+                <div class="vocab-pair"><span class="vp-de">g&auml;hnen</span><span class="vp-sep">&middot;</span><span class="vp-en">to yawn</span><span class="vp-ua">позіхати</span></div>
+                <div class="vocab-pair"><span class="vp-de">das Gehirn</span><span class="vp-sep">&middot;</span><span class="vp-en">brain</span><span class="vp-ua">мозок</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Luft</span><span class="vp-sep">&middot;</span><span class="vp-en">air</span><span class="vp-ua">повітря</span></div>
+                <div class="vocab-pair"><span class="vp-de">ansteckend</span><span class="vp-sep">&middot;</span><span class="vp-en">contagious</span><span class="vp-ua">заразний</span></div>
+                <div class="vocab-pair"><span class="vp-de">die Empathie</span><span class="vp-sep">&middot;</span><span class="vp-en">empathy</span><span class="vp-ua">емпатія</span></div>
+            </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(63,185,80,0.10),rgba(88,166,255,0.05));border:1.5px solid rgba(63,185,80,0.35);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.8rem;">
+            <h3 style="margin:0 0 0.5rem;color:#86efac;font-size:1.05rem;">&#x1F31F; So nutzt du diese Texte am effektivsten</h3>
+            <p style="margin:0;font-size:0.92rem;line-height:1.65;color:rgba(230,230,235,0.9);">
+                <strong>1.</strong> Lies erst die deutsche Spalte. <strong>2.</strong> Dann die englische. <strong>3.</strong> Versuch, denselben Text auf einer Sprache aus dem Ged&auml;chtnis nachzuerz&auml;hlen. <strong>4.</strong> Pr&uuml;f dich mit der anderen Sprache. <strong>5.</strong> Lern die 5 Vokabelpaare unten &mdash; das sind die Schl&uuml;sselbegriffe. Auf dem Handy: Tipp auf &laquo;DE only&raquo; oder &laquo;EN only&raquo;, um dich zu pr&uuml;fen!
+            </p>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        function setMode(mode) {
+            document.body.classList.remove('mode-both', 'mode-de', 'mode-en');
+            document.body.classList.add('mode-' + mode);
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-mode="' + mode + '"]').classList.add('active');
+        }
+    </script>
+</body>
+</html>
