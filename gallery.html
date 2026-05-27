@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery · NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <style>
+        /* ── Background ── */
+        .gallery-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .gallery-bg img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center 25%;
+            filter: brightness(0.18) saturate(1.6);
+        }
+        .gallery-bg::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(180,40,120,0.18) 0%, transparent 70%),
+                        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(100,40,200,0.12) 0%, transparent 70%);
+        }
+
+        body { position: relative; min-height: 100vh; }
+
+        /* ── Hero ── */
+        .gl-hero {
+            position: relative; z-index: 2;
+            text-align: center;
+            padding: 7.5rem 1.5rem 2.5rem;
+        }
+        .gl-hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.22em;
+            text-transform: uppercase; color: rgba(255,160,190,0.6);
+            margin-bottom: 1.1rem;
+        }
+        .gl-hero h1 {
+            font-size: clamp(2.4rem, 6vw, 3.8rem);
+            font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+            margin: 0 0 1rem;
+            background: linear-gradient(140deg, #fff 20%, #ffb6c1 55%, #bf5af2 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gl-hero-quote {
+            font-size: 0.95rem; color: rgba(230,210,240,0.5);
+            font-style: italic; margin: 0 auto 1.8rem;
+            max-width: 420px; line-height: 1.6;
+        }
+        .gl-badge {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,160,190,0.2);
+            border-radius: 999px; padding: 0.3rem 1rem;
+            font-size: 0.78rem; color: rgba(255,200,220,0.65);
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Grid wrapper ── */
+        .gl-wrap {
+            position: relative; z-index: 2;
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 0.75rem 5rem;
+        }
+
+        /* ── Masonry columns ── */
+        .masonry {
+            column-count: 4; column-gap: 8px;
+        }
+        @media (max-width: 1050px) { .masonry { column-count: 3; } }
+        @media (max-width: 680px)  { .masonry { column-count: 2; } }
+        @media (max-width: 380px)  { .masonry { column-count: 1; } }
+
+        /* ── Photo tiles ── */
+        .gl-item {
+            break-inside: avoid;
+            margin-bottom: 8px;
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            display: block;
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .gl-item.visible {
+            opacity: 1; transform: translateY(0);
+        }
+        .gl-item img {
+            width: 100%; height: auto; display: block;
+            filter: brightness(0.88) saturate(1.05);
+            transition: filter 0.4s ease, transform 0.5s ease;
+        }
+        .gl-item:hover img {
+            filter: brightness(1.06) saturate(1.2);
+            transform: scale(1.04);
+        }
+        .gl-item::after {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255,160,190,0);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            pointer-events: none;
+        }
+        .gl-item:hover::after {
+            border-color: rgba(255,140,180,0.4);
+            box-shadow: 0 0 24px rgba(220,80,160,0.15), inset 0 0 12px rgba(255,140,180,0.06);
+        }
+
+        /* ── Quote cards (mixed into masonry) ── */
+        .gl-quote {
+            break-inside: avoid;
+            margin-bottom: 8px;
+            border-radius: 14px;
+            padding: 2rem 1.4rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,140,180,0.18);
+            backdrop-filter: blur(10px);
+            opacity: 0; transform: translateY(22px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; min-height: 160px;
+        }
+        .gl-quote.visible { opacity: 1; transform: translateY(0); }
+        .gl-quote-icon { font-size: 1.5rem; margin-bottom: 0.75rem; line-height: 1; }
+        .gl-quote-text {
+            font-size: 0.88rem; color: rgba(240,210,230,0.85);
+            font-style: italic; line-height: 1.6;
+            font-weight: 500;
+        }
+        .gl-quote-author {
+            font-size: 0.72rem; color: rgba(255,160,190,0.5);
+            margin-top: 0.6rem; letter-spacing: 0.06em;
+        }
+
+        /* ── Lightbox ── */
+        .lightbox {
+            display: none; position: fixed; inset: 0; z-index: 999;
+            background: rgba(4,0,10,0.94);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            align-items: center; justify-content: center;
+        }
+        .lightbox.open { display: flex; }
+        .lb-inner {
+            position: relative;
+            max-width: min(88vw, 900px); max-height: 90vh;
+        }
+        .lb-inner img {
+            max-width: 100%; max-height: 88vh;
+            border-radius: 16px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.75);
+            object-fit: contain; display: block;
+        }
+        .lb-btn {
+            position: fixed; background: rgba(255,255,255,0.08);
+            border: none; border-radius: 50%; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(8px);
+            transition: background 0.2s, transform 0.15s;
+            z-index: 1000;
+        }
+        .lb-btn:hover { background: rgba(255,150,180,0.2); }
+        .lb-close { top: 1.2rem; right: 1.4rem; width: 2.5rem; height: 2.5rem; font-size: 1.1rem; }
+        .lb-prev  { left: 1.1rem; top: 50%; transform: translateY(-50%); width: 3rem; height: 3rem; font-size: 1.4rem; }
+        .lb-next  { right: 1.1rem; top: 50%; transform: translateY(-50%); width: 3rem; height: 3rem; font-size: 1.4rem; }
+        .lb-counter {
+            position: fixed; bottom: 1.4rem; left: 50%; transform: translateX(-50%);
+            font-size: 0.78rem; color: rgba(255,255,255,0.35); letter-spacing: 0.1em;
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <!-- Background -->
+    <div class="gallery-bg">
+        <img src="img/gallery/photo20.webp" alt="">
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-transparent" style="position:relative;z-index:10;">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="englisch-vokabeln.html">Vocabulary</a>
+            <a href="gallery.html" class="active">Gallery</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="gl-hero">
+        <div class="gl-hero-eyebrow">✦ aesthetic board ✦</div>
+        <h1>Gallery</h1>
+        <p class="gl-hero-quote">"Она не ищет одобрения. Она просто сияет."</p>
+        <div class="gl-badge">🌸 34 photos · tap to open</div>
+    </div>
+
+    <!-- Grid -->
+    <div class="gl-wrap">
+        <div class="masonry" id="masonry">
+
+            <div class="gl-item" data-src="img/gallery/photo01.jpeg"><img src="img/gallery/photo01.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo02.jpeg"><img src="img/gallery/photo02.jpeg" alt="" loading="lazy"></div>
+
+            <div class="gl-item" data-src="img/gallery/photo03.webp"><img src="img/gallery/photo03.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo04.jpeg"><img src="img/gallery/photo04.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo05.jpeg"><img src="img/gallery/photo05.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo06.webp"><img src="img/gallery/photo06.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo07.jpeg"><img src="img/gallery/photo07.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo08.jpeg"><img src="img/gallery/photo08.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo09.jpeg"><img src="img/gallery/photo09.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo10.webp"><img src="img/gallery/photo10.webp" alt="" loading="lazy"></div>
+
+            <div class="gl-item" data-src="img/gallery/photo12.jpeg"><img src="img/gallery/photo12.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo13.jpeg"><img src="img/gallery/photo13.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo14.jpeg"><img src="img/gallery/photo14.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo15.webp"><img src="img/gallery/photo15.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo16.webp"><img src="img/gallery/photo16.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo17.jpeg"><img src="img/gallery/photo17.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo19.jpeg"><img src="img/gallery/photo19.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo20.webp"><img src="img/gallery/photo20.webp" alt="" loading="lazy"></div>
+
+            <div class="gl-item" data-src="img/gallery/photo21.jpeg"><img src="img/gallery/photo21.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo23.jpeg"><img src="img/gallery/photo23.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo24.jpeg"><img src="img/gallery/photo24.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo25.jpeg"><img src="img/gallery/photo25.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo26.webp"><img src="img/gallery/photo26.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo27.jpeg"><img src="img/gallery/photo27.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo28.jpeg"><img src="img/gallery/photo28.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo30.jpeg"><img src="img/gallery/photo30.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo31.jpeg"><img src="img/gallery/photo31.jpeg" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo32.jpeg"><img src="img/gallery/photo32.jpeg" alt="" loading="lazy"></div>
+
+            <div class="gl-item" data-src="img/gallery/photo34.webp"><img src="img/gallery/photo34.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo35.webp"><img src="img/gallery/photo35.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo36.webp"><img src="img/gallery/photo36.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo37.webp"><img src="img/gallery/photo37.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo38.webp"><img src="img/gallery/photo38.webp" alt="" loading="lazy"></div>
+            <div class="gl-item" data-src="img/gallery/photo39.jpeg"><img src="img/gallery/photo39.jpeg" alt="" loading="lazy"></div>
+
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-btn lb-close" id="lb-close">✕</button>
+        <button class="lb-btn lb-prev" id="lb-prev">‹</button>
+        <div class="lb-inner"><img src="" alt="" id="lb-img"></div>
+        <button class="lb-btn lb-next" id="lb-next">›</button>
+        <div class="lb-counter" id="lb-counter"></div>
+    </div>
+
+    <script>
+        // ── Scroll-reveal ──
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((e, idx) => {
+                if (e.isIntersecting) {
+                    setTimeout(() => e.target.classList.add('visible'), idx * 40);
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+        document.querySelectorAll('.gl-item, .gl-quote').forEach(el => observer.observe(el));
+
+        // ── Lightbox ──
+        const photos = Array.from(document.querySelectorAll('.gl-item'));
+        const lightbox = document.getElementById('lightbox');
+        const lbImg    = document.getElementById('lb-img');
+        const lbCtr    = document.getElementById('lb-counter');
+        let cur = 0;
+
+        function lbOpen(i) {
+            cur = i;
+            lbImg.src = photos[i].dataset.src;
+            lbCtr.textContent = (i + 1) + ' / ' + photos.length;
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function lbClose() {
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function lbPrev() { lbOpen((cur - 1 + photos.length) % photos.length); }
+        function lbNext() { lbOpen((cur + 1) % photos.length); }
+
+        photos.forEach((el, i) => el.addEventListener('click', () => lbOpen(i)));
+        document.getElementById('lb-close').addEventListener('click', lbClose);
+        document.getElementById('lb-prev').addEventListener('click', lbPrev);
+        document.getElementById('lb-next').addEventListener('click', lbNext);
+        lightbox.addEventListener('click', e => { if (e.target === lightbox) lbClose(); });
+        document.addEventListener('keydown', e => {
+            if (!lightbox.classList.contains('open')) return;
+            if (e.key === 'ArrowLeft')  lbPrev();
+            if (e.key === 'ArrowRight') lbNext();
+            if (e.key === 'Escape')     lbClose();
+        });
+    </script>
+</body>
+</html>

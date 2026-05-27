@@ -5,6 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
+    <style>
+        .gcard { background: var(--color-bg-card, rgba(22,27,34,0.85)); border: 1px solid var(--color-border, rgba(48,54,61,0.9)); border-radius: 14px; overflow: hidden; cursor: pointer; transition: border-color 0.25s, box-shadow 0.25s; }
+        .gcard:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+        .gcard.open { border-color: rgba(255,255,255,0.18); }
+        .gcard-header { display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.1rem; user-select: none; }
+        .gcard-emoji { font-size: 1.55rem; flex-shrink: 0; line-height: 1; }
+        .gcard-title { font-size: 0.93rem; font-weight: 700; color: var(--color-text, #e6edf3); }
+        .gcard-sub { font-size: 0.76rem; color: rgba(220,220,230,0.38); margin-top: 0.12rem; }
+        .gcard-arrow { margin-left: auto; color: rgba(255,255,255,0.28); font-size: 1rem; transition: transform 0.3s ease; flex-shrink: 0; }
+        .gcard.open .gcard-arrow { transform: rotate(90deg); color: rgba(255,255,255,0.6); }
+        .gcard-body { max-height: 0; overflow: hidden; transition: max-height 0.42s ease, padding 0.3s ease; padding: 0 1.2rem; }
+        .gcard.open .gcard-body { max-height: 600px; padding-bottom: 1.3rem; }
+        .gcard-body p { font-size: 0.87rem; color: rgba(220,220,230,0.75); line-height: 1.65; margin: 0.5rem 0; }
+        .gcard-body p:first-child { margin-top: 0; }
+        .gcard-tip { display: inline-flex; align-items: flex-start; gap: 0.5rem; background: rgba(255,255,255,0.055); border-radius: 9px; padding: 0.55rem 0.85rem; font-size: 0.83rem; color: rgba(220,220,230,0.88); margin-top: 0.65rem; font-weight: 600; line-height: 1.5; }
+        .grule { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.055); }
+        .grule:last-child { border-bottom: none; padding-bottom: 0; }
+        .grule-num { font-size: 0.78rem; font-weight: 800; color: #4493f8; flex-shrink: 0; width: 1.5rem; padding-top: 0.15rem; letter-spacing: 0.02em; }
+        .grule-text { font-size: 0.87rem; color: rgba(220,220,230,0.78); line-height: 1.55; }
+
+        /* Photo strip */
+        .photo-strip { display:flex; height:185px; overflow:hidden; gap:2px; width:100%; }
+        .photo-strip-item { overflow:hidden; min-width:0; flex-shrink:0; }
+        .photo-strip-item img { width:100%; height:100%; object-fit:cover; transition:transform 0.45s ease, filter 0.3s ease; filter:brightness(0.88); display:block; }
+        .photo-strip-item:hover img { transform:scale(1.07); filter:brightness(1.05); }
+        @media (max-width: 600px) {
+            .photo-strip { overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+            .photo-strip-item { min-width:140px; flex:none; scroll-snap-align:start; }
+        }
+    </style>
 </head>
 <body class="dark-theme">
     <nav class="navbar navbar-transparent">
@@ -16,6 +46,7 @@
             <a href="deutsch.html">Deutsch</a>
             <a href="vokabeln.html">Vokabeln</a>
             <a href="englisch-vokabeln.html">Vocabulary</a>
+            <a href="gallery.html">Gallery</a>
         </div>
     </nav>
 
@@ -154,6 +185,115 @@
         </div>
     </section>
 
+    <!-- ============ PHOTO STRIP ============ -->
+    <div class="photo-strip" title="✨">
+        <div class="photo-strip-item" style="flex:1;">
+            <img src="img/guitar.jpeg" alt="" style="object-position:center 30%;">
+        </div>
+        <div class="photo-strip-item" style="flex:1.25;">
+            <img src="img/peonies.webp" alt="" style="object-position:center center;">
+        </div>
+        <div class="photo-strip-item" style="flex:1.35;">
+            <img src="img/paris.webp" alt="" style="object-position:center 55%;">
+        </div>
+        <div class="photo-strip-item" style="flex:0.9;">
+            <img src="img/rose-silver.jpeg" alt="" style="object-position:center top;">
+        </div>
+        <div class="photo-strip-item" style="flex:1.5;">
+            <img src="img/sunset.webp" alt="" style="object-position:center center;">
+        </div>
+    </div>
+
+    <!-- ============ PROFI-GUIDE SECTION ============ -->
+    <section class="home-subjects" id="profi-guide" style="padding-top:0.5rem; margin-top:0.5rem;">
+        <h2 style="margin-bottom:0.3rem;">&#x1F9E0; Wie werde ich zum Profi?</h2>
+        <p style="color:rgba(220,220,230,0.45);font-size:0.84rem;margin-top:0;margin-bottom:1.4rem;">Echte Probleme &mdash; echte L&ouml;sungen. Kein Blabla.</p>
+
+        <div style="display:flex;flex-direction:column;gap:0.65rem;">
+
+            <!-- Problem 1: Ich will sofort Ergebnisse -->
+            <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #f85149;">
+                <div class="gcard-header">
+                    <span class="gcard-emoji">&#x1F3AF;</span>
+                    <div>
+                        <div class="gcard-title">&#x201E;Ich will sofort Ergebnisse sehen!&#x201C;</div>
+                        <div class="gcard-sub">Tippe f&uuml;r die L&ouml;sung &#x1F447;</div>
+                    </div>
+                    <span class="gcard-arrow">&#x25B8;</span>
+                </div>
+                <div class="gcard-body">
+                    <p>Das Gehirn speichert neues Wissen <strong style="color:#e6edf3;">im Schlaf</strong> &mdash; nicht w&auml;hrend du lernst. Heute lernst du, morgen sitzt es besser. &Uuml;bermorgen noch besser. Du siehst es nur nicht sofort.</p>
+                    <p>15 Minuten t&auml;glich &times; 30 Tage = <strong style="color:#e6edf3;">7,5 Stunden echtes Lernen</strong>. Den Unterschied merkst du an Tag&nbsp;7, 14, 21 &mdash; nicht an Tag 1.</p>
+                    <p>Wer auf sofortige Ergebnisse wartet, gibt nach einer Woche auf. Wer dranbleibt, ist nach einem Monat <em>jemand anderes</em>.</p>
+                    <div class="gcard-tip">&#x2705;&nbsp; Trick: Streiche jeden Lerntag in einem Kalender ab. Der Streak h&auml;lt dich besser bei der Stange als jede Motivation.</div>
+                </div>
+            </div>
+
+            <!-- Problem 2: Ich hab noch Zeit -->
+            <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #f59e0b;">
+                <div class="gcard-header">
+                    <span class="gcard-emoji">&#x23F0;</span>
+                    <div>
+                        <div class="gcard-title">&#x201E;Ach, ich hab doch noch Zeit&hellip;&#x201C;</div>
+                        <div class="gcard-sub">Tippe f&uuml;r die L&ouml;sung &#x1F447;</div>
+                    </div>
+                    <span class="gcard-arrow">&#x25B8;</span>
+                </div>
+                <div class="gcard-body">
+                    <p>Das Gehirn <strong style="color:#e6edf3;">l&uuml;gt</strong>. &bdquo;Morgen&ldquo; f&uuml;hlt sich genauso sicher an wie gestern &mdash; bis pl&ouml;tzlich kein Morgen mehr da ist. Das kennst du.</p>
+                    <p><strong style="color:#f59e0b;">Der Halbierungs-Trick:</strong> Deadline am 31.? Dein pers&ouml;nlicher Deadline ist der 25. In deinem Kopf. Keine Ausnahmen. Dann hast du 5 Tage Puffer f&uuml;r Notf&auml;lle und kein Panik-Gef&uuml;hl am Ende.</p>
+                    <p><strong style="color:#e6edf3;">Und fang heute an</strong> &mdash; nur 5 Minuten. Das Gehirn braucht einen Start-Impuls, um &uuml;berhaupt in den Lernmodus zu kommen. Danach geht es leichter.</p>
+                    <div class="gcard-tip">&#x1F4CC;&nbsp; Wenn du denkst &bdquo;ich mach das sp&auml;ter&ldquo; &rarr; tu es in den n&auml;chsten 5 Minuten. Auch wenn es klein ist. Auch wenn es nur eine Seite ist.</div>
+                </div>
+            </div>
+
+            <!-- Problem 3: Es ist zu schwer -->
+            <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #58a6ff;">
+                <div class="gcard-header">
+                    <span class="gcard-emoji">&#x1F625;</span>
+                    <div>
+                        <div class="gcard-title">&#x201E;Es ist zu schwer, ich hab keine Lust&hellip;&#x201C;</div>
+                        <div class="gcard-sub">Tippe f&uuml;r die L&ouml;sung &#x1F447;</div>
+                    </div>
+                    <span class="gcard-arrow">&#x25B8;</span>
+                </div>
+                <div class="gcard-body">
+                    <p>Motivation kommt <em>nach</em> dem Start &mdash; nicht davor. Du musst keine Lust haben, um anzufangen. Du musst einfach <strong style="color:#e6edf3;">anfangen</strong>. Die Lust folgt nach 3&ndash;5 Minuten.</p>
+                    <p>Das unbequeme Gef&uuml;hl beim Lernen? Das ist kein Zeichen, dass du es nicht kannst. Das ist dein Gehirn, das <strong style="color:#58a6ff;">gerade w&auml;chst</strong>. Widerstand = Wachstum.</p>
+                    <p>Starte mit dem <strong style="color:#e6edf3;">einfachsten Teil</strong> &mdash; einer Vokabel, einer Aufgabe, einer Seite. Dann kommt der Rest von selbst.</p>
+                    <div class="gcard-tip">&#x1F4A1;&nbsp; Vergleich dich mit <em>dir von letzter Woche</em> &mdash; nicht mit anderen. Du wirst &Uuml;berraschungen erleben.</div>
+                </div>
+            </div>
+
+        </div><!-- end cards -->
+
+        <!-- 5 Profi-Regeln -->
+        <div class="glass-card" style="margin-top:1.4rem;padding:1.25rem 1.35rem;border-radius:14px;">
+            <h3 style="font-size:0.93rem;font-weight:800;color:#fff;margin:0 0 1rem 0;letter-spacing:0.01em;">&#x2728; Die 5 Profi-Regeln</h3>
+            <div class="grule">
+                <div class="grule-num">01</div>
+                <div class="grule-text"><strong>15 Min t&auml;glich &gt; 3 h einmal pro Woche.</strong> Konsistenz schl&auml;gt Intensit&auml;t. Immer.</div>
+            </div>
+            <div class="grule">
+                <div class="grule-num">02</div>
+                <div class="grule-text"><strong>Handy weg = Gehirn an.</strong> Flugzeugmodus beim Lernen &mdash; du lernst buchst&auml;blich doppelt so schnell.</div>
+            </div>
+            <div class="grule">
+                <div class="grule-num">03</div>
+                <div class="grule-text"><strong>Pause ist Teil des Lernens.</strong> 25 Min lernen &bull; 5 Min Pause &bull; wiederholen. (Pomodoro-Methode)</div>
+            </div>
+            <div class="grule">
+                <div class="grule-num">04</div>
+                <div class="grule-text"><strong>Fehler machen = Fortschritt.</strong> Das Gehirn lernt durch Fehler, nicht durch perfektes Verstehen. Falsch liegen ist gut.</div>
+            </div>
+            <div class="grule">
+                <div class="grule-num">05</div>
+                <div class="grule-text"><strong>Fang jetzt an.</strong> Auch mit 5 Minuten. Auch ohne Lust. Der Start ist das Schwerste &mdash; danach l&auml;uft es.</div>
+            </div>
+        </div>
+
+    </section>
+
     <footer class="footer-dark">
         <p>NeoStudy &copy; 2026</p>
     </footer>
@@ -186,6 +326,13 @@
         // Toggle motivation section
         function toggleMotivation() {
             document.getElementById('motivation-section').classList.toggle('collapsed');
+        }
+
+        // Toggle profi-guide cards
+        function toggleG(card) {
+            const isOpen = card.classList.contains('open');
+            document.querySelectorAll('.gcard.open').forEach(c => c.classList.remove('open'));
+            if (!isOpen) card.classList.add('open');
         }
 
         // Site search
