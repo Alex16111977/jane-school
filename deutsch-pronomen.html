@@ -6,6 +6,85 @@
     <title>Pronomen | NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .survival-kit {
+            background: rgba(68,147,248,0.07);
+            border: 1px solid rgba(68,147,248,0.3);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+        .sk-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #58a6ff; margin-bottom: 0.7rem; }
+        .sk-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .sk-chip { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0.9rem; border-radius: 10px; font-weight: 700; font-size: 1rem; line-height: 1.3; min-width: 64px; text-align: center; }
+        .sk-chip .sk-tag { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; }
+        .sk-chip .sk-ru  { font-size: 0.7rem; font-weight: 400; opacity: 0.6; }
+        .sk-chip.acc { background: rgba(68,147,248,0.14); border: 1px solid rgba(68,147,248,0.35); color: #58a6ff; }
+        .sk-chip.dat { background: rgba(210,153,34,0.14); border: 1px solid rgba(210,153,34,0.35); color: #d29922; }
+        .sk-chip.refl { background: rgba(63,185,80,0.14); border: 1px solid rgba(63,185,80,0.35); color: #3fb950; }
+
+        .mnem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.8rem; }
+        .mnem-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 1rem; display: flex; gap: 0.8rem; align-items: flex-start; }
+        .mnem-icon { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
+        .mnem-body strong { font-size: 1.15rem; color: #58a6ff; display: block; margin-bottom: 0.2rem; }
+        .mnem-body p { font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.5; margin: 0; }
+        .mnem-body em { color: var(--color-text); font-style: italic; }
+
+        .dialogue { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.8rem; }
+        .bubble-row { display: flex; gap: 0.6rem; align-items: flex-end; }
+        .bubble-row.right { flex-direction: row-reverse; }
+        .bubble-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .bubble-row:not(.right) .bubble-avatar { background: rgba(244,167,185,0.15); }
+        .bubble-row.right .bubble-avatar { background: rgba(68,147,248,0.15); }
+        .bubble { max-width: 76%; padding: 0.55rem 0.9rem; border-radius: 14px; font-size: 0.9rem; line-height: 1.55; }
+        .bubble-row:not(.right) .bubble { background: rgba(255,255,255,0.07); border-radius: 4px 14px 14px 14px; }
+        .bubble-row.right .bubble { background: rgba(68,147,248,0.13); border-radius: 14px 4px 14px 14px; }
+        .bubble .bname { font-size: 0.7rem; color: var(--color-text-muted); margin-bottom: 0.1rem; font-weight: 600; }
+        .bubble .hl { color: #f4a7b9; font-weight: 700; }
+
+        .story-steps { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.6rem; }
+        .story-step { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 0.8rem; border-radius: 10px; background: rgba(255,255,255,0.04); border-left: 3px solid rgba(63,185,80,0.4); }
+        .story-step-time { font-size: 0.74rem; color: var(--color-text-muted); min-width: 38px; font-weight: 600; }
+        .story-step-de { font-size: 0.9rem; flex: 1; }
+        .story-step-de .hl { color: #3fb950; font-weight: 700; }
+        .story-step-ru { font-size: 0.8rem; color: var(--color-text-muted); white-space: nowrap; }
+
+        .trap-card { background: rgba(248,81,73,0.05); border: 1px solid rgba(248,81,73,0.28); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.9rem; }
+        .trap-card h3 { color: #f85149; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem; font-size: 1rem; }
+        .trap-rows { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.4rem; }
+        .trap-row { display: grid; grid-template-columns: 90px 1fr 1.4fr; align-items: baseline; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 8px; background: rgba(255,255,255,0.025); border-left: 3px solid rgba(248,81,73,0.3); }
+        .trap-row .word { font-weight: 700; font-size: 1rem; color: #f4a7b9; }
+        .trap-row .meaning { color: var(--color-text-muted); font-size: 0.85rem; }
+        .trap-row .example { font-style: italic; color: var(--color-text); font-size: 0.85rem; }
+        .trap-tip { font-size: 0.82rem; background: rgba(68,147,248,0.07); border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.7rem; color: var(--color-text-secondary); }
+
+        .owner-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+        .owner-chip { text-align: center; padding: 0.55rem 0.75rem; border-radius: 10px; min-width: 72px; }
+        .owner-chip .oc-pro { font-size: 0.68rem; font-weight: 700; margin-bottom: 0.1rem; }
+        .owner-chip .oc-word { font-size: 1.05rem; font-weight: 700; }
+
+        .fill-input {
+            display: inline-block; width: 78px; padding: 2px 6px;
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.07); color: var(--color-text);
+            font-size: 0.92rem; text-align: center; outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            vertical-align: baseline;
+        }
+        .fill-input:focus { border-color: var(--color-accent); background: rgba(68,147,248,0.08); }
+        .fill-input.correct { border-color: #3fb950; background: rgba(63,185,80,0.12); color: #3fb950; font-weight: 700; }
+        .fill-input.wrong { border-color: #f85149; background: rgba(248,81,73,0.1); }
+        .fill-hint { font-size: 0.78rem; color: #f85149; margin-left: 2px; font-weight: 700; }
+        .text-para { font-size: 0.97rem; line-height: 2.1; margin-bottom: 0.6rem; }
+        .text-num { display: inline-block; width: 18px; text-align: right; font-size: 0.72rem; color: var(--color-text-muted); font-weight: 700; margin-right: 1px; vertical-align: baseline; }
+        .fill-score { font-size: 1.1rem; margin-top: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .mnem-grid { grid-template-columns: 1fr; }
+            .trap-row { grid-template-columns: 80px 1fr; }
+            .trap-row .example { grid-column: 1 / -1; }
+        }
+    </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
@@ -34,106 +113,176 @@
         <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
 
         <div class="page-header" style="text-align:left; padding-top:1rem">
-            <h1>Pronomen &#x1F464;</h1>
-            <p class="page-subtitle">mich / mir &bull; sich &bull; ihr / ihre &bull; euer &mdash; всё что путает</p>
+            <h1>Pronomen</h1>
+            <p class="page-subtitle">Мнемоники, диалоги, ловушки — без воды</p>
+        </div>
+
+        <!-- SURVIVAL KIT -->
+        <div class="survival-kit">
+            <div class="sk-label">&#x26A1; Выживальный набор — эти 7 форм нужны каждый день</div>
+            <div class="sk-chips">
+                <div class="sk-chip acc"><span class="sk-tag">Akk</span>mich<span class="sk-ru">меня</span></div>
+                <div class="sk-chip dat"><span class="sk-tag">Dat</span>mir<span class="sk-ru">мне</span></div>
+                <div class="sk-chip acc"><span class="sk-tag">Akk</span>dich<span class="sk-ru">тебя</span></div>
+                <div class="sk-chip dat"><span class="sk-tag">Dat</span>dir<span class="sk-ru">тебе</span></div>
+                <div class="sk-chip acc"><span class="sk-tag">Akk</span>ihn<span class="sk-ru">его</span></div>
+                <div class="sk-chip dat"><span class="sk-tag">Dat</span>ihm<span class="sk-ru">ему</span></div>
+                <div class="sk-chip refl"><span class="sk-tag">Refl</span>sich<span class="sk-ru">себя/-ся</span></div>
+            </div>
         </div>
 
         <div class="tabs">
-            <button class="tab active" data-tab="personal">&#x1F9D1; Personal</button>
+            <button class="tab active" data-tab="personal">&#x1F464; Personal</button>
             <button class="tab" data-tab="reflexiv">&#x1F504; Reflexiv</button>
             <button class="tab" data-tab="possessiv">&#x1F511; Possessiv</button>
-            <button class="tab" data-tab="fallen">&#x26A0;&#xFE0F; Ловушки</button>
+            <button class="tab" data-tab="fallen">&#x26A0; Fallen</button>
             <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="text">&#x1F4DD; Text</button>
         </div>
 
         <!-- ===== PERSONAL ===== -->
         <div class="tab-content active" id="tab-personal">
         <div class="zp-notes">
             <section class="note-section">
+
                 <div class="lesson-header-block">
-                    <span class="lesson-header-icon">&#x1F9D1;</span>
+                    <span class="lesson-header-icon">&#x2753;</span>
                     <div>
-                        <h2>Personalpronomen</h2>
-                        <p class="lesson-header-sub">Личные — ich, du, er… по падежам</p>
+                        <h2>Akk или Dat — один вопрос решает</h2>
+                        <p class="lesson-header-sub">Задай вопрос к пропуску — падеж определится сам</p>
+                    </div>
+                </div>
+                <div class="note-card highlight-card" style="border-color:rgba(68,147,248,0.3); background:rgba(68,147,248,0.06);">
+                    <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:200px;">
+                            <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:#58a6ff; font-weight:700; margin-bottom:0.4rem;">Akkusativ — кого? что?</p>
+                            <p style="font-size:0.95rem; margin-bottom:0.3rem;"><strong style="color:#58a6ff;">mich &nbsp;dich &nbsp;ihn &nbsp;sie &nbsp;es &nbsp;uns &nbsp;euch</strong></p>
+                            <p style="font-size:0.86rem; color:var(--color-text-muted);">Прямой объект — действие падает на него</p>
+                            <p style="font-size:0.88rem; margin-top:0.4rem; font-style:italic;">Ich liebe <strong style="color:#58a6ff;">dich</strong>. &mdash; Я люблю тебя.</p>
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:#d29922; font-weight:700; margin-bottom:0.4rem;">Dativ — кому?</p>
+                            <p style="font-size:0.95rem; margin-bottom:0.3rem;"><strong style="color:#d29922;">mir &nbsp;dir &nbsp;ihm &nbsp;ihr &nbsp;uns &nbsp;euch &nbsp;ihnen</strong></p>
+                            <p style="font-size:0.86rem; color:var(--color-text-muted);">Получатель — ему что-то дают, пишут, помогают</p>
+                            <p style="font-size:0.88rem; margin-top:0.4rem; font-style:italic;">Ich helfe <strong style="color:#d29922;">dir</strong>. &mdash; Я помогаю тебе.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="note-card">
-                    <h3>Таблица &mdash; Nom / Akk / Dat</h3>
-                    <table class="unit-table">
-                        <tr><th>Лицо</th><th>Nom.</th><th>Akk. (wen/was?)</th><th>Dat. (wem?)</th></tr>
-                        <tr><td>я</td><td>ich</td><td><strong style="color:#c9b3ff;">mich</strong></td><td><strong style="color:#79c0ff;">mir</strong></td></tr>
-                        <tr><td>ты</td><td>du</td><td><strong style="color:#c9b3ff;">dich</strong></td><td><strong style="color:#79c0ff;">dir</strong></td></tr>
-                        <tr><td>он</td><td>er</td><td><strong style="color:#c9b3ff;">ihn</strong></td><td><strong style="color:#79c0ff;">ihm</strong></td></tr>
-                        <tr><td>она</td><td>sie</td><td><strong style="color:#c9b3ff;">sie</strong></td><td><strong style="color:#79c0ff;">ihr</strong></td></tr>
-                        <tr><td>оно</td><td>es</td><td><strong style="color:#c9b3ff;">es</strong></td><td><strong style="color:#79c0ff;">ihm</strong></td></tr>
-                        <tr><td>мы</td><td>wir</td><td><strong style="color:#c9b3ff;">uns</strong></td><td><strong style="color:#79c0ff;">uns</strong></td></tr>
-                        <tr><td>вы</td><td>ihr</td><td><strong style="color:#c9b3ff;">euch</strong></td><td><strong style="color:#79c0ff;">euch</strong></td></tr>
-                        <tr><td>они</td><td>sie</td><td><strong style="color:#c9b3ff;">sie</strong></td><td><strong style="color:#79c0ff;">ihnen</strong></td></tr>
-                        <tr><td>Вы (вежл.)</td><td>Sie</td><td><strong style="color:#c9b3ff;">Sie</strong></td><td><strong style="color:#79c0ff;">Ihnen</strong></td></tr>
-                    </table>
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x1F4A1;</span>
+                    <div>
+                        <h2>Мнемоники</h2>
+                        <p class="lesson-header-sub">Образ запоминается лучше правила</p>
+                    </div>
+                </div>
+                <div class="mnem-grid">
+                    <div class="mnem-card">
+                        <div class="mnem-icon">&#x1FA9E;</div>
+                        <div class="mnem-body">
+                            <strong>mich</strong>
+                            <p><em>Ich sehe mich im Spiegel.</em><br>Зеркало = Akk. Действие летит прямо в тебя.</p>
+                        </div>
+                    </div>
+                    <div class="mnem-card">
+                        <div class="mnem-icon">&#x1F932;</div>
+                        <div class="mnem-body">
+                            <strong>mir</strong>
+                            <p><em>Gib mir das Buch!</em><br>Протянутые руки = Dat. Ты получатель.</p>
+                        </div>
+                    </div>
+                    <div class="mnem-card">
+                        <div class="mnem-icon">&#x1F440;</div>
+                        <div class="mnem-body">
+                            <strong>ihn</strong>
+                            <p><em>Siehst du ihn?</em><br>«ихН» — его видят, любят, ищут. Akk.</p>
+                        </div>
+                    </div>
+                    <div class="mnem-card">
+                        <div class="mnem-icon">&#x1F381;</div>
+                        <div class="mnem-body">
+                            <strong>ihm</strong>
+                            <p><em>Ich gebe ihm ein Geschenk.</em><br>«ихМ» — ему дают, пишут, помогают. Dat.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- ГЛАВНОЕ: mich vs mir -->
-                <div class="note-card highlight-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.08);">
-                    <h3>&#x1F525; mich vs mir &mdash; главный вопрос</h3>
-                    <p style="color:rgba(255,255,255,0.7);margin-bottom:1rem;">Это самое частое место где люди ошибаются. Вот трюк:</p>
-
-                    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-                        <div style="flex:1;min-width:200px;background:rgba(163,113,247,0.12);border:1px solid rgba(163,113,247,0.4);border-radius:12px;padding:1rem;">
-                            <p style="font-weight:800;color:#c9b3ff;font-size:1rem;margin-bottom:0.5rem;">Frage: <span style="font-size:1.2rem;">WEN?</span></p>
-                            <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:0.7rem;">«кого?» → Akkusativ</p>
-                            <p style="font-size:1.1rem;font-weight:800;color:#c9b3ff;">→ mich / dich / ihn…</p>
-                            <div style="margin-top:0.8rem;font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.75);">
-                                Ich liebe <strong>dich</strong>.<br>
-                                Er sieht <strong>mich</strong>.<br>
-                                Sie kennt <strong>ihn</strong>.
+                <div class="lesson-header-block" style="margin-top:1.4rem;">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>Живой диалог</h2>
+                        <p class="lesson-header-sub">Все формы в контексте — читай, не зубри</p>
+                    </div>
+                </div>
+                <div class="note-card">
+                    <p style="font-size:0.78rem; color:var(--color-text-muted); margin-bottom:0.8rem;">&#x1F7E1; Выделены местоимения в деле</p>
+                    <div class="dialogue">
+                        <div class="bubble-row">
+                            <div class="bubble-avatar">&#x1F469;</div>
+                            <div class="bubble">
+                                <div class="bname">Anna</div>
+                                Hast du Max gesehen? Ich suche <span class="hl">ihn</span> schon eine Stunde.
                             </div>
                         </div>
-                        <div style="flex:1;min-width:200px;background:rgba(88,166,255,0.10);border:1px solid rgba(88,166,255,0.4);border-radius:12px;padding:1rem;">
-                            <p style="font-weight:800;color:#79c0ff;font-size:1rem;margin-bottom:0.5rem;">Frage: <span style="font-size:1.2rem;">WEM?</span></p>
-                            <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:0.7rem;">«кому?» → Dativ</p>
-                            <p style="font-size:1.1rem;font-weight:800;color:#79c0ff;">→ mir / dir / ihm…</p>
-                            <div style="margin-top:0.8rem;font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.75);">
-                                Er hilft <strong>mir</strong>.<br>
-                                Ich glaube <strong>dir</strong>.<br>
-                                Sie dankt <strong>ihm</strong>.
+                        <div class="bubble-row right">
+                            <div class="bubble-avatar">&#x1F466;</div>
+                            <div class="bubble">
+                                <div class="bname">Leo</div>
+                                Ja! Ich habe <span class="hl">ihn</span> gerade getroffen. Er wartet auf <span class="hl">dich</span>.
+                            </div>
+                        </div>
+                        <div class="bubble-row">
+                            <div class="bubble-avatar">&#x1F469;</div>
+                            <div class="bubble">
+                                <div class="bname">Anna</div>
+                                Wirklich? Kannst du <span class="hl">ihm</span> sagen, dass ich komme?
+                            </div>
+                        </div>
+                        <div class="bubble-row right">
+                            <div class="bubble-avatar">&#x1F466;</div>
+                            <div class="bubble">
+                                <div class="bname">Leo</div>
+                                Klar, ich schreibe <span class="hl">ihm</span> sofort. Soll er auf <span class="hl">dich</span> warten?
+                            </div>
+                        </div>
+                        <div class="bubble-row">
+                            <div class="bubble-avatar">&#x1F469;</div>
+                            <div class="bubble">
+                                <div class="bname">Anna</div>
+                                Ja bitte! Danke <span class="hl">dir</span>! Du hilfst <span class="hl">mir</span> so viel. &#x1F49C;
+                            </div>
+                        </div>
+                        <div class="bubble-row right">
+                            <div class="bubble-avatar">&#x1F466;</div>
+                            <div class="bubble">
+                                <div class="bname">Leo</div>
+                                Kein Problem! Ich mache das gerne f&uuml;r <span class="hl">dich</span>. &#x1F60A;
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div style="margin-top:1rem;background:rgba(255,255,255,0.05);border-radius:10px;padding:0.85rem 1rem;">
-                        <p style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:0.5rem;">&#x1F4A1; Глаголы, которые требуют Dativ (wem?) &mdash; учи их:</p>
-                        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;font-size:0.85rem;">
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">helfen</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">danken</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">glauben</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">gefallen</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">gehören</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">folgen</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">passen</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">schmecken</span>
-                            <span style="background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:6px;padding:0.2rem 0.6rem;">fehlen</span>
-                        </div>
+                <div class="lesson-header-block" style="margin-top:1.4rem;">
+                    <span class="lesson-header-icon">&#x1F4CB;</span>
+                    <div>
+                        <h2>Полная таблица</h2>
+                        <p class="lesson-header-sub">Синий = Akk, жёлтый = Dat</p>
                     </div>
                 </div>
-
-                <!-- Примеры -->
                 <div class="note-card">
-                    <h3>&#x1F4DD; Примеры в контексте</h3>
                     <table class="unit-table">
-                        <tr><th>Satz</th><th>Перевод</th><th>Падеж</th></tr>
-                        <tr><td>Kannst du <strong style="color:#79c0ff;">mir</strong> helfen?</td><td>Можешь мне помочь?</td><td>Dat.</td></tr>
-                        <tr><td>Ich kenne <strong style="color:#c9b3ff;">dich</strong> schon lange.</td><td>Я знаю тебя давно.</td><td>Akk.</td></tr>
-                        <tr><td>Das gef&auml;llt <strong style="color:#79c0ff;">mir</strong> sehr.</td><td>Мне это очень нравится.</td><td>Dat.</td></tr>
-                        <tr><td>Er liebt <strong style="color:#c9b3ff;">sie</strong>.</td><td>Он любит её.</td><td>Akk.</td></tr>
-                        <tr><td>Ich glaube <strong style="color:#79c0ff;">ihm</strong> nicht.</td><td>Я ему не верю.</td><td>Dat.</td></tr>
-                        <tr><td>Das Buch geh&ouml;rt <strong style="color:#79c0ff;">ihr</strong>.</td><td>Книга принадлежит ей.</td><td>Dat.</td></tr>
-                        <tr><td>Wir besuchen <strong style="color:#c9b3ff;">euch</strong> morgen.</td><td>Мы навестим вас завтра.</td><td>Akk.</td></tr>
-                        <tr><td>Ich danke <strong style="color:#79c0ff;">Ihnen</strong>.</td><td>Я благодарю Вас.</td><td>Dat.</td></tr>
+                        <tr><th>Лицо</th><th>Nom.</th><th style="color:#58a6ff;">Akk.</th><th style="color:#d29922;">Dat.</th></tr>
+                        <tr><td>я</td><td>ich</td><td style="color:#58a6ff;"><strong>mich</strong></td><td style="color:#d29922;"><strong>mir</strong></td></tr>
+                        <tr><td>ты</td><td>du</td><td style="color:#58a6ff;"><strong>dich</strong></td><td style="color:#d29922;"><strong>dir</strong></td></tr>
+                        <tr><td>он</td><td>er</td><td style="color:#58a6ff;"><strong>ihn</strong></td><td style="color:#d29922;"><strong>ihm</strong></td></tr>
+                        <tr><td>она</td><td>sie</td><td style="color:#58a6ff;"><strong>sie</strong></td><td style="color:#d29922;"><strong>ihr</strong></td></tr>
+                        <tr><td>оно</td><td>es</td><td style="color:#58a6ff;"><strong>es</strong></td><td style="color:#d29922;"><strong>ihm</strong></td></tr>
+                        <tr><td>мы</td><td>wir</td><td style="color:#58a6ff;"><strong>uns</strong></td><td style="color:#d29922;"><strong>uns</strong></td></tr>
+                        <tr><td>вы</td><td>ihr</td><td style="color:#58a6ff;"><strong>euch</strong></td><td style="color:#d29922;"><strong>euch</strong></td></tr>
+                        <tr><td>они</td><td>sie</td><td style="color:#58a6ff;"><strong>sie</strong></td><td style="color:#d29922;"><strong>ihnen</strong></td></tr>
+                        <tr><td>Вы (вежл.)</td><td>Sie</td><td style="color:#58a6ff;"><strong>Sie</strong></td><td style="color:#d29922;"><strong>Ihnen</strong></td></tr>
                     </table>
                 </div>
-
             </section>
         </div>
         </div>
@@ -142,79 +291,96 @@
         <div class="tab-content" id="tab-reflexiv">
         <div class="zp-notes">
             <section class="note-section">
+
                 <div class="lesson-header-block">
-                    <span class="lesson-header-icon">&#x1F504;</span>
+                    <span class="lesson-header-icon">&#x1FA9F;</span>
                     <div>
-                        <h2>Reflexivpronomen</h2>
-                        <p class="lesson-header-sub">Возвратные — «-ся» по-немецки</p>
+                        <h2>Reflexiv = действие возвращается к тебе</h2>
+                        <p class="lesson-header-sub">Как «-ся» в русском — моюсь, радуюсь, тороплюсь</p>
                     </div>
                 </div>
-
-                <div class="note-card highlight-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.08);">
-                    <h3>&#x1F4A1; Главное правило: когда sich?</h3>
-                    <p style="color:rgba(255,255,255,0.75);margin-bottom:0.9rem;">У 1-го и 2-го лица возвратное = обычное личное местоимение. Только у 3-го лица (er/sie/es/sie/Sie) — особое <strong style="font-size:1.1rem;">sich</strong>.</p>
-                    <table class="unit-table">
-                        <tr><th>Лицо</th><th>Akk.</th><th>Dat.</th></tr>
-                        <tr><td>ich</td><td>mich</td><td>mir</td></tr>
-                        <tr><td>du</td><td>dich</td><td>dir</td></tr>
-                        <tr><td style="color:#7ee787;font-weight:700;">er / sie / es</td><td style="color:#7ee787;font-weight:700;">sich</td><td style="color:#7ee787;font-weight:700;">sich</td></tr>
-                        <tr><td>wir</td><td>uns</td><td>uns</td></tr>
-                        <tr><td>ihr</td><td>euch</td><td>euch</td></tr>
-                        <tr><td style="color:#7ee787;font-weight:700;">sie / Sie</td><td style="color:#7ee787;font-weight:700;">sich</td><td style="color:#7ee787;font-weight:700;">sich</td></tr>
-                    </table>
-                    <div style="margin-top:0.8rem;font-size:0.88rem;line-height:1.9;background:rgba(255,255,255,0.05);border-radius:8px;padding:0.7rem 1rem;">
-                        Ich wasche <strong>mich</strong>. &nbsp;&bull;&nbsp; Du wäschst <strong>dich</strong>. &nbsp;&bull;&nbsp; Er wäscht <strong style="color:#7ee787;">sich</strong>.<br>
-                        Ich freue <strong>mich</strong>. &nbsp;&bull;&nbsp; Du freust <strong>dich</strong>. &nbsp;&bull;&nbsp; Sie freut <strong style="color:#7ee787;">sich</strong>.
-                    </div>
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.3); background:rgba(63,185,80,0.06);">
+                    <p style="margin-bottom:0.5rem;">У 1-го и 2-го лица возвратные = личным: <strong>mich/mir &nbsp;dich/dir &nbsp;uns &nbsp;euch</strong>.</p>
+                    <p>У 3-го лица и Sie — всегда одно: <strong style="color:#3fb950; font-size:1.15rem;">sich</strong></p>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.4rem; font-style:italic;">er wäscht <strong style="color:#3fb950;">sich</strong> &nbsp;·&nbsp; sie freut <strong style="color:#3fb950;">sich</strong> &nbsp;·&nbsp; sie beeilen <strong style="color:#3fb950;">sich</strong></p>
                 </div>
 
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x2600;&#xFE0F;</span>
+                    <div>
+                        <h2>Утро Тома</h2>
+                        <p class="lesson-header-sub">История с возвратными глаголами — читай как рассказ</p>
+                    </div>
+                </div>
                 <div class="note-card">
-                    <h3>mich vs mir при возвратных глаголах</h3>
-                    <p style="color:rgba(255,255,255,0.65);margin-bottom:0.7rem;">Если в предложении есть <strong>ещё один объект (Akk.)</strong> — возвратное стоит в <strong>Dativ</strong>:</p>
+                    <div class="story-steps">
+                        <div class="story-step">
+                            <div class="story-step-time">7:00</div>
+                            <div class="story-step-de">Tom wacht auf und <span class="hl">streckt sich</span>.</div>
+                            <div class="story-step-ru">потягивается</div>
+                        </div>
+                        <div class="story-step">
+                            <div class="story-step-time">7:05</div>
+                            <div class="story-step-de">Er <span class="hl">wäscht sich</span> das Gesicht.</div>
+                            <div class="story-step-ru">умывается</div>
+                        </div>
+                        <div class="story-step">
+                            <div class="story-step-time">7:10</div>
+                            <div class="story-step-de">Er <span class="hl">kämmt sich</span> die Haare.</div>
+                            <div class="story-step-ru">причёсывается</div>
+                        </div>
+                        <div class="story-step">
+                            <div class="story-step-time">7:15</div>
+                            <div class="story-step-de">Er <span class="hl">zieht sich</span> an.</div>
+                            <div class="story-step-ru">одевается</div>
+                        </div>
+                        <div class="story-step">
+                            <div class="story-step-time">7:20</div>
+                            <div class="story-step-de">Er <span class="hl">freut sich</span> auf den Tag.</div>
+                            <div class="story-step-ru">радуется дню</div>
+                        </div>
+                        <div class="story-step">
+                            <div class="story-step-time">7:25</div>
+                            <div class="story-step-de">Er <span class="hl">beeilt sich</span> — er ist spät dran!</div>
+                            <div class="story-step-ru">торопится</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x2696;&#xFE0F;</span>
+                    <div>
+                        <h2>mich vs mir в возвратных</h2>
+                        <p class="lesson-header-sub">Есть второй объект → берёшь Dat</p>
+                    </div>
+                </div>
+                <div class="note-card">
                     <table class="unit-table">
                         <tr><th>Предложение</th><th>Почему</th></tr>
-                        <tr>
-                            <td>Ich wasche <strong style="color:#c9b3ff;">mich</strong>.</td>
-                            <td>нет другого объекта → Akk.</td>
-                        </tr>
-                        <tr>
-                            <td>Ich wasche <strong style="color:#79c0ff;">mir</strong> die Hände.</td>
-                            <td>«die Hände» = Akk. → возвратное в Dat.</td>
-                        </tr>
-                        <tr>
-                            <td>Ich putze <strong style="color:#79c0ff;">mir</strong> die Zähne.</td>
-                            <td>«die Zähne» = Akk. → возвратное в Dat.</td>
-                        </tr>
-                        <tr>
-                            <td>Ich kaufe <strong style="color:#79c0ff;">mir</strong> ein Buch.</td>
-                            <td>«ein Buch» = Akk. → возвратное в Dat.</td>
-                        </tr>
-                        <tr>
-                            <td>Ich stelle <strong style="color:#79c0ff;">mir</strong> vor, dass&hellip;</td>
-                            <td>подчинённое предложение = Akk. → Dat.</td>
-                        </tr>
+                        <tr><td>Ich wasche <strong style="color:#58a6ff;">mich</strong>.</td><td style="color:var(--color-text-muted); font-size:0.88rem;">Akk — других объектов нет</td></tr>
+                        <tr><td>Ich wasche <strong style="color:#d29922;">mir</strong> die Hände.</td><td style="color:var(--color-text-muted); font-size:0.88rem;">Dat — «die Hände» уже Akk</td></tr>
+                        <tr><td>Ich putze <strong style="color:#d29922;">mir</strong> die Zähne.</td><td style="color:var(--color-text-muted); font-size:0.88rem;">Dat — «die Zähne» = Akk</td></tr>
+                        <tr><td>Ich kämme <strong style="color:#d29922;">mir</strong> die Haare.</td><td style="color:var(--color-text-muted); font-size:0.88rem;">Dat — «die Haare» = Akk</td></tr>
                     </table>
                 </div>
 
-                <div class="note-card highlight-card">
-                    <h3>&#x1F4DA; Важные возвратные глаголы B2</h3>
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x1F4DD;</span>
+                    <div><h2>Топ возвратных глаголов</h2></div>
+                </div>
+                <div class="note-card">
                     <table class="unit-table">
                         <tr><th>Глагол</th><th>Перевод</th><th>Пример</th></tr>
-                        <tr><td><strong>sich freuen auf</strong></td><td>ждать с нетерпением</td><td>Ich freue mich auf den Urlaub.</td></tr>
-                        <tr><td><strong>sich freuen über</strong></td><td>радоваться чему-то</td><td>Sie freut sich über das Geschenk.</td></tr>
-                        <tr><td><strong>sich erinnern an</strong></td><td>помнить о&hellip;</td><td>Ich erinnere mich an diesen Tag.</td></tr>
-                        <tr><td><strong>sich interessieren für</strong></td><td>интересоваться</td><td>Er interessiert sich für Sport.</td></tr>
-                        <tr><td><strong>sich entscheiden für</strong></td><td>решиться на&hellip;</td><td>Wir entscheiden uns für den Zug.</td></tr>
-                        <tr><td><strong>sich vorstellen</strong></td><td>представляться / воображать</td><td>Ich stelle mich vor. / Ich stelle mir vor…</td></tr>
-                        <tr><td><strong>sich ärgern über</strong></td><td>злиться из-за&hellip;</td><td>Mama ärgert sich über den Lärm.</td></tr>
-                        <tr><td><strong>sich kümmern um</strong></td><td>заботиться о&hellip;</td><td>Sie kümmert sich um ihre Eltern.</td></tr>
-                        <tr><td><strong>sich gewöhnen an</strong></td><td>привыкать к&hellip;</td><td>Man gewöhnt sich an alles.</td></tr>
-                        <tr><td><strong>sich bewerben um</strong></td><td>подавать заявку на&hellip;</td><td>Er bewirbt sich um die Stelle.</td></tr>
-                        <tr><td><strong>sich handeln um</strong></td><td>речь идёт о&hellip;</td><td>Es handelt sich um ein Problem.</td></tr>
-                        <tr><td><strong>sich befinden</strong></td><td>находиться</td><td>Das Hotel befindet sich im Zentrum.</td></tr>
+                        <tr><td>sich freuen auf</td><td>радоваться (чему впереди)</td><td><em>Ich freue mich auf Urlaub.</em></td></tr>
+                        <tr><td>sich freuen über</td><td>радоваться (тому что есть)</td><td><em>Ich freue mich über das Geschenk.</em></td></tr>
+                        <tr><td>sich interessieren für</td><td>интересоваться</td><td><em>Er interessiert sich für Musik.</em></td></tr>
+                        <tr><td>sich erinnern an</td><td>вспоминать</td><td><em>Ich erinnere mich an ihn.</em></td></tr>
+                        <tr><td>sich treffen mit</td><td>встречаться</td><td><em>Wir treffen uns um 5.</em></td></tr>
+                        <tr><td>sich ärgern über</td><td>злиться из-за</td><td><em>Sie ärgert sich über den Lärm.</em></td></tr>
+                        <tr><td>sich vorstellen</td><td>представляться</td><td><em>Ich stelle mich vor.</em></td></tr>
+                        <tr><td>sich beeilen</td><td>торопиться</td><td><em>Beeil dich!</em></td></tr>
                     </table>
                 </div>
-
             </section>
         </div>
         </div>
@@ -223,181 +389,195 @@
         <div class="tab-content" id="tab-possessiv">
         <div class="zp-notes">
             <section class="note-section">
+
                 <div class="lesson-header-block">
                     <span class="lesson-header-icon">&#x1F511;</span>
                     <div>
-                        <h2>Possessivpronomen</h2>
-                        <p class="lesson-header-sub">мой, твой, его, её, наш&hellip;</p>
+                        <h2>mein · dein · sein · ihr — рифмуются</h2>
+                        <p class="lesson-header-sub">Каждому местоимению — свой притяжательный</p>
                     </div>
                 </div>
-
                 <div class="note-card">
-                    <h3>Базовые формы &mdash; без склонения</h3>
-                    <table class="unit-table">
-                        <tr><th>Лицо</th><th>Местоимение</th><th>Пример</th><th>Перевод</th></tr>
-                        <tr><td>ich</td><td><strong>mein</strong></td><td>mein Vater</td><td>мой отец</td></tr>
-                        <tr><td>du</td><td><strong>dein</strong></td><td>dein Buch</td><td>твоя книга</td></tr>
-                        <tr><td>er / es</td><td><strong>sein</strong></td><td>sein Auto</td><td>его машина</td></tr>
-                        <tr><td>sie (она)</td><td><strong>ihr</strong></td><td>ihr Hund</td><td>её собака</td></tr>
-                        <tr><td>wir</td><td><strong>unser</strong></td><td>unser Haus</td><td>наш дом</td></tr>
-                        <tr><td>ihr (вы)</td><td><strong>euer</strong></td><td>euer Lehrer</td><td>ваш учитель</td></tr>
-                        <tr><td>sie (они)</td><td><strong>ihr</strong></td><td>ihre Eltern</td><td>их родители</td></tr>
-                        <tr><td>Sie (Вы)</td><td><strong>Ihr</strong></td><td>Ihre Frage</td><td>Ваш вопрос</td></tr>
-                    </table>
+                    <div class="owner-chips">
+                        <div class="owner-chip" style="background:rgba(68,147,248,0.1); border:1px solid rgba(68,147,248,0.3);">
+                            <div class="oc-pro" style="color:#58a6ff;">ich</div>
+                            <div class="oc-word">mein</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.3);">
+                            <div class="oc-pro" style="color:#3fb950;">du</div>
+                            <div class="oc-word">dein</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(244,167,185,0.1); border:1px solid rgba(244,167,185,0.3);">
+                            <div class="oc-pro" style="color:#f4a7b9;">er/es</div>
+                            <div class="oc-word">sein</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(244,167,185,0.1); border:1px solid rgba(244,167,185,0.3);">
+                            <div class="oc-pro" style="color:#f4a7b9;">sie (она)</div>
+                            <div class="oc-word">ihr</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(68,147,248,0.1); border:1px solid rgba(68,147,248,0.3);">
+                            <div class="oc-pro" style="color:#58a6ff;">wir</div>
+                            <div class="oc-word">unser</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.3);">
+                            <div class="oc-pro" style="color:#3fb950;">ihr (вы)</div>
+                            <div class="oc-word">euer</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(244,167,185,0.1); border:1px solid rgba(244,167,185,0.3);">
+                            <div class="oc-pro" style="color:#f4a7b9;">sie (они)</div>
+                            <div class="oc-word">ihr</div>
+                        </div>
+                        <div class="owner-chip" style="background:rgba(210,153,34,0.1); border:1px solid rgba(210,153,34,0.3);">
+                            <div class="oc-pro" style="color:#d29922;">Sie (вежл.)</div>
+                            <div class="oc-word">Ihr</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted);">&#x26A0; <strong>ihr</strong> = её / их — одинаково, контекст решает. Подробнее во вкладке Fallen.</p>
                 </div>
 
-                <div class="note-card highlight-card" style="border-color:rgba(240,136,62,0.4); background:rgba(240,136,62,0.08);">
-                    <h3>&#x26A0;&#xFE0F; euer &mdash; особое поведение</h3>
-                    <p style="color:rgba(255,255,255,0.7);margin-bottom:0.8rem;">У <strong>euer</strong> при добавлении окончания <strong>выпадает -e-</strong>:</p>
-                    <table class="unit-table">
-                        <tr><th></th><th>м.р. (der)</th><th>ж.р. (die)</th><th>ср.р. (das)</th><th>Plural</th></tr>
-                        <tr><td>Nom.</td><td>eu<strong>er</strong> Vater</td><td>eu<strong>re</strong> Mutter</td><td>eu<strong>er</strong> Kind</td><td>eu<strong>re</strong> Kinder</td></tr>
-                        <tr><td>Akk.</td><td>eu<strong>ren</strong> Vater</td><td>eu<strong>re</strong> Mutter</td><td>eu<strong>er</strong> Kind</td><td>eu<strong>re</strong> Kinder</td></tr>
-                        <tr><td>Dat.</td><td>eu<strong>rem</strong> Vater</td><td>eu<strong>rer</strong> Mutter</td><td>eu<strong>rem</strong> Kind</td><td>eu<strong>ren</strong> Kindern</td></tr>
-                    </table>
-                    <p style="font-size:0.83rem;color:rgba(255,255,255,0.4);margin-top:0.6rem;">Ср.: euer Vater (nom.m) — eure Mutter (nom.f) — euren Vater (akk.m)</p>
-                </div>
-
-                <div class="note-card highlight-card">
-                    <h3>&#x1F4A1; Склоняются как ein / kein</h3>
-                    <p style="color:rgba(255,255,255,0.65);margin-bottom:0.7rem;">mein, dein, sein, ihr, unser, euer, ihr — все берут одинаковые окончания:</p>
-                    <table class="unit-table">
-                        <tr><th></th><th>м.р.</th><th>ж.р.</th><th>ср.р.</th><th>Plural</th></tr>
-                        <tr><td>Nom.</td><td>mein <strong>—</strong></td><td>mein<strong>e</strong></td><td>mein <strong>—</strong></td><td>mein<strong>e</strong></td></tr>
-                        <tr><td>Akk.</td><td>mein<strong>en</strong></td><td>mein<strong>e</strong></td><td>mein <strong>—</strong></td><td>mein<strong>e</strong></td></tr>
-                        <tr><td>Dat.</td><td>mein<strong>em</strong></td><td>mein<strong>er</strong></td><td>mein<strong>em</strong></td><td>mein<strong>en</strong></td></tr>
-                        <tr><td>Gen.</td><td>mein<strong>es</strong></td><td>mein<strong>er</strong></td><td>mein<strong>es</strong></td><td>mein<strong>er</strong></td></tr>
-                    </table>
-                    <div style="margin-top:0.8rem;font-size:0.9rem;line-height:1.9;background:rgba(255,255,255,0.05);border-radius:8px;padding:0.7rem 1rem;">
-                        Ich gebe <strong>meinem</strong> Bruder <strong>mein</strong> Buch. &nbsp;<span style="color:rgba(255,255,255,0.4);">(Dat.m + Akk.n)</span><br>
-                        Er liebt <strong>seine</strong> Arbeit. &nbsp;<span style="color:rgba(255,255,255,0.4);">(Akk.f)</span><br>
-                        Wir besuchen <strong>unsere</strong> Eltern. &nbsp;<span style="color:rgba(255,255,255,0.4);">(Akk.pl)</span>
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Окончания = как у ein/kein</h2>
+                        <p class="lesson-header-sub">Знаешь ein — знаешь mein, dein, sein, ihr...</p>
                     </div>
                 </div>
+                <div class="note-card">
+                    <table class="unit-table">
+                        <tr><th></th><th>m (der)</th><th>f (die)</th><th>n (das)</th><th>pl</th></tr>
+                        <tr><td><strong>Nom.</strong></td><td>mein&thinsp;—</td><td>mein<strong style="color:#58a6ff;">e</strong></td><td>mein&thinsp;—</td><td>mein<strong style="color:#58a6ff;">e</strong></td></tr>
+                        <tr><td><strong>Akk.</strong></td><td>mein<strong style="color:#3fb950;">en</strong></td><td>mein<strong style="color:#58a6ff;">e</strong></td><td>mein&thinsp;—</td><td>mein<strong style="color:#58a6ff;">e</strong></td></tr>
+                        <tr><td><strong>Dat.</strong></td><td>mein<strong style="color:#d29922;">em</strong></td><td>mein<strong style="color:#f4a7b9;">er</strong></td><td>mein<strong style="color:#d29922;">em</strong></td><td>mein<strong style="color:#3fb950;">en</strong></td></tr>
+                        <tr><td><strong>Gen.</strong></td><td>mein<strong style="color:var(--color-text-muted);">es</strong></td><td>mein<strong style="color:#f4a7b9;">er</strong></td><td>mein<strong style="color:var(--color-text-muted);">es</strong></td><td>mein<strong style="color:#f4a7b9;">er</strong></td></tr>
+                    </table>
+                    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-top:0.6rem; font-style:italic;">
+                        Ich gebe <strong>meinem</strong> Bruder <strong>mein</strong> Buch. &mdash; Dat.&nbsp;m + Akk.&nbsp;n
+                    </p>
+                </div>
 
+                <div class="lesson-header-block" style="margin-top:1.2rem;">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div><h2>Живые примеры</h2></div>
+                </div>
+                <div class="note-card">
+                    <table class="unit-table">
+                        <tr><th>Предложение</th><th>Перевод</th></tr>
+                        <tr><td><strong>Mein</strong> Vater arbeitet in Berlin.</td><td>Мой папа работает в Берлине.</td></tr>
+                        <tr><td>Wo ist <strong>dein</strong> Handy?</td><td>Где твой телефон?</td></tr>
+                        <tr><td>Er liebt <strong>seine</strong> Katze sehr.</td><td>Он очень любит свою кошку.</td></tr>
+                        <tr><td>Anna vermisst <strong>ihre</strong> Freunde.</td><td>Анна скучает по своим друзьям.</td></tr>
+                        <tr><td><strong>Unser</strong> Haus ist nicht weit.</td><td>Наш дом недалеко.</td></tr>
+                        <tr><td>Habt ihr <strong>eure</strong> Bücher dabei?</td><td>У вас с собой ваши книги?</td></tr>
+                    </table>
+                </div>
             </section>
         </div>
         </div>
 
-        <!-- ===== FALLEN (ЛОВУШКИ) ===== -->
+        <!-- ===== FALLEN ===== -->
         <div class="tab-content" id="tab-fallen">
         <div class="zp-notes">
             <section class="note-section">
+
                 <div class="lesson-header-block">
-                    <span class="lesson-header-icon">&#x26A0;&#xFE0F;</span>
+                    <span class="lesson-header-icon">&#x1F4A3;</span>
                     <div>
-                        <h2>Ловушки &amp; путаница</h2>
-                        <p class="lesson-header-sub">Самые частые ошибки с местоимениями</p>
+                        <h2>Fallen — Ловушки</h2>
+                        <p class="lesson-header-sub">Самые частые ошибки и как их обойти</p>
                     </div>
                 </div>
 
-                <!-- ihr — 3 значения -->
-                <div class="note-card highlight-card" style="border-color:rgba(248,81,73,0.4); background:rgba(248,81,73,0.07);">
-                    <h3>&#x1F525; ihr &mdash; 3 разных значения</h3>
-                    <p style="color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">Одно слово — три смысла. Только контекст спасает:</p>
-                    <table class="unit-table">
-                        <tr><th>Форма</th><th>Значение</th><th>Пример</th></tr>
-                        <tr>
-                            <td><strong style="color:#f4a7b9;">ihr</strong></td>
-                            <td>вы (Nom. Plural)</td>
-                            <td>Kommt <strong>ihr</strong> morgen? (Вы придёте завтра?)</td>
-                        </tr>
-                        <tr>
-                            <td><strong style="color:#79c0ff;">ihr</strong></td>
-                            <td>ей (Dat. von sie)</td>
-                            <td>Ich helfe <strong>ihr</strong>. (Я помогаю ей.)</td>
-                        </tr>
-                        <tr>
-                            <td><strong style="color:#7ee787;">ihr/ihre</strong></td>
-                            <td>её / их (Possessiv)</td>
-                            <td><strong>Ihr</strong> Hund ist süß. (Её собака милая.)</td>
-                        </tr>
-                    </table>
-                    <div style="margin-top:0.8rem;background:rgba(255,255,255,0.05);border-radius:8px;padding:0.7rem 1rem;font-size:0.88rem;line-height:1.9;">
-                        <strong>Как различить?</strong><br>
-                        &bull; Стоит в начале + заглавная / перед существительным → Possessiv<br>
-                        &bull; После глагола типа «helfen/danken» → Dativ (ей)<br>
-                        &bull; Отдельно как подлежащее → «вы»
+                <div class="trap-card">
+                    <h3>&#x26A0; Ловушка 1: ihr — 4 значения</h3>
+                    <p style="font-size:0.86rem; color:var(--color-text-muted); margin-bottom:0.7rem;">Одно слово — четыре смысла. Контекст решает.</p>
+                    <div class="trap-rows">
+                        <div class="trap-row">
+                            <div class="word">ihr</div>
+                            <div class="meaning">вы (Nom)</div>
+                            <div class="example">Kommt <strong>ihr</strong> morgen? — Вы придёте?</div>
+                        </div>
+                        <div class="trap-row">
+                            <div class="word">ihr</div>
+                            <div class="meaning">ей (Dat от sie)</div>
+                            <div class="example">Ich gebe <strong>ihr</strong> das Buch.</div>
+                        </div>
+                        <div class="trap-row">
+                            <div class="word">ihr/ihre</div>
+                            <div class="meaning">её (Poss)</div>
+                            <div class="example"><strong>Ihr</strong> Hund ist süß.</div>
+                        </div>
+                        <div class="trap-row">
+                            <div class="word">ihre</div>
+                            <div class="meaning">их (Poss pl)</div>
+                            <div class="example"><strong>Ihre</strong> Kinder spielen.</div>
+                        </div>
+                        <div class="trap-row" style="border-left-color:rgba(210,153,34,0.5);">
+                            <div class="word" style="color:#d29922;">Ihr</div>
+                            <div class="meaning">Ваш (вежл.)</div>
+                            <div class="example"><strong>Ihr</strong> Name, bitte?</div>
+                        </div>
+                    </div>
+                    <div class="trap-tip">
+                        &#x1F4A1; После <strong>ihr</strong> стоит глагол → это «вы»: <em>Seid ihr fertig?</em><br>
+                        После <strong>ihr</strong> стоит существительное → это «её / их / Ваш»: <em>ihr Bruder</em>
                     </div>
                 </div>
 
-                <!-- sein vs ihr путаница -->
-                <div class="note-card highlight-card" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.07);">
-                    <h3>&#x26A1; sein vs ihr &mdash; его / её / их</h3>
-                    <table class="unit-table">
-                        <tr><th>Слово</th><th>Значение</th><th>Пример</th></tr>
-                        <tr>
-                            <td><strong style="color:#fbbf24;">sein</strong></td>
-                            <td>его (von er / es)</td>
-                            <td>Tom trinkt <strong>seinen</strong> Kaffee. (Том пьёт свой кофе.)</td>
-                        </tr>
-                        <tr>
-                            <td><strong style="color:#f4a7b9;">ihr</strong></td>
-                            <td>её (von sie — она)</td>
-                            <td>Anna liest <strong>ihr</strong> Buch. (Анна читает свою книгу.)</td>
-                        </tr>
-                        <tr>
-                            <td><strong style="color:#7ee787;">ihr/ihre</strong></td>
-                            <td>их (von sie — они)</td>
-                            <td>Die Kinder lieben <strong>ihre</strong> Mutter. (Дети любят свою маму.)</td>
-                        </tr>
-                    </table>
-                    <div style="margin-top:0.8rem;background:rgba(255,255,255,0.05);border-radius:8px;padding:0.7rem 1rem;font-size:0.88rem;">
-                        ⚠️ <strong>ihr</strong> может значить и «её» и «их» — одна форма!<br>
-                        Только контекст (подлежащее в предложении) говорит, что имеется в виду.
+                <div class="trap-card">
+                    <h3>&#x26A0; Ловушка 2: sie vs Sie</h3>
+                    <div class="trap-rows">
+                        <div class="trap-row">
+                            <div class="word">sie</div>
+                            <div class="meaning">она</div>
+                            <div class="example"><strong>Sie</strong> ist meine Freundin.</div>
+                        </div>
+                        <div class="trap-row">
+                            <div class="word">sie</div>
+                            <div class="meaning">они</div>
+                            <div class="example"><strong>Sie</strong> sind müde.</div>
+                        </div>
+                        <div class="trap-row" style="border-left-color:rgba(210,153,34,0.5);">
+                            <div class="word" style="color:#d29922;">Sie</div>
+                            <div class="meaning">Вы (вежл.)</div>
+                            <div class="example"><strong>Sie</strong> sind sehr nett, Herr Müller.</div>
+                        </div>
+                    </div>
+                    <div class="trap-tip">
+                        &#x1F4A1; <strong>Sie</strong> с большой буквы в середине предложения = только вежливое Вы.<br>
+                        В начале предложения смотри на контекст и обращение.
                     </div>
                 </div>
 
-                <!-- sich vorstellen — 2 значения -->
-                <div class="note-card" style="border-color:rgba(163,113,247,0.4); background:rgba(163,113,247,0.07);">
-                    <h3>&#x1F914; sich vorstellen &mdash; два смысла</h3>
-                    <table class="unit-table">
-                        <tr><th>Форма</th><th>Значение</th><th>Пример</th></tr>
-                        <tr>
-                            <td>Ich stelle <strong style="color:#c9b3ff;">mich</strong> vor.</td>
-                            <td>Я представляюсь (знакомлюсь)</td>
-                            <td>Darf ich mich vorstellen? Ich bin Anna.</td>
-                        </tr>
-                        <tr>
-                            <td>Ich stelle <strong style="color:#79c0ff;">mir</strong> vor, dass&hellip;</td>
-                            <td>Я представляю себе / воображаю</td>
-                            <td>Ich stelle mir vor, wie schön das wäre.</td>
-                        </tr>
-                    </table>
+                <div class="trap-card">
+                    <h3>&#x26A0; Ловушка 3: sein- vs ihr- (его vs её)</h3>
+                    <div class="trap-rows">
+                        <div class="trap-row">
+                            <div class="word">sein-</div>
+                            <div class="meaning">его (er/es)</div>
+                            <div class="example">Er liebt <strong>seinen</strong> Hund.</div>
+                        </div>
+                        <div class="trap-row">
+                            <div class="word">ihr-</div>
+                            <div class="meaning">её (sie)</div>
+                            <div class="example">Sie liebt <strong>ihren</strong> Hund.</div>
+                        </div>
+                    </div>
+                    <div class="trap-tip">
+                        &#x1F4A1; Оба склоняются одинаково. Разница только в корне: <strong>sein-</strong> или <strong>ihr-</strong>.
+                    </div>
                 </div>
 
-                <!-- Типичные ошибки -->
-                <div class="note-card" style="border-color:rgba(248,81,73,0.35); background:rgba(248,81,73,0.06);">
-                    <h3>&#x274C; Частые ошибки</h3>
-                    <table class="unit-table">
-                        <tr>
-                            <td><span style="color:#ff8888;">❌ Kannst du mich helfen?</span></td>
-                            <td><span style="color:#88ff88;">✅ Kannst du <strong>mir</strong> helfen?</span></td>
-                            <td>helfen → Dativ</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#ff8888;">❌ Das gefällt mich.</span></td>
-                            <td><span style="color:#88ff88;">✅ Das gefällt <strong>mir</strong>.</span></td>
-                            <td>gefallen → Dativ</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#ff8888;">❌ Er wäscht sich die Hände. → mich</span></td>
-                            <td><span style="color:#88ff88;">✅ Er wäscht <strong>sich</strong> die Hände.</span></td>
-                            <td>3-е лицо → sich</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#ff8888;">❌ Das ist eure Vater.</span></td>
-                            <td><span style="color:#88ff88;">✅ Das ist <strong>euer</strong> Vater.</span></td>
-                            <td>м.р. Nom. → euer (без окончания)</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#ff8888;">❌ Ich danke sie.</span></td>
-                            <td><span style="color:#88ff88;">✅ Ich danke <strong>ihnen</strong>.</span></td>
-                            <td>danken → Dativ Plural</td>
-                        </tr>
-                    </table>
+                <div class="note-card highlight-card" style="border-color:rgba(63,185,80,0.3); background:rgba(63,185,80,0.06); margin-top:0.4rem;">
+                    <h3>&#x2705; Быстрый тест — два вопроса решают всё</h3>
+                    <ul style="margin:0.5rem 0 0 1.2rem; line-height:2.1;">
+                        <li><strong>кого? / что?</strong> &rarr; Akkusativ &rarr; mich · dich · ihn · sie · uns · euch</li>
+                        <li><strong>кому?</strong> &rarr; Dativ &rarr; mir · dir · ihm · ihr · uns · euch · ihnen</li>
+                    </ul>
+                    <p style="font-size:0.88rem; color:var(--color-text-muted); margin-top:0.6rem; font-style:italic;">
+                        Ich liebe ___ (кого?) &rarr; Akk &rarr; <strong>dich</strong> &#x2713;&nbsp;&nbsp;
+                        Ich schreibe ___ (кому?) &rarr; Dat &rarr; <strong>dir</strong> &#x2713;
+                    </p>
                 </div>
-
             </section>
         </div>
         </div>
@@ -418,7 +598,7 @@
                     <p id="score-pron" style="font-size:1.1rem; margin-bottom:0.6rem;"></p>
 
                     <div class="quiz-question" data-answer="mir">
-                        <p><strong>1.</strong> Kannst du ___ helfen? &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(мне)</span></p>
+                        <p><strong>1.</strong> Kannst du ___ helfen? <span style="color:var(--color-text-muted); font-size:0.85rem;">(мне)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'mich')">mich</button>
                             <button class="quiz-btn" onclick="checkPron(this,'mir')">mir</button>
@@ -427,18 +607,8 @@
                         <p class="quiz-feedback"></p>
                     </div>
 
-                    <div class="quiz-question" data-answer="mir">
-                        <p><strong>2.</strong> Das gef&auml;llt ___ sehr gut. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(gefallen → Dativ!)</span></p>
-                        <div class="quiz-options">
-                            <button class="quiz-btn" onclick="checkPron(this,'mich')">mich</button>
-                            <button class="quiz-btn" onclick="checkPron(this,'mir')">mir</button>
-                            <button class="quiz-btn" onclick="checkPron(this,'ich')">ich</button>
-                        </div>
-                        <p class="quiz-feedback"></p>
-                    </div>
-
                     <div class="quiz-question" data-answer="ihn">
-                        <p><strong>3.</strong> Ich sehe ___ jeden Tag. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(его)</span></p>
+                        <p><strong>2.</strong> Ich sehe ___ jeden Tag. <span style="color:var(--color-text-muted); font-size:0.85rem;">(его, Akk)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'ihm')">ihm</button>
                             <button class="quiz-btn" onclick="checkPron(this,'ihn')">ihn</button>
@@ -448,7 +618,7 @@
                     </div>
 
                     <div class="quiz-question" data-answer="sich">
-                        <p><strong>4.</strong> Er freut ___ auf das Wochenende.</p>
+                        <p><strong>3.</strong> Er freut ___ auf das Wochenende.</p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'ihn')">ihn</button>
                             <button class="quiz-btn" onclick="checkPron(this,'sich')">sich</button>
@@ -458,7 +628,7 @@
                     </div>
 
                     <div class="quiz-question" data-answer="mir">
-                        <p><strong>5.</strong> Ich putze ___ die Z&auml;hne. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(«die Zähne» = Akk.)</span></p>
+                        <p><strong>4.</strong> Ich putze ___ die Zähne. <span style="color:var(--color-text-muted); font-size:0.85rem;">(«Zähne» уже Akk)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'mich')">mich</button>
                             <button class="quiz-btn" onclick="checkPron(this,'mir')">mir</button>
@@ -468,7 +638,7 @@
                     </div>
 
                     <div class="quiz-question" data-answer="meinem">
-                        <p><strong>6.</strong> Ich gebe ___ Bruder ein Buch. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(моему — Dat. m)</span></p>
+                        <p><strong>5.</strong> Ich gebe ___ Bruder ein Buch. <span style="color:var(--color-text-muted); font-size:0.85rem;">(Dat. m)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'mein')">mein</button>
                             <button class="quiz-btn" onclick="checkPron(this,'meinen')">meinen</button>
@@ -478,7 +648,7 @@
                     </div>
 
                     <div class="quiz-question" data-answer="ihre">
-                        <p><strong>7.</strong> Anna besucht ___ Eltern. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(её, Akk. pl)</span></p>
+                        <p><strong>6.</strong> Anna besucht ___ Eltern. <span style="color:var(--color-text-muted); font-size:0.85rem;">(её, Akk pl)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'ihr')">ihr</button>
                             <button class="quiz-btn" onclick="checkPron(this,'ihre')">ihre</button>
@@ -488,7 +658,7 @@
                     </div>
 
                     <div class="quiz-question" data-answer="ihnen">
-                        <p><strong>8.</strong> Ich danke ___ f&uuml;r die Hilfe. &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(им — danken → Dativ!)</span></p>
+                        <p><strong>7.</strong> Ich danke ___ für die Hilfe. <span style="color:var(--color-text-muted); font-size:0.85rem;">(им)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'sie')">sie</button>
                             <button class="quiz-btn" onclick="checkPron(this,'ihnen')">ihnen</button>
@@ -497,26 +667,106 @@
                         <p class="quiz-feedback"></p>
                     </div>
 
-                    <div class="quiz-question" data-answer="sich">
-                        <p><strong>9.</strong> Sie k&uuml;mmert ___ um ihre Eltern.</p>
+                    <div class="quiz-question" data-answer="ihr">
+                        <p><strong>8.</strong> Kommt ___ morgen auch? <span style="color:var(--color-text-muted); font-size:0.85rem;">(вы, Nom)</span></p>
                         <div class="quiz-options">
                             <button class="quiz-btn" onclick="checkPron(this,'sie')">sie</button>
+                            <button class="quiz-btn" onclick="checkPron(this,'euch')">euch</button>
                             <button class="quiz-btn" onclick="checkPron(this,'ihr')">ihr</button>
-                            <button class="quiz-btn" onclick="checkPron(this,'sich')">sich</button>
                         </div>
                         <p class="quiz-feedback"></p>
                     </div>
 
-                    <div class="quiz-question" data-answer="euer">
-                        <p><strong>10.</strong> Ist das ___ Vater? &nbsp;<span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">(ваш — Nom. m)</span></p>
-                        <div class="quiz-options">
-                            <button class="quiz-btn" onclick="checkPron(this,'eure')">eure</button>
-                            <button class="quiz-btn" onclick="checkPron(this,'euer')">euer</button>
-                            <button class="quiz-btn" onclick="checkPron(this,'eurem')">eurem</button>
-                        </div>
-                        <p class="quiz-feedback"></p>
+                    <button onclick="resetPron()" style="margin-top:1rem; padding:0.5rem 1.2rem; border-radius:8px; border:1px solid var(--color-border); background:rgba(255,255,255,0.05); color:var(--color-text); cursor:pointer; font-size:0.9rem;">&#x1F504; Попробовать ещё раз</button>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ===== TEXT ===== -->
+        <div class="tab-content" id="tab-text">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DD;</span>
+                    <div>
+                        <h2>Ein Nachmittag im Park</h2>
+                        <p class="lesson-header-sub">Вставь правильное местоимение — потом проверь</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <p style="font-size:0.78rem; color:var(--color-text-muted); margin-bottom:1rem;">
+                        Вписывай в поле — строчными буквами, без подсказок. Когда закончишь, нажми «Проверить».
+                    </p>
+
+                    <div class="text-para">
+                        Max schreibt Anna eine Nachricht. Er fragt
+                        <span class="text-num">1</span><input class="fill-input" data-answer="sie" placeholder="___">,
+                        ob sie Zeit hat.
+                        Anna freut
+                        <span class="text-num">2</span><input class="fill-input" data-answer="sich" placeholder="___">
+                        sehr und antwortet sofort: „Ja!"
                     </div>
 
+                    <div class="text-para">
+                        Sie treffen
+                        <span class="text-num">3</span><input class="fill-input" data-answer="sich" placeholder="___">
+                        um drei Uhr am See.
+                        Max hat
+                        <span class="text-num">4</span><input class="fill-input" data-answer="ihr" placeholder="___">
+                        einen Kaffee mitgebracht.
+                        „Das ist so nett von
+                        <span class="text-num">5</span><input class="fill-input" data-answer="dir" placeholder="___">!", sagt Anna.
+                    </div>
+
+                    <div class="text-para">
+                        Plötzlich kommt Tom mit seinem Hund.
+                        Anna kennt
+                        <span class="text-num">6</span><input class="fill-input" data-answer="ihn" placeholder="___">
+                        aus der Schule.
+                        Max ruft
+                        <span class="text-num">7</span><input class="fill-input" data-answer="ihm" placeholder="___">:
+                        „Komm zu
+                        <span class="text-num">8</span><input class="fill-input" data-answer="uns" placeholder="___">!"
+                    </div>
+
+                    <div class="text-para">
+                        Tom setzt
+                        <span class="text-num">9</span><input class="fill-input" data-answer="sich" placeholder="___">
+                        zu ihnen und zeigt
+                        <span class="text-num">10</span><input class="fill-input" data-answer="ihnen" placeholder="___">
+                        Fotos von seiner neuen Stadt.
+                        „Ich freue
+                        <span class="text-num">11</span><input class="fill-input" data-answer="mich" placeholder="___">
+                        so darüber", sagt er lächelnd.
+                    </div>
+
+                    <div style="margin-top:1rem; display:flex; gap:0.7rem; flex-wrap:wrap; align-items:center;">
+                        <button onclick="checkText()" style="padding:0.5rem 1.3rem; border-radius:8px; border:none; background:var(--color-accent); color:#fff; cursor:pointer; font-size:0.92rem; font-weight:600;">&#x2714; Проверить</button>
+                        <button onclick="resetText()" style="padding:0.5rem 1.2rem; border-radius:8px; border:1px solid var(--color-border); background:rgba(255,255,255,0.05); color:var(--color-text); cursor:pointer; font-size:0.9rem;">&#x1F504; Сбросить</button>
+                        <span id="text-score" class="fill-score"></span>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card" style="border-color:rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); margin-top:0.8rem;">
+                    <h3 style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.5rem;">&#x1F4CB; Подсказки — смотри только если совсем застрял</h3>
+                    <details style="cursor:pointer;">
+                        <summary style="font-size:0.85rem; color:var(--color-accent); user-select:none;">Показать ответы</summary>
+                        <div style="margin-top:0.6rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">1. sie</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">2. sich</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">3. sich</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">4. ihr</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">5. dir</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">6. ihn</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">7. ihm</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">8. uns</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">9. sich</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">10. ihnen</span>
+                            <span style="font-size:0.82rem; background:rgba(255,255,255,0.05); padding:0.2rem 0.6rem; border-radius:6px;">11. mich</span>
+                        </div>
+                    </details>
                 </div>
             </section>
         </div>
@@ -538,7 +788,9 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
-        const pronState = { score: 0, total: 0, max: 10 };
+
+        const pronState = { score: 0, total: 0, max: 8 };
+
         function checkPron(btn, answer) {
             const q = btn.closest('.quiz-question');
             if (q.classList.contains('answered')) return;
@@ -555,17 +807,68 @@
                 pronState.score++;
             } else {
                 btn.classList.add('wrong');
-                btns.forEach(b => { if (b.onclick.toString().includes("'" + correct + "'")) b.classList.add('correct'); });
-                fb.textContent = 'Falsch!';
+                btns.forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct'); });
+                fb.innerHTML = 'Falsch! Richtig: <strong>' + correct + '</strong>';
                 fb.style.color = 'var(--color-red)';
             }
             const sc = document.getElementById('score-pron');
             if (pronState.total === pronState.max) {
                 const s = pronState.score;
-                if (s >= 9) { sc.innerHTML = '⭐ ' + s + '/10 — Super!'; sc.style.color = 'var(--color-green)'; }
-                else if (s >= 6) { sc.innerHTML = s + '/10 — Gut!'; sc.style.color = 'var(--color-orange)'; }
-                else { sc.innerHTML = s + '/10 — Lerne nochmal!'; sc.style.color = 'var(--color-red)'; }
+                if (s >= 7) { sc.innerHTML = '&#x2B50; ' + s + '/8 &mdash; Super!'; sc.style.color = 'var(--color-green)'; }
+                else if (s >= 5) { sc.innerHTML = s + '/8 &mdash; Gut gemacht!'; sc.style.color = 'var(--color-orange)'; }
+                else { sc.innerHTML = s + '/8 &mdash; Lerne nochmal!'; sc.style.color = 'var(--color-red)'; }
             }
+        }
+
+        function checkText() {
+            const inputs = document.querySelectorAll('#tab-text .fill-input');
+            let score = 0;
+            inputs.forEach(inp => {
+                const old = inp.nextElementSibling;
+                if (old && old.classList.contains('fill-hint')) old.remove();
+                const val = inp.value.trim().toLowerCase();
+                const ans = inp.dataset.answer;
+                inp.classList.remove('correct', 'wrong');
+                if (val === ans) {
+                    inp.classList.add('correct');
+                    score++;
+                } else {
+                    inp.classList.add('wrong');
+                    const hint = document.createElement('span');
+                    hint.className = 'fill-hint';
+                    hint.textContent = ans;
+                    inp.insertAdjacentElement('afterend', hint);
+                }
+            });
+            const sc = document.getElementById('text-score');
+            const total = inputs.length;
+            if (score === total) { sc.textContent = '⭐ ' + score + '/' + total + ' — Perfekt!'; sc.style.color = 'var(--color-green)'; }
+            else if (score >= total * 0.7) { sc.textContent = score + '/' + total + ' — Gut!'; sc.style.color = 'var(--color-orange)'; }
+            else { sc.textContent = score + '/' + total + ' — Nochmal versuchen!'; sc.style.color = 'var(--color-red)'; }
+        }
+
+        function resetText() {
+            document.querySelectorAll('#tab-text .fill-input').forEach(inp => {
+                inp.value = '';
+                inp.classList.remove('correct', 'wrong');
+                const hint = inp.nextElementSibling;
+                if (hint && hint.classList.contains('fill-hint')) hint.remove();
+            });
+            document.getElementById('text-score').textContent = '';
+        }
+
+        function resetPron() {
+            pronState.score = 0;
+            pronState.total = 0;
+            document.querySelectorAll('.quiz-question').forEach(q => {
+                q.classList.remove('answered');
+                q.querySelectorAll('.quiz-btn').forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('correct', 'wrong');
+                });
+                q.querySelector('.quiz-feedback').textContent = '';
+            });
+            document.getElementById('score-pron').textContent = '';
         }
     </script>
 </body>
