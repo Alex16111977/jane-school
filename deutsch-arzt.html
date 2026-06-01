@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beim Arzt: Untersuchungen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ── word cards ── */
+        .w-section {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            margin-bottom: 1.2rem;
+            overflow: hidden;
+        }
+        .w-section-head {
+            display: flex; align-items: center; gap: 0.9rem;
+            padding: 0.95rem 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .w-section-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .w-section-title { font-size: 0.97rem; font-weight: 800; color: #fff; }
+        .w-section-sub { font-size: 0.78rem; color: rgba(225,205,245,0.45); margin-top: 0.1rem; }
+        .w-level {
+            margin-left: auto; font-size: 0.68rem; font-weight: 800;
+            padding: 0.15rem 0.55rem; border-radius: 999px; flex-shrink: 0;
+        }
+        .lv-b2 { background: rgba(251,191,36,0.12); color: #fbbf24; }
+        .lv-c1 { background: rgba(248,113,113,0.12); color: #f87171; }
+
+        /* ── single word row ── */
+        .w-list { padding: 0.3rem 0.5rem 0.8rem; }
+        .w-item {
+            display: flex; flex-direction: column;
+            padding: 0.8rem 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 0.3rem;
+            transition: background 0.2s;
+            cursor: default;
+        }
+        .w-item:hover { background: rgba(255,255,255,0.04); }
+        .w-item-top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+        .w-de {
+            font-size: 1.02rem; font-weight: 800; color: #fff;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .w-de .art { color: rgba(192,132,252,0.7); font-weight: 600;
+            font-family: 'Nunito', sans-serif; font-size: 0.85rem; }
+        .w-de .prefix { color: #c084fc; }
+        .w-ua { font-size: 0.86rem; color: rgba(210,185,245,0.65); }
+        .w-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.3rem; }
+        .w-tag {
+            font-size: 0.68rem; font-weight: 700;
+            padding: 0.1rem 0.45rem; border-radius: 999px;
+        }
+        .tag-note  { background:rgba(147,197,253,0.1);  color:#93c5fd; }
+        .tag-pron  { background:rgba(192,132,252,0.1);  color:#c084fc; }
+        .tag-coll  { background:rgba(251,191,36,0.1);   color:#fbbf24; }
+        .tag-tip   { background:rgba(134,239,172,0.1);  color:#86efac; }
+        .tag-warn  { background:rgba(248,113,113,0.1);  color:#f87171; }
+
+        .w-example {
+            margin-top: 0.5rem;
+            background: rgba(192,132,252,0.06);
+            border-left: 2px solid rgba(192,132,252,0.35);
+            border-radius: 0 8px 8px 0;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.85rem; color: rgba(230,215,248,0.88);
+            line-height: 1.6;
+        }
+        .w-example .hl { color: #c084fc; font-weight: 700; }
+        .w-extra {
+            margin-top: 0.35rem;
+            font-size: 0.8rem; color: rgba(210,185,245,0.5);
+            line-height: 1.5; padding-left: 0.1rem;
+        }
+        .w-divider {
+            height: 1px; background: rgba(255,255,255,0.055);
+            margin: 0.15rem 0.8rem;
+        }
+
+        /* ── compound words showcase ── */
+        .compounds {
+            display: flex; flex-wrap: wrap; gap: 0.5rem;
+            padding: 0.6rem 0.8rem 0.9rem;
+        }
+        .compound-chip {
+            background: rgba(192,132,252,0.08);
+            border: 1px solid rgba(192,132,252,0.2);
+            border-radius: 10px; padding: 0.4rem 0.8rem;
+            font-size: 0.84rem; font-weight: 700; color: #e2d4f8;
+        }
+        .compound-chip span { color: #c084fc; }
+        .compound-chip .ua {
+            display: block; font-size: 0.72rem;
+            color: rgba(210,185,245,0.5); font-weight: 400; margin-top: 0.1rem;
+        }
+
+        /* ── vs block ── */
+        .vs-block {
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.7rem;
+            align-items: center; padding: 0.9rem 1.1rem; margin: 0.2rem 0.5rem 0.8rem;
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+        }
+        .vs-word { font-size: 0.9rem; font-weight: 800; color: #fff; }
+        .vs-ua { font-size: 0.78rem; color: rgba(210,185,245,0.55); margin-top: 0.15rem; }
+        .vs-sep { font-size: 1.1rem; color: rgba(255,255,255,0.15); text-align: center; }
+        .vs-ok  { border-left: 2px solid rgba(134,239,172,0.5); padding-left:0.7rem; }
+        .vs-bad { border-left: 2px solid rgba(248,113,113,0.5); padding-left:0.7rem; }
+
+        /* ── hero ── */
+        .page-hero {
+            background: linear-gradient(135deg, rgba(192,132,252,0.1), rgba(244,114,182,0.07));
+            border: 1px solid rgba(192,132,252,0.25);
+            border-radius: 16px; padding: 1.2rem 1.5rem;
+            margin-bottom: 1.8rem;
+            display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+        }
+        .ph-emoji { font-size: 2.6rem; flex-shrink: 0; }
+        .ph-title {
+            font-size: 1.5rem; font-weight: 900; color: #fff;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .ph-sub { font-size: 0.84rem; color: rgba(220,200,245,0.5); margin-top: 0.2rem; }
+        .ph-badges { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .ph-badge {
+            font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/paris.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 45%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">›</span>
+            <span class="current">Beim Arzt: Untersuchungen</span>
+        </nav>
+
+        <!-- ── hero ── -->
+        <div class="page-hero" style="margin-top:1rem;">
+            <div class="ph-emoji">🏥</div>
+            <div>
+                <div class="ph-title">Untersuchungen beim Arzt</div>
+                <div class="ph-sub">Медичні обстеження — терміни з відео Rieke</div>
+                <div class="ph-badges">
+                    <span class="ph-badge lv-b2">B2</span>
+                    <span class="ph-badge lv-c1">C1</span>
+                    <span class="ph-badge" style="background:rgba(192,132,252,0.12);color:#c084fc;">4 блоки · 25+ слів</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 1: Загальні терміни ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">🩺</span>
+                <div>
+                    <div class="w-section-title">Загальні терміни</div>
+                    <div class="w-section-sub">лікарі та типи обстежень</div>
+                </div>
+                <span class="w-level lv-b2">B2</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Hausarzt</div>
+                        <div class="w-ua">сімейний лікар / терапевт</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-tip">= Allgemeinmediziner</span>
+                        <span class="w-tag tag-note">перший лікар, до якого йдуть</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Facharzt</div>
+                        <div class="w-ua">вузький спеціаліст</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">Kardiologe, Orthopäde, Dermatologe...</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">die</span> Vorsorgeuntersuchung</div>
+                        <div class="w-ua">профілактичне обстеження</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-tip">= Check-up</span>
+                        <span class="w-tag tag-note">коли не хворий, але йдеш для перевірки</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 2: У терапевта ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">👨‍⚕️</span>
+                <div>
+                    <div class="w-section-title">У терапевта — що роблять</div>
+                    <div class="w-section-sub">дії, процедури, терміни</div>
+                </div>
+                <span class="w-level lv-b2">B2</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">den Blutdruck <span class="prefix">messen</span></div>
+                        <div class="w-ua">вимірювати тиск</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-warn">⚠️ прийменник: zu (не durch / von)</span>
+                    </div>
+                    <div class="w-example">„Sie haben einen Blutdruck von 120 <span class="hl">zu</span> 80."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">die</span> Manschette</div>
+                        <div class="w-ua">манжета (яку надягають на руку)</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">надувна манжета для вимірювання тиску</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">jemanden <span class="prefix">abtasten</span></div>
+                        <div class="w-ua">пальпувати, прощупувати тіло руками</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">лікар перевіряє тіло руками</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">jemandem Blut <span class="prefix">abnehmen</span></div>
+                        <div class="w-ua">взяти кров (у пацієнта)</div>
+                    </div>
+                    <div class="w-example">„Die Ärztin <span class="hl">nimmt</span> mir <span class="hl">Blut ab</span>."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">nüchtern</div>
+                        <div class="w-ua">натщесерце — нічого не їв того дня</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">потрібно для аналізу крові на цукор/холестерин</span>
+                    </div>
+                    <div class="w-example">„Bitte kommen Sie <span class="hl">nüchtern</span> zur Blutabnahme."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Urin</div>
+                        <div class="w-ua">сеча (медичний термін)</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">= Urinprobe — аналіз сечі</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Stuhl</div>
+                        <div class="w-ua">кал (медичний термін)</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-warn">! в побуті = стілець (меблі) — контекст вирішує</span>
+                        <span class="w-tag tag-note">= Stuhlprobe — аналіз калу</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 3: Лабораторія ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">🔬</span>
+                <div>
+                    <div class="w-section-title">Лабораторія — результати</div>
+                    <div class="w-section-sub">аналізи, показники, висновки</div>
+                </div>
+                <span class="w-level lv-b2">B2</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">etwas <span class="prefix">bestimmen</span></div>
+                        <div class="w-ua">визначати (наприклад, рівень заліза)</div>
+                    </div>
+                    <div class="w-example">„Um den Eisenwert zu <span class="hl">bestimmen</span>, braucht man eine Blutprobe."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <!-- compound -wert showcase -->
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="prefix">der -wert</span></div>
+                        <div class="w-ua">показник / рівень — у складних словах</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-tip">часто зустрічається у складних словах</span>
+                    </div>
+                </div>
+                <div class="compounds">
+                    <div class="compound-chip"><span>Eisen</span>wert <span class="ua">рівень заліза</span></div>
+                    <div class="compound-chip"><span>Blutzucker</span>wert <span class="ua">рівень цукру в крові</span></div>
+                    <div class="compound-chip"><span>Cholesterin</span>wert <span class="ua">рівень холестерину</span></div>
+                    <div class="compound-chip"><span>Blutdruck</span>wert <span class="ua">показник тиску</span></div>
+                    <div class="compound-chip"><span>Hämoglobin</span>wert <span class="ua">рівень гемоглобіну</span></div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Befund</div>
+                        <div class="w-ua">результат обстеження / висновок</div>
+                    </div>
+                    <div class="w-extra">Те що лікар видає після аналізів або обстеження.</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <!-- auffällig vs unauffällig -->
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">auffällig &nbsp;/&nbsp; unauffällig</div>
+                    </div>
+                </div>
+                <div class="vs-block">
+                    <div class="vs-bad">
+                        <div class="vs-word">⚠️ auffällig</div>
+                        <div class="vs-ua">відхилення від норми — щось не так</div>
+                    </div>
+                    <div class="vs-sep">vs</div>
+                    <div class="vs-ok">
+                        <div class="vs-word">✅ unauffällig</div>
+                        <div class="vs-ua">в нормі — все добре</div>
+                    </div>
+                </div>
+                <div class="w-example" style="margin:0 0.8rem 0.9rem;">„Ihre Blutwerte sind <span class="hl">unauffällig</span>." — Ваші показники крові в нормі.</div>
+                <div class="w-divider" style="margin-top:0.1rem;"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">die</span> Krebsvorsorge</div>
+                        <div class="w-ua">профілактичне обстеження на рак</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">Vorsorge = профілактика + Krebs = рак</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 4: Спеціалізовані обстеження ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">🧲</span>
+                <div>
+                    <div class="w-section-title">Спеціалізовані обстеження</div>
+                    <div class="w-section-sub">рентген, УЗД, КТ, МРТ, ендоскопія</div>
+                </div>
+                <span class="w-level lv-c1">C1</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="prefix">röntgen</span> / eine Röntgenaufnahme machen</div>
+                        <div class="w-ua">робити рентген</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-pron">🔊 «рентг»: вимовляй [ˈʁœntɡən]</span>
+                        <span class="w-tag tag-warn">не «рентгт»!</span>
+                    </div>
+                    <div class="w-example">„Wir müssen den Arm <span class="hl">röntgen</span>."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Ultraschall</div>
+                        <div class="w-ua">УЗД (ультразвукове дослідження)</div>
+                    </div>
+                    <div class="w-extra">Ultra = ультра + Schall = звук → ультразвук</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">das</span> CT</div>
+                        <div class="w-ua">комп'ютерна томографія</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">= Computertomographie</span>
+                    </div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">das</span> MRT</div>
+                        <div class="w-ua">МРТ (магнітно-резонансна томографія)</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">= Magnetresonanztomographie</span>
+                        <span class="w-tag tag-coll">розм: in die Röhre</span>
+                    </div>
+                    <div class="w-example">„Ich muss in die <span class="hl">Röhre</span>." <span style="color:rgba(210,185,245,0.5);font-size:0.8rem;">— розм., бо апарат схожий на трубу</span></div>
+                    <div class="w-extra" style="margin-top:0.4rem;"><span style="color:#c084fc;">die Röhre</span> = труба / трубка</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">die</span> Spiegelung</div>
+                        <div class="w-ua">ендоскопія — коли лікар вводить камеру всередину</div>
+                    </div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">від: spiegeln = відображати / дивитися</span>
+                    </div>
+                </div>
+                <!-- Spiegelung compounds -->
+                <div class="compounds">
+                    <div class="compound-chip"><span>Knie</span>spiegelung <span class="ua">артроскопія коліна</span></div>
+                    <div class="compound-chip"><span>Magen</span>spiegelung <span class="ua">гастроскопія</span></div>
+                    <div class="compound-chip"><span>Darm</span>spiegelung <span class="ua">колоноскопія</span></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── quick cheat sheet ── -->
+        <div class="note-card highlight-card" style="margin-top:0.5rem;">
+            <p style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:0.7rem;">📋 Шпаргалка — корисні фрази у лікаря</p>
+            <div style="display:flex;flex-direction:column;gap:0.45rem;">
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich habe einen Termin bei Dr. Müller."</em> — Я записана до лікаря Мюллер</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Mir wurde Blut abgenommen."</em> — Мені взяли кров</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Alle Werte sind unauffällig."</em> — Всі показники в нормі</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich brauche eine Überweisung zum Facharzt."</em> — Мені потрібне направлення до спеціаліста</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Soll ich nüchtern kommen?"</em> — Мені прийти натщесерце?</div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:2.5rem; padding-bottom:2rem;">
+            <a href="deutsch.html" style="font-size:0.85rem; color:rgba(192,132,252,0.6); text-decoration:none;">
+                ← zurück zu Deutsch
+            </a>
+        </div>
+    </div>
+</body>
+</html>

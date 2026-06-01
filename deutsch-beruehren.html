@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verben des Berührens | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(163,113,247,0.5); color: #fff; }
+        .tab-btn.active {
+            background: rgba(163,113,247,0.18);
+            border-color: #a371f7;
+            color: #fff;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Verb cards */
+        .verb-card {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.1rem;
+            transition: border-color 0.2s;
+        }
+        .verb-card:hover { border-color: rgba(163,113,247,0.35); }
+        .verb-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #c8a5ff;
+            margin-bottom: 0.3rem;
+        }
+        .verb-ua {
+            color: rgba(230,230,235,0.65);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+        .verb-desc {
+            color: #e2e8f0;
+            font-size: 0.93rem;
+            line-height: 1.65;
+            margin-bottom: 0.9rem;
+        }
+        .verb-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .verb-ex {
+            background: rgba(163,113,247,0.07);
+            border-left: 3px solid rgba(163,113,247,0.4);
+            border-radius: 0 8px 8px 0;
+            padding: 0.5rem 0.9rem;
+            font-style: italic;
+            color: rgba(230,230,235,0.8);
+            font-size: 0.9rem;
+        }
+        .verb-ex .ex-ua {
+            font-style: normal;
+            color: rgba(230,230,235,0.45);
+            font-size: 0.83rem;
+            margin-top: 0.2rem;
+        }
+        .verb-warn {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background: rgba(248,81,73,0.08);
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            margin-top: 0.8rem;
+            color: #ff9a93;
+            font-size: 0.88rem;
+        }
+
+        /* Comparison table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .comp-table th {
+            background: rgba(163,113,247,0.15);
+            color: #c8a5ff;
+            font-weight: 700;
+            padding: 0.65rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(163,113,247,0.3);
+        }
+        .comp-table td {
+            padding: 0.6rem 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: rgba(230,230,235,0.8);
+            vertical-align: top;
+        }
+        .comp-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .comp-table td:first-child { font-weight: 800; color: #c8a5ff; }
+        .yes { color: #86efac; }
+        .no  { color: rgba(230,230,235,0.3); }
+        .sometimes { color: #fbbf24; }
+
+        /* Quiz */
+        .quiz-q {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.1rem;
+        }
+        .quiz-q p { font-weight: 600; color: #e2e8f0; margin-bottom: 0.7rem; font-size: 0.97rem; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+        .quiz-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            color: rgba(230,230,235,0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+        }
+        .quiz-btn:hover { border-color: rgba(163,113,247,0.4); color:#fff; background:rgba(163,113,247,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15);  border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.5rem; min-height:1.2em; }
+        .quiz-score-box {
+            background: rgba(163,113,247,0.1);
+            border: 1px solid rgba(163,113,247,0.35);
+            border-radius: 12px;
+            padding: 1rem 1.3rem;
+            margin-top: 1.2rem;
+            color: #c8a5ff;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Source badge */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.25);
+            border-radius: 50px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.82rem;
+            color: #ff7b72;
+            margin-bottom: 1.4rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/sakura.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.87)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verben des Ber&uuml;hrens</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1FAF3; Verben des Ber&uuml;hrens</h1>
+            <p class="page-subtitle">ber&uuml;hren &bull; streichen &bull; streifen &bull; streicheln &bull; anfassen &bull; greifen &mdash; B2/C1</p>
+        </div>
+
+        <div class="source-badge">
+            &#x25B6;&#xFE0F; Rieke &mdash; Verben des Ber&uuml;hrens
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="showTab('tab-verben', this)">&#x1FAF3; Verben</button>
+            <button class="tab-btn" onclick="showTab('tab-vergleich', this)">&#x1F4CA; Vergleich</button>
+            <button class="tab-btn" onclick="showTab('tab-quiz', this)">&#x1F9E0; Quiz</button>
+        </div>
+
+        <!-- TAB: VERBEN -->
+        <div id="tab-verben" class="tab-pane active">
+
+            <!-- berühren -->
+            <div class="verb-card">
+                <div class="verb-title">berühren</div>
+                <div class="verb-ua">торкатися</div>
+                <div class="verb-desc">
+                    Легкий контакт рукою або іншою частиною тіла. Може бути <strong>випадковим або навмисним</strong>. Найнейтральніше слово серед усіх.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Sie ber&uuml;hrt das Blatt mit ihrem Finger."
+                        <div class="ex-ua">Вона торкається листочка пальцем.</div>
+                    </div>
+                    <div class="verb-ex">
+                        „Ich habe im Zug aus Versehen das Bein einer anderen Person ber&uuml;hrt."
+                        <div class="ex-ua">У потязі я випадково торкнулась ноги іншої людини.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- streichen -->
+            <div class="verb-card">
+                <div class="verb-title">streichen <span style="font-size:0.9rem; font-weight:500; color:rgba(230,230,235,0.4)">(über etwas streichen)</span></div>
+                <div class="verb-ua">проводити рукою по поверхні</div>
+                <div class="verb-desc">
+                    Легкий <strong>ковзний рух рукою</strong> по поверхні. Завжди <strong>навмисний</strong> і <strong>тільки рукою</strong>. Без емоції — просто рух.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Sie strich mit ihrer Hand &uuml;ber den Waldboden."
+                        <div class="ex-ua">Вона провела рукою по лісовій підлозі.</div>
+                    </div>
+                    <div class="verb-ex">
+                        „Sie hat die Tischdecke glattgestrichen."
+                        <div class="ex-ua">Вона розгладила скатертину рукою.</div>
+                    </div>
+                </div>
+                <div class="verb-warn">
+                    <span>⚠️</span>
+                    <span>Тільки рукою &mdash; і завжди навмисно!</span>
+                </div>
+            </div>
+
+            <!-- streifen -->
+            <div class="verb-card">
+                <div class="verb-title">streifen</div>
+                <div class="verb-ua">злегка зачепити, торкнутися мимохідь</div>
+                <div class="verb-desc">
+                    Теж ковзний рух, але <strong>зазвичай випадково</strong> і <strong>не обов'язково рукою</strong> — будь-яка частина тіла або навіть предмет. Мимохідь, злегка.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Ich habe ihn beim Vorbeigehen an der Schulter gestreift."
+                        <div class="ex-ua">Проходячи повз, я випадково зачепила його за плече.</div>
+                    </div>
+                    <div class="verb-ex">
+                        „Ich habe beim Ausparken ein anderes Auto gestreift."
+                        <div class="ex-ua">Виїжджаючи з парковки, я притерла іншу машину.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- streicheln -->
+            <div class="verb-card">
+                <div class="verb-title">streicheln</div>
+                <div class="verb-ua">пестити, гладити (з ніжністю)</div>
+                <div class="verb-desc">
+                    Ковзний рух рукою — як <em>streichen</em>, але <strong>з емоцією</strong>: ніжністю, любов'ю, турботою. Тільки <strong>людей і тварин</strong>, не предмети.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Ich streichle den Hund."
+                        <div class="ex-ua">Я глажу пса. (показую, що він мені подобається)</div>
+                    </div>
+                    <div class="verb-ex">
+                        <span style="color:rgba(230,230,235,0.45); font-style:normal;">порівняй:</span><br>
+                        „Ich streiche &uuml;ber das Fell." &rarr; нейтрально, просто рух<br>
+                        „Ich streichle den Hund." &rarr; з ніжністю ❤️
+                    </div>
+                </div>
+            </div>
+
+            <!-- anfassen -->
+            <div class="verb-card">
+                <div class="verb-title">anfassen</div>
+                <div class="verb-ua">чіпати, брати в руки</div>
+                <div class="verb-desc">
+                    <strong>Сильніший контакт</strong> ніж berühren — є мета: дослідити, перевірити на дотик, взяти. Завжди навмисно і рукою.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Fass den Topf nicht an! Er ist hei&szlig;."
+                        <div class="ex-ua">Не чіпай каструлю! Вона гаряча.</div>
+                    </div>
+                    <div class="verb-ex">
+                        „Dieser Stoff ist total weich &mdash; fass ihn mal an!"
+                        <div class="ex-ua">Ця тканина така м'яка — доторкнись до неї!</div>
+                    </div>
+                </div>
+                <div class="verb-warn">
+                    <span>⚠️</span>
+                    <span>З людьми може означати <strong>небажаний дотик</strong>: „Fass mich nicht an!" — не чіпай мене!</span>
+                </div>
+            </div>
+
+            <!-- greifen -->
+            <div class="verb-card">
+                <div class="verb-title">greifen</div>
+                <div class="verb-ua">хапати, брати (активно)</div>
+                <div class="verb-desc">
+                    <strong>Активна дія</strong> — схопити щось рукою з певною метою. Найактивніше та найцілеспрямованіше слово серед усіх.
+                </div>
+                <div class="verb-examples">
+                    <div class="verb-ex">
+                        „Sie greift nach dem Glas."
+                        <div class="ex-ua">Вона тягнеться до склянки (щоб взяти її).</div>
+                    </div>
+                    <div class="verb-ex">
+                        „Er griff ihr an den Arm."
+                        <div class="ex-ua">Він схопив її за руку.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-verben -->
+
+        <!-- TAB: VERGLEICH -->
+        <div id="tab-vergleich" class="tab-pane">
+
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Швидке порівняння всіх шести дієслів:</p>
+
+            <div style="overflow-x:auto;">
+            <table class="comp-table">
+                <tr>
+                    <th>Слово</th>
+                    <th>Навмисно?</th>
+                    <th>Чим?</th>
+                    <th>Емоція?</th>
+                    <th>Особливість</th>
+                </tr>
+                <tr>
+                    <td>berühren</td>
+                    <td><span class="sometimes">не завжди</span></td>
+                    <td>будь-що</td>
+                    <td><span class="no">ні</span></td>
+                    <td>найнейтральніше, базове слово</td>
+                </tr>
+                <tr>
+                    <td>streichen</td>
+                    <td><span class="yes">так</span></td>
+                    <td>тільки рука</td>
+                    <td><span class="no">ні</span></td>
+                    <td>ковзний рух, без емоції</td>
+                </tr>
+                <tr>
+                    <td>streifen</td>
+                    <td><span class="no">зазвичай ні</span></td>
+                    <td>будь-що</td>
+                    <td><span class="no">ні</span></td>
+                    <td>мимохідь, випадково</td>
+                </tr>
+                <tr>
+                    <td>streicheln</td>
+                    <td><span class="yes">так</span></td>
+                    <td>тільки рука</td>
+                    <td><span class="yes">ніжність ❤️</span></td>
+                    <td>тільки люди і тварини</td>
+                </tr>
+                <tr>
+                    <td>anfassen</td>
+                    <td><span class="yes">так</span></td>
+                    <td>рука</td>
+                    <td><span class="no">ні</span></td>
+                    <td>з метою — перевірити/взяти</td>
+                </tr>
+                <tr>
+                    <td>greifen</td>
+                    <td><span class="yes">так</span></td>
+                    <td>рука</td>
+                    <td><span class="no">ні (активно!)</span></td>
+                    <td>схопити з метою</td>
+                </tr>
+            </table>
+            </div>
+
+            <div class="note-card" style="margin-top:1.8rem; background:rgba(163,113,247,0.07); border-color:rgba(163,113,247,0.25);">
+                <h3 style="color:#c8a5ff;">&#x1F9E9; Ключові пари, які плутають</h3>
+                <div style="display:flex; flex-direction:column; gap:0.8rem; margin-top:0.7rem; font-size:0.92rem;">
+                    <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.7rem 1rem;">
+                        <strong style="color:#c8a5ff;">streichen</strong> vs <strong style="color:#c8a5ff;">streicheln</strong>
+                        <p style="color:rgba(230,230,235,0.65); margin:0.3rem 0 0; font-size:0.88rem;">Обидва — ковзний рух рукою. Різниця: streicheln має <em>емоцію</em> (ніжність), streichen — ні.</p>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.7rem 1rem;">
+                        <strong style="color:#c8a5ff;">berühren</strong> vs <strong style="color:#c8a5ff;">anfassen</strong>
+                        <p style="color:rgba(230,230,235,0.65); margin:0.3rem 0 0; font-size:0.88rem;">berühren — просто торкнутися (легко, може випадково). anfassen — з метою: помацати, перевірити.</p>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.7rem 1rem;">
+                        <strong style="color:#c8a5ff;">streifen</strong> vs <strong style="color:#c8a5ff;">streichen</strong>
+                        <p style="color:rgba(230,230,235,0.65); margin:0.3rem 0 0; font-size:0.88rem;">Обидва — ковзний рух. Різниця: streichen навмисно і тільки рукою; streifen зазвичай випадково і будь-чим.</p>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-vergleich -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-quiz" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Вибери правильне дієслово або переклад:</p>
+
+            <div class="quiz-q" data-answer="b">
+                <p>1. Ich habe im Zug aus Versehen das Bein einer anderen Person ___. <em>(випадково торкнулась)</em></p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'b','1')">a) gestreift</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','1')">b) berührt</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','1')">c) gestreichelt</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','1')">d) angefasst</button>
+                </div>
+                <div class="quiz-feedback" id="bf1"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>2. „Ich ___ den Hund." — я глажу пса з ніжністю</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'c','2')">a) greife</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','2')">b) streiche über</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','2')">c) streichle</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','2')">d) berühre</button>
+                </div>
+                <div class="quiz-feedback" id="bf2"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>3. Beim Ausparken habe ich das Auto ___. <em>(мимохідь зачепила)</em></p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'a','3')">a) gestreift</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','3')">b) berührt</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','3')">c) angefasst</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','3')">d) gegriffen</button>
+                </div>
+                <div class="quiz-feedback" id="bf3"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>4. „Fass den Topf nicht an!" — що означає <strong>anfassen</strong>?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'d','4')">a) гладити</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','4')">b) випадково зачепити</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','4')">c) хапати</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','4')">d) чіпати (з метою)</button>
+                </div>
+                <div class="quiz-feedback" id="bf4"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>5. <strong>streicheln</strong> відрізняється від <strong>streichen</strong> тим, що:</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'b','5')">a) streicheln — завжди випадково</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','5')">b) streicheln — з емоцією (ніжністю)</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','5')">c) streicheln — можна будь-чим, не тільки рукою</button>
+                    <button class="quiz-btn" onclick="checkB(this,'b','5')">d) різниці немає</button>
+                </div>
+                <div class="quiz-feedback" id="bf5"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>6. „Sie ___ nach dem Glas." — вона тягнеться до склянки (щоб взяти)</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'c','6')">a) streichelt</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','6')">b) berührt</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','6')">c) greift</button>
+                    <button class="quiz-btn" onclick="checkB(this,'c','6')">d) streift</button>
+                </div>
+                <div class="quiz-feedback" id="bf6"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>7. Яке дієслово <em>не можна</em> використати для предметів (тільки для людей/тварин)?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'a','7')">a) streicheln</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','7')">b) streichen</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','7')">c) berühren</button>
+                    <button class="quiz-btn" onclick="checkB(this,'a','7')">d) anfassen</button>
+                </div>
+                <div class="quiz-feedback" id="bf7"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>8. <strong>streichen</strong> — це:</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkB(this,'d','8')">a) хапати щось рукою</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','8')">b) випадково торкнутися</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','8')">c) гладити з ніжністю</button>
+                    <button class="quiz-btn" onclick="checkB(this,'d','8')">d) навмисно провести рукою по поверхні</button>
+                </div>
+                <div class="quiz-feedback" id="bf8"></div>
+            </div>
+
+            <div class="quiz-score-box" id="bscore" style="display:none;"></div>
+        </div><!-- /tab-quiz -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        function showTab(id, btn) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        var bScore = 0, bTotal = 0, bMax = 8;
+
+        function checkB(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            bTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('bf' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                bScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (bTotal === bMax) {
+                var box = document.getElementById('bscore');
+                box.style.display = 'block';
+                box.textContent = '🫱 Результат: ' + bScore + ' / ' + bMax + (bScore >= 7 ? ' — відмінно!' : bScore >= 5 ? ' — непогано!' : ' — повтори дієслова!');
+            }
+        }
+    </script>
+</body>
+</html>

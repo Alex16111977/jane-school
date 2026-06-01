@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>„mal" und seine Kombinationen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(88,166,255,0.5); color: #fff; }
+        .tab-btn.active {
+            background: rgba(88,166,255,0.15);
+            border-color: #58a6ff;
+            color: #fff;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Mal cards */
+        .mal-card {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.1rem;
+        }
+        .mal-word {
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #79b8ff;
+            margin-bottom: 0.15rem;
+        }
+        .mal-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(88,166,255,0.15);
+            border: 1px solid rgba(88,166,255,0.3);
+            border-radius: 50px;
+            padding: 0.15rem 0.6rem;
+            color: #79b8ff;
+            letter-spacing: 0.05em;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+        }
+        .mal-ua {
+            color: rgba(230,230,235,0.6);
+            font-size: 0.93rem;
+            margin: 0.3rem 0 0.8rem;
+        }
+        .mal-desc {
+            color: #e2e8f0;
+            font-size: 0.93rem;
+            line-height: 1.65;
+            margin-bottom: 0.9rem;
+        }
+        .mal-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .mal-ex {
+            background: rgba(88,166,255,0.07);
+            border-left: 3px solid rgba(88,166,255,0.4);
+            border-radius: 0 8px 8px 0;
+            padding: 0.55rem 0.9rem;
+            font-style: italic;
+            color: rgba(230,230,235,0.85);
+            font-size: 0.9rem;
+        }
+        .mal-ex .ex-ua {
+            font-style: normal;
+            color: rgba(230,230,235,0.45);
+            font-size: 0.83rem;
+            margin-top: 0.25rem;
+        }
+        .mal-warn {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background: rgba(248,81,73,0.08);
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            margin-top: 0.8rem;
+            color: #ff9a93;
+            font-size: 0.88rem;
+        }
+        .mal-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background: rgba(34,197,94,0.07);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            margin-top: 0.8rem;
+            color: #86efac;
+            font-size: 0.88rem;
+        }
+
+        /* Quick ref table */
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .ref-table th {
+            background: rgba(88,166,255,0.12);
+            color: #79b8ff;
+            font-weight: 700;
+            padding: 0.65rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(88,166,255,0.25);
+        }
+        .ref-table td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: rgba(230,230,235,0.8);
+            vertical-align: top;
+        }
+        .ref-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .ref-table td:first-child { font-weight: 800; color: #79b8ff; white-space: nowrap; }
+
+        /* Quiz */
+        .quiz-q {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.1rem;
+        }
+        .quiz-q p { font-weight: 600; color: #e2e8f0; margin-bottom: 0.7rem; font-size: 0.96rem; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+        .quiz-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            color: rgba(230,230,235,0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+        }
+        .quiz-btn:hover { border-color: rgba(88,166,255,0.4); color:#fff; background:rgba(88,166,255,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15);  border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.5rem; min-height:1.2em; }
+        .quiz-score-box {
+            background: rgba(88,166,255,0.1);
+            border: 1px solid rgba(88,166,255,0.3);
+            border-radius: 12px;
+            padding: 1rem 1.3rem;
+            margin-top: 1.2rem;
+            color: #79b8ff;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.25);
+            border-radius: 50px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.82rem;
+            color: #ff7b72;
+            margin-bottom: 1.4rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/moon.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">&bdquo;mal&ldquo; &amp; Kombinationen</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F4AC; &bdquo;mal&ldquo; &amp; seine Kombinationen</h1>
+            <p class="page-subtitle">schon mal &bull; noch mal &bull; erst mal &bull; nicht mal &bull; nun mal &mdash; B2/C1</p>
+        </div>
+
+        <div class="source-badge">
+            &#x25B6;&#xFE0F; Rieke &mdash; &bdquo;Das Wort MAL&ldquo;
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="showTab('tab-erkl', this)">&#x1F4D6; Erkl&auml;rung</button>
+            <button class="tab-btn" onclick="showTab('tab-ref', this)">&#x26A1; &Uuml;bersicht</button>
+            <button class="tab-btn" onclick="showTab('tab-quiz', this)">&#x1F9E0; Quiz</button>
+        </div>
+
+        <!-- TAB: ERKLÄRUNG -->
+        <div id="tab-erkl" class="tab-pane active">
+
+            <!-- mal = irgendwann -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">mal</span>
+                    <span class="mal-badge">= irgendwann</span>
+                </div>
+                <div class="mal-ua">колись, будь-коли — скорочення від „einmal"</div>
+                <div class="mal-desc">
+                    Може відноситись до минулого або майбутнього. Додає відтінок <strong>невизначеності</strong> — «колись, не пам'ятаю точно» або «колись у майбутньому». Пом'якшує, робить менш категоричним.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Das habe ich (ein)mal gelesen."
+                        <div class="ex-ua">Я колись це читав. (не пам'ятаю добре — колись давно)</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Ich m&ouml;chte es unbedingt (ein)mal lesen."
+                        <div class="ex-ua">Я обов'язково хочу це колись прочитати.</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Ich werde mal zum Arzt gehen."
+                        <div class="ex-ua">Колись піду до лікаря. (не прямо зараз — відкладаю)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- mal як Partikel -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">mal</span>
+                    <span class="mal-badge">Partikel</span>
+                </div>
+                <div class="mal-ua">пом'якшення прохань і наказів</div>
+                <div class="mal-desc">
+                    Робить речення <strong>м'якшим і природнішим</strong> у розмові. Часто не має окремого лексичного значення — просто робить фразу менш різкою, більш розмовною.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Leg dich doch mal hin."
+                        <div class="ex-ua">Ляж відпочини. (м'якше ніж просто „Leg dich hin!")</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Ich gehe jetzt mal mit dem Hund raus."
+                        <div class="ex-ua">Я зараз виведу собаку. (звучить природно, невимушено)</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Schau mal!"
+                        <div class="ex-ua">Подивись! (привертає увагу, не наказово)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- schon mal -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">schon mal</span>
+                </div>
+                <div class="mal-ua">вже заздалегідь, раніше ніж потрібно (бо так зручніше)</div>
+                <div class="mal-desc">
+                    Означає, що дія виконується <strong>заздалегідь</strong>, до того моменту, коли вона буде потрібна — щоб потім не треба було. Часто вживається з проханнями.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Ich bereite schon mal den Salat vor."
+                        <div class="ex-ua">Я вже зараз підготую салат. (щоб потім не доводилось)</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Kannst du schon mal die Koffer ins Auto bringen?"
+                        <div class="ex-ua">Можеш вже занести валізи в машину?</div>
+                    </div>
+                </div>
+                <div class="mal-warn">
+                    <span>⚠️</span>
+                    <span>Пишеться окремо: <strong>schon mal</strong> (не &bdquo;schonmal&ldquo;)</span>
+                </div>
+            </div>
+
+            <!-- noch mal -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">noch mal</span>
+                </div>
+                <div class="mal-ua">ще раз, знову</div>
+                <div class="mal-desc">
+                    Просить або констатує <strong>повторення дії</strong>. Стійкий вираз — не можна просто прибрати «mal».
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Kannst du das noch mal erkl&auml;ren?"
+                        <div class="ex-ua">Можеш пояснити ще раз?</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Wann kommt dein Zug noch mal an?"
+                        <div class="ex-ua">Коли там твій поїзд приїжджає? (забув — питаю знову)</div>
+                    </div>
+                </div>
+                <div class="mal-warn">
+                    <span>⚠️</span>
+                    <span>„noch mal" — стійкий вираз. Не можна прибрати „mal": ❌ „Kannst du das noch erklären?" &rarr; змінює зміст!</span>
+                </div>
+            </div>
+
+            <!-- nun mal -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">nun mal</span>
+                </div>
+                <div class="mal-ua">так воно є, нічого не вдієш</div>
+                <div class="mal-desc">
+                    Виражає <strong>змирення з реальністю</strong> — щось є таким, яке є, і це треба прийняти. Немає сенсу скаржитись чи протестувати.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „So ist das Wetter im April nun mal."
+                        <div class="ex-ua">Таке вже квітневе погода — нічого не зробиш.</div>
+                    </div>
+                    <div class="mal-ex">
+                        „So ist das nun mal, wenn man &auml;lter wird."
+                        <div class="ex-ua">Таке вже буває, коли старієш. (прийми це)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- erst mal -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">erst mal</span>
+                </div>
+                <div class="mal-ua">спочатку, перш за все</div>
+                <div class="mal-desc">
+                    Означає, що одна дія виконується <strong>перед іншою</strong>. Схоже на «zuerst», але більш розмовне. Підкреслює пріоритет першої дії.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Ich will zum Sport, aber erst mal esse ich was."
+                        <div class="ex-ua">Хочу на спорт, але спочатку поїм.</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Dar&uuml;ber muss ich erst mal nachdenken."
+                        <div class="ex-ua">Мені спочатку треба подумати над цим.</div>
+                    </div>
+                </div>
+                <div class="mal-tip">
+                    <span>💡</span>
+                    <span>≈ „zuerst" — але не завжди взаємозамінні. „erst mal" звучить більш розмовно.</span>
+                </div>
+            </div>
+
+            <!-- nicht mal -->
+            <div class="mal-card">
+                <div>
+                    <span class="mal-word">nicht mal</span>
+                </div>
+                <div class="mal-ua">навіть не (підсилює заперечення)</div>
+                <div class="mal-desc">
+                    = „nicht einmal" = „sogar nicht". <strong>Підсилює заперечення</strong> — щось настільки мінімальне, що навіть його не було. Виражає здивування або обурення.
+                </div>
+                <div class="mal-examples">
+                    <div class="mal-ex">
+                        „Er konnte nicht mal die einfachsten Fragen beantworten."
+                        <div class="ex-ua">Він навіть найлегших питань не міг відповісти.</div>
+                    </div>
+                    <div class="mal-ex">
+                        „Er hat mich nicht mal begr&uuml;&szlig;t."
+                        <div class="ex-ua">Він навіть не привітався зі мною.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- mal у математиці -->
+            <div class="mal-card" style="border-color:rgba(245,158,11,0.2);">
+                <div>
+                    <span class="mal-word" style="color:#fbbf24;">mal</span>
+                    <span class="mal-badge" style="background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.3); color:#fbbf24;">математика</span>
+                </div>
+                <div class="mal-ua">помножити на (×)</div>
+                <div class="mal-examples">
+                    <div class="mal-ex" style="border-left-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06);">
+                        „2 mal 3 ist sechs."
+                        <div class="ex-ua">2 × 3 = 6</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-erkl -->
+
+        <!-- TAB: ÜBERSICHT -->
+        <div id="tab-ref" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Всі значення одразу &mdash; для швидкого повторення:</p>
+
+            <div style="overflow-x:auto;">
+            <table class="ref-table">
+                <tr>
+                    <th>Вираз</th>
+                    <th>Значення</th>
+                    <th>Приклад</th>
+                </tr>
+                <tr>
+                    <td>mal</td>
+                    <td>колись (невизначено)</td>
+                    <td>„Ich werde mal zum Arzt gehen."</td>
+                </tr>
+                <tr>
+                    <td>mal <span style="font-weight:400; color:rgba(230,230,235,0.4)">(Partikel)</span></td>
+                    <td>пом'якшення, розмовний тон</td>
+                    <td>„Schau mal!" / „Leg dich mal hin."</td>
+                </tr>
+                <tr>
+                    <td>schon mal</td>
+                    <td>вже заздалегідь</td>
+                    <td>„Ich bereite schon mal den Salat vor."</td>
+                </tr>
+                <tr>
+                    <td>noch mal</td>
+                    <td>ще раз, знову</td>
+                    <td>„Kannst du das noch mal erkl&auml;ren?"</td>
+                </tr>
+                <tr>
+                    <td>nun mal</td>
+                    <td>так воно є, нічого не вдієш</td>
+                    <td>„So ist das Wetter im April nun mal."</td>
+                </tr>
+                <tr>
+                    <td>erst mal</td>
+                    <td>спочатку, перш за все</td>
+                    <td>„Erst mal esse ich was."</td>
+                </tr>
+                <tr>
+                    <td>nicht mal</td>
+                    <td>навіть не</td>
+                    <td>„Er hat mich nicht mal begr&uuml;&szlig;t."</td>
+                </tr>
+                <tr>
+                    <td>mal <span style="font-weight:400; color:rgba(230,230,235,0.4)">(Mathe)</span></td>
+                    <td>помножити на (×)</td>
+                    <td>„2 mal 3 ist sechs."</td>
+                </tr>
+            </table>
+            </div>
+
+            <div class="note-card" style="margin-top:1.8rem; background:rgba(88,166,255,0.06); border-color:rgba(88,166,255,0.2);">
+                <h3 style="color:#79b8ff;">&#x1F4A1; Як не плутати</h3>
+                <div style="display:flex; flex-direction:column; gap:0.7rem; margin-top:0.7rem; font-size:0.91rem; color:rgba(230,230,235,0.75);">
+                    <div>&#x1F538; <strong style="color:#79b8ff;">schon mal</strong> — робиш щось <em>до</em> потрібного моменту (заздалегідь)</div>
+                    <div>&#x1F538; <strong style="color:#79b8ff;">erst mal</strong> — робиш щось <em>перед</em> іншою справою (пріоритет)</div>
+                    <div>&#x1F538; <strong style="color:#79b8ff;">noch mal</strong> — робиш щось <em>знову</em> (повторення)</div>
+                    <div>&#x1F538; <strong style="color:#79b8ff;">nun mal</strong> — нічого не <em>робиш</em>, просто приймаєш ситуацію</div>
+                    <div>&#x1F538; <strong style="color:#79b8ff;">nicht mal</strong> — підсилює <em>заперечення</em> (навіть цього не було)</div>
+                </div>
+            </div>
+        </div><!-- /tab-ref -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-quiz" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Вибери правильне слово або переклад:</p>
+
+            <div class="quiz-q" data-answer="c">
+                <p>1. „Ich werde ___ zum Arzt gehen." — колись піду до лікаря (не зараз)</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'c','1')">a) noch mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','1')">b) erst mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','1')">c) mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','1')">d) nicht mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf1"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>2. „Kannst du das ___ erkl&auml;ren?" — можеш пояснити <em>ще раз</em>?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'a','2')">a) noch mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','2')">b) schon mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','2')">c) erst mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','2')">d) nun mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf2"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>3. „Ich bereite ___ den Salat vor." — я <em>вже зараз</em> підготую (щоб потім не доводилось)</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'b','3')">a) erst mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','3')">b) schon mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','3')">c) noch mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','3')">d) nun mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf3"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>4. „So ist das Wetter im April ___ ." — таке вже квітневе погода, нічого не вдієш</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'d','4')">a) nicht mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','4')">b) noch mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','4')">c) schon mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','4')">d) nun mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf4"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>5. „Er hat mich ___ begr&uuml;&szlig;t." — він <em>навіть</em> не привітався</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'b','5')">a) nun mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','5')">b) nicht mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','5')">c) schon mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'b','5')">d) noch mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf5"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>6. „Ich will zum Sport, aber ___ esse ich was." — <em>спочатку</em> поїм</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'c','6')">a) schon mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','6')">b) nun mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','6')">c) erst mal</button>
+                    <button class="quiz-btn" onclick="checkM(this,'c','6')">d) noch mal</button>
+                </div>
+                <div class="quiz-feedback" id="mf6"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>7. „Schau ___!" — mal тут виконує роль:</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'a','7')">a) Partikel — пом'якшує, робить природнішим</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','7')">b) означає «ще раз»</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','7')">c) означає «колись»</button>
+                    <button class="quiz-btn" onclick="checkM(this,'a','7')">d) математичне множення</button>
+                </div>
+                <div class="quiz-feedback" id="mf7"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>8. Що означає: „Er konnte nicht mal die einfachsten Fragen beantworten."?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkM(this,'d','8')">a) Він ще раз відповів на прості питання.</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','8')">b) Він спочатку відповів на прості питання.</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','8')">c) Він колись відповідав на прості питання.</button>
+                    <button class="quiz-btn" onclick="checkM(this,'d','8')">d) Він навіть найлегших питань не міг відповісти.</button>
+                </div>
+                <div class="quiz-feedback" id="mf8"></div>
+            </div>
+
+            <div class="quiz-score-box" id="mscore" style="display:none;"></div>
+        </div><!-- /tab-quiz -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        function showTab(id, btn) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        var mScore = 0, mTotal = 0, mMax = 8;
+
+        function checkM(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            mTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('mf' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                mScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (mTotal === mMax) {
+                var box = document.getElementById('mscore');
+                box.style.display = 'block';
+                box.textContent = '💬 Результат: ' + mScore + ' / ' + mMax + (mScore >= 7 ? ' — відмінно!' : mScore >= 5 ? ' — непогано!' : ' — повтори ще раз!');
+            }
+        }
+    </script>
+</body>
+</html>

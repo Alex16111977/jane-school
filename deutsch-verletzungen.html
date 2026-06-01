@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verletzungen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .w-section {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            margin-bottom: 1.2rem;
+            overflow: hidden;
+        }
+        .w-section-head {
+            display: flex; align-items: center; gap: 0.9rem;
+            padding: 0.95rem 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .w-section-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .w-section-title { font-size: 0.97rem; font-weight: 800; color: #fff; }
+        .w-section-sub { font-size: 0.78rem; color: rgba(225,205,245,0.45); margin-top: 0.1rem; }
+        .w-level {
+            margin-left: auto; font-size: 0.68rem; font-weight: 800;
+            padding: 0.15rem 0.55rem; border-radius: 999px; flex-shrink: 0;
+        }
+        .lv-c1 { background: rgba(248,113,113,0.12); color: #f87171; }
+
+        .w-list { padding: 0.3rem 0.5rem 0.8rem; }
+        .w-item {
+            display: flex; flex-direction: column;
+            padding: 0.85rem 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 0.15rem;
+            transition: background 0.2s;
+        }
+        .w-item:hover { background: rgba(255,255,255,0.035); }
+        .w-item-top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+
+        .w-de {
+            font-size: 1.05rem; font-weight: 800; color: #fff;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .w-de .art { color: rgba(244,114,182,0.7); font-weight: 600;
+            font-family: 'Nunito', sans-serif; font-size: 0.85rem; }
+        .w-pair {
+            font-size: 0.88rem; font-weight: 700;
+            color: rgba(244,114,182,0.65);
+            font-family: 'Nunito', sans-serif;
+        }
+        .w-ua { font-size: 0.87rem; color: rgba(210,185,245,0.65); }
+
+        .w-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.35rem; }
+        .w-tag {
+            font-size: 0.68rem; font-weight: 700;
+            padding: 0.1rem 0.45rem; border-radius: 999px;
+        }
+        .tag-coll  { background:rgba(251,191,36,0.1);   color:#fbbf24; }
+        .tag-note  { background:rgba(147,197,253,0.1);  color:#93c5fd; }
+        .tag-tip   { background:rgba(134,239,172,0.1);  color:#86efac; }
+        .tag-warn  { background:rgba(248,113,113,0.1);  color:#f87171; }
+        .tag-syn   { background:rgba(192,132,252,0.1);  color:#c084fc; }
+
+        .w-desc {
+            font-size: 0.83rem; color: rgba(225,205,245,0.6);
+            line-height: 1.55; margin-top: 0.35rem;
+        }
+        .w-example {
+            margin-top: 0.5rem;
+            background: rgba(244,114,182,0.06);
+            border-left: 2px solid rgba(244,114,182,0.35);
+            border-radius: 0 8px 8px 0;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.86rem; color: rgba(230,215,248,0.9);
+            line-height: 1.6;
+        }
+        .w-example + .w-example { margin-top: 0.3rem; }
+        .w-example .hl { color: #f472b6; font-weight: 700; }
+        .w-divider {
+            height: 1px; background: rgba(255,255,255,0.05);
+            margin: 0.1rem 0.8rem;
+        }
+
+        /* scale of severity */
+        .severity-bar {
+            display: flex; gap: 0; margin: 0.5rem 0.8rem 0.9rem;
+            border-radius: 12px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .sv-step {
+            flex: 1; padding: 0.65rem 0.6rem; text-align: center;
+            font-size: 0.75rem; font-weight: 700; line-height: 1.3;
+        }
+        .sv-1 { background: rgba(251,191,36,0.12); color: #fbbf24; }
+        .sv-2 { background: rgba(248,113,113,0.12); color: #f87171;
+                border-left: 1px solid rgba(255,255,255,0.07); }
+        .sv-3 { background: rgba(192,50,50,0.15); color: #fca5a5;
+                border-left: 1px solid rgba(255,255,255,0.07); }
+        .sv-label { font-size: 0.65rem; opacity: 0.6; display: block; margin-top: 0.1rem; }
+
+        /* pair block */
+        .word-pair {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
+            padding: 0 0.8rem 0.9rem;
+        }
+        .wp-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px; padding: 0.8rem 0.9rem;
+        }
+        .wp-verb { font-size: 0.95rem; font-weight: 800; color: #fff;
+            font-family: 'Playfair Display', serif; }
+        .wp-noun { font-size: 0.78rem; color: rgba(244,114,182,0.65); margin-top: 0.1rem; font-weight: 600; }
+        .wp-ua { font-size: 0.8rem; color: rgba(210,185,245,0.6); margin-top: 0.2rem; }
+
+        /* hero */
+        .page-hero {
+            background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(192,132,252,0.07));
+            border: 1px solid rgba(244,114,182,0.25);
+            border-radius: 16px; padding: 1.2rem 1.5rem;
+            margin: 1rem 0 1.8rem;
+            display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+        }
+        .ph-emoji { font-size: 2.6rem; flex-shrink: 0; }
+        .ph-title { font-size: 1.5rem; font-weight: 900; color: #fff;
+            font-family: 'Playfair Display', Georgia, serif; }
+        .ph-sub { font-size: 0.84rem; color: rgba(220,200,245,0.5); margin-top: 0.2rem; }
+        .ph-badges { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .ph-badge { font-size: 0.7rem; font-weight: 800;
+            padding: 0.15rem 0.6rem; border-radius: 999px; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/paris.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 45%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">›</span>
+            <span class="current">Über Verletzungen sprechen</span>
+        </nav>
+
+        <div class="page-hero">
+            <div class="ph-emoji">🤕</div>
+            <div>
+                <div class="ph-title">Über Verletzungen sprechen</div>
+                <div class="ph-sub">Як говорити про травми по-німецьки — слова з відео Rieke</div>
+                <div class="ph-badges">
+                    <span class="ph-badge lv-c1">C1</span>
+                    <span class="ph-badge" style="background:rgba(244,114,182,0.12);color:#f472b6;">4 блоки · 14 слів</span>
+                    <span class="ph-badge" style="background:rgba(251,191,36,0.1);color:#fbbf24;">+ розмовні варіанти</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 1: Зв'язки і суглоби ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">🦵</span>
+                <div>
+                    <div class="w-section-title">Зв'язки і суглоби</div>
+                    <div class="w-section-sub">розтягнення, розрив, вивих — від легкого до важкого</div>
+                </div>
+                <span class="w-level lv-c1">C1</span>
+            </div>
+
+            <!-- severity scale -->
+            <div class="severity-bar">
+                <div class="sv-step sv-1">😬 Verstauchung<span class="sv-label">розтягнення зв'язок</span></div>
+                <div class="sv-step sv-2">😣 Bänderriss<span class="sv-label">розрив зв'язок</span></div>
+                <div class="sv-step sv-3">😱 Verrenkung<span class="sv-label">вивих кістки</span></div>
+            </div>
+
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich etwas <span style="color:#f472b6;">verstauchen</span></div>
+                        <div class="w-pair">· die Verstauchung</div>
+                    </div>
+                    <div class="w-ua">вивихнути зв'язки / розтягнення зв'язок</div>
+                    <div class="w-desc">Нога або рука рухається у неправильному напрямку — зв'язки навколо суглоба сильно розтягуються, але не рвуться.</div>
+                    <div class="w-example">„Ich habe mir den Fuß <span class="hl">verstaucht</span>."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Bänderriss</div>
+                    </div>
+                    <div class="w-ua">розрив зв'язок</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-warn">гірше за Verstauchung — зв'язки рвуться повністю</span>
+                    </div>
+                    <div class="w-desc"><span style="color:#f472b6;">das Band</span> (зв'язка) + <span style="color:#f472b6;">der Riss</span> (розрив) → Bänderriss</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich etwas <span style="color:#f472b6;">verrenken</span></div>
+                        <div class="w-pair">· die Verrenkung</div>
+                    </div>
+                    <div class="w-ua">вивихнути (кістка виходить з суглоба)</div>
+                    <div class="w-example">„Ich habe mir beim Sturz die Schulter <span class="hl">verrenkt</span>."</div>
+                    <div class="w-tags" style="margin-top:0.5rem;">
+                        <span class="w-tag tag-syn">= розм: sich etwas auskugeln</span>
+                    </div>
+                    <div class="w-example">„Beim Skifahren hat sie sich das Knie <span class="hl">ausgekugelt</span>."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span style="color:#f472b6;">einrenken</span></div>
+                    </div>
+                    <div class="w-ua">вправити — лікар повертає кістку на місце без операції</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-tip">трен.: renkt … ein · renkte ein · eingerenkt</span>
+                    </div>
+                    <div class="w-example">„Der Arzt <span class="hl">renkt</span> meine Schulter wieder <span class="hl">ein</span>."</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 2: М'язи ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">💪</span>
+                <div>
+                    <div class="w-section-title">М'язи</div>
+                    <div class="w-section-sub">розтягнення м'яза і крепатура</div>
+                </div>
+                <span class="w-level lv-c1">C1</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich etwas <span style="color:#f472b6;">zerren</span></div>
+                        <div class="w-pair">· die Zerrung</div>
+                    </div>
+                    <div class="w-ua">розтягнення м'яза — м'яз надмірно розтягується</div>
+                    <div class="w-example">„Er hat sich beim Fußball den Oberschenkel <span class="hl">gezerrt</span>."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Muskelkater</div>
+                    </div>
+                    <div class="w-ua">крепатура — біль у м'язах після тренування</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-note">не травма! проходить через кілька днів</span>
+                        <span class="w-tag tag-tip">der Kater = кіт (або похмілля)</span>
+                    </div>
+                    <div class="w-example">„Ich habe so einen <span class="hl">Muskelkater</span> vom Training gestern!"</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 3: Удар і синець ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">🟣</span>
+                <div>
+                    <div class="w-section-title">Удар і синець</div>
+                    <div class="w-section-sub">забій, синець — без відкритої рани</div>
+                </div>
+                <span class="w-level lv-c1">C1</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich etwas <span style="color:#f472b6;">prellen</span></div>
+                        <div class="w-pair">· die Prellung</div>
+                    </div>
+                    <div class="w-ua">забити — удар об тверду поверхню, без відкритої рани</div>
+                    <div class="w-desc">Результат: синець (Bluterguss) і набряк. Шкіра ціла.</div>
+                    <div class="w-example">„Ich habe mir das Knie <span class="hl">geprellt</span>."</div>
+                    <div class="w-example">„Der Arzt hat eine Schulter<span class="hl">prellung</span> festgestellt."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Bluterguss</div>
+                        <div class="w-pair">= der blaue Fleck</div>
+                    </div>
+                    <div class="w-ua">синець</div>
+                    <div class="w-desc"><span style="color:#f472b6;">das Blut</span> (кров) + <span style="color:#f472b6;">der Erguss</span> (виток) → витікання крові під шкіру</div>
+                    <div class="w-tags" style="margin-top:0.4rem;">
+                        <span class="w-tag tag-coll">розм: der blaue Fleck — буквально «блакитна пляма»</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ БЛОК 4: Розмовні вирази ══ -->
+        <div class="w-section">
+            <div class="w-section-head">
+                <span class="w-section-icon">💬</span>
+                <div>
+                    <div class="w-section-title">Розмовні вирази</div>
+                    <div class="w-section-sub">так кажуть у живій мові — не в підручниках</div>
+                </div>
+                <span class="w-level lv-c1">C1 розм.</span>
+            </div>
+            <div class="w-list">
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich etwas <span style="color:#f472b6;">verknacksen</span></div>
+                    </div>
+                    <div class="w-ua">підвернути / травмувати — неважливо що саме</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-coll">⚡ розмовне</span>
+                        <span class="w-tag tag-note">просто «неправильно рухнулась і тепер болить»</span>
+                    </div>
+                    <div class="w-example">„Ich habe mir den Fuß <span class="hl">verknackst</span>."</div>
+                    <div class="w-example">„Pass auf, dass du dir beim Umzug nicht den Rücken <span class="hl">verknackst</span>!"</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de">sich <span style="color:#f472b6;">vertreten</span></div>
+                        <div class="w-pair">= falsch auftreten</div>
+                    </div>
+                    <div class="w-ua">підвернути ногу при ходьбі — неправильно поставила ступню</div>
+                    <div class="w-example">„Ich habe mich <span class="hl">vertreten</span>."</div>
+                    <div class="w-example">„Sie ist <span class="hl">falsch aufgetreten</span> und hat sich den Knöchel verstaucht."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">das</span> Kreuz</div>
+                    </div>
+                    <div class="w-ua">поперек — нижня частина спини (розмовне)</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-coll">⚡ розмовне</span>
+                        <span class="w-tag tag-note">від: das Kreuzbein = крижова кістка</span>
+                    </div>
+                    <div class="w-example">„Ich hab's im <span class="hl">Kreuz</span>." &nbsp;/&nbsp; „Mir tut das <span class="hl">Kreuz</span> weh."</div>
+                </div>
+                <div class="w-divider"></div>
+
+                <div class="w-item">
+                    <div class="w-item-top">
+                        <div class="w-de"><span class="art">der</span> Hexenschuss</div>
+                    </div>
+                    <div class="w-ua">прострел у попереку — різкий сильний біль знизу спини</div>
+                    <div class="w-tags">
+                        <span class="w-tag tag-coll">⚡ розмовне</span>
+                        <span class="w-tag tag-tip">die Hexe = відьма · der Schuss = постріл → «відьма вистрілила»</span>
+                    </div>
+                    <div class="w-example">„Ich kann heute nicht zur Arbeit, ich hab einen <span class="hl">Hexenschuss</span>."</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── шпаргалка ── -->
+        <div class="note-card highlight-card" style="margin-top:0.5rem;">
+            <p style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:0.8rem;">📋 Як сказати що тебе болить — готові фрази</p>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich habe mir den Fuß verstaucht."</em> — Я розтягнула зв'язки на нозі</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich habe mich vertreten."</em> — Я підвернула ногу</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich hab's im Kreuz."</em> — У мене болить поперек</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich habe einen Muskelkater."</em> — У мене крепатура</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Ich habe mir das Knie geprellt."</em> — Я забила коліно</div>
+                <div style="font-size:0.84rem;color:rgba(230,215,248,0.85);">💬 <em>„Der Arzt hat eine Zerrung festgestellt."</em> — Лікар встановив розтягнення м'яза</div>
+            </div>
+        </div>
+
+        <!-- ── пари: дієслово / іменник ── -->
+        <div style="font-size:0.88rem;font-weight:700;color:rgba(244,114,182,0.7);margin:1.5rem 0 0.6rem;letter-spacing:0.04em;text-transform:uppercase;">
+            ⚡ Швидко — дієслово + іменник
+        </div>
+        <div class="word-pair">
+            <div class="wp-card">
+                <div class="wp-verb">verstauchen</div>
+                <div class="wp-noun">die Verstauchung</div>
+                <div class="wp-ua">розтягнення зв'язок</div>
+            </div>
+            <div class="wp-card">
+                <div class="wp-verb">zerren</div>
+                <div class="wp-noun">die Zerrung</div>
+                <div class="wp-ua">розтягнення м'яза</div>
+            </div>
+            <div class="wp-card">
+                <div class="wp-verb">prellen</div>
+                <div class="wp-noun">die Prellung</div>
+                <div class="wp-ua">забій</div>
+            </div>
+            <div class="wp-card">
+                <div class="wp-verb">verrenken</div>
+                <div class="wp-noun">die Verrenkung</div>
+                <div class="wp-ua">вивих</div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:2.5rem; padding-bottom:2rem;">
+            <a href="deutsch.html" style="font-size:0.85rem; color:rgba(244,114,182,0.5); text-decoration:none;">
+                ← zurück zu Deutsch
+            </a>
+        </div>
+    </div>
+</body>
+</html>

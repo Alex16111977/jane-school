@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wortfamilie: tragen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ── verb cards ── */
+        .verb-hero {
+            background: linear-gradient(135deg, rgba(192,132,252,0.12), rgba(244,114,182,0.08));
+            border: 1px solid rgba(192,132,252,0.3);
+            border-radius: 16px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 2rem;
+            display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+        }
+        .verb-hero-word {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.4rem; font-weight: 800;
+            background: linear-gradient(135deg, #fff 20%, #c084fc 60%, #f472b6 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1; flex-shrink: 0;
+        }
+        .verb-hero-info { flex: 1; min-width: 200px; }
+        .verb-hero-forms {
+            display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.5rem;
+        }
+        .vform {
+            font-size: 0.82rem; font-weight: 700;
+            padding: 0.2rem 0.6rem; border-radius: 8px;
+        }
+        .vform-inf  { background:rgba(192,132,252,0.12); color:#c084fc; }
+        .vform-pres { background:rgba(251,191,36,0.12);  color:#fbbf24; }
+        .vform-pret { background:rgba(134,239,172,0.12); color:#86efac; }
+        .vform-pp   { background:rgba(244,114,182,0.12); color:#f9a8d4; }
+        .vform-aux  { background:rgba(147,197,253,0.12); color:#93c5fd; }
+
+        /* ── single verb block ── */
+        .verb-block {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            margin-bottom: 1.1rem;
+            overflow: hidden;
+            transition: border-color 0.25s;
+        }
+        .verb-block:hover { border-color: rgba(192,132,252,0.3); }
+
+        .verb-header {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem 1.3rem;
+            cursor: pointer; user-select: none;
+        }
+        .verb-name {
+            font-size: 1.25rem; font-weight: 900;
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #fff;
+        }
+        .verb-name .prefix { color: #c084fc; }
+        .verb-ru {
+            font-size: 0.84rem; color: rgba(230,210,245,0.55);
+            font-style: italic; flex: 1;
+        }
+        .verb-count {
+            font-size: 0.72rem; font-weight: 700;
+            background: rgba(192,132,252,0.1);
+            color: rgba(192,132,252,0.8);
+            border-radius: 999px; padding: 0.15rem 0.6rem;
+            white-space: nowrap;
+        }
+        .verb-arrow {
+            color: rgba(192,132,252,0.4); font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+        .verb-block.open .verb-arrow { transform: rotate(90deg); color: #c084fc; }
+
+        .verb-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.45s ease, padding 0.3s ease;
+            padding: 0 1.3rem;
+        }
+        .verb-block.open .verb-body { max-height: 1000px; padding-bottom: 1.3rem; }
+
+        /* ── meanings ── */
+        .meaning {
+            display: flex; gap: 0.9rem; align-items: flex-start;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.055);
+        }
+        .meaning:last-child { border-bottom: none; }
+        .m-num {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(192,132,252,0.15);
+            color: #c084fc; font-size: 0.72rem; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 0.1rem;
+        }
+        .m-body { flex: 1; }
+        .m-de {
+            font-size: 0.92rem; font-weight: 700; color: #fff;
+            margin-bottom: 0.25rem;
+        }
+        .m-ua {
+            font-size: 0.84rem; color: rgba(210,185,245,0.65);
+            margin-bottom: 0.5rem;
+        }
+        .m-example {
+            background: rgba(192,132,252,0.06);
+            border-left: 2px solid rgba(192,132,252,0.4);
+            border-radius: 0 8px 8px 0;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.86rem;
+            color: rgba(230,215,248,0.88);
+            line-height: 1.6;
+        }
+        .m-example .hl { color: #c084fc; font-weight: 700; }
+        .m-tag {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 0.12rem 0.5rem; border-radius: 999px;
+            margin-bottom: 0.35rem;
+        }
+        .tag-coll { background:rgba(251,191,36,0.12); color:#fbbf24; }
+        .tag-form { background:rgba(147,197,253,0.12); color:#93c5fd; }
+        .tag-sep  { background:rgba(134,239,172,0.12); color:#86efac; }
+        .tag-insep{ background:rgba(248,113,113,0.12); color:#f87171; }
+
+        /* ── quick compare table ── */
+        .compare-table { width:100%; border-collapse:collapse; font-size:0.87rem; margin-top:0.5rem; }
+        .compare-table th {
+            background:rgba(192,132,252,0.1); color:#c084fc;
+            padding:0.55rem 0.8rem; text-align:left; font-weight:700;
+            border-bottom:1.5px solid rgba(192,132,252,0.2);
+        }
+        .compare-table td {
+            padding:0.5rem 0.8rem;
+            border-bottom:1px solid rgba(255,255,255,0.055);
+            vertical-align:top;
+        }
+        .compare-table tr:hover td { background:rgba(255,255,255,0.03); }
+        .ct-verb { font-weight:800; color:#fff; }
+        .ct-verb .prefix { color:#c084fc; }
+        .ct-ua { color:rgba(210,185,245,0.6); font-size:0.82rem; }
+        .ct-ex { color:rgba(230,215,248,0.78); font-size:0.82rem; font-style:italic; }
+        .sep-badge {
+            font-size:0.65rem; font-weight:700; padding:0.08rem 0.4rem;
+            border-radius:999px; white-space:nowrap;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/paris.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 45%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">›</span>
+            <span class="current">Wortfamilie: tragen</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem; margin-bottom:1.5rem;">
+            <h1>Wortfamilie: <span style="color:#c084fc;">tragen</span></h1>
+            <p class="page-subtitle">7 Verben &bull; von auftragen bis zutragen &bull; mit Beispielen</p>
+        </div>
+
+        <!-- ── hero: Stammverb ── -->
+        <div class="verb-hero">
+            <div class="verb-hero-word">tragen</div>
+            <div class="verb-hero-info">
+                <div style="font-size:0.82rem;color:rgba(230,210,245,0.55);margin-bottom:0.35rem;">Stammverb — нести, носити, тримати</div>
+                <div class="verb-hero-forms">
+                    <span class="vform vform-inf">Inf: tragen</span>
+                    <span class="vform vform-pres">3.Sg: trägt</span>
+                    <span class="vform vform-pret">Prät: trug</span>
+                    <span class="vform vform-pp">Part.II: getragen</span>
+                    <span class="vform vform-aux">+ haben</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── quick overview table ── -->
+        <div class="note-card" style="margin-bottom:1.8rem; padding:0;">
+            <div style="padding:0.9rem 1.1rem 0.4rem; font-size:0.88rem; font-weight:700; color:#fff;">
+                ⚡ Schnellübersicht — alle 7 Verben
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Trennbar?</th>
+                            <th>Bedeutung (UA)</th>
+                            <th>Beispiel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">auf</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(134,239,172,0.12);color:#86efac;">трен.</span></td>
+                            <td><span class="ct-ua">наносити / доручати / зношувати</span></td>
+                            <td><span class="ct-ex">Ich trage Creme auf.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">be</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(248,113,113,0.12);color:#f87171;">нетрен.</span></td>
+                            <td><span class="ct-ua">становити певну величину</span></td>
+                            <td><span class="ct-ex">Die Distanz beträgt 20 km.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">er</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(248,113,113,0.12);color:#f87171;">нетрен.</span></td>
+                            <td><span class="ct-ua">витримувати, терпіти</span></td>
+                            <td><span class="ct-ex">Sie erträgt den Lärm nicht.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">mit</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(134,239,172,0.12);color:#86efac;">трен.</span></td>
+                            <td><span class="ct-ua">спільно підтримувати</span></td>
+                            <td><span class="ct-ex">Das Gesetz wird mitgetragen.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">vor</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(134,239,172,0.12);color:#86efac;">трен.</span></td>
+                            <td><span class="ct-ua">виступати / представляти</span></td>
+                            <td><span class="ct-ex">Sie trägt ein Gedicht vor.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">über</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(134,239,172,0.12);color:#86efac;">трен.*</span></td>
+                            <td><span class="ct-ua">транслювати / передавати / перекладати</span></td>
+                            <td><span class="ct-ex">Das Spiel wird übertragen.</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="ct-verb"><span class="prefix">zu</span>tragen</span></td>
+                            <td><span class="sep-badge" style="background:rgba(134,239,172,0.12);color:#86efac;">трен.</span></td>
+                            <td><span class="ct-ua">траплятися / таємно передавати</span></td>
+                            <td><span class="ct-ex">Wie hat es sich zugetragen?</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- auftragen -->
+        <!-- ══════════════════════════════════════ -->
+        <div class="verb-block open" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">auf</span>tragen</div>
+                    <div class="verb-ru">наносити · доручати · зношувати · перебільшувати</div>
+                </div>
+                <span class="verb-count">5 значень</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-sep">трен. → trägt auf · trug auf · aufgetragen</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Наносити щось на поверхню</div>
+                        <div class="m-ua">крем, макіяж, мазь, фарбу — auf etw. auftragen</div>
+                        <div class="m-example">„Ich trage jeden Morgen Sonnencreme <span class="hl">auf</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">2</div>
+                    <div class="m-body">
+                        <div class="m-de">Доручати комусь завдання</div>
+                        <div class="m-ua">дати наказ щось зробити — jmdm. etw. auftragen</div>
+                        <div class="m-example">„Mir wurde <span class="hl">aufgetragen</span>, die Präsentation vorzubereiten."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">3</div>
+                    <div class="m-body">
+                        <div class="m-de">Зносити одяг — донашувати чужий одяг</div>
+                        <div class="m-ua">носити до зносу / донашувати за старшими</div>
+                        <div class="m-example">„Meine kleinen Brüder müssen immer meine alten Winterjacken <span class="hl">auftragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">4</div>
+                    <div class="m-body">
+                        <div class="m-de">Робити фігуру повнішою (про одяг)</div>
+                        <div class="m-ua">одяг, який «товстить» / збільшує обсяг</div>
+                        <div class="m-example">„Dieser Pullover steht dir nicht. Er <span class="hl">trägt auf</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">5</div>
+                    <div class="m-body">
+                        <span class="m-tag tag-coll">⚡ розмовне</span>
+                        <div class="m-de">dick auftragen — перебільшувати, хвалитися</div>
+                        <div class="m-ua">перебільшувати власні заслуги / хвастатися</div>
+                        <div class="m-example">„Du solltest im Bewerbungsgespräch nicht zu <span class="hl">dick auftragen</span>."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- betragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">be</span>tragen</div>
+                    <div class="verb-ru">становити певну величину (ціну, відстань, розмір)</div>
+                </div>
+                <span class="verb-count">1 значення</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-insep">нетрен. → beträgt · betrug · betragen</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Становити певну величину — числа, розміри, ціни</div>
+                        <div class="m-ua">відстань / ціна / температура — дорівнює, становить</div>
+                        <div class="m-example">„Die Entfernung <span class="hl">beträgt</span> 20 Kilometer."</div>
+                        <div class="m-example" style="margin-top:0.4rem;">„Die Temperatur <span class="hl">beträgt</span> minus 10 Grad."</div>
+                        <div class="m-example" style="margin-top:0.4rem;">„Der Schaden <span class="hl">beträgt</span> ca. 5000 Euro."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ertragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">er</span>tragen</div>
+                    <div class="verb-ru">витримувати, терпіти щось неприємне</div>
+                </div>
+                <span class="verb-count">1 значення</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-insep">нетрен. → erträgt · ertrug · ertragen</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Витримувати біль, ситуацію, людину</div>
+                        <div class="m-ua">терпіти / витримувати — часто негативне</div>
+                        <div class="m-example">„Nach der OP musste ich starke Schmerzen <span class="hl">ertragen</span>."</div>
+                        <div class="m-example" style="margin-top:0.4rem;">„Sie <span class="hl">erträgt</span> es nicht, wenn man sich über sie lustig macht."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- mittragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">mit</span>tragen</div>
+                    <div class="verb-ru">спільно підтримувати рішення / нести відповідальність</div>
+                </div>
+                <span class="verb-count">1 значення</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-sep">трен. → trägt mit · trug mit · mitgetragen</span>
+                    <span class="m-tag tag-form">📌 часто пасив</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Разом підтримувати рішення / нести відповідальність</div>
+                        <div class="m-ua">підтримувати колективно, погоджуватися</div>
+                        <div class="m-example">„Das neue Gesetz wird von allen Parteien <span class="hl">mitgetragen</span>."</div>
+                        <div class="m-example" style="margin-top:0.4rem;">„Ich kann diese Entscheidung nicht <span class="hl">mittragen</span>."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- vortragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">vor</span>tragen</div>
+                    <div class="verb-ru">виступати / офіційно представляти</div>
+                </div>
+                <span class="verb-count">2 значення</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-sep">трен. → trägt vor · trug vor · vorgetragen</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Виступати, читати вголос — вірш, музику, перед публікою</div>
+                        <div class="m-ua">виконувати публічно</div>
+                        <div class="m-example">„Die Pianistin wird morgen Beethoven-Sonaten <span class="hl">vortragen</span>."</div>
+                        <div class="m-example" style="margin-top:0.4rem;">„Das Kind <span class="hl">trägt</span> ein Gedicht <span class="hl">vor</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">2</div>
+                    <div class="m-body">
+                        <div class="m-de">Офіційно представляти — інформацію, результати, рішення</div>
+                        <div class="m-ua">доповідати, презентувати (офіційно)</div>
+                        <div class="m-example">„Im Teammeeting <span class="hl">trug</span> sie die Ergebnisse der Studie <span class="hl">vor</span>."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- übertragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">über</span>tragen</div>
+                    <div class="verb-ru">транслювати · передавати · перекладати · заражати</div>
+                </div>
+                <span class="verb-count">6 значень</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-sep">трен.* → überträgt · übertrug · übertragen</span>
+                    <div style="font-size:0.75rem;color:rgba(230,200,245,0.45);align-self:center;">* може бути і трен., і нетрен. — залежить від значення</div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">Транслювати — пряма трансляція</div>
+                        <div class="m-ua">показувати в прямому ефірі</div>
+                        <div class="m-example">„Das Finale wird live <span class="hl">übertragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">2</div>
+                    <div class="m-body">
+                        <div class="m-de">Передавати файли / дані між пристроями</div>
+                        <div class="m-ua">копіювати з одного пристрою на інший</div>
+                        <div class="m-example">„Ich habe die Fotos von meinem Computer auf einen USB-Stick <span class="hl">übertragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">3</div>
+                    <div class="m-body">
+                        <span class="m-tag tag-form">📌 піднесений стиль</span>
+                        <div class="m-de">Перекладати (художній/піднесений переклад)</div>
+                        <div class="m-ua">перекладати (вишуканіше ніж übersetzen)</div>
+                        <div class="m-example">„Eine Übersetzerin hat das Gedicht vom Chinesischen ins Deutsche <span class="hl">übertragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">4</div>
+                    <div class="m-body">
+                        <div class="m-de">Передавати завдання / повноваження комусь</div>
+                        <div class="m-ua">делегувати, довіряти відповідальність</div>
+                        <div class="m-example">„Der Chef hat mir die Leitung der Abteilung <span class="hl">übertragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">5</div>
+                    <div class="m-body">
+                        <div class="m-de">Передавати вірус / хворобу</div>
+                        <div class="m-ua">заражати, передавати інфекцію</div>
+                        <div class="m-example">„Dieses Virus wird von Tieren auf Menschen <span class="hl">übertragen</span>."</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">6</div>
+                    <div class="m-body">
+                        <div class="m-de">sich übertragen — переноситися (про емоції, настрій)</div>
+                        <div class="m-ua">заразити своїм настроєм / передатися іншим</div>
+                        <div class="m-example">„Seine Motivation <span class="hl">übertrug sich</span> auf das gesamte Team."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- zutragen -->
+        <div class="verb-block" onclick="toggleVerb(this)">
+            <div class="verb-header">
+                <div>
+                    <div class="verb-name"><span class="prefix">zu</span>tragen</div>
+                    <div class="verb-ru">траплятися / таємно передавати інформацію</div>
+                </div>
+                <span class="verb-count">2 значення</span>
+                <span class="verb-arrow">›</span>
+            </div>
+            <div class="verb-body">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="m-tag tag-sep">трен. → trägt zu · trug zu · zugetragen</span>
+                    <span class="m-tag tag-form">📌 піднесений стиль</span>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">1</div>
+                    <div class="m-body">
+                        <div class="m-de">sich zutragen — траплятися, відбуватися</div>
+                        <div class="m-ua">= passieren / geschehen (але більш офіційно)</div>
+                        <div class="m-example">„Gibt es Zeugen, die beschreiben können, wie sich der Unfall <span class="hl">zugetragen hat</span>?"</div>
+                    </div>
+                </div>
+
+                <div class="meaning">
+                    <div class="m-num">2</div>
+                    <div class="m-body">
+                        <div class="m-de">Таємно передавати інформацію комусь</div>
+                        <div class="m-ua">переказувати секрети, «стукати»</div>
+                        <div class="m-example">„Jemand muss dem Chef <span class="hl">zugetragen</span> haben, dass wir über ihn sprechen."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:2.5rem; padding-bottom:2rem;">
+            <a href="deutsch.html" style="font-size:0.85rem; color:rgba(192,132,252,0.6); text-decoration:none;">
+                ← zurück zu Deutsch
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleVerb(block) {
+            block.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

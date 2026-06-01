@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beim Zahnarzt | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .vocab-section {
+            margin-bottom: 2rem;
+        }
+        .vocab-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(230,230,235,0.5);
+            margin: 0 0 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        /* Vocab rows */
+        .vocab-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .vocab-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: background 0.2s;
+        }
+        .vocab-row:hover { background: rgba(255,255,255,0.07); }
+        .vocab-de {
+            flex: 1;
+            font-weight: 700;
+            color: #e2e8f0;
+            font-size: 0.97rem;
+        }
+        .vocab-de em {
+            font-style: normal;
+            color: rgba(230,230,235,0.45);
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+        .vocab-sep {
+            color: rgba(230,230,235,0.2);
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+        .vocab-ua {
+            flex: 1;
+            color: rgba(230,230,235,0.65);
+            font-size: 0.92rem;
+        }
+
+        /* Command cards */
+        .cmd-card {
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .cmd-de {
+            font-weight: 800;
+            color: #fbbf24;
+            font-size: 1rem;
+            font-style: italic;
+        }
+        .cmd-ua {
+            color: rgba(230,230,235,0.65);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(245,158,11,0.4); color: #fff; }
+        .tab-btn.active {
+            background: rgba(245,158,11,0.18);
+            border-color: #f59e0b;
+            color: #fff;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Quiz */
+        .quiz-q {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.1rem;
+        }
+        .quiz-q p { font-weight: 600; color: #e2e8f0; margin-bottom: 0.7rem; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+        .quiz-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            color: rgba(230,230,235,0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+        }
+        .quiz-btn:hover { border-color: rgba(245,158,11,0.4); color:#fff; background:rgba(245,158,11,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15);  border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.5rem; min-height:1.2em; }
+        .quiz-score-box {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 12px;
+            padding: 1rem 1.3rem;
+            margin-top: 1.2rem;
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Source badge */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.25);
+            border-radius: 50px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.82rem;
+            color: #ff7b72;
+            margin-bottom: 1.4rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/peonies.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.86)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Beim Zahnarzt</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F9B7; Beim Zahnarzt</h1>
+            <p class="page-subtitle">Wortschatz B2/C1 &mdash; Termin, Diagnose, Behandlung</p>
+        </div>
+
+        <div class="source-badge">
+            &#x25B6;&#xFE0F; Rieke &mdash; &bdquo;Deutsch beim Zahnarzt&ldquo;
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="showTab('tab-wort', this)">&#x1F4CB; W&ouml;rterbuch</button>
+            <button class="tab-btn" onclick="showTab('tab-cmd', this)">&#x1F4AC; Befehle</button>
+            <button class="tab-btn" onclick="showTab('tab-quiz', this)">&#x1F9E0; Quiz</button>
+        </div>
+
+        <!-- TAB: WÖRTERBUCH -->
+        <div id="tab-wort" class="tab-pane active">
+
+            <!-- Termin -->
+            <div class="vocab-section">
+                <div class="vocab-section-title">&#x1F4DE; Termin vereinbaren</div>
+                <div class="vocab-list">
+                    <div class="vocab-row">
+                        <span class="vocab-de">einen Termin vereinbaren / ausmachen</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">записатися на прийом</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Kontrolle</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">профілактичний огляд</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Vorsorgeuntersuchung</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">профілактичне обстеження</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rezeption -->
+            <div class="vocab-section">
+                <div class="vocab-section-title">&#x1F3E5; In der Rezeption</div>
+                <div class="vocab-list">
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Rezeption</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">реєстратура</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Versichertenkarte <em>/ Krankenkassenkarte</em></span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">страхова картка (потрібна на кожному прийомі)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">der Anamnesebogen</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">анкета про стан здоров&rsquo;я <em>(заповнюється вперше)</em></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnose -->
+            <div class="vocab-section">
+                <div class="vocab-section-title">&#x1F4CB; Diagnosen</div>
+                <div class="vocab-list">
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Karies <em>/ &bdquo;ein Loch&ldquo;</em></span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">карієс / дірка в зубі (розмовне)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">freiliegende Zahnhälse</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">оголені шийки зубів (чутливість до холоду/тепла)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">das Knirschen</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">скрегіт зубами (часто вночі)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Knirscherschiene</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">капа від скрегіту</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Behandlung -->
+            <div class="vocab-section">
+                <div class="vocab-section-title">&#x1FA78; Behandlung</div>
+                <div class="vocab-list">
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Betäubungsspritze</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">укол анестезії</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">bohren</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">свердлити</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Füllung</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">пломба</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Wurzelbehandlung <em>/ Wurzelkanalbehandlung</em></span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">лікування кореневого каналу</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">den Zahn ziehen</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">видалити зуб</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Brücke</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">місток (протез на місці видаленого зуба)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">die Krone</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">коронка (коли зуб сильно зруйнований)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">das Implantat</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">імплант (штучний корінь, вкручується в кістку)</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">professionelle Zahnreinigung</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">профес. чищення зубів (платне)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-wort -->
+
+        <!-- TAB: BEFEHLE -->
+        <div id="tab-cmd" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Що каже лікар під час огляду &mdash; ці фрази почуєш майже завжди:</p>
+
+            <div class="cmd-card">
+                <div class="cmd-de">&bdquo;Bitte weit aufmachen!&ldquo;</div>
+                <div class="cmd-ua">&#x1F449; широко відкрийте рот</div>
+            </div>
+            <div class="cmd-card">
+                <div class="cmd-de">&bdquo;Jetzt bitte mal zubei&szlig;en.&ldquo;</div>
+                <div class="cmd-ua">&#x1F449; зімкніть зуби</div>
+            </div>
+            <div class="cmd-card">
+                <div class="cmd-de">&bdquo;Den Kopf zu mir drehen!&ldquo;</div>
+                <div class="cmd-ua">&#x1F449; поверніть голову до мене</div>
+            </div>
+            <div class="cmd-card">
+                <div class="cmd-de">&bdquo;Kurz sp&uuml;len bitte.&ldquo;</div>
+                <div class="cmd-ua">&#x1F449; прополоскайте</div>
+            </div>
+
+            <div class="note-card" style="margin-top:1.5rem; background:rgba(34,197,94,0.06); border-color:rgba(34,197,94,0.25);">
+                <h3 style="color:#86efac;">&#x1F4AC; Корисні фрази для тебе</h3>
+                <div class="vocab-list" style="margin-top:0.6rem;">
+                    <div class="vocab-row">
+                        <span class="vocab-de">Ich habe Zahnschmerzen.</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">У мене болить зуб.</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">Dieser Zahn ist empfindlich.</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">Цей зуб чутливий.</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">Ich brauche eine Betäubung.</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">Мені потрібна анестезія.</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">Ist das kassenärztlich?</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">Це покривається страховкою?</span>
+                    </div>
+                    <div class="vocab-row">
+                        <span class="vocab-de">Ich knirschen nachts mit den Zähnen.</span>
+                        <span class="vocab-sep">—</span>
+                        <span class="vocab-ua">Я скрипаю зубами вночі.</span>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-cmd -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-quiz" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Обирай правильний переклад:</p>
+
+            <div id="quiz-z">
+
+                <div class="quiz-q" data-answer="b">
+                    <p>1. Was bedeutet <strong>„die Betäubungsspritze"</strong>?</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'b','1')">a) пломба</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','1')">b) укол анестезії</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','1')">c) коронка</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','1')">d) рентген</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf1"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="c">
+                    <p>2. <strong>„Die Füllung"</strong> &mdash; це:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'c','2')">a) коронка</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','2')">b) імплант</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','2')">c) пломба</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','2')">d) місток</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf2"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="a">
+                    <p>3. <strong>„Bitte weit aufmachen!"</strong> значить:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'a','3')">a) широко відкрийте рот</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','3')">b) зімкніть зуби</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','3')">c) поверніть голову</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','3')">d) прополоскайте</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf3"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="d">
+                    <p>4. <strong>„Das Implantat"</strong> &mdash; це:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'d','4')">a) капа від скрегіту</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','4')">b) місток</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','4')">c) коронка</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','4')">d) імплант (штучний корінь)</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf4"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="b">
+                    <p>5. <strong>„Der Anamnesebogen"</strong> &mdash; це:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'b','5')">a) рентгенівський знімок</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','5')">b) анкета про стан здоров&rsquo;я</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','5')">c) страхова картка</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'b','5')">d) рецепт</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf5"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="c">
+                    <p>6. <strong>„Freiliegende Zahnhälse"</strong> означає:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'c','6')">a) карієс</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','6')">b) скрегіт зубами</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','6')">c) оголені шийки зубів</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'c','6')">d) видалення зуба</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf6"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="a">
+                    <p>7. <strong>„Die Brücke"</strong> beim Zahnarzt &mdash; це:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'a','7')">a) місток (протез на місці видаленого зуба)</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','7')">b) коронка</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','7')">c) пломба</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'a','7')">d) анестезія</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf7"></div>
+                </div>
+
+                <div class="quiz-q" data-answer="d">
+                    <p>8. <strong>„Kurz spülen bitte"</strong> &mdash; лікар просить:</p>
+                    <div class="quiz-opts">
+                        <button class="quiz-btn" onclick="checkZ(this,'d','8')">a) поверніть голову</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','8')">b) відкрийте рот</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','8')">c) зімкніть зуби</button>
+                        <button class="quiz-btn" onclick="checkZ(this,'d','8')">d) прополоскайте</button>
+                    </div>
+                    <div class="quiz-feedback" id="zf8"></div>
+                </div>
+
+            </div><!-- /quiz-z -->
+            <div class="quiz-score-box" id="zscore" style="display:none;"></div>
+        </div><!-- /tab-quiz -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        function showTab(id, btn) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        var zScore = 0, zTotal = 0, zMax = 8;
+
+        function checkZ(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            zTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('zf' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                zScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (zTotal === zMax) {
+                var box = document.getElementById('zscore');
+                box.style.display = 'block';
+                box.textContent = '🦷 Результат: ' + zScore + ' / ' + zMax + (zScore >= 7 ? ' — відмінно!' : zScore >= 5 ? ' — непогано!' : ' — повтори словник!');
+            }
+        }
+    </script>
+</body>
+</html>
