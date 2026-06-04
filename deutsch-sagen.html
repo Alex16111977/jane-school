@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verben mit „sagen" | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(251,191,36,0.5); color: #fff; }
+        .tab-btn.active {
+            background: rgba(251,191,36,0.15);
+            border-color: #fbbf24;
+            color: #fff;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Verb cards */
+        .verb-card {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        .verb-card:hover { border-color: rgba(251,191,36,0.3); }
+
+        .verb-head {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 0.25rem;
+        }
+        .verb-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+        .verb-num {
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(251,191,36,0.12);
+            border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 50px;
+            padding: 0.15rem 0.6rem;
+            color: #fbbf24;
+            letter-spacing: 0.03em;
+        }
+        .verb-ua {
+            color: rgba(230,230,235,0.6);
+            font-size: 0.93rem;
+            margin: 0.25rem 0 0.85rem;
+            line-height: 1.5;
+        }
+        .verb-meanings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .verb-meaning {
+            border-left: 3px solid rgba(251,191,36,0.35);
+            padding-left: 0.9rem;
+        }
+        .verb-meaning-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: rgba(251,191,36,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+        }
+        .verb-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .verb-ex {
+            background: rgba(251,191,36,0.06);
+            border-radius: 8px;
+            padding: 0.5rem 0.85rem;
+            font-style: italic;
+            color: rgba(230,230,235,0.82);
+            font-size: 0.9rem;
+        }
+        .verb-ex .ex-ua {
+            font-style: normal;
+            color: rgba(230,230,235,0.42);
+            font-size: 0.83rem;
+            margin-top: 0.2rem;
+        }
+        .verb-syn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: rgba(230,230,235,0.45);
+            margin-top: 0.35rem;
+        }
+        .verb-syn strong { color: #86efac; }
+        .verb-warn {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(248,81,73,0.07);
+            border: 1px solid rgba(248,81,73,0.22);
+            border-radius: 9px;
+            padding: 0.55rem 0.85rem;
+            margin-top: 0.75rem;
+            color: #ff9a93;
+            font-size: 0.87rem;
+        }
+
+        /* Overview table */
+        .ov-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .ov-table th {
+            background: rgba(251,191,36,0.12);
+            color: #fbbf24;
+            font-weight: 700;
+            padding: 0.6rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(251,191,36,0.22);
+        }
+        .ov-table td {
+            padding: 0.55rem 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(230,230,235,0.78);
+            vertical-align: top;
+        }
+        .ov-table tr:hover td { background: rgba(255,255,255,0.025); }
+        .ov-table td:first-child { font-weight: 800; color: #fbbf24; white-space: nowrap; }
+        .multi { color: #79b8ff; font-size: 0.78rem; font-weight: 700; }
+
+        /* Quiz */
+        .quiz-q {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-q p { font-weight: 600; color: #e2e8f0; margin-bottom: 0.7rem; font-size: 0.95rem; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 0.4rem; }
+        .quiz-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            color: rgba(230,230,235,0.78);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+        }
+        .quiz-btn:hover { border-color: rgba(251,191,36,0.4); color:#fff; background:rgba(251,191,36,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15);  border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.45rem; min-height:1.2em; }
+        .quiz-score-box {
+            background: rgba(251,191,36,0.09);
+            border: 1px solid rgba(251,191,36,0.28);
+            border-radius: 12px;
+            padding: 1rem 1.3rem;
+            margin-top: 1.2rem;
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.25);
+            border-radius: 50px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.82rem;
+            color: #ff7b72;
+            margin-bottom: 1.4rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/guitar.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verben mit „sagen"</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F5E3;&#xFE0F; Verben mit &bdquo;sagen&ldquo;</h1>
+            <p class="page-subtitle">absagen &bull; versagen &bull; zusagen &bull; untersagen &hellip; &mdash; 10 Verben B2/C1</p>
+        </div>
+
+        <div class="source-badge">
+            &#x25B6;&#xFE0F; Rieke &mdash; Verben mit &bdquo;sagen&ldquo;
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="showTab('tab-v','this',event)">&#x1F4D6; Verben</button>
+            <button class="tab-btn" onclick="showTab('tab-ov','this',event)">&#x26A1; &Uuml;bersicht</button>
+            <button class="tab-btn" onclick="showTab('tab-q','this',event)">&#x1F9E0; Quiz</button>
+        </div>
+
+        <!-- TAB: VERBEN -->
+        <div id="tab-v" class="tab-pane active">
+
+            <!-- 1. absagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">absagen</span>
+                    <span class="verb-num">01</span>
+                </div>
+                <div class="verb-ua">скасовувати (захід або зустріч, яка була запланована)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Erik hat seine Geburtstagsparty abgesagt."
+                                <div class="ex-ua">Ерік скасував свою вечірку на день народження.</div>
+                            </div>
+                            <div class="verb-ex">„Ich muss leider meinen Termin absagen."
+                                <div class="ex-ua">Мені на жаль доводиться скасувати свій прийом.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">Протилежне: <strong>zusagen</strong> (підтвердити участь)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ansagen / durchsagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">ansagen</span>
+                    <span style="color:rgba(230,230,235,0.3); font-size:1.1rem;">/</span>
+                    <span class="verb-title">durchsagen</span>
+                    <span class="verb-num">02</span>
+                </div>
+                <div class="verb-ua">оголошувати (по гучномовцю, на радіо, перед концертом)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Der Radiomoderator hat das n&auml;chste Lied angesagt."
+                                <div class="ex-ua">Радіоведучий оголосив наступну пісню.</div>
+                            </div>
+                            <div class="verb-ex">„Es wurde angesagt, dass der Zug 60 Minuten Versp&auml;tung hat."
+                                <div class="ex-ua">Було оголошено, що потяг запізнюється на 60 хвилин.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">= <strong>durchsagen</strong> — те саме значення</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. aufsagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">aufsagen</span>
+                    <span class="verb-num">03</span>
+                </div>
+                <div class="verb-ua">відтворювати напам'ять (вірш, таблицю множення — без емоцій, просто повторюєш завчене)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Als Kind musste ich an Weihnachten immer ein Gedicht aufsagen."
+                                <div class="ex-ua">В дитинстві я завжди мав декламувати вірш на Різдво.</div>
+                            </div>
+                            <div class="verb-ex">„Ich habe die Achterreihe aufgesagt."
+                                <div class="ex-ua">Я відтворив таблицю множення на 8.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. dahinsagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">dahinsagen</span>
+                    <span class="verb-num">04</span>
+                </div>
+                <div class="verb-ua">говорити необдумано, «так просто сказати» — не всерйоз</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Das war nur so dahingesagt."
+                                <div class="ex-ua">Я це просто так сказав — не варто сприймати серйозно.</div>
+                            </div>
+                            <div class="verb-ex">„Nimm das nicht so ernst &mdash; das hat er nur so dahingesagt."
+                                <div class="ex-ua">Не бери так близько до серця — він просто ляпнув, не думаючи.</div>
+                            </div>
+                        </div>
+                        <div class="verb-warn">
+                            <span>⚠️</span>
+                            <span>Завжди у виразі: <strong>nur so dahinsagen</strong> / <strong>dahingesagt</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. aussagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">aussagen</span>
+                    <span class="verb-num">05</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① виражати, свідчити про щось &nbsp;|&nbsp; ② давати свідчення (у поліції, суді)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">① виражати / говорити про щось</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Julias Antwort sagt viel &uuml;ber ihren Charakter aus."
+                                <div class="ex-ua">Відповідь Юлії багато говорить про її характер.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">= <strong>ausdrücken</strong> / <strong>erkennen lassen</strong></div>
+                    </div>
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">② давати свідчення</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Der Zeuge hat ausgesagt, dass..."
+                                <div class="ex-ua">Свідок показав, що...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. nachsagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">nachsagen</span>
+                    <span class="verb-num">06</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① повторювати за кимось &nbsp;|&nbsp; ② стверджувати щось про когось (чутка)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">① повторювати (як папуга)</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Felix hat einen Papagei, der ihm alles nachsagt."
+                                <div class="ex-ua">У Фелікса є папуга, який повторює за ним все.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">② говорять / кажуть про когось</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Dem Schauspieler wird Arroganz nachgesagt."
+                                <div class="ex-ua">Говорять, що цей актор зарозумілий. (може бути правдою або ні)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. totsagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">totsagen</span>
+                    <span class="verb-num">07</span>
+                </div>
+                <div class="verb-ua">стверджувати, що щось вже мертве / не актуальне — але насправді це не так</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Schallplatten waren lange totgesagt, doch sie leben immer noch."
+                                <div class="ex-ua">Про вінілові платівки давно говорили, що їм кінець — але вони й досі живуть.</div>
+                            </div>
+                            <div class="verb-ex">„Facebook wird gern totgesagt."
+                                <div class="ex-ua">Facebook люблять оголошувати мертвим. (але він живе)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. untersagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">untersagen</span>
+                    <span class="verb-num">08</span>
+                </div>
+                <div class="verb-ua">забороняти (офіційно, піднесений стиль)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Das Betreten der Baustelle ist strengstens untersagt."
+                                <div class="ex-ua">Вхід на будівельний майданчик суворо заборонено.</div>
+                            </div>
+                            <div class="verb-ex">„Das Parken ist hier untersagt."
+                                <div class="ex-ua">Парковка тут заборонена.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">= <strong>verbieten</strong> — але офіційніше, більш піднесено</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. versagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">versagen</span>
+                    <span class="verb-num">09</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① провалитися, не досягти мети &nbsp;|&nbsp; ② раптово перестати працювати (техніка, органи)</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">① провалитися</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Lars hat bei der Abschlusspr&uuml;fung versagt."
+                                <div class="ex-ua">Ларс провалив випускний іспит.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">= <strong>scheitern</strong></div>
+                    </div>
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">② перестати функціонувати</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Die Bremsen haben versagt."
+                                <div class="ex-ua">Гальма відмовили.</div>
+                            </div>
+                            <div class="verb-ex">„Sein Herz hat versagt."
+                                <div class="ex-ua">Його серце зупинилося.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. zusagen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">zusagen</span>
+                    <span class="verb-num">10</span>
+                    <span class="multi">3 значення</span>
+                </div>
+                <div class="verb-ua">① підтвердити участь &nbsp;|&nbsp; ② обіцяти офіційно &nbsp;|&nbsp; ③ подобатися</div>
+                <div class="verb-meanings">
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">① підтвердити участь</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Ich habe fest zugesagt."
+                                <div class="ex-ua">Я точно підтвердив, що прийду. (≠ absagen)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">② обіцяти офіційно (у ЗМІ, політиці)</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Die US-Regierung hat der Ukraine Waffen zugesagt."
+                                <div class="ex-ua">Уряд США пообіцяв Україні зброю.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="verb-meaning">
+                        <div class="verb-meaning-label">③ подобатися (піднесений синонім gefallen)</div>
+                        <div class="verb-examples">
+                            <div class="verb-ex">„Dieses Buch sagt mir nicht zu."
+                                <div class="ex-ua">Ця книга мені не подобається.</div>
+                            </div>
+                        </div>
+                        <div class="verb-syn">= <strong>gefallen</strong> — але більш піднесено</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-v -->
+
+        <!-- TAB: ÜBERSICHT -->
+        <div id="tab-ov" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Всі 10 дієслів одним поглядом:</p>
+            <div style="overflow-x:auto;">
+            <table class="ov-table">
+                <tr>
+                    <th>#</th>
+                    <th>Дієслово</th>
+                    <th>Значення</th>
+                    <th>Синонім / Нотатка</th>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">01</td>
+                    <td>absagen</td>
+                    <td>скасовувати (заплановане)</td>
+                    <td>≠ zusagen</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">02</td>
+                    <td>ansagen / durchsagen</td>
+                    <td>оголошувати (радіо, гучномовець)</td>
+                    <td>= однакові</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">03</td>
+                    <td>aufsagen</td>
+                    <td>відтворювати напам'ять</td>
+                    <td>вірш, таблиця</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">04</td>
+                    <td>dahinsagen</td>
+                    <td>сказати не думаючи, просто так</td>
+                    <td>nur so dahingesagt</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">05</td>
+                    <td>aussagen</td>
+                    <td>① виражати ② давати свідчення</td>
+                    <td>= ausdrücken / суд</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">06</td>
+                    <td>nachsagen</td>
+                    <td>① повторювати ② говорять про когось</td>
+                    <td>папуга / чутка</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">07</td>
+                    <td>totsagen</td>
+                    <td>говорити, що щось вже «мертве»</td>
+                    <td>але насправді живе!</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">08</td>
+                    <td>untersagen</td>
+                    <td>забороняти (офіційно)</td>
+                    <td>= verbieten (піднесено)</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">09</td>
+                    <td>versagen</td>
+                    <td>① провалитися ② відмовити (техніка)</td>
+                    <td>= scheitern</td>
+                </tr>
+                <tr>
+                    <td style="color:rgba(230,230,235,0.3); font-size:0.8rem;">10</td>
+                    <td>zusagen</td>
+                    <td>① підтвердити ② обіцяти ③ подобатися</td>
+                    <td>= gefallen (③)</td>
+                </tr>
+            </table>
+            </div>
+
+            <div class="note-card" style="margin-top:1.8rem; background:rgba(251,191,36,0.06); border-color:rgba(251,191,36,0.2);">
+                <h3 style="color:#fbbf24;">&#x1F9E9; Пари, які легко плутати</h3>
+                <div style="display:flex; flex-direction:column; gap:0.7rem; margin-top:0.7rem; font-size:0.91rem; color:rgba(230,230,235,0.75); line-height:1.6;">
+                    <div>&#x1F538; <strong style="color:#fbbf24;">absagen</strong> ↔ <strong style="color:#fbbf24;">zusagen</strong> — скасувати ↔ підтвердити участь</div>
+                    <div>&#x1F538; <strong style="color:#fbbf24;">ansagen</strong> = <strong style="color:#fbbf24;">durchsagen</strong> — однакові значення (оголошувати)</div>
+                    <div>&#x1F538; <strong style="color:#fbbf24;">untersagen</strong> = <strong style="color:#fbbf24;">verbieten</strong> — але untersagen офіційніше</div>
+                    <div>&#x1F538; <strong style="color:#fbbf24;">versagen</strong> — увага: «versagen» ≠ «sagen» — цілком інше значення!</div>
+                    <div>&#x1F538; <strong style="color:#fbbf24;">zusagen</strong> (③) = подобатися — не плутай з gefallen: „Das sagt mir zu" = „Das gefällt mir"</div>
+                </div>
+            </div>
+        </div><!-- /tab-ov -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-q" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Вибери правильне дієслово або значення:</p>
+
+            <div class="quiz-q" data-answer="b">
+                <p>1. Erik hat seine Party ___. — Ерік <em>скасував</em> вечірку.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'b','1')">a) zugesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','1')">b) abgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','1')">c) ausgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','1')">d) nachgesagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf1"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>2. „Die Bremsen haben ___." — гальма <em>відмовили</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'c','2')">a) abgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','2')">b) untersagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','2')">c) versagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','2')">d) totgesagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf2"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>3. „Das Betreten der Baustelle ist ___." — вхід <em>заборонено</em> (офіційно)</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'a','3')">a) untersagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','3')">b) abgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','3')">c) versagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','3')">d) dahingasagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf3"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>4. „Das war nur so ___." — я це <em>просто так ляпнув</em>, не всерйоз</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'d','4')">a) aufgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','4')">b) nachgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','4')">c) ausgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','4')">d) dahingesagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf4"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>5. „Ich habe fest ___." — я <em>підтвердив</em>, що прийду.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'b','5')">a) abgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','5')">b) zugesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','5')">c) aufgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','5')">d) angesagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf5"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>6. „Schallplatten wurden lange ___." — про них <em>говорили, що вони мертві</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'c','6')">a) abgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','6')">b) untersagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','6')">c) totgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','6')">d) nachgesagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf6"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>7. „Julias Antwort sagt viel über ihren Charakter ___." — яке дієслово тут?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'a','7')">a) aussagen — виражати, свідчити про щось</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','7')">b) nachsagen — говорять про когось</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','7')">c) ansagen — оголошувати</button>
+                    <button class="quiz-btn" onclick="checkS(this,'a','7')">d) aufsagen — відтворювати напам'ять</button>
+                </div>
+                <div class="quiz-feedback" id="sf7"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>8. „Dieses Buch sagt mir nicht zu." — це означає:</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'d','8')">a) Я не читав цю книгу.</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','8')">b) Я підтвердив, що прочитаю книгу.</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','8')">c) Книга мені ще не сказала нічого.</button>
+                    <button class="quiz-btn" onclick="checkS(this,'d','8')">d) Ця книга мені не подобається.</button>
+                </div>
+                <div class="quiz-feedback" id="sf8"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>9. Яке дієслово означає «<em>відтворити напам'ять</em>» (вірш, таблицю множення)?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'b','9')">a) ansagen</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','9')">b) aufsagen</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','9')">c) nachsagen</button>
+                    <button class="quiz-btn" onclick="checkS(this,'b','9')">d) dahinsagen</button>
+                </div>
+                <div class="quiz-feedback" id="sf9"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>10. „Dem Schauspieler wird Arroganz ___." — <em>говорять</em>, що він зарозумілий.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkS(this,'c','10')">a) ausgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','10')">b) totgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','10')">c) nachgesagt</button>
+                    <button class="quiz-btn" onclick="checkS(this,'c','10')">d) untersagt</button>
+                </div>
+                <div class="quiz-feedback" id="sf10"></div>
+            </div>
+
+            <div class="quiz-score-box" id="sscore" style="display:none;"></div>
+        </div><!-- /tab-q -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        function showTab(id, _, e) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            e.currentTarget.classList.add('active');
+        }
+
+        var sScore = 0, sTotal = 0, sMax = 10;
+
+        function checkS(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            sTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('sf' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                sScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (sTotal === sMax) {
+                var box = document.getElementById('sscore');
+                box.style.display = 'block';
+                box.textContent = '🗣️ Результат: ' + sScore + ' / ' + sMax + (sScore >= 9 ? ' — відмінно!' : sScore >= 7 ? ' — непогано!' : ' — повтори дієслова!');
+            }
+        }
+
+        // Fix tab switching — use event delegation
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verben mit „lassen" | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .tab-bar { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(52,211,153,0.5); color:#fff; }
+        .tab-btn.active { background:rgba(52,211,153,0.15); border-color:#34d399; color:#fff; }
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; }
+
+        /* Verb cards */
+        .verb-card {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        .verb-card:hover { border-color: rgba(52,211,153,0.3); }
+
+        .verb-head { display:flex; align-items:baseline; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.25rem; }
+        .verb-title { font-size:1.4rem; font-weight:900; color:#34d399; }
+        .verb-num {
+            font-size:0.72rem; font-weight:700;
+            background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.25);
+            border-radius:50px; padding:0.15rem 0.6rem; color:#34d399;
+        }
+        .verb-tag {
+            font-size:0.72rem; font-weight:700;
+            background:rgba(248,81,73,0.1); border:1px solid rgba(248,81,73,0.25);
+            border-radius:50px; padding:0.15rem 0.65rem; color:#ff9a93;
+        }
+        .multi { color:#79b8ff; font-size:0.78rem; font-weight:700; }
+
+        .verb-ua { color:rgba(230,230,235,0.6); font-size:0.93rem; margin:0.25rem 0 0.85rem; line-height:1.5; }
+
+        .verb-meaning {
+            border-left:3px solid rgba(52,211,153,0.35);
+            padding-left:0.9rem;
+            margin-bottom:0.7rem;
+        }
+        .verb-meaning-label {
+            font-size:0.78rem; font-weight:700; color:rgba(52,211,153,0.7);
+            text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.4rem;
+        }
+        .verb-examples { display:flex; flex-direction:column; gap:0.4rem; }
+        .verb-ex {
+            background:rgba(52,211,153,0.06); border-radius:8px;
+            padding:0.5rem 0.85rem; font-style:italic;
+            color:rgba(230,230,235,0.82); font-size:0.9rem;
+        }
+        .verb-ex .ex-ua {
+            font-style:normal; color:rgba(230,230,235,0.42); font-size:0.83rem; margin-top:0.2rem;
+        }
+        .verb-syn { font-size:0.8rem; color:rgba(230,230,235,0.45); margin-top:0.35rem; }
+        .verb-syn strong { color:#86efac; }
+        .verb-warn {
+            display:flex; gap:0.5rem;
+            background:rgba(248,81,73,0.07); border:1px solid rgba(248,81,73,0.22);
+            border-radius:9px; padding:0.55rem 0.85rem; margin-top:0.75rem;
+            color:#ff9a93; font-size:0.87rem;
+        }
+        .verb-tip {
+            display:flex; gap:0.5rem;
+            background:rgba(52,211,153,0.07); border:1px solid rgba(52,211,153,0.2);
+            border-radius:9px; padding:0.55rem 0.85rem; margin-top:0.75rem;
+            color:#86efac; font-size:0.87rem;
+        }
+
+        /* Table */
+        .ov-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+        .ov-table th {
+            background:rgba(52,211,153,0.1); color:#34d399; font-weight:700;
+            padding:0.6rem 0.9rem; text-align:left;
+            border-bottom:1px solid rgba(52,211,153,0.2);
+        }
+        .ov-table td {
+            padding:0.55rem 0.9rem; border-bottom:1px solid rgba(255,255,255,0.05);
+            color:rgba(230,230,235,0.78); vertical-align:top;
+        }
+        .ov-table tr:hover td { background:rgba(255,255,255,0.025); }
+        .ov-table td:first-child { font-weight:800; color:#34d399; white-space:nowrap; }
+
+        /* Quiz */
+        .quiz-q {
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            border-radius:14px; padding:1.1rem 1.3rem; margin-bottom:1rem;
+        }
+        .quiz-q p { font-weight:600; color:#e2e8f0; margin-bottom:0.7rem; font-size:0.95rem; }
+        .quiz-opts { display:flex; flex-direction:column; gap:0.4rem; }
+        .quiz-btn {
+            background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.09);
+            border-radius:8px; padding:0.6rem 1rem; color:rgba(230,230,235,0.78);
+            font-size:0.9rem; cursor:pointer; text-align:left; transition:all 0.18s;
+        }
+        .quiz-btn:hover { border-color:rgba(52,211,153,0.4); color:#fff; background:rgba(52,211,153,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15); border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.45rem; min-height:1.2em; }
+        .quiz-score-box {
+            background:rgba(52,211,153,0.09); border:1px solid rgba(52,211,153,0.28);
+            border-radius:12px; padding:1rem 1.3rem; margin-top:1.2rem;
+            color:#34d399; font-weight:700; font-size:1rem;
+        }
+        .source-badge {
+            display:inline-flex; align-items:center; gap:0.4rem;
+            background:rgba(255,0,0,0.1); border:1px solid rgba(255,0,0,0.25);
+            border-radius:50px; padding:0.3rem 0.9rem;
+            font-size:0.82rem; color:#ff7b72; margin-bottom:1.4rem;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/flowers.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verben mit &bdquo;lassen&ldquo;</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F511; Verben mit &bdquo;lassen&ldquo;</h1>
+            <p class="page-subtitle">kaltlassen &bull; auslassen &bull; erlassen &bull; veranlassen &hellip; &mdash; 10 Verben B2/C1</p>
+        </div>
+
+        <div class="source-badge">&#x25B6;&#xFE0F; Rieke &mdash; Verben mit &bdquo;lassen&ldquo;</div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="tab-v">&#x1F4D6; Verben</button>
+            <button class="tab-btn" data-tab="tab-ov">&#x26A1; &Uuml;bersicht</button>
+            <button class="tab-btn" data-tab="tab-q">&#x1F9E0; Quiz</button>
+        </div>
+
+        <!-- TAB: VERBEN -->
+        <div id="tab-v" class="tab-pane active">
+
+            <!-- 1. kaltlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">kaltlassen</span>
+                    <span class="verb-num">01</span>
+                    <span class="verb-tag">розмовне</span>
+                </div>
+                <div class="verb-ua">не вражати, залишати байдужим</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Das l&auml;sst mich kalt."
+                            <div class="ex-ua">Мені байдуже. Мене це не зачіпає.</div>
+                        </div>
+                        <div class="verb-ex">„Die Kritik seiner Konkurrenten l&auml;sst ihn kalt."
+                            <div class="ex-ua">Критика конкурентів його не чіпає.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. nachlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">nachlassen</span>
+                    <span class="verb-num">02</span>
+                </div>
+                <div class="verb-ua">слабшати, зменшуватись (поступово стає менш інтенсивним)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Der Regen hat nachgelassen."
+                            <div class="ex-ua">Дощ вщух.</div>
+                        </div>
+                        <div class="verb-ex">„Theresa hat in den letzten Monaten stark nachgelassen."
+                            <div class="ex-ua">За останні місяці якість її роботи значно погіршилась.</div>
+                        </div>
+                        <div class="verb-ex">„Die Wirkung des Medikaments l&auml;sst nach."
+                            <div class="ex-ua">Дія ліків зменшується.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. stehenlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">stehenlassen</span>
+                    <span class="verb-num">03</span>
+                    <span class="multi">4 значення</span>
+                </div>
+                <div class="verb-ua">залишати стояти &bull; забути &bull; не погоджуватись &bull; відрощувати бороду</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① не прибирати, залишати стояти</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Mein Mitbewohner l&auml;sst nach dem Kochen immer sein Geschirr stehen."
+                            <div class="ex-ua">Мій сусід завжди залишає посуд після готування.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② забути (річ десь)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Ich habe meinen Schirm im Bus stehenlassen."
+                            <div class="ex-ua">Я забув парасолю в автобусі.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">③ не погоджуватись з твердженням</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Das kann ich so nicht stehenlassen."
+                            <div class="ex-ua">Я не можу це так залишити — треба виправити / я з цим не згоден.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">④ відрощувати бороду</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Martin hat sich einen Drei-Tage-Bart stehenlassen."
+                            <div class="ex-ua">Мартін відростив триденну щетину.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. sitzenlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">sitzenlassen</span>
+                    <span class="verb-num">04</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① кидати партнера &nbsp;|&nbsp; ② не дозволяти образі залишитись без відповіді</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① кидати (кохану людину)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er hat seine Freundin nach drei Jahren sitzenlassen."
+                            <div class="ex-ua">Він кинув свою дівчину після трьох років стосунків.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② nicht auf sich sitzen lassen — не змовчувати на образу</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Wenn dich jemand beleidigt, darfst du das nicht auf dir sitzen lassen."
+                            <div class="ex-ua">Якщо хтось тебе образив — не можна промовчати.</div>
+                        </div>
+                        <div class="verb-ex">„Wir lagen 0:1 hinten &mdash; das konnten wir nicht auf uns sitzen lassen."
+                            <div class="ex-ua">Ми програвали 0:1 — ми не могли з цим змиритись.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. vorlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">vorlassen</span>
+                    <span class="verb-num">05</span>
+                </div>
+                <div class="verb-ua">пропускати когось вперед (у черзі, в магазині)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er hat mich an der Kasse vorgelassen."
+                            <div class="ex-ua">Він пропустив мене на касі.</div>
+                        </div>
+                        <div class="verb-ex">„Wollen Sie vorgehen?" / „Gehen Sie ruhig vor!"
+                            <div class="ex-ua">Хочете пройти першим? / Проходьте, будь ласка!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. erlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">erlassen</span>
+                    <span class="verb-num">06</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① офіційно видавати (закон, ордер) &nbsp;|&nbsp; ② скасовувати борг або покарання</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① видавати (закон, постанову, ордер)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Der Staat erl&auml;sst ein neues Gesetz."
+                            <div class="ex-ua">Держава видає новий закон.</div>
+                        </div>
+                        <div class="verb-ex">„Haftbefehl gegen Drogenhändler erlassen."
+                            <div class="ex-ua">Видати ордер на арешт торговця наркотиками.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② пробачити борг / скасувати покарання</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Biden will Studenten 10.000 Dollar Schulden erlassen."
+                            <div class="ex-ua">Байден хоче списати студентам борги на 10 000 доларів.</div>
+                        </div>
+                        <div class="verb-ex">„Die H&auml;lfte der Strafe wurde ihm erlassen."
+                            <div class="ex-ua">Йому скасували половину покарання.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. auslassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">auslassen</span>
+                    <span class="verb-num">07</span>
+                    <span class="multi">4 значення</span>
+                </div>
+                <div class="verb-ua">пропускати &bull; вимикати &bull; зривати злість &bull; довго говорити про когось</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① пропускати, не робити (звичне або одне з ряду)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Ich lasse heute mein Fr&uuml;hst&uuml;ck aus."
+                            <div class="ex-ua">Сьогодні я пропускаю сніданок.</div>
+                        </div>
+                        <div class="verb-ex">„Bei der Pr&uuml;fung habe ich die dritte Frage ausgelassen."
+                            <div class="ex-ua">На іспиті я пропустила третє питання.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② вимикати і не вмикати певний час</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„W&auml;hrend ich arbeite, lasse ich mein Handy aus."
+                            <div class="ex-ua">Поки я працюю, я тримаю телефон вимкненим.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">③ зривати злість на невинному</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Julia hat ihren &Auml;rger &uuml;ber die Kollegen an ihrem Freund ausgelassen."
+                            <div class="ex-ua">Юлія зірвала злість на хлопцеві через ситуацію з колегами.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">④ sich über jmd. auslassen — довго негативно говорити про когось</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Michael hat sich eine halbe Stunde &uuml;ber seine Schwiegermutter ausgelassen."
+                            <div class="ex-ua">Міхаель півгодини «виливав душу» про свою тещу.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. unterlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">unterlassen</span>
+                    <span class="verb-num">08</span>
+                    <span class="verb-tag">офіційно</span>
+                </div>
+                <div class="verb-ua">утримуватись від дії, припиняти щось робити</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Bitte unterlassen Sie es, im Kino zu rauchen."
+                            <div class="ex-ua">Будь ласка, утримайтесь від куріння в кінотеатрі.</div>
+                        </div>
+                        <div class="verb-ex">„Wir bitten, das Fotografieren zu unterlassen."
+                            <div class="ex-ua">Просимо утриматись від фотографування.</div>
+                        </div>
+                    </div>
+                    <div class="verb-tip">
+                        <span>⚖️</span>
+                        <span><strong>unterlassene Hilfeleistung</strong> — ненадання допомоги (кримінальна відповідальність в Німеччині)</span>
+                    </div>
+                    <div class="verb-syn">= <strong>nicht tun</strong> — але офіційно, письмово</div>
+                </div>
+            </div>
+
+            <!-- 9. sein lassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">sein&nbsp;lassen</span>
+                    <span class="verb-num">09</span>
+                    <span class="verb-tag">розмовне</span>
+                </div>
+                <div class="verb-ua">припиняти щось робити (= unterlassen, але неформально)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Lass das Rauchen sein!"
+                            <div class="ex-ua">Кинь курити!</div>
+                        </div>
+                        <div class="verb-ex">„Lass das sein!"
+                            <div class="ex-ua">Припини це! / Не роби цього!</div>
+                        </div>
+                    </div>
+                    <div class="verb-syn">= <strong>unterlassen</strong> — але дуже розмовне</div>
+                </div>
+            </div>
+
+            <!-- 10. veranlassen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">veranlassen</span>
+                    <span class="verb-num">10</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① доручати, організовувати &nbsp;|&nbsp; ② спонукати когось до чогось</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① доручати (сам не робиш — даєш завдання)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Frau Becker, veranlassen Sie bitte, dass unser Kunde die Rechnung erh&auml;lt."
+                            <div class="ex-ua">Пані Беккер, подбайте, будь ласка, щоб клієнт отримав рахунок.</div>
+                        </div>
+                        <div class="verb-ex">„Ich habe veranlasst, dass morgen frische Blumen im B&uuml;ro stehen."
+                            <div class="ex-ua">Я організував, щоб завтра в офісі були свіжі квіти.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② jmd. zu etwas veranlassen — спонукати, мотивувати</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Was hat dich dazu veranlasst, Deutsch zu lernen?"
+                            <div class="ex-ua">Що спонукало тебе вивчати німецьку?</div>
+                        </div>
+                        <div class="verb-ex">„Meine Liebe zu Tieren hat mich dazu veranlasst, den Beruf zu wechseln."
+                            <div class="ex-ua">Любов до тварин спонукала мене змінити професію.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-v -->
+
+        <!-- TAB: ÜBERSICHT -->
+        <div id="tab-ov" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Всі 10 дієслів одним поглядом:</p>
+            <div style="overflow-x:auto;">
+            <table class="ov-table">
+                <tr><th>#</th><th>Дієслово</th><th>Значення</th><th>Нотатка</th></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">01</td><td>kaltlassen</td><td>не вражати, бути байдужим</td><td>розмовне</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">02</td><td>nachlassen</td><td>слабшати, зменшуватись</td><td>дощ, ліки, якість</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">03</td><td>stehenlassen</td><td>① не прибрати ② забути ③ не погодитись ④ відростити</td><td>4 значення!</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">04</td><td>sitzenlassen</td><td>① кинути партнера ② не змовчати на образу</td><td>nicht auf sich ~</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">05</td><td>vorlassen</td><td>пропустити вперед у черзі</td><td>–</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">06</td><td>erlassen</td><td>① видати закон ② списати борг</td><td>офіційно</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">07</td><td>auslassen</td><td>① пропустити ② вимкнути ③ зірвати злість ④ говорити про когось</td><td>4 значення!</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">08</td><td>unterlassen</td><td>утримуватись від дії</td><td>офіційно = nicht tun</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">09</td><td>sein lassen</td><td>припинити щось</td><td>розмовне = unterlassen</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">10</td><td>veranlassen</td><td>① доручити ② спонукати</td><td>офіційно</td></tr>
+            </table>
+            </div>
+
+            <div class="note-card" style="margin-top:1.8rem; background:rgba(52,211,153,0.05); border-color:rgba(52,211,153,0.2);">
+                <h3 style="color:#34d399;">&#x1F9E9; Важливі пари</h3>
+                <div style="display:flex; flex-direction:column; gap:0.7rem; margin-top:0.7rem; font-size:0.91rem; color:rgba(230,230,235,0.75); line-height:1.6;">
+                    <div>&#x1F538; <strong style="color:#34d399;">unterlassen</strong> = <strong style="color:#34d399;">sein lassen</strong> — різниця лише в реєстрі: офіційне vs розмовне</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">stehenlassen</strong> та <strong style="color:#34d399;">auslassen</strong> — по 4 значення, вчи окремо кожне!</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">sitzenlassen</strong> (② nicht auf sich ~) — стійкий вираз, не можна перефразувати</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">erlassen</strong> ① vs ② — те саме слово: видати закон ↔ списати борг (протилежні за змістом!)</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">kaltlassen</strong> — пишеться разом, тільки розмовне: „Das lässt mich kalt."</div>
+                </div>
+            </div>
+        </div><!-- /tab-ov -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-q" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Вибери правильне дієслово або значення:</p>
+
+            <div class="quiz-q" data-answer="c">
+                <p>1. „Der Regen hat ___." — дощ <em>вщух</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'c','1')">a) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','1')">b) kaltgelassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','1')">c) nachgelassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','1')">d) ausgelassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf1"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>2. „Das l&auml;sst mich ___." — мені <em>байдуже</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'a','2')">a) kalt</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','2')">b) nach</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','2')">c) aus</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','2')">d) vor</button>
+                </div>
+                <div class="quiz-feedback" id="lf2"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>3. „Julia hat ihren Ärger an ihrem Freund ___." — <em>зірвала злість</em> на хлопцеві.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'b','3')">a) nachgelassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','3')">b) ausgelassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','3')">c) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','3')">d) unterlassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf3"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>4. „Er hat mich an der Kasse ___." — він <em>пропустив мене</em> на касі.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'d','4')">a) sitzenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','4')">b) erlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','4')">c) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','4')">d) vorgelassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf4"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>5. „Bitte ___ Sie es, im Kino zu rauchen." — <em>утримайтесь</em> від куріння (офіційно).</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'a','5')">a) unterlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','5')">b) auslassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','5')">c) nachlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','5')">d) vorlassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf5"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>6. „Das kann ich so nicht ___." — <em>я з цим не згоден</em>, треба виправити.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'c','6')">a) sitzenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','6')">b) sein lassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','6')">c) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','6')">d) erlassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf6"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>7. „Biden will Studenten 10.000 Dollar Schulden ___." — <em>списати борги</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'b','7')">a) nachlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','7')">b) erlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','7')">c) unterlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'b','7')">d) veranlassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf7"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>8. „Was hat dich dazu ___, Deutsch zu lernen?" — що <em>спонукало</em> тебе?</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'d','8')">a) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','8')">b) unterlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','8')">c) erlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'d','8')">d) veranlasst</button>
+                </div>
+                <div class="quiz-feedback" id="lf8"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>9. „Er hat seine Freundin nach drei Jahren ___." — він її <em>кинув</em>.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'a','9')">a) sitzenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','9')">b) stehenlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','9')">c) nachlassen</button>
+                    <button class="quiz-btn" onclick="checkL(this,'a','9')">d) kaltgelassen</button>
+                </div>
+                <div class="quiz-feedback" id="lf9"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>10. „Lass das ___!" — <em>припини це!</em> (розмовне = unterlassen)</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkL(this,'c','10')">a) nach</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','10')">b) aus</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','10')">c) sein</button>
+                    <button class="quiz-btn" onclick="checkL(this,'c','10')">d) vor</button>
+                </div>
+                <div class="quiz-feedback" id="lf10"></div>
+            </div>
+
+            <div class="quiz-score-box" id="lscore" style="display:none;"></div>
+        </div><!-- /tab-q -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.tab;
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                this.classList.add('active');
+            });
+        });
+
+        var lScore = 0, lTotal = 0, lMax = 10;
+
+        function checkL(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            lTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('lf' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                lScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (lTotal === lMax) {
+                var box = document.getElementById('lscore');
+                box.style.display = 'block';
+                box.textContent = '🔑 Результат: ' + lScore + ' / ' + lMax + (lScore >= 9 ? ' — відмінно!' : lScore >= 7 ? ' — непогано!' : ' — повтори дієслова!');
+            }
+        }
+    </script>
+</body>
+</html>
