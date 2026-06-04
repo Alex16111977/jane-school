@@ -6,90 +6,301 @@
     <title>NeoStudy</title>
     <link rel="stylesheet" href="css/style.css?v=10">
     <style>
-        /* ── Collapsible guide cards ── */
-        .gcard { background: var(--color-bg-card, rgba(22,14,30,0.85)); border: 1px solid rgba(244,114,182,0.15); border-radius: 14px; overflow: hidden; cursor: pointer; transition: border-color 0.25s, box-shadow 0.25s; }
-        .gcard:hover { box-shadow: 0 4px 20px rgba(244,114,182,0.1); }
-        .gcard.open { border-color: rgba(244,114,182,0.35); }
-        .gcard-header { display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.1rem; user-select: none; }
-        .gcard-emoji { font-size: 1.55rem; flex-shrink: 0; line-height: 1; }
-        .gcard-title { font-size: 0.93rem; font-weight: 700; color: var(--color-text, #f0eaf8); }
-        .gcard-sub { font-size: 0.76rem; color: rgba(220,200,235,0.38); margin-top: 0.12rem; }
-        .gcard-arrow { margin-left: auto; color: rgba(244,114,182,0.4); font-size: 1rem; transition: transform 0.3s ease; flex-shrink: 0; }
-        .gcard.open .gcard-arrow { transform: rotate(90deg); color: rgba(244,114,182,0.8); }
-        .gcard-body { max-height: 0; overflow: hidden; transition: max-height 0.42s ease, padding 0.3s ease; padding: 0 1.2rem; }
-        .gcard.open .gcard-body { max-height: 600px; padding-bottom: 1.3rem; }
-        .gcard-body p { font-size: 0.87rem; color: rgba(230,210,245,0.75); line-height: 1.65; margin: 0.5rem 0; }
-        .gcard-body p:first-child { margin-top: 0; }
-        .gcard-tip { display: inline-flex; align-items: flex-start; gap: 0.5rem; background: rgba(244,114,182,0.08); border-radius: 9px; padding: 0.55rem 0.85rem; font-size: 0.83rem; color: rgba(240,210,240,0.9); margin-top: 0.65rem; font-weight: 600; line-height: 1.5; }
-        .grule { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.055); }
-        .grule:last-child { border-bottom: none; padding-bottom: 0; }
-        .grule-num { font-size: 0.78rem; font-weight: 800; color: #f472b6; flex-shrink: 0; width: 1.5rem; padding-top: 0.15rem; letter-spacing: 0.02em; }
-        .grule-text { font-size: 0.87rem; color: rgba(230,210,245,0.78); line-height: 1.55; }
+        /* ── Google Fonts extra ── */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
 
-        /* ── Hero overrides ── */
-        .hero-content h1 { font-size: clamp(2.6rem, 6vw, 4rem); letter-spacing: -0.03em; }
-        .hero-content p { font-size: 1.05rem; color: rgba(240,210,235,0.6); font-style: italic; letter-spacing: 0.02em; }
+        /* ── Stars / particle hero ── */
+        .stars-layer {
+            position: absolute; inset: 0; overflow: hidden; z-index: 1;
+        }
+        .star {
+            position: absolute; background: #fff; border-radius: 50%;
+            animation: twinkle var(--d,4s) ease-in-out infinite var(--delay,0s);
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.4); }
+        }
+
+        /* ── Hero ── */
+        .hero-banner { min-height: 62vh; }
+        .hero-content h1 {
+            font-size: clamp(3rem, 9vw, 5.5rem);
+            letter-spacing: -0.035em;
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+        }
+        .hero-content p {
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            color: rgba(240,210,235,0.55);
+            font-style: italic; letter-spacing: 0.04em;
+        }
+        .hero-title-glow {
+            background: linear-gradient(135deg, #fff 10%, #f9a8d4 50%, #c084fc 90%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            filter: drop-shadow(0 0 40px rgba(244,114,182,0.35));
+        }
+        .hero-tagline {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin-top: 1.2rem; padding: 0.55rem 1.3rem;
+            background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.25);
+            border-radius: 30px; font-size: 0.82rem; font-weight: 700;
+            color: #f9a8d4; letter-spacing: 0.1em; text-transform: uppercase;
+            backdrop-filter: blur(8px);
+        }
+        .hero-tagline::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#f472b6; box-shadow:0 0 8px #f472b6; animation: pulse-dot 2s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.5} }
 
         /* ── Affirmation ── */
         .affirmation-section {
-            background: linear-gradient(90deg, rgba(244,114,182,0.08) 0%, rgba(192,132,252,0.1) 50%, rgba(244,114,182,0.08) 100%);
-            border-bottom: 1px solid rgba(244,114,182,0.15);
+            background: linear-gradient(90deg, rgba(244,114,182,0.07) 0%, rgba(192,132,252,0.11) 50%, rgba(244,114,182,0.07) 100%);
+            border-bottom: 1px solid rgba(244,114,182,0.14);
         }
         .affirmation-text { color: #f9a8d4 !important; font-family: 'Playfair Display', serif; font-style: italic; }
 
         /* ── Section headings ── */
-        .home-subjects h2 { letter-spacing: -0.01em; }
-
-        /* ── Subject cards ── */
-        .subject-card.glass-card:hover { border-color: rgba(244,114,182,0.5) !important; box-shadow: 0 8px 32px rgba(244,114,182,0.12) !important; }
-        .card-meta { border-top-color: rgba(244,114,182,0.12); }
-
-        /* ── Motivation cards ── */
-        .motivation-card.glass-card { border-color: rgba(244,114,182,0.2); }
-        .motivation-card.glass-card:hover { border-color: rgba(244,114,182,0.45); }
-        .motivation-emoji { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
-        .motivation-card p { font-style: italic; color: rgba(240,210,245,0.8); }
-
-        /* ── Photo row ── */
-        .photo-row {
-            display: flex;
-            gap: 8px;
-            padding: 14px 16px;
-            overflow-x: auto;
-            background: #080510;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+        .section-headline {
+            display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem;
         }
-        .photo-row::-webkit-scrollbar { display: none; }
-        .photo-row-item {
-            flex-shrink: 0;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: opacity 0.3s, transform 0.35s;
-        }
-        .photo-row-item:hover { opacity: 0.9; transform: scale(1.03); }
-        .photo-row-item img {
-            height: 140px;
-            width: auto;
-            display: block;
-            border-radius: 10px;
-        }
-
-        /* ── Subjects section heading decoration ── */
-        .subjects-heading {
-            display: flex; align-items: center; gap: 0.7rem;
-            margin-bottom: 1.4rem;
-        }
-        .subjects-heading h2 { margin: 0; }
-        .subjects-heading::after {
-            content: ''; flex: 1;
-            height: 1px;
+        .section-headline h2 { margin: 0; }
+        .section-headline::after {
+            content:''; flex:1; height:1px;
             background: linear-gradient(90deg, rgba(244,114,182,0.3), transparent);
         }
 
+        /* ── Subject / motivation cards ── */
+        .subject-card.glass-card:hover { border-color: rgba(244,114,182,0.5) !important; box-shadow: 0 8px 32px rgba(244,114,182,0.12) !important; }
+        .card-meta { border-top-color: rgba(244,114,182,0.12); }
+        .motivation-card.glass-card { border-color: rgba(244,114,182,0.18); }
+        .motivation-card.glass-card:hover { border-color: rgba(244,114,182,0.5); }
+        .motivation-emoji { font-size: 2.2rem; display:block; margin-bottom:0.5rem; }
+        .motivation-card p { font-style:italic; color:rgba(240,210,245,0.82); font-size:0.95rem; }
+
         /* ── Progress fill pink ── */
         .progress-fill { background: linear-gradient(90deg, #f472b6, #c084fc) !important; }
+
+        /* ── Photo row ── */
+        .photo-row {
+            display:flex; gap:10px; padding:16px 20px;
+            overflow-x:auto; background:linear-gradient(180deg,#0a0716 0%, #080510 60%);
+            scrollbar-width:none; -ms-overflow-style:none;
+        }
+        .photo-row::-webkit-scrollbar { display:none; }
+        .photo-row::before,.photo-row::after {
+            content:''; position:absolute; top:0; bottom:0; width:60px; pointer-events:none; z-index:2;
+        }
+        .photo-row-wrap { position:relative; }
+        .photo-row-wrap::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:60px;
+            background:linear-gradient(to right, #080510, transparent); z-index:2; pointer-events:none;
+        }
+        .photo-row-wrap::after {
+            content:''; position:absolute; right:0; top:0; bottom:0; width:60px;
+            background:linear-gradient(to left, #080510, transparent); z-index:2; pointer-events:none;
+        }
+        .photo-row-item {
+            flex-shrink:0; border-radius:14px; overflow:hidden; cursor:pointer;
+            transition:opacity 0.3s, transform 0.35s, box-shadow 0.35s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        .photo-row-item:hover { opacity:0.93; transform:scale(1.05) translateY(-4px); box-shadow:0 8px 28px rgba(244,114,182,0.2); }
+        .photo-row-item img { height:150px; width:auto; display:block; border-radius:14px; }
+
+        /* ── Collapsible guide cards ── */
+        .gcard { background: rgba(22,14,30,0.85); border:1px solid rgba(244,114,182,0.15); border-radius:14px; overflow:hidden; cursor:pointer; transition:border-color 0.25s, box-shadow 0.25s; }
+        .gcard:hover { box-shadow:0 4px 20px rgba(244,114,182,0.1); }
+        .gcard.open { border-color:rgba(244,114,182,0.4); }
+        .gcard-header { display:flex; align-items:center; gap:0.9rem; padding:1rem 1.1rem; user-select:none; }
+        .gcard-emoji { font-size:1.55rem; flex-shrink:0; line-height:1; }
+        .gcard-title { font-size:0.93rem; font-weight:700; color:#f0eaf8; }
+        .gcard-sub { font-size:0.76rem; color:rgba(220,200,235,0.38); margin-top:0.12rem; }
+        .gcard-arrow { margin-left:auto; color:rgba(244,114,182,0.4); font-size:1rem; transition:transform 0.3s ease; flex-shrink:0; }
+        .gcard.open .gcard-arrow { transform:rotate(90deg); color:rgba(244,114,182,0.85); }
+        .gcard-body { max-height:0; overflow:hidden; transition:max-height 0.42s ease, padding 0.3s ease; padding:0 1.2rem; }
+        .gcard.open .gcard-body { max-height:700px; padding-bottom:1.3rem; }
+        .gcard-body p { font-size:0.87rem; color:rgba(230,210,245,0.76); line-height:1.65; margin:0.5rem 0; }
+        .gcard-tip { display:inline-flex; align-items:flex-start; gap:0.5rem; background:rgba(244,114,182,0.09); border-radius:9px; padding:0.55rem 0.85rem; font-size:0.83rem; color:rgba(240,210,240,0.9); margin-top:0.65rem; font-weight:600; line-height:1.5; }
+        .grule { display:flex; align-items:flex-start; gap:0.8rem; padding:0.65rem 0; border-bottom:1px solid rgba(255,255,255,0.055); }
+        .grule:last-child { border-bottom:none; padding-bottom:0; }
+        .grule-num { font-size:0.78rem; font-weight:800; color:#f472b6; flex-shrink:0; width:1.5rem; padding-top:0.15rem; letter-spacing:0.02em; }
+        .grule-text { font-size:0.87rem; color:rgba(230,210,245,0.8); line-height:1.55; }
+
+        /* ── GENIUS SECTION ── */
+        .genius-section {
+            padding: 3rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .genius-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        .genius-card {
+            background: rgba(22,14,32,0.9);
+            border: 1px solid rgba(244,114,182,0.14);
+            border-radius: 18px;
+            padding: 1.4rem 1.2rem 1.3rem;
+            transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .genius-card::before {
+            content:'';
+            position:absolute; top:0; left:0; right:0; height:2px;
+            background: var(--gc-color, linear-gradient(90deg, #f472b6, #c084fc));
+            opacity: 0.7;
+        }
+        .genius-card:hover {
+            border-color: rgba(244,114,182,0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 36px rgba(244,114,182,0.12);
+        }
+        .genius-avatar {
+            font-size: 2.8rem; display:block; margin-bottom:0.7rem; line-height:1;
+            filter: drop-shadow(0 2px 12px rgba(244,114,182,0.3));
+        }
+        .genius-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem; font-weight:800; color:#f0eaf8; margin-bottom:0.2rem;
+        }
+        .genius-field {
+            font-size: 0.73rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:0.1em; color:#f472b6; margin-bottom:0.85rem;
+        }
+        .genius-secret {
+            font-size: 0.82rem; color:rgba(225,205,240,0.75); line-height:1.6;
+            font-style:italic;
+        }
+        .genius-secret strong { color:#f9a8d4; font-style:normal; }
+        .genius-quote {
+            margin-top:0.9rem; padding:0.7rem 0.9rem;
+            background:rgba(244,114,182,0.07); border-radius:10px;
+            border-left:2px solid rgba(244,114,182,0.4);
+            font-size:0.78rem; color:rgba(240,210,245,0.7);
+            font-style:italic; line-height:1.55;
+        }
+
+        /* ── SUPERHIRN SECTION ── */
+        .brain-section {
+            padding: 3rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .brain-banner {
+            background: linear-gradient(135deg, rgba(244,114,182,0.07) 0%, rgba(192,132,252,0.1) 50%, rgba(244,114,182,0.07) 100%);
+            border: 1px solid rgba(192,132,252,0.2);
+            border-radius: 20px;
+            padding: 2rem 2.2rem;
+            margin-bottom: 1.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .brain-banner::after {
+            content:'🧠'; position:absolute; right:1.5rem; bottom:-0.5rem;
+            font-size:5rem; opacity:0.06; line-height:1;
+        }
+        .brain-banner h2 { margin:0 0 0.4rem 0; font-size:1.6rem; }
+        .brain-banner p { color:rgba(220,200,240,0.6); font-size:0.9rem; margin:0; }
+        .brain-tips {
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap:1rem;
+        }
+        .brain-tip {
+            background:rgba(20,14,28,0.9);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:16px; padding:1.3rem 1.2rem;
+            transition:border-color 0.25s, transform 0.25s;
+            display:flex; gap:0.9rem; align-items:flex-start;
+        }
+        .brain-tip:hover { border-color:rgba(192,132,252,0.4); transform:translateY(-3px); }
+        .brain-tip-icon {
+            font-size:1.7rem; flex-shrink:0; margin-top:0.1rem;
+            filter:drop-shadow(0 0 8px rgba(192,132,252,0.35));
+        }
+        .brain-tip h4 { font-size:0.88rem; font-weight:800; color:#e2d8f5; margin-bottom:0.3rem; }
+        .brain-tip p { font-size:0.8rem; color:rgba(200,180,225,0.65); line-height:1.55; margin:0; }
+        .brain-tip .tip-tag {
+            display:inline-block; margin-top:0.5rem; padding:0.15rem 0.55rem;
+            background:rgba(192,132,252,0.12); border-radius:6px;
+            font-size:0.7rem; font-weight:700; color:#c084fc; text-transform:uppercase; letter-spacing:0.06em;
+        }
+
+        /* ── BIG QUOTE BANNER ── */
+        .big-quote-section {
+            padding:3rem 2rem;
+            text-align:center;
+            background:linear-gradient(180deg, transparent 0%, rgba(244,114,182,0.04) 50%, transparent 100%);
+            border-top:1px solid rgba(244,114,182,0.08);
+            border-bottom:1px solid rgba(244,114,182,0.08);
+        }
+        .big-quote {
+            font-family:'Playfair Display', serif;
+            font-size:clamp(1.3rem, 4vw, 2rem);
+            font-weight:700; font-style:italic;
+            color:rgba(249,168,212,0.9);
+            max-width:740px; margin:0 auto;
+            line-height:1.45;
+            transition:opacity 0.5s ease;
+        }
+        .big-quote-author {
+            margin-top:1rem; font-size:0.82rem; color:rgba(200,180,225,0.45);
+            text-transform:uppercase; letter-spacing:0.12em; font-weight:700;
+        }
+        .big-quote-dots {
+            display:flex; justify-content:center; gap:0.5rem; margin-top:1.4rem;
+        }
+        .bqd {
+            width:6px; height:6px; border-radius:50%;
+            background:rgba(244,114,182,0.2); cursor:pointer;
+            transition:background 0.25s, transform 0.25s;
+        }
+        .bqd.active { background:#f472b6; transform:scale(1.4); }
+
+        /* ── ZP Countdown enhanced ── */
+        .learning-progress { border-color:rgba(248,81,73,0.25) !important; }
+
+        /* ── Streak badge ── */
+        .streak-bar {
+            display:flex; align-items:center; gap:1rem;
+            background:linear-gradient(90deg, rgba(244,114,182,0.08), rgba(192,132,252,0.1));
+            border:1px solid rgba(244,114,182,0.2); border-radius:14px;
+            padding:1rem 1.4rem; margin-bottom:1.8rem; flex-wrap:wrap;
+        }
+        .streak-fire { font-size:2rem; filter:drop-shadow(0 0 10px rgba(251,146,60,0.7)); animation:fire-flicker 1.8s ease-in-out infinite; }
+        @keyframes fire-flicker { 0%,100%{transform:scale(1) rotate(-2deg);} 50%{transform:scale(1.1) rotate(2deg);} }
+        .streak-label { flex:1; }
+        .streak-label strong { display:block; font-size:0.95rem; color:#f0eaf8; }
+        .streak-label span { font-size:0.78rem; color:rgba(200,180,225,0.5); }
+        .streak-days { display:flex; gap:5px; }
+        .streak-dot {
+            width:24px; height:24px; border-radius:50%; border:1.5px solid rgba(244,114,182,0.25);
+            display:flex; align-items:center; justify-content:center; font-size:0.65rem;
+            color:rgba(200,180,225,0.3); font-weight:700;
+            transition:all 0.25s;
+        }
+        .streak-dot.done { background:linear-gradient(135deg,#f472b6,#c084fc); border-color:transparent; color:#fff; box-shadow:0 0 8px rgba(244,114,182,0.4); }
+        .streak-dot.today { border-color:#f472b6; color:#f472b6; }
+
+        /* ── Footer enhanced ── */
+        .footer-dark { background:linear-gradient(to top, rgba(244,114,182,0.04), transparent); }
+
+        /* ── Scroll animations ── */
+        .fade-in-up { opacity:0; transform:translateY(24px); transition:opacity 0.7s ease, transform 0.7s ease; }
+        .fade-in-up.visible { opacity:1; transform:none; }
+
+        /* ── Responsive ── */
+        @media(max-width:600px){
+            .genius-grid { grid-template-columns:1fr 1fr; }
+            .brain-tips { grid-template-columns:1fr; }
+            .big-quote { font-size:1.15rem; }
+            .streak-days { flex-wrap:wrap; }
+        }
+        @media(max-width:400px){
+            .genius-grid { grid-template-columns:1fr; }
+        }
     </style>
 </head>
 <body class="dark-theme">
@@ -100,6 +311,7 @@
             <a href="mathe.html">Mathematik</a>
             <a href="englisch.html">Englisch</a>
             <a href="deutsch.html">Deutsch</a>
+            <a href="biologie.html">Biologie</a>
             <a href="vokabeln.html">Vokabeln</a>
             <a href="englisch-vokabeln.html">Vocabulary</a>
             <a href="gallery.html">Gallery</a>
@@ -108,26 +320,32 @@
         </div>
     </nav>
 
+    <!-- ============ HERO ============ -->
     <main class="hero-banner">
         <div class="hero-bg">
             <img src="img/hero-bg.jpeg" alt="" style="object-position:center 20%;">
         </div>
-        <div class="hero-overlay" style="background:linear-gradient(to bottom, rgba(8,5,14,0.55) 0%, rgba(8,5,14,0.72) 55%, rgba(8,5,14,1) 100%);"></div>
+        <div class="hero-overlay" style="background:linear-gradient(to bottom, rgba(8,5,14,0.5) 0%, rgba(8,5,14,0.7) 55%, rgba(8,5,14,1) 100%);"></div>
+
+        <!-- Stars -->
+        <div class="stars-layer" id="stars-layer"></div>
+
         <div class="hero-shapes">
             <div class="hero-shape" style="background:#f472b6;"></div>
             <div class="hero-shape" style="background:#c084fc;"></div>
             <div class="hero-shape" style="background:#f9a8d4;"></div>
         </div>
         <div class="hero-content">
-            <h1 class="hero-title-glow">NeoStudy</h1>
-            <p>dein sch&ouml;nes Lernportal ✨</p>
-            <div class="hero-scroll-hint">
+            <div class="hero-tagline">dein Lernportal ✨ Wissen ist Macht</div>
+            <h1 class="hero-title-glow" style="margin-top:1rem;">NeoStudy</h1>
+            <p>Lerne wie ein Genie &mdash; Schritt f&uuml;r Schritt</p>
+            <div class="hero-scroll-hint" style="margin-top:2rem;">
                 <span class="scroll-arrow"></span>
             </div>
         </div>
     </main>
 
-    <!-- Affirmation Banner -->
+    <!-- ============ AFFIRMATION ============ -->
     <section class="affirmation-section">
         <div class="affirmation-container">
             <span class="affirmation-icon">&#10024;</span>
@@ -136,79 +354,240 @@
         </div>
     </section>
 
-    <!-- Search -->
+    <!-- ============ BIG ROTATING QUOTE ============ -->
+    <section class="big-quote-section">
+        <div class="big-quote" id="big-quote">&bdquo;Bildung ist das m&auml;chtigste Werkzeug, das du nutzen kannst, um die Welt zu ver&auml;ndern.&ldquo;</div>
+        <div class="big-quote-author" id="big-quote-author">&mdash; Nelson Mandela</div>
+        <div class="big-quote-dots" id="bq-dots"></div>
+    </section>
+
+    <!-- ============ SEARCH + COUNTDOWN ============ -->
     <section class="home-subjects">
         <div class="search-container">
             <span class="search-icon">&#128269;</span>
-            <input type="text" class="search-input" id="site-search" placeholder="Thema suchen... (z.B. Binomische Formeln, Email writing)" autocomplete="off">
+            <input type="text" class="search-input" id="site-search" placeholder="Thema suchen… (z.B. Binomische Formeln, Email writing)" autocomplete="off">
             <div class="search-results" id="search-results"></div>
         </div>
 
+        <!-- Streak bar -->
+        <div class="streak-bar">
+            <span class="streak-fire">🔥</span>
+            <div class="streak-label">
+                <strong>Lern-Streak &mdash; bleib dran!</strong>
+                <span>Markiere jeden Tag, an dem du gelernt hast</span>
+            </div>
+            <div class="streak-days" id="streak-days"></div>
+        </div>
 
         <!-- ZP Countdown -->
-        <div class="learning-progress" style="margin-top:1rem; border-color: rgba(248,81,73,0.3);">
+        <div class="learning-progress" style="margin-top:0.5rem;">
             <h3>&#x23F3; Countdown bis ZP 10</h3>
             <div id="zp-countdown" style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:0.8rem;"></div>
         </div>
-
-
     </section>
 
-    <!-- Motivational Cards -->
+    <!-- ============ MOTIVATION ============ -->
     <section class="motivation-section" id="motivation-section">
-        <h2 onclick="toggleMotivation()">Motivation f&uuml;r heute</h2>
+        <h2 onclick="toggleMotivation()">&#x1F525; Motivation f&uuml;r heute</h2>
         <div class="motivation-grid">
             <div class="motivation-card glass-card">
                 <span class="motivation-emoji">🧠</span>
-                <p>Jeder Fehler bringt dich n&auml;her ans Ziel.</p>
+                <p>Jeder Fehler macht dich klüger. Dein Gehirn wächst, wenn du es herausforderst.</p>
             </div>
             <div class="motivation-card glass-card">
                 <span class="motivation-emoji">🚀</span>
-                <p>Kleine Schritte f&uuml;hren zu gro&szlig;en Erfolgen.</p>
+                <p>Kleine Schritte täglich &rarr; große Ergebnisse. In 30 Tagen bist du jemand anderes.</p>
             </div>
             <div class="motivation-card glass-card">
-                <span class="motivation-emoji">💪</span>
-                <p>Du bist st&auml;rker als du denkst!</p>
+                <span class="motivation-emoji">💎</span>
+                <p>Dein Wissen kann dir niemand wegnehmen. Es ist der einzige Reichtum, der mit dir wächst.</p>
             </div>
         </div>
     </section>
 
     <!-- ============ PHOTO ROW ============ -->
-    <div class="photo-row">
-        <div class="photo-row-item"><img src="img/gallery/photo01.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo03.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo05.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo06.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo07.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo09.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo10.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo12.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo15.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo16.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo19.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo20.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo23.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo25.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo26.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo28.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo30.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo32.jpeg" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo35.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo37.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/gallery/photo38.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/peonies.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/paris.webp" alt="" loading="lazy"></div>
-        <div class="photo-row-item"><img src="img/rose-silver.jpeg" alt="" loading="lazy"></div>
+    <div class="photo-row-wrap">
+        <div class="photo-row">
+            <div class="photo-row-item"><img src="img/gallery/photo01.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo03.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo05.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo06.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo07.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo09.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo10.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo12.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo15.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo16.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo19.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo20.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo23.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo25.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo26.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo28.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo30.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo32.jpeg" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo35.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo37.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/gallery/photo38.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/peonies.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/paris.webp" alt="" loading="lazy"></div>
+            <div class="photo-row-item"><img src="img/rose-silver.jpeg" alt="" loading="lazy"></div>
+        </div>
     </div>
 
+    <!-- ============ GENIUS SECTION ============ -->
+    <section class="genius-section fade-in-up">
+        <div class="section-headline">
+            <h2>&#x1F31F; Die gr&ouml;&szlig;ten Genies aller Zeiten</h2>
+        </div>
+        <p style="color:rgba(220,200,240,0.45);font-size:0.85rem;margin-top:0;margin-bottom:1.6rem;">
+            Was hatten sie gemeinsam? Neugier, Ausdauer &mdash; und die Bereitschaft, immer wieder neu anzufangen.
+        </p>
+        <div class="genius-grid">
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#f59e0b,#fbbf24);">
+                <span class="genius-avatar">👨‍🔬</span>
+                <div class="genius-name">Albert Einstein</div>
+                <div class="genius-field">Physik &bull; Relativit&auml;t</div>
+                <p class="genius-secret">Als Kind sprach er sp&auml;t und galt als &bdquo;langsam&ldquo;. Sein Geheimnis: <strong>Gedankenexperimente</strong> &mdash; er stellte sich alles bildlich vor, bevor er rechnete.</p>
+                <div class="genius-quote">&bdquo;Phantasie ist wichtiger als Wissen. Wissen ist begrenzt, Phantasie umfasst die ganze Welt.&ldquo;</div>
+            </div>
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#818cf8,#a78bfa);">
+                <span class="genius-avatar">👩‍🔬</span>
+                <div class="genius-name">Marie Curie</div>
+                <div class="genius-field">Chemie &bull; Physik &bull; 2 Nobelpreise</div>
+                <p class="genius-secret">Als Frau hatte sie keinen Zugang zu Universit&auml;ten. Sie studierte <strong>heimlich bei Nacht</strong> und wurde zur ersten Frau mit zwei Nobelpreisen.</p>
+                <div class="genius-quote">&bdquo;Im Leben gibt es nichts zu f&uuml;rchten, nur zu verstehen.&ldquo;</div>
+            </div>
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#34d399,#6ee7b7);">
+                <span class="genius-avatar">🎨</span>
+                <div class="genius-name">Leonardo da Vinci</div>
+                <div class="genius-field">Kunst &bull; Wissenschaft &bull; Erfindungen</div>
+                <p class="genius-secret">Er f&uuml;hrte sein ganzes Leben lang <strong>Notizbücher</strong> mit Skizzen und Fragen. &Uuml;ber 7.000 Seiten sind erhalten. Er lernte durch Beobachtung &mdash; stundenlanges Schauen.</p>
+                <div class="genius-quote">&bdquo;Lernen ist die einzige Sache, vor der man sich nicht f&uuml;rchten muss.&ldquo;</div>
+            </div>
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#f472b6,#e879f9);">
+                <span class="genius-avatar">⚡</span>
+                <div class="genius-name">Nikola Tesla</div>
+                <div class="genius-field">Elektrotechnik &bull; Wechselstrom</div>
+                <p class="genius-secret">Er konnte ganze Maschinen <strong>im Kopf konstruieren</strong> und visualisieren, bevor er einen Stift ansetzte. Sein Gedächtnis für Bücher war fotografisch.</p>
+                <div class="genius-quote">&bdquo;Wenn dein Geist einen Gedanken konzipiert &mdash; verfolge ihn bis zum Ende.&ldquo;</div>
+            </div>
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#fb923c,#fbbf24);">
+                <span class="genius-avatar">🍎</span>
+                <div class="genius-name">Isaac Newton</div>
+                <div class="genius-field">Mathematik &bull; Gravitation &bull; Optik</div>
+                <p class="genius-secret">Er verbrachte Monate allein, las alles, was er finden konnte, und f&uuml;hrte <strong>Tausende von Experimenten</strong>. Die Pest trieb ihn in zwei Jahre produktivster Einsamkeit.</p>
+                <div class="genius-quote">&bdquo;Wenn ich weiter gesehen habe als andere, so deshalb, weil ich auf den Schultern von Riesen stand.&ldquo;</div>
+            </div>
+
+            <div class="genius-card" style="--gc-color:linear-gradient(90deg,#38bdf8,#818cf8);">
+                <span class="genius-avatar">💻</span>
+                <div class="genius-name">Ada Lovelace</div>
+                <div class="genius-field">Mathematik &bull; Erste Programmiererin</div>
+                <p class="genius-secret">Sie entwickelte als erste Mensch das Konzept eines <strong>Computerprogramms</strong> &mdash; 100 Jahre bevor Computer existierten. Sie dachte in Abstraktionen, die ihre Zeit weit &uuml;bertrafen.</p>
+                <div class="genius-quote">&bdquo;Die Maschine kann nur das tun, was wir sie zu tun anweisen k&ouml;nnen.&ldquo;</div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============ SUPERHIRN SECTION ============ -->
+    <section class="brain-section fade-in-up">
+        <div class="brain-banner">
+            <h2>&#x1F9EC; Wie werde ich superintelligent?</h2>
+            <p>Keine Magie &mdash; reine Neurowissenschaft. Diese Techniken nutzen Genies und Top-Sch&uuml;ler weltweit.</p>
+        </div>
+        <div class="brain-tips">
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🔁</span>
+                <div>
+                    <h4>Spaced Repetition</h4>
+                    <p>Lerne nicht alles auf einmal. Wiederhole nach 1 Tag &rarr; 3 Tagen &rarr; 1 Woche &rarr; 1 Monat. So sitzt Wissen f&uuml;r immer.</p>
+                    <span class="tip-tag">Neurowissenschaft</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🗣️</span>
+                <div>
+                    <h4>Feynman-Technik</h4>
+                    <p>Erkl&auml;re alles laut, als w&uuml;rdest du es einem 10-j&auml;hrigen beibringen. Was du nicht erkl&auml;ren kannst, hast du nicht wirklich verstanden.</p>
+                    <span class="tip-tag">Nobel-Trick</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">💤</span>
+                <div>
+                    <h4>Schlaf = Speichern</h4>
+                    <p>Im Schlaf konsolidiert dein Hippocampus Wissen ins Langzeitged&auml;chtnis. 8 Stunden Schlaf &gt; 3 Stunden Extra-Lernen.</p>
+                    <span class="tip-tag">Biologisch bewiesen</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">✍️</span>
+                <div>
+                    <h4>Mit der Hand schreiben</h4>
+                    <p>Handschriftliche Notizen aktivieren mehr Gehirnbereiche als Tippen. Du verstehst und behältst bis zu 40% mehr.</p>
+                    <span class="tip-tag">Princeton-Studie</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🎯</span>
+                <div>
+                    <h4>Active Recall</h4>
+                    <p>Statt zu lesen: Klappe das Buch zu und schreibe alles auf, was du weißt. Selbsttest ist 2-3x effektiver als Wiederholung.</p>
+                    <span class="tip-tag">Harvard-Methode</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🌿</span>
+                <div>
+                    <h4>Bewegung &amp; Natur</h4>
+                    <p>20 Minuten spazieren gehen steigert BDNF &mdash; ein Protein, das neue Synapsen wachsen l&auml;sst. Gehe nach dem Lernen raus.</p>
+                    <span class="tip-tag">Stanford-Forschung</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🔕</span>
+                <div>
+                    <h4>Deep Work (kein Multitasking)</h4>
+                    <p>Das Gehirn kann nicht wirklich mehrere Dinge gleichzeitig tun. 45 Min fokussiert = 3 h &bdquo;nebenbei&ldquo;. Handy in einen anderen Raum.</p>
+                    <span class="tip-tag">Cal Newport</span>
+                </div>
+            </div>
+
+            <div class="brain-tip">
+                <span class="brain-tip-icon">🧩</span>
+                <div>
+                    <h4>Vern&uuml;pfe neues Wissen</h4>
+                    <p>Verkn&uuml;pfe Neues mit etwas, das du bereits weißt. Je mehr Verbindungen, desto schneller der Abruf. Denke in Analogien.</p>
+                    <span class="tip-tag">Chunking</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
     <!-- ============ PROFI-GUIDE SECTION ============ -->
-    <section class="home-subjects" id="profi-guide" style="padding-top:0.5rem; margin-top:0.5rem;">
-        <h2 style="margin-bottom:0.3rem;">🌟 Wie werde ich zum Profi?</h2>
-        <p style="color:rgba(220,220,230,0.45);font-size:0.84rem;margin-top:0;margin-bottom:1.4rem;">Echte Probleme &mdash; echte L&ouml;sungen. Kein Blabla.</p>
+    <section class="home-subjects fade-in-up" id="profi-guide" style="padding-top:0.5rem; margin-top:0.5rem;">
+        <div class="section-headline">
+            <h2>&#x1F3AF; Wie werde ich zum Profi?</h2>
+        </div>
+        <p style="color:rgba(220,220,230,0.42);font-size:0.84rem;margin-top:-0.8rem;margin-bottom:1.4rem;">Echte Probleme &mdash; echte L&ouml;sungen. Kein Blabla.</p>
 
         <div style="display:flex;flex-direction:column;gap:0.65rem;">
 
-            <!-- Problem 1: Ich will sofort Ergebnisse -->
             <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #f85149;">
                 <div class="gcard-header">
                     <span class="gcard-emoji">&#x1F3AF;</span>
@@ -226,7 +605,6 @@
                 </div>
             </div>
 
-            <!-- Problem 2: Ich hab noch Zeit -->
             <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #f59e0b;">
                 <div class="gcard-header">
                     <span class="gcard-emoji">&#x23F0;</span>
@@ -237,14 +615,13 @@
                     <span class="gcard-arrow">&#x25B8;</span>
                 </div>
                 <div class="gcard-body">
-                    <p>Das Gehirn <strong style="color:#e6edf3;">l&uuml;gt</strong>. &bdquo;Morgen&ldquo; f&uuml;hlt sich genauso sicher an wie gestern &mdash; bis pl&ouml;tzlich kein Morgen mehr da ist. Das kennst du.</p>
-                    <p><strong style="color:#f59e0b;">Der Halbierungs-Trick:</strong> Deadline am 31.? Dein pers&ouml;nlicher Deadline ist der 25. In deinem Kopf. Keine Ausnahmen. Dann hast du 5 Tage Puffer f&uuml;r Notf&auml;lle und kein Panik-Gef&uuml;hl am Ende.</p>
-                    <p><strong style="color:#e6edf3;">Und fang heute an</strong> &mdash; nur 5 Minuten. Das Gehirn braucht einen Start-Impuls, um &uuml;berhaupt in den Lernmodus zu kommen. Danach geht es leichter.</p>
-                    <div class="gcard-tip">&#x1F4CC;&nbsp; Wenn du denkst &bdquo;ich mach das sp&auml;ter&ldquo; &rarr; tu es in den n&auml;chsten 5 Minuten. Auch wenn es klein ist. Auch wenn es nur eine Seite ist.</div>
+                    <p>Das Gehirn <strong style="color:#e6edf3;">l&uuml;gt</strong>. &bdquo;Morgen&ldquo; f&uuml;hlt sich genauso sicher an wie gestern &mdash; bis pl&ouml;tzlich kein Morgen mehr da ist.</p>
+                    <p><strong style="color:#f59e0b;">Der Halbierungs-Trick:</strong> Deadline am 31.? Dein pers&ouml;nlicher Deadline ist der 25. In deinem Kopf. Keine Ausnahmen.</p>
+                    <p><strong style="color:#e6edf3;">Fang heute an</strong> &mdash; nur 5 Minuten. Das Gehirn braucht einen Start-Impuls, um &uuml;berhaupt in den Lernmodus zu kommen.</p>
+                    <div class="gcard-tip">&#x1F4CC;&nbsp; Wenn du denkst &bdquo;ich mach das sp&auml;ter&ldquo; &rarr; tu es in den n&auml;chsten 5 Minuten.</div>
                 </div>
             </div>
 
-            <!-- Problem 3: Es ist zu schwer -->
             <div class="gcard" onclick="toggleG(this)" style="border-left:3px solid #58a6ff;">
                 <div class="gcard-header">
                     <span class="gcard-emoji">&#x1F625;</span>
@@ -255,14 +632,14 @@
                     <span class="gcard-arrow">&#x25B8;</span>
                 </div>
                 <div class="gcard-body">
-                    <p>Motivation kommt <em>nach</em> dem Start &mdash; nicht davor. Du musst keine Lust haben, um anzufangen. Du musst einfach <strong style="color:#e6edf3;">anfangen</strong>. Die Lust folgt nach 3&ndash;5 Minuten.</p>
-                    <p>Das unbequeme Gef&uuml;hl beim Lernen? Das ist kein Zeichen, dass du es nicht kannst. Das ist dein Gehirn, das <strong style="color:#58a6ff;">gerade w&auml;chst</strong>. Widerstand = Wachstum.</p>
-                    <p>Starte mit dem <strong style="color:#e6edf3;">einfachsten Teil</strong> &mdash; einer Vokabel, einer Aufgabe, einer Seite. Dann kommt der Rest von selbst.</p>
-                    <div class="gcard-tip">&#x1F4A1;&nbsp; Vergleich dich mit <em>dir von letzter Woche</em> &mdash; nicht mit anderen. Du wirst &Uuml;berraschungen erleben.</div>
+                    <p>Motivation kommt <em>nach</em> dem Start &mdash; nicht davor. Du musst keine Lust haben, um anzufangen. Einfach <strong style="color:#e6edf3;">anfangen</strong>. Die Lust folgt nach 3&ndash;5 Minuten.</p>
+                    <p>Das unbequeme Gef&uuml;hl beim Lernen? Das ist dein Gehirn, das <strong style="color:#58a6ff;">gerade w&auml;chst</strong>. Widerstand = Wachstum.</p>
+                    <p>Starte mit dem <strong style="color:#e6edf3;">einfachsten Teil</strong> &mdash; einer Vokabel, einer Aufgabe, einer Seite.</p>
+                    <div class="gcard-tip">&#x1F4A1;&nbsp; Vergleich dich mit <em>dir von letzter Woche</em> &mdash; nicht mit anderen.</div>
                 </div>
             </div>
 
-        </div><!-- end cards -->
+        </div>
 
         <!-- 5 Profi-Regeln -->
         <div class="glass-card" style="margin-top:1.4rem;padding:1.25rem 1.35rem;border-radius:14px;">
@@ -288,155 +665,179 @@
                 <div class="grule-text"><strong>Fang jetzt an.</strong> Auch mit 5 Minuten. Auch ohne Lust. Der Start ist das Schwerste &mdash; danach l&auml;uft es.</div>
             </div>
         </div>
-
     </section>
 
     <footer class="footer-dark">
-        <p>NeoStudy &copy; 2026</p>
+        <p style="font-size:0.82rem; color:rgba(200,180,225,0.4); letter-spacing:0.05em;">NeoStudy &copy; 2026 &nbsp;&mdash;&nbsp; Wissen ist Macht &nbsp;&#x2728;</p>
     </footer>
 
     <script>
-        // Rotating affirmations
-        const affirmations = [
-            "Du schaffst das \u2728",
-            "Du bl\u00fchst gerade \ud83c\udf38",
-            "Heute ist dein Tag \ud83c\udf1f",
-            "Glaube an dich selbst \ud83e\udd0d",
-            "Du bist genug \ud83e\udec7",
-            "Bleib neugierig \u2728",
-            "Schritt f\u00fcr Schritt \ud83c\udf19",
-            "Fehler machen dich st\u00e4rker \ud83d\udcab",
-            "Du w\u00e4chst jeden Tag \ud83c\udf3f",
-            "Du siehst wundersch\u00f6n aus heute \ud83e\udd29"
-        ];
-        let affIdx = 0;
-        const affEl = document.getElementById('affirmation');
-        setInterval(() => {
-            affEl.style.opacity = 0;
-            setTimeout(() => {
-                affIdx = (affIdx + 1) % affirmations.length;
-                affEl.textContent = affirmations[affIdx];
-                affEl.style.opacity = 1;
-            }, 400);
-        }, 4000);
-
-        // Toggle motivation section
-        function toggleMotivation() {
-            document.getElementById('motivation-section').classList.toggle('collapsed');
+    /* ── Stars ── */
+    (function(){
+        var layer = document.getElementById('stars-layer');
+        for(var i=0;i<80;i++){
+            var s=document.createElement('div');
+            s.className='star';
+            var sz=(Math.random()*2+1).toFixed(1)+'px';
+            s.style.cssText='width:'+sz+';height:'+sz+
+                ';top:'+(Math.random()*100)+'%;left:'+(Math.random()*100)+'%;'+
+                '--d:'+(Math.random()*5+2).toFixed(1)+'s;--delay:-'+(Math.random()*6).toFixed(1)+'s;'+
+                'opacity:'+(Math.random()*0.4+0.1);
+            layer.appendChild(s);
         }
+    })();
 
-        // Toggle profi-guide cards
-        function toggleG(card) {
-            const isOpen = card.classList.contains('open');
-            document.querySelectorAll('.gcard.open').forEach(c => c.classList.remove('open'));
-            if (!isOpen) card.classList.add('open');
-        }
+    /* ── Rotating affirmations ── */
+    var affirmations=[
+        "Du schaffst das ✨","Du blühst gerade 🌸","Heute ist dein Tag 🌟",
+        "Glaube an dich selbst 🤍","Du bist genug 🫇","Bleib neugierig ✨",
+        "Schritt für Schritt 🌙","Fehler machen dich stärker 💫",
+        "Du wächst jeden Tag 🌿","Du siehst wunderschön aus heute 🤩",
+        "Dein Genie erwacht 🧠","Unmögliches wird möglich 🚀"
+    ];
+    var affIdx=0,affEl=document.getElementById('affirmation');
+    setInterval(function(){
+        affEl.style.opacity=0;
+        setTimeout(function(){
+            affIdx=(affIdx+1)%affirmations.length;
+            affEl.textContent=affirmations[affIdx];
+            affEl.style.opacity=1;
+        },400);
+    },4000);
 
-        // Site search
-        const searchData = [
-            { title: "Binomische Formeln", desc: "Alle 3 Formeln mit Beispielen und Training", url: "mathe-binomische.html" },
-            { title: "Zuordnungen", desc: "Proportional, antiproportional & Dreisatz", url: "mathe-zuordnung.html" },
-            { title: "K\u00f6rper & Textaufgaben", desc: "Pyramide, Kegel, Zylinder", url: "mathe-koerper.html" },
-            { title: "Formelsammlung", desc: "Geometrische K\u00f6rper, Ma\u00dfeinheiten", url: "mathe-formelsammlung.html" },
-            { title: "Prozentrechnung", desc: "Grundwert, Prozentwert, Prozentsatz", url: "mathe-prozent.html" },
-            { title: "Gleichungen & Terme", desc: "Gleichungen l\u00f6sen, Terme umformen", url: "mathe-gleichungen.html" },
-            { title: "Lineare Funktionen", desc: "y = mx + b, Steigung, Graph", url: "mathe-funktionen.html" },
-            { title: "Wahrscheinlichkeit", desc: "Baumdiagramm, Zufallsversuche", url: "mathe-wahrscheinlichkeit.html" },
-            { title: "Englisch \u2014 Reading", desc: "Leseverstehen \u00fcben", url: "englisch.html" },
-            { title: "Englisch \u2014 Grammar", desc: "Tenses, mistakes, rules", url: "englisch.html" },
-            { title: "Englisch \u2014 Email Writing", desc: "Aufbau und Phrasen", url: "englisch.html" },
-            { title: "Englisch \u2014 Useful Phrases", desc: "Introduction, Arguments, Conclusion", url: "englisch.html" },
-            { title: "Mathematik", desc: "Alle Themen f\u00fcr die ZP 10", url: "mathe.html" },
-            { title: "Deutsch", desc: "Themen und Lernmaterialien", url: "deutsch.html" },
-            { title: "Masterplan", desc: "Alle 3 F\u00e4cher \u2014 Tagesplan + Wochenplan bis ZP", url: "lernplan.html" }
-        ];
+    /* ── Big rotating quotes ── */
+    var bigQuotes=[
+        {q:"Bildung ist das mächtigste Werkzeug, das du nutzen kannst, um die Welt zu verändern.",a:"Nelson Mandela"},
+        {q:"Phantasie ist wichtiger als Wissen. Wissen ist begrenzt, Phantasie umfasst die ganze Welt.",a:"Albert Einstein"},
+        {q:"Im Leben gibt es nichts zu fürchten, nur zu verstehen.",a:"Marie Curie"},
+        {q:"Lernen ist nicht Zufälligkeit. Es ist eine Gewohnheit — und Gewohnheiten machen Genies.",a:"Aristoteles"},
+        {q:"Der einzige Weg zum Wissen ist Erfahrung.",a:"Albert Einstein"},
+        {q:"Wenn du lernst, niemals aufzugeben, lernst du alles.",a:"Barack Obama"},
+        {q:"Investiere in dein Wissen — es bringt immer die besten Zinsen.",a:"Benjamin Franklin"},
+    ];
+    var bqIdx=0;
+    var bqEl=document.getElementById('big-quote');
+    var bqAEl=document.getElementById('big-quote-author');
+    var dotsEl=document.getElementById('bq-dots');
 
-        const searchInput = document.getElementById('site-search');
-        const searchResults = document.getElementById('search-results');
-
-        searchInput.addEventListener('input', function() {
-            const q = this.value.toLowerCase().trim();
-            if (q.length < 2) {
-                searchResults.classList.remove('active');
-                return;
-            }
-            const matches = searchData.filter(d =>
-                d.title.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q)
-            );
-            if (matches.length === 0) {
-                searchResults.classList.remove('active');
-                return;
-            }
-            searchResults.innerHTML = matches.map(m =>
-                `<a class="search-result-item" href="${m.url}"><strong>${m.title}</strong><small>${m.desc}</small></a>`
-            ).join('');
-            searchResults.classList.add('active');
+    function renderDots(){
+        dotsEl.innerHTML=bigQuotes.map(function(_,i){
+            return '<span class="bqd'+(i===bqIdx?' active':'')+'"></span>';
+        }).join('');
+        dotsEl.querySelectorAll('.bqd').forEach(function(d,i){
+            d.onclick=function(){setBQ(i);};
         });
+    }
+    function setBQ(idx){
+        bqIdx=idx;
+        bqEl.style.opacity=0; bqAEl.style.opacity=0;
+        setTimeout(function(){
+            bqEl.textContent='„'+bigQuotes[bqIdx].q+'“';
+            bqAEl.textContent='— '+bigQuotes[bqIdx].a;
+            bqEl.style.opacity=1; bqAEl.style.opacity=1;
+            renderDots();
+        },350);
+    }
+    renderDots();
+    setInterval(function(){ setBQ((bqIdx+1)%bigQuotes.length); }, 7000);
 
-        searchInput.addEventListener('blur', () => {
-            setTimeout(() => searchResults.classList.remove('active'), 200);
+    /* ── Streak days ── */
+    (function(){
+        var key='neostudy_streak';
+        var data=JSON.parse(localStorage.getItem(key)||'{}');
+        var days=['Mo','Di','Mi','Do','Fr','Sa','So'];
+        var today=new Date().getDay(); // 0=Sun
+        var wrap=document.getElementById('streak-days');
+        var todayIdx=today===0?6:today-1;
+        wrap.innerHTML=days.map(function(d,i){
+            var done=data['d'+i]==='1';
+            var isToday=i===todayIdx;
+            return '<div class="streak-dot'+(done?' done':isToday?' today':'')+(isToday?' streak-today':'')+'" data-idx="'+i+'">'+d+'</div>';
+        }).join('');
+        wrap.querySelectorAll('.streak-dot').forEach(function(dot){
+            dot.onclick=function(){
+                var idx=this.getAttribute('data-idx');
+                data['d'+idx]=data['d'+idx]==='1'?'0':'1';
+                localStorage.setItem(key,JSON.stringify(data));
+                this.classList.toggle('done');
+                this.classList.remove('today');
+            };
         });
+    })();
 
-        // ZP Countdown
-        const zpDates = [
-            { name: 'Deutsch', date: new Date('2026-05-13'), emoji: '\uD83C\uDDE9\uD83C\uDDEA', color: '#4493f8', doneLink: 'deutsch-geschafft.html' },
-            { name: 'Englisch', date: new Date('2026-05-19'), emoji: '\uD83C\uDDEC\uD83C\uDDE7', color: '#3fb950', doneLink: 'englisch-geschafft.html', planLink: 'englisch-6tage.html' },
-            { name: 'Mathe', date: new Date('2026-05-28'), emoji: '\uD83D\uDCD0', color: '#f85149' }
-        ];
-        function updateCountdown() {
-            const now = new Date();
-            const el = document.getElementById('zp-countdown');
-            el.innerHTML = zpDates.map(zp => {
-                const diff = Math.ceil((zp.date - now) / (1000 * 60 * 60 * 24));
-                const urgent = diff <= 14;
-                const done = diff <= 0;
-                const hasPlan = !done && zp.planLink;
-                const inner =
-                    '<div style="font-size:1.5rem;">' + zp.emoji + '</div>' +
-                    '<div style="font-size:0.85rem; color:var(--color-text-muted); margin:0.3rem 0;">' + zp.name + '</div>' +
-                    '<div style="font-size:1.8rem; font-weight:800; color:' + (urgent ? 'var(--color-red)' : zp.color) + ';">' + (diff > 0 ? diff : '\u2705') + '</div>' +
-                    '<div style="font-size:0.78rem; color:var(--color-text-muted);">' + (diff > 0 ? (diff === 1 ? 'Tag' : 'Tage') : 'Geschafft!') + '</div>' +
-                    (done && zp.doneLink ? '<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(244,114,182,0.7);">\u043D\u0430\u0436\u043C\u0438 &#x2192;</div>' : '') +
-                    (hasPlan ? '<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(63,185,80,0.8);">6-Tage-Plan &#x2192;</div>' : '');
-                const style = 'flex:1; min-width:140px; background:' + (done && zp.doneLink ? 'rgba(244,114,182,0.08)' : hasPlan ? 'rgba(63,185,80,0.07)' : urgent ? 'rgba(248,81,73,0.1)' : 'var(--color-bg-card)') + '; border:1px solid ' + (done && zp.doneLink ? 'rgba(244,114,182,0.35)' : hasPlan ? 'rgba(63,185,80,0.3)' : urgent ? 'rgba(248,81,73,0.3)' : 'var(--color-border)') + '; border-radius:12px; padding:1rem; text-align:center;' + (done && zp.doneLink || hasPlan ? 'cursor:pointer;text-decoration:none;display:block;transition:opacity 0.15s;' : '');
-                if (done && zp.doneLink) {
-                    return '<a href="' + zp.doneLink + '" style="' + style + '">' + inner + '</a>';
-                }
-                if (hasPlan) {
-                    return '<a href="' + zp.planLink + '" style="' + style + '">' + inner + '</a>';
-                }
-                return '<div style="' + style + '">' + inner + '</div>';
-            }).join('');
-        }
-        updateCountdown();
+    /* ── Toggle motivation ── */
+    function toggleMotivation(){
+        document.getElementById('motivation-section').classList.toggle('collapsed');
+    }
 
-        // Aufgabe des Tages
-        const dailyTasks = [
-            { text: 'Schreibe eine Einleitung f\u00fcr eine Stellungnahme zum Thema \u201eSoziale Medien\u201c', link: 'deutsch.html', subject: 'Deutsch' },
-            { text: 'L\u00f6se 5 Binomische Formeln im Trainer', link: 'mathe-binomische.html', subject: 'Mathe' },
-            { text: 'Lies den Text \u201eEmma\u2019s Bookshop\u201c und beantworte die True/False-Fragen', link: 'englisch.html', subject: 'Englisch' },
-            { text: '\u00dcbe 6 Stilmittel im Trainer \u2014 schaffst du 6/6?', link: 'deutsch.html', subject: 'Deutsch' },
-            { text: 'Wiederhole die Dreisatz-Textaufgaben (Zuordnungen)', link: 'mathe-zuordnung.html', subject: 'Mathe' },
-            { text: 'Lerne 12 Vokabeln \u201eWork & Jobs\u201c mit den Flashcards', link: 'englisch.html', subject: 'Englisch' },
-            { text: 'Schreibe eine Grafik-Beschreibung (150 W\u00f6rter)', link: 'deutsch.html', subject: 'Deutsch' },
-            { text: 'Wiederhole die 4 typischen Fehler bei Binomischen Formeln', link: 'mathe-binomische.html', subject: 'Mathe' },
-            { text: 'Schreibe eine Email auf Englisch (80\u2013100 W\u00f6rter)', link: 'englisch.html', subject: 'Englisch' },
-            { text: 'L\u00f6se die Textaufgabe \u201eIm Supermarkt\u201c mit Dreisatz', link: 'mathe-zuordnung.html', subject: 'Mathe' },
-            { text: 'Wiederhole alle Useful Phrases \u2014 Conclusion-Bereich', link: 'englisch.html', subject: 'Englisch' },
-            { text: 'Schreibe eine komplette Stellungnahme (150\u2013200 W\u00f6rter) mit Timer', link: 'deutsch.html', subject: 'Deutsch' },
-            { text: '\u00dcbe 3 K\u00f6rper-Textaufgaben (Pyramide, Kegel)', link: 'mathe-koerper.html', subject: 'Mathe' },
-            { text: 'Lies den ZP-Beispieltext \u201eDigitale Welten\u201c und beantworte die Fragen', link: 'deutsch.html', subject: 'Deutsch' }
-        ];
-        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        const todayTask = dailyTasks[dayOfYear % dailyTasks.length];
-        const badgeColors = { Deutsch: '#4493f8', Englisch: '#3fb950', Mathe: '#f85149' };
-        document.getElementById('daily-task').innerHTML =
-            '<div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">' +
-            '<span style="background:' + badgeColors[todayTask.subject] + '; color:#fff; font-size:0.72rem; font-weight:700; text-transform:uppercase; padding:0.2rem 0.6rem; border-radius:4px;">' + todayTask.subject + '</span>' +
-            '<span style="flex:1; font-size:0.95rem; color:var(--color-text);">' + todayTask.text + '</span>' +
-            '</div>' +
-            '<a href="' + todayTask.link + '" class="btn-continue" style="margin-top:1rem; display:inline-flex;">' +
-            'Aufgabe starten <span class="arrow">\u2192</span></a>';
+    /* ── Toggle profi-guide cards ── */
+    function toggleG(card){
+        var isOpen=card.classList.contains('open');
+        document.querySelectorAll('.gcard.open').forEach(function(c){c.classList.remove('open');});
+        if(!isOpen) card.classList.add('open');
+    }
+
+    /* ── Site search ── */
+    var searchData=[
+        {title:"Binomische Formeln",desc:"Alle 3 Formeln mit Beispielen und Training",url:"mathe-binomische.html"},
+        {title:"Zuordnungen",desc:"Proportional, antiproportional & Dreisatz",url:"mathe-zuordnung.html"},
+        {title:"Körper & Textaufgaben",desc:"Pyramide, Kegel, Zylinder",url:"mathe-koerper.html"},
+        {title:"Formelsammlung",desc:"Geometrische Körper, Maßeinheiten",url:"mathe-formelsammlung.html"},
+        {title:"Prozentrechnung",desc:"Grundwert, Prozentwert, Prozentsatz",url:"mathe-prozent.html"},
+        {title:"Gleichungen & Terme",desc:"Gleichungen lösen, Terme umformen",url:"mathe-gleichungen.html"},
+        {title:"Lineare Funktionen",desc:"y = mx + b, Steigung, Graph",url:"mathe-funktionen.html"},
+        {title:"Wahrscheinlichkeit",desc:"Baumdiagramm, Zufallsversuche",url:"mathe-wahrscheinlichkeit.html"},
+        {title:"Englisch — Reading",desc:"Leseverstehen üben",url:"englisch.html"},
+        {title:"Englisch — Grammar",desc:"Tenses, mistakes, rules",url:"englisch.html"},
+        {title:"Englisch — Email Writing",desc:"Aufbau und Phrasen",url:"englisch.html"},
+        {title:"Mathematik",desc:"Alle Themen für die ZP 10",url:"mathe.html"},
+        {title:"Deutsch",desc:"Themen und Lernmaterialien",url:"deutsch.html"},
+        {title:"Masterplan",desc:"Alle 3 Fächer — Tagesplan + Wochenplan bis ZP",url:"lernplan.html"}
+    ];
+    var searchInput=document.getElementById('site-search');
+    var searchResults=document.getElementById('search-results');
+    searchInput.addEventListener('input',function(){
+        var q=this.value.toLowerCase().trim();
+        if(q.length<2){searchResults.classList.remove('active');return;}
+        var matches=searchData.filter(function(d){return d.title.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q);});
+        if(!matches.length){searchResults.classList.remove('active');return;}
+        searchResults.innerHTML=matches.map(function(m){
+            return '<a class="search-result-item" href="'+m.url+'"><strong>'+m.title+'</strong><small>'+m.desc+'</small></a>';
+        }).join('');
+        searchResults.classList.add('active');
+    });
+    searchInput.addEventListener('blur',function(){setTimeout(function(){searchResults.classList.remove('active');},200);});
+
+    /* ── ZP Countdown ── */
+    var zpDates=[
+        {name:'Deutsch',date:new Date('2026-05-13'),emoji:'🇩🇪',color:'#4493f8',doneLink:'deutsch-geschafft.html'},
+        {name:'Englisch',date:new Date('2026-05-19'),emoji:'🇬🇧',color:'#3fb950',doneLink:'englisch-geschafft.html',planLink:'englisch-6tage.html'},
+        {name:'Mathe',date:new Date('2026-05-28'),emoji:'📐',color:'#f85149'}
+    ];
+    function updateCountdown(){
+        var now=new Date(),el=document.getElementById('zp-countdown');
+        el.innerHTML=zpDates.map(function(zp){
+            var diff=Math.ceil((zp.date-now)/(1000*60*60*24));
+            var urgent=diff<=14,done=diff<=0,hasPlan=!done&&zp.planLink;
+            var inner='<div style="font-size:1.5rem;">'+zp.emoji+'</div>'+
+                '<div style="font-size:0.85rem;color:var(--color-text-muted);margin:0.3rem 0;">'+zp.name+'</div>'+
+                '<div style="font-size:1.8rem;font-weight:800;color:'+(urgent?'var(--color-red)':zp.color)+';">'+(diff>0?diff:'✅')+'</div>'+
+                '<div style="font-size:0.78rem;color:var(--color-text-muted);">'+(diff>0?(diff===1?'Tag':'Tage'):'Geschafft!')+'</div>'+
+                (done&&zp.doneLink?'<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(244,114,182,0.7);">нажми &#x2192;</div>':'')+
+                (hasPlan?'<div style="font-size:0.72rem;margin-top:0.4rem;color:rgba(63,185,80,0.8);">6-Tage-Plan &#x2192;</div>':'');
+            var style='flex:1;min-width:140px;background:'+(done&&zp.doneLink?'rgba(244,114,182,0.08)':hasPlan?'rgba(63,185,80,0.07)':urgent?'rgba(248,81,73,0.1)':'var(--color-bg-card)')+';border:1px solid '+(done&&zp.doneLink?'rgba(244,114,182,0.35)':hasPlan?'rgba(63,185,80,0.3)':urgent?'rgba(248,81,73,0.3)':'var(--color-border)')+';border-radius:12px;padding:1rem;text-align:center;';
+            if(done&&zp.doneLink) return '<a href="'+zp.doneLink+'" style="'+style+'text-decoration:none;display:block;">'+inner+'</a>';
+            if(hasPlan) return '<a href="'+zp.planLink+'" style="'+style+'text-decoration:none;display:block;">'+inner+'</a>';
+            return '<div style="'+style+'">'+inner+'</div>';
+        }).join('');
+    }
+    updateCountdown();
+
+    /* ── Scroll fade-in ── */
+    var obs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+    },{threshold:0.08});
+    document.querySelectorAll('.fade-in-up').forEach(function(el){obs.observe(el);});
     </script>
 </body>
 </html>

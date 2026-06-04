@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nervenzelle | Biologie | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ── Biology color palette ── */
+        :root {
+            --bio-teal:   #2dd4bf;
+            --bio-green:  #4ade80;
+            --bio-mint:   #a7f3d0;
+            --bio-cyan:   #67e8f9;
+            --bio-indigo: #818cf8;
+            --bio-gold:   #fbbf24;
+            --bio-pink:   #f472b6;
+            --bio-sky:    #38bdf8;
+            --bio-violet: #a78bfa;
+        }
+
+        /* ── Section headings ── */
+        .bio-sec {
+            display: flex; align-items: center; gap: 0.8rem;
+            margin: 2.8rem 0 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(45,212,191,0.22);
+        }
+        .bio-sec h2 { margin: 0; font-size: 1.15rem; color: var(--bio-teal); }
+        .bio-sec::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(45,212,191,0.25),transparent); }
+
+        /* ── Neuron / synapse diagram wrapper ── */
+        .diagram-box {
+            background: rgba(8,18,28,0.82);
+            border: 1px solid rgba(45,212,191,0.18);
+            border-radius: 16px;
+            padding: 1.2rem 0.8rem;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+        }
+        .diagram-box svg { display:block; margin:0 auto; max-width:100%; }
+
+        /* ── Component table ── */
+        .bio-table { width:100%; border-collapse:collapse; font-size:0.87rem; }
+        .bio-table th {
+            background: rgba(45,212,191,0.1);
+            color: var(--bio-teal);
+            padding: 0.65rem 1rem;
+            text-align: left;
+            font-size:0.78rem; font-weight:700;
+            letter-spacing:0.06em; text-transform:uppercase;
+            border-bottom: 1px solid rgba(45,212,191,0.2);
+        }
+        .bio-table td {
+            padding: 0.75rem 1rem;
+            color: rgba(225,238,245,0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.055);
+            vertical-align: top; line-height: 1.55;
+        }
+        .bio-table tr:last-child td { border-bottom: none; }
+        .bio-table tr:hover td { background: rgba(45,212,191,0.04); }
+        .part-name { font-weight:700; display:block; }
+        .part-alt  { color:rgba(167,243,208,0.5); font-size:0.77rem; display:block; margin-top:0.1rem; font-style:italic; }
+
+        /* ── Info boxes ── */
+        .ibox {
+            background: rgba(45,212,191,0.07);
+            border: 1px solid rgba(45,212,191,0.25);
+            border-radius: 12px; padding: 1rem 1.2rem; margin: 1rem 0;
+        }
+        .ibox p { margin:0.35rem 0; font-size:0.87rem; color:rgba(218,235,245,0.85); line-height:1.6; }
+        .ibox p:first-child { margin-top:0; }
+        .ibox strong { color: var(--bio-mint); }
+        .ibox.gold  { background:rgba(251,191,36,0.07);   border-color:rgba(251,191,36,0.25); }
+        .ibox.gold strong  { color:var(--bio-gold); }
+        .ibox.indigo{ background:rgba(129,140,248,0.07);  border-color:rgba(129,140,248,0.25); }
+        .ibox.indigo strong{ color:var(--bio-indigo); }
+        .ibox.pink  { background:rgba(244,114,182,0.07);  border-color:rgba(244,114,182,0.25); }
+        .ibox.pink strong  { color:var(--bio-pink); }
+
+        /* ── 5-Day plan ── */
+        .day-plan { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:0.85rem; margin:1.2rem 0; }
+        .day-card {
+            background: rgba(14,22,36,0.85);
+            border: 1px solid rgba(45,212,191,0.2);
+            border-radius: 14px; padding: 1rem 0.85rem; text-align:center;
+            transition: border-color .25s, transform .25s;
+        }
+        .day-card:hover { border-color:rgba(45,212,191,0.5); transform:translateY(-2px); }
+        .day-card .dnum { font-size:1.9rem; line-height:1; margin-bottom:0.3rem; }
+        .day-card .dlbl { font-size:0.7rem; color:var(--bio-teal); font-weight:700; letter-spacing:.07em; text-transform:uppercase; margin-bottom:0.45rem; }
+        .day-card .dtop { font-size:0.8rem; color:rgba(215,232,242,0.8); line-height:1.4; }
+
+        /* ── Signal steps (numbered list) ── */
+        .steps { list-style:none; padding:0; margin:1rem 0; }
+        .steps li { display:flex; gap:0.9rem; padding:0.72rem 0; border-bottom:1px solid rgba(255,255,255,0.055); align-items:flex-start; }
+        .steps li:last-child { border-bottom:none; }
+        .snum {
+            background: linear-gradient(135deg,var(--bio-teal),var(--bio-green));
+            color:#061510; font-weight:900; font-size:0.76rem;
+            min-width:1.75rem; height:1.75rem; border-radius:50%;
+            display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.05rem;
+        }
+        .snum.pink   { background:linear-gradient(135deg,#f472b6,#e879f9); color:#1a0010; }
+        .snum.gold   { background:linear-gradient(135deg,#fbbf24,#f97316); color:#1a0800; }
+        .snum.indigo { background:linear-gradient(135deg,#818cf8,#a78bfa); color:#0a0820; }
+        .stxt { font-size:0.86rem; color:rgba(218,235,245,0.85); line-height:1.55; }
+        .stxt strong { color:var(--bio-mint); }
+
+        /* ── 3-part synapse label cards ── */
+        .syn3 { display:flex; flex-direction:column; gap:0.55rem; }
+        .syn-part {
+            border-left: 3px solid;
+            border-radius: 0 9px 9px 0;
+            padding: 0.6rem 0.9rem;
+        }
+        .syn-part .sp-title { font-size:0.85rem; font-weight:700; display:block; margin-bottom:0.2rem; }
+        .syn-part .sp-text  { font-size:0.81rem; color:rgba(210,228,240,0.8); line-height:1.45; }
+
+        /* ── Flip cards ── */
+        .flip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:0.95rem; margin:1.2rem 0; }
+        .flip { perspective:600px; height:130px; cursor:pointer; }
+        .flip-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .48s; }
+        .flip.on .flip-inner { transform:rotateY(180deg); }
+        .flip-f, .flip-b {
+            position:absolute; inset:0; backface-visibility:hidden;
+            border-radius:13px; display:flex; align-items:center; justify-content:center;
+            padding:0.85rem; text-align:center; flex-direction:column; gap:0.35rem;
+        }
+        .flip-f { background:rgba(14,24,38,0.92); border:1px solid rgba(45,212,191,0.28); }
+        .flip-b { background:rgba(45,212,191,0.09); border:1px solid rgba(45,212,191,0.52); transform:rotateY(180deg); }
+        .flip-f .fq  { font-size:0.8rem; color:rgba(198,228,242,0.82); line-height:1.4; }
+        .flip-f .fh  { font-size:0.66rem; color:rgba(45,212,191,0.45); margin-top:0.2rem; }
+        .flip-b .fa  { font-size:0.82rem; color:var(--bio-mint); font-weight:700; line-height:1.42; }
+
+        /* ── Quiz items ── */
+        .qitem {
+            background: rgba(10,18,30,0.82);
+            border: 1px solid rgba(45,212,191,0.14);
+            border-radius: 12px; padding:1rem 1.2rem; margin-bottom:0.85rem;
+            cursor:pointer; transition:border-color .2s;
+        }
+        .qitem:hover { border-color:rgba(45,212,191,0.38); }
+        .qitem.open  { border-color:rgba(45,212,191,0.35); }
+        .qq { font-size:0.88rem; color:rgba(218,235,245,0.92); font-weight:600; }
+        .qt { font-size:0.73rem; color:rgba(45,212,191,0.45); margin-top:0.22rem; }
+        .qa {
+            display:none; font-size:0.84rem; color:var(--bio-mint);
+            padding-top:0.65rem; border-top:1px solid rgba(45,212,191,0.13);
+            margin-top:0.65rem; line-height:1.58;
+        }
+        .qitem.open .qa { display:block; }
+
+        /* ── Misc ── */
+        .cdot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+        .btag {
+            display:inline-block; border-radius:6px; padding:0.1rem 0.55rem;
+            font-size:0.73rem; font-weight:700; margin:0.12rem;
+            background:rgba(45,212,191,0.12); color:var(--bio-teal); border:1px solid rgba(45,212,191,0.3);
+        }
+        .btag.g { background:rgba(251,191,36,0.11); color:var(--bio-gold); border-color:rgba(251,191,36,0.3); }
+        .btag.i { background:rgba(129,140,248,0.11); color:var(--bio-indigo); border-color:rgba(129,140,248,0.3); }
+        .btag.p { background:rgba(244,114,182,0.11); color:var(--bio-pink); border-color:rgba(244,114,182,0.3); }
+
+        .synapse-wrap { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start; margin:1.2rem 0; }
+        @media(max-width:660px){ .synapse-wrap{ grid-template-columns:1fr; } }
+        @media(max-width:660px){ .two-col{ grid-template-columns:1fr !important; } }
+
+        /* ── Gap-fill (Lückentext) ── */
+        .lt {
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+            transition: color .25s, background .25s;
+            font-weight: 700;
+            user-select: none;
+        }
+        .lt.revealed { color: #a7f3d0 !important; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <!-- Background -->
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/peonies.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 30%">
+        <div style="position:absolute;inset:0;background:rgba(4,12,20,0.92)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="biologie.html" class="active">Biologie</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="biologie.html">Biologie</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Die Nervenzelle</span>
+        </nav>
+
+        <!-- ════ HEADER ════ -->
+        <div class="page-header" style="text-align:left; padding-top:1rem; margin-bottom:1.5rem;">
+            <h1 style="color:#2dd4bf; font-family:'Playfair Display',serif;">&#x1F9E0; Die Nervenzelle</h1>
+            <p class="page-subtitle" style="color:rgba(167,243,208,0.65)">Bestandteile &middot; Funktion &middot; Zeichnung &middot; Synapse &middot; Synaptischer Spalt</p>
+        </div>
+
+        <!-- Test-Banner -->
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(45,212,191,0.07)); border:1px solid rgba(251,191,36,0.42); border-radius:14px; padding:1rem 1.3rem; margin-bottom:2rem; display:flex; align-items:center; gap:1rem;">
+            <span style="font-size:1.9rem;">&#x23F3;</span>
+            <div>
+                <strong style="color:#fbbf24; font-size:0.96rem;">Test in 5 Tagen &mdash; du schaffst das!</strong>
+                <p style="margin:0.25rem 0 0; color:rgba(200,228,242,0.6); font-size:0.84rem;">Lies jeden Tag einen Abschnitt. Tag&nbsp;1&nbsp;= &Uuml;bersicht lernen &nbsp;|&nbsp; Tag&nbsp;5&nbsp;= alles wiederholen &amp; Fragen beantworten.</p>
+            </div>
+        </div>
+
+        <!-- ════ 5-TAGE PLAN ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F4C5;</span><h2>5-Tage Lernplan</h2></div>
+        <div class="day-plan">
+            <div class="day-card">
+                <div class="dnum">&#x1F331;</div>
+                <div class="dlbl">Tag 1</div>
+                <div class="dtop">&Uuml;bersicht &amp; Bestandteile kennenlernen</div>
+            </div>
+            <div class="day-card">
+                <div class="dnum">&#x270F;&#xFE0F;</div>
+                <div class="dlbl">Tag 2</div>
+                <div class="dtop">Zeichnung aus dem Kopf beschriften &uuml;ben</div>
+            </div>
+            <div class="day-card">
+                <div class="dnum">&#x26A1;</div>
+                <div class="dlbl">Tag 3</div>
+                <div class="dtop">Funktionen &amp; Signalleitung</div>
+            </div>
+            <div class="day-card">
+                <div class="dnum">&#x1F52C;</div>
+                <div class="dlbl">Tag 4</div>
+                <div class="dtop">Synapse &amp; Synaptischer Spalt im Detail</div>
+            </div>
+            <div class="day-card" style="border-color:rgba(251,191,36,0.42);">
+                <div class="dnum">&#x1F3C6;</div>
+                <div class="dlbl" style="color:#fbbf24;">Tag 5</div>
+                <div class="dtop">Alles wiederholen &amp; alle Fragen beantworten</div>
+            </div>
+        </div>
+
+        <!-- ════ ÜBERSICHT ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F4D6;</span><h2>&Uuml;bersicht &mdash; Was ist eine Nervenzelle?</h2></div>
+
+        <div class="ibox">
+            <p>Eine <strong>Nervenzelle (Neuron)</strong> ist die Grundeinheit des Nervensystems. Sie empf&auml;ngt Reize, verarbeitet sie und leitet Informationen als elektrische Signale weiter.</p>
+            <p>Das menschliche Gehirn besitzt ca. <strong>86&nbsp;Milliarden Neuronen</strong>. Jedes Neuron kann mit bis zu <strong>10.000 anderen</strong> Neuronen verbunden sein.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:0.8rem; margin:1rem 0 0.5rem;">
+            <div style="background:rgba(45,212,191,0.07); border:1px solid rgba(45,212,191,0.2); border-radius:11px; padding:0.85rem; text-align:center;">
+                <div style="font-size:1.45rem; margin-bottom:0.3rem;">&#x1F4E1;</div>
+                <div style="font-size:0.74rem; color:#2dd4bf; font-weight:700; margin-bottom:0.25rem; letter-spacing:.05em;">EMPFANGEN</div>
+                <div style="font-size:0.8rem; color:rgba(198,228,240,0.75);">Dendriten nehmen Signale von anderen Neuronen auf</div>
+            </div>
+            <div style="background:rgba(129,140,248,0.07); border:1px solid rgba(129,140,248,0.2); border-radius:11px; padding:0.85rem; text-align:center;">
+                <div style="font-size:1.45rem; margin-bottom:0.3rem;">&#x1F9EE;</div>
+                <div style="font-size:0.74rem; color:#818cf8; font-weight:700; margin-bottom:0.25rem; letter-spacing:.05em;">VERARBEITEN</div>
+                <div style="font-size:0.8rem; color:rgba(198,228,240,0.75);">Zellk&ouml;rper integriert alle eingehenden Signale</div>
+            </div>
+            <div style="background:rgba(244,114,182,0.07); border:1px solid rgba(244,114,182,0.2); border-radius:11px; padding:0.85rem; text-align:center;">
+                <div style="font-size:1.45rem; margin-bottom:0.3rem;">&#x26A1;</div>
+                <div style="font-size:0.74rem; color:#f472b6; font-weight:700; margin-bottom:0.25rem; letter-spacing:.05em;">WEITERLEITEN</div>
+                <div style="font-size:0.8rem; color:rgba(198,228,240,0.75);">Axon leitet Aktionspotenzial zu den Endkn&ouml;pfchen</div>
+            </div>
+        </div>
+
+        <!-- ════ ZEICHNUNG ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F3A8;</span><h2>Zeichnung &amp; Beschriftung</h2></div>
+        <p style="font-size:0.85rem; color:rgba(167,243,208,0.55); margin-bottom:0.8rem;">Lerne diese Zeichnung auswendig &mdash; im Test musst du eine Nervenzelle selbst beschriften k&ouml;nnen!</p>
+
+        <div class="diagram-box" style="padding:1rem 0.5rem 0.5rem;">
+            <!-- NEURON SVG — Schulstil mit nummerierten Beschriftungen -->
+            <svg viewBox="0 0 870 395" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:560px; font-family:'Nunito',sans-serif;">
+                <defs>
+                    <marker id="imp" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                        <path d="M0,0 L0,8 L8,4 Z" fill="#4ade80"/>
+                    </marker>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+
+                <!-- ══════════════════════════════════════
+                     DENDRITEN — organisch verzweigt
+                ════════════════════════════════════════ -->
+                <!-- Hauptast 1: oben links weit -->
+                <path d="M 152 178 Q 112 142 70 104" stroke="#4ade80" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <path d="M 105 138 Q 72 118 38 96" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 105 138 Q 78 130 50 122" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 2: oben links -->
+                <path d="M 160 162 Q 130 112 105 68" stroke="#4ade80" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <path d="M 122 98 Q 92 76 64 58" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 122 98 Q 104 72 90 50" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 3: oben -->
+                <path d="M 174 155 Q 168 104 163 58" stroke="#4ade80" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                <path d="M 166 88 Q 152 66 140 46" stroke="#4ade80" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M 166 88 Q 176 64 180 44" stroke="#4ade80" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 4: links (horizontal) -->
+                <path d="M 148 196 Q 94 194 42 190" stroke="#4ade80" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <path d="M 88 193 Q 64 175 36 165" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 88 193 Q 65 208 38 218" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 5: unten links -->
+                <path d="M 154 226 Q 112 260 70 295" stroke="#4ade80" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <path d="M 106 265 Q 74 282 42 295" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 106 265 Q 80 288 55 305" stroke="#4ade80" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 6: unten -->
+                <path d="M 168 236 Q 162 282 155 326" stroke="#4ade80" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                <path d="M 158 304 Q 143 318 128 330" stroke="#4ade80" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M 158 304 Q 170 320 172 335" stroke="#4ade80" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+                <!-- Hauptast 7: unten rechts von Soma -->
+                <path d="M 192 246 Q 192 290 190 328" stroke="#4ade80" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+
+                <!-- ══════════════════════════════════════
+                     ZELLKÖRPER (SOMA)
+                ════════════════════════════════════════ -->
+                <ellipse cx="213" cy="196" rx="68" ry="65" fill="rgba(45,212,191,0.1)" stroke="#2dd4bf" stroke-width="2.8" filter="url(#glow)"/>
+
+                <!-- Zellkern (Nukleus) -->
+                <circle cx="213" cy="196" r="26" fill="rgba(103,232,249,0.17)" stroke="#67e8f9" stroke-width="2.2"/>
+                <!-- Nucleolus -->
+                <circle cx="208" cy="192" r="10" fill="rgba(103,232,249,0.38)" stroke="#67e8f9" stroke-width="1.5"/>
+
+                <!-- ══════════════════════════════════════
+                     AXONHÜGEL
+                ════════════════════════════════════════ -->
+                <polygon points="278,183 320,193 320,199 278,209" fill="rgba(167,139,250,0.22)" stroke="#a78bfa" stroke-width="1.8"/>
+
+                <!-- ══════════════════════════════════════
+                     AXON (Mittellinie unter Hüllzellen)
+                ════════════════════════════════════════ -->
+                <line x1="320" y1="196" x2="738" y2="196" stroke="#38bdf8" stroke-width="5" opacity="0.4" stroke-linecap="round"/>
+
+                <!-- ══════════════════════════════════════
+                     HÜLLZELLEN — gelb/amber wie im Lehrbuch
+                ════════════════════════════════════════ -->
+                <rect x="326" y="185" width="88" height="22" rx="11" fill="rgba(245,158,11,0.88)" stroke="#92400e" stroke-width="1.5"/>
+                <rect x="428" y="185" width="88" height="22" rx="11" fill="rgba(245,158,11,0.88)" stroke="#92400e" stroke-width="1.5"/>
+                <rect x="530" y="185" width="88" height="22" rx="11" fill="rgba(245,158,11,0.88)" stroke="#92400e" stroke-width="1.5"/>
+                <rect x="632" y="185" width="88" height="22" rx="11" fill="rgba(245,158,11,0.88)" stroke="#92400e" stroke-width="1.5"/>
+                <!-- kleines Stück am Ende -->
+                <rect x="734" y="185" width="20" height="22" rx="9" fill="rgba(245,158,11,0.88)" stroke="#92400e" stroke-width="1.5"/>
+
+                <!-- ══════════════════════════════════════
+                     SCHNÜRRINGE (Lücken zwischen Hüllzellen)
+                ════════════════════════════════════════ -->
+                <circle cx="418" cy="196" r="5.5" fill="#fbbf24" stroke="#fde68a" stroke-width="1.8"/>
+                <circle cx="522" cy="196" r="5.5" fill="#fbbf24" stroke="#fde68a" stroke-width="1.8"/>
+                <circle cx="624" cy="196" r="5.5" fill="#fbbf24" stroke="#fde68a" stroke-width="1.8"/>
+                <circle cx="728" cy="196" r="5.5" fill="#fbbf24" stroke="#fde68a" stroke-width="1.8"/>
+
+                <!-- ══════════════════════════════════════
+                     AXON-ENDKNÖPFCHEN (Synapse)
+                ════════════════════════════════════════ -->
+                <line x1="754" y1="196" x2="808" y2="150" stroke="#f472b6" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="754" y1="196" x2="832" y2="196" stroke="#f472b6" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="754" y1="196" x2="808" y2="242" stroke="#f472b6" stroke-width="2.8" stroke-linecap="round"/>
+                <!-- Endknöpfchen-Kugeln -->
+                <circle cx="820" cy="145" r="15" fill="rgba(244,114,182,0.24)" stroke="#f472b6" stroke-width="2.2"/>
+                <circle cx="847" cy="196" r="15" fill="rgba(244,114,182,0.24)" stroke="#f472b6" stroke-width="2.2"/>
+                <circle cx="820" cy="247" r="15" fill="rgba(244,114,182,0.24)" stroke="#f472b6" stroke-width="2.2"/>
+                <!-- Membranblässchen innen -->
+                <circle cx="816" cy="142" r="4.5" fill="#f9a8d4" opacity="0.75"/>
+                <circle cx="824" cy="148" r="3.5" fill="#f9a8d4" opacity="0.65"/>
+                <circle cx="820" cy="152" r="3" fill="#f9a8d4" opacity="0.55"/>
+                <circle cx="843" cy="193" r="4.5" fill="#f9a8d4" opacity="0.75"/>
+                <circle cx="851" cy="199" r="3.5" fill="#f9a8d4" opacity="0.65"/>
+                <circle cx="816" cy="243" r="4.5" fill="#f9a8d4" opacity="0.75"/>
+                <circle cx="824" cy="249" r="3.5" fill="#f9a8d4" opacity="0.65"/>
+
+                <!-- ══════════════════════════════════════
+                     IMPULS-PFEIL
+                ════════════════════════════════════════ -->
+                <line x1="340" y1="222" x2="718" y2="222" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="6,3" marker-end="url(#imp)"/>
+                <text x="520" y="236" fill="#4ade80" font-size="10" font-weight="700" text-anchor="middle">Impuls &#x2192;</text>
+
+                <!-- ══════════════════════════════════════
+                     NERVENFASER-KLAMMER
+                ════════════════════════════════════════ -->
+                <line x1="326" y1="252" x2="754" y2="252" stroke="rgba(167,243,208,0.38)" stroke-width="1.5"/>
+                <line x1="326" y1="247" x2="326" y2="257" stroke="rgba(167,243,208,0.38)" stroke-width="1.5"/>
+                <line x1="754" y1="247" x2="754" y2="257" stroke="rgba(167,243,208,0.38)" stroke-width="1.5"/>
+                <text x="540" y="266" fill="rgba(167,243,208,0.62)" font-size="9.5" font-weight="700" text-anchor="middle">Axon + H&uuml;llzelle = Nervenfaser</text>
+
+                <!-- ══════════════════════════════════════
+                     NUMMERIERTE BESCHRIFTUNGEN (wie Schulbuch)
+                ════════════════════════════════════════ -->
+
+                <!-- Leitlinie-Stil: Kreis unten, gestrichelte Linie nach oben zum Bauteil -->
+
+                <!-- ① Dendriten -->
+                <line x1="68" y1="339" x2="80" y2="268" stroke="rgba(74,222,128,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="68" cy="350" r="13" fill="#4ade80"/>
+                <text x="68" y="355" fill="#051a08" font-size="13" font-weight="900" text-anchor="middle">1</text>
+                <text x="68" y="372" fill="#4ade80" font-size="10" font-weight="700" text-anchor="middle">Dendriten</text>
+
+                <!-- ② Zellkörper -->
+                <line x1="175" y1="339" x2="192" y2="262" stroke="rgba(45,212,191,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="175" cy="350" r="13" fill="#2dd4bf"/>
+                <text x="175" y="355" fill="#041510" font-size="13" font-weight="900" text-anchor="middle">2</text>
+                <text x="175" y="372" fill="#2dd4bf" font-size="10" font-weight="700" text-anchor="middle">Zellk&ouml;rper</text>
+
+                <!-- ③ Zellkern -->
+                <line x1="258" y1="339" x2="224" y2="222" stroke="rgba(103,232,249,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="258" cy="350" r="13" fill="#67e8f9"/>
+                <text x="258" y="355" fill="#041018" font-size="13" font-weight="900" text-anchor="middle">3</text>
+                <text x="258" y="372" fill="#67e8f9" font-size="10" font-weight="700" text-anchor="middle">Zellkern</text>
+
+                <!-- ④ Axonhügel -->
+                <line x1="322" y1="339" x2="322" y2="212" stroke="rgba(167,139,250,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="322" cy="350" r="13" fill="#a78bfa"/>
+                <text x="322" y="355" fill="#070520" font-size="13" font-weight="900" text-anchor="middle">4</text>
+                <text x="322" y="372" fill="#a78bfa" font-size="9.5" font-weight="700" text-anchor="middle">Axonh&uuml;gel</text>
+
+                <!-- ⑤ Hüllzelle -->
+                <line x1="472" y1="339" x2="472" y2="208" stroke="rgba(245,158,11,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="472" cy="350" r="13" fill="#f59e0b"/>
+                <text x="472" y="355" fill="#0a0400" font-size="13" font-weight="900" text-anchor="middle">5</text>
+                <text x="472" y="372" fill="#f59e0b" font-size="10" font-weight="700" text-anchor="middle">H&uuml;llzelle</text>
+
+                <!-- ⑥ Schnürring -->
+                <line x1="572" y1="339" x2="524" y2="204" stroke="rgba(251,191,36,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="572" cy="350" r="13" fill="#fbbf24"/>
+                <text x="572" y="355" fill="#0a0800" font-size="13" font-weight="900" text-anchor="middle">6</text>
+                <text x="572" y="372" fill="#fbbf24" font-size="10" font-weight="700" text-anchor="middle">Schn&uuml;rring</text>
+
+                <!-- ⑦ Synapse / Endknöpfchen -->
+                <line x1="670" y1="339" x2="748" y2="240" stroke="rgba(244,114,182,0.32)" stroke-width="1.2" stroke-dasharray="4,3"/>
+                <circle cx="670" cy="350" r="13" fill="#f472b6"/>
+                <text x="670" y="355" fill="#1a0010" font-size="13" font-weight="900" text-anchor="middle">7</text>
+                <text x="670" y="370" fill="#f472b6" font-size="9" font-weight="700" text-anchor="middle">Synapse /</text>
+                <text x="670" y="382" fill="#f472b6" font-size="9" font-weight="700" text-anchor="middle">Endkn&ouml;pfchen</text>
+
+            </svg>
+        </div>
+
+        <!-- Color legend -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.65rem; margin:0.4rem 0 1.8rem; font-size:0.77rem; color:rgba(195,225,240,0.7);">
+            <span><span class="cdot" style="background:#4ade80"></span>Dendriten</span>
+            <span><span class="cdot" style="background:#2dd4bf"></span>Zellk&ouml;rper</span>
+            <span><span class="cdot" style="background:#67e8f9"></span>Zellkern</span>
+            <span><span class="cdot" style="background:#a78bfa"></span>Axonh&uuml;gel</span>
+            <span><span class="cdot" style="background:#38bdf8"></span>Axon</span>
+            <span><span class="cdot" style="background:#818cf8"></span>H&uuml;llzelle (Myelinscheide)</span>
+            <span><span class="cdot" style="background:#fbbf24"></span>Ranvierscher Schn&uuml;rring</span>
+            <span><span class="cdot" style="background:#f472b6"></span>Synaptische Endkn&ouml;pfchen</span>
+        </div>
+
+        <!-- ════ BESTANDTEILE TABELLE ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F52C;</span><h2>Bestandteile &amp; Funktionen</h2></div>
+        <p style="font-size:0.84rem; color:rgba(167,243,208,0.55); margin-bottom:0.9rem;">Diese Tabelle ist Pflicht f&uuml;r den Test. Lerne jeden <span style="color:#2dd4bf; font-weight:700;">Begriff</span> + seine <span style="color:#2dd4bf; font-weight:700;">Funktion</span> + die Merkhilfe.</p>
+
+        <div style="background:rgba(8,16,26,0.88); border:1px solid rgba(45,212,191,0.18); border-radius:14px; overflow:hidden; margin-bottom:1.6rem;">
+            <table class="bio-table">
+                <thead>
+                    <tr>
+                        <th style="width:26%">Bestandteil</th>
+                        <th style="width:44%">Funktion</th>
+                        <th style="width:30%">Merkhilfe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#4ade80;">&#x1F33F; Dendriten</span>
+                            <span class="part-alt">griech. <em>dendron</em> = Baum</span>
+                        </td>
+                        <td>Kurze, baumartig verzweigte Forts&auml;tze am Zellk&ouml;rper. Empfangen Signale von anderen Neuronen oder Rezeptoren und leiten sie zum Zellk&ouml;rper.</td>
+                        <td><span class="btag">Antenne</span> Stell dir viele Antennen vor, die Funksignale empfangen.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#2dd4bf;">&#x1FAD7; Zellk&ouml;rper (Soma)</span>
+                            <span class="part-alt">auch: Perikaryon</span>
+                        </td>
+                        <td>Enth&auml;lt den Zellkern und alle wichtigen Zellorganellen. Steuert den Stoffwechsel der Zelle und integriert alle eingehenden Signale von den Dendriten.</td>
+                        <td><span class="btag">Zentrale</span> Die Schaltzentrale &mdash; hier wird gesammelt und entschieden.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#67e8f9;">&#x1F535; Zellkern (Nukleus)</span>
+                        </td>
+                        <td>Liegt im Zellk&ouml;rper. Enth&auml;lt die DNA (Erbgut) und steuert die Proteinsynthese der gesamten Zelle.</td>
+                        <td><span class="btag">Chef</span> Der Kern = Chef der Zelle. Gibt Bef&auml;hle an alle Bereiche.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#a78bfa;">&#x25B7; Axonh&uuml;gel</span>
+                        </td>
+                        <td>Verbindet Zellk&ouml;rper mit dem Axon. <strong style="color:#a78bfa;">Entstehungsort des Aktionspotenzials.</strong> Wertet alle Eingangssignale aus &mdash; Entscheidung: Signal weiterleiten (ja/nein)?</td>
+                        <td><span class="btag g">Alles-oder-nichts</span> Erst wenn die Reizschwelle erreicht ist, wird ein Aktionspotenzial ausgel&ouml;st.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#38bdf8;">&#x27F6; Axon</span>
+                            <span class="part-alt">auch: Neurit</span>
+                        </td>
+                        <td>Langer Forts&auml;tz (bis zu 1&nbsp;m!), der das elektrische Signal (Impuls) vom Zellk&ouml;rper zu den Endkn&ouml;pfchen leitet.<br><span style="color:rgba(167,243,208,0.55); font-size:0.8rem;">&#x26A0;&#xFE0F; Axon + H&uuml;llzelle zusammen = <strong style="color:#a7f3d0;">Nervenfaser</strong></span></td>
+                        <td><span class="btag">Autobahn</span> Das Axon ist die Datenleitung &mdash; schnell und lang.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#818cf8;">&#x1FAD9; H&uuml;llzelle</span>
+                            <span class="part-alt">auch: Myelinscheide / Schwann-Zelle</span>
+                        </td>
+                        <td>Umh&uuml;llt das Axon und <strong style="color:#818cf8;">beschleunigt</strong> die Informationsleitung. Die Impulse &bdquo;springen&ldquo; direkt von einem <strong style="color:#fbbf24;">Schn&uuml;rring</strong> zum n&auml;chsten (saltatorische Leitung). Ohne H&uuml;llzelle w&auml;re die Leitung viel langsamer!</td>
+                        <td><span class="btag i">Kabelisolierung</span> Wie Gummi um ein Stromkabel &mdash; sch&uuml;tzt &amp; beschleunigt.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#fbbf24;">&#x26AC; Schn&uuml;rring</span>
+                            <span class="part-alt">= Ranvierscher Schn&uuml;rring</span>
+                        </td>
+                        <td>Unterbrechungen der H&uuml;llzelle. Die Impulse springen direkt von Schn&uuml;rring zu Schn&uuml;rring &rarr; schnelle Erregungsleitung mit wenig Energieverbrauch.</td>
+                        <td><span class="btag g">Sprungpunkt</span> Wie Trittsteine &mdash; das Signal h&uuml;pft von Stein zu Stein.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="part-name" style="color:#f472b6;">&#x29BF; Endkn&ouml;pfchen</span>
+                            <span class="part-alt">= Synaptisches Endkn&ouml;pfchen</span>
+                        </td>
+                        <td>Endstellen des Axons. Enthalten <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> (= synaptische Bl&auml;schen) mit <strong style="color:#f9a8d4;">&Uuml;bertr&auml;gerstoffen (Transmittern)</strong>. Bei Erregung werden Transmitter in den synaptischen Spalt freigesetzt.</td>
+                        <td><span class="btag p">Sender</span> Schickt den &bdquo;Chemie-Brief&ldquo; (Transmitter) ans n&auml;chste Neuron oder an die Muskelfaser.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ════ SIGNALLEITUNG ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x26A1;</span><h2>Wie wird ein Signal weitergeleitet?</h2></div>
+
+        <div class="ibox" style="margin-bottom:1rem;">
+            <p>Ein <strong>Aktionspotenzial</strong> ist ein kurzer elektrischer Spannungsimpuls. Es gibt zwei Arten der Erregungsleitung:</p>
+            <p><strong>&#x2460; Kontinuierliche Leitung</strong> (ohne Myelin) &mdash; Signal l&auml;uft langsam entlang des gesamten Axons (0,5&ndash;2&nbsp;m/s).</p>
+            <p><strong>&#x2461; Saltatorische Leitung</strong> (mit Myelin) &mdash; Signal springt von Schn&uuml;rring zu Schn&uuml;rring &rarr; bis zu <strong>120&nbsp;m/s</strong> &amp; energieeffizienter!</p>
+        </div>
+
+        <ol class="steps">
+            <li><span class="snum">1</span><span class="stxt"><strong>Dendriten</strong> empfangen ein eingehendes Signal (von einem anderen Neuron oder einem Rezeptor).</span></li>
+            <li><span class="snum">2</span><span class="stxt">Signal l&auml;uft als elektrischer Impuls durch den <strong>Zellk&ouml;rper (Soma)</strong> &mdash; alle Signale werden integriert.</span></li>
+            <li><span class="snum">3</span><span class="stxt">Am <strong>Axonh&uuml;gel</strong>: Ist der Reiz stark genug? &rarr; <em>Alles-oder-nichts-Gesetz</em>. Wenn ja &rarr; Aktionspotenzial wird ausgel&ouml;st.</span></li>
+            <li><span class="snum">4</span><span class="stxt">Aktionspotenzial l&auml;uft durch das <strong>Axon</strong>. Mit Myelinscheide springt es von <strong>Ranvierschem Schn&uuml;rring zu Schn&uuml;rring</strong> (saltatorisch).</span></li>
+            <li><span class="snum">5</span><span class="stxt">Am <strong>synaptischen Endkn&ouml;pfchen</strong>: Vesikel fusionieren mit der Membran, <strong>Neurotransmitter</strong> werden ausgesch&uuml;ttet (Exozytose).</span></li>
+            <li><span class="snum">6</span><span class="stxt">Neurotransmitter diffundieren durch den <strong>Synaptischen Spalt</strong> und binden an Rezeptoren des n&auml;chsten Neurons.</span></li>
+        </ol>
+
+        <!-- ════ SYNAPTISCHE FUNKTION ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F517;</span><h2>Synaptische Funktion</h2></div>
+
+        <div class="synapse-wrap">
+            <!-- Synapse SVG -->
+            <div class="diagram-box" style="padding:1.4rem 0.8rem;">
+                <svg viewBox="0 0 310 345" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:280px; margin:0 auto; display:block; font-family:'Nunito',sans-serif;">
+
+                    <text x="155" y="16" fill="rgba(195,225,240,0.55)" font-size="9.5" text-anchor="middle" font-weight="600">SYNAPSE &mdash; Querschnitt</text>
+
+                    <!-- Präsynaptische Membran label -->
+                    <text x="155" y="40" fill="#f472b6" font-size="9" text-anchor="middle" font-weight="700">Pr&auml;synaptische Membran</text>
+
+                    <!-- Presynaptic terminal -->
+                    <rect x="52" y="45" width="206" height="135" rx="18" fill="rgba(244,114,182,0.09)" stroke="#f472b6" stroke-width="1.8"/>
+
+                    <!-- Vesicles -->
+                    <circle cx="105" cy="90"  r="12" fill="rgba(244,114,182,0.22)" stroke="#f472b6" stroke-width="1.5"/>
+                    <circle cx="138" cy="112" r="12" fill="rgba(244,114,182,0.22)" stroke="#f472b6" stroke-width="1.5"/>
+                    <circle cx="170" cy="88"  r="12" fill="rgba(244,114,182,0.22)" stroke="#f472b6" stroke-width="1.5"/>
+                    <circle cx="202" cy="110" r="12" fill="rgba(244,114,182,0.22)" stroke="#f472b6" stroke-width="1.5"/>
+                    <circle cx="126" cy="72"  r="9"  fill="rgba(244,114,182,0.18)" stroke="#f472b6" stroke-width="1.2"/>
+                    <circle cx="186" cy="72"  r="9"  fill="rgba(244,114,182,0.18)" stroke="#f472b6" stroke-width="1.2"/>
+                    <!-- dots -->
+                    <circle cx="105" cy="90"  r="4.5" fill="#f9a8d4" opacity="0.65"/>
+                    <circle cx="138" cy="112" r="4.5" fill="#f9a8d4" opacity="0.65"/>
+                    <circle cx="170" cy="88"  r="4.5" fill="#f9a8d4" opacity="0.65"/>
+                    <circle cx="202" cy="110" r="4.5" fill="#f9a8d4" opacity="0.65"/>
+                    <!-- Membranblässchen label -->
+                    <text x="76" y="100" fill="#f9a8d4" font-size="8" text-anchor="middle" font-style="italic">Membran-</text>
+                    <text x="76" y="110" fill="#f9a8d4" font-size="8" text-anchor="middle" font-style="italic">bl&auml;schen</text>
+                    <text x="76" y="120" fill="#f9a8d4" font-size="7.5" text-anchor="middle" font-style="italic">(Transmitter)</text>
+
+                    <!-- Fusing vesicle at membrane bottom -->
+                    <circle cx="155" cy="167" r="12" fill="rgba(244,114,182,0.32)" stroke="#f472b6" stroke-width="2"/>
+                    <circle cx="155" cy="167" r="4.5" fill="#f9a8d4"/>
+
+                    <!-- SYNAPTISCHER SPALT -->
+                    <line x1="52"  y1="178" x2="258" y2="178" stroke="rgba(251,191,36,0.55)" stroke-width="1.5"/>
+                    <line x1="52"  y1="214" x2="258" y2="214" stroke="rgba(45,212,191,0.55)"  stroke-width="1.5"/>
+                    <rect x="52"   y="178" width="206" height="36" fill="rgba(251,191,36,0.05)"/>
+
+                    <!-- NT molecules in cleft -->
+                    <circle cx="92"  cy="196" r="5.5" fill="rgba(251,191,36,0.55)" stroke="#fbbf24" stroke-width="1.2"/>
+                    <circle cx="125" cy="192" r="5.5" fill="rgba(251,191,36,0.55)" stroke="#fbbf24" stroke-width="1.2"/>
+                    <circle cx="155" cy="197" r="5.5" fill="rgba(251,191,36,0.55)" stroke="#fbbf24" stroke-width="1.2"/>
+                    <circle cx="185" cy="192" r="5.5" fill="rgba(251,191,36,0.55)" stroke="#fbbf24" stroke-width="1.2"/>
+                    <circle cx="218" cy="196" r="5.5" fill="rgba(251,191,36,0.55)" stroke="#fbbf24" stroke-width="1.2"/>
+
+                    <!-- Spalt label left -->
+                    <text x="36" y="190" fill="#fbbf24" font-size="8" text-anchor="middle" font-weight="700">Syn.</text>
+                    <text x="36" y="200" fill="#fbbf24" font-size="8" text-anchor="middle" font-weight="700">Spalt</text>
+                    <text x="36" y="210" fill="#fbbf24" font-size="7.5" text-anchor="middle" font-style="italic">~20 nm</text>
+                    <line x1="44" y1="196" x2="50" y2="196" stroke="rgba(251,191,36,0.45)" stroke-width="1"/>
+
+                    <!-- Arrows down -->
+                    <text x="155" y="210" fill="#fbbf24" font-size="12" text-anchor="middle">&#x2193;&#x2193;&#x2193;</text>
+
+                    <!-- POSTSYNAPTISCHE MEMBRAN -->
+                    <text x="155" y="228" fill="#2dd4bf" font-size="9" text-anchor="middle" font-weight="700">Postsynaptische Membran</text>
+                    <rect x="52"  y="214" width="206" height="20" fill="rgba(45,212,191,0.14)" stroke="#2dd4bf" stroke-width="1.6"/>
+
+                    <!-- Receptors -->
+                    <rect x="85"  y="216" width="15" height="16" rx="2.5" fill="rgba(45,212,191,0.28)" stroke="#2dd4bf" stroke-width="1.2"/>
+                    <rect x="118" y="216" width="15" height="16" rx="2.5" fill="rgba(45,212,191,0.28)" stroke="#2dd4bf" stroke-width="1.2"/>
+                    <rect x="148" y="216" width="15" height="16" rx="2.5" fill="rgba(45,212,191,0.28)" stroke="#2dd4bf" stroke-width="1.2"/>
+                    <rect x="178" y="216" width="15" height="16" rx="2.5" fill="rgba(45,212,191,0.28)" stroke="#2dd4bf" stroke-width="1.2"/>
+                    <rect x="208" y="216" width="15" height="16" rx="2.5" fill="rgba(45,212,191,0.28)" stroke="#2dd4bf" stroke-width="1.2"/>
+                    <text x="155" y="242" fill="#67e8f9" font-size="8" text-anchor="middle" font-style="italic">Rezeptoren</text>
+
+                    <!-- Postsynaptic cell -->
+                    <rect x="52"  y="234" width="206" height="65" fill="rgba(45,212,191,0.06)" stroke="#2dd4bf" stroke-width="1.2" stroke-dasharray="4,2"/>
+                    <text x="155" y="260" fill="#4ade80" font-size="9" text-anchor="middle">Na&#x207A; &#x2192; Na&#x207A; &#x2192; Na&#x207A;</text>
+                    <text x="155" y="273" fill="rgba(167,243,208,0.55)" font-size="8" text-anchor="middle" font-style="italic">Ionenkan&auml;le &ouml;ffnen sich</text>
+                    <text x="155" y="288" fill="#2dd4bf" font-size="8.5" text-anchor="middle" font-weight="700">Postsynaptisches Neuron</text>
+                    <text x="155" y="300" fill="rgba(167,243,208,0.5)" font-size="7.5" text-anchor="middle" font-style="italic">(nimmt Signal auf)</text>
+                </svg>
+            </div>
+
+            <!-- Explanation -->
+            <div>
+                <div class="ibox pink" style="margin-top:0; margin-bottom:1rem;">
+                    <p style="font-size:0.9rem; font-weight:700; color:#f472b6; margin-bottom:0.5rem;">Was ist eine Synapse?</p>
+                    <p>Eine Synapse ist die <strong>Kontaktstelle zwischen zwei Neuronen</strong> (oder Neuron &amp; Muskelzelle). Hier wird das elektrische Signal in ein <strong>chemisches Signal</strong> umgewandelt.</p>
+                </div>
+
+                <p style="font-size:0.9rem; font-weight:700; color:#2dd4bf; margin:0 0 0.6rem;">3 Teile der Synapse:</p>
+                <div class="syn3">
+                    <div class="syn-part" style="border-color:#f472b6; background:rgba(244,114,182,0.07);">
+                        <span class="sp-title" style="color:#f472b6;">&#x2460; Endkn&ouml;pfchen (sendend)</span>
+                        <span class="sp-text">Enth&auml;lt <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> (synaptische Bl&auml;schen) mit <strong style="color:#f9a8d4;">&Uuml;bertr&auml;gerstoffen (Transmittern)</strong>.</span>
+                    </div>
+                    <div class="syn-part" style="border-color:#fbbf24; background:rgba(251,191,36,0.07);">
+                        <span class="sp-title" style="color:#fbbf24;">&#x2461; Synaptischer Spalt</span>
+                        <span class="sp-text">Winziger Zwischenraum. Transmitter werden hier <strong style="color:#fde68a;">freigesetzt</strong> und wandern zur n&auml;chsten Zelle.</span>
+                    </div>
+                    <div class="syn-part" style="border-color:#2dd4bf; background:rgba(45,212,191,0.07);">
+                        <span class="sp-title" style="color:#2dd4bf;">&#x2462; Folgende Nervenzelle / Muskelfaser</span>
+                        <span class="sp-text">Tr&auml;gt <strong style="color:#a7f3d0;">Rezeptoren</strong>. Transmitter binden dort an &rarr; neuer elektrischer <strong style="color:#a7f3d0;">Impuls</strong> entsteht.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ SYNAPTISCHER SPALT DETAIL ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F50D;</span><h2>Synaptischer Spalt &mdash; im Detail</h2></div>
+
+        <div class="ibox gold">
+            <p style="font-size:0.92rem;"><strong>Definition:</strong> Der synaptische Spalt ist der Zwischenraum zwischen dem Endkn&ouml;pfchen der einen Nervenzelle und der n&auml;chsten Nervenzelle (oder Muskelfaser).</p>
+        </div>
+
+        <!-- LERNTEXT AUSWENDIG — exakt vom Arbeitsblatt -->
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(45,212,191,0.05)); border:2px solid rgba(251,191,36,0.5); border-radius:14px; padding:1.2rem 1.4rem; margin:1.2rem 0;">
+            <p style="font-size:0.82rem; font-weight:700; color:#fbbf24; letter-spacing:.06em; text-transform:uppercase; margin-bottom:0.7rem;">&#x2B50; Lerntext &mdash; diesen Text auswendig k&ouml;nnen!</p>
+            <ol style="list-style:decimal; padding-left:1.3rem; margin:0; display:flex; flex-direction:column; gap:0.45rem;">
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Ein elektrisches Signal kommt am <strong style="color:#f472b6;">Endkn&ouml;pfchen</strong> der Nervenzelle an.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Im Endkn&ouml;pfchen befinden sich <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> mit <strong style="color:#f9a8d4;">Transmittern</strong>.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Die Transmitter werden in den <strong style="color:#fbbf24;">synaptischen Spalt</strong> freigesetzt.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Sie wandern zur n&auml;chsten Nervenzelle und binden dort an die <strong style="color:#2dd4bf;">Rezeptoren</strong>.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Dadurch wird ein neuer elektrischer <strong style="color:#4ade80;">Impuls</strong> ausgel&ouml;st und das Signal wird weitergeleitet.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Danach l&ouml;sen <strong style="color:#818cf8;">Enzyme</strong> die Transmitter von den Rezeptoren.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">Die Transmitter werden wieder in die <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> zur&uuml;ckgebracht.</li>
+                <li style="font-size:0.88rem; color:rgba(225,240,248,0.92); line-height:1.55;">So endet das Signal und die Synapse ist wieder <strong style="color:#4ade80;">bereit</strong>.</li>
+            </ol>
+        </div>
+
+        <!-- Begriffe aus dem Unterricht -->
+        <div style="background:rgba(129,140,248,0.07); border:1px solid rgba(129,140,248,0.25); border-radius:12px; padding:1rem 1.2rem; margin:1rem 0 1.5rem;">
+            <p style="font-size:0.82rem; font-weight:700; color:#818cf8; margin-bottom:0.6rem;">&#x1F4D6; Begriffe aus eurem Unterricht &mdash; diese Schreibweise verwenden!</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1.5rem; font-size:0.83rem;">
+                <div><span style="color:rgba(200,220,240,0.5);">Hüllzelle</span> <span style="color:rgba(200,220,240,0.35);">statt</span> <span style="color:rgba(200,220,240,0.5); text-decoration:line-through; font-size:0.77rem;">Myelinscheide</span></div>
+                <div><span style="color:rgba(200,220,240,0.5);">Schn&uuml;rring</span> <span style="color:rgba(200,220,240,0.35);">statt</span> <span style="color:rgba(200,220,240,0.5); text-decoration:line-through; font-size:0.77rem;">Ranvierscher Schn&uuml;rring</span></div>
+                <div><span style="color:#f9a8d4; font-weight:700;">Membranbl&auml;schen</span> <span style="color:rgba(200,220,240,0.35);">statt</span> <span style="color:rgba(200,220,240,0.5); text-decoration:line-through; font-size:0.77rem;">Vesikel</span></div>
+                <div><span style="color:#f9a8d4; font-weight:700;">Transmitter / &Uuml;bertr&auml;gerstoff</span> <span style="color:rgba(200,220,240,0.35);">statt</span> <span style="color:rgba(200,220,240,0.5); text-decoration:line-through; font-size:0.77rem;">Neurotransmitter</span></div>
+                <div><span style="color:#a7f3d0; font-weight:700;">Nervenfaser</span> <span style="color:rgba(200,220,240,0.45);">= Axon + H&uuml;llzelle</span></div>
+                <div><span style="color:#a7f3d0; font-weight:700;">Impuls</span> <span style="color:rgba(200,220,240,0.45);">= elektrisches Signal</span></div>
+            </div>
+        </div>
+
+        <p style="font-size:0.9rem; font-weight:700; color:#2dd4bf; margin:1.2rem 0 0.6rem;">Ablauf im Lückentext-Format (aus eurem AB):</p>
+        <ol class="steps">
+            <li><span class="snum pink">1</span><span class="stxt">Ein elektrischer <strong>Impuls</strong> erreicht &uuml;ber das Axon das <strong>Endkn&ouml;pfchen</strong>.</span></li>
+            <li><span class="snum pink">2</span><span class="stxt">Daraufhin <strong>verschmelzen</strong> einige <strong>synaptische Bl&auml;schen</strong> mit der Membran des Endkn&ouml;pfchens. Dadurch gelangt &Uuml;bertr&auml;gerstoff in den <strong>Spalt</strong>.</span></li>
+            <li><span class="snum gold">3</span><span class="stxt">Erreichen &Uuml;bertr&auml;gerstoff-Teilchen den <strong>Rezeptor</strong>, docken sie dort an und ein neuer elektrischer <strong>Impuls</strong> entsteht.</span></li>
+            <li><span class="snum gold">4</span><span class="stxt">Die &Uuml;bertr&auml;gerstoff-Teilchen l&ouml;sen sich schlie&szlig;lich vom <strong>Rezeptor</strong> und werden von einem <strong>Enzym</strong> gespalten.</span></li>
+            <li><span class="snum indigo">5</span><span class="stxt">Die St&uuml;cke der gespaltenen Teilchen werden von einem <strong>Transportenzym</strong> in das Endkn&ouml;pfchen <strong>gebracht</strong> und dort erneut zusammengesetzt.</span></li>
+        </ol>
+
+        <!-- ════ MERKKARTEN ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x1F3B4;</span><h2>Merkkarten &mdash; tippen zum Umdrehen</h2></div>
+
+        <div class="flip-grid">
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x1F33F;</span><p class="fq">Funktion der Dendriten?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">Empfangen Signale von anderen Neuronen; leiten sie zum Zellk&ouml;rper.</p></div>
+                </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x25B7;</span><p class="fq">Was macht der Axonh&uuml;gel?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">Entscheidet ob Aktionspotenzial ausgel&ouml;st wird. Alles-oder-nichts-Gesetz.</p></div>
+                </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x1FAD9;</span><p class="fq">Wozu dient die H&uuml;llzelle?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">Umh&uuml;llt das Axon, beschleunigt Leitung. Impuls springt von Schn&uuml;rring zu Schn&uuml;rring.</p></div>
+                </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x26AC;</span><p class="fq">Was ist ein Schn&uuml;rring?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">Unterbrechung der H&uuml;llzelle. Impuls springt direkt von Schn&uuml;rring zu Schn&uuml;rring &rarr; schnelle Leitung.</p></div>
+                </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x1F4E6;</span><p class="fq">Was sind Membranbl&auml;schen?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">Bl&auml;schen im Endkn&ouml;pfchen, die Transmitter enthalten. Verschmelzen bei Erregung mit der Membran &rarr; Transmitter freigesetzt.</p></div>
+                </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('on')">
+                <div class="flip-inner">
+                    <div class="flip-f"><span style="font-size:1.4rem;">&#x1F517;</span><p class="fq">Was ist Axon + H&uuml;llzelle zusammen?</p><p class="fh">tippen &#x21BA;</p></div>
+                    <div class="flip-b"><p class="fa">= Nervenfaser! Axon leitet den Impuls, H&uuml;llzelle isoliert und beschleunigt.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ TESTFRAGEN ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x2753;</span><h2>Testfragen &mdash; tippen f&uuml;r Antwort</h2></div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">1. Nenne alle Bestandteile einer Nervenzelle und erkl&auml;re kurz ihre Funktion.</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                <strong style="color:#4ade80;">Dendriten</strong> &mdash; Signalempfang<br>
+                <strong style="color:#2dd4bf;">Zellk&ouml;rper (Soma)</strong> &mdash; Schaltzentrale + Zellkern<br>
+                <strong style="color:#67e8f9;">Zellkern (Nukleus)</strong> &mdash; DNA, Proteinsynthese<br>
+                <strong style="color:#a78bfa;">Axonh&uuml;gel</strong> &mdash; Entstehungsort Aktionspotenzial<br>
+                <strong style="color:#38bdf8;">Axon</strong> &mdash; leitet Signal weiter (bis 1&nbsp;m lang)<br>
+                <strong style="color:#818cf8;">Myelinscheide</strong> &mdash; Isolation, beschleunigt Leitung<br>
+                <strong style="color:#fbbf24;">Ranvierscher Schn&uuml;rring</strong> &mdash; L&uuml;cke in Myelin, Sprungpunkt<br>
+                <strong style="color:#f472b6;">Synaptische Endkn&ouml;pfchen</strong> &mdash; geben Neurotransmitter ab
+            </div>
+        </div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">2. Erkl&auml;re den Ablauf der Informations&uuml;bertragung an der Synapse. (8 S&auml;tze)</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                1. Ein elektrisches Signal kommt am <strong style="color:#f472b6;">Endkn&ouml;pfchen</strong> der Nervenzelle an.<br>
+                2. Im Endkn&ouml;pfchen befinden sich <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> mit <strong style="color:#f9a8d4;">Transmittern</strong>.<br>
+                3. Die Transmitter werden in den <strong style="color:#fbbf24;">synaptischen Spalt</strong> freigesetzt.<br>
+                4. Sie wandern zur n&auml;chsten Nervenzelle und binden dort an die <strong style="color:#2dd4bf;">Rezeptoren</strong>.<br>
+                5. Dadurch wird ein neuer elektrischer <strong style="color:#4ade80;">Impuls</strong> ausgel&ouml;st und das Signal wird weitergeleitet.<br>
+                6. Danach l&ouml;sen <strong style="color:#818cf8;">Enzyme</strong> die Transmitter von den Rezeptoren.<br>
+                7. Die Transmitter werden wieder in die <strong style="color:#f9a8d4;">Membranbl&auml;schen</strong> zur&uuml;ckgebracht.<br>
+                8. So endet das Signal und die Synapse ist wieder <strong style="color:#4ade80;">bereit</strong>.
+            </div>
+        </div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">3. Was ist der Unterschied zwischen kontinuierlicher und saltatorischer Erregungsleitung?</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                <strong>Kontinuierliche Leitung:</strong> Kein Myelin. Signal wandert langsam entlang des gesamten Axons (z.&nbsp;B. 0,5&ndash;2&nbsp;m/s).<br><br>
+                <strong>Saltatorische Leitung:</strong> Mit Myelinscheide. Signal &bdquo;springt&ldquo; von Ranvierschem Schn&uuml;rring zu Schn&uuml;rring &rarr; viel schneller (bis 120&nbsp;m/s!) und energieeffizienter, weil nur die Schn&uuml;rringe erregt werden m&uuml;ssen.
+            </div>
+        </div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">4. Was ist der synaptische Spalt und welche Rolle spielt er?</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                Der synaptische Spalt ist der schmale Zwischenraum (20&ndash;40&nbsp;nm) zwischen pr&auml;synaptischer und postsynaptischer Membran. Neurotransmitter diffundieren passiv durch ihn, um das Signal vom sendenden auf das empfangende Neuron zu &uuml;bertragen. Er erm&ouml;glicht die Umwandlung des elektrischen Signals in ein chemisches Signal.
+            </div>
+        </div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">5. Was bedeutet das Alles-oder-nichts-Gesetz?</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                Am Axonh&uuml;gel wird gepr&uuml;ft, ob die Reizschwelle &uuml;berschritten wird. Wenn ja &rarr; volles Aktionspotenzial (egal wie stark der Reiz war). Wenn nein &rarr; gar kein Aktionspotenzial. Es gibt keine &bdquo;schwachen&ldquo; Aktionspotenziale &mdash; nur volle oder keine.
+            </div>
+        </div>
+
+        <div class="qitem" onclick="this.classList.toggle('open')">
+            <div class="qq">6. Welche Aufgabe hat die Myelinscheide und wer bildet sie?</div>
+            <div class="qt">&#x25B6; Antwort zeigen</div>
+            <div class="qa">
+                Die Myelinscheide isoliert das Axon und erm&ouml;glicht die saltatorische Erregungsleitung (Signal springt von Schn&uuml;rring zu Schn&uuml;rring &rarr; bis zu 120&nbsp;m/s). Sie wird von <strong style="color:#a7f3d0;">Schwann-Zellen</strong> (im peripheren Nervensystem) bzw. Oligodendrozyten (im zentralen Nervensystem) gebildet.
+            </div>
+        </div>
+
+        <!-- ════ LÜCKENTEXT ÜBUNG ════ -->
+        <div class="bio-sec"><span style="font-size:1.25rem;">&#x270F;&#xFE0F;</span><h2>L&uuml;ckentext &mdash; &uuml;ben wie im Test</h2></div>
+        <p style="font-size:0.84rem; color:rgba(167,243,208,0.55); margin-bottom:1rem;">Klick auf die L&uuml;cke um die Antwort zu sehen. Versuche erst selbst zu denken!</p>
+
+        <!-- Lückentext 1: Bau und Funktion -->
+        <div style="background:rgba(10,18,30,0.85); border:1px solid rgba(45,212,191,0.18); border-radius:14px; padding:1.2rem 1.4rem; margin-bottom:1.2rem;">
+            <p style="font-size:0.78rem; font-weight:700; color:#2dd4bf; letter-spacing:.06em; text-transform:uppercase; margin-bottom:0.8rem;">&#x1F4DD; Lückentext 1 — Bau &amp; Funktion (wie Arbeitsblatt)</p>
+            <p style="font-size:0.87rem; color:rgba(220,238,248,0.88); line-height:1.85;">
+                Der Bau einer Nervenzelle und ihrer einzelnen Bestandteile sind gut an ihre Funktion angepasst: Eine ihrer Hauptaufgaben ist es, <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(45,212,191,0.15); border:1px solid rgba(45,212,191,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Informationen">Informationen</span> weiterzuleiten. Sie besitzt einen besonders langen Fortsatz, das <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Axon">Axon</span>. Da es so lang ist, kann es Informationen &uuml;ber <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="große">gro&szlig;e</span> Strecken weiterleiten. Es ist von <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(129,140,248,0.15); border:1px solid rgba(129,140,248,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Hüllzellen">H&uuml;llzellen</span> umgeben. Durch sie wird die Informationsleitung <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="beschleunigt">beschleunigt</span>, denn die Impulse &bdquo;springen&ldquo; direkt von einem <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Schnürring">Schn&uuml;rring</span> zum n&auml;chsten. &Uuml;ber <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(244,114,182,0.12); border:1px solid rgba(244,114,182,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Synapsen">Synapsen</span> wird die Information schlie&szlig;lich an die <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(45,212,191,0.12); border:1px solid rgba(45,212,191,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="folgende Zelle">folgende Zelle</span> weitergegeben.
+            </p>
+            <p style="font-size:0.87rem; color:rgba(220,238,248,0.88); line-height:1.85; margin-top:0.7rem;">
+                Nervenzellen verarbeiten die Informationen aber auch. Am Zellk&ouml;rper befinden sich dazu fein <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="verästelte">ver&auml;stelte</span> Forts&auml;tze, die <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Dendriten">Dendriten</span>. Der Zellkern enth&auml;lt die <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(103,232,249,0.12); border:1px solid rgba(103,232,249,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Erbinformation">Erbinformation</span> der Zelle.
+            </p>
+            <p style="font-size:0.74rem; color:rgba(45,212,191,0.5); margin-top:0.6rem;">&#x1F447; Tippe auf eine L&uuml;cke um die Antwort zu sehen</p>
+        </div>
+
+        <!-- Lückentext 2: Synapse -->
+        <div style="background:rgba(10,18,30,0.85); border:1px solid rgba(244,114,182,0.18); border-radius:14px; padding:1.2rem 1.4rem; margin-bottom:1.5rem;">
+            <p style="font-size:0.78rem; font-weight:700; color:#f472b6; letter-spacing:.06em; text-transform:uppercase; margin-bottom:0.8rem;">&#x1F4DD; Lückentext 2 — Informations&uuml;bertragung an der Synapse</p>
+            <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                <div style="background:rgba(244,114,182,0.06); border:1px solid rgba(244,114,182,0.2); border-radius:9px; padding:0.7rem 1rem; font-size:0.86rem; color:rgba(220,238,248,0.9); line-height:1.6;">
+                    Ein elektrischer <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Impuls">Impuls</span> erreicht &uuml;ber das Axon das <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(244,114,182,0.18); border:1px solid rgba(244,114,182,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Endknöpfchen">Endkn&ouml;pfchen</span>.
+                </div>
+                <div style="background:rgba(244,114,182,0.06); border:1px solid rgba(244,114,182,0.2); border-radius:9px; padding:0.7rem 1rem; font-size:0.86rem; color:rgba(220,238,248,0.9); line-height:1.6;">
+                    Daraufhin <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="verschmelzen">verschmelzen</span> einige <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(244,114,182,0.18); border:1px solid rgba(244,114,182,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="synaptische Bläschen">synaptische Bl&auml;schen</span> mit der Membran des Endkn&ouml;pfchens. Dadurch gelangt &Uuml;bertr&auml;gerstoff in den <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Spalt">Spalt</span>.
+                </div>
+                <div style="background:rgba(45,212,191,0.05); border:1px solid rgba(45,212,191,0.18); border-radius:9px; padding:0.7rem 1rem; font-size:0.86rem; color:rgba(220,238,248,0.9); line-height:1.6;">
+                    Erreichen &Uuml;bertr&auml;gerstoff-Teilchen den <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(45,212,191,0.15); border:1px solid rgba(45,212,191,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Rezeptor">Rezeptor</span>, docken sie dort an und ein neuer elektrischer <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.3); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Impuls">Impuls</span> entsteht.
+                </div>
+                <div style="background:rgba(129,140,248,0.05); border:1px solid rgba(129,140,248,0.18); border-radius:9px; padding:0.7rem 1rem; font-size:0.86rem; color:rgba(220,238,248,0.9); line-height:1.6;">
+                    Die &Uuml;bertr&auml;gerstoff-Teilchen l&ouml;sen sich schlie&szlig;lich vom <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(45,212,191,0.15); border:1px solid rgba(45,212,191,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Rezeptor">Rezeptor</span> und werden von einem <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(129,140,248,0.15); border:1px solid rgba(129,140,248,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="Enzym">Enzym</span> gespalten.
+                </div>
+                <div style="background:rgba(129,140,248,0.05); border:1px solid rgba(129,140,248,0.18); border-radius:9px; padding:0.7rem 1rem; font-size:0.86rem; color:rgba(220,238,248,0.9); line-height:1.6;">
+                    Die St&uuml;cke der gespaltenen Teilchen werden von einem Transportenzym in das Endkn&ouml;pfchen <span class="lt" onclick="this.classList.toggle('revealed')" style="cursor:pointer; background:rgba(129,140,248,0.15); border:1px solid rgba(129,140,248,0.35); border-radius:5px; padding:0.05rem 0.6rem; color:transparent;" data-ans="gebracht">gebracht</span> und dort erneut zusammengesetzt.
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ FOOTER ════ -->
+        <div style="background:linear-gradient(135deg,rgba(45,212,191,0.06),rgba(74,222,128,0.04)); border:1px solid rgba(45,212,191,0.2); border-radius:14px; padding:1.3rem 1.6rem; margin:2.5rem 0 1rem; text-align:center;">
+            <p style="font-size:0.98rem; color:#2dd4bf; font-weight:700; margin-bottom:0.4rem;">&#x1F31F; Du schaffst das!</p>
+            <p style="font-size:0.82rem; color:rgba(167,243,208,0.6); margin:0;">Jeden Tag ein bisschen. Die Merkkarten t&auml;glich durchgehen. Am Tag&nbsp;5 alles &uuml;berfliegen und alle Fragen beantworten &mdash; dann bist du bereit. &#x1F340;</p>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <script>
+        document.querySelectorAll('.qitem').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var t = this.querySelector('.qt');
+                t.textContent = this.classList.contains('open')
+                    ? '▼ Antwort verstecken'
+                    : '▶ Antwort zeigen';
+            });
+        });
+
+        // Gap-fill: show text on click using data-ans attribute
+        document.querySelectorAll('.lt').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!this.classList.contains('revealed')) {
+                    this.textContent = this.dataset.ans;
+                    this.classList.add('revealed');
+                } else {
+                    this.textContent = this.dataset.ans;
+                }
+            });
+            // Set invisible placeholder text same length as answer for spacing
+            el.textContent = ' '.repeat(Math.max(4, el.dataset.ans ? el.dataset.ans.length : 4));
+        });
+    </script>
+</body>
+</html>
