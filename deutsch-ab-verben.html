@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verben mit „ab-" | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .tab-bar { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .tab-btn {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: rgba(230,230,235,0.55);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: rgba(52,211,153,0.5); color:#fff; }
+        .tab-btn.active { background:rgba(52,211,153,0.15); border-color:#34d399; color:#fff; }
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; }
+
+        /* Verb cards */
+        .verb-card {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        .verb-card:hover { border-color: rgba(52,211,153,0.3); }
+
+        .verb-head { display:flex; align-items:baseline; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.25rem; }
+        .verb-title { font-size:1.4rem; font-weight:900; color:#34d399; }
+        .verb-num {
+            font-size:0.72rem; font-weight:700;
+            background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.25);
+            border-radius:50px; padding:0.15rem 0.6rem; color:#34d399;
+        }
+        .verb-tag {
+            font-size:0.72rem; font-weight:700;
+            background:rgba(248,81,73,0.1); border:1px solid rgba(248,81,73,0.25);
+            border-radius:50px; padding:0.15rem 0.65rem; color:#ff9a93;
+        }
+        .multi { color:#79b8ff; font-size:0.78rem; font-weight:700; }
+
+        .verb-ua { color:rgba(230,230,235,0.6); font-size:0.93rem; margin:0.25rem 0 0.85rem; line-height:1.5; }
+
+        .verb-meaning {
+            border-left:3px solid rgba(52,211,153,0.35);
+            padding-left:0.9rem;
+            margin-bottom:0.7rem;
+        }
+        .verb-meaning-label {
+            font-size:0.78rem; font-weight:700; color:rgba(52,211,153,0.7);
+            text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.4rem;
+        }
+        .verb-examples { display:flex; flex-direction:column; gap:0.4rem; }
+        .verb-ex {
+            background:rgba(52,211,153,0.06); border-radius:8px;
+            padding:0.5rem 0.85rem; font-style:italic;
+            color:rgba(230,230,235,0.82); font-size:0.9rem;
+        }
+        .verb-ex .ex-ua {
+            font-style:normal; color:rgba(230,230,235,0.42); font-size:0.83rem; margin-top:0.2rem;
+        }
+        .verb-syn { font-size:0.8rem; color:rgba(230,230,235,0.45); margin-top:0.35rem; }
+        .verb-syn strong { color:#86efac; }
+        .verb-warn {
+            display:flex; gap:0.5rem;
+            background:rgba(248,81,73,0.07); border:1px solid rgba(248,81,73,0.22);
+            border-radius:9px; padding:0.55rem 0.85rem; margin-top:0.75rem;
+            color:#ff9a93; font-size:0.87rem;
+        }
+        .verb-tip {
+            display:flex; gap:0.5rem;
+            background:rgba(52,211,153,0.07); border:1px solid rgba(52,211,153,0.2);
+            border-radius:9px; padding:0.55rem 0.85rem; margin-top:0.75rem;
+            color:#86efac; font-size:0.87rem;
+        }
+
+        /* Table */
+        .ov-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+        .ov-table th {
+            background:rgba(52,211,153,0.1); color:#34d399; font-weight:700;
+            padding:0.6rem 0.9rem; text-align:left;
+            border-bottom:1px solid rgba(52,211,153,0.2);
+        }
+        .ov-table td {
+            padding:0.55rem 0.9rem; border-bottom:1px solid rgba(255,255,255,0.05);
+            color:rgba(230,230,235,0.78); vertical-align:top;
+        }
+        .ov-table tr:hover td { background:rgba(255,255,255,0.025); }
+        .ov-table td:first-child { font-weight:800; color:#34d399; white-space:nowrap; }
+
+        /* Quiz */
+        .quiz-q {
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            border-radius:14px; padding:1.1rem 1.3rem; margin-bottom:1rem;
+        }
+        .quiz-q p { font-weight:600; color:#e2e8f0; margin-bottom:0.7rem; font-size:0.95rem; }
+        .quiz-opts { display:flex; flex-direction:column; gap:0.4rem; }
+        .quiz-btn {
+            background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.09);
+            border-radius:8px; padding:0.6rem 1rem; color:rgba(230,230,235,0.78);
+            font-size:0.9rem; cursor:pointer; text-align:left; transition:all 0.18s;
+        }
+        .quiz-btn:hover { border-color:rgba(52,211,153,0.4); color:#fff; background:rgba(52,211,153,0.07); }
+        .quiz-btn.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#86efac; }
+        .quiz-btn.wrong   { background:rgba(248,81,73,0.15); border-color:#f85149; color:#ff9a93; }
+        .quiz-feedback { font-size:0.85rem; margin-top:0.45rem; min-height:1.2em; }
+        .quiz-score-box {
+            background:rgba(52,211,153,0.09); border:1px solid rgba(52,211,153,0.28);
+            border-radius:12px; padding:1rem 1.3rem; margin-top:1.2rem;
+            color:#34d399; font-weight:700; font-size:1rem;
+        }
+        .source-badge {
+            display:inline-flex; align-items:center; gap:0.4rem;
+            background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.25);
+            border-radius:50px; padding:0.3rem 0.9rem;
+            font-size:0.82rem; color:#34d399; margin-bottom:1.4rem;
+        }
+
+        /* Poem cards */
+        .poem-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.3rem; }
+        .poem-card {
+            background:rgba(52,211,153,0.04);
+            border:1.5px solid rgba(52,211,153,0.18);
+            border-radius:16px;
+            padding:1.1rem 1.3rem;
+            transition: border-color 0.2s;
+        }
+        .poem-card:hover { border-color:rgba(52,211,153,0.4); }
+        .poem-verb { font-size:1rem; font-weight:900; color:#34d399; margin:0 0 0.55rem 0; }
+        .poem-lines { font-style:italic; line-height:2; color:rgba(230,230,235,0.85); font-size:0.91rem; margin:0 0 0.55rem 0; }
+        .poem-lines strong { color:#34d399; font-style:normal; }
+        .poem-ua { font-size:0.76rem; color:rgba(230,230,235,0.38); margin:0; line-height:1.5; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/flowers.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(8,10,22,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verben mit &bdquo;ab-&ldquo;</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F504; Verben mit &bdquo;ab-&ldquo;</h1>
+            <p class="page-subtitle">abgewinnen &bull; abwimmeln &bull; abwinken &bull; abraten &bull; abw&auml;gen &hellip; &mdash; 10 Verben B2/C1</p>
+        </div>
+
+        <div class="source-badge">&#x2728; ab- + Verb &mdash; Pr&auml;fix mit vielen Gesichtern</div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="tab-v">&#x1F4D6; Verben</button>
+            <button class="tab-btn" data-tab="tab-ov">&#x26A1; &Uuml;bersicht</button>
+            <button class="tab-btn" data-tab="tab-q">&#x1F9E0; Quiz</button>
+            <button class="tab-btn" data-tab="tab-g">&#x1F4DC; Вірші</button>
+        </div>
+
+        <!-- TAB: VERBEN -->
+        <div id="tab-v" class="tab-pane active">
+
+            <!-- 1. abgewinnen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abgewinnen</span>
+                    <span class="verb-num">01</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① знаходити щось хороше в чомусь &nbsp;|&nbsp; ② виграти у когось щось</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① etw./jmdm. etwas abgewinnen — знайти позитивне / подобатись (щось у чомусь)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Ich kann dem Vorschlag nichts abgewinnen."
+                            <div class="ex-ua">Я не можу знайти нічого позитивного в цій пропозиції. (Мені це не подобається.)</div>
+                        </div>
+                        <div class="verb-ex">„Dem grauen Wetter konnte sie eine romantische Stimmung abgewinnen."
+                            <div class="ex-ua">У сірій погоді вона змогла знайти щось романтичне.</div>
+                        </div>
+                        <div class="verb-ex">„Kannst du dem Lernen etwas abgewinnen?"
+                            <div class="ex-ua">Чи знаходиш ти щось хороше в навчанні?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② jmdm. etwas abgewinnen — виграти щось у когось (у грі, суперечці)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er konnte dem Schachmeister keinen einzigen Punkt abgewinnen."
+                            <div class="ex-ua">Він не зміг виграти жодного очка у чемпіона з шахів.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-tip">
+                    <span>💡</span>
+                    <span>Найчастіше вживається з <strong>nichts</strong> або <strong>etwas</strong>: <em>„Ich kann dem nichts abgewinnen"</em> — найважливіша конструкція!</span>
+                </div>
+            </div>
+
+            <!-- 2. abwimmeln -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abwimmeln</span>
+                    <span class="verb-num">02</span>
+                    <span class="verb-tag">розмовне</span>
+                </div>
+                <div class="verb-ua">позбуватись когось, відбивати (нав'язливих людей)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er hat mich einfach abgewimmelt."
+                            <div class="ex-ua">Він просто позбувся мене / відмахнувся від мене.</div>
+                        </div>
+                        <div class="verb-ex">„Die Sekretärin wimmelt alle lästigen Anrufer ab."
+                            <div class="ex-ua">Секретарка відбиває всіх набридливих дзвонарів.</div>
+                        </div>
+                        <div class="verb-ex">„Ich wollte sie um Hilfe bitten, aber sie hat mich abgewimmelt."
+                            <div class="ex-ua">Я хотів попросити її про допомогу, але вона мене відправила ні з чим.</div>
+                        </div>
+                    </div>
+                    <div class="verb-syn">= <strong>loswerden, wegschicken</strong> — але менш формально</div>
+                </div>
+            </div>
+
+            <!-- 3. abwinken -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abwinken</span>
+                    <span class="verb-num">03</span>
+                    <span class="verb-tag">розмовне</span>
+                </div>
+                <div class="verb-ua">відмахуватись, відхиляти (жестом або фігурально)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Als ich nochmal fragen wollte, hat er sofort abgewinkt."
+                            <div class="ex-ua">Коли я хотів запитати ще раз, він одразу відмахнувся.</div>
+                        </div>
+                        <div class="verb-ex">„Ich winke ab — das ist mir zu kompliziert."
+                            <div class="ex-ua">Я відмовляюсь — це занадто складно для мене.</div>
+                        </div>
+                        <div class="verb-ex">„Sie hat bei dem Angebot gleich abgewinkt."
+                            <div class="ex-ua">На цю пропозицію вона одразу ж відмахнулась.</div>
+                        </div>
+                    </div>
+                    <div class="verb-warn">
+                        <span>⚠️</span>
+                        <span><strong>abwinken ≠ abwimmeln</strong>: abwinken — відхилити ідею/пропозицію жестом; abwimmeln — позбутись людини</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. abraten -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abraten</span>
+                    <span class="verb-num">04</span>
+                </div>
+                <div class="verb-ua">радити не робити, застерігати від чогось</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Ich rate dir davon ab, das zu tun."
+                            <div class="ex-ua">Я раджу тобі цього не робити.</div>
+                        </div>
+                        <div class="verb-ex">„Der Arzt hat mir vom Sport abgeraten."
+                            <div class="ex-ua">Лікар застеріг мене від занять спортом.</div>
+                        </div>
+                        <div class="verb-ex">„Ich rate dringend davon ab, diese Route zu nehmen."
+                            <div class="ex-ua">Я настійно рекомендую не обирати цей маршрут.</div>
+                        </div>
+                    </div>
+                    <div class="verb-tip">
+                        <span>💡</span>
+                        <span>Конструкція: <strong>jmdm. von etw. abraten</strong> або <strong>jmdm. davon abraten, etw. zu tun</strong></span>
+                    </div>
+                    <div class="verb-syn">↔ <strong>raten</strong> (радити зробити) &nbsp;|&nbsp; <strong>abraten</strong> (радити НЕ робити)</div>
+                </div>
+            </div>
+
+            <!-- 5. abwägen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abw&auml;gen</span>
+                    <span class="verb-num">05</span>
+                </div>
+                <div class="verb-ua">зважувати, ретельно обдумувати (плюси і мінуси)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Vor einer Entscheidung sollte man Vor- und Nachteile abwägen."
+                            <div class="ex-ua">Перед прийняттям рішення слід зважити всі плюси і мінуси.</div>
+                        </div>
+                        <div class="verb-ex">„Er wägte lange ab, bevor er zusagte."
+                            <div class="ex-ua">Він довго зважував, перш ніж погодитись.</div>
+                        </div>
+                        <div class="verb-ex">„Man muss Risiko und Nutzen sorgfältig abwägen."
+                            <div class="ex-ua">Треба ретельно зважити ризик і користь.</div>
+                        </div>
+                    </div>
+                    <div class="verb-syn">= <strong>überlegen, berücksichtigen</strong> — але з відтінком порівняння двох сторін</div>
+                </div>
+            </div>
+
+            <!-- 6. absehen -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">absehen</span>
+                    <span class="verb-num">06</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① утримуватись від (офіційно) &nbsp;|&nbsp; ② передбачати / бачити кінець</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① von etw. absehen — утримуватись, відмовлятись (від покарання, вимоги)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Die Polizei sah von einer Anzeige ab."
+                            <div class="ex-ua">Поліція утрималась від подачі заяви.</div>
+                        </div>
+                        <div class="verb-ex">„Wir sehen diesmal von einer Strafe ab."
+                            <div class="ex-ua">Цього разу ми утримаємось від покарання.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② es ist (nicht) abzusehen — (не) передбачити / (не) видно кінця</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Das Ende des Konflikts ist noch nicht abzusehen."
+                            <div class="ex-ua">Кінець конфлікту ще не видно.</div>
+                        </div>
+                        <div class="verb-ex">„Es ist abzusehen, dass die Preise steigen werden."
+                            <div class="ex-ua">Можна передбачити, що ціни зростуть.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-tip">
+                    <span>💡</span>
+                    <span><strong>abgesehen von</strong> — окрім, не рахуючи: <em>„Abgesehen davon, war alles gut."</em> — Крім цього, все було добре.</span>
+                </div>
+            </div>
+
+            <!-- 7. abwenden -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abwenden</span>
+                    <span class="verb-num">07</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① відвертати / запобігати (катастрофі) &nbsp;|&nbsp; ② відвертатись (від когось)</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① etw. abwenden — запобігти, відвернути (небезпеку, катастрофу)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Die Katastrophe konnte im letzten Moment abgewendet werden."
+                            <div class="ex-ua">Катастрофу вдалось відвернути в останній момент.</div>
+                        </div>
+                        <div class="verb-ex">„Ein Krieg muss um jeden Preis abgewendet werden."
+                            <div class="ex-ua">Війну слід відвернути за будь-яку ціну.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② sich (von jmdm.) abwenden — відвернутись, відвертатись від когось</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Sie wandte sich schweigend von ihm ab."
+                            <div class="ex-ua">Вона мовчки відвернулась від нього.</div>
+                        </div>
+                        <div class="verb-ex">„Viele Wähler wenden sich von der Partei ab."
+                            <div class="ex-ua">Багато виборців відвертаються від партії.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. abhalten -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abhalten</span>
+                    <span class="verb-num">08</span>
+                    <span class="multi">2 значення</span>
+                </div>
+                <div class="verb-ua">① проводити (захід) &nbsp;|&nbsp; ② утримувати когось від чогось</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① eine Veranstaltung abhalten — проводити (збори, конференцію, вибори)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Die Konferenz wird morgen abgehalten."
+                            <div class="ex-ua">Конференція відбудеться завтра.</div>
+                        </div>
+                        <div class="verb-ex">„Nächste Woche werden Wahlen abgehalten."
+                            <div class="ex-ua">Наступного тижня відбудуться вибори.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② jmdn. von etw. abhalten — утримувати / заважати</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Was hat dich davon abgehalten, früher zu kommen?"
+                            <div class="ex-ua">Що утримало тебе від того, щоб прийти раніше?</div>
+                        </div>
+                        <div class="verb-ex">„Lass dich nicht davon abhalten!"
+                            <div class="ex-ua">Не дозволяй нічому тебе зупинити!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. abstreiten -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abstreiten</span>
+                    <span class="verb-num">09</span>
+                </div>
+                <div class="verb-ua">заперечувати, відкидати (провину, факт)</div>
+                <div class="verb-meaning">
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er streitet jede Schuld ab."
+                            <div class="ex-ua">Він заперечує будь-яку провину.</div>
+                        </div>
+                        <div class="verb-ex">„Das lässt sich nicht abstreiten."
+                            <div class="ex-ua">Це не можна заперечити. / Це незаперечний факт.</div>
+                        </div>
+                        <div class="verb-ex">„Sie streitet ab, dabei gewesen zu sein."
+                            <div class="ex-ua">Вона заперечує, що була там.</div>
+                        </div>
+                    </div>
+                    <div class="verb-syn">= <strong>leugnen, verneinen</strong> &nbsp;|&nbsp; ↔ <strong>zugeben, eingestehen</strong> (визнавати)</div>
+                    <div class="verb-tip">
+                        <span>💡</span>
+                        <span><em>„Das lässt sich nicht abstreiten"</em> — стійкий вираз, дуже корисний у дискусіях і текстах!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. abgeben -->
+            <div class="verb-card">
+                <div class="verb-head">
+                    <span class="verb-title">abgeben</span>
+                    <span class="verb-num">10</span>
+                    <span class="multi">3 значення</span>
+                </div>
+                <div class="verb-ua">① здавати / відправляти &nbsp;|&nbsp; ② ділитись &nbsp;|&nbsp; ③ sich abgeben — возитись з</div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">① etw. abgeben — здавати, передавати</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Ich gebe die Hausaufgaben morgen ab."
+                            <div class="ex-ua">Я здам домашнє завдання завтра.</div>
+                        </div>
+                        <div class="verb-ex">„Den Koffer am Schalter abgeben."
+                            <div class="ex-ua">Здати валізу на стійці реєстрації.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">② etw. (von etw.) abgeben — поділитись, дати частину</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Gibst du mir etwas von deinem Kuchen ab?"
+                            <div class="ex-ua">Дай мені шматочок свого торта?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="verb-meaning">
+                    <div class="verb-meaning-label">③ sich mit jmdm./etw. abgeben — возитись, мати справу (зазвичай небажану)</div>
+                    <div class="verb-examples">
+                        <div class="verb-ex">„Er gibt sich nicht mit solchen Leuten ab."
+                            <div class="ex-ua">Він не має справи з такими людьми. / Він не возиться з такими людьми.</div>
+                        </div>
+                        <div class="verb-ex">„Ich gebe mich nicht mit Klatsch ab."
+                            <div class="ex-ua">Я не цікавлюсь плітками.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-v -->
+
+        <!-- TAB: ÜBERSICHT -->
+        <div id="tab-ov" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.9rem; margin-bottom:1.2rem;">Всі 10 дієслів одним поглядом:</p>
+            <div style="overflow-x:auto;">
+            <table class="ov-table">
+                <tr><th>#</th><th>Дієслово</th><th>Значення</th><th>Нотатка</th></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">01</td><td>abgewinnen</td><td>① знайти щось позитивне ② виграти у когось</td><td>„nichts/etwas abgewinnen"</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">02</td><td>abwimmeln</td><td>позбуватись когось, відбивати</td><td>розмовне</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">03</td><td>abwinken</td><td>відмахуватись від пропозиції/ідеї</td><td>розмовне ≠ abwimmeln</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">04</td><td>abraten</td><td>радити не робити, застерігати</td><td>jmdm. von etw. abraten</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">05</td><td>abwägen</td><td>зважувати (плюси і мінуси)</td><td>Vor- und Nachteile ~</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">06</td><td>absehen</td><td>① утримуватись від ② передбачати / не видно кінця</td><td>abgesehen von = окрім</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">07</td><td>abwenden</td><td>① відвернути катастрофу ② відвернутись від когось</td><td>sich abwenden ≠ etw. abwenden</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">08</td><td>abhalten</td><td>① провести захід ② утримати когось від</td><td>Wahlen / Konferenz abhalten</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">09</td><td>abstreiten</td><td>заперечувати, відкидати</td><td>„lässt sich nicht abstreiten"</td></tr>
+                <tr><td style="color:rgba(230,230,235,0.3);font-size:0.8rem;">10</td><td>abgeben</td><td>① здати ② поділитись ③ sich ~ — возитись з</td><td>3 значення!</td></tr>
+            </table>
+            </div>
+
+            <div class="note-card" style="margin-top:1.8rem; background:rgba(52,211,153,0.05); border-color:rgba(52,211,153,0.2);">
+                <h3 style="color:#34d399;">&#x1F9E9; Важливі пари і пастки</h3>
+                <div style="display:flex; flex-direction:column; gap:0.7rem; margin-top:0.7rem; font-size:0.91rem; color:rgba(230,230,235,0.75); line-height:1.6;">
+                    <div>&#x1F538; <strong style="color:#34d399;">abwinken ≠ abwimmeln</strong> — abwinken відхиляє ідею; abwimmeln позбувається людини</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">abgewinnen</strong> — не плутай з „gewinnen": „Ich kann dem nichts abgewinnen" ≠ я не виграю</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">abraten ↔ raten</strong> — рatan радить, abraten застерігає; обидва: <em>jmdm. etw. raten/abraten</em></div>
+                    <div>&#x1F538; <strong style="color:#34d399;">abhalten</strong> ① + Veranstaltung ② + Person — два зовсім різних значення!</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">abgesehen von</strong> — не дієслово, а прийменник: <em>„Abgesehen davon..."</em> = окрім цього</div>
+                    <div>&#x1F538; <strong style="color:#34d399;">sich abgeben mit</strong> (③) — зазвичай з негативним відтінком: він не хоче мати з цим справу</div>
+                </div>
+            </div>
+        </div><!-- /tab-ov -->
+
+        <!-- TAB: QUIZ -->
+        <div id="tab-q" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.55); font-size:0.88rem; margin-bottom:1.2rem;">Вибери правильне дієслово або значення:</p>
+
+            <div class="quiz-q" data-answer="b">
+                <p>1. „Ich kann dem Vorschlag nichts ___." — не можу знайти нічого позитивного.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'b','1')">a) abstreiten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','1')">b) abgewinnen</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','1')">c) abwägen</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','1')">d) abraten</button>
+                </div>
+                <div class="quiz-feedback" id="af1"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>2. „Er hat mich einfach ___." — він позбувся мене, відправив ні з чим.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'c','2')">a) abgewinkt</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','2')">b) abgehalten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','2')">c) abgewimmelt</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','2')">d) abgewendet</button>
+                </div>
+                <div class="quiz-feedback" id="af2"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>3. „Ich rate dir davon ___, das zu tun." — я застерігаю тебе від цього.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'a','3')">a) ab</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','3')">b) aus</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','3')">c) nach</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','3')">d) vor</button>
+                </div>
+                <div class="quiz-feedback" id="af3"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>4. „Man sollte Vor- und Nachteile ___." — слід зважити всі плюси і мінуси.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'d','4')">a) abstreiten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','4')">b) abwimmeln</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','4')">c) absehen</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','4')">d) abwägen</button>
+                </div>
+                <div class="quiz-feedback" id="af4"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>5. „Die Konferenz wird morgen ___." — конференція відбудеться завтра.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'b','5')">a) abgestritten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','5')">b) abgehalten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','5')">c) abgewogen</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','5')">d) abgegeben</button>
+                </div>
+                <div class="quiz-feedback" id="af5"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>6. „Das lässt sich nicht ___." — це не можна заперечити.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'c','6')">a) abwenden</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','6')">b) abwimmeln</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','6')">c) abstreiten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','6')">d) abraten</button>
+                </div>
+                <div class="quiz-feedback" id="af6"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="a">
+                <p>7. „Die Katastrophe konnte ___ werden." — катастрофу вдалось відвернути.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'a','7')">a) abgewendet</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','7')">b) abgewogen</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','7')">c) abgestritten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'a','7')">d) abgewimmelt</button>
+                </div>
+                <div class="quiz-feedback" id="af7"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="d">
+                <p>8. „Die Polizei sah von einer Anzeige ___." — поліція утрималась від заяви.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'d','8')">a) nach</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','8')">b) aus</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','8')">c) vor</button>
+                    <button class="quiz-btn" onclick="checkA(this,'d','8')">d) ab</button>
+                </div>
+                <div class="quiz-feedback" id="af8"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="b">
+                <p>9. „Er gibt sich nicht mit solchen Leuten ___." — він не возиться з такими людьми.</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'b','9')">a) vor</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','9')">b) ab</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','9')">c) nach</button>
+                    <button class="quiz-btn" onclick="checkA(this,'b','9')">d) aus</button>
+                </div>
+                <div class="quiz-feedback" id="af9"></div>
+            </div>
+
+            <div class="quiz-q" data-answer="c">
+                <p>10. „Als ich nochmal fragte, hat er sofort ___." — він одразу відмахнувся (жестом).</p>
+                <div class="quiz-opts">
+                    <button class="quiz-btn" onclick="checkA(this,'c','10')">a) abgewimmelt</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','10')">b) abgehalten</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','10')">c) abgewinkt</button>
+                    <button class="quiz-btn" onclick="checkA(this,'c','10')">d) abgestritten</button>
+                </div>
+                <div class="quiz-feedback" id="af10"></div>
+            </div>
+
+            <div class="quiz-score-box" id="ascore" style="display:none;"></div>
+        </div><!-- /tab-q -->
+
+        <!-- TAB: ВІРШІ -->
+        <div id="tab-g" class="tab-pane">
+            <p style="color:rgba(230,230,235,0.45); font-size:0.88rem; margin-bottom:1.2rem;">Один чотиривірш — одне дієслово</p>
+            <div class="poem-grid">
+
+                <div class="poem-card">
+                    <p class="poem-verb">01 · abgewinnen</p>
+                    <p class="poem-lines">
+                        Dem grauen Montag, schwer und leer —<br>
+                        kann ich was <strong>abgewinnen</strong>, sehr?<br>
+                        Den Kaffee, die Stille, den neuen Start —<br>
+                        <strong>abgewinnen</strong> ist eine Kunst, die man wahrt.
+                    </p>
+                    <p class="poem-ua">У сірому понеділку — знайти щось хороше. Кава, тиша, новий початок. Abgewinnen — це мистецтво.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">02 · abwimmeln</p>
+                    <p class="poem-lines">
+                        „Ich hab keine Zeit!" — kurz gesagt,<br>
+                        <strong>abgewimmelt</strong>, wer mich fragt.<br>
+                        Die Sekretärin, kühl und schlau,<br>
+                        <strong>wimmelt</strong> jeden <strong>ab</strong> — ganz genau.
+                    </p>
+                    <p class="poem-ua">«Немає часу!» — і позбувся. Секретарка холодно відбиває всіх. Abwimmeln — майстерно.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">03 · abwinken</p>
+                    <p class="poem-lines">
+                        „Noch eine Frage?" — „Nein, ich <strong>wink ab</strong>!"<br>
+                        Kein Wort mehr nötig, kein langer Stab.<br>
+                        Die Hand gehoben — fertig, weg —<br>
+                        <strong>abwinken</strong>: das ist mein Weg.
+                    </p>
+                    <p class="poem-ua">«Ще одне питання?» — «Ні, я відмахуюсь!» Рука піднята — і все, достатньо.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">04 · abraten</p>
+                    <p class="poem-lines">
+                        „Tu das nicht!" — das ist mein Rat.<br>
+                        <strong>Abraten</strong>, eh's dir schadet grad.<br>
+                        Ich rate dir davon ab, mein Kind —<br>
+                        weil ich seh, wohin die Wege sind.
+                    </p>
+                    <p class="poem-ua">«Не роби цього!» — моя порада. Abraten — до того, як стане пізно. Я бачу, куди ведуть шляхи.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">05 · abwägen</p>
+                    <p class="poem-lines">
+                        Links oder rechts? Pro oder Kon?<br>
+                        Erst <strong>abwägen</strong> — dann geh davon!<br>
+                        Vor- und Nachteile auf die Waag' —<br>
+                        <strong>abwägen</strong> macht den klugen Tag.
+                    </p>
+                    <p class="poem-ua">Ліво чи право? «За» чи «проти»? Спершу зваж — потім дій. Abwägen робить день розумним.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">06 · absehen</p>
+                    <p class="poem-lines">
+                        Von einer Strafe <strong>absehen</strong> — fein.<br>
+                        Das Ende? Nicht <strong>abzusehen</strong> — nein.<br>
+                        <strong>Abgesehen davon</strong> war alles gut —<br>
+                        drei Formen, ein Verb — das braucht Mut.
+                    </p>
+                    <p class="poem-ua">Утриматись від покарання. Кінця не видно. Окрім цього — все добре. Три значення, одне слово.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">07 · abwenden</p>
+                    <p class="poem-lines">
+                        Die Krise kam — doch wir <strong>wendeten ab</strong>,<br>
+                        was uns im letzten Moment zerbrach.<br>
+                        Sie <strong>wandte sich</strong> von ihm still <strong>ab</strong> —<br>
+                        <strong>abwenden</strong>: innen und außen, tab.
+                    </p>
+                    <p class="poem-ua">Ми відвернули кризу. Вона мовчки відвернулась від нього. Abwenden — зовні і всередині.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">08 · abhalten</p>
+                    <p class="poem-lines">
+                        Die Wahl wird morgen <strong>abgehalten</strong> — groß.<br>
+                        Was hält dich davon <strong>ab</strong>? Kein Stoß?<br>
+                        Ein Wort — doch zwei so verschiedne Seiten:<br>
+                        Veranstaltung und Hindernis — beide leiten.
+                    </p>
+                    <p class="poem-ua">Вибори відбудуться завтра. Що тебе зупиняє? Одне слово — два значення: провести і утримати.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">09 · abstreiten</p>
+                    <p class="poem-lines">
+                        „Ich war's nicht!" — doch es stimmt, sei ehrlich!<br>
+                        <strong>Abstreiten</strong> macht's nur schwierlich.<br>
+                        „Das lässt sich nicht <strong>abstreiten</strong>", klar —<br>
+                        was wahr ist, bleibt nun einmal wahr.
+                    </p>
+                    <p class="poem-ua">«Це не я!» — але правда є правдою. Заперечення лише ускладнює. Що правда — те правда.</p>
+                </div>
+
+                <div class="poem-card">
+                    <p class="poem-verb">10 · abgeben</p>
+                    <p class="poem-lines">
+                        Die Hausaufgabe <strong>abgegeben</strong> — check!<br>
+                        „Gib mir ein Stück <strong>ab</strong>!" — nicht weg.<br>
+                        Mit solchen Leuten <strong>geb ich mich</strong> nicht <strong>ab</strong> —<br>
+                        drei Sinne, ein Verb — das gibt's wohl ab.
+                    </p>
+                    <p class="poem-ua">Здала домашнє. Поділись шматочком. З такими людьми я не вожуся. Три значення — одне дієслово.</p>
+                </div>
+
+            </div>
+        </div><!-- /tab-g -->
+
+    </div>
+
+    <footer class="footer-dark">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.tab;
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                this.classList.add('active');
+            });
+        });
+
+        var aScore = 0, aTotal = 0, aMax = 10;
+
+        function checkA(btn, correct, num) {
+            var q = btn.closest('.quiz-q');
+            if (q.dataset.done) return;
+            q.dataset.done = '1';
+            aTotal++;
+            var opts = q.querySelectorAll('.quiz-btn');
+            var letters = ['a','b','c','d'];
+            var chosen = letters[Array.from(opts).indexOf(btn)];
+            var fb = document.getElementById('af' + num);
+            opts.forEach(function(b, i) {
+                b.disabled = true;
+                if (letters[i] === correct) b.classList.add('correct');
+            });
+            if (chosen === correct) {
+                aScore++;
+                btn.classList.add('correct');
+                fb.style.color = '#86efac';
+                fb.textContent = '✓ Правильно!';
+            } else {
+                btn.classList.add('wrong');
+                fb.style.color = '#ff9a93';
+                fb.textContent = '✗ Неправильно';
+            }
+            if (aTotal === aMax) {
+                var box = document.getElementById('ascore');
+                box.style.display = 'block';
+                box.textContent = '🔑 Результат: ' + aScore + ' / ' + aMax + (aScore >= 9 ? ' — відмінно!' : aScore >= 7 ? ' — непогано!' : ' — повтори дієслова!');
+            }
+        }
+    </script>
+</body>
+</html>
