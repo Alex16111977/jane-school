@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discourse Markers | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .dm-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .dm-table th, .dm-table td {
+            padding: 0.55rem 0.65rem;
+            border: 1px solid rgba(255,255,255,0.07);
+            text-align: left;
+            vertical-align: middle;
+        }
+        .dm-table th {
+            background: rgba(255,255,255,0.04);
+            font-weight: 700;
+            color: var(--color-text-muted);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .dm-table td.marker {
+            font-weight: 800;
+            font-family: 'Georgia', serif;
+            color: #06b6d4;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .dm-table td.tr {
+            font-family: 'Menlo', monospace;
+            color: #fbbf24;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .dm-table td.func {
+            color: rgba(230,230,235,0.95);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .dm-table td.ex {
+            color: #a371f7;
+            font-size: 0.82rem;
+            font-style: italic;
+        }
+        .dm-table td.ex strong { color: #06b6d4; font-style: normal; font-weight: 800; }
+        .dm-table td.note {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+        }
+        .dm-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+        .group-header {
+            background: linear-gradient(135deg, var(--group-from, rgba(6,182,212,0.18)), var(--group-to, rgba(6,182,212,0.04)));
+            border: 1px solid var(--group-border, rgba(6,182,212,0.3));
+            border-left: 4px solid var(--group-accent, #06b6d4);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            margin: 1.5rem 0 0.6rem;
+        }
+        .group-header h3 {
+            margin: 0;
+            color: var(--group-accent, #06b6d4);
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .group-header .group-count {
+            background: var(--group-accent, #06b6d4);
+            color: #0a0a14;
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 0.15rem 0.55rem;
+            border-radius: 12px;
+        }
+        .group-header p {
+            margin: 0.3rem 0 0;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .table-wrapper { overflow-x: auto; }
+
+        .top10-box {
+            background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.04));
+            border: 2px solid rgba(6,182,212,0.4);
+            border-radius: 14px;
+            padding: 1.1rem 1.4rem;
+            margin: 1.2rem 0;
+        }
+        .top10-box h3 {
+            margin: 0 0 0.6rem;
+            color: #06b6d4;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .top10-box ol {
+            margin: 0;
+            padding-left: 1.3rem;
+            line-height: 1.9;
+            font-size: 0.9rem;
+        }
+        .top10-box code {
+            background: rgba(0,0,0,0.3);
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #06b6d4;
+            font-family: 'Georgia', serif;
+            font-weight: 800;
+        }
+        .top10-box .fn {
+            color: var(--color-text-muted);
+            font-size: 0.82rem;
+        }
+
+        /* compare box */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.9rem;
+            margin: 1rem 0;
+        }
+        @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+
+        .compare-bad {
+            background: rgba(239,68,68,0.08);
+            border: 1.5px solid rgba(239,68,68,0.35);
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+        }
+        .compare-good {
+            background: rgba(63,185,80,0.08);
+            border: 1.5px solid rgba(63,185,80,0.35);
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+        }
+        .compare-bad h4 { margin: 0 0 0.5rem; color: #ef4444; font-size: 0.82rem; letter-spacing: 0.03em; text-transform: uppercase; }
+        .compare-good h4 { margin: 0 0 0.5rem; color: #3fb950; font-size: 0.82rem; letter-spacing: 0.03em; text-transform: uppercase; }
+        .compare-bad p, .compare-good p {
+            margin: 0;
+            font-size: 0.88rem;
+            line-height: 1.75;
+            font-style: italic;
+            color: rgba(230,230,235,0.9);
+        }
+        .compare-bad p strong { color: #ef4444; font-style: normal; }
+        .compare-good p strong { color: #06b6d4; font-style: normal; }
+
+        /* level chip */
+        .chip {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            letter-spacing: 0.04em;
+            vertical-align: middle;
+            margin-left: 0.3rem;
+        }
+        .chip-a2 { background: rgba(63,185,80,0.2); color: #3fb950; border: 1px solid rgba(63,185,80,0.4); }
+        .chip-b1 { background: rgba(88,166,255,0.2); color: #58a6ff; border: 1px solid rgba(88,166,255,0.4); }
+        .chip-b2 { background: rgba(163,113,247,0.2); color: #a371f7; border: 1px solid rgba(163,113,247,0.4); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Discourse Markers</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&#x1F4AC; Discourse Markers</h1>
+            <p class="page-subtitle">Слова-клей живой речи &mdash; без них звучишь как учебник</p>
+        </div>
+
+        <!-- ============ WHAT IS IT ============ -->
+        <div class="note-card highlight-card" style="border-color:rgba(6,182,212,0.4); background:rgba(6,182,212,0.06);">
+            <p style="margin:0;"><strong style="color:#06b6d4;">&#x1F4CC; Что такое discourse markers?</strong> Это слова, которые <strong>не несут отдельного смысла</strong>, но делают речь живой и связной. Носители вставляют их постоянно &mdash; чтобы выиграть время, мягче звучать, показать что думают вслух, перейти к следующей мысли. Без них даже грамматически правильная речь звучит <em>как чтение вслух из учебника</em>.</p>
+        </div>
+
+        <!-- ============ COMPARE BOX ============ -->
+        <div class="compare-grid">
+            <div class="compare-bad">
+                <h4>&#x274C; Без маркеров &mdash; звучит странно</h4>
+                <p>&ldquo;I think the answer is correct. It is difficult. We should try again. The problem is the time limit.&rdquo;</p>
+            </div>
+            <div class="compare-good">
+                <h4>&#x2705; С маркерами &mdash; звучит живо</h4>
+                <p>&ldquo;<strong>Well</strong>, I think the answer is correct. <strong>I mean</strong>, it&rsquo;s pretty difficult. <strong>But</strong>, <strong>you know</strong>, we should try again &mdash; <strong>actually</strong>, the real problem is the time limit.&rdquo;</p>
+            </div>
+        </div>
+
+        <!-- ============ TOP-10 ============ -->
+        <div class="top10-box">
+            <h3>&#x1F3C6; Топ-10 must-know &mdash; учи в первую очередь</h3>
+            <ol>
+                <li><code>well</code> <span class="fn">&mdash; начало мысли, пауза, мягкий ответ (<em>Well, I&rsquo;m not sure...</em>)</span></li>
+                <li><code>you know</code> <span class="fn">&mdash; &laquo;ты понимаешь&raquo; / пауза-наполнитель (<em>It was, you know, complicated.</em>)</span></li>
+                <li><code>I mean</code> <span class="fn">&mdash; уточнение, объяснение (<em>I mean, it&rsquo;s not wrong, but...</em>)</span></li>
+                <li><code>like</code> <span class="fn">&mdash; молодёжный разговорный наполнитель (<em>She was like, really upset.</em>)</span></li>
+                <li><code>actually</code> <span class="fn">&mdash; поправка, удивляющий факт (<em>Actually, I agree.</em>)</span></li>
+                <li><code>so</code> <span class="fn">&mdash; вывод или переход (<em>So, what do we do now?</em>)</span></li>
+                <li><code>right</code> <span class="fn">&mdash; проверка понимания / подтверждение (<em>Right, so let&rsquo;s start.</em>)</span></li>
+                <li><code>basically</code> <span class="fn">&mdash; вкратце, суть (<em>Basically, we failed.</em>)</span></li>
+                <li><code>anyway</code> <span class="fn">&mdash; возврат к теме / закрытие (<em>Anyway, moving on...</em>)</span></li>
+                <li><code>look</code> <span class="fn">&mdash; привлечь внимание, серьёзный момент (<em>Look, this is important.</em>)</span></li>
+            </ol>
+        </div>
+
+        <!-- ============ 1. STARTERS ============ -->
+        <div class="group-header" style="--group-accent:#06b6d4; --group-from:rgba(6,182,212,0.18); --group-to:rgba(6,182,212,0.04); --group-border:rgba(6,182,212,0.3);">
+            <h3>&#x1F7E6; 1. Starters &mdash; как начать мысль <span class="group-count">6</span></h3>
+            <p>Вместо того чтобы молчать и резко говорить &mdash; открой фразу мягко</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">Well</td>
+                    <td class="tr">уэл</td>
+                    <td class="func">пауза перед ответом, смягчение, &laquo;ну...&raquo;</td>
+                    <td class="ex">&laquo;<strong>Well</strong>, I&rsquo;m not totally sure about that.&raquo;</td>
+                    <td class="note">Самый частый starter &mdash; вставляй почти в каждый ответ</td>
+                </tr>
+                <tr>
+                    <td class="marker">So</td>
+                    <td class="tr">со́у</td>
+                    <td class="func">переход, вывод, &laquo;итак&raquo;</td>
+                    <td class="ex">&laquo;<strong>So</strong>, what do we do now?&raquo;</td>
+                    <td class="note">В конце фразы &laquo;So...&raquo; значит: ожидаю ответа</td>
+                </tr>
+                <tr>
+                    <td class="marker">Look</td>
+                    <td class="tr">лук</td>
+                    <td class="func">привлечение внимания, серьёзный момент</td>
+                    <td class="ex">&laquo;<strong>Look</strong>, I need to be honest with you.&raquo;</td>
+                    <td class="note">= &laquo;послушай&raquo;, звучит решительно</td>
+                </tr>
+                <tr>
+                    <td class="marker">Right</td>
+                    <td class="tr">райт</td>
+                    <td class="func">начало нового этапа, &laquo;итак, ладно&raquo;</td>
+                    <td class="ex">&laquo;<strong>Right</strong>, let&rsquo;s get started then.&raquo;</td>
+                    <td class="note">Часто учитель/спикер говорит это перед переходом к теме</td>
+                </tr>
+                <tr>
+                    <td class="marker">Okay</td>
+                    <td class="tr">о́укэй</td>
+                    <td class="func">принятие, переход, согласие</td>
+                    <td class="ex">&laquo;<strong>Okay</strong>, so here&rsquo;s the plan.&raquo;</td>
+                    <td class="note">Нейтрально, можно в любой ситуации</td>
+                </tr>
+                <tr>
+                    <td class="marker">Now</td>
+                    <td class="tr">на́у</td>
+                    <td class="func">смена темы / привлечение внимания</td>
+                    <td class="ex">&laquo;<strong>Now</strong>, the second point is very different.&raquo;</td>
+                    <td class="note">Более формальное, подходит для presentations</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 2. FILLERS ============ -->
+        <div class="group-header" style="--group-accent:#fbbf24; --group-from:rgba(251,191,36,0.18); --group-to:rgba(251,191,36,0.04); --group-border:rgba(251,191,36,0.3);">
+            <h3>&#x23F3; 2. Fillers &mdash; думаю вслух / тяну время <span class="group-count">7</span></h3>
+            <p>Заполняют паузу, пока ты думаешь &mdash; вместо &laquo;ehhh&raquo; и тишины</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">you know</td>
+                    <td class="tr">ю но́у</td>
+                    <td class="func">тянет время / апеллирует к пониманию</td>
+                    <td class="ex">&laquo;It was, <strong>you know</strong>, kind of awkward.&raquo;</td>
+                    <td class="note">Самый частый живой filler; не злоупотребляй</td>
+                </tr>
+                <tr>
+                    <td class="marker">I mean</td>
+                    <td class="tr">ай ми:н</td>
+                    <td class="func">уточняет / мягко переформулирует</td>
+                    <td class="ex">&laquo;She&rsquo;s nice, <strong>I mean</strong>, most of the time.&raquo;</td>
+                    <td class="note">= &laquo;то есть&raquo;; звучит как думаешь в реальном времени</td>
+                </tr>
+                <tr>
+                    <td class="marker">like</td>
+                    <td class="tr">лайк</td>
+                    <td class="func">разговорный filler, приблизительность</td>
+                    <td class="ex">&laquo;It was <strong>like</strong> really loud in there.&raquo;</td>
+                    <td class="note">Молодёжный, очень частый; в формальной речи &mdash; осторожно</td>
+                </tr>
+                <tr>
+                    <td class="marker">kind of / sort of</td>
+                    <td class="tr">кайнд ов / со:т ов</td>
+                    <td class="func">смягчение, &laquo;как бы&raquo;, приблизительность</td>
+                    <td class="ex">&laquo;It&rsquo;s <strong>kind of</strong> embarrassing, honestly.&raquo;</td>
+                    <td class="note">kinda / sorta &mdash; разговорные формы. Смягчает утверждение</td>
+                </tr>
+                <tr>
+                    <td class="marker">I guess</td>
+                    <td class="tr">ай гэс</td>
+                    <td class="func">неуверенное согласие, предположение</td>
+                    <td class="ex">&laquo;<strong>I guess</strong> that makes sense.&raquo;</td>
+                    <td class="note">= &laquo;наверное&raquo;, &laquo;думаю да&raquo;; без убеждённости</td>
+                </tr>
+                <tr>
+                    <td class="marker">I suppose</td>
+                    <td class="tr">ай сэпо́уз</td>
+                    <td class="func">осторожное согласие</td>
+                    <td class="ex">&laquo;<strong>I suppose</strong> you&rsquo;re right, yeah.&raquo;</td>
+                    <td class="note">Чуть формальнее чем I guess; часто с паузой</td>
+                </tr>
+                <tr>
+                    <td class="marker">thing is</td>
+                    <td class="tr">тинг из</td>
+                    <td class="func">предупреждает: сейчас объясню главное</td>
+                    <td class="ex">&laquo;<strong>The thing is</strong>, I didn&rsquo;t know she&rsquo;d be there.&raquo;</td>
+                    <td class="note">= &laquo;дело в том, что...&raquo; &mdash; очень разговорное</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 3. EMPHASIS ============ -->
+        <div class="group-header" style="--group-accent:#f43f5e; --group-from:rgba(244,63,94,0.18); --group-to:rgba(244,63,94,0.04); --group-border:rgba(244,63,94,0.3);">
+            <h3>&#x1F525; 3. Emphatics &mdash; делаю акцент <span class="group-count">6</span></h3>
+            <p>Усиливают смысл, привлекают внимание к ключевому слову</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">actually</td>
+                    <td class="tr">э́кчуэли</td>
+                    <td class="func">поправка, неожиданный факт, &laquo;на самом деле&raquo;</td>
+                    <td class="ex">&laquo;<strong>Actually</strong>, I think you&rsquo;re wrong about that.&raquo;</td>
+                    <td class="note">Не = &laquo;в данный момент&raquo;! Это &laquo;на самом деле&raquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">basically</td>
+                    <td class="tr">бэ́йсикли</td>
+                    <td class="func">суть дела, упрощение</td>
+                    <td class="ex">&laquo;<strong>Basically</strong>, we ran out of time.&raquo;</td>
+                    <td class="note">= &laquo;короче&raquo;, &laquo;суть в том что&raquo;; очень частое</td>
+                </tr>
+                <tr>
+                    <td class="marker">honestly</td>
+                    <td class="tr">о́нэсли</td>
+                    <td class="func">откровенность, &laquo;честно говоря&raquo;</td>
+                    <td class="ex">&laquo;<strong>Honestly</strong>, I have no idea what happened.&raquo;</td>
+                    <td class="note">Синонимы: <em>to be honest / frankly</em></td>
+                </tr>
+                <tr>
+                    <td class="marker">literally</td>
+                    <td class="tr">ли́тэрэли</td>
+                    <td class="func">усиление (разг. &mdash; не всегда буквально)</td>
+                    <td class="ex">&laquo;I <strong>literally</strong> could not stop laughing.&raquo;</td>
+                    <td class="note">В разг. речи = &laquo;прямо реально&raquo;; носители используют как усилитель</td>
+                </tr>
+                <tr>
+                    <td class="marker">seriously</td>
+                    <td class="tr">си́эриэсли</td>
+                    <td class="func">усиление, удивление/возмущение</td>
+                    <td class="ex">&laquo;<strong>Seriously</strong>? You said that to her?&raquo;</td>
+                    <td class="note">Как вопрос &mdash; выражает шок. Как утверждение &mdash; &laquo;без шуток&raquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">clearly</td>
+                    <td class="tr">кли́эли</td>
+                    <td class="func">очевидно, &laquo;явно же&raquo;</td>
+                    <td class="ex">&laquo;<strong>Clearly</strong>, that plan didn&rsquo;t work.&raquo;</td>
+                    <td class="note">Может звучать саркастично в зависимости от тона</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 4. CONNECTORS ============ -->
+        <div class="group-header" style="--group-accent:#3fb950; --group-from:rgba(63,185,80,0.18); --group-to:rgba(63,185,80,0.04); --group-border:rgba(63,185,80,0.3);">
+            <h3>&#x1F517; 4. Connectors &mdash; добавляю мысль <span class="group-count">6</span></h3>
+            <p>Связывают идеи &mdash; добавление, усиление, развитие</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">also</td>
+                    <td class="tr">о́:лсоу</td>
+                    <td class="func">добавление, &laquo;также&raquo;</td>
+                    <td class="ex">&laquo;It&rsquo;s expensive, and <strong>also</strong> pretty slow.&raquo;</td>
+                    <td class="note">Нейтральное; подходит и в Writing, и Speaking</td>
+                </tr>
+                <tr>
+                    <td class="marker">plus</td>
+                    <td class="tr">плас</td>
+                    <td class="func">добавление, &laquo;к тому же&raquo;</td>
+                    <td class="ex">&laquo;It&rsquo;s free, <strong>plus</strong> it works really well.&raquo;</td>
+                    <td class="note">Разговорное, сильнее чем &ldquo;also&rdquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">on top of that</td>
+                    <td class="tr">он топ оф зэт</td>
+                    <td class="func">ещё одно сверх того, &laquo;вдобавок&raquo;</td>
+                    <td class="ex">&laquo;She missed the bus and, <strong>on top of that</strong>, it rained.&raquo;</td>
+                    <td class="note">Чуть торжественнее plus; отлично в Speaking-тестах</td>
+                </tr>
+                <tr>
+                    <td class="marker">not to mention</td>
+                    <td class="tr">нот тэ мэ́ншэн</td>
+                    <td class="func">добавление очевидного / ещё одного</td>
+                    <td class="ex">&laquo;It was loud, messy, <strong>not to mention</strong> expensive.&raquo;</td>
+                    <td class="note">= &laquo;и это не говоря уже о...&raquo;; хорошо в Speaking B2</td>
+                </tr>
+                <tr>
+                    <td class="marker">and then</td>
+                    <td class="tr">энд зэн</td>
+                    <td class="func">последовательность событий</td>
+                    <td class="ex">&laquo;We left, <strong>and then</strong> it all went wrong.&raquo;</td>
+                    <td class="note">Storytelling-маркер; в нарративах незаменим</td>
+                </tr>
+                <tr>
+                    <td class="marker">what&rsquo;s more</td>
+                    <td class="tr">уо:тс мо:</td>
+                    <td class="func">усиленное добавление, &laquo;более того&raquo;</td>
+                    <td class="ex">&laquo;<strong>What&rsquo;s more</strong>, nobody warned us.&raquo;</td>
+                    <td class="note">Более формальное; отлично для Writing</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 5. REDIRECTORS ============ -->
+        <div class="group-header" style="--group-accent:#a371f7; --group-from:rgba(163,113,247,0.18); --group-to:rgba(163,113,247,0.04); --group-border:rgba(163,113,247,0.3);">
+            <h3>&#x21A9;&#xFE0F; 5. Redirectors &mdash; меняю направление <span class="group-count">7</span></h3>
+            <p>Но / хотя / всё же / вернёмся к теме &mdash; когда нужно повернуть разговор</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">but</td>
+                    <td class="tr">бат</td>
+                    <td class="func">контраст, возражение</td>
+                    <td class="ex">&laquo;<strong>But</strong> that doesn&rsquo;t mean we should give up.&raquo;</td>
+                    <td class="note">В начале предложения &mdash; разговорно; в учебнике &mdash; избегай</td>
+                </tr>
+                <tr>
+                    <td class="marker">though</td>
+                    <td class="tr">зо́у</td>
+                    <td class="func">слабый контраст, &laquo;хотя&raquo; / &laquo;но всё же&raquo;</td>
+                    <td class="ex">&laquo;It was fun, <strong>though</strong> I was pretty tired.&raquo;</td>
+                    <td class="note">В конце фразы &mdash; очень разговорно; &laquo;It was cold, <em>though</em>.&raquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">still</td>
+                    <td class="tr">стил</td>
+                    <td class="func">&laquo;всё равно&raquo; / &laquo;тем не менее&raquo;</td>
+                    <td class="ex">&laquo;It was hard, but <strong>still</strong> worth it.&raquo;</td>
+                    <td class="note">Удерживает позицию вопреки предыдущему</td>
+                </tr>
+                <tr>
+                    <td class="marker">anyway</td>
+                    <td class="tr">э́ниуэй</td>
+                    <td class="func">возврат к теме / закрытие отступления</td>
+                    <td class="ex">&laquo;<strong>Anyway</strong>, back to what I was saying...&raquo;</td>
+                    <td class="note">= &laquo;так вот&raquo;, &laquo;в общем&raquo;; хорошо завершает отступление</td>
+                </tr>
+                <tr>
+                    <td class="marker">having said that</td>
+                    <td class="tr">хэ́винг сэд зэт</td>
+                    <td class="func">сказанное верно, но есть нюанс</td>
+                    <td class="ex">&laquo;It&rsquo;s risky. <strong>Having said that</strong>, we should try.&raquo;</td>
+                    <td class="note">= &laquo;и всё же&raquo;; формальнее, хорошо в Speaking B2+</td>
+                </tr>
+                <tr>
+                    <td class="marker">mind you</td>
+                    <td class="tr">майнд ю:</td>
+                    <td class="func">добавляет нюанс / поправку с удивлением</td>
+                    <td class="ex">&laquo;It was cheap. <strong>Mind you</strong>, the quality shows.&raquo;</td>
+                    <td class="note">Типично британское; = &laquo;впрочем&raquo;, &laquo;хотя, надо сказать&raquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">then again</td>
+                    <td class="tr">зэн эгэ́н</td>
+                    <td class="func">пересмотр своей же мысли</td>
+                    <td class="ex">&laquo;Maybe I was wrong. <strong>Then again</strong>, who knows?&raquo;</td>
+                    <td class="note">= &laquo;хотя, с другой стороны&raquo;</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 6. LISTENER CHECKS ============ -->
+        <div class="group-header" style="--group-accent:#fb923c; --group-from:rgba(251,146,60,0.18); --group-to:rgba(251,146,60,0.04); --group-border:rgba(251,146,60,0.3);">
+            <h3>&#x1F9FF; 6. Listener checks &mdash; проверяю, слушаешь? <span class="group-count">5</span></h3>
+            <p>Говорящий &laquo;пингует&raquo; слушателя: понимаешь? со мной? видишь?</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">right?</td>
+                    <td class="tr">райт?</td>
+                    <td class="func">проверка согласия / понимания</td>
+                    <td class="ex">&laquo;So we meet at five, <strong>right</strong>?&raquo;</td>
+                    <td class="note">Тон вопросительный; ожидает &laquo;yeah&raquo; / &laquo;exactly&raquo;</td>
+                </tr>
+                <tr>
+                    <td class="marker">you know?</td>
+                    <td class="tr">ю но́у?</td>
+                    <td class="func">&laquo;ты понимаешь?&raquo; / ты со мной?</td>
+                    <td class="ex">&laquo;It&rsquo;s just too much, <strong>you know</strong>?&raquo;</td>
+                    <td class="note">Призывает собеседника разделить чувство/мнение</td>
+                </tr>
+                <tr>
+                    <td class="marker">you see?</td>
+                    <td class="tr">ю си:?</td>
+                    <td class="func">объяснение / &laquo;видишь что я имею в виду?&raquo;</td>
+                    <td class="ex">&laquo;It doesn&rsquo;t add up, <strong>you see</strong>?&raquo;</td>
+                    <td class="note">Чуть старомоднее; часто в объяснениях</td>
+                </tr>
+                <tr>
+                    <td class="marker">got it?</td>
+                    <td class="tr">гот ит?</td>
+                    <td class="func">проверка понимания, &laquo;понял?&raquo;</td>
+                    <td class="ex">&laquo;Don&rsquo;t touch it again, <strong>got it</strong>?&raquo;</td>
+                    <td class="note">Может звучать требовательно; с друзьями &mdash; нормально</td>
+                </tr>
+                <tr>
+                    <td class="marker">does that make sense?</td>
+                    <td class="tr">дэз зэт мэйк сэнс?</td>
+                    <td class="func">&laquo;понятно объясняю?&raquo;</td>
+                    <td class="ex">&laquo;So you multiply both sides. <strong>Does that make sense</strong>?&raquo;</td>
+                    <td class="note">Вежливо; учителя, объяснения, презентации</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ 7. WRAP-UP ============ -->
+        <div class="group-header" style="--group-accent:#58a6ff; --group-from:rgba(88,166,255,0.18); --group-to:rgba(88,166,255,0.04); --group-border:rgba(88,166,255,0.3);">
+            <h3>&#x1F3C1; 7. Wrap-up &mdash; завершаю / делаю вывод <span class="group-count">5</span></h3>
+            <p>Чтобы не обрывать мысль резко, а закрыть её плавно</p>
+        </div>
+        <div class="note-card" style="padding:0.5rem;">
+            <div class="table-wrapper"><table class="dm-table">
+                <tr><th style="width:12%;">Слово</th><th style="width:14%;">Читать</th><th style="width:28%;">Функция</th><th>Пример</th><th style="width:18%;">Заметка</th></tr>
+                <tr>
+                    <td class="marker">so yeah</td>
+                    <td class="tr">со́у йэ</td>
+                    <td class="func">разговорное завершение мысли</td>
+                    <td class="ex">&laquo;It was a bit of a mess. <strong>So yeah</strong>, that happened.&raquo;</td>
+                    <td class="note">Очень разговорное; в Speaking-тестах уместно</td>
+                </tr>
+                <tr>
+                    <td class="marker">at the end of the day</td>
+                    <td class="tr">эт зэ энд оф зэ дэй</td>
+                    <td class="func">&laquo;в конце концов&raquo; / главное что...</td>
+                    <td class="ex">&laquo;<strong>At the end of the day</strong>, results matter.&raquo;</td>
+                    <td class="note">= &laquo;в конечном счёте&raquo;; отлично для мнения/аргумента</td>
+                </tr>
+                <tr>
+                    <td class="marker">all in all</td>
+                    <td class="tr">о:л ин о:л</td>
+                    <td class="func">итог, общая оценка</td>
+                    <td class="ex">&laquo;<strong>All in all</strong>, it was a good experience.&raquo;</td>
+                    <td class="note">= &laquo;в целом&raquo;; хорошо для вывода в Speaking/Writing</td>
+                </tr>
+                <tr>
+                    <td class="marker">to sum up</td>
+                    <td class="tr">тэ сам ап</td>
+                    <td class="func">подведение итога</td>
+                    <td class="ex">&laquo;<strong>To sum up</strong>, there are three main reasons.&raquo;</td>
+                    <td class="note">Формальное; для presentations и Writing B2</td>
+                </tr>
+                <tr>
+                    <td class="marker">in the end</td>
+                    <td class="tr">ин зэ энд</td>
+                    <td class="func">&laquo;в итоге&raquo;, что произошло в конце</td>
+                    <td class="ex">&laquo;<strong>In the end</strong>, we just went home.&raquo;</td>
+                    <td class="note">О результате событий; не то же что &ldquo;at the end&rdquo;</td>
+                </tr>
+            </table></div>
+        </div>
+
+        <!-- ============ CONVERSATION EXAMPLE ============ -->
+        <div style="margin: 1.5rem 0;">
+            <div class="group-header" style="--group-accent:#ec4899; --group-from:rgba(236,72,153,0.18); --group-to:rgba(236,72,153,0.04); --group-border:rgba(236,72,153,0.3);">
+                <h3>&#x1F4AD; Пример живого разговора</h3>
+                <p>Discourse markers выделены &mdash; посмотри как много их в обычной речи</p>
+            </div>
+            <div class="note-card" style="padding: 1.1rem 1.3rem; line-height: 2; font-size: 0.9rem;">
+                <p style="margin:0;">
+                    &ldquo;<span style="color:#06b6d4;font-weight:800;">Well</span>, the thing is, I had to call her. <span style="color:#06b6d4;font-weight:800;">I mean</span>, she had no idea what was going on, <span style="color:#06b6d4;font-weight:800;">you know</span>? So I <span style="color:#06b6d4;font-weight:800;">basically</span> just explained everything. And she was <span style="color:#06b6d4;font-weight:800;">like</span>, totally fine with it, <span style="color:#06b6d4;font-weight:800;">actually</span>. <span style="color:#06b6d4;font-weight:800;">I mean</span>, she was <span style="color:#06b6d4;font-weight:800;">kind of</span> surprised at first. <span style="color:#06b6d4;font-weight:800;">But</span>, <span style="color:#06b6d4;font-weight:800;">honestly</span>, it was <span style="color:#06b6d4;font-weight:800;">literally</span> the best outcome. <span style="color:#06b6d4;font-weight:800;">So yeah</span>, it all worked out <span style="color:#06b6d4;font-weight:800;">in the end</span>.&rdquo;
+                </p>
+                <p style="margin:0.8rem 0 0; font-size:0.82rem; color:var(--color-text-muted);">&#x2192; 9 discourse markers в 4-5 предложениях &mdash; это норма в разговорном английском</p>
+            </div>
+        </div>
+
+        <!-- ============ TIPS ============ -->
+        <div class="note-card highlight-card" style="margin-top:1.5rem; border-color:rgba(6,182,212,0.4); background:rgba(6,182,212,0.06);">
+            <h3 style="color:#06b6d4; margin-top:0;">&#x1F4A1; Как практиковать</h3>
+            <ol style="margin:0.5rem 0; padding-left:1.4rem; line-height:1.9; font-size:0.88rem;">
+                <li><strong>Начни с Топ-3</strong> &mdash; <em>well, I mean, actually</em>. Вставляй их в каждый ответ, пока не станет автоматом.</li>
+                <li><strong>Смотри сериалы с субтитрами</strong> &mdash; <em>Friends, The Office, Succession</em>. Discourse markers там буквально в каждом диалоге.</li>
+                <li><strong>Слушай подкасты</strong> &mdash; нативные интервью. Считай сколько раз говорят &ldquo;you know&rdquo; за 5 минут.</li>
+                <li><strong>В Speaking-тесте</strong>: начинай ответ с <em>Well</em> или <em>So</em>, используй <em>I mean / basically</em> внутри, заканчивай <em>all in all / at the end of the day</em>.</li>
+                <li><strong>Не переусердствуй</strong> &mdash; &ldquo;like, you know, like, I mean, like&rdquo; &mdash; слишком. 2-3 маркера на фразу &mdash; норма.</li>
+            </ol>
+            <p style="margin:0.7rem 0 0; font-size:0.85rem; color:var(--color-text-muted);">&#x26A0;&#xFE0F; <strong>Для Writing:</strong> большинство разговорных маркеров (<em>like, you know, basically, so yeah</em>) &mdash; неформальны. В Academic Writing используй <em>however, moreover, furthermore, all in all, to sum up</em>.</p>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>
