@@ -310,6 +310,134 @@
             z-index: 1;
         }
 
+        /* ===== SEARCH ===== */
+        .search-wrap {
+            margin: 0 0 1rem;
+        }
+        .search-inner {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(163,113,247,0.35);
+            border-radius: 14px;
+            padding: 0 1rem;
+            gap: 0.6rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .search-inner:focus-within {
+            border-color: rgba(163,113,247,0.75);
+            background: rgba(163,113,247,0.08);
+        }
+        .search-ico {
+            font-size: 1rem;
+            color: rgba(163,113,247,0.7);
+            flex-shrink: 0;
+        }
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 0.97rem;
+            padding: 0.8rem 0;
+            font-family: inherit;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.3); }
+        .search-clear {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            display: none;
+            transition: color 0.15s;
+        }
+        .search-clear:hover { color: rgba(255,255,255,0.8); }
+        .search-count {
+            font-size: 0.78rem;
+            color: rgba(163,113,247,0.7);
+            margin-top: 0.45rem;
+            margin-left: 0.3rem;
+            min-height: 1.1em;
+            font-weight: 600;
+        }
+        .search-results {
+            margin-bottom: 1.5rem;
+        }
+        .sr-group-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.28);
+            margin: 1.2rem 0 0.5rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .sr-group-label:first-child { margin-top: 0; }
+        .sr-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .sr-card:hover {
+            background: rgba(163,113,247,0.1);
+            border-color: rgba(163,113,247,0.4);
+        }
+        .sr-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: rgba(163,113,247,0.6);
+            min-width: 1.5rem;
+            padding-top: 0.1rem;
+            flex-shrink: 0;
+        }
+        .sr-text {
+            font-size: 0.94rem;
+            color: rgba(255,255,255,0.88);
+            line-height: 1.5;
+        }
+        .sr-text mark {
+            background: rgba(163,113,247,0.35);
+            color: #fff;
+            border-radius: 3px;
+            padding: 0 2px;
+            font-style: normal;
+        }
+        .sr-hint {
+            font-size: 0.76rem;
+            color: rgba(255,255,255,0.32);
+            margin-top: 0.2rem;
+        }
+        .sr-tab-badge {
+            font-size: 0.68rem;
+            background: rgba(163,113,247,0.15);
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 6px;
+            padding: 0.1rem 0.45rem;
+            color: rgba(163,113,247,0.85);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-left: auto;
+            align-self: flex-start;
+        }
+        .sr-empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.95rem;
+        }
+        .sr-empty span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
         /* ===== SUBSECTION HEADER inside tab ===== */
         .subsec {
             display: flex;
@@ -366,7 +494,20 @@
             <p class="page-subtitle">Alleine sprechen &bull; B1&rarr;B2 &bull; Fragen, Timer &amp; Redemittel</p>
         </div>
 
-        <div class="tabs">
+        <!-- ===== SEARCH BAR ===== -->
+        <div class="search-wrap" id="searchWrap">
+            <div class="search-inner">
+                <span class="search-ico">&#x1F50D;</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Frage suchen… z.B. „Homeoffice" oder „Konjunktiv"" autocomplete="off" oninput="doSearch(this.value)">
+                <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Löschen">&#x2715;</button>
+            </div>
+            <div id="searchCount" class="search-count"></div>
+        </div>
+
+        <!-- ===== SEARCH RESULTS ===== -->
+        <div id="searchResults" class="search-results" style="display:none"></div>
+
+        <div class="tabs" id="mainTabs">
             <button class="tab active" data-tab="zufall">&#x1F3B2; Zufallsfrage</button>
             <button class="tab" data-tab="fragen">&#x1F4CB; Alle Fragen</button>
             <button class="tab" data-tab="sprache">&#x1F310; Sprache &amp; Lernen</button>
@@ -1342,6 +1483,164 @@
                 btn.classList.add('active');
                 document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
             });
+        });
+
+        // ===== SEARCH =====
+        function buildSearchIndex() {
+            const index = [];
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                const tabId = tab.id; // e.g. tab-fragen
+                let currentSection = '';
+                tab.childNodes.forEach(node => {
+                    if (node.nodeType !== 1) return;
+                    if (node.classList.contains('section-label') || node.classList.contains('subsec')) {
+                        currentSection = node.innerText.trim().replace(/\n/g, ' ');
+                    }
+                    if (node.classList.contains('speak-question-card')) {
+                        const qEl = node.querySelector('.speak-q-text');
+                        const hEl = node.querySelector('.speak-q-hint');
+                        const numEl = node.querySelector('.speak-q-num');
+                        if (qEl) {
+                            index.push({
+                                text: qEl.innerText.trim(),
+                                hint: hEl ? hEl.innerText.trim() : '',
+                                num: numEl ? numEl.innerText.trim() : '',
+                                section: currentSection,
+                                tabId: tabId,
+                                tabLabel: tabLabels[tabId] || tabId,
+                                el: node
+                            });
+                        }
+                    }
+                });
+            });
+            return index;
+        }
+
+        const tabLabels = {
+            'tab-fragen': 'Alle Fragen',
+            'tab-sprache': 'Sprache & Lernen',
+            'tab-ziele': 'Ziele & Träume',
+        };
+
+        let searchIndex = null;
+
+        function highlight(text, query) {
+            if (!query) return text;
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+        }
+
+        function doSearch(val) {
+            const q = val.trim();
+            const resultsBox = document.getElementById('searchResults');
+            const tabs = document.getElementById('mainTabs');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const countEl = document.getElementById('searchCount');
+            const clearBtn = document.getElementById('searchClear');
+
+            clearBtn.style.display = q ? 'block' : 'none';
+
+            if (!q) {
+                resultsBox.style.display = 'none';
+                resultsBox.innerHTML = '';
+                tabs.style.display = '';
+                tabContents.forEach(c => c.style.display = '');
+                countEl.textContent = '';
+                return;
+            }
+
+            // Build index once
+            if (!searchIndex) searchIndex = buildSearchIndex();
+
+            const lower = q.toLowerCase();
+            const matches = searchIndex.filter(item =>
+                item.text.toLowerCase().includes(lower) ||
+                item.hint.toLowerCase().includes(lower) ||
+                item.section.toLowerCase().includes(lower)
+            );
+
+            // Hide tabs, show results panel
+            tabs.style.display = 'none';
+            tabContents.forEach(c => c.style.display = 'none');
+            resultsBox.style.display = 'block';
+
+            countEl.textContent = matches.length
+                ? `${matches.length} Ergebnis${matches.length === 1 ? '' : 'se'} gefunden`
+                : '';
+
+            if (!matches.length) {
+                resultsBox.innerHTML = `<div class="sr-empty"><span>🔍</span>Keine Fragen zu „${q}" gefunden.</div>`;
+                return;
+            }
+
+            // Group by tab + section
+            const groups = [];
+            const seen = new Map();
+            matches.forEach(m => {
+                const key = m.tabId + '||' + m.section;
+                if (!seen.has(key)) {
+                    seen.set(key, []);
+                    groups.push({ key, tabLabel: m.tabLabel, section: m.section, items: seen.get(key) });
+                }
+                seen.get(key).push(m);
+            });
+
+            let html = '';
+            groups.forEach(g => {
+                const secText = g.section
+                    ? `${g.tabLabel} › ${g.section}`
+                    : g.tabLabel;
+                html += `<div class="sr-group-label">${secText}</div>`;
+                g.items.forEach(item => {
+                    html += `<div class="sr-card" onclick="jumpTo('${item.tabId}', this)" data-tab="${item.tabId}">
+                        <span class="sr-num">${item.num}</span>
+                        <div>
+                            <div class="sr-text">${highlight(item.text, q)}</div>
+                            ${item.hint ? `<div class="sr-hint">${item.hint}</div>` : ''}
+                        </div>
+                    </div>`;
+                });
+            });
+
+            resultsBox.innerHTML = html;
+        }
+
+        function jumpTo(tabId, card) {
+            clearSearch();
+            // Switch to the right tab
+            const tabBtn = document.querySelector(`.tab[data-tab="${tabId.replace('tab-', '')}"]`);
+            if (tabBtn) tabBtn.click();
+            // Find and highlight the matching card
+            const num = card.querySelector ? card.querySelector('.sr-num')?.textContent.trim() : '';
+            setTimeout(() => {
+                const all = document.querySelectorAll('#' + tabId + ' .speak-question-card');
+                all.forEach(c => {
+                    const n = c.querySelector('.speak-q-num');
+                    if (n && n.textContent.trim() === num) {
+                        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        c.style.transition = 'background 0.3s';
+                        c.style.background = 'rgba(163,113,247,0.22)';
+                        c.style.borderColor = 'rgba(163,113,247,0.6)';
+                        setTimeout(() => {
+                            c.style.background = '';
+                            c.style.borderColor = '';
+                        }, 1800);
+                    }
+                });
+            }, 80);
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            doSearch('');
+            input.focus();
+        }
+
+        // Keyboard: Escape clears search
+        document.getElementById('searchInput').addEventListener('keydown', e => {
+            if (e.key === 'Escape') clearSearch();
         });
 
         // ===== RANDOM QUESTION =====
