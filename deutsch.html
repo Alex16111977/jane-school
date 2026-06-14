@@ -39,11 +39,23 @@
             <p class="page-subtitle">Grammatik &amp; Weiterlernen</p>
         </div>
 
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="deutsch-search" placeholder="Thema suchen&hellip; z.B. Konjunktiv, Passiv, Adjektive" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
         <!-- ===== Grammatik &mdash; nach Niveau geordnet ===== -->
-        <h2 style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+        <h2 id="grammatik-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
             &#x1F4DA; Grammatik &mdash; nach Schwierigkeit
         </h2>
-        <p style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+        <p id="grammatik-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
             Geh Schritt f&uuml;r Schritt: erst <strong style="color:#86efac;">A1</strong> Grundlagen, dann <strong style="color:#79b8ff;">A2</strong>, <strong style="color:#fbbf24;">B1</strong>, <strong style="color:#ff9a93;">B2</strong>. Wenn du dir bei einem Thema unsicher bist &mdash; geh zur&uuml;ck zum niedrigeren Level.
         </p>
 
@@ -368,7 +380,7 @@
         </div>
 
                 <!-- ===== Wörter & Extras ===== -->
-        <h2 style="color:#fff; font-size:1.05rem; font-weight:700; margin:2rem 0 0.9rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+        <h2 id="woerter-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:2rem 0 0.9rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
             &#x1F4DD; W&ouml;rter &amp; Extras
         </h2>
         <div class="subjects" style="justify-content:flex-start; max-width:100%;">
@@ -428,6 +440,11 @@
                 <span class="subject-icon">&#x1F601;</span>
                 <h3>Deutsch Memes</h3>
                 <p>Смешные слова, ловушки &amp; гигаслова</p>
+            </a>
+            <a href="deutsch-gespraeche.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(56,211,153,0.4);">
+                <span class="subject-icon">&#x1F5E3;&#xFE0F;</span>
+                <h3>Im Gespr&auml;ch</h3>
+                <p>Hör mal &bull; Warte &bull; Ich mein damit &mdash; echte Redewendungen nach Situation</p>
             </a>
             <a href="deutsch-phrasen.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,167,185,0.4);">
                 <span class="subject-icon">&#x1F4AC;</span>
@@ -1214,6 +1231,100 @@
             });
             updateProgress();
         })();
+    </script>
+
+    <script>
+    (function(){
+        const input = document.getElementById('deutsch-search');
+        if (!input) return;
+
+        const clearBtn   = document.getElementById('search-clear');
+        const noResults  = document.getElementById('search-no-results');
+        const qDisplay   = document.getElementById('search-query-display');
+        const grammatikH2   = document.getElementById('grammatik-h2');
+        const grammatikDesc = document.getElementById('grammatik-desc');
+        const woerterH2  = document.getElementById('woerter-h2');
+        const pageContent = document.querySelector('.page-content.page-with-bg');
+
+        // Only direct-child .subjects (excludes the ZP10 <details> section)
+        const mainGrids = pageContent
+            ? [...pageContent.querySelectorAll(':scope > .subjects')]
+            : [];
+        const allCards = mainGrids.flatMap(g => [...g.querySelectorAll('.subject-card')]);
+
+        function isLevelHeader(el) {
+            return el && el.tagName === 'DIV' && el.querySelector('span[style*="border-radius:50px"]');
+        }
+
+        function follows(el, anchor) {
+            return !!(anchor && anchor.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+        }
+
+        function precedes(el, anchor) {
+            return !!(anchor && anchor.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING);
+        }
+
+        function normalize(s) {
+            return s.toLowerCase()
+                .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+        }
+
+        function showAll() {
+            allCards.forEach(c => { c.style.display = ''; });
+            mainGrids.forEach(g => {
+                g.style.display = '';
+                const prev = g.previousElementSibling;
+                if (isLevelHeader(prev)) prev.style.display = 'flex';
+            });
+            if (grammatikH2)   grammatikH2.style.display   = '';
+            if (grammatikDesc) grammatikDesc.style.display = '';
+            if (woerterH2)     woerterH2.style.display     = '';
+            noResults.hidden = true;
+            clearBtn.style.opacity = '0';
+        }
+
+        function doSearch(raw) {
+            if (!raw.trim()) { showAll(); return; }
+
+            clearBtn.style.opacity = '1';
+            const q = normalize(raw);
+            let anyVisible = false;
+
+            allCards.forEach(card => {
+                const text = normalize(
+                    (card.querySelector('h3')?.textContent ?? '') + ' ' +
+                    (card.querySelector('p')?.textContent  ?? '')
+                );
+                card.style.display = text.includes(q) ? '' : 'none';
+                if (card.style.display !== 'none') anyVisible = true;
+            });
+
+            let grammatikAny = false, woerterAny = false;
+
+            mainGrids.forEach(grid => {
+                const hasVisible = [...grid.querySelectorAll('.subject-card')].some(c => c.style.display !== 'none');
+                grid.style.display = hasVisible ? '' : 'none';
+                const prev = grid.previousElementSibling;
+                if (isLevelHeader(prev)) prev.style.display = hasVisible ? 'flex' : 'none';
+
+                if (hasVisible) {
+                    if (follows(grid, grammatikH2) && precedes(grid, woerterH2)) grammatikAny = true;
+                    else if (follows(grid, woerterH2)) woerterAny = true;
+                }
+            });
+
+            if (grammatikH2)   grammatikH2.style.display   = grammatikAny ? '' : 'none';
+            if (grammatikDesc) grammatikDesc.style.display  = grammatikAny ? '' : 'none';
+            if (woerterH2)     woerterH2.style.display      = woerterAny  ? '' : 'none';
+
+            noResults.hidden = anyVisible;
+            if (!anyVisible) qDisplay.textContent = raw.trim();
+        }
+
+        input.addEventListener('input', function() { doSearch(this.value); });
+        input.addEventListener('keydown', function(e) { if (e.key === 'Escape') { this.value = ''; showAll(); } });
+        clearBtn.addEventListener('click', function() { input.value = ''; input.focus(); showAll(); });
+    })();
     </script>
 </body>
 </html>

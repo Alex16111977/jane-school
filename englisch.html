@@ -39,6 +39,18 @@
             <p class="page-subtitle">Weiter lernen &mdash; Schritt f&uuml;r Schritt</p>
         </div>
 
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="englisch-search" placeholder="Search topics&hellip; e.g. Modals, Idioms, Writing" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="Clear" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Clear search">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nothing found for &ldquo;<span id="search-query-display"></span>&rdquo; &mdash; try a different word
+            </div>
+        </div>
+
         <!-- ============ MAIN LEARNING TOOL ============ -->
         <h2 style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.4rem 0 0.9rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
             &#x1F4C5; T&auml;glich lernen
@@ -85,6 +97,12 @@
                 <span class="subject-icon">&#x1F5E3;&#xFE0F;</span>
                 <h3>Speaking Practice</h3>
                 <p>4 modes &middot; 60-sec challenges, dialogues, stories, pronunciation</p>
+            </a>
+            <a href="englisch-gespraeche.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.45); position:relative;">
+                <span style="position:absolute;top:-8px;right:-6px;background:linear-gradient(135deg,#3fb950,#86efac);color:#0a1a0e;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;padding:0.18rem 0.55rem;border-radius:20px;box-shadow:0 2px 8px rgba(63,185,80,0.45);white-space:nowrap;">&#x1F5E8; QUESTIONS</span>
+                <span class="subject-icon">&#x2753;</span>
+                <h3>Conversation Questions</h3>
+                <p>30 questions &middot; A1&ndash;C2 &middot; random picker &middot; 2-min timer</p>
             </a>
             <a href="englisch-intonation.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(163,113,247,0.4); position:relative;">
                 <span style="position:absolute;top:-8px;right:-6px;background:linear-gradient(135deg,#a371f7,#79b8ff);color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;padding:0.18rem 0.55rem;border-radius:20px;box-shadow:0 2px 8px rgba(163,113,247,0.5);white-space:nowrap;">&#x1F3B6; RHYTHM</span>
@@ -202,5 +220,72 @@
     <footer class="footer-dark" style="position:relative;z-index:1">
         <p>NeoStudy &copy; 2026</p>
     </footer>
+
+    <script>
+    (function(){
+        const input = document.getElementById('englisch-search');
+        if (!input) return;
+
+        const clearBtn  = document.getElementById('search-clear');
+        const noResults = document.getElementById('search-no-results');
+        const qDisplay  = document.getElementById('search-query-display');
+        const pageContent = document.querySelector('.page-content.page-with-bg');
+
+        const mainGrids = pageContent
+            ? [...pageContent.querySelectorAll(':scope > .subjects')]
+            : [];
+        const allCards = mainGrids.flatMap(g => [...g.querySelectorAll('.subject-card')]);
+
+        const gridHeaders = mainGrids.map(g => {
+            const prev = g.previousElementSibling;
+            return prev?.tagName === 'H2' ? prev : null;
+        });
+
+        function normalize(s) {
+            return s.toLowerCase()
+                .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+        }
+
+        function showAll() {
+            allCards.forEach(c => { c.style.display = ''; });
+            mainGrids.forEach((g, i) => {
+                g.style.display = '';
+                if (gridHeaders[i]) gridHeaders[i].style.display = '';
+            });
+            noResults.hidden = true;
+            clearBtn.style.opacity = '0';
+        }
+
+        function doSearch(raw) {
+            if (!raw.trim()) { showAll(); return; }
+
+            clearBtn.style.opacity = '1';
+            const q = normalize(raw);
+            let anyVisible = false;
+
+            allCards.forEach(card => {
+                const text = normalize(
+                    (card.querySelector('h3')?.textContent ?? '') + ' ' +
+                    (card.querySelector('p')?.textContent  ?? '')
+                );
+                card.style.display = text.includes(q) ? '' : 'none';
+                if (card.style.display !== 'none') anyVisible = true;
+            });
+
+            mainGrids.forEach((grid, i) => {
+                const hasVisible = [...grid.querySelectorAll('.subject-card')].some(c => c.style.display !== 'none');
+                grid.style.display = hasVisible ? '' : 'none';
+                if (gridHeaders[i]) gridHeaders[i].style.display = hasVisible ? '' : 'none';
+            });
+
+            noResults.hidden = anyVisible;
+            if (!anyVisible) qDisplay.textContent = raw.trim();
+        }
+
+        input.addEventListener('input', function() { doSearch(this.value); });
+        input.addEventListener('keydown', function(e) { if (e.key === 'Escape') { this.value = ''; showAll(); } });
+        clearBtn.addEventListener('click', function() { input.value = ''; input.focus(); showAll(); });
+    })();
+    </script>
 </body>
 </html>

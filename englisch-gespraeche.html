@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Questions | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            padding: 0.22rem 0.7rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .badge-a1 { background: rgba(63,185,80,0.18); color: #86efac; border: 1px solid rgba(63,185,80,0.4); }
+        .badge-b1 { background: rgba(88,166,255,0.18); color: #79b8ff; border: 1px solid rgba(88,166,255,0.4); }
+        .badge-c1 { background: rgba(192,132,252,0.18); color: #c9b3ff; border: 1px solid rgba(192,132,252,0.4); }
+
+        /* Random question picker */
+        .picker-box {
+            background: linear-gradient(145deg, rgba(88,166,255,0.09), rgba(163,113,247,0.05));
+            border: 1.5px solid rgba(88,166,255,0.28);
+            border-radius: 18px;
+            padding: 1.4rem 1.5rem 1.2rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
+        }
+        .picker-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(88,166,255,0.7);
+            margin-bottom: 0.7rem;
+        }
+        .picker-question {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.5;
+            min-height: 3rem;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+        .picker-timer {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s;
+        }
+        .picker-timer.running { color: #58a6ff; }
+        .picker-timer.done { color: #3fb950; }
+        .picker-controls {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pk-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid;
+            font-family: var(--font-main);
+            transition: all 0.2s;
+        }
+        .pk-new {
+            background: linear-gradient(135deg, #58a6ff, #79b8ff);
+            color: #0a0a14;
+            border-color: #58a6ff;
+        }
+        .pk-new:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(88,166,255,0.35); }
+        .pk-go {
+            background: rgba(63,185,80,0.18);
+            color: #86efac;
+            border-color: rgba(63,185,80,0.45);
+        }
+        .pk-go:hover { background: rgba(63,185,80,0.28); }
+        .pk-stop {
+            background: rgba(248,81,73,0.18);
+            color: #ff9a93;
+            border-color: rgba(248,81,73,0.4);
+            display: none;
+        }
+        .pk-stop:hover { background: rgba(248,81,73,0.28); }
+
+        /* Question list */
+        .q-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .q-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 13px;
+            padding: 0.9rem 1.1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .q-card:hover {
+            background: rgba(88,166,255,0.07);
+            border-color: rgba(88,166,255,0.25);
+        }
+        .q-num {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            margin-top: 0.1rem;
+        }
+        .q-num-a1 { background: rgba(63,185,80,0.18); color: #86efac; }
+        .q-num-b1 { background: rgba(88,166,255,0.18); color: #79b8ff; }
+        .q-num-c1 { background: rgba(192,132,252,0.18); color: #c9b3ff; }
+        .q-text {
+            font-size: 0.97rem;
+            color: rgba(230,230,235,0.9);
+            line-height: 1.55;
+        }
+
+        /* Tips bar */
+        .tip-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.88rem;
+            color: rgba(230,230,235,0.8);
+            line-height: 1.5;
+        }
+        .tip-row strong { color: #fbbf24; }
+
+        @media (max-width: 600px) {
+            .picker-question { font-size: 1.05rem; }
+            .picker-timer { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.83)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="biologie.html">Biologie</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Conversation Questions</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Back to English</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Conversation Questions &#x1F5E8;&#xFE0F;</h1>
+            <p class="page-subtitle">30 questions about learning English &mdash; A1 to C2 &bull; говори, не молчи</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="a1">&#x1F7E2; A1&ndash;A2</button>
+            <button class="tab" data-tab="b1">&#x1F535; B1&ndash;B2</button>
+            <button class="tab" data-tab="c1">&#x1F7E3; C1&ndash;C2</button>
+        </div>
+
+        <!-- ===== A1–A2 ===== -->
+        <div class="tab-content active" id="tab-a1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F7E2;</span>
+                <div>
+                    <h2><span class="level-badge badge-a1">A1&ndash;A2</span> Beginner Questions</h2>
+                    <p class="lesson-header-sub">Simple and clear &mdash; talk about your experience with English</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>How to use:</strong> click <em>New Question</em> to get a random question, then press <em>Start 2 min</em> to time yourself speaking. Or just read through all 10 and pick what interests you.</span>
+            </div>
+
+            <div class="picker-box" id="picker-a1">
+                <div class="picker-label">&#x1F3B2; Random Question — A1/A2</div>
+                <div class="picker-question" id="pq-a1">Click "New Question" to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-a1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" onclick="newQ('a1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-a1" onclick="startTimer('a1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-a1" onclick="stopTimer('a1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card">
+                <h3>&#x1F4CB; All A1&ndash;A2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-a1">1</span><span class="q-text">Why do you learn English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">2</span><span class="q-text">What is the most difficult thing about learning English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">3</span><span class="q-text">What is the easiest thing about learning English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">4</span><span class="q-text">Why do you like and dislike English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">5</span><span class="q-text">Why is it important to speak English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">6</span><span class="q-text">What ways of learning English do you like?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">7</span><span class="q-text">How did you start learning English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">8</span><span class="q-text">What is the biggest difference between English and your language?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">9</span><span class="q-text">Have you ever quit learning English? Why?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">10</span><span class="q-text">How do you find time for studying?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(63,185,80,0.25); background:rgba(63,185,80,0.05);">
+                <h3 style="color:#86efac;">&#x1F4AC; Useful answers starters — A1/A2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>I learn English because&hellip;</strong><br>
+                    <strong>For me, the hardest thing is&hellip;</strong><br>
+                    <strong>I think English is important because&hellip;</strong><br>
+                    <strong>I started learning English when I was&hellip;</strong><br>
+                    <strong>I like / don't like&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+        <!-- ===== B1–B2 ===== -->
+        <div class="tab-content" id="tab-b1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F535;</span>
+                <div>
+                    <h2><span class="level-badge badge-b1">B1&ndash;B2</span> Intermediate Questions</h2>
+                    <p class="lesson-header-sub">Go deeper &mdash; share experiences, opinions, stories</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>Challenge:</strong> answer in at least 5–8 sentences. Use <em>past tenses, conditionals, and linking words</em> like <em>however / although / as a result</em>.</span>
+            </div>
+
+            <div class="picker-box" id="picker-b1">
+                <div class="picker-label">&#x1F3B2; Random Question — B1/B2</div>
+                <div class="picker-question" id="pq-b1">Click "New Question" to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-b1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" onclick="newQ('b1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-b1" onclick="startTimer('b1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-b1" onclick="stopTimer('b1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card" style="border-color:rgba(88,166,255,0.35);">
+                <h3>&#x1F4CB; All B1&ndash;B2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-b1">1</span><span class="q-text">Have you ever traveled to an English-speaking country? If yes, where did you go?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">2</span><span class="q-text">How long have you been learning English and how did you start?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">3</span><span class="q-text">What do you find most and least challenging about learning English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">4</span><span class="q-text">What is your favorite English expression and why?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">5</span><span class="q-text">Can you share an interesting experience you&rsquo;ve had while practicing English?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">6</span><span class="q-text">Do you enjoy watching movies or TV shows in English? Which ones do you recommend?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">7</span><span class="q-text">Have you ever read a book in English? What was it about?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">8</span><span class="q-text">Do you have any tips for improving English speaking skills?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">9</span><span class="q-text">Have you used English outside of the classroom? If so, how?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">10</span><span class="q-text">How has learning English influenced your life or career goals?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(88,166,255,0.25); background:rgba(88,166,255,0.05);">
+                <h3 style="color:#79b8ff;">&#x1F4AC; Useful phrases — B1/B2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>I&rsquo;ve been learning English for&hellip; / since&hellip;</strong><br>
+                    <strong>What I find most challenging is&hellip; because&hellip;</strong><br>
+                    <strong>One experience that stands out is&hellip;</strong><br>
+                    <strong>In terms of speaking, I think the best way is&hellip;</strong><br>
+                    <strong>Learning English has opened doors for me in&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+        <!-- ===== C1–C2 ===== -->
+        <div class="tab-content" id="tab-c1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F7E3;</span>
+                <div>
+                    <h2><span class="level-badge badge-c1">C1&ndash;C2</span> Advanced Questions</h2>
+                    <p class="lesson-header-sub">Nuanced, reflective answers &mdash; show your depth and fluency</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>Challenge:</strong> give structured 2–3 minute answers with <em>concrete examples, contrasts, and personal reflection</em>. Avoid generic answers &mdash; be specific.</span>
+            </div>
+
+            <div class="picker-box" id="picker-c1" style="border-color:rgba(192,132,252,0.35); background:linear-gradient(145deg, rgba(192,132,252,0.09), rgba(88,166,255,0.04));">
+                <div class="picker-label" style="color:rgba(192,132,252,0.75);">&#x1F3B2; Random Question — C1/C2</div>
+                <div class="picker-question" id="pq-c1">Click "New Question" to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-c1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" style="background:linear-gradient(135deg,#c084fc,#a855f7);border-color:#c084fc;color:#fff;" onclick="newQ('c1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-c1" onclick="startTimer('c1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-c1" onclick="stopTimer('c1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card" style="border-color:rgba(192,132,252,0.35);">
+                <h3>&#x1F4CB; All C1&ndash;C2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-c1">1</span><span class="q-text">What strategies or resources have you found helpful for learning English at an advanced level?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">2</span><span class="q-text">How has your understanding of English culture and society evolved as you&rsquo;ve become more proficient in the language?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">3</span><span class="q-text">Have you ever participated in language exchange programs or language immersion experiences? How did they impact your language skills?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">4</span><span class="q-text">Can you discuss a specific challenge you faced while learning English and how you overcame it?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">5</span><span class="q-text">How has learning English opened up new opportunities for you in terms of travel, work, or personal relationships?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">6</span><span class="q-text">Can you share your favorite English-speaking author, book, or movie, and why it resonated with you?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">7</span><span class="q-text">What do you think are the most effective ways to maintain and further develop your English skills?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">8</span><span class="q-text">Have you ever given a presentation or delivered a speech in English? How did it go?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">9</span><span class="q-text">What advice would you give to ESL learners who are just starting their journey?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">10</span><span class="q-text">How has your perception of the English language changed as you&rsquo;ve progressed to an advanced level?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(192,132,252,0.25); background:rgba(192,132,252,0.05);">
+                <h3 style="color:#c9b3ff;">&#x1F4AC; Useful phrases — C1/C2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>What I find particularly interesting is that&hellip;</strong><br>
+                    <strong>Looking back on my language journey&hellip;</strong><br>
+                    <strong>One of the most significant shifts in my perception was&hellip;</strong><br>
+                    <strong>To a large extent, I believe&hellip; however, it&rsquo;s worth noting that&hellip;</strong><br>
+                    <strong>In retrospect, the approach that proved most effective was&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+    const QUESTIONS = {
+        a1: [
+            "Why do you learn English?",
+            "What is the most difficult thing about learning English?",
+            "What is the easiest thing about learning English?",
+            "Why do you like and dislike English?",
+            "Why is it important to speak English?",
+            "What ways of learning English do you like?",
+            "How did you start learning English?",
+            "What is the biggest difference between English and your language?",
+            "Have you ever quit learning English? Why?",
+            "How do you find time for studying?"
+        ],
+        b1: [
+            "Have you ever traveled to an English-speaking country? If yes, where did you go?",
+            "How long have you been learning English and how did you start?",
+            "What do you find most and least challenging about learning English?",
+            "What is your favorite English expression and why?",
+            "Can you share an interesting experience you've had while practicing English?",
+            "Do you enjoy watching movies or TV shows in English? Which ones do you recommend?",
+            "Have you ever read a book in English? What was it about?",
+            "Do you have any tips for improving English speaking skills?",
+            "Have you used English outside of the classroom? If so, how?",
+            "How has learning English influenced your life or career goals?"
+        ],
+        c1: [
+            "What strategies or resources have you found helpful for learning English at an advanced level?",
+            "How has your understanding of English culture and society evolved as you've become more proficient in the language?",
+            "Have you ever participated in language exchange programs or language immersion experiences? How did they impact your language skills?",
+            "Can you discuss a specific challenge you faced while learning English and how you overcame it?",
+            "How has learning English opened up new opportunities for you in terms of travel, work, or personal relationships?",
+            "Can you share your favorite English-speaking author, book, or movie, and why it resonated with you?",
+            "What do you think are the most effective ways to maintain and further develop your English skills?",
+            "Have you ever given a presentation or delivered a speech in English? How did it go?",
+            "What advice would you give to ESL learners who are just starting their journey?",
+            "How has your perception of the English language changed as you've progressed to an advanced level?"
+        ]
+    };
+
+    const timers = {};
+
+    function newQ(level) {
+        const pool = QUESTIONS[level];
+        const q = pool[Math.floor(Math.random() * pool.length)];
+        document.getElementById('pq-' + level).textContent = q;
+        resetTimer(level);
+    }
+
+    function resetTimer(level) {
+        if (timers[level]) { clearInterval(timers[level]); timers[level] = null; }
+        const el = document.getElementById('pt-' + level);
+        el.textContent = '2:00';
+        el.className = 'picker-timer';
+        document.getElementById('pg-' + level).style.display = '';
+        document.getElementById('ps-' + level).style.display = 'none';
+    }
+
+    function startTimer(level) {
+        if (document.getElementById('pq-' + level).textContent.includes('Click')) {
+            newQ(level);
+            return;
+        }
+        if (timers[level]) return;
+        let secs = 120;
+        const el = document.getElementById('pt-' + level);
+        el.className = 'picker-timer running';
+        document.getElementById('pg-' + level).style.display = 'none';
+        document.getElementById('ps-' + level).style.display = '';
+        timers[level] = setInterval(function() {
+            secs--;
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+            if (secs <= 0) {
+                clearInterval(timers[level]);
+                timers[level] = null;
+                el.textContent = 'Done! ✓';
+                el.className = 'picker-timer done';
+                document.getElementById('pg-' + level).style.display = '';
+                document.getElementById('ps-' + level).style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    function stopTimer(level) {
+        if (timers[level]) { clearInterval(timers[level]); timers[level] = null; }
+        resetTimer(level);
+    }
+
+    // tabs
+    (function(){
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(){
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const id = 'tab-' + this.getAttribute('data-tab');
+                const el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

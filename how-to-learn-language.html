@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Как выучить язык · NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <style>
+        .page-bg { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .page-bg img { width:100%; height:100%; object-fit:cover; object-position:center 30%;
+            filter:brightness(0.12) saturate(1.4); }
+        .page-bg::after { content:''; position:absolute; inset:0;
+            background: radial-gradient(ellipse 65% 50% at 75% 10%, rgba(99,179,237,0.14) 0%, transparent 65%),
+                        radial-gradient(ellipse 50% 45% at 20% 85%, rgba(192,132,252,0.1) 0%, transparent 65%); }
+        body { position:relative; }
+
+        /* ── layout ── */
+        .hero { position:relative; z-index:2; text-align:center; padding:7rem 1rem 2.5rem; }
+        .eyebrow { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.22em;
+            text-transform:uppercase; color:rgba(99,179,237,0.65); margin-bottom:0.9rem; }
+        .hero h1 { font-size:clamp(2.2rem,5vw,3.4rem); font-weight:900; letter-spacing:-0.03em;
+            margin:0 0 0.7rem;
+            background:linear-gradient(135deg,#fff 15%,#63b3ed 55%,#c084fc 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero p { font-size:1rem; color:rgba(200,220,245,0.5); font-style:italic; margin:0; }
+
+        .wrap { position:relative; z-index:2; max-width:900px; margin:0 auto; padding:0 1.2rem 5rem; }
+
+        /* ── section heading ── */
+        .sec-h { font-size:1.05rem; font-weight:800; color:#fff; font-family:'Nunito',sans-serif;
+            margin:2.5rem 0 1rem; padding-bottom:0.5rem;
+            border-bottom:1px solid rgba(99,179,237,0.2);
+            display:flex; align-items:center; gap:0.6rem; }
+
+        /* ── Method cards ── */
+        .methods-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:1rem; }
+        .method-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+            border-radius:14px; padding:1.15rem 1.2rem;
+            transition:border-color 0.25s, box-shadow 0.25s; }
+        .method-card:hover { border-color:rgba(99,179,237,0.3); box-shadow:0 6px 24px rgba(99,179,237,0.08); }
+        .method-icon { font-size:1.6rem; display:block; margin-bottom:0.6rem; }
+        .method-name { font-size:0.97rem; font-weight:800; color:#fff; margin-bottom:0.35rem; }
+        .method-badge { display:inline-block; font-size:0.66rem; font-weight:700; padding:0.1rem 0.5rem;
+            border-radius:999px; margin-bottom:0.55rem; }
+        .badge-blue   { background:rgba(99,179,237,0.15);  color:#63b3ed; }
+        .badge-purple { background:rgba(192,132,252,0.15); color:#c084fc; }
+        .badge-pink   { background:rgba(244,114,182,0.15); color:#f472b6; }
+        .badge-green  { background:rgba(134,239,172,0.15); color:#86efac; }
+        .badge-gold   { background:rgba(251,191,36,0.15);  color:#fbbf24; }
+        .method-text { font-size:0.85rem; color:rgba(220,210,245,0.72); line-height:1.6; }
+        .method-how { margin-top:0.6rem; font-size:0.8rem; color:rgba(99,179,237,0.7);
+            font-style:italic; padding-top:0.6rem; border-top:1px solid rgba(255,255,255,0.06); }
+
+        /* ── Timeline ── */
+        .timeline { display:flex; flex-direction:column; gap:0; position:relative; }
+        .timeline::before { content:''; position:absolute; left:28px; top:0; bottom:0;
+            width:2px; background:linear-gradient(to bottom,#63b3ed,#c084fc,transparent); }
+        .tl-item { display:flex; gap:1.2rem; align-items:flex-start; padding:0 0 1.4rem; position:relative; }
+        .tl-dot { width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:0.25rem;
+            border:2px solid; position:relative; z-index:1; background:#090d14; }
+        .tl-dot.blue   { border-color:#63b3ed; box-shadow:0 0 10px rgba(99,179,237,0.4); }
+        .tl-dot.teal   { border-color:#5eead4; box-shadow:0 0 10px rgba(94,234,212,0.35); }
+        .tl-dot.purple { border-color:#c084fc; box-shadow:0 0 10px rgba(192,132,252,0.4); }
+        .tl-dot.yellow { border-color:#fbbf24; box-shadow:0 0 10px rgba(251,191,36,0.35); }
+        .tl-content { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+            border-radius:13px; padding:0.9rem 1.1rem; flex:1; }
+        .tl-when { font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; }
+        .tl-title { font-size:0.97rem; font-weight:800; color:#fff; margin-bottom:0.4rem; }
+        .tl-text { font-size:0.86rem; color:rgba(220,210,245,0.72); line-height:1.6; }
+        .tl-tags { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.5rem; }
+        .tl-tag { font-size:0.7rem; font-weight:700; padding:0.15rem 0.55rem; border-radius:999px; }
+
+        /* ── Do / Don't ── */
+        .do-dont { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        @media(max-width:580px) { .do-dont { grid-template-columns:1fr; } }
+        .do-box  { background:rgba(134,239,172,0.05); border:1px solid rgba(134,239,172,0.2); border-radius:14px; padding:1.1rem 1.2rem; }
+        .dont-box{ background:rgba(248,113,113,0.05); border:1px solid rgba(248,113,113,0.2); border-radius:14px; padding:1.1rem 1.2rem; }
+        .do-box h3   { color:#86efac; font-size:0.88rem; font-weight:800; margin-bottom:0.7rem; font-family:'Nunito',sans-serif; }
+        .dont-box h3 { color:#f87171; font-size:0.88rem; font-weight:800; margin-bottom:0.7rem; font-family:'Nunito',sans-serif; }
+        .dd-item { display:flex; gap:0.6rem; align-items:flex-start; padding:0.3rem 0;
+            font-size:0.85rem; color:rgba(225,210,245,0.78); line-height:1.45; }
+        .dd-icon { flex-shrink:0; font-size:0.9rem; margin-top:0.05rem; }
+
+        /* ── Chips ── */
+        .chips { display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.5rem; }
+        .chip { background:rgba(99,179,237,0.1); border:1px solid rgba(99,179,237,0.2);
+            border-radius:999px; padding:0.25rem 0.75rem;
+            font-size:0.78rem; color:rgba(160,210,250,0.8); }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <div class="page-bg">
+        <img src="img/paris.webp" alt="">
+    </div>
+
+    <nav class="navbar navbar-transparent" style="position:relative;z-index:10;">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <span class="eyebrow">✦ язык — это навык, а не талант ✦</span>
+        <h1>Как выучить язык 🌍</h1>
+        <p>консистентность важнее интенсивности</p>
+    </div>
+
+    <div class="wrap">
+
+        <!-- ══ METHODS ══ -->
+        <div class="sec-h">🔑 Что реально работает</div>
+        <p style="font-size:0.84rem;color:rgba(220,205,245,0.45);margin:-0.4rem 0 1.2rem;">Каждый пункт — не теория, а практика. Комбинируй всё сразу</p>
+
+        <div class="methods-grid">
+
+            <div class="method-card">
+                <span class="method-icon">🌊</span>
+                <div class="method-name">Погружение (иммерсия)</div>
+                <span class="method-badge badge-blue">⭐ основа всего</span>
+                <div class="method-text">Язык должен окружать тебя максимальное количество часов в сутки. Переключи интерфейс телефона, компьютера и соцсетей на целевой язык — это создаёт постоянный пассивный контакт.</div>
+                <div class="method-how">→ Смотри фильмы с субтитрами на целевом языке (не на родном!). Потом — без субтитров совсем. Фоновое радио/подкасты тоже работают — мозг привыкает к ритму</div>
+                <div class="chips">
+                    <span class="chip">Интерфейс телефона</span>
+                    <span class="chip">Сериалы с субтитрами</span>
+                    <span class="chip">Фоновое радио</span>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <span class="method-icon">📚</span>
+                <div class="method-name">Читать — много и разнообразно</div>
+                <span class="method-badge badge-purple">Самый недооценённый инструмент</span>
+                <div class="method-text">Носители к 18 годам прочитали десятки миллионов слов — именно поэтому они интуитивно знают грамматику. Начни с детских книг или адаптированной литературы, потом переходи к оригиналам.</div>
+                <div class="method-how">→ Читай новости, Википедию, форумы — там живой язык. Незнакомые слова не обязательно смотреть в словаре: часто значение ясно из контекста. Частые слова — в Anki</div>
+                <div class="chips">
+                    <span class="chip">Адаптированные книги</span>
+                    <span class="chip">Anki</span>
+                    <span class="chip">Форумы и соцсети</span>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <span class="method-icon">🎙️</span>
+                <div class="method-name">Shadowing</div>
+                <span class="method-badge badge-pink">Техника полиглотов</span>
+                <div class="method-text">Берёшь аудио с носителем — подкаст, интервью, сериал — и повторяешь одновременно, копируя не только слова, но и интонацию, темп, паузы, эмоции. Через несколько месяцев речь становится заметно естественнее.</div>
+                <div class="method-how">→ Найди запись, включи, говори вместе с ней. Поначалу трудно — так и должно быть. Метод Като Ломба и Пимслера построены на том же принципе</div>
+                <div class="chips">
+                    <span class="chip">Подкасты</span>
+                    <span class="chip">Интервью</span>
+                    <span class="chip">Интонация + темп</span>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <span class="method-icon">🧠</span>
+                <div class="method-name">Думать на языке</div>
+                <span class="method-badge badge-green">Главный шаг к беглости</span>
+                <div class="method-text">Перевод в голове — главный тормоз. Комментируй всё вокруг мысленно на целевом языке: «вот стакан воды», «я иду на кухню». Считай в уме на нём, мечтай. Чем быстрее язык станет языком мышления — тем лучше.</div>
+                <div class="method-how">→ Ведй дневник на этом языке — несколько предложений в день. Не нужно много: просто описывай что происходит</div>
+                <div class="chips">
+                    <span class="chip">Мысленный комментарий</span>
+                    <span class="chip">Дневник</span>
+                    <span class="chip">Счёт в уме</span>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <span class="method-icon">📐</span>
+                <div class="method-name">Грамматика — по мере нужды</div>
+                <span class="method-badge badge-gold">Не зубрить правила</span>
+                <div class="method-text">Грамматику лучше учить не из учебника, а когда столкнулась с непонятной конструкцией в тексте или тебя поправил кто-то. Базовые структуры — в начале, дальше грамматика усваивается через огромное количество примеров.</div>
+                <div class="method-how">→ Имитируй целые фразы носителей, а не конструируй их из правил — это быстрее формирует интуицию</div>
+                <div class="chips">
+                    <span class="chip">Имитировать фразы</span>
+                    <span class="chip">Из контекста</span>
+                    <span class="chip">Не зубрить таблицы</span>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <span class="method-icon">🗣️</span>
+                <div class="method-name">Произношение и акцент</div>
+                <span class="method-badge badge-blue">Отдельная работа</span>
+                <div class="method-text">Идеальное произношение требует специальной работы. Найди записи с фонетическим разбором звуков на YouTube. Записывай себя и сравнивай с носителем — некомфортно, но очень эффективно.</div>
+                <div class="method-how">→ Акцент дают именно звуки, которых нет в твоём родном языке — найди их и тренируй отдельно</div>
+                <div class="chips">
+                    <span class="chip">Диктофон</span>
+                    <span class="chip">Сравнивать с носителем</span>
+                    <span class="chip">YouTube фонетика</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ══ TIMELINE ══ -->
+        <div class="sec-h" style="margin-top:3rem;">⏳ Реалистичный план по времени</div>
+        <p style="font-size:0.84rem;color:rgba(220,205,245,0.45);margin:-0.4rem 0 1.2rem;">При 3–4 часах в день — приблизительно такой прогресс</p>
+
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-dot blue"></div>
+                <div class="tl-content">
+                    <div class="tl-when" style="color:#63b3ed;">3–6 месяцев</div>
+                    <div class="tl-title">Базовое общение</div>
+                    <div class="tl-text">Понимаешь простые тексты, можешь говорить на базовые темы. Грамматика ещё нестабильна, лексика небольшая, но коммуникация уже возможна.</div>
+                    <div class="tl-tags">
+                        <span class="tl-tag" style="background:rgba(99,179,237,0.12);color:#63b3ed;">Детские книги</span>
+                        <span class="tl-tag" style="background:rgba(99,179,237,0.12);color:#63b3ed;">Простые сериалы</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot teal"></div>
+                <div class="tl-content">
+                    <div class="tl-when" style="color:#5eead4;">1–2 года</div>
+                    <div class="tl-title">Уверенный разговор</div>
+                    <div class="tl-text">Смотришь фильмы и читаешь книги с удовольствием. Говоришь на любые темы — пусть с ошибками и паузами. Язык перестаёт быть «трудом».</div>
+                    <div class="tl-tags">
+                        <span class="tl-tag" style="background:rgba(94,234,212,0.12);color:#5eead4;">Оригинальные книги</span>
+                        <span class="tl-tag" style="background:rgba(94,234,212,0.12);color:#5eead4;">Без субтитров</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot purple"></div>
+                <div class="tl-content">
+                    <div class="tl-when" style="color:#c084fc;">5–10 лет</div>
+                    <div class="tl-title">Уровень близкий к носителю</div>
+                    <div class="tl-text">Идиомы, юмор, культурные отсылки, нюансы стиля — это финальная шлифовка. Не нужно ждать 10 лет, чтобы нормально общаться: просто нужно продолжать.</div>
+                    <div class="tl-tags">
+                        <span class="tl-tag" style="background:rgba(192,132,252,0.12);color:#c084fc;">Идиомы</span>
+                        <span class="tl-tag" style="background:rgba(192,132,252,0.12);color:#c084fc;">Культурный контекст</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot yellow"></div>
+                <div class="tl-content">
+                    <div class="tl-when" style="color:#fbbf24;">всегда</div>
+                    <div class="tl-title">Час каждый день &gt; 7 часов раз в неделю</div>
+                    <div class="tl-text">Язык — это навык, который строится постепенно. Мозг продолжает работу даже когда ты спишь. Консистентность — главное правило.</div>
+                    <div class="tl-tags">
+                        <span class="tl-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;">Каждый день</span>
+                        <span class="tl-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;">Хотя бы 30 минут</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ DO / DON'T ══ -->
+        <div class="sec-h">✅ Что делать и что нет</div>
+        <div class="do-dont">
+            <div class="do-box">
+                <h3>✅ Делай</h3>
+                <div class="dd-item"><span class="dd-icon">📺</span>Смотри фильмы с субтитрами на целевом языке — не на русском</div>
+                <div class="dd-item"><span class="dd-icon">📖</span>Читай что угодно на языке — комментарии, форумы, новости</div>
+                <div class="dd-item"><span class="dd-icon">🎙️</span>Делай shadowing: повторяй за носителем одновременно с ним</div>
+                <div class="dd-item"><span class="dd-icon">🃏</span>Используй Anki для частых слов — интервальное повторение работает</div>
+                <div class="dd-item"><span class="dd-icon">🧠</span>Комментируй мысленно всё вокруг на целевом языке</div>
+                <div class="dd-item"><span class="dd-icon">📝</span>Веди дневник — несколько предложений в день</div>
+                <div class="dd-item"><span class="dd-icon">📱</span>Переключи интерфейс телефона на целевой язык</div>
+                <div class="dd-item"><span class="dd-icon">🎧</span>Слушай фоново — радио, подкасты, YouTube</div>
+            </div>
+            <div class="dont-box">
+                <h3>❌ Не делай</h3>
+                <div class="dd-item"><span class="dd-icon">📖</span>Не учи грамматику по учебнику от и до — скучно и неэффективно</div>
+                <div class="dd-item"><span class="dd-icon">🔤</span>Не учи слова в изоляции — только в контексте фразы</div>
+                <div class="dd-item"><span class="dd-icon">📺</span>Не смотри с субтитрами на родном языке — мозг читает, не слушает</div>
+                <div class="dd-item"><span class="dd-icon">🤔</span>Не переводи в голове — это тормоз. Думай на языке</div>
+                <div class="dd-item"><span class="dd-icon">📚</span>Не жди «готовности» — говори с ошибками с самого начала</div>
+                <div class="dd-item"><span class="dd-icon">⚡</span>Не делай 7 часов раз в неделю — делай час каждый день</div>
+                <div class="dd-item"><span class="dd-icon">🔊</span>Не игнорируй произношение — записывай себя и сравнивай</div>
+                <div class="dd-item"><span class="dd-icon">🔍</span>Не смотри каждое незнакомое слово в словарь — угадывай из контекста</div>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-top:3rem;color:rgba(99,179,237,0.35);font-size:0.8rem;letter-spacing:0.08em;">
+            ✦ язык — это марафон, а не спринт · один день за раз ✦
+        </div>
+
+    </div>
+</body>
+</html>
