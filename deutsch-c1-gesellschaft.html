@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C1 Gesellschaft &amp; Widerspr&uuml;che | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 7px;
+            margin: 0.5rem 0 0.25rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #a371f7, #c084fc);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+        }
+        .progress-label span { color: #c084fc; font-weight: 700; }
+
+        .controls {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.3rem;
+        }
+        .ctrl-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary {
+            background: rgba(163,113,247,0.15);
+            border-color: rgba(163,113,247,0.4);
+            color: #c084fc;
+        }
+        .ctrl-btn.primary:hover { background: rgba(163,113,247,0.25); color: #fff; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 0.65rem;
+        }
+
+        .fcard {
+            position: relative;
+            min-height: 135px;
+            border-radius: 13px;
+            background: rgba(13,17,23,0.82);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .fcard::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 13px 0 0 13px;
+            background: #a371f7;
+        }
+        .fcard::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 4px; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(163,113,247,0.45), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+
+        .fcard-front {
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 135px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 0.9rem; font-weight: 700; color: rgba(163,113,247,0.6); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.05rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.68rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+
+        .fcard-back {
+            display: none;
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 135px;
+            flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en {
+            font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.62);
+            margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .fcard-en::before {
+            content: 'EN'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem;
+            border-radius: 5px; background: rgba(88,166,255,0.15); color: #79b8ff;
+            border: 1px solid rgba(88,166,255,0.28); letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .fcard-example { font-size: 0.75rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.9rem; font-style: italic; color: rgba(163,113,247,0.9); margin-top: 0.42rem; line-height: 1.55; border-left: 2px solid rgba(163,113,247,0.35); padding-left: 0.5rem; }
+        .fcard-frage {
+            font-size: 0.74rem;
+            color: rgba(52,211,153,0.85);
+            margin-top: 0.5rem;
+            line-height: 1.5;
+            border-left: 2px solid rgba(52,211,153,0.3);
+            padding-left: 0.5rem;
+        }
+        .know-btn {
+            display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem;
+            border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28);
+            color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer;
+            width: fit-content; transition: all 0.2s; align-self: flex-start;
+        }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+
+        .group-label {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin: 1.5rem 0 0.65rem;
+            font-size: 0.77rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--color-text-muted);
+        }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+        .done-screen {
+            display: none; text-align: center; padding: 2rem 1rem;
+            border-radius: 16px; background: rgba(13,17,23,0.6);
+            border: 1px solid rgba(163,113,247,0.3); margin-top: 1.5rem;
+        }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #c084fc; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+
+        .intro-box {
+            background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02));
+            border: 1px solid rgba(163,113,247,0.22);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.3rem;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: rgba(230,230,235,0.8);
+        }
+        .intro-box strong { color: #c084fc; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .fcard-front, .fcard-back { min-height: 115px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; }
+            .fcard-word { font-size: 0.93rem; }
+        }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+
+        /* === Lesbarkeit: größere Schrift für alle Karten === */
+        .fcard { min-height: 155px; }
+        .fcard-front, .fcard-back { min-height: 155px; }
+        .fcard-num { font-size: 1rem; }
+        .fcard-word { font-size: 1.22rem; }
+        .fcard-hint { font-size: 0.83rem; color: rgba(255,255,255,0.38); }
+        .flip-tip { font-size: 0.76rem; }
+        .fcard-ua { font-size: 1.12rem; }
+        .fcard-en { font-size: 0.93rem; }
+        .fcard-example { font-size: 0.84rem; }
+        .fcard-poem { font-size: 0.97rem; }
+        .fcard-frage { font-size: 0.83rem; }
+        @media (max-width: 600px) {
+            .fcard-front, .fcard-back { min-height: 135px; }
+            .fcard-word { font-size: 1.08rem; }
+        }
+
+        /* === Tages-Tabs === */
+        .day-tabs {
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
+            margin-bottom: 1.1rem;
+        }
+        .day-tab {
+            padding: 0.52rem 1.1rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .day-tab.active {
+            background: rgba(163,113,247,0.18);
+            border-color: rgba(163,113,247,0.5);
+            color: #c084fc;
+        }
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">C1 Gesellschaft &amp; Widerspr&uuml;che</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Gesellschaft &amp; Widerspr&uuml;che <span style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">C1</span></h1>
+            <p class="page-subtitle">Ambivalenz &bull; Doppelmoral &bull; Weltanschauung &mdash; 92 Einheiten: W&ouml;rter, Phrasen &amp; Redewendungen</p>
+        </div>
+
+        <div class="intro-box">
+            &#x1F91D; <strong>F&uuml;r Gespr&auml;che mit dem Lernpartner:</strong> Lern die W&ouml;rter &mdash; dann nutze die <span style="color:rgba(52,211,153,0.9);">gr&uuml;nen Fragen</span> auf der R&uuml;ckseite jeder Karte als Gespr&auml;chsimpuls. Versucht, eure Antworten mit m&ouml;glichst vielen der C1-W&ouml;rter zu formulieren.
+        </div>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="switchDay(1)">&#x1F4C5; Tag 1 &bull; 23 Karten</button>
+            <button class="day-tab" onclick="switchDay(2)">&#x1F4C5; Tag 2 &bull; 23 Karten</button>
+            <button class="day-tab" onclick="switchDay(3)">&#x1F4C5; Tag 3 &bull; 23 Karten</button>
+            <button class="day-tab" onclick="switchDay(4)">&#x1F4C5; Tag 4 &bull; 23 Karten</button>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-c1"></div></div>
+        <div class="progress-label">Gelernt: <span id="num-c1">0</span> / <span id="total-c1">20</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Alle aufdecken</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Zur&uuml;cksetzen</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Mischen</button>
+        </div>
+
+        <div id="cards-c1">
+
+            <div class="day-content active" data-day="1">
+
+            <div class="group-label">📖 Nomen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">die &Uuml;berzeugung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; von + Dat. &uuml;berzeugt &bull; Pl.: &Uuml;berzeugungen</div></div><div class="fcard-back"><div class="fcard-ua">переконання</div><div class="fcard-en">conviction / belief</div><div class="fcard-example">„Er handelt aus tiefer &Uuml;berzeugung, nicht aus Karrieregr&uuml;nden."</div><div class="fcard-poem">&Uuml;berzeugung &mdash; mein inneres Ja,<br>переконання &mdash; не здається під тиском.</div><div class="fcard-frage">&#x1F4AC; Gibt es eine &Uuml;berzeugung, die du fr&uuml;her hattest, die sich ver&auml;ndert hat? Was hat dich dazu gebracht?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">die Haltung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; zu + Dat. &bull; Pl.: Haltungen</div></div><div class="fcard-back"><div class="fcard-ua">позиція / ставлення</div><div class="fcard-en">stance / attitude</div><div class="fcard-example">„Seine Haltung zu sozialer Ungleichheit hat sich durch Reisen ver&auml;ndert."</div><div class="fcard-poem">Haltung &mdash; stehst du, f&auml;llst du nicht,<br>позиція &mdash; твій внутрішній стрижень.</div><div class="fcard-frage">&#x1F4AC; Zu welchem gesellschaftlichen Thema hast du eine klare Haltung &mdash; und woher kommt sie?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">die Weltanschauung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; Sg. &bull; Pl.: Weltanschauungen</div></div><div class="fcard-back"><div class="fcard-ua">світогляд</div><div class="fcard-en">worldview / philosophy of life</div><div class="fcard-example">„Unsere Weltanschauung wird stark durch Erziehung und Kultur gepr&auml;gt."</div><div class="fcard-poem">Weltanschauung &mdash; Linse f&uuml;r die Welt,<br>світогляд &mdash; ти бачиш крізь неї все.</div><div class="fcard-frage">&#x1F4AC; Was hat deine Weltanschauung am st&auml;rksten gepr&auml;gt &mdash; Familie, Erfahrungen oder B&uuml;cher?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">das Vorurteil</div><div class="fcard-hint">Nomen (n.) &bull; C1 &bull; gegen&uuml;ber + Dat. &bull; Pl.: Vorurteile</div></div><div class="fcard-back"><div class="fcard-ua">упередження / стереотип</div><div class="fcard-en">prejudice / stereotype</div><div class="fcard-example">„Vorurteile entstehen oft aus Unwissenheit und mangelndem pers&ouml;nlichen Kontakt."</div><div class="fcard-poem">Vorurteil &mdash; urteilst, bevor du kennst,<br>упередження &mdash; бачиш те, чого немає.</div><div class="fcard-frage">&#x1F4AC; Hast du je ein Vorurteil &uuml;berwunden? Was hat geholfen &mdash; Begegnung, Information oder Zeit?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">das Tabu</div><div class="fcard-hint">Nomen (n.) &bull; C1 &bull; &uuml;ber + Akk. sprechen &bull; Pl.: Tabus</div></div><div class="fcard-back"><div class="fcard-ua">табу</div><div class="fcard-en">taboo</div><div class="fcard-example">„Geld ist in vielen deutschen Familien ein absolutes Tabu."</div><div class="fcard-poem">Tabu &mdash; nicht sagen, nicht fragen,<br>табу &mdash; межа, яку не переходять.</div><div class="fcard-frage">&#x1F4AC; Welche gesellschaftlichen Tabus hältst du f&uuml;r sinnvoll &mdash; und welche sollten hinterfragt werden?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">der Widerspruch</div><div class="fcard-hint">Nomen (m.) &bull; C1 &bull; in + Dat. &bull; Pl.: Widerspr&uuml;che</div></div><div class="fcard-back"><div class="fcard-ua">суперечність / протиріччя</div><div class="fcard-en">contradiction</div><div class="fcard-example">„Es gibt einen offensichtlichen Widerspruch zwischen seinen Worten und Taten."</div><div class="fcard-poem">Widerspruch &mdash; zwei Wahrheiten, ein Satz,<br>суперечність &mdash; хто з них переможе?</div><div class="fcard-frage">&#x1F4AC; Welchen inneren Widerspruch erkennst du bei dir selbst &mdash; zwischen deinen Werten und deinem Verhalten?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">das Dilemma</div><div class="fcard-hint">Nomen (n.) &bull; C1 &bull; in einem Dilemma stecken &bull; Pl.: Dilemmata</div></div><div class="fcard-back"><div class="fcard-ua">дилема</div><div class="fcard-en">dilemma</div><div class="fcard-example">„Das Dilemma zwischen Umweltschutz und wirtschaftlichem Wachstum ist zentral."</div><div class="fcard-poem">Dilemma &mdash; zwei Wege, kein Ausweg,<br>дилема &mdash; жодне рішення не ідеальне.</div><div class="fcard-frage">&#x1F4AC; Beschreibe ein moralisches Dilemma aus deinem Alltag oder aus der Politik &mdash; wie w&uuml;rdest du entscheiden?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">der Zwiespalt</div><div class="fcard-hint">Nomen (m.) &bull; C1 &bull; im Zwiespalt sein &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">внутрішній конфлікт / роздвоєність</div><div class="fcard-en">inner conflict / torn feeling</div><div class="fcard-example">„Ich bin im Zwiespalt: Ich will ehrlich sein, aber niemanden verletzen."</div><div class="fcard-poem">Zwiespalt &mdash; das Herz zieht in zwei Richtungen,<br>внутрішній конфлікт &mdash; ніхто цього не бачить.</div><div class="fcard-frage">&#x1F4AC; Bist du gerade in einem inneren Zwiespalt? Beschreibe eine Situation, in der du zerrissen warst.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">✏️ Verben &amp; Adjektive</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">anecken (bei jdm.)</div><div class="fcard-hint">VERB · C1 · sie eckt an · umgangssprachlich · Perfekt: angeeckt</div></div><div class="fcard-back"><div class="fcard-ua">натикатися на опір / бути незручним для інших</div><div class="fcard-en">to rub people the wrong way / to clash</div><div class="fcard-example">„Sie eckt immer an, weil sie unbequeme Wahrheiten ausspricht."</div><div class="fcard-poem">anecken — sagst du die Wahrheit, stößt du an,<br>натикаєшся — коли ти занадто чесний.</div><div class="fcard-frage">💬 Warst du mal in einer Situation, wo du angeeckt bist, weil du ehrlich warst?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">sich abfinden (mit + Dat.)</div><div class="fcard-hint">VERB · C1 · fand sich ab · hat sich abgefunden · ≠ zustimmen!</div></div><div class="fcard-back"><div class="fcard-ua">змиритися (з чимось) / прийняти як є</div><div class="fcard-en">to come to terms with / to accept reluctantly</div><div class="fcard-example">„Es fällt schwer, sich mit Ungerechtigkeit abzufinden."</div><div class="fcard-poem">abfinden — kein Kampf mehr, kein Nein,<br>змиритися — не значить погодитись.</div><div class="fcard-frage">💬 Gibt es gesellschaftliche Probleme, mit denen du dich abgefunden hast — ist das Realismus oder Resignation?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">nachhaltig</div><div class="fcard-hint">ADJEKTIV · C1 · nachhaltig handeln · nachhaltige Entwicklung · ≠ kurzfristig</div></div><div class="fcard-back"><div class="fcard-ua">сталий / тривалий / з довготривалим ефектом</div><div class="fcard-en">sustainable / lasting</div><div class="fcard-example">„Nachhaltige Politik denkt nicht nur an die nächste Wahl, sondern an die nächste Generation."</div><div class="fcard-poem">nachhaltig — heute pflanzen, morgen ernten,<br>сталий — коріння глибше, ніж видно.</div><div class="fcard-frage">💬 In welchen Bereichen handelst du wirklich nachhaltig — und wo noch nicht?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">spaltend</div><div class="fcard-hint">ADJEKTIV · C1 · ein spaltendes Thema · diese Frage wirkt sehr spaltend</div></div><div class="fcard-back"><div class="fcard-ua">те, що розколює / поляризуючий</div><div class="fcard-en">divisive</div><div class="fcard-example">„Kaum ein Thema ist so spaltend wie die Einwanderungsdebatte."</div><div class="fcard-poem">spaltend — ein Wort, und die Gruppe bricht,<br>розколює — і ти бачиш, хто з ким.</div><div class="fcard-frage">💬 Welches Thema ist in deinem Freundeskreis am spaltendsten — und wie geht ihr damit um?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">nachvollziehbar</div><div class="fcard-hint">ADJEKTIV · C1 · das ist (nicht) nachvollziehbar · sehr häufig im Gespräch</div></div><div class="fcard-back"><div class="fcard-ua">зрозумілий / такий, що можна зрозуміти</div><div class="fcard-en">understandable / makes sense / traceable</div><div class="fcard-example">„Deine Reaktion ist für mich total nachvollziehbar, auch wenn ich anders handeln würde."</div><div class="fcard-poem">nachvollziehbar — ich gehe deinen Weg mit,<br>зрозумілий — навіть якщо не згодний.</div><div class="fcard-frage">💬 Kann man eine Handlung nachvollziehbar finden, ohne sie gutzuheißen — wo ist die Grenze?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#84</div><div class="fcard-word">einschränken</div><div class="fcard-hint">VERB · B2 · etw. einschränken · Nomen: die Einschränkung · ≠ erweitern</div></div><div class="fcard-back"><div class="fcard-ua">обмежувати / скорочувати</div><div class="fcard-en">to restrict / to limit / to curtail</div><div class="fcard-example">„Die Regierung plant, die Redefreiheit einzuschränken."</div><div class="fcard-poem">einschränken — enger werden, ob gewollt?,<br>обмежувати — де межа свободи?</div><div class="fcard-frage">💬 Wann ist es legitim, individuelle Freiheit einzuschränken — im Namen der Sicherheit oder des Gemeinwohls?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#85</div><div class="fcard-word">überdenken</div><div class="fcard-hint">VERB · B2–C1 · etw. grundlegend überdenken · dachte um · hat umgedacht</div></div><div class="fcard-back"><div class="fcard-ua">переосмислювати / переглядати</div><div class="fcard-en">to reconsider / to rethink</div><div class="fcard-example">„Manchmal müssen wir unsere Überzeugungen grundlegend überdenken."</div><div class="fcard-poem">überdenken — nochmal von vorne, ohne Angst,<br>переосмислювати — тільки сильні можуть це.</div><div class="fcard-frage">💬 Gibt es gesellschaftliche Überzeugungen, die du zuletzt grundlegend überdacht hast?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#86</div><div class="fcard-word">abwägen</div><div class="fcard-hint">VERB · C1 · Vor- und Nachteile abwägen · wog ab · hat abgewogen</div></div><div class="fcard-back"><div class="fcard-ua">зважувати / обдумувати з усіх боків</div><div class="fcard-en">to weigh up / to consider carefully</div><div class="fcard-example">„Vor einer Entscheidung sollte man alle Aspekte sorgfältig abwägen."</div><div class="fcard-poem">abwägen — keine Seite zu schnell bevorzugen,<br>зважувати — бо поспіх рідко мудрий.</div><div class="fcard-frage">💬 Wie wägst du ab, wenn du zwischen zwei wichtigen, aber widersprechenden Werten entscheiden musst?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">💬 Phrasen &amp; Redewendungen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">Ich bin der Meinung, dass...</div><div class="fcard-hint">PHRASE · C1 · formeller als „Ich denke" · mündlich &amp; schriftlich</div></div><div class="fcard-back"><div class="fcard-ua">Я вважаю, що... / На мою думку, ...</div><div class="fcard-en">I am of the opinion that...</div><div class="fcard-example">„Ich bin der Meinung, dass soziale Ungleichheit strukturelle Ursachen hat."</div><div class="fcard-poem">📌 Formeller als „Ich denke" — klingt durchdachter.<br>Підказка: звучить обдумано, не імпульсивно.</div><div class="fcard-frage">💬 Formuliere damit einen Satz über ein gesellschaftliches Problem, das dich beschäftigt.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">Ich sehe das etwas anders:</div><div class="fcard-hint">PHRASE · C1 · höflicher Widerspruch · für Gespräche &amp; Diskussionen</div></div><div class="fcard-back"><div class="fcard-ua">Я бачу це дещо інакше: ...</div><div class="fcard-en">I see this a bit differently: ...</div><div class="fcard-example">„Ich sehe das etwas anders: Nicht Faulheit, sondern fehlende Chancen sind das Problem."</div><div class="fcard-poem">📌 Höflicher Widerspruch — viel besser als „Du hast Unrecht!"<br>Підказка: не атакуєш, а пропонуєш свій погляд.</div><div class="fcard-frage">💬 Widersprich deinem Lernpartner höflich zu einem Thema mit genau diesem Einstieg.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">Ehrlich gesagt...</div><div class="fcard-hint">PHRASE · B2–C1 · sehr häufig im Gespräch · signalisiert Authentizität</div></div><div class="fcard-back"><div class="fcard-ua">Чесно кажучи...</div><div class="fcard-en">Honestly / to be honest...</div><div class="fcard-example">„Ehrlich gesagt finde ich diese Diskussion oft zu abstrakt."</div><div class="fcard-poem">📌 Signalisiert Authentizität — du sagst, was du wirklich denkst.<br>Підказка: одна з найчастіших фраз у живій розмові.</div><div class="fcard-frage">💬 Sag ehrlich gesagt etwas, das du denkst, aber selten laut sagst.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">Das kommt darauf an, ob / wie...</div><div class="fcard-hint">PHRASE · C1 · verhindert schnelle Urteile · zeigt Differenziertheit</div></div><div class="fcard-back"><div class="fcard-ua">Це залежить від того, чи / як...</div><div class="fcard-en">It depends on whether / how...</div><div class="fcard-example">„Das kommt darauf an, ob man Freiheit oder Sicherheit höher bewertet."</div><div class="fcard-poem">📌 Verhindert zu schnelle Urteile — zeigt, dass du komplex denkst.<br>Підказка: немає простих відповідей — і ти це показуєш.</div><div class="fcard-frage">💬 Nutze diesen Satz, um zu erklären, warum du bei einem Thema keine klare Position hast.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">mit dem Strom schwimmen</div><div class="fcard-hint">REDEWENDUNG · C1 · wie alle anderen handeln · ≠ gegen den Strom</div></div><div class="fcard-back"><div class="fcard-ua">плисти за течією / діяти як усі</div><div class="fcard-en">to go with the flow / to follow the crowd</div><div class="fcard-example">„Es ist leichter, mit dem Strom zu schwimmen, als eigene Überzeugungen zu vertreten."</div><div class="fcard-poem">🔍 wörtlich: in einem Fluss mit der Strömung schwimmen.<br>буквально: плисти за водою, не проти неї.</div><div class="fcard-frage">💬 In welchen Bereichen schwimmst du mit dem Strom — und wo bewusst dagegen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">unter den Teppich kehren</div><div class="fcard-hint">REDEWENDUNG · C1 · ein Problem verbergen / ignorieren</div></div><div class="fcard-back"><div class="fcard-ua">замітати під килим / приховувати проблему</div><div class="fcard-en">to sweep under the rug / brush under the carpet</div><div class="fcard-example">„Gesellschaftliche Probleme lassen sich nicht ewig unter den Teppich kehren."</div><div class="fcard-poem">🔍 wörtlich: Schmutz unter einen Teppich fegen — aus den Augen, aus dem Sinn.<br>буквально: замести бруд під килим — поки ніхто не бачить.</div><div class="fcard-frage">💬 Welche gesellschaftliche Frage wird in deinem Land am häufigsten unter den Teppich gekehrt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">auf dem Spiel stehen</div><div class="fcard-hint">REDEWENDUNG · C1 · etwas ist in Gefahr · bei etw. steht viel auf dem Spiel</div></div><div class="fcard-back"><div class="fcard-ua">бути під загрозою / стояти на кону</div><div class="fcard-en">to be at stake</div><div class="fcard-example">„Bei dieser Entscheidung steht die Zukunft ganzer Generationen auf dem Spiel."</div><div class="fcard-poem">🔍 wörtlich: beim Spiel setzt man etwas ein — und kann es verlieren.<br>буквально: ставка в грі — можна виграти або втратити.</div><div class="fcard-frage">💬 Was steht bei den aktuellen politischen Entscheidungen deiner Gesellschaft auf dem Spiel?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            </div><!-- /day-1 -->
+
+            <div class="day-content" data-day="2">
+
+            <div class="group-label">📖 Nomen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#21</div><div class="fcard-word">die Ambivalenz</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; Sg. (keine Pl.)</div></div><div class="fcard-back"><div class="fcard-ua">двоїстість / суперечливі почуття</div><div class="fcard-en">ambivalence</div><div class="fcard-example">„Man sp&uuml;rt Ambivalenz, wenn man jemanden liebt, aber seine Entscheidungen ablehnt."</div><div class="fcard-poem">Ambivalenz &mdash; ja und nein zugleich,<br>двоїстість &mdash; серце не дає відповіді.</div><div class="fcard-frage">&#x1F4AC; Kennst du eine Situation, in der du echte Ambivalenz gef&uuml;hlt hast &mdash; gleichzeitig ja und nein?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#22</div><div class="fcard-word">die Selbstt&auml;uschung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">самообман</div><div class="fcard-en">self-deception / self-delusion</div><div class="fcard-example">„Selbstt&auml;uschung sch&uuml;tzt uns kurzfristig, schadet aber langfristig."</div><div class="fcard-poem">Selbstt&auml;uschung &mdash; L&uuml;ge an sich selbst,<br>самообман &mdash; найскладніше побачити.</div><div class="fcard-frage">&#x1F4AC; In welchen Bereichen t&auml;uscht man sich selbst am h&auml;ufigsten &mdash; in Beziehungen, im Beruf oder bei Gewohnheiten?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#23</div><div class="fcard-word">die Doppelmoral</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">подвійна мораль</div><div class="fcard-en">double standard / hypocrisy</div><div class="fcard-example">„Es ist Doppelmoral, &Ouml;koaktivismus zu predigen und gleichzeitig Fernreisen zu machen."</div><div class="fcard-poem">Doppelmoral &mdash; sagst eins, tust andres,<br>подвійна мораль &mdash; брехня без сорому.</div><div class="fcard-frage">&#x1F4AC; Welche gesellschaftliche Doppelmoral f&auml;llt dir am meisten auf &mdash; in der Politik, im Umweltbereich oder im Alltag?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#24</div><div class="fcard-word">die Scheinheiligkeit</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">лицемірство</div><div class="fcard-en">hypocrisy / sanctimoniousness</div><div class="fcard-example">„Scheinheiligkeit ist es, soziale Gerechtigkeit zu fordern, aber selbst nichts zu ver&auml;ndern."</div><div class="fcard-poem">Scheinheiligkeit &mdash; heilige Maske,<br>лицемірство &mdash; пуста оболонка.</div><div class="fcard-frage">&#x1F4AC; Wo begegnest du Scheinheiligkeit am h&auml;ufigsten &mdash; in der Politik, in sozialen Medien oder im Alltag?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#25</div><div class="fcard-word">die Entr&uuml;stung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; &uuml;ber + Akk. &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">обурення</div><div class="fcard-en">indignation / outrage</div><div class="fcard-example">„Die &ouml;ffentliche Entr&uuml;stung &uuml;ber den Skandal war enorm gro&szlig;."</div><div class="fcard-poem">Entr&uuml;stung &mdash; das Herz sagt laut &bdquo;Nein!&ldquo;,<br>обурення &mdash; коли несправедливість.</div><div class="fcard-frage">&#x1F4AC; Wann ist &ouml;ffentliche Entr&uuml;stung berechtigt &mdash; und wann wird sie selbst zur Heuchelei?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#26</div><div class="fcard-word">die Polarisierung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">поляризація</div><div class="fcard-en">polarization</div><div class="fcard-example">„Social Media verst&auml;rkt die Polarisierung der &ouml;ffentlichen Meinung enorm."</div><div class="fcard-poem">Polarisierung &mdash; zwei Lager, kein Mitte,<br>поляризація &mdash; діалог зникає.</div><div class="fcard-frage">&#x1F4AC; Was sind deiner Meinung nach die Hauptursachen f&uuml;r gesellschaftliche Polarisierung? Wie kann man gegensteuern?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#27</div><div class="fcard-word">die Gratwanderung</div><div class="fcard-hint">Nomen (f.) &bull; C1 &bull; keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">балансування на межі / крок по лезу</div><div class="fcard-en">balancing act / tightrope walk</div><div class="fcard-example">„Ehrlich und trotzdem taktvoll zu sein ist eine echte Gratwanderung."</div><div class="fcard-poem">Gratwanderung &mdash; zwischen zwei Abgr&uuml;nden,<br>балансування &mdash; один неправильний крок.</div><div class="fcard-frage">&#x1F4AC; Beschreibe eine Gratwanderung in deinem Leben &mdash; zwischen zwei Anforderungen, die sich widersprechen.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#28</div><div class="fcard-word">die Solidarität</div><div class="fcard-hint">NOMEN (f.) · C1 · keine Pl. · Solidarität zeigen / üben · mit + Dat.</div></div><div class="fcard-back"><div class="fcard-ua">солідарність</div><div class="fcard-en">solidarity</div><div class="fcard-example">„Ohne Solidarität zerfällt jede Gesellschaft in isolierte Individuen."</div><div class="fcard-poem">Solidarität — du trägst mit, auch wenn es schwerfällt,<br>солідарність — я поруч, навіть якщо важко.</div><div class="fcard-frage">💬 In welchen Momenten zeigt eine Gesellschaft wirklich Solidarität — und wann ist es nur Schein?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">✏️ Verben &amp; Adjektive</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#29</div><div class="fcard-word">aufhetzen (gegen + Akk.)</div><div class="fcard-hint">VERB · C1 · jdn. gegen jdn. aufhetzen · stark negativ besetzt</div></div><div class="fcard-back"><div class="fcard-ua">підбурювати / натравлювати</div><div class="fcard-en">to stir up / to incite (against)</div><div class="fcard-example">„Manche Politiker hetzen die Bevölkerung gegen Minderheiten auf."</div><div class="fcard-poem">aufhetzen — Feuer im Kopf von anderen,<br>підбурювати — чужа рука твоїм гнівом.</div><div class="fcard-frage">💬 Woran erkennst du, ob jemand aufgehetzt ist — oder ob er aus eigener Überzeugung handelt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#30</div><div class="fcard-word">hinterfragen</div><div class="fcard-hint">VERB · C1 · etw. kritisch hinterfragen · typisch in Texten &amp; Reden</div></div><div class="fcard-back"><div class="fcard-ua">піддавати сумніву / критично осмислювати</div><div class="fcard-en">to question critically / to scrutinize</div><div class="fcard-example">„Es ist wichtig, gesellschaftliche Normen regelmäßig zu hinterfragen."</div><div class="fcard-poem">hinterfragen — nicht das Was, sondern Warum,<br>піддавати сумніву — перший крок до змін.</div><div class="fcard-frage">💬 Welche gesellschaftliche Norm oder Erwartung sollte stärker hinterfragt werden?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#31</div><div class="fcard-word">marginalisiert</div><div class="fcard-hint">ADJEKTIV · C1 · marginalisierte Gruppen · Verb: marginalisieren</div></div><div class="fcard-back"><div class="fcard-ua">маргіналізований / відкинутий на узбіччя суспільства</div><div class="fcard-en">marginalized</div><div class="fcard-example">„Marginalisierte Gruppen haben oft keinen Zugang zu politischer Mitsprache."</div><div class="fcard-poem">marginalisiert — am Rand, aber nicht weg,<br>маргіналізований — край — це не кінець.</div><div class="fcard-frage">💬 Welche Gruppen sind in deiner Gesellschaft am stärksten marginalisiert — und warum?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#32</div><div class="fcard-word">zwiespältig</div><div class="fcard-hint">ADJEKTIV · C1 · zwiespältige Gefühle · ich reagiere zwiespältig · ≈ ambivalent</div></div><div class="fcard-back"><div class="fcard-ua">суперечливий / з подвійним відчуттям</div><div class="fcard-en">ambivalent / conflicted / mixed feelings</div><div class="fcard-example">„Meine Gefühle zu diesem Thema sind sehr zwiespältig."</div><div class="fcard-poem">zwiespältig — ja-nein-ja in einer Sekunde,<br>суперечливий — ти сам себе не розумієш.</div><div class="fcard-frage">💬 Zu welchem Thema hast du zwiespältige Gefühle — kannst du weder klar ja noch klar nein sagen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#33</div><div class="fcard-word">ausgewogen</div><div class="fcard-hint">ADJEKTIV · C1 · ausgewogene Berichterstattung · ausgewogen urteilen · oft in Medienkontext</div></div><div class="fcard-back"><div class="fcard-ua">збалансований / об'єктивний</div><div class="fcard-en">balanced / even-handed</div><div class="fcard-example">„Eine ausgewogene Debatte berücksichtigt alle relevanten Perspektiven."</div><div class="fcard-poem">ausgewogen — beide Seiten halten die Waage,<br>збалансований — рідше, ніж здається.</div><div class="fcard-frage">💬 Gibt es wirklich ausgewogene Medien — oder ist absolute Objektivität ein Mythos?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#87</div><div class="fcard-word">sich durchsetzen</div><div class="fcard-hint">VERB · B2 · sich gegen jdn. durchsetzen · hat sich durchgesetzt</div></div><div class="fcard-back"><div class="fcard-ua">домагатися свого / наполягати на своєму</div><div class="fcard-en">to prevail / to assert oneself / to push through</div><div class="fcard-example">„Wer etwas verändern will, muss sich oft gegen Widerstände durchsetzen."</div><div class="fcard-poem">durchsetzen — der Weg durch die Mauer, nicht daran vorbei,<br>домагатися — навіть якщо важко.</div><div class="fcard-frage">💬 Wann ist es wichtig, sich durchzusetzen — und wann sollte man nachgeben?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#88</div><div class="fcard-word">vereinfachen</div><div class="fcard-hint">VERB · B2 · etw. (zu stark) vereinfachen · oft negativ: übervereinfachen</div></div><div class="fcard-back"><div class="fcard-ua">спрощувати / зводити до простого</div><div class="fcard-en">to simplify / to oversimplify</div><div class="fcard-example">„Populisten vereinfachen komplexe Probleme zu einfachen Feindbildern."</div><div class="fcard-poem">vereinfachen — leichter zu verstehen, schwerer wahr,<br>спрощувати — зручно, але небезпечно.</div><div class="fcard-frage">💬 Wann wird Vereinfachung zur Gefahr — im Diskurs, in Medien oder in der Politik?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#89</div><div class="fcard-word">reflektieren (über + Akk.)</div><div class="fcard-hint">VERB · C1 · über etw. reflektieren · typisch im akademischen Kontext</div></div><div class="fcard-back"><div class="fcard-ua">рефлектувати / критично осмислювати</div><div class="fcard-en">to reflect (upon) / to think critically about</div><div class="fcard-example">„Eine demokratische Gesellschaft muss in der Lage sein, ihr eigenes Handeln zu reflektieren."</div><div class="fcard-poem">reflektieren — innehalten und schauen, was war,<br>рефлектувати — не кожен може стояти тихо.</div><div class="fcard-frage">💬 Reflektierst du regelmäßig über deine eigenen gesellschaftlichen Vorurteile — oder ist das unbequem?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">💬 Phrasen &amp; Redewendungen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#34</div><div class="fcard-word">Es lässt sich argumentieren, dass...</div><div class="fcard-hint">PHRASE · C1 · distanziert · ideal für Essays &amp; schriftliche Argumentation</div></div><div class="fcard-back"><div class="fcard-ua">Можна стверджувати, що...</div><div class="fcard-en">It can be argued that...</div><div class="fcard-example">„Es lässt sich argumentieren, dass mehr Eigenverantwortung die Gesellschaft spaltet."</div><div class="fcard-poem">📌 Distanziert sich leicht von der eigenen Meinung — wirkt objektiv.<br>Підказка: не ти особисто — а логіка аргументу.</div><div class="fcard-frage">💬 Nutze diesen Einstieg für eine Position, die du eigentlich nicht teilst.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#35</div><div class="fcard-word">Was mich dabei beschäftigt, ist...</div><div class="fcard-hint">PHRASE · C1 · zeigt Reflexion · persönliche Perspektive einbringen</div></div><div class="fcard-back"><div class="fcard-ua">Мене тут турбує / цікавить...</div><div class="fcard-en">What concerns / occupies me here is...</div><div class="fcard-example">„Was mich bei diesem Thema beschäftigt, ist die Frage der Eigenverantwortung."</div><div class="fcard-poem">📌 Zeigt Reflexion statt oberflächlicher Meinung.<br>Підказка: відкриває особистий погляд, не декларацію.</div><div class="fcard-frage">💬 Was beschäftigt dich bei einem aktuellen gesellschaftlichen Thema wirklich?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#36</div><div class="fcard-word">Von meiner Warte aus...</div><div class="fcard-hint">PHRASE · C1 · leicht gehoben · gut in formellen Gesprächen</div></div><div class="fcard-back"><div class="fcard-ua">З моєї точки зору / зі своєї позиції...</div><div class="fcard-en">From where I stand / from my vantage point...</div><div class="fcard-example">„Von meiner Warte aus ist das Problem nicht so einfach zu lösen."</div><div class="fcard-poem">📌 Leicht gehoben — klingt souverän in formellen Debatten.<br>Підказка: звучить впевнено і трохи офіційно.</div><div class="fcard-frage">💬 Nutze diesen Ausdruck, um deine persönliche Lebenserfahrung einzubringen.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#37</div><div class="fcard-word">Ich tendiere dazu zu glauben, dass...</div><div class="fcard-hint">PHRASE · C1 · zeigt Offenheit · gut bei komplexen unsicheren Themen</div></div><div class="fcard-back"><div class="fcard-ua">Я схиляюся до думки, що...</div><div class="fcard-en">I tend to believe that...</div><div class="fcard-example">„Ich tendiere dazu zu glauben, dass Bildung die stärkste Waffe gegen Vorurteile ist."</div><div class="fcard-poem">📌 Zeigt Offenheit und Unsicherheit — du bist kein Dogmatiker.<br>Підказка: не претендуєш на абсолютну правду — і це сила.</div><div class="fcard-frage">💬 Formuliere eine Überzeugung, bei der du dir noch nicht 100% sicher bist.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#38</div><div class="fcard-word">jemandem den Spiegel vorhalten</div><div class="fcard-hint">REDEWENDUNG · C1 · jdm. zeigen, wie er wirklich ist</div></div><div class="fcard-back"><div class="fcard-ua">показати комусь, яким він насправді є / вказати на недоліки</div><div class="fcard-en">to hold up a mirror to someone</div><div class="fcard-example">„Gute Freunde halten uns manchmal den Spiegel vor — auch wenn es wehtut."</div><div class="fcard-poem">🔍 wörtlich: einen echten Spiegel vor jdn. halten.<br>буквально: тримати дзеркало — і видно справжнє обличчя.</div><div class="fcard-frage">💬 Wer in deinem Leben hat dir schon mal den Spiegel vorgehalten — und wie hast du reagiert?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#39</div><div class="fcard-word">das Ruder herumreißen</div><div class="fcard-hint">REDEWENDUNG · C1 · die Situation im letzten Moment retten / Kurs ändern</div></div><div class="fcard-back"><div class="fcard-ua">різко змінити курс / виправити ситуацію в останній момент</div><div class="fcard-en">to turn the ship around / to make a dramatic turnaround</div><div class="fcard-example">„Die Regierung muss jetzt das Ruder herumreißen, sonst wird die Krise größer."</div><div class="fcard-poem">🔍 wörtlich: das Steuer eines Schiffs ruckartig drehen.<br>буквально: різко крутити кермо корабля.</div><div class="fcard-frage">💬 Wann musstest du in deinem Leben das Ruder herumreißen — beruflich oder persönlich?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#40</div><div class="fcard-word">den Teufel an die Wand malen</div><div class="fcard-hint">REDEWENDUNG · C1 · das Schlimmste vorhersagen · oft als Warnung benutzt</div></div><div class="fcard-back"><div class="fcard-ua">передбачати найгірше / малювати чорта на стіні</div><div class="fcard-en">to paint the devil on the wall / to conjure up the worst case</div><div class="fcard-example">„Ich will nicht den Teufel an die Wand malen, aber die Lage ist ernst."</div><div class="fcard-poem">🔍 wörtlich: den Teufel malen — dann erscheint er wirklich.<br>буквально: намалюй чорта — і він прийде.</div><div class="fcard-frage">💬 Wann ist es sinnvoll, den Teufel an die Wand zu malen — und wann ist es destruktiv?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            </div><!-- /day-2 -->
+
+            <div class="day-content" data-day="3">
+
+            <div class="group-label">📖 Nomen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#41</div><div class="fcard-word">die Chancengleichheit</div><div class="fcard-hint">NOMEN (f.) · C1 · keine Pl. · für Chancengleichheit sorgen / kämpfen</div></div><div class="fcard-back"><div class="fcard-ua">рівні можливості</div><div class="fcard-en">equal opportunities</div><div class="fcard-example">„Wahre Chancengleichheit gibt es nicht, solange Bildung von der Herkunft abhängt."</div><div class="fcard-poem">Chancengleichheit — alle starten, nicht alle gleich,<br>рівні можливості — чи однакова точка старту?</div><div class="fcard-frage">💬 Glaubst du, dass echte Chancengleichheit in deiner Gesellschaft wirklich existiert?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#42</div><div class="fcard-word">die Benachteiligung</div><div class="fcard-hint">NOMEN (f.) · C1 · strukturelle Benachteiligung · Pl.: Benachteiligungen</div></div><div class="fcard-back"><div class="fcard-ua">ущемлення / нерівне ставлення</div><div class="fcard-en">disadvantage / structural discrimination</div><div class="fcard-example">„Strukturelle Benachteiligung beginnt oft schon im Bildungssystem."</div><div class="fcard-poem">Benachteiligung — nicht dein Fehler, sondern das System,<br>ущемлення — невидима стіна.</div><div class="fcard-frage">💬 Wo siehst du strukturelle Benachteiligung in deiner Gesellschaft — in Bildung, Beruf oder Gesundheit?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#43</div><div class="fcard-word">der Graben</div><div class="fcard-hint">NOMEN (m.) · C1 · sozialer / politischer Graben · Pl.: Gräben</div></div><div class="fcard-back"><div class="fcard-ua">прірва / розрив (між групами людей)</div><div class="fcard-en">divide / rift / gap (social)</div><div class="fcard-example">„Der soziale Graben zwischen Arm und Reich wird immer tiefer."</div><div class="fcard-poem">Graben — zwischen uns wächst die Stille,<br>прірва — хто перший зробить крок?</div><div class="fcard-frage">💬 Welcher gesellschaftliche Graben bereitet dir am meisten Sorgen — sozial, politisch oder kulturell?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#44</div><div class="fcard-word">der Sündenbock</div><div class="fcard-hint">NOMEN (m.) · C1 · jdn. zum Sündenbock machen · Pl.: Sündenböcke</div></div><div class="fcard-back"><div class="fcard-ua">козел відпущення</div><div class="fcard-en">scapegoat</div><div class="fcard-example">„In Krisen sucht die Gesellschaft gerne einen Sündenbock statt Lösungen."</div><div class="fcard-poem">Sündenbock — er trägt, was alle vermeiden,<br>козел відпущення — найлегше звинуватити.</div><div class="fcard-frage">💬 Wer wird in deiner Gesellschaft am häufigsten zum Sündenbock gemacht — und warum gerade diese Gruppe?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#45</div><div class="fcard-word">die Echokammer</div><div class="fcard-hint">NOMEN (f.) · C1 · in einer Echokammer leben · Pl.: Echokammern</div></div><div class="fcard-back"><div class="fcard-ua">ехо-камера / інформаційний пузир</div><div class="fcard-en">echo chamber</div><div class="fcard-example">„Social Media schafft Echokammern, in denen man nur die eigene Meinung hört."</div><div class="fcard-poem">Echokammer — nur dein Echo bleibt,<br>ехо-камера — тиша від іншого боку.</div><div class="fcard-frage">💬 Wie schaffst du es, aus deiner Echokammer herauszutreten und andere Perspektiven wirklich zu hören?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#46</div><div class="fcard-word">das Misstrauen</div><div class="fcard-hint">NOMEN (n.) · C1 · gegenüber + Dat. · keine Pl. · Misstrauen hegen / säen</div></div><div class="fcard-back"><div class="fcard-ua">недовіра / підозра</div><div class="fcard-en">distrust / mistrust</div><div class="fcard-example">„Das Misstrauen gegenüber Institutionen wächst in vielen Ländern."</div><div class="fcard-poem">Misstrauen — schaust du zweimal hin,<br>недовіра — може, вона рятує?</div><div class="fcard-frage">💬 Ist Misstrauen gegenüber Regierung oder Medien kritisches Denken — oder einfach destruktiv?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#47</div><div class="fcard-word">das Leitbild</div><div class="fcard-hint">NOMEN (n.) · C1 · gesellschaftliches Leitbild · Pl.: Leitbilder</div></div><div class="fcard-back"><div class="fcard-ua">ідеал / орієнтир / суспільний зразок</div><div class="fcard-en">guiding ideal / collective vision / role model</div><div class="fcard-example">„Das Leitbild einer solidarischen Gesellschaft gerät zunehmend unter Druck."</div><div class="fcard-poem">Leitbild — wohin wir streben, noch nicht sind,<br>ідеал — компас без гарантій.</div><div class="fcard-frage">💬 Was ist für dich das Leitbild einer gerechten Gesellschaft — und wie weit sind wir davon entfernt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#48</div><div class="fcard-word">die Eigenverantwortung</div><div class="fcard-hint">NOMEN (f.) · C1 · keine Pl. · Eigenverantwortung übernehmen / stärken</div></div><div class="fcard-back"><div class="fcard-ua">особиста відповідальність</div><div class="fcard-en">personal responsibility / self-reliance</div><div class="fcard-example">„Die Frage ist, wie viel Eigenverantwortung man vom Einzelnen erwarten kann."</div><div class="fcard-poem">Eigenverantwortung — ich, nicht der Staat,<br>особиста відповідальність — де межа?</div><div class="fcard-frage">💬 Wo hört Eigenverantwortung auf und wo beginnt staatliche Pflicht — in Gesundheit, Bildung, Armut?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#49</div><div class="fcard-word">der Mainstream</div><div class="fcard-hint">NOMEN (m.) · C1 · keine Pl. · gegen den Mainstream / im Mainstream schwimmen</div></div><div class="fcard-back"><div class="fcard-ua">мейнстрім / панівна суспільна думка</div><div class="fcard-en">the mainstream</div><div class="fcard-example">„Wer gegen den Mainstream denkt, braucht Mut und starke Argumente."</div><div class="fcard-poem">Mainstream — der Fluss trägt alle mit,<br>мейнстрім — ти пливеш проти чи з ним?</div><div class="fcard-frage">💬 Gibt es Bereiche, wo du bewusst gegen den Mainstream gehst — oder ist das nur ein Selbstbild?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">✏️ Verben &amp; Adjektive</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#50</div><div class="fcard-word">sich distanzieren (von + Dat.)</div><div class="fcard-hint">VERB · C1 · öffentlich sich distanzieren · Nomen: die Distanzierung</div></div><div class="fcard-back"><div class="fcard-ua">дистанціюватися / відмежуватися</div><div class="fcard-en">to distance oneself / to dissociate from</div><div class="fcard-example">„Die Partei distanzierte sich öffentlich von den extremen Aussagen ihres Mitglieds."</div><div class="fcard-poem">distanzieren — ich gehöre nicht dazu,<br>відмежуватися — легше сказати, schwerer zu leben.</div><div class="fcard-frage">💬 Wann ist öffentliche Distanzierung wichtig — und wann wird sie zu performativem Aktivismus?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#51</div><div class="fcard-word">sich zuspitzen</div><div class="fcard-hint">VERB · C1 · die Lage spitzt sich zu · Nomen: die Zuspitzung</div></div><div class="fcard-back"><div class="fcard-ua">загострюватися / доходити до критичної точки</div><div class="fcard-en">to escalate / to come to a head</div><div class="fcard-example">„Der Konflikt hat sich in den letzten Monaten dramatisch zugespitzt."</div><div class="fcard-poem">zuspitzen — die Spannung wächst bis zum Punkt,<br>загострюватися — коли вже не відкрутитись.</div><div class="fcard-frage">💬 Siehst du gesellschaftliche Konflikte, die sich gerade zuspitzen — wohin führt das deiner Meinung nach?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#52</div><div class="fcard-word">polarisierend</div><div class="fcard-hint">ADJEKTIV · C1 · ein polarisierendes Thema · stark polarisierend wirken</div></div><div class="fcard-back"><div class="fcard-ua">що поляризує / що розколює суспільство</div><div class="fcard-en">polarizing</div><div class="fcard-example">„Kaum ein Thema ist so polarisierend wie die Klimapolitik."</div><div class="fcard-poem">polarisierend — entweder-oder, kein Dazwischen,<br>що поляризує — і діалог зникає.</div><div class="fcard-frage">💬 Sind manche Themen von Natur aus polarisierend — oder ist Polarisierung immer künstlich erzeugt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#53</div><div class="fcard-word">aufgeklärt</div><div class="fcard-hint">ADJEKTIV · C1 · eine aufgeklärte Gesellschaft · Epoche: die Aufklärung</div></div><div class="fcard-back"><div class="fcard-ua">просвічений / освічений (у широкому сенсі)</div><div class="fcard-en">enlightened / informed / open-minded</div><div class="fcard-example">„Auch eine aufgeklärte Gesellschaft ist nicht immun gegen Populismus."</div><div class="fcard-poem">aufgeklärt — denkst du wirklich selbst?,<br>просвічений — чи тільки так вважаєш?</div><div class="fcard-frage">💬 Was macht eine Gesellschaft wirklich aufgeklärt — Bildung, freie Presse oder kritisches Denken?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#54</div><div class="fcard-word">kontraproduktiv</div><div class="fcard-hint">ADJEKTIV · C1 · kontraproduktiv wirken · das ist völlig kontraproduktiv</div></div><div class="fcard-back"><div class="fcard-ua">контрпродуктивний / з зворотним ефектом</div><div class="fcard-en">counterproductive</div><div class="fcard-example">„Übermäßige Strafe kann für die Erziehung völlig kontraproduktiv sein."</div><div class="fcard-poem">kontraproduktiv — meinst du's gut, schaffst du Schaden,<br>контрпродуктивний — добрі наміри, поганий ефект.</div><div class="fcard-frage">💬 Kennst du gesellschaftliche Maßnahmen, die gut gemeint, aber letztendlich kontraproduktiv waren?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#90</div><div class="fcard-word">instrumentalisieren</div><div class="fcard-hint">VERB · C1–C2 · jdn. / etw. für eigene Zwecke instrumentalisieren</div></div><div class="fcard-back"><div class="fcard-ua">інструменталізувати / використовувати у своїх цілях</div><div class="fcard-en">to instrumentalize / to exploit for one's purposes</div><div class="fcard-example">„Minderheiten werden oft in politischen Debatten instrumentalisiert."</div><div class="fcard-poem">instrumentalisieren — du bist kein Mittel, sondern Ziel,<br>інструменталізувати — коли людина стає аргументом.</div><div class="fcard-frage">💬 Wer wird in deiner Gesellschaft am häufigsten politisch instrumentalisiert — und wer profitiert davon?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#91</div><div class="fcard-word">differenzieren</div><div class="fcard-hint">VERB · C1 · zwischen etw. differenzieren · Adj.: differenziert · ≠ verallgemeinern</div></div><div class="fcard-back"><div class="fcard-ua">диференціювати / розрізняти / нюансувати</div><div class="fcard-en">to differentiate / to nuance / to make distinctions</div><div class="fcard-example">„Man muss zwischen Kritik an einem System und Hass auf Menschen differenzieren."</div><div class="fcard-poem">differenzieren — nicht alles ist schwarz oder weiß,<br>диференціювати — бо нюанс — це і є правда.</div><div class="fcard-frage">💬 Wann ist es wichtig, im Diskurs zu differenzieren — und wann kostet es zu viel Zeit?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#92</div><div class="fcard-word">sich behaupten</div><div class="fcard-hint">VERB · B2–C1 · sich gegen Druck behaupten · hat sich behauptet</div></div><div class="fcard-back"><div class="fcard-ua">відстоювати себе / не здаватися</div><div class="fcard-en">to hold one's ground / to assert oneself</div><div class="fcard-example">„Demokratische Werte müssen sich immer wieder neu behaupten."</div><div class="fcard-poem">behaupten — ich stehe, obwohl der Wind bläst,<br>відстоювати себе — без Lärm, але твердо.</div><div class="fcard-frage">💬 In welchen Situationen fällt es dir schwer, dich zu behaupten — privat oder gesellschaftlich?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">💬 Phrasen &amp; Redewendungen</div>
+            <div class="card-grid">
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#55</div><div class="fcard-word">Ich möchte hinzufügen, dass...</div><div class="fcard-hint">PHRASE · C1 · ergänzen ohne zu widersprechen · oft nach dem Gesprächspartner</div></div><div class="fcard-back"><div class="fcard-ua">Я хотів би додати, що...</div><div class="fcard-en">I would like to add that...</div><div class="fcard-example">„Ich möchte hinzufügen, dass das Problem auch eine historische Dimension hat."</div><div class="fcard-poem">📌 Ergänzt, ohne zu widersprechen — zeigt, dass du zugehört hast.<br>Підказка: додаєш, а не перебиваєш — і це elegant.</div><div class="fcard-frage">💬 Ergänze etwas, was dein Lernpartner gerade gesagt hat, mit diesem Ausdruck.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#56</div><div class="fcard-word">Wenn ich das richtig verstehe...</div><div class="fcard-hint">PHRASE · C1 · Verständnis prüfen · höfliche Zusammenfassung</div></div><div class="fcard-back"><div class="fcard-ua">Якщо я правильно розумію, ...</div><div class="fcard-en">If I understand correctly...</div><div class="fcard-example">„Wenn ich das richtig verstehe, meinen Sie, dass das System grundlegend reformiert werden müsste."</div><div class="fcard-poem">📌 Fasst zusammen und fragt nach — zeigt aktives Zuhören.<br>Підказка: перефразовуєш — і всі чують, чи правильно зрозуміли.</div><div class="fcard-frage">💬 Fasse den letzten Satz deines Lernpartners mit diesem Ausdruck zusammen.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#57</div><div class="fcard-word">ein zweischneidiges Schwert sein</div><div class="fcard-hint">REDEWENDUNG · C1 · hat Vor- UND Nachteile · für gesellschaftliche Debatten</div></div><div class="fcard-back"><div class="fcard-ua">бути обопільним мечем / мати і добрий, і поганий бік</div><div class="fcard-en">to be a double-edged sword</div><div class="fcard-example">„Soziale Medien sind ein zweischneidiges Schwert: Verbindung und Isolation zugleich."</div><div class="fcard-poem">🔍 wörtlich: ein Schwert, das auf beiden Seiten schneidet.<br>буквально: меч, що ріже з обох боків.</div><div class="fcard-frage">💬 Nenn ein gesellschaftliches Phänomen, das ein zweischneidiges Schwert ist.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#58</div><div class="fcard-word">auf keinen grünen Zweig kommen</div><div class="fcard-hint">REDEWENDUNG · C1 · keinen Erfolg haben · festgefahrene Situation</div></div><div class="fcard-back"><div class="fcard-ua">ніяк не досягти успіху / топтатися на місці</div><div class="fcard-en">to never get anywhere / to make no headway</div><div class="fcard-example">„Mit dieser Politik werden wir in der Bildungsreform auf keinen grünen Zweig kommen."</div><div class="fcard-poem">🔍 wörtlich: den grünen Ast (Symbol des Wachstums) nicht erreichen können.<br>буквально: не дістатися зеленої гілки — символу успіху.</div><div class="fcard-frage">💬 In welchem Bereich kommt dein Land deiner Meinung nach auf keinen grünen Zweig?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#59</div><div class="fcard-word">gegen Windmühlen kämpfen</div><div class="fcard-hint">REDEWENDUNG · C1 · aus Don Quijote · aussichtsloser Kampf</div></div><div class="fcard-back"><div class="fcard-ua">боротися з вітряками / вести безперспективну боротьбу</div><div class="fcard-en">to tilt at windmills / to fight a losing battle</div><div class="fcard-example">„Manchmal fühlt es sich an, als würde man gegen Windmühlen kämpfen, wenn man das System ändern will."</div><div class="fcard-poem">🔍 wörtlich: Don Quijote kämpft gegen Windmühlen, die er für Riesen hält.<br>буквально: Дон Кіхот і вітряки — битва без сенсу.</div><div class="fcard-frage">💬 Gibt es gesellschaftliche Kämpfe, die du für Windmühlenkämpfe hältst — wo du sagst „das ändert sich nie"?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            <div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#60</div><div class="fcard-word">die Katze aus dem Sack lassen</div><div class="fcard-hint">REDEWENDUNG · C1 · ein Geheimnis verraten · etwas enthüllen</div></div><div class="fcard-back"><div class="fcard-ua">виказати / розкрити секрет / розкрити карти</div><div class="fcard-en">to let the cat out of the bag</div><div class="fcard-example">„Der Politiker ließ die Katze aus dem Sack: Das Projekt war schon längst beschlossen."</div><div class="fcard-poem">🔍 wörtlich: eine versteckte Katze im Sack entkommt.<br>буквально: кішка вирвалася з мішка — секрет розкрито.</div><div class="fcard-frage">💬 Wann ist es schwer, die Katze im Sack zu halten — also ein wichtiges Geheimnis zu bewahren?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            </div><!-- /day-3 -->
+
+            <div class="day-content" data-day="4">
+
+            <div class="group-label">📖 Nomen</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#61</div><div class="fcard-word">die Spaltung</div><div class="fcard-hint">NOMEN (f.) · C1 · gesellschaftliche Spaltung · Pl.: Spaltungen · Verb: spalten</div></div><div class="fcard-back"><div class="fcard-ua">розкол / суспільний поділ</div><div class="fcard-en">split / societal division</div><div class="fcard-example">„Die gesellschaftliche Spaltung vertieft sich, wenn Dialog fehlt."</div><div class="fcard-poem">Spaltung — was einmal ganz war, bricht,<br>розкол — і зібрати важко знову.</div><div class="fcard-frage">💬 An welchen Punkten spaltet sich deine Gesellschaft am stärksten — und was fehlt, um wieder zusammenzukommen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#62</div><div class="fcard-word">der Diskurs</div><div class="fcard-hint">NOMEN (m.) · C1 · öffentlicher Diskurs · Pl.: Diskurse · Diskurs führen</div></div><div class="fcard-back"><div class="fcard-ua">дискурс / суспільна дискусія</div><div class="fcard-en">discourse / public debate</div><div class="fcard-example">„Ein offener Diskurs ist die Grundlage jeder Demokratie."</div><div class="fcard-poem">Diskurs — Worte, die etwas bewegen sollen,<br>дискурс — коли розмова важливіша за результат.</div><div class="fcard-frage">💬 Welcher gesellschaftliche Diskurs beschäftigt dich gerade am meisten — und warum?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#63</div><div class="fcard-word">das Vorrecht</div><div class="fcard-hint">NOMEN (n.) · C1 · das Vorrecht haben · Pl.: Vorrechte · ≈ Privileg</div></div><div class="fcard-back"><div class="fcard-ua">привілей / перевага</div><div class="fcard-en">privilege / prerogative</div><div class="fcard-example">„Bildung ist in vielen Ländern noch immer ein Vorrecht der Wohlhabenden."</div><div class="fcard-poem">Vorrecht — wer hat's, sieht's selten,<br>привілей — той, хто має, часто не помічає.</div><div class="fcard-frage">💬 Welches Vorrecht hast du vielleicht, das dir selbst kaum bewusst ist?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#64</div><div class="fcard-word">die Ausgrenzung</div><div class="fcard-hint">NOMEN (f.) · C1 · soziale Ausgrenzung · Pl.: Ausgrenzungen · Verb: ausgrenzen</div></div><div class="fcard-back"><div class="fcard-ua">виключення / маргіналізація</div><div class="fcard-en">exclusion / marginalization</div><div class="fcard-example">„Soziale Ausgrenzung beginnt oft mit kleinen Gesten der Ablehnung."</div><div class="fcard-poem">Ausgrenzung — du bist nicht dabei, weil du anders bist,<br>виключення — найтихіша форма насилля.</div><div class="fcard-frage">💬 Hast du je Ausgrenzung erlebt oder beobachtet — was hätte damals helfen können?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#65</div><div class="fcard-word">das Machtgefälle</div><div class="fcard-hint">NOMEN (n.) · C1 · soziales Machtgefälle · Pl.: Machtgefälle · strukturell benutzt</div></div><div class="fcard-back"><div class="fcard-ua">нерівність влади / владна асиметрія</div><div class="fcard-en">power imbalance / power differential</div><div class="fcard-example">„In vielen Beziehungen gibt es ein unsichtbares Machtgefälle."</div><div class="fcard-poem">Machtgefälle — einer steht höher, spricht lauter,<br>нерівність влади — мовчання другого — не згода.</div><div class="fcard-frage">💬 Wo siehst du ein Machtgefälle in deinem Alltag — und wie gehst du damit um?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#66</div><div class="fcard-word">die Gleichgültigkeit</div><div class="fcard-hint">NOMEN (f.) · C1 · gegenüber + Dat. · keine Pl. · Gleichgültigkeit zeigen</div></div><div class="fcard-back"><div class="fcard-ua">байдужість / апатія</div><div class="fcard-en">indifference / apathy</div><div class="fcard-example">„Gleichgültigkeit gegenüber Unrecht ist keine Neutralität — sie ist Zustimmung."</div><div class="fcard-poem">Gleichgültigkeit — nicht ja, nicht nein, nur Schweigen,<br>байдужість — гучніша, ніж здається.</div><div class="fcard-frage">💬 Gibt es Themen, bei denen du selbst gleichgültig bist — und warum ist das so?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#67</div><div class="fcard-word">der Rückschritt</div><div class="fcard-hint">NOMEN (m.) · B2–C1 · einen Rückschritt machen · ≠ Fortschritt · Pl.: Rückschritte</div></div><div class="fcard-back"><div class="fcard-ua">крок назад / регрес</div><div class="fcard-en">step backward / regression</div><div class="fcard-example">„Manche nennen es Tradition, andere sehen darin einen Rückschritt."</div><div class="fcard-poem">Rückschritt — nicht alle Richtungen heißen Fortschritt,<br>регрес — іноді у зворотному напрямку.</div><div class="fcard-frage">💬 Wo siehst du gesellschaftliche Rückschritte in den letzten Jahren — und was steckt dahinter?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#68</div><div class="fcard-word">der Anpassungsdruck</div><div class="fcard-hint">NOMEN (m.) · C1 · sozialer Anpassungsdruck · keine Pl.</div></div><div class="fcard-back"><div class="fcard-ua">тиск відповідності / примус пристосовуватися</div><div class="fcard-en">pressure to conform / social pressure</div><div class="fcard-example">„In sozialen Medien ist der Anpassungsdruck besonders stark."</div><div class="fcard-poem">Anpassungsdruck — sei wie die anderen, oder sei allein,<br>тиск відповідності — і ти забуваєш, хто ти є.</div><div class="fcard-frage">💬 In welchen Bereichen deines Lebens spürst du Anpassungsdruck am meisten?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">✏️ Verben &amp; Adjektive</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#69</div><div class="fcard-word">sich anpassen (an + Akk.)</div><div class="fcard-hint">VERB · B2 · sie passt sich an · hat sich angepasst · ≠ Eigenständigkeit bewahren</div></div><div class="fcard-back"><div class="fcard-ua">пристосовуватися / адаптуватися</div><div class="fcard-en">to adapt / to conform / to adjust</div><div class="fcard-example">„Es ist wichtig, sich anzupassen, ohne sich selbst zu verlieren."</div><div class="fcard-poem">anpassen — Form wechseln, Kern bleibt?,<br>пристосовуватися — де межа між гнучкістю і капітуляцією?</div><div class="fcard-frage">💬 Hast du dich je so stark angepasst, dass du dich selbst kaum wiedererkannt hast?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#70</div><div class="fcard-word">ausgrenzen</div><div class="fcard-hint">VERB · B2–C1 · jdn. ausgrenzen · Nomen: die Ausgrenzung · stark negativ besetzt</div></div><div class="fcard-back"><div class="fcard-ua">виключати / відштовхувати</div><div class="fcard-en">to exclude / to marginalize</div><div class="fcard-example">„Wer anders denkt, wird in manchen Gruppen schnell ausgegrenzt."</div><div class="fcard-poem">ausgrenzen — der Zaun ist nicht immer sichtbar,<br>виключати — відчуваєш, навіть коли не кажуть.</div><div class="fcard-frage">💬 Wie kann man aktiv dagegen steuern, jemanden unbewusst auszugrenzen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#71</div><div class="fcard-word">verdrängen</div><div class="fcard-hint">VERB · C1 · etw. aus dem Bewusstsein verdrängen · Nomen: die Verdrängung</div></div><div class="fcard-back"><div class="fcard-ua">витісняти / пригнічувати / замовчувати</div><div class="fcard-en">to suppress / to displace / to repress</div><div class="fcard-example">„Gesellschaften verdrängen oft dunkle Kapitel ihrer Geschichte."</div><div class="fcard-poem">verdrängen — aus dem Blick, doch nicht weg,<br>витісняти — воно повернеться, коли не чекаєш.</div><div class="fcard-frage">💬 Welche gesellschaftliche Wahrheit wird in deinem Land am meisten verdrängt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#72</div><div class="fcard-word">eingestehen</div><div class="fcard-hint">VERB · C1 · jdm. / sich etw. eingestehen · gestand ein · hat eingestanden</div></div><div class="fcard-back"><div class="fcard-ua">визнавати (щось неприємне) / зізнаватися</div><div class="fcard-en">to admit / to concede</div><div class="fcard-example">„Es braucht Mut, eigene Fehler öffentlich einzugestehen."</div><div class="fcard-poem">eingestehen — das Schwerste: ich war falsch,<br>визнавати — і ставати при цьому сильнішим.</div><div class="fcard-frage">💬 Was fällt dir schwerer — jemandem etwas einzugestehen oder sich selbst?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#73</div><div class="fcard-word">verharmlosen</div><div class="fcard-hint">VERB · C1 · etw. verharmlosen · Adj.: verharmlosend · oft kritisch verwendet</div></div><div class="fcard-back"><div class="fcard-ua">применшувати / не брати серйозно</div><div class="fcard-en">to downplay / to trivialize</div><div class="fcard-example">„Rassismus zu verharmlosen bedeutet, ihn indirekt zu akzeptieren."</div><div class="fcard-poem">verharmlosen — sagst du „nicht so schlimm",<br>применшувати — а проблема нікуди не зникає.</div><div class="fcard-frage">💬 Welche gesellschaftlichen Probleme werden deiner Meinung nach am häufigsten verharmlost?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#74</div><div class="fcard-word">selbstkritisch</div><div class="fcard-hint">ADJEKTIV · B2–C1 · selbstkritisch sein / denken · Nomen: die Selbstkritik</div></div><div class="fcard-back"><div class="fcard-ua">самокритичний</div><div class="fcard-en">self-critical</div><div class="fcard-example">„Eine selbstkritische Gesellschaft kann aus ihren Fehlern lernen."</div><div class="fcard-poem">selbstkritisch — schaust du dir in die Augen?,<br>самокритичний — це сила, не слабкість.</div><div class="fcard-frage">💬 Bist du in Bezug auf gesellschaftliche Fragen selbstkritisch — oder neigst du zur Selbstgerechtigkeit?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#75</div><div class="fcard-word">vielschichtig</div><div class="fcard-hint">ADJEKTIV · C1 · ein vielschichtiges Problem · ≈ komplex, nuanciert</div></div><div class="fcard-back"><div class="fcard-ua">багатошаровий / комплексний</div><div class="fcard-en">multifaceted / multilayered</div><div class="fcard-example">„Das Problem ist vielschichtig und lässt sich nicht mit einfachen Lösungen angehen."</div><div class="fcard-poem">vielschichtig — nicht eine Wahrheit, viele,<br>багатошаровий — копни глибше, знову інакше.</div><div class="fcard-frage">💬 Welches gesellschaftliche Problem findest du am vielschichtigsten — und warum widersteht es einfachen Lösungen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#76</div><div class="fcard-word">unzumutbar</div><div class="fcard-hint">ADJEKTIV · C1 · das ist unzumutbar · jdm. etw. Unzumutbares abverlangen · ≈ unannehmbar</div></div><div class="fcard-back"><div class="fcard-ua">неприйнятний / нестерпний</div><div class="fcard-en">unreasonable / unacceptable / intolerable</div><div class="fcard-example">„Es ist unzumutbar, von Menschen in Armut zu verlangen, sie sollen einfach härter arbeiten."</div><div class="fcard-poem">unzumutbar — eine Grenze wird überschritten,<br>неприйнятний — навіть якщо це нікому не кажуть.</div><div class="fcard-frage">💬 Was findest du gesellschaftlich unzumutbar — auch wenn viele das anders sehen?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#77</div><div class="fcard-word">verharmlosend</div><div class="fcard-hint">ADJEKTIV · C1 · eine verharmlosende Aussage · von: verharmlosen</div></div><div class="fcard-back"><div class="fcard-ua">той що применшує / такий що не бере серйозно</div><div class="fcard-en">trivializing / downplaying</div><div class="fcard-example">„Ein verharmlosender Kommentar kann Betroffene tief verletzen."</div><div class="fcard-poem">verharmlosend — „ist doch nicht so schlimm",<br>применшує — а для когось це цілий світ.</div><div class="fcard-frage">💬 Wann ist ein gut gemeinter Kommentar ungewollt verharmlosend?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">💬 Phrasen &amp; Redewendungen</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#78</div><div class="fcard-word">Um es auf den Punkt zu bringen...</div><div class="fcard-hint">PHRASE · C1 · fasst zusammen · für Schlussfolgerungen &amp; Abschluss von Argumenten</div></div><div class="fcard-back"><div class="fcard-ua">Щоб підвести підсумок... / Якщо коротко...</div><div class="fcard-en">To put it plainly... / To get to the point...</div><div class="fcard-example">„Um es auf den Punkt zu bringen: Ohne Vertrauen funktioniert keine Gesellschaft."</div><div class="fcard-poem">📌 Fasst zusammen, klar und direkt — wirkt entschieden.<br>Підказка: наприкінці аргументу — щоб підбити підсумок.</div><div class="fcard-frage">💬 Bring deine Meinung zu einem gesellschaftlichen Thema mit genau diesem Ausdruck auf den Punkt.</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#79</div><div class="fcard-word">Ich würde das differenzierter sehen.</div><div class="fcard-hint">PHRASE · C1 · höfliche Ablehnung von Schwarz-Weiß-Denken · zeigt Reflexion</div></div><div class="fcard-back"><div class="fcard-ua">Я б дивився на це більш диференційовано.</div><div class="fcard-en">I would see that in a more nuanced way.</div><div class="fcard-example">„Ich würde das differenzierter sehen: Es gibt nicht nur Gut und Böse in dieser Frage."</div><div class="fcard-poem">📌 Lehnt Schwarz-Weiß-Denken höflich ab — wirkt reflektiert.<br>Підказка: замість "ти не правий" — показуєш складність.</div><div class="fcard-frage">💬 Wo siehst du einen Diskurs, den du differenzierter siehst als die Mehrheit?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#80</div><div class="fcard-word">Das lässt sich so nicht verallgemeinern.</div><div class="fcard-hint">PHRASE · C1 · stoppt vorschnelle Schlüsse · für differenzierte Debatten</div></div><div class="fcard-back"><div class="fcard-ua">Це не можна так узагальнювати.</div><div class="fcard-en">You can't generalize that way.</div><div class="fcard-example">„Das lässt sich so nicht verallgemeinern — die Situation ist von Land zu Land verschieden."</div><div class="fcard-poem">📌 Stoppt vorschnelle Schlüsse — ohne direkt zu widersprechen.<br>Підказка: ввічливий стоп для надто швидких висновків.</div><div class="fcard-frage">💬 Welche Aussage hörst du oft, die sich deiner Meinung nach so nicht verallgemeinern lässt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#81</div><div class="fcard-word">den Finger in die Wunde legen</div><div class="fcard-hint">REDEWENDUNG · C1 · auf ein schmerzhaftes Problem hinweisen</div></div><div class="fcard-back"><div class="fcard-ua">торкнутися хворого місця / вказати на болючу проблему</div><div class="fcard-en">to put one's finger on the sore spot</div><div class="fcard-example">„Ihre Frage legte den Finger genau in die Wunde der gesellschaftlichen Ungleichheit."</div><div class="fcard-poem">🔍 wörtlich: direkt auf eine Wunde drücken — schmerzt, aber heilt.<br>буквально: натиснути на рану — боляче, але чесно.</div><div class="fcard-frage">💬 Wer oder was legt in deiner Gesellschaft gerade den Finger in die Wunde — und wird dafür kritisiert?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#82</div><div class="fcard-word">über seinen Schatten springen</div><div class="fcard-hint">REDEWENDUNG · C1 · eigene Hemmungen / Vorurteile überwinden</div></div><div class="fcard-back"><div class="fcard-ua">переступити через себе / подолати власні обмеження</div><div class="fcard-en">to get over oneself / to overcome one's inhibitions</div><div class="fcard-example">„Um Vorurteile abzubauen, muss man manchmal über seinen Schatten springen."</div><div class="fcard-poem">🔍 wörtlich: über seinen eigenen Schatten — den man nicht überholen kann.<br>буквально: перестрибнути власну тінь — це потребує сміливості.</div><div class="fcard-frage">💬 Wann hast du das letzte Mal über deinen Schatten gesprungen — und wie hat es sich angefühlt?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#83</div><div class="fcard-word">Wasser auf jmds. Mühlen sein</div><div class="fcard-hint">REDEWENDUNG · C1 · jdm. ungewollt Argumente liefern · jds. Position stärken</div></div><div class="fcard-back"><div class="fcard-ua">бути на руку комусь / лити воду на чиюсь мельницю</div><div class="fcard-en">to play into someone's hands / grist for someone's mill</div><div class="fcard-example">„Diese Aussage war Wasser auf die Mühlen der Populisten."</div><div class="fcard-poem">🔍 wörtlich: Wasser treibt eine Mühle an — man liefert den Antrieb.<br>буквально: вода крутить жорна — ти забезпечуєш їхній рух.</div><div class="fcard-frage">💬 Gibt es Debatten, bei denen manche Argumente immer nur Wasser auf die Mühlen einer Seite sind?</div><div class="know-btn" onclick="markKnown(event,this)">✓ Ich kenne es</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            </div><!-- /day-4 -->
+
+        </div>
+
+        <div class="done-screen" id="done-c1">
+            <div class="done-icon">&#x1F9E0;</div>
+            <h2>&#x1F3C6; Alle 3 Tage abgeschlossen!</h2>
+            <p>Jetzt diskutiert mit dem Partner &mdash; nutzt die gr&uuml;nen Fragen als Gespr&auml;chsimpuls. &#x1F91D;</p>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        const DAY_TOTALS = {1: 23, 2: 23, 3: 23, 4: 23};
+        const dayCounts = {1: 0, 2: 0, 3: 0};
+        let currentDay = 1;
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
+            document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = DAY_TOTALS[currentDay];
+            const cnt = dayCounts[currentDay];
+            document.getElementById('bar-c1').style.width = (cnt / total * 100) + '%';
+            document.getElementById('num-c1').textContent = cnt;
+            document.getElementById('total-c1').textContent = total;
+            const allDone = Object.keys(DAY_TOTALS).every(function(d) {
+                return dayCounts[d] === DAY_TOTALS[d];
+            });
+            document.getElementById('done-c1').classList.toggle('show', allDone);
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const dayEl = card.closest('.day-content');
+            const day = dayEl ? parseInt(dayEl.dataset.day) : currentDay;
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) {
+                card.classList.remove('known');
+                btn.textContent = '✓ Ich kenne es';
+                dayCounts[day] = Math.max(0, dayCounts[day] - 1);
+            } else {
+                card.classList.add('known');
+                btn.textContent = '✓ Gelernt!';
+                dayCounts[day]++;
+            }
+            if (day === currentDay) updateProgress();
+        }
+
+        function flipAll() {
+            document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+        }
+
+        function resetAll() {
+            document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ Ich kenne es');
+            dayCounts[currentDay] = 0;
+            updateProgress();
+        }
+
+        function shuffleCards() {
+            document.querySelectorAll('.day-content.active .card-grid').forEach(function(grid) {
+                const cards = [...grid.children];
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+    </script>
+</body>
+</html>

@@ -81,6 +81,11 @@
                 <h3>Zeitformen</h3>
                 <p>Pr&auml;sens &middot; Perfekt &middot; Pr&auml;teritum (+ Plusqp. &amp; Futur)</p>
             </a>
+            <a href="deutsch-uhrzeit.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.3);">
+                <span class="subject-icon">&#x23F0;</span>
+                <h3>Uhrzeit &amp; Zeitausdr&uuml;cke</h3>
+                <p>halb 7 &bull; am Montag vs. montags &bull; seit/vor &bull; im Sommer</p>
+            </a>
             <a href="deutsch-pronomen.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.3);">
                 <span class="subject-icon">&#x1F464;</span>
                 <h3>Pronomen</h3>
@@ -135,10 +140,20 @@
                 <h3>Adverbien</h3>
                 <p>schnell &bull; oft &bull; sehr &bull; vielleicht</p>
             </a>
+            <a href="deutsch-adj-vs-adv.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.3);">
+                <span class="subject-icon">&#x2194;&#xFE0F;</span>
+                <h3>Adjektiv vs. Adverb</h3>
+                <p>schnell<em>e</em>s Auto &bull; Er f&auml;hrt schnell &mdash; в чём разница?</p>
+            </a>
             <a href="deutsch-mengen.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.3);">
                 <span class="subject-icon">&#x1F522;</span>
                 <h3>Mengenangaben</h3>
                 <p>viele / wenige &bull; einige &bull; manche</p>
+            </a>
+            <a href="deutsch-masse.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.3);">
+                <span class="subject-icon">&#x2696;&#xFE0F;</span>
+                <h3>Ma&szlig;e &amp; Mengen</h3>
+                <p>Kilo &bull; Liter &bull; Meter &bull; Grad &bull; Rezepte &bull; Grammatik</p>
             </a>
             <a href="deutsch-fehler.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.3);">
                 <span class="subject-icon">&#x26A0;&#xFE0F;</span>
@@ -376,6 +391,12 @@
                 <span class="subject-icon">&#x1F4AC;</span>
                 <h3>Redewendungen &amp; Idiome</h3>
                 <p>auf Wolke 7 sein &bull; den Nagel auf den Kopf treffen &mdash; 35+ Idiome</p>
+            </a>
+            <a href="deutsch-c1-gesellschaft.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(163,113,247,0.5); position:relative;">
+                <span style="position:absolute;top:-8px;right:-6px;background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;padding:0.18rem 0.55rem;border-radius:20px;box-shadow:0 2px 8px rgba(163,113,247,0.4);white-space:nowrap;">&#x1F91D; MIT PARTNER</span>
+                <span class="subject-icon">&#x1F9E0;</span>
+                <h3>Gesellschaft &amp; Widerspr&uuml;che</h3>
+                <p>Ambivalenz &bull; Doppelmoral &bull; Weltanschauung &mdash; 15 W&ouml;rter C1</p>
             </a>
         </div>
 
@@ -1324,6 +1345,247 @@
         input.addEventListener('input', function() { doSearch(this.value); });
         input.addEventListener('keydown', function(e) { if (e.key === 'Escape') { this.value = ''; showAll(); } });
         clearBtn.addEventListener('click', function() { input.value = ''; input.focus(); showAll(); });
+    })();
+    </script>
+
+    <!-- ===== PLAN SYSTEM ===== -->
+    <style>
+        /* Plan toggle button inside each card */
+        .plan-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.72rem;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s;
+            z-index: 3;
+            flex-shrink: 0;
+            padding: 0;
+            font-family: inherit;
+        }
+        .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+        /* Card states */
+        a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+        a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+        a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+        a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+        a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+        a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+        /* Badge on card */
+        .plan-badge {
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.13rem 0.48rem;
+            border-radius: 20px;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+            z-index: 4;
+        }
+        .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+        .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+        .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+        /* Dashboard */
+        .plan-dashboard {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+        .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+        .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+        .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+        .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+        .pf-btn {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.55);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+        }
+        .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+        .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+        .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+        .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+        .plan-empty-msg {
+            display: none;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            padding: 2.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        a.subject-card.plan-hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .plan-filter-btns { margin-left: 0; }
+            .plan-divider { display: none; }
+        }
+    </style>
+
+    <script>
+    (function() {
+        const KEY = 'neostudy_deutsch_plan';
+        const CYCLE = [null, 'week', 'done', 'later'];
+        const ICONS  = { week: '📅', done: '✓', later: '🔖' };
+        const LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+        const TIPS   = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+        function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; } }
+        function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+        let state = load();
+        let filter = 'all';
+
+        /* ---- build dashboard ---- */
+        const dash = document.createElement('div');
+        dash.className = 'plan-dashboard';
+        dash.id = 'plan-dashboard';
+        dash.innerHTML =
+            '<div class="plan-stats">' +
+                '<div class="plan-stat">' +
+                    '<span style="font-size:1rem;">📅</span>' +
+                    '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                    '<span class="plan-stat-label">Diese Woche</span>' +
+                '</div>' +
+                '<div class="plan-divider"></div>' +
+                '<div class="plan-stat">' +
+                    '<span style="font-size:1rem;">✓</span>' +
+                    '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                    '<span class="plan-stat-label">Erledigt</span>' +
+                '</div>' +
+                '<div class="plan-divider"></div>' +
+                '<div class="plan-stat">' +
+                    '<span style="font-size:1rem;">🔖</span>' +
+                    '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                    '<span class="plan-stat-label">Später</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="plan-filter-btns">' +
+                '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+                '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+                '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+                '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+            '</div>';
+
+        const searchWrap = document.querySelector('#deutsch-search').closest('div').parentElement;
+        searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+        /* empty-state message */
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'plan-empty-msg';
+        emptyMsg.id = 'plan-empty';
+        emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+        searchWrap.parentNode.insertBefore(emptyMsg, searchWrap.nextSibling.nextSibling);
+
+        /* ---- filter buttons ---- */
+        dash.querySelectorAll('.pf-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                filter = this.dataset.f;
+                dash.querySelectorAll('.pf-btn').forEach(b => b.className = 'pf-btn');
+                this.classList.add('pf-active');
+                if (filter !== 'all') this.classList.add('pf-active-' + filter);
+                applyFilter();
+            });
+        });
+
+        /* ---- cards ---- */
+        const cards = Array.from(document.querySelectorAll('a.subject-card'));
+        cards.forEach(card => {
+            card.style.position = 'relative';
+            const href = card.getAttribute('href');
+
+            const btn = document.createElement('button');
+            btn.className = 'plan-btn';
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const cur = state[href] || null;
+                const idx = CYCLE.indexOf(cur);
+                const next = CYCLE[(idx + 1) % CYCLE.length];
+                if (next === null) delete state[href]; else state[href] = next;
+                save(state);
+                renderCard(card, href);
+                updateCounts();
+                applyFilter();
+            });
+            card.appendChild(btn);
+            renderCard(card, href);
+        });
+
+        function renderCard(card, href) {
+            const s = state[href] || null;
+            card.setAttribute('data-plan', s || '');
+
+            const btn = card.querySelector('.plan-btn');
+            if (btn) {
+                btn.textContent = s ? ICONS[s] : '+';
+                btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+            }
+
+            const old = card.querySelector('.plan-badge');
+            if (old) old.remove();
+            if (s) {
+                const badge = document.createElement('span');
+                badge.className = 'plan-badge plan-badge-' + s;
+                badge.textContent = LABELS[s];
+                card.appendChild(badge);
+            }
+        }
+
+        function updateCounts() {
+            let w = 0, d = 0, l = 0;
+            Object.values(state).forEach(v => { if (v==='week') w++; else if (v==='done') d++; else if (v==='later') l++; });
+            document.getElementById('pn-week').textContent = w;
+            document.getElementById('pn-done').textContent = d;
+            document.getElementById('pn-later').textContent = l;
+        }
+
+        function applyFilter() {
+            let visible = 0;
+            cards.forEach(card => {
+                const s = state[card.getAttribute('href')] || null;
+                const hide = filter !== 'all' && s !== filter;
+                card.classList.toggle('plan-hidden', hide);
+                if (!hide) visible++;
+            });
+            emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+        }
+
+        updateCounts();
+        applyFilter();
     })();
     </script>
 </body>

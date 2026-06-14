@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uhrzeit &amp; Zeit | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* Clock display */
+        .clock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.6rem;
+            margin: 0.8rem 0 1.3rem;
+        }
+        .clock-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+        }
+        .clock-time { font-size: 1.4rem; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+        .clock-formal { font-size: 0.83rem; color: #79b8ff; margin-top: 0.25rem; }
+        .clock-informal { font-size: 0.83rem; color: #fbbf24; }
+        .clock-ru { font-size: 0.72rem; color: rgba(230,230,235,0.35); margin-top: 0.15rem; }
+
+        /* Rule boxes */
+        .rule-box {
+            background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(163,113,247,0.04));
+            border: 1.5px solid rgba(88,166,255,0.25);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.1rem;
+        }
+        .rule-box.amber { background: linear-gradient(135deg,rgba(245,158,11,0.09),rgba(245,158,11,0.03)); border-color: rgba(245,158,11,0.35); }
+        .rule-box.green  { background: linear-gradient(135deg,rgba(63,185,80,0.08),rgba(63,185,80,0.03));  border-color: rgba(63,185,80,0.3); }
+        .rule-box.red    { background: linear-gradient(135deg,rgba(248,81,73,0.09),rgba(248,81,73,0.03));  border-color: rgba(248,81,73,0.35); }
+        .rule-box.purple { background: linear-gradient(135deg,rgba(163,113,247,0.09),rgba(163,113,247,0.03)); border-color: rgba(163,113,247,0.35); }
+        .rule-title {
+            font-size: 0.76rem; font-weight: 800; letter-spacing: 0.07em;
+            text-transform: uppercase; color: rgba(88,166,255,0.8); margin-bottom: 0.5rem;
+        }
+        .rule-box.amber .rule-title { color: rgba(245,158,11,0.9); }
+        .rule-box.green  .rule-title { color: rgba(63,185,80,0.9); }
+        .rule-box.red    .rule-title { color: rgba(248,81,73,0.9); }
+        .rule-box.purple .rule-title { color: rgba(163,113,247,0.9); }
+
+        /* Example rows */
+        .ex-list { display: flex; flex-direction: column; gap: 0.45rem; margin: 0.6rem 0 1.1rem; }
+        .ex-row {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 9px; padding: 0.6rem 0.9rem;
+            display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+        }
+        .ex-de { font-size: 0.92rem; color: rgba(230,230,235,0.9); flex: 1; min-width: 200px; }
+        .ex-de strong { color: #79b8ff; }
+        .ex-de em { color: #fbbf24; font-style: normal; }
+        .ex-ru { font-size: 0.81rem; color: rgba(230,230,235,0.4); flex-shrink: 0; }
+        .tick { color: #3fb950; font-weight: 800; }
+        .cross { color: #f85149; font-weight: 800; }
+
+        /* Compare table */
+        .ct { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1.1rem; font-size: 0.87rem; }
+        .ct th { background: rgba(255,255,255,0.06); color: rgba(230,230,235,0.55); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.45rem 0.8rem; text-align: left; }
+        .ct td { padding: 0.5rem 0.8rem; border-top: 1px solid rgba(255,255,255,0.06); color: rgba(230,230,235,0.85); vertical-align: top; }
+        .ct td:first-child { font-weight: 700; color: #fff; white-space: nowrap; }
+        .ct tr:hover td { background: rgba(255,255,255,0.03); }
+
+        /* Section label */
+        .sl { font-size: 0.73rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.27); margin: 1.5rem 0 0.55rem; }
+        .sl span { font-size: 0.92rem; margin-right: 0.3rem; }
+
+        /* Day grid */
+        .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.55rem; margin: 0.7rem 0 1.1rem; }
+        .day-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.65rem 0.9rem; }
+        .day-de { font-size: 0.95rem; font-weight: 700; color: #fff; }
+        .day-abbr { font-size: 0.72rem; color: rgba(230,230,235,0.4); }
+        .day-ru { font-size: 0.78rem; color: rgba(230,230,235,0.5); margin-top: 0.1rem; }
+
+        /* Trap card */
+        .trap-card {
+            background: rgba(248,81,73,0.06);
+            border: 1.5px solid rgba(248,81,73,0.3);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .trap-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(248,81,73,0.8); margin-bottom: 0.45rem; }
+        .trap-wrong { font-size: 0.9rem; color: #ff9a93; }
+        .trap-right { font-size: 0.9rem; color: #86efac; margin-top: 0.25rem; }
+        .trap-why   { font-size: 0.8rem; color: rgba(230,230,235,0.5); margin-top: 0.35rem; line-height: 1.5; }
+
+        /* Prep chips */
+        .prep-grid { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.6rem 0 1.1rem; }
+        .prep-chip {
+            border-radius: 10px; padding: 0.6rem 1rem; min-width: 120px;
+            border: 1px solid rgba(255,255,255,0.09);
+            background: rgba(255,255,255,0.04);
+        }
+        .prep-word { font-size: 1.05rem; font-weight: 900; color: #fff; }
+        .prep-rule { font-size: 0.78rem; color: rgba(230,230,235,0.5); margin-top: 0.1rem; }
+
+        @media (max-width:600px) {
+            .clock-grid { grid-template-columns: repeat(2,1fr); }
+            .day-grid { grid-template-columns: repeat(2,1fr); }
+            .ct { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/paris.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 45%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="biologie.html">Biologie</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Uhrzeit &amp; Zeitausdr&uuml;cke</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>Uhrzeit &amp; Zeitausdr&uuml;cke &#x23F0;</h1>
+            <p class="page-subtitle">im Sommer &bull; am Montag &bull; um 6 Uhr &bull; halb, Viertel &bull; alle Fallen</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="uhr">&#x1F559; Uhrzeit</button>
+            <button class="tab" data-tab="tage">&#x1F4C5; Wochentage</button>
+            <button class="tab" data-tab="jahr">&#x1F331; Monate &amp; Jahreszeiten</button>
+            <button class="tab" data-tab="prep">&#x23F3; Zeitpr&auml;positionen</button>
+            <button class="tab" data-tab="fallen">&#x26A0;&#xFE0F; Typische Fallen</button>
+            <button class="tab" data-tab="alle">&#x1F4CB; Alle Zeitw&ouml;rter</button>
+        </div>
+
+        <!-- ===== TAB: UHRZEIT ===== -->
+        <div class="tab-content active" id="tab-uhr">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F559;</span>
+                <div>
+                    <h2>Uhrzeit lesen &amp; sagen</h2>
+                    <p class="lesson-header-sub">offiziell (24h) vs. umgangssprachlich &mdash; und warum halb NICHT die H&auml;lfte ist</p>
+                </div>
+            </div>
+
+            <div class="rule-box amber">
+                <div class="rule-title">&#x2605; Die gr&ouml;&szlig;te Falle: halb!</div>
+                <p style="font-size:0.95rem;color:rgba(230,230,235,0.9);margin:0 0 0.4rem;"><strong style="color:#fbbf24;">halb sieben = 6:30</strong> &mdash; nicht 7:30!</p>
+                <p style="font-size:0.85rem;color:rgba(230,230,235,0.6);margin:0;">&bdquo;halb&ldquo; bedeutet: <em>eine halbe Stunde VOR der genannten Stunde</em>.<br>
+                halb sieben = halbe Stunde vor 7 = 6:30 &mdash; как &laquo;половина седьмого&raquo; в русском!</p>
+            </div>
+
+            <div class="sl"><span>&#x1F535;</span> Offiziell &mdash; 24-Stunden-Uhr (Bahn, Radio, Termine)</div>
+            <div class="clock-grid">
+                <div class="clock-card"><div class="clock-time">6:00</div><div class="clock-formal">sechs Uhr</div><div class="clock-ru">6 часов</div></div>
+                <div class="clock-card"><div class="clock-time">9:15</div><div class="clock-formal">neun Uhr f&uuml;nfzehn</div><div class="clock-ru">9:15</div></div>
+                <div class="clock-card"><div class="clock-time">13:00</div><div class="clock-formal">dreizehn Uhr</div><div class="clock-ru">13:00 / 1 час дня</div></div>
+                <div class="clock-card"><div class="clock-time">14:30</div><div class="clock-formal">vierzehn Uhr drei&szlig;ig</div><div class="clock-ru">14:30</div></div>
+                <div class="clock-card"><div class="clock-time">18:45</div><div class="clock-formal">achtzehn Uhr f&uuml;nfundvierzig</div><div class="clock-ru">18:45</div></div>
+                <div class="clock-card"><div class="clock-time">20:00</div><div class="clock-formal">zwanzig Uhr</div><div class="clock-ru">20:00</div></div>
+            </div>
+
+            <div class="sl"><span>&#x1F7E1;</span> Umgangssprachlich &mdash; 12-Stunden + halb / Viertel (im Alltag)</div>
+
+            <table class="ct">
+                <thead><tr><th>Uhrzeit</th><th style="color:#79b8ff;">Offiziell</th><th style="color:#fbbf24;">Umgangssprachlich</th><th>По-русски</th></tr></thead>
+                <tbody>
+                    <tr><td>6:00</td><td>sechs Uhr</td><td>sechs (Uhr)</td><td>шесть часов</td></tr>
+                    <tr><td>6:15</td><td>sechs Uhr f&uuml;nfzehn</td><td><strong>Viertel nach sechs</strong></td><td>четверть седьмого</td></tr>
+                    <tr><td>6:30</td><td>sechs Uhr drei&szlig;ig</td><td><strong style="color:#fbbf24;">halb sieben ⚠</strong></td><td>половина седьмого</td></tr>
+                    <tr><td>6:45</td><td>sechs Uhr f&uuml;nfundvierzig</td><td><strong>Viertel vor sieben</strong></td><td>без четверти семь</td></tr>
+                    <tr><td>7:00</td><td>sieben Uhr</td><td>sieben (Uhr)</td><td>семь часов</td></tr>
+                    <tr><td>7:20</td><td>sieben Uhr zwanzig</td><td>zwanzig nach sieben</td><td>двадцать минут восьмого</td></tr>
+                    <tr><td>7:40</td><td>sieben Uhr vierzig</td><td>zwanzig vor acht</td><td>без двадцати восемь</td></tr>
+                    <tr><td>12:00</td><td>zw&ouml;lf Uhr</td><td>Mittag / Mitternacht (0:00)</td><td>полдень</td></tr>
+                </tbody>
+            </table>
+
+            <div class="rule-box">
+                <div class="rule-title">Wie fragt man nach der Uhrzeit?</div>
+                <div class="ex-list" style="margin:0">
+                    <div class="ex-row"><span class="ex-de"><strong>Wie sp&auml;t ist es?</strong></span><span class="ex-ru">Который час? (разговорное)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Wie viel Uhr ist es?</strong></span><span class="ex-ru">Сколько времени? (нейтральное)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Wann</strong> f&auml;ngt der Zug an?</span><span class="ex-ru">Когда отправляется поезд?</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Um wie viel Uhr</strong> treffen wir uns?</span><span class="ex-ru">В котором часу мы встречаемся?</span></div>
+                </div>
+            </div>
+
+            <div class="sl"><span>&#x1F4AC;</span> Uhrzeit im Satz</div>
+            <div class="ex-list">
+                <div class="ex-row"><span class="ex-de">Der Kurs beginnt <strong>um 8 Uhr</strong>.</span><span class="ex-ru">Курс начинается в 8 часов.</span></div>
+                <div class="ex-row"><span class="ex-de">Ich stehe <strong>um halb sieben</strong> auf.</span><span class="ex-ru">Я встаю в половине седьмого (6:30).</span></div>
+                <div class="ex-row"><span class="ex-de">Der Film l&auml;uft <strong>um Viertel nach acht</strong>.</span><span class="ex-ru">Фильм идёт в 8:15.</span></div>
+                <div class="ex-row"><span class="ex-de">Der Zug f&auml;hrt <strong>um 14:37 Uhr</strong> ab.</span><span class="ex-ru">Поезд отправляется в 14:37.</span></div>
+                <div class="ex-row"><span class="ex-de">Wir treffen uns <strong>gegen 19 Uhr</strong>.</span><span class="ex-ru">Встретимся около 19:00.</span></div>
+            </div>
+
+        </section></div>
+        </div>
+
+        <!-- ===== TAB: WOCHENTAGE ===== -->
+        <div class="tab-content" id="tab-tage">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F4C5;</span>
+                <div>
+                    <h2>Wochentage &amp; Tageszeiten</h2>
+                    <p class="lesson-header-sub"><em>am Montag</em> vs. <em>montags</em> &mdash; das ist kein kleiner Unterschied!</p>
+                </div>
+            </div>
+
+            <div class="sl"><span>&#x1F4CB;</span> Die Wochentage</div>
+            <div class="day-grid">
+                <div class="day-card" style="border-color:rgba(88,166,255,0.3)"><div class="day-de">Montag</div><div class="day-abbr">Mo &bull; der Montag</div><div class="day-ru">понедельник</div></div>
+                <div class="day-card" style="border-color:rgba(88,166,255,0.3)"><div class="day-de">Dienstag</div><div class="day-abbr">Di &bull; der Dienstag</div><div class="day-ru">вторник</div></div>
+                <div class="day-card" style="border-color:rgba(88,166,255,0.3)"><div class="day-de">Mittwoch</div><div class="day-abbr">Mi &bull; der Mittwoch</div><div class="day-ru">среда</div></div>
+                <div class="day-card" style="border-color:rgba(88,166,255,0.3)"><div class="day-de">Donnerstag</div><div class="day-abbr">Do &bull; der Donnerstag</div><div class="day-ru">четверг</div></div>
+                <div class="day-card" style="border-color:rgba(88,166,255,0.3)"><div class="day-de">Freitag</div><div class="day-abbr">Fr &bull; der Freitag</div><div class="day-ru">пятница</div></div>
+                <div class="day-card" style="border-color:rgba(63,185,80,0.35)"><div class="day-de">Samstag</div><div class="day-abbr">Sa &bull; der Samstag</div><div class="day-ru">суббота</div></div>
+                <div class="day-card" style="border-color:rgba(63,185,80,0.35)"><div class="day-de">Sonntag</div><div class="day-abbr">So &bull; der Sonntag</div><div class="day-ru">воскресенье</div></div>
+            </div>
+
+            <div class="rule-box amber">
+                <div class="rule-title">&#x2605; am Montag vs. montags &mdash; огромная разница!</div>
+                <table class="ct" style="margin:0.3rem 0 0">
+                    <thead><tr><th>Форма</th><th>Значение</th><th>Пример</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong style="color:#fbbf24;">am Montag</strong></td><td>В конкретный понедельник (один раз)</td><td><em>Am Montag gehe ich zum Arzt.</em> — В понедельник иду к врачу.</td></tr>
+                        <tr><td><strong style="color:#79b8ff;">montags</strong></td><td>Каждый понедельник (регулярно)</td><td><em>Montags habe ich Deutschkurs.</em> — По понедельникам у меня курс немецкого.</td></tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.82rem;color:rgba(230,230,235,0.5);margin:0.5rem 0 0;">То же с другими днями: <em>dienstags, mittwochs, donnerstags, freitags, samstags, sonntags</em></p>
+            </div>
+
+            <div class="sl"><span>&#x1F31E;</span> Tageszeiten</div>
+            <table class="ct">
+                <thead><tr><th>Tageszeit</th><th>Uhrzeit (ca.)</th><th>am / -s Form</th><th>По-русски</th></tr></thead>
+                <tbody>
+                    <tr><td>der Morgen</td><td>6–9 Uhr</td><td><strong>am Morgen</strong> / morgens</td><td>утро / по утрам</td></tr>
+                    <tr><td>der Vormittag</td><td>9–12 Uhr</td><td><strong>am Vormittag</strong> / vormittags</td><td>первая половина дня</td></tr>
+                    <tr><td>der Mittag</td><td>12–14 Uhr</td><td><strong>am Mittag</strong> / mittags</td><td>полдень / в обед</td></tr>
+                    <tr><td>der Nachmittag</td><td>14–18 Uhr</td><td><strong>am Nachmittag</strong> / nachmittags</td><td>послеполудень</td></tr>
+                    <tr><td>der Abend</td><td>18–22 Uhr</td><td><strong>am Abend</strong> / abends</td><td>вечер / по вечерам</td></tr>
+                    <tr><td>die Nacht</td><td>22–6 Uhr</td><td><strong>in der Nacht</strong> / nachts</td><td>ночь / по ночам</td></tr>
+                </tbody>
+            </table>
+
+            <div class="rule-box red">
+                <div class="rule-title">&#x26A0; morgen ≠ morgens!</div>
+                <div class="ex-list" style="margin:0.3rem 0 0">
+                    <div class="ex-row"><span class="ex-de"><strong>morgen</strong> (маленькая буква)</span><span class="ex-ru">завтра</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>der Morgen</strong> (большая буква)</span><span class="ex-ru">утро (существительное)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>morgens</strong> (маленькая)</span><span class="ex-ru">по утрам (наречие)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>morgen fr&uuml;h</strong></span><span class="ex-ru">завтра утром</span></div>
+                    <div class="ex-row"><span class="ex-de"><span class="cross">✗</span> <em>morgen Morgen</em></span><span class="ex-ru">— так НЕ говорят!</span></div>
+                </div>
+            </div>
+
+            <div class="sl"><span>&#x1F4AC;</span> Kombinationen</div>
+            <div class="ex-list">
+                <div class="ex-row"><span class="ex-de"><strong>heute Morgen</strong></span><span class="ex-ru">сегодня утром</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>morgen fr&uuml;h</strong></span><span class="ex-ru">завтра утром</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>gestern Abend</strong></span><span class="ex-ru">вчера вечером</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>am Montagabend</strong></span><span class="ex-ru">в понедельник вечером</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>montagnachmittags</strong></span><span class="ex-ru">по понедельничным послеполудням</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>&uuml;bermorgen</strong></span><span class="ex-ru">послезавтра</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>vorgestern</strong></span><span class="ex-ru">позавчера</span></div>
+            </div>
+
+        </section></div>
+        </div>
+
+        <!-- ===== TAB: MONATE & JAHRESZEITEN ===== -->
+        <div class="tab-content" id="tab-jahr">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F331;</span>
+                <div>
+                    <h2>Monate &amp; Jahreszeiten</h2>
+                    <p class="lesson-header-sub"><em>im Sommer</em> &bull; <em>diesen Sommer</em> &bull; <em>letzten Sommer</em> &mdash; warum andere Endungen?</p>
+                </div>
+            </div>
+
+            <div class="sl"><span>&#x1F4C6;</span> Die Monate</div>
+            <table class="ct">
+                <thead><tr><th>Monat</th><th>Abk.</th><th>По-русски</th><th>Im Satz (im + Dat.)</th></tr></thead>
+                <tbody>
+                    <tr><td>Januar</td><td>Jan.</td><td>январь</td><td><em>im Januar</em></td></tr>
+                    <tr><td>Februar</td><td>Feb.</td><td>февраль</td><td><em>im Februar</em></td></tr>
+                    <tr><td>M&auml;rz</td><td>Mrz.</td><td>март</td><td><em>im M&auml;rz</em></td></tr>
+                    <tr><td>April</td><td>Apr.</td><td>апрель</td><td><em>im April</em></td></tr>
+                    <tr><td>Mai</td><td>Mai</td><td>май</td><td><em>im Mai</em></td></tr>
+                    <tr><td>Juni</td><td>Jun.</td><td>июнь</td><td><em>im Juni</em></td></tr>
+                    <tr><td>Juli</td><td>Jul.</td><td>июль</td><td><em>im Juli</em></td></tr>
+                    <tr><td>August</td><td>Aug.</td><td>август</td><td><em>im August</em></td></tr>
+                    <tr><td>September</td><td>Sep.</td><td>сентябрь</td><td><em>im September</em></td></tr>
+                    <tr><td>Oktober</td><td>Okt.</td><td>октябрь</td><td><em>im Oktober</em></td></tr>
+                    <tr><td>November</td><td>Nov.</td><td>ноябрь</td><td><em>im November</em></td></tr>
+                    <tr><td>Dezember</td><td>Dez.</td><td>декабрь</td><td><em>im Dezember</em></td></tr>
+                </tbody>
+            </table>
+
+            <div class="sl"><span>&#x2600;</span> Die Jahreszeiten</div>
+            <div class="day-grid">
+                <div class="day-card" style="border-color:rgba(63,185,80,0.4)"><div class="day-de" style="color:#86efac">der Fr&uuml;hling</div><div class="day-abbr">M&auml;rz – Mai</div><div class="day-ru">весна &mdash; im Fr&uuml;hling</div></div>
+                <div class="day-card" style="border-color:rgba(251,191,36,0.4)"><div class="day-de" style="color:#fbbf24">der Sommer</div><div class="day-abbr">Juni – August</div><div class="day-ru">лето &mdash; im Sommer</div></div>
+                <div class="day-card" style="border-color:rgba(245,158,11,0.4)"><div class="day-de" style="color:#f59e0b">der Herbst</div><div class="day-abbr">September – November</div><div class="day-ru">осень &mdash; im Herbst</div></div>
+                <div class="day-card" style="border-color:rgba(88,166,255,0.4)"><div class="day-de" style="color:#79b8ff">der Winter</div><div class="day-abbr">Dezember – Februar</div><div class="day-ru">зима &mdash; im Winter</div></div>
+            </div>
+
+            <div class="rule-box amber">
+                <div class="rule-title">&#x2605; im / diesen / letzten / n&auml;chsten Sommer &mdash; разные падежи!</div>
+                <table class="ct" style="margin:0.3rem 0 0">
+                    <thead><tr><th>Ausdruck</th><th>Падеж</th><th>Пример</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>im Sommer</strong></td><td>Dativ (immer)</td><td><em>Im Sommer fahre ich ans Meer.</em></td></tr>
+                        <tr><td><strong>diesen Sommer</strong></td><td>Akkusativ</td><td><em>Diesen Sommer lerne ich Surfen.</em></td></tr>
+                        <tr><td><strong>letzten Sommer</strong></td><td>Akkusativ</td><td><em>Letzten Sommer war ich in Spanien.</em></td></tr>
+                        <tr><td><strong>n&auml;chsten Sommer</strong></td><td>Akkusativ</td><td><em>N&auml;chsten Sommer ziehe ich um.</em></td></tr>
+                        <tr><td><strong>jeden Sommer</strong></td><td>Akkusativ</td><td><em>Jeden Sommer besuche ich Oma.</em></td></tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.82rem;color:rgba(230,230,235,0.5);margin:0.6rem 0 0;">Gleiche Logik f&uuml;r Monate: <em>im Januar</em> aber <em>diesen Januar / letzten Januar</em>.</p>
+            </div>
+
+            <div class="ex-list">
+                <div class="ex-row"><span class="ex-de"><strong>Im Winter</strong> ist es hier sehr kalt.</span><span class="ex-ru">Зимой здесь очень холодно.</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>Letzten Sommer</strong> haben wir Wien besucht.</span><span class="ex-ru">Прошлым летом мы побывали в Вене.</span></div>
+                <div class="ex-row"><span class="ex-de"><strong>N&auml;chsten Fr&uuml;hling</strong> beginnt das Projekt.</span><span class="ex-ru">Следующей весной начнётся проект.</span></div>
+                <div class="ex-row"><span class="ex-de">Die Pr&uuml;fung ist <strong>im Juni</strong>.</span><span class="ex-ru">Экзамен в июне.</span></div>
+            </div>
+
+        </section></div>
+        </div>
+
+        <!-- ===== TAB: ZEITPRÄPOSITIONEN ===== -->
+        <div class="tab-content" id="tab-prep">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x23F3;</span>
+                <div>
+                    <h2>Zeitpr&auml;positionen</h2>
+                    <p class="lesson-header-sub">um / gegen / ab / seit / vor / nach / in / an / &uuml;ber &mdash; wann was?</p>
+                </div>
+            </div>
+
+            <table class="ct">
+                <thead><tr><th>Pr&auml;p.</th><th>Bedeutung</th><th>Verwendet mit</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong style="color:#79b8ff;">um</strong></td><td>genau um … Uhr</td><td>Uhrzeit</td><td><em>um 6 Uhr, um Mitternacht</em></td></tr>
+                    <tr><td><strong style="color:#79b8ff;">gegen</strong></td><td>ungef&auml;hr, circa</td><td>Uhrzeit</td><td><em>gegen 8 Uhr &mdash; около 8</em></td></tr>
+                    <tr><td><strong style="color:#fbbf24;">an</strong></td><td>an einem bestimmten Tag</td><td>Tage, Datum</td><td><em>am Montag, am 3. Mai</em></td></tr>
+                    <tr><td><strong style="color:#fbbf24;">in</strong></td><td>innerhalb einer Periode</td><td>Monate, Jahreszeiten, Zukunft</td><td><em>im Januar, im Sommer, in 2 Tagen</em></td></tr>
+                    <tr><td><strong style="color:#86efac;">ab</strong></td><td>ab diesem Zeitpunkt</td><td>Uhrzeit, Datum</td><td><em>ab 18 Uhr, ab Montag &mdash; с 18:00</em></td></tr>
+                    <tr><td><strong style="color:#86efac;">seit</strong></td><td>seit damals, noch immer</td><td>Zeitpunkt (bis jetzt)</td><td><em>seit 3 Jahren, seit Montag</em></td></tr>
+                    <tr><td><strong style="color:#86efac;">bis</strong></td><td>Endpunkt</td><td>Uhrzeit, Datum</td><td><em>bis 20 Uhr, bis Freitag</em></td></tr>
+                    <tr><td><strong style="color:#c9b3ff;">vor</strong></td><td>vor … Zeit (vergangen)</td><td>Zeitspanne</td><td><em>vor 3 Tagen, vor einem Jahr</em></td></tr>
+                    <tr><td><strong style="color:#c9b3ff;">nach</strong></td><td>nach einem Ereignis</td><td>Zeitpunkt</td><td><em>nach dem Essen, nach 18 Uhr</em></td></tr>
+                    <tr><td><strong style="color:#c9b3ff;">in</strong></td><td>in … Zeit (Zukunft)</td><td>Zeitspanne</td><td><em>in 5 Minuten, in einer Woche</em></td></tr>
+                    <tr><td><strong style="color:#ff9a93;">&uuml;ber</strong></td><td>&uuml;ber … hinaus / im Laufe von</td><td>Zeitspanne</td><td><em>&uuml;ber Nacht, &uuml;ber das Wochenende</em></td></tr>
+                </tbody>
+            </table>
+
+            <div class="rule-box red">
+                <div class="rule-title">&#x2605; seit vs. vor &mdash; классическая ошибка</div>
+                <div class="ex-list" style="margin:0.3rem 0 0">
+                    <div class="ex-row"><span class="ex-de"><strong>seit</strong> 3 Jahren lerne ich Deutsch.</span><span class="ex-ru">Я учу немецкий уже 3 года (и продолжаю)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>vor</strong> 3 Jahren habe ich angefangen.</span><span class="ex-ru">3 года назад я начала (прошлое, закончилось)</span></div>
+                    <div class="ex-row"><span class="ex-de"><span class="cross">✗</span> <em>vor 3 Jahren lerne ich Deutsch</em></span><span class="ex-ru">— так нельзя!</span></div>
+                </div>
+            </div>
+
+            <div class="rule-box amber">
+                <div class="rule-title">&#x2605; in vs. nach</div>
+                <div class="ex-list" style="margin:0.3rem 0 0">
+                    <div class="ex-row"><span class="ex-de">Der Bus kommt <strong>in</strong> 5 Minuten.</span><span class="ex-ru">Автобус придёт через 5 минут (с сейчас)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Nach</strong> dem Kurs gehen wir essen.</span><span class="ex-ru">После курса идём есть (после события)</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Nach</strong> 18 Uhr bin ich frei.</span><span class="ex-ru">После 18:00 я свободна.</span></div>
+                </div>
+            </div>
+
+            <div class="rule-box green">
+                <div class="rule-title">&#x2605; ab &mdash; с какого момента</div>
+                <div class="ex-list" style="margin:0.3rem 0 0">
+                    <div class="ex-row"><span class="ex-de"><strong>Ab</strong> Montag gilt der neue Fahrplan.</span><span class="ex-ru">С понедельника действует новое расписание.</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Ab</strong> 18 Uhr ist der Eintritt frei.</span><span class="ex-ru">С 18:00 вход бесплатный.</span></div>
+                    <div class="ex-row"><span class="ex-de"><strong>Ab</strong> sofort nicht mehr!</span><span class="ex-ru">С этого момента больше никогда!</span></div>
+                </div>
+            </div>
+
+        </section></div>
+        </div>
+
+        <!-- ===== TAB: TYPISCHE FALLEN ===== -->
+        <div class="tab-content" id="tab-fallen">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x26A0;&#xFE0F;</span>
+                <div>
+                    <h2>Typische Fallen</h2>
+                    <p class="lesson-header-sub">Die häufigsten Fehler &mdash; und wie man sie nie wieder macht</p>
+                </div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 1 &mdash; halb</div>
+                <div class="trap-wrong">✗ &bdquo;halb sieben&ldquo; = 7:30?</div>
+                <div class="trap-right">✓ halb sieben = 6:30</div>
+                <div class="trap-why">Halb = eine halbe Stunde <strong>VOR</strong> der genannten Stunde. Halb sieben = 30 Minuten vor 7 = 6:30.<br>Как по-русски &laquo;половина седьмого&raquo; = 6:30.</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 2 &mdash; am Montag vs. montags</div>
+                <div class="trap-wrong">✗ &bdquo;Ich gehe montags zum Arzt&ldquo; &mdash; wenn du einmal hingehst</div>
+                <div class="trap-right">✓ Ich gehe am Montag zum Arzt. (einmalig)<br>✓ Ich gehe montags zum Arzt. (jeden Montag)</div>
+                <div class="trap-why"><strong>am Montag</strong> = конкретный понедельник. <strong>montags</strong> = регулярно каждый понедельник.</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 3 &mdash; morgen vs. morgens vs. der Morgen</div>
+                <div class="trap-wrong">✗ &bdquo;morgen fr&uuml;h&ldquo; sagt man, nicht &bdquo;morgen Morgen&ldquo;</div>
+                <div class="trap-right">✓ morgen fr&uuml;h (завтра утром)<br>✓ morgens (по утрам)<br>✓ am Morgen (утром — разовое)</div>
+                <div class="trap-why"><strong>morgen</strong> (маленькая) = завтра. <strong>der Morgen</strong> (большая) = утро. <strong>morgen Morgen</strong> звучит странно — говори <strong>morgen fr&uuml;h</strong>.</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 4 &mdash; seit vs. vor</div>
+                <div class="trap-wrong">✗ Vor 3 Jahren lerne ich Deutsch.</div>
+                <div class="trap-right">✓ Seit 3 Jahren lerne ich Deutsch. (noch immer)<br>✓ Vor 3 Jahren habe ich angefangen. (Vergangenheit)</div>
+                <div class="trap-why"><strong>seit</strong> + Pr&auml;sens = действие началось в прошлом и продолжается. <strong>vor</strong> + Perfekt/Pr&auml;teritum = завершённое прошлое.</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 5 &mdash; im Sommer vs. diesen Sommer</div>
+                <div class="trap-wrong">✗ In diesem Sommer fahre ich weg.</div>
+                <div class="trap-right">✓ Diesen Sommer fahre ich weg. (Akkusativ, ohne Präposition!)<br>✓ Im Sommer fahre ich weg. (allgemein)</div>
+                <div class="trap-why">Mit <strong>diesen / letzten / n&auml;chsten</strong> benutzt man <strong>keinen Präpositionen</strong> &mdash; direkter Akkusativ. <strong>im Sommer</strong> = allgemeine Aussage (Dativ mit in).</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 6 &mdash; in vs. nach (Zukunft)</div>
+                <div class="trap-wrong">✗ Nach 5 Minuten kommt der Bus. (wenn du jetzt wartest)</div>
+                <div class="trap-right">✓ In 5 Minuten kommt der Bus. (in 5 Minuten ab jetzt)<br>✓ Nach 18 Uhr bin ich frei. (nach dem Zeitpunkt 18:00)</div>
+                <div class="trap-why"><strong>in + Zeitspanne</strong> = durch … Zeit von jetzt. <strong>nach + Zeitpunkt/Ereignis</strong> = danach.</div>
+            </div>
+
+            <div class="trap-card">
+                <div class="trap-label">Falle 7 &mdash; Viertel vor/nach vs. Viertel auf</div>
+                <div class="trap-wrong">✗ &bdquo;Viertel auf sieben&ldquo; (österreichisch, nicht standarddeutsch)</div>
+                <div class="trap-right">✓ Viertel nach sechs = 6:15<br>✓ Viertel vor sieben = 6:45<br>✓ dreiviertel sieben = 6:45 (regional / österreichisch)</div>
+                <div class="trap-why">Im Standarddeutschen: <strong>Viertel nach</strong> und <strong>Viertel vor</strong>. &bdquo;dreiviertel sieben&ldquo; ist regional (Ostdeutschland, Österreich), wird aber verstanden.</div>
+            </div>
+
+        </section></div>
+        </div>
+
+        <!-- ===== TAB: ALLE ZEITWÖRTER ===== -->
+        <div class="tab-content" id="tab-alle">
+        <div class="zp-notes"><section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F4CB;</span>
+                <div>
+                    <h2>Alle Zeitw&ouml;rter &mdash; komplett</h2>
+                    <p class="lesson-header-sub">vorvorgestern bis &uuml;bermorgen &bull; Woche &bull; Monat &bull; H&auml;ufigkeit &bull; Dauer</p>
+                </div>
+            </div>
+
+            <!-- VERGANGENHEIT -->
+            <div class="sl"><span>&#x23EA;</span> Vergangenheit &mdash; прошлое</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>vorvorgestern</strong></td><td>три дня назад</td><td><em>Vorvorgestern war ich krank.</em></td></tr>
+                    <tr><td><strong>vorgestern</strong></td><td>позавчера</td><td><em>Vorgestern haben wir uns getroffen.</em></td></tr>
+                    <tr><td><strong>gestern</strong></td><td>вчера</td><td><em>Gestern hatte ich keine Zeit.</em></td></tr>
+                    <tr><td><strong>gestern fr&uuml;h</strong></td><td>вчера утром</td><td><em>Gestern fr&uuml;h hat sie angerufen.</em></td></tr>
+                    <tr><td><strong>gestern Mittag</strong></td><td>вчера в обед</td><td><em>Gestern Mittag war ich in der Stadt.</em></td></tr>
+                    <tr><td><strong>gestern Abend</strong></td><td>вчера вечером</td><td><em>Gestern Abend haben wir einen Film geguckt.</em></td></tr>
+                    <tr><td><strong>gestern Nacht</strong></td><td>вчера ночью</td><td><em>Gestern Nacht habe ich schlecht geschlafen.</em></td></tr>
+                    <tr><td><strong>neulich</strong></td><td>недавно (разговорное)</td><td><em>Neulich habe ich ihn zuf&auml;llig getroffen.</em></td></tr>
+                    <tr><td><strong>k&uuml;rzlich</strong></td><td>недавно (формальное)</td><td><em>Das Haus wurde k&uuml;rzlich renoviert.</em></td></tr>
+                    <tr><td><strong>letzte Woche</strong></td><td>на прошлой неделе</td><td><em>Letzte Woche war ich in Berlin.</em></td></tr>
+                    <tr><td><strong>letzten Monat</strong></td><td>в прошлом месяце</td><td><em>Letzten Monat habe ich das Buch gelesen.</em></td></tr>
+                    <tr><td><strong>letztes Jahr</strong></td><td>в прошлом году</td><td><em>Letztes Jahr haben wir geheiratet.</em></td></tr>
+                    <tr><td><strong>vor einer Woche</strong></td><td>неделю назад</td><td><em>Vor einer Woche bin ich angekommen.</em></td></tr>
+                    <tr><td><strong>vor zwei Jahren</strong></td><td>два года назад</td><td><em>Vor zwei Jahren habe ich angefangen.</em></td></tr>
+                    <tr><td><strong>damals</strong></td><td>тогда / в то время</td><td><em>Damals war alles anders.</em></td></tr>
+                    <tr><td><strong>fr&uuml;her</strong></td><td>раньше / в прошлом</td><td><em>Fr&uuml;her hatte ich mehr Zeit.</em></td></tr>
+                    <tr><td><strong>einmal</strong></td><td>однажды / когда-то</td><td><em>Einmal war ich in Japan.</em></td></tr>
+                    <tr><td><strong>inzwischen</strong></td><td>тем временем / с тех пор</td><td><em>Inzwischen hat er eine neue Stelle.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- HEUTE -->
+            <div class="sl"><span>&#x1F4CD;</span> Heute &mdash; сегодня</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>heute fr&uuml;h</strong></td><td>сегодня утром</td><td><em>Heute fr&uuml;h war es kalt.</em></td></tr>
+                    <tr><td><strong>heute Morgen</strong></td><td>сегодня утром (= heute fr&uuml;h)</td><td><em>Heute Morgen habe ich Kaffee getrunken.</em></td></tr>
+                    <tr><td><strong>heute Vormittag</strong></td><td>сегодня до обеда</td><td><em>Heute Vormittag habe ich gearbeitet.</em></td></tr>
+                    <tr><td><strong>heute Mittag</strong></td><td>сегодня в обед</td><td><em>Heute Mittag essen wir zusammen.</em></td></tr>
+                    <tr><td><strong>heute Nachmittag</strong></td><td>сегодня после обеда</td><td><em>Heute Nachmittag gehe ich einkaufen.</em></td></tr>
+                    <tr><td><strong>heute Abend</strong></td><td>сегодня вечером</td><td><em>Heute Abend schauen wir Netflix.</em></td></tr>
+                    <tr><td><strong>heute Nacht</strong></td><td>сегодня ночью</td><td><em>Heute Nacht gibt es ein Gewitter.</em></td></tr>
+                    <tr><td><strong>heutzutage</strong></td><td>в наши дни / сегодня (в смысле «nowadays»)</td><td><em>Heutzutage nutzt jeder ein Smartphone.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- ZUKUNFT -->
+            <div class="sl"><span>&#x23E9;</span> Zukunft &mdash; будущее</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>gleich</strong></td><td>сейчас / сразу (через минуту)</td><td><em>Ich komme gleich!</em></td></tr>
+                    <tr><td><strong>sofort</strong></td><td>немедленно / сейчас же</td><td><em>Ruf mich sofort an!</em></td></tr>
+                    <tr><td><strong>bald</strong></td><td>скоро</td><td><em>Bald ist Weihnachten.</em></td></tr>
+                    <tr><td><strong>demn&auml;chst</strong></td><td>в ближайшее время</td><td><em>Demn&auml;chst kommt ein neuer Film.</em></td></tr>
+                    <tr><td><strong>morgen fr&uuml;h</strong></td><td>завтра утром</td><td><em>Morgen fr&uuml;h fahre ich ab.</em></td></tr>
+                    <tr><td><strong>morgen Mittag</strong></td><td>завтра в обед</td><td><em>Morgen Mittag treffen wir uns.</em></td></tr>
+                    <tr><td><strong>morgen Abend</strong></td><td>завтра вечером</td><td><em>Morgen Abend gehen wir aus.</em></td></tr>
+                    <tr><td><strong>&uuml;bermorgen</strong></td><td>послезавтра</td><td><em>&Uuml;bermorgen kommt das Paket.</em></td></tr>
+                    <tr><td><strong>&uuml;ber&uuml;bermorgen</strong></td><td>послепослезавтра (разговорное)</td><td><em>Das schaffe ich fr&uuml;hestens &uuml;ber&uuml;bermorgen.</em></td></tr>
+                    <tr><td><strong>n&auml;chste Woche</strong></td><td>на следующей неделе</td><td><em>N&auml;chste Woche habe ich Urlaub.</em></td></tr>
+                    <tr><td><strong>n&auml;chsten Monat</strong></td><td>в следующем месяце</td><td><em>N&auml;chsten Monat ziehe ich um.</em></td></tr>
+                    <tr><td><strong>n&auml;chstes Jahr</strong></td><td>в следующем году</td><td><em>N&auml;chstes Jahr mache ich meinen Abschluss.</em></td></tr>
+                    <tr><td><strong>in einer Woche</strong></td><td>через неделю</td><td><em>In einer Woche bin ich zur&uuml;ck.</em></td></tr>
+                    <tr><td><strong>in zwei Monaten</strong></td><td>через два месяца</td><td><em>In zwei Monaten ist die Pr&uuml;fung.</em></td></tr>
+                    <tr><td><strong>irgendwann</strong></td><td>когда-нибудь</td><td><em>Irgendwann m&ouml;chte ich nach Japan reisen.</em></td></tr>
+                    <tr><td><strong>sp&auml;ter</strong></td><td>позже</td><td><em>Sp&auml;ter erkl&auml;re ich das.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- WOCHE / MONAT / WOCHENENDE -->
+            <div class="sl"><span>&#x1F5D3;</span> Woche, Monat, Wochenende</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>diese Woche</strong></td><td>на этой неделе</td><td><em>Diese Woche lerne ich jeden Tag.</em></td></tr>
+                    <tr><td><strong>unter der Woche</strong></td><td>в будние дни</td><td><em>Unter der Woche bin ich beschäftigt.</em></td></tr>
+                    <tr><td><strong>am Wochenende</strong></td><td>на выходных</td><td><em>Am Wochenende schlafe ich lange.</em></td></tr>
+                    <tr><td><strong>letztes Wochenende</strong></td><td>на прошлых выходных</td><td><em>Letztes Wochenende war ich bei Freunden.</em></td></tr>
+                    <tr><td><strong>n&auml;chstes Wochenende</strong></td><td>на следующих выходных</td><td><em>N&auml;chstes Wochenende fahren wir weg.</em></td></tr>
+                    <tr><td><strong>diesen Monat</strong></td><td>в этом месяце</td><td><em>Diesen Monat spare ich.</em></td></tr>
+                    <tr><td><strong>dieses Jahr</strong></td><td>в этом году</td><td><em>Dieses Jahr lerne ich Gitarre.</em></td></tr>
+                    <tr><td><strong>Anfang der Woche</strong></td><td>в начале недели</td><td><em>Anfang der Woche habe ich viel zu tun.</em></td></tr>
+                    <tr><td><strong>Mitte der Woche</strong></td><td>в середине недели</td><td><em>Mitte der Woche treffen wir uns.</em></td></tr>
+                    <tr><td><strong>Ende der Woche</strong></td><td>в конце недели</td><td><em>Ende der Woche bin ich frei.</em></td></tr>
+                    <tr><td><strong>Anfang Januar</strong></td><td>в начале января</td><td><em>Anfang Januar beginnt das Semester.</em></td></tr>
+                    <tr><td><strong>Mitte Februar</strong></td><td>в середине февраля</td><td><em>Mitte Februar fahre ich weg.</em></td></tr>
+                    <tr><td><strong>Ende M&auml;rz</strong></td><td>в конце марта</td><td><em>Ende M&auml;rz kommen die Ergebnisse.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- HÄUFIGKEIT -->
+            <div class="sl"><span>&#x1F504;</span> H&auml;ufigkeit &mdash; как часто</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>immer</strong></td><td>всегда</td><td><em>Ich trinke immer Kaffee morgens.</em></td></tr>
+                    <tr><td><strong>fast immer</strong></td><td>почти всегда</td><td><em>Sie ist fast immer p&uuml;nktlich.</em></td></tr>
+                    <tr><td><strong>meistens / meist</strong></td><td>в основном / чаще всего</td><td><em>Meistens koche ich selbst.</em></td></tr>
+                    <tr><td><strong>h&auml;ufig / oft</strong></td><td>часто</td><td><em>Er ruft mich oft an.</em></td></tr>
+                    <tr><td><strong>regelm&auml;&szlig;ig</strong></td><td>регулярно</td><td><em>Ich lerne regelm&auml;&szlig;ig Deutsch.</em></td></tr>
+                    <tr><td><strong>manchmal</strong></td><td>иногда</td><td><em>Manchmal esse ich Fastfood.</em></td></tr>
+                    <tr><td><strong>ab und zu</strong></td><td>время от времени</td><td><em>Ab und zu gehe ich ins Kino.</em></td></tr>
+                    <tr><td><strong>hin und wieder</strong></td><td>время от времени (чуть реже)</td><td><em>Hin und wieder treffe ich alte Freunde.</em></td></tr>
+                    <tr><td><strong>gelegentlich</strong></td><td>иногда / порой (формальное)</td><td><em>Sie besucht uns gelegentlich.</em></td></tr>
+                    <tr><td><strong>selten</strong></td><td>редко</td><td><em>Ich schlafe selten vor Mitternacht.</em></td></tr>
+                    <tr><td><strong>kaum</strong></td><td>почти никогда / едва</td><td><em>Er schreibt mir kaum noch.</em></td></tr>
+                    <tr><td><strong>fast nie</strong></td><td>почти никогда</td><td><em>Sie isst fast nie Fleisch.</em></td></tr>
+                    <tr><td><strong>nie / niemals</strong></td><td>никогда</td><td><em>Ich gehe nie ohne Schlüssel.</em></td></tr>
+                    <tr><td><strong>einmal pro Woche</strong></td><td>раз в неделю</td><td><em>Wir treffen uns einmal pro Woche.</em></td></tr>
+                    <tr><td><strong>zweimal im Monat</strong></td><td>два раза в месяц</td><td><em>Ich gehe zweimal im Monat zum Sport.</em></td></tr>
+                    <tr><td><strong>t&auml;glich</strong></td><td>ежедневно</td><td><em>Ich nehme die Pille t&auml;glich.</em></td></tr>
+                    <tr><td><strong>w&ouml;chentlich</strong></td><td>еженедельно</td><td><em>Das Meeting findet w&ouml;chentlich statt.</em></td></tr>
+                    <tr><td><strong>monatlich</strong></td><td>ежемесячно</td><td><em>Die Miete wird monatlich bezahlt.</em></td></tr>
+                    <tr><td><strong>j&auml;hrlich</strong></td><td>ежегодно</td><td><em>Der Urlaub ist j&auml;hrlich.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- DAUER -->
+            <div class="sl"><span>&#x23F1;</span> Dauer &mdash; продолжительность</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>kurz</strong></td><td>недолго / кратко</td><td><em>Ich bin nur kurz weg.</em></td></tr>
+                    <tr><td><strong>kurz darauf</strong></td><td>вскоре после этого</td><td><em>Kurz darauf kam sie zur&uuml;ck.</em></td></tr>
+                    <tr><td><strong>eine Weile</strong></td><td>некоторое время</td><td><em>Wir haben eine Weile gewartet.</em></td></tr>
+                    <tr><td><strong>lange</strong></td><td>долго</td><td><em>Das dauert nicht lange.</em></td></tr>
+                    <tr><td><strong>stundenlang</strong></td><td>часами</td><td><em>Er hat stundenlang gespielt.</em></td></tr>
+                    <tr><td><strong>tagelang</strong></td><td>днями / несколько дней</td><td><em>Es hat tagelang geregnet.</em></td></tr>
+                    <tr><td><strong>wochenlang</strong></td><td>неделями</td><td><em>Sie hat wochenlang ge&uuml;bt.</em></td></tr>
+                    <tr><td><strong>monatelang</strong></td><td>месяцами</td><td><em>Das Projekt hat monatelang gedauert.</em></td></tr>
+                    <tr><td><strong>jahrelang</strong></td><td>годами</td><td><em>Er hat jahrelang daran gearbeitet.</em></td></tr>
+                    <tr><td><strong>die ganze Zeit</strong></td><td>всё это время</td><td><em>Sie hat die ganze Zeit geschlafen.</em></td></tr>
+                    <tr><td><strong>den ganzen Tag</strong></td><td>весь день</td><td><em>Ich habe den ganzen Tag gelernt.</em></td></tr>
+                    <tr><td><strong>die ganze Nacht</strong></td><td>всю ночь</td><td><em>Er hat die ganze Nacht gearbeitet.</em></td></tr>
+                    <tr><td><strong>immer noch</strong></td><td>до сих пор (ещё)</td><td><em>Sie wohnt immer noch bei ihren Eltern.</em></td></tr>
+                    <tr><td><strong>nicht mehr</strong></td><td>больше не / уже не</td><td><em>Ich rauche nicht mehr.</em></td></tr>
+                    <tr><td><strong>noch nie</strong></td><td>никогда ещё / ни разу</td><td><em>Ich war noch nie in Australien.</em></td></tr>
+                    <tr><td><strong>schon immer</strong></td><td>всегда (с самого начала)</td><td><em>Sie hat schon immer gern gesungen.</em></td></tr>
+                </tbody>
+            </table>
+
+            <!-- REIHENFOLGE -->
+            <div class="sl"><span>&#x1F522;</span> Reihenfolge &mdash; порядок событий</div>
+            <table class="ct">
+                <thead><tr><th>Deutsch</th><th>По-русски</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>zuerst / zun&auml;chst</strong></td><td>сначала</td><td><em>Zuerst lerne ich, dann schlafe ich.</em></td></tr>
+                    <tr><td><strong>dann / danach</strong></td><td>потом / затем</td><td><em>Dann gehen wir essen.</em></td></tr>
+                    <tr><td><strong>anschlie&szlig;end</strong></td><td>после этого / затем (формальное)</td><td><em>Anschlie&szlig;end gibt es eine Diskussion.</em></td></tr>
+                    <tr><td><strong>gleichzeitig</strong></td><td>одновременно</td><td><em>Sie kann nicht gleichzeitig reden und schreiben.</em></td></tr>
+                    <tr><td><strong>w&auml;hrend</strong></td><td>во время / пока</td><td><em>W&auml;hrend des Essens lesen wir.</em></td></tr>
+                    <tr><td><strong>bevor / ehe</strong></td><td>прежде чем / до того как</td><td><em>Bevor ich gehe, r&auml;ume ich auf.</em></td></tr>
+                    <tr><td><strong>nachdem</strong></td><td>после того как</td><td><em>Nachdem sie gegessen hatte, schlief sie ein.</em></td></tr>
+                    <tr><td><strong>sobald</strong></td><td>как только</td><td><em>Sobald ich fertig bin, rufe ich an.</em></td></tr>
+                    <tr><td><strong>seitdem</strong></td><td>с тех пор как</td><td><em>Seitdem ich umgezogen bin, fühle ich mich besser.</em></td></tr>
+                    <tr><td><strong>bis</strong></td><td>до тех пор пока</td><td><em>Warte, bis ich komme.</em></td></tr>
+                    <tr><td><strong>am Ende / schlie&szlig;lich</strong></td><td>в конце концов / наконец</td><td><em>Am Ende hat er doch Recht gehabt.</em></td></tr>
+                    <tr><td><strong>endlich</strong></td><td>наконец-то</td><td><em>Endlich ist der Sommer da!</em></td></tr>
+                </tbody>
+            </table>
+
+        </section></div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+    (function(){
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(){
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const el = document.getElementById('tab-' + this.getAttribute('data-tab'));
+                if (el) el.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
