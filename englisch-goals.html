@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goals &amp; Dreams — Conversation Questions | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            padding: 0.22rem 0.7rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .badge-a1 { background: rgba(63,185,80,0.18); color: #86efac; border: 1px solid rgba(63,185,80,0.4); }
+        .badge-b1 { background: rgba(88,166,255,0.18); color: #79b8ff; border: 1px solid rgba(88,166,255,0.4); }
+        .badge-c1 { background: rgba(192,132,252,0.18); color: #c9b3ff; border: 1px solid rgba(192,132,252,0.4); }
+
+        .picker-box {
+            background: linear-gradient(145deg, rgba(88,166,255,0.09), rgba(163,113,247,0.05));
+            border: 1.5px solid rgba(88,166,255,0.28);
+            border-radius: 18px;
+            padding: 1.4rem 1.5rem 1.2rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
+        }
+        .picker-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(88,166,255,0.7);
+            margin-bottom: 0.7rem;
+        }
+        .picker-question {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.5;
+            min-height: 3rem;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+        .picker-timer {
+            font-family: 'SF Mono', 'Menlo', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s;
+        }
+        .picker-timer.running { color: #58a6ff; }
+        .picker-timer.done { color: #3fb950; }
+        .picker-controls {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pk-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid;
+            font-family: var(--font-main);
+            transition: all 0.2s;
+        }
+        .pk-new {
+            background: linear-gradient(135deg, #58a6ff, #79b8ff);
+            color: #0a0a14;
+            border-color: #58a6ff;
+        }
+        .pk-new:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(88,166,255,0.35); }
+        .pk-go {
+            background: rgba(63,185,80,0.18);
+            color: #86efac;
+            border-color: rgba(63,185,80,0.45);
+        }
+        .pk-go:hover { background: rgba(63,185,80,0.28); }
+        .pk-stop {
+            background: rgba(248,81,73,0.18);
+            color: #ff9a93;
+            border-color: rgba(248,81,73,0.4);
+            display: none;
+        }
+        .pk-stop:hover { background: rgba(248,81,73,0.28); }
+
+        .q-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .q-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 13px;
+            padding: 0.9rem 1.1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .q-card:hover {
+            background: rgba(88,166,255,0.07);
+            border-color: rgba(88,166,255,0.25);
+        }
+        .q-num {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            margin-top: 0.1rem;
+        }
+        .q-num-a1 { background: rgba(63,185,80,0.18); color: #86efac; }
+        .q-num-b1 { background: rgba(88,166,255,0.18); color: #79b8ff; }
+        .q-num-c1 { background: rgba(192,132,252,0.18); color: #c9b3ff; }
+        .q-text {
+            font-size: 0.97rem;
+            color: rgba(230,230,235,0.9);
+            line-height: 1.55;
+        }
+
+        .tip-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 0.88rem;
+            color: rgba(230,230,235,0.8);
+            line-height: 1.5;
+        }
+        .tip-row strong { color: #fbbf24; }
+
+        @media (max-width: 600px) {
+            .picker-question { font-size: 1.05rem; }
+            .picker-timer { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.83)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="biologie.html">Biologie</a>
+            <a href="vokabeln.html">Vokabeln</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="kanikuly.html">Bloom</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Goals &amp; Dreams</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Back to English</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Goals &amp; Dreams &#x1F3AF;</h1>
+            <p class="page-subtitle">29 conversation questions &mdash; A1 to C2 &bull; talk about your future &amp; ambitions</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="a1">&#x1F7E2; A1&ndash;A2</button>
+            <button class="tab" data-tab="b1">&#x1F535; B1&ndash;B2</button>
+            <button class="tab" data-tab="c1">&#x1F7E3; C1&ndash;C2</button>
+        </div>
+
+        <!-- ===== A1–A2 ===== -->
+        <div class="tab-content active" id="tab-a1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F7E2;</span>
+                <div>
+                    <h2><span class="level-badge badge-a1">A1&ndash;A2</span> Beginner Questions</h2>
+                    <p class="lesson-header-sub">Simple goals &amp; dreams &mdash; talk about what you want in life</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>How to use:</strong> click <em>New Question</em> to get a random question, then press <em>Start 2 min</em> to time yourself speaking. Or just read through all questions and pick what interests you.</span>
+            </div>
+
+            <div class="picker-box" id="picker-a1">
+                <div class="picker-label">&#x1F3B2; Random Question &mdash; A1/A2</div>
+                <div class="picker-question" id="pq-a1">Click &ldquo;New Question&rdquo; to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-a1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" onclick="newQ('a1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-a1" onclick="startTimer('a1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-a1" onclick="stopTimer('a1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card">
+                <h3>&#x1F4CB; All A1&ndash;A2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-a1">1</span><span class="q-text">Do you have any short-term goals that you want to achieve?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">2</span><span class="q-text">Have you ever accomplished a goal you set for yourself?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">3</span><span class="q-text">What is something you would like to learn or improve on?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">4</span><span class="q-text">Do you have any specific goals related to your health and fitness?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">5</span><span class="q-text">What do you imagine your life to be like in the future?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">6</span><span class="q-text">Are there any places you dream of visiting one day?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">7</span><span class="q-text">What is one thing you want to achieve before you turn 30 (or a specific age)?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">8</span><span class="q-text">Do you have any goals related to your education or career?</span></div>
+                    <div class="q-card"><span class="q-num q-num-a1">9</span><span class="q-text">How do you plan to work towards achieving your goals?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(63,185,80,0.25); background:rgba(63,185,80,0.05);">
+                <h3 style="color:#86efac;">&#x1F4AC; Useful answer starters &mdash; A1/A2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>My short-term goal is to&hellip;</strong><br>
+                    <strong>One day I would like to&hellip;</strong><br>
+                    <strong>I want to improve my&hellip;</strong><br>
+                    <strong>I dream of visiting&hellip;</strong><br>
+                    <strong>I plan to&hellip; by&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+        <!-- ===== B1–B2 ===== -->
+        <div class="tab-content" id="tab-b1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F535;</span>
+                <div>
+                    <h2><span class="level-badge badge-b1">B1&ndash;B2</span> Intermediate Questions</h2>
+                    <p class="lesson-header-sub">Go deeper &mdash; talk about motivation, obstacles, and success stories</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>Challenge:</strong> answer in at least 5&ndash;8 sentences. Use <em>past tenses, conditionals, and linking words</em> like <em>however / although / as a result</em>.</span>
+            </div>
+
+            <div class="picker-box" id="picker-b1">
+                <div class="picker-label">&#x1F3B2; Random Question &mdash; B1/B2</div>
+                <div class="picker-question" id="pq-b1">Click &ldquo;New Question&rdquo; to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-b1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" onclick="newQ('b1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-b1" onclick="startTimer('b1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-b1" onclick="stopTimer('b1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card" style="border-color:rgba(88,166,255,0.35);">
+                <h3>&#x1F4CB; All B1&ndash;B2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-b1">1</span><span class="q-text">Can you describe one of your long-term goals and why it is important to you?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">2</span><span class="q-text">How do you stay motivated and focused on your goals?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">3</span><span class="q-text">Have you ever faced any obstacles or setbacks while pursuing your goals? How did you overcome them?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">4</span><span class="q-text">Do you believe in setting specific deadlines for achieving goals, or do you prefer a more flexible approach?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">5</span><span class="q-text">How do you celebrate when you accomplish a goal?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">6</span><span class="q-text">Can you share a success story where you achieved a goal that seemed challenging at first?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">7</span><span class="q-text">Do you believe in the power of visualization and positive affirmations when it comes to achieving goals?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">8</span><span class="q-text">Have you ever set goals as a group or with a partner? How did it enhance the experience?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">9</span><span class="q-text">How do you balance pursuing your goals with other aspects of your life, such as family and leisure?</span></div>
+                    <div class="q-card"><span class="q-num q-num-b1">10</span><span class="q-text">What advice would you give to someone who is struggling to set and achieve their goals?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(88,166,255,0.25); background:rgba(88,166,255,0.05);">
+                <h3 style="color:#79b8ff;">&#x1F4AC; Useful phrases &mdash; B1/B2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>One of my long-term goals is to&hellip; because&hellip;</strong><br>
+                    <strong>What keeps me motivated is&hellip;</strong><br>
+                    <strong>I faced a setback when&hellip; but I overcame it by&hellip;</strong><br>
+                    <strong>When I accomplish a goal, I usually&hellip;</strong><br>
+                    <strong>The advice I&rsquo;d give is&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+        <!-- ===== C1–C2 ===== -->
+        <div class="tab-content" id="tab-c1">
+        <div class="zp-notes">
+        <section class="note-section">
+
+            <div class="lesson-header-block">
+                <span class="lesson-header-icon">&#x1F7E3;</span>
+                <div>
+                    <h2><span class="level-badge badge-c1">C1&ndash;C2</span> Advanced Questions</h2>
+                    <p class="lesson-header-sub">Nuanced, reflective answers &mdash; values, growth, and big-picture thinking</p>
+                </div>
+            </div>
+
+            <div class="tip-row">
+                <span>&#x1F4A1;</span>
+                <span><strong>Challenge:</strong> give structured 2&ndash;3 minute answers with <em>concrete examples, contrasts, and personal reflection</em>. Avoid generic answers &mdash; be specific.</span>
+            </div>
+
+            <div class="picker-box" id="picker-c1" style="border-color:rgba(192,132,252,0.35); background:linear-gradient(145deg, rgba(192,132,252,0.09), rgba(88,166,255,0.04));">
+                <div class="picker-label" style="color:rgba(192,132,252,0.75);">&#x1F3B2; Random Question &mdash; C1/C2</div>
+                <div class="picker-question" id="pq-c1">Click &ldquo;New Question&rdquo; to start &#x1F447;</div>
+                <div class="picker-timer" id="pt-c1">2:00</div>
+                <div class="picker-controls">
+                    <button class="pk-btn pk-new" style="background:linear-gradient(135deg,#c084fc,#a855f7);border-color:#c084fc;color:#fff;" onclick="newQ('c1')">New Question</button>
+                    <button class="pk-btn pk-go" id="pg-c1" onclick="startTimer('c1')">&#x25B6; Start 2 min</button>
+                    <button class="pk-btn pk-stop" id="ps-c1" onclick="stopTimer('c1')">&#x25A0; Stop</button>
+                </div>
+            </div>
+
+            <div class="note-card highlight-card" style="border-color:rgba(192,132,252,0.35);">
+                <h3>&#x1F4CB; All C1&ndash;C2 Questions</h3>
+                <div class="q-list" style="margin-top:0.7rem;">
+                    <div class="q-card"><span class="q-num q-num-c1">1</span><span class="q-text">How has your understanding of goals and goal-setting evolved over the years?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">2</span><span class="q-text">Can you discuss a time when you had to adjust or change your goals due to unforeseen circumstances?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">3</span><span class="q-text">How do you prioritize your goals when you have multiple competing priorities in your life?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">4</span><span class="q-text">Can you share an example of a goal that required you to step out of your comfort zone? How did it impact your personal growth?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">5</span><span class="q-text">Have you ever helped someone else achieve their goals? How did it feel to be a part of their journey?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">6</span><span class="q-text">What role do you think self-reflection and self-assessment play in setting and achieving meaningful goals?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">7</span><span class="q-text">Can you discuss the relationship between goals and self-motivation? How do you keep yourself motivated throughout the process?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">8</span><span class="q-text">How do you ensure that your goals align with your values and long-term vision for your life?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">9</span><span class="q-text">Can you discuss any cultural or societal factors that influence how people set and pursue their goals?</span></div>
+                    <div class="q-card"><span class="q-num q-num-c1">10</span><span class="q-text">How do you define success in relation to achieving goals? Has your definition changed over time?</span></div>
+                </div>
+            </div>
+
+            <div class="note-card" style="border-color:rgba(192,132,252,0.25); background:rgba(192,132,252,0.05);">
+                <h3 style="color:#c9b3ff;">&#x1F4AC; Useful phrases &mdash; C1/C2</h3>
+                <p style="font-size:0.9rem; color:rgba(230,230,235,0.75); margin-top:0.4rem; line-height:1.9;">
+                    <strong>My perspective on goal-setting has evolved significantly in that&hellip;</strong><br>
+                    <strong>When faced with competing priorities, I tend to&hellip;</strong><br>
+                    <strong>Stepping out of my comfort zone taught me that&hellip;</strong><br>
+                    <strong>I believe that self-reflection is crucial because&hellip;</strong><br>
+                    <strong>My definition of success has shifted over time &mdash; whereas before I&hellip; now I&hellip;</strong>
+                </p>
+            </div>
+
+        </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+    const QUESTIONS = {
+        a1: [
+            "Do you have any short-term goals that you want to achieve?",
+            "Have you ever accomplished a goal you set for yourself?",
+            "What is something you would like to learn or improve on?",
+            "Do you have any specific goals related to your health and fitness?",
+            "What do you imagine your life to be like in the future?",
+            "Are there any places you dream of visiting one day?",
+            "What is one thing you want to achieve before you turn 30 (or a specific age)?",
+            "Do you have any goals related to your education or career?",
+            "How do you plan to work towards achieving your goals?"
+        ],
+        b1: [
+            "Can you describe one of your long-term goals and why it is important to you?",
+            "How do you stay motivated and focused on your goals?",
+            "Have you ever faced any obstacles or setbacks while pursuing your goals? How did you overcome them?",
+            "Do you believe in setting specific deadlines for achieving goals, or do you prefer a more flexible approach?",
+            "How do you celebrate when you accomplish a goal?",
+            "Can you share a success story where you achieved a goal that seemed challenging at first?",
+            "Do you believe in the power of visualization and positive affirmations when it comes to achieving goals?",
+            "Have you ever set goals as a group or with a partner? How did it enhance the experience?",
+            "How do you balance pursuing your goals with other aspects of your life, such as family and leisure?",
+            "What advice would you give to someone who is struggling to set and achieve their goals?"
+        ],
+        c1: [
+            "How has your understanding of goals and goal-setting evolved over the years?",
+            "Can you discuss a time when you had to adjust or change your goals due to unforeseen circumstances?",
+            "How do you prioritize your goals when you have multiple competing priorities in your life?",
+            "Can you share an example of a goal that required you to step out of your comfort zone? How did it impact your personal growth?",
+            "Have you ever helped someone else achieve their goals? How did it feel to be a part of their journey?",
+            "What role do you think self-reflection and self-assessment play in setting and achieving meaningful goals?",
+            "Can you discuss the relationship between goals and self-motivation? How do you keep yourself motivated throughout the process?",
+            "How do you ensure that your goals align with your values and long-term vision for your life?",
+            "Can you discuss any cultural or societal factors that influence how people set and pursue their goals?",
+            "How do you define success in relation to achieving goals? Has your definition changed over time?"
+        ]
+    };
+
+    const timers = {};
+
+    function newQ(level) {
+        const pool = QUESTIONS[level];
+        const q = pool[Math.floor(Math.random() * pool.length)];
+        document.getElementById('pq-' + level).textContent = q;
+        resetTimer(level);
+    }
+
+    function resetTimer(level) {
+        if (timers[level]) { clearInterval(timers[level]); timers[level] = null; }
+        const el = document.getElementById('pt-' + level);
+        el.textContent = '2:00';
+        el.className = 'picker-timer';
+        document.getElementById('pg-' + level).style.display = '';
+        document.getElementById('ps-' + level).style.display = 'none';
+    }
+
+    function startTimer(level) {
+        if (document.getElementById('pq-' + level).textContent.includes('Click')) {
+            newQ(level);
+            return;
+        }
+        if (timers[level]) return;
+        let secs = 120;
+        const el = document.getElementById('pt-' + level);
+        el.className = 'picker-timer running';
+        document.getElementById('pg-' + level).style.display = 'none';
+        document.getElementById('ps-' + level).style.display = '';
+        timers[level] = setInterval(function() {
+            secs--;
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+            if (secs <= 0) {
+                clearInterval(timers[level]);
+                timers[level] = null;
+                el.textContent = 'Done! ✓';
+                el.className = 'picker-timer done';
+                document.getElementById('pg-' + level).style.display = '';
+                document.getElementById('ps-' + level).style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    function stopTimer(level) {
+        if (timers[level]) { clearInterval(timers[level]); timers[level] = null; }
+        resetTimer(level);
+    }
+
+    (function(){
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(){
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const id = 'tab-' + this.getAttribute('data-tab');
+                const el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
