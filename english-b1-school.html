@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1&ndash;B2 School &amp; Education | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .progress-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 20px; height: 7px; margin: 0.5rem 0 0.25rem; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #a371f7, #c084fc); transition: width 0.4s ease; width: 0%; }
+        .progress-label { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .progress-label span { color: #c084fc; font-weight: 700; }
+        .controls { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.3rem; }
+        .ctrl-btn { padding: 0.45rem 0.9rem; border-radius: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--color-text-muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.4); color: #c084fc; }
+        .ctrl-btn.primary:hover { background: rgba(163,113,247,0.25); color: #fff; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 0.65rem; }
+        .fcard { position: relative; min-height: 155px; border-radius: 13px; background: rgba(13,17,23,0.82); backdrop-filter: blur(8px); border: 1.5px solid rgba(255,255,255,0.07); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; overflow: hidden; }
+        .fcard::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 13px 0 0 13px; background: #a371f7; }
+        .fcard::after { content: ''; position: absolute; top: 0; left: 4px; right: 0; height: 1px; background: linear-gradient(90deg, rgba(163,113,247,0.45), transparent); opacity: 0; transition: opacity 0.2s; }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+        .fcard-front { padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; display: flex; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 1rem; font-weight: 700; color: rgba(163,113,247,0.6); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.83rem; color: rgba(255,255,255,0.38); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.76rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+        .fcard-back { display: none; padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1.12rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en { font-size: 0.93rem; font-weight: 600; color: rgba(255,255,255,0.62); margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem; }
+        .fcard-en::before { content: 'DE'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem; border-radius: 5px; background: rgba(255,193,7,0.15); color: #ffd55a; border: 1px solid rgba(255,193,7,0.3); letter-spacing: 0.5px; flex-shrink: 0; }
+        .fcard-example { font-size: 0.84rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.97rem; font-style: italic; color: rgba(163,113,247,0.9); margin-top: 0.42rem; line-height: 1.55; border-left: 2px solid rgba(163,113,247,0.35); padding-left: 0.5rem; }
+        .fcard-frage { font-size: 0.83rem; color: rgba(52,211,153,0.85); margin-top: 0.5rem; line-height: 1.5; border-left: 2px solid rgba(52,211,153,0.3); padding-left: 0.5rem; }
+        .know-btn { display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem; border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28); color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer; width: fit-content; transition: all 0.2s; align-self: flex-start; }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+        .group-label { display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0.65rem; font-size: 0.77rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+        .done-screen { display: none; text-align: center; padding: 2rem 1rem; border-radius: 16px; background: rgba(13,17,23,0.6); border: 1px solid rgba(163,113,247,0.3); margin-top: 1.5rem; }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #c084fc; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+        .intro-box { background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02)); border: 1px solid rgba(163,113,247,0.22); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.3rem; font-size: 0.88rem; line-height: 1.6; color: rgba(230,230,235,0.8); }
+        .intro-box strong { color: #c084fc; }
+        @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; } .fcard-front, .fcard-back { min-height: 135px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; } .fcard-word { font-size: 1.08rem; } }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+        .day-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+        .day-tab { padding: 0.52rem 1.1rem; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color: #c084fc; }
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+        .tagesartikel { background: #fffdf7; border-left: 5px solid #b8860b; border-radius: 0 12px 12px 0; padding: 1.3rem 1.6rem 1.2rem; margin: 0 0 2rem 0; font-family: Georgia, 'Times New Roman', serif; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .tagesartikel-header { display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; user-select: none; gap: 0.8rem; }
+        .tagesartikel-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: #b8860b; font-family: sans-serif; margin-bottom: 0.3rem; font-weight: 600; }
+        .tagesartikel h3 { font-size: 1.05rem; font-weight: bold; color: #1a120a; margin: 0; line-height: 1.4; }
+        .tagesartikel-toggle { background: none; border: 1px solid #d4a017; border-radius: 50%; width: 28px; height: 28px; font-size: 0.75rem; cursor: pointer; color: #b8860b; padding: 0; flex-shrink: 0; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .tagesartikel-body { overflow: hidden; transition: max-height 0.35s ease; }
+        .tagesartikel-body.collapsed { max-height: 0; }
+        .tagesartikel-body.expanded { max-height: 9999px; }
+        .tagesartikel-body p { font-size: 0.95rem; line-height: 1.85; color: #1a120a; margin: 0.9rem 0 0; }
+        .tagesartikel b { color: #7a4f00; font-weight: 700; }
+        .fcard-trans { font-size: 0.76rem; color: rgba(163,113,247,0.65); margin-top: 0.13rem; letter-spacing: 0.1px; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">B1&ndash;B2 School &amp; Education</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>School &amp; Education <span style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">B1&ndash;B2</span></h1>
+            <p class="page-subtitle">Study &bull; Knowledge &bull; Achievement &mdash; 69 units: words, phrases &amp; expressions</p>
+        </div>
+
+        <div class="intro-box">
+            &#x1F4DA; <strong>For conversation practice:</strong> Learn the words &mdash; then use the <span style="color:rgba(52,211,153,0.9);">green questions</span> to discuss school life, study habits, and what real success looks like.
+        </div>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="switchDay(1)">&#x1F4CB; School Life &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(2)">&#x1F9E0; Study Skills &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(3)">&#x1F3C6; Achievement &bull; 23</button>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-sch"></div></div>
+        <div class="progress-label">Learned: <span id="num-sch">0</span> / <span id="total-sch">23</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Reveal all</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Reset</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Shuffle</button>
+        </div>
+
+        <div id="cards-sch">
+
+        <!-- ===== DAY 1 ===== -->
+        <div class="day-content active" data-day="1">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>School Life: Why Deadlines and Grades Matter More Than You Think</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Every student has had that sinking feeling: the <b>deadline</b> is tomorrow, the <b>assignment</b> is unfinished, and there is simply no time left. In that moment, school feels like a machine designed to create stress. But the structure of <b>timetables</b>, <b>grades</b>, and <b>essays</b> exists for a reason — it prepares you for a world that runs on deadlines.</p>
+            <p>Learning to <b>concentrate</b> under pressure is a life skill. So is knowing how to <b>revise</b> efficiently rather than frantically. Many students spend hours re-reading notes without actually <b>preparing</b> properly — passive reading is not the same as active learning. The ability to <b>submit</b> work on time, even when it is not perfect, is also a lesson in itself.</p>
+            <p>Some teachers are <b>strict</b>; others are more flexible. Both approaches have value. A <b>strict</b> teacher trains you to meet standards. A supportive one gives you the confidence to try. The best <b>academic</b> environments combine both: high expectations and genuine encouragement.</p>
+            <p>If you ever feel <b>overwhelmed</b>, remember: the goal is not to be perfect. The goal is to keep going, even when things are <b>challenging</b>.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">assignment</div><div class="fcard-hint">NOUN &bull; B1 &bull; do / complete an assignment &bull; Pl.: assignments</div></div><div class="fcard-back"><div class="fcard-ua">задание / домашнее задание / работа</div><div class="fcard-en">die Aufgabe, die Hausaufgabe</div><div class="fcard-example">"I have three assignments due this week and I haven't started any of them."</div><div class="fcard-poem">Assignment — the task that waits while you procrastinate,<br>задание — от него не убежать.</div><div class="fcard-frage">&#x1F4AC; How do you usually organise your assignments to avoid leaving them to the last minute?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">deadline</div><div class="fcard-hint">NOUN &bull; B1 &bull; meet a deadline / miss a deadline &bull; Pl.: deadlines</div></div><div class="fcard-back"><div class="fcard-ua">дедлайн / срок сдачи</div><div class="fcard-en">die Frist, der Abgabetermin</div><div class="fcard-example">"The deadline is Friday at noon — I need to stop procrastinating and start now."</div><div class="fcard-poem">Deadline — the clock that never pauses for excuses,<br>срок — либо успел, либо нет.</div><div class="fcard-frage">&#x1F4AC; Are you good at meeting deadlines, or do you usually leave things to the last moment?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">grade</div><div class="fcard-hint">NOUN &bull; B1 &bull; get a good / bad grade &bull; Pl.: grades</div></div><div class="fcard-back"><div class="fcard-ua">оценка / отметка / балл</div><div class="fcard-en">die Note, die Benotung</div><div class="fcard-example">"She worked really hard and finally got the grade she deserved."</div><div class="fcard-poem">Grade — a number that tells part of the story,<br>оценка — не вся правда о тебе.</div><div class="fcard-frage">&#x1F4AC; How important are grades to you? Do they reflect how much you actually know?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">essay</div><div class="fcard-hint">NOUN &bull; B1 &bull; write an essay on / about sth &bull; Pl.: essays</div></div><div class="fcard-back"><div class="fcard-ua">сочинение / эссе / письменная работа</div><div class="fcard-en">der Aufsatz, das Essay</div><div class="fcard-example">"Writing a good essay requires a clear argument, strong evidence, and a logical structure."</div><div class="fcard-poem">Essay — your argument, built word by word,<br>эссе — мысль, которую нельзя просто назвать.</div><div class="fcard-frage">&#x1F4AC; What do you find most difficult about writing an essay — starting, structuring, or finishing?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">subject</div><div class="fcard-hint">NOUN &bull; B1 &bull; a school subject &bull; Pl.: subjects</div></div><div class="fcard-back"><div class="fcard-ua">предмет / дисциплина / учебный курс</div><div class="fcard-en">das Fach, das Unterrichtsfach</div><div class="fcard-example">"My favourite subject is biology — I find the way living things work absolutely fascinating."</div><div class="fcard-poem">Subject — one window into the world's knowledge,<br>предмет — каждый открывает что-то своё.</div><div class="fcard-frage">&#x1F4AC; Which school subject has been most useful to you in real life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">timetable</div><div class="fcard-hint">NOUN &bull; B1 &bull; check the timetable &bull; Pl.: timetables</div></div><div class="fcard-back"><div class="fcard-ua">расписание / план занятий</div><div class="fcard-en">der Stundenplan, der Zeitplan</div><div class="fcard-example">"According to the timetable, we have double maths on Monday morning — not ideal."</div><div class="fcard-poem">Timetable — the skeleton of your school week,<br>расписание — ты в нём, хочешь или нет.</div><div class="fcard-frage">&#x1F4AC; What does your ideal school timetable look like?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">lecture</div><div class="fcard-hint">NOUN &bull; B1 &bull; attend / give a lecture &bull; Pl.: lectures</div></div><div class="fcard-back"><div class="fcard-ua">лекция / лекционное занятие</div><div class="fcard-en">die Vorlesung, der Vortrag</div><div class="fcard-example">"The lecture was so interesting that nobody checked their phone for the full two hours."</div><div class="fcard-poem">Lecture — knowledge delivered, yours to catch,<br>лекция — слушаешь, и мир становится шире.</div><div class="fcard-frage">&#x1F4AC; Do you find it easier to learn from a lecture or from reading on your own?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">revision</div><div class="fcard-hint">NOUN &bull; B1 &bull; do your revision / exam revision &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">повторение материала / подготовка к экзамену</div><div class="fcard-en">die Wiederholung, das Lernen</div><div class="fcard-example">"I always leave my revision too late and then panic the night before the exam."</div><div class="fcard-poem">Revision — going back to what you thought you knew,<br>повторение — мать учения.</div><div class="fcard-frage">&#x1F4AC; What is your revision strategy before an important exam?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">to revise</div><div class="fcard-hint">VERB &bull; B1 &bull; revise for an exam / revise a topic &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">повторять материал / готовиться к экзамену</div><div class="fcard-en">wiederholen, lernen (f&uuml;r eine Pr&uuml;fung)</div><div class="fcard-example">"I need to revise three chapters tonight if I want to feel ready for tomorrow."</div><div class="fcard-poem">Revise — visit old knowledge with fresh eyes,<br>повторять — видишь то, что пропустил прежде.</div><div class="fcard-frage">&#x1F4AC; How many days before an exam do you usually start to revise?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">to submit</div><div class="fcard-hint">VERB &bull; B1 &bull; submit work / an assignment / a form &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">сдавать / подавать (работу, заявление)</div><div class="fcard-en">einreichen, abgeben</div><div class="fcard-example">"You must submit your essay by midnight — late submissions will not be accepted."</div><div class="fcard-poem">Submit — let it go, it's ready or it isn't,<br>сдать — отпустить и не оглядываться.</div><div class="fcard-frage">&#x1F4AC; Do you find it hard to submit work when you feel it's not perfect yet?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">to concentrate</div><div class="fcard-hint">VERB &bull; B1 &bull; concentrate on sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">сосредотачиваться / концентрироваться</div><div class="fcard-en">sich konzentrieren</div><div class="fcard-example">"I find it really hard to concentrate when there is background noise or my phone is nearby."</div><div class="fcard-poem">Concentrate — one thing, fully, now,<br>сосредоточиться — всё лишнее — за дверь.</div><div class="fcard-frage">&#x1F4AC; What helps you concentrate when you're studying?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">to pass / to fail</div><div class="fcard-hint">VERB &bull; B1 &bull; pass / fail an exam &bull; &ne; opposites!</div></div><div class="fcard-back"><div class="fcard-ua">сдать / провалить (экзамен)</div><div class="fcard-en">bestehen / durchfallen</div><div class="fcard-example">"She failed the first attempt but passed the resit with a really high score."</div><div class="fcard-poem">Pass or fail — two doors, one choice, your effort,<br>сдать или провалить — зависит от тебя.</div><div class="fcard-frage">&#x1F4AC; Have you ever failed something important? What did you learn from it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">strict</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a strict teacher / rule / parent</div></div><div class="fcard-back"><div class="fcard-ua">строгий / требовательный</div><div class="fcard-en">streng, strikt</div><div class="fcard-example">"She was a strict teacher, but everyone respected her — and actually learned a lot."</div><div class="fcard-poem">Strict — the fence that makes the garden grow,<br>строгий — не враг, а тот, кто ждёт лучшего.</div><div class="fcard-frage">&#x1F4AC; Do you think strict teachers help students more than lenient ones?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">academic</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; academic performance / year / achievement</div></div><div class="fcard-back"><div class="fcard-ua">академический / учебный / научный</div><div class="fcard-en">akademisch, schulisch</div><div class="fcard-example">"His academic performance improved dramatically once he found a subject he was passionate about."</div><div class="fcard-poem">Academic — the formal world of learning,<br>академический — там, где знания ставят оценки.</div><div class="fcard-frage">&#x1F4AC; Is academic success important to you, or are other skills more valuable?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">challenging</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a challenging task / course / question</div></div><div class="fcard-back"><div class="fcard-ua">сложный / трудный / требующий усилий</div><div class="fcard-en">herausfordernd, anspruchsvoll</div><div class="fcard-example">"The exam was challenging, but I felt prepared — all that revision paid off."</div><div class="fcard-poem">Challenging — hard enough to make you grow,<br>сложный — именно это и делает тебя лучше.</div><div class="fcard-frage">&#x1F4AC; What subject or skill do you find most challenging right now?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">overwhelmed</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; feel overwhelmed by sth</div></div><div class="fcard-back"><div class="fcard-ua">перегруженный / подавленный / захлёстнутый</div><div class="fcard-en">&uuml;berw&auml;ltigt, &uuml;berfordert</div><div class="fcard-example">"By exam season, most students feel completely overwhelmed — there just isn't enough time."</div><div class="fcard-poem">Overwhelmed — when the wave is bigger than the boat,<br>перегруженный — слишком много сразу.</div><div class="fcard-frage">&#x1F4AC; What do you do when you feel overwhelmed by schoolwork or responsibilities?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">to fall behind</div><div class="fcard-hint">PHRASE &bull; B1 &bull; fall behind with / on sth</div></div><div class="fcard-back"><div class="fcard-ua">отставать / не успевать (по программе)</div><div class="fcard-en">in R&uuml;ckstand geraten, zur&uuml;ckfallen</div><div class="fcard-example">"I fell behind with my coursework after being ill for a week and struggled to catch up."</div><div class="fcard-poem">&#x1F4CC; Opposite: "catch up" — to close the gap after falling behind.<br>Подсказка: противоположность — "catch up" (наверстать).</div><div class="fcard-frage">&#x1F4AC; Have you ever fallen behind in school? What helped you get back on track?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">to catch up</div><div class="fcard-hint">PHRASE &bull; B1 &bull; catch up with / on sth</div></div><div class="fcard-back"><div class="fcard-ua">догнать / наверстать упущенное</div><div class="fcard-en">aufholen, nachholen</div><div class="fcard-example">"After missing two weeks, she worked every evening to catch up with the rest of the class."</div><div class="fcard-poem">&#x1F4CC; Also used socially: "let's catch up!" = let's meet and talk.<br>Подсказка: в разговоре "catch up" = встретиться и поговорить.</div><div class="fcard-frage">&#x1F4AC; How do you catch up when you miss a lesson or fall behind?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">to hand in</div><div class="fcard-hint">PHRASE &bull; B1 &bull; hand in your homework / essay / assignment</div></div><div class="fcard-back"><div class="fcard-ua">сдавать / подавать (работу учителю)</div><div class="fcard-en">abgeben, einreichen</div><div class="fcard-example">"Don't forget to hand in your assignment before the end of the lesson."</div><div class="fcard-poem">&#x1F4CC; "Hand in" = give physically to someone; "submit" = more formal / online.<br>Подсказка: "hand in" — в руки; "submit" — формально / онлайн.</div><div class="fcard-frage">&#x1F4AC; Do you usually hand in your work on time, or often at the last second?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">to take notes</div><div class="fcard-hint">PHRASE &bull; B1 &bull; take notes in class / during a lecture</div></div><div class="fcard-back"><div class="fcard-ua">делать заметки / конспектировать</div><div class="fcard-en">Notizen machen, mitschreiben</div><div class="fcard-example">"Taking good notes during a lecture is a skill — most people write too much or too little."</div><div class="fcard-poem">&#x1F4CC; "Make notes" = same meaning — both forms are natural.<br>Подсказка: "make notes" и "take notes" — оба варианта правильны.</div><div class="fcard-frage">&#x1F4AC; Do you take notes by hand or digitally? Which works better for you?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#21</div><div class="fcard-word">to prepare for an exam</div><div class="fcard-hint">PHRASE &bull; B1 &bull; prepare for / study for an exam</div></div><div class="fcard-back"><div class="fcard-ua">готовиться к экзамену</div><div class="fcard-en">sich auf eine Pr&uuml;fung vorbereiten</div><div class="fcard-example">"The best way to prepare for an exam is to practise, not just re-read your notes."</div><div class="fcard-poem">&#x1F4CC; "Study for" and "prepare for" an exam — both very natural.<br>Подсказка: оба варианта одинаково правильны.</div><div class="fcard-frage">&#x1F4AC; How do you prepare for an important exam? What is your best strategy?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#22</div><div class="fcard-word">to give a presentation</div><div class="fcard-hint">PHRASE &bull; B1 &bull; give / do / deliver a presentation</div></div><div class="fcard-back"><div class="fcard-ua">делать презентацию / выступать с докладом</div><div class="fcard-en">eine Pr&auml;sentation halten</div><div class="fcard-example">"Giving a presentation in front of the whole class still makes me nervous, even now."</div><div class="fcard-poem">&#x1F4CC; "Give" or "deliver" a presentation — both formal and natural.<br>Подсказка: "deliver" — более официальный вариант.</div><div class="fcard-frage">&#x1F4AC; Are you nervous when giving a presentation? What helps you feel more confident?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#23</div><div class="fcard-word">to work under pressure</div><div class="fcard-hint">PHRASE &bull; B2 &bull; work well / struggle to work under pressure</div></div><div class="fcard-back"><div class="fcard-ua">работать под давлением / в стрессовых условиях</div><div class="fcard-en">unter Druck arbeiten</div><div class="fcard-example">"Some people actually work better under pressure — the deadline forces them to focus."</div><div class="fcard-poem">&#x1F4CC; Very common in job interviews: "I work well under pressure."<br>Подсказка: популярный ответ на собеседовании.</div><div class="fcard-frage">&#x1F4AC; Do you work better with a tight deadline, or do you prefer to plan ahead?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-1 -->
+
+        <!-- ===== DAY 2 ===== -->
+        <div class="day-content" data-day="2">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>How to Study Smarter: The Science of Real Learning</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Most students study the wrong way. They re-read their notes, highlight text, and hope the information stays in their minds. But <b>research</b> in cognitive science shows that passive review is one of the least effective learning <b>techniques</b>. Real <b>understanding</b> comes from actively working with information — not just reading it.</p>
+            <p>What actually works? Testing yourself. Writing <b>arguments</b> from memory. Finding new <b>sources</b> and comparing them. Building <b>evidence</b> for a position and then challenging it. When you write an essay and have to <b>evaluate</b> competing ideas, you are not just repeating — you are thinking.</p>
+            <p>The best learners also track their own <b>progress</b>. They ask: what do I now know that I didn't know before? Where are the gaps? This kind of <b>critical</b> self-awareness — honest and <b>logical</b> — is what turns effort into real <b>knowledge</b>.</p>
+            <p>Learning is not about being <b>thorough</b> in covering everything. It is about being <b>thorough</b> in building genuine understanding. That difference changes everything.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#24</div><div class="fcard-word">knowledge</div><div class="fcard-hint">NOUN &bull; B1 &bull; general / specialist knowledge &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">знания / познания / осведомлённость</div><div class="fcard-en">das Wissen, die Kenntnisse (Pl.)</div><div class="fcard-example">"You can't replace real knowledge with just looking things up — you need to understand them."</div><div class="fcard-poem">Knowledge — what stays when the textbook is gone,<br>знания — то, что не забыть.</div><div class="fcard-frage">&#x1F4AC; What area of knowledge do you most want to develop in the next few years?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#25</div><div class="fcard-word">research</div><div class="fcard-hint">NOUN &bull; B1 &bull; do research on / into sth &bull; no plural (uncountable)</div></div><div class="fcard-back"><div class="fcard-ua">исследование / изучение / поиск информации</div><div class="fcard-en">die Forschung, die Recherche</div><div class="fcard-example">"Before writing the essay, she spent two hours doing research and gathering sources."</div><div class="fcard-poem">Research — digging until you find what's true,<br>исследование — вопрос до самого дна.</div><div class="fcard-frage">&#x1F4AC; How do you usually do research for a school assignment?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#26</div><div class="fcard-word">source</div><div class="fcard-hint">NOUN &bull; B2 &bull; a reliable / primary / secondary source &bull; Pl.: sources</div></div><div class="fcard-back"><div class="fcard-ua">источник / первоисточник</div><div class="fcard-en">die Quelle</div><div class="fcard-example">"Not all sources on the internet are reliable — you need to check who wrote it and why."</div><div class="fcard-poem">Source — where the river of knowledge begins,<br>источник — важнее, кто сказал, чем что.</div><div class="fcard-frage">&#x1F4AC; How do you decide if a source of information is reliable?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#27</div><div class="fcard-word">argument</div><div class="fcard-hint">NOUN &bull; B2 &bull; make / develop an argument &bull; Pl.: arguments</div></div><div class="fcard-back"><div class="fcard-ua">аргумент / довод / позиция</div><div class="fcard-en">das Argument, der Standpunkt</div><div class="fcard-example">"A good essay doesn't just state opinions — it builds a clear, logical argument."</div><div class="fcard-poem">Argument — a claim that earns its right to stand,<br>аргумент — не просто мнение, а доказательство.</div><div class="fcard-frage">&#x1F4AC; Do you find it easy to build a logical argument when discussing or writing?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#28</div><div class="fcard-word">evidence</div><div class="fcard-hint">NOUN &bull; B2 &bull; provide / use evidence &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">доказательство / свидетельство / данные</div><div class="fcard-en">der Beweis, der Beleg</div><div class="fcard-example">"Without evidence, an argument is just an opinion — you need facts to support your claim."</div><div class="fcard-poem">Evidence — the proof that earns belief,<br>доказательство — слова без него — просто слова.</div><div class="fcard-frage">&#x1F4AC; Why is evidence so important in academic writing and real-life discussions?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#29</div><div class="fcard-word">progress</div><div class="fcard-hint">NOUN &bull; B1 &bull; make progress &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">прогресс / успехи / движение вперёд</div><div class="fcard-en">der Fortschritt</div><div class="fcard-example">"She has made incredible progress this year — her work is completely transformed."</div><div class="fcard-poem">Progress — not perfection, just forward,<br>прогресс — вчера не мог, сегодня могу.</div><div class="fcard-frage">&#x1F4AC; How do you measure your own progress in learning something new?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#30</div><div class="fcard-word">understanding</div><div class="fcard-hint">NOUN &bull; B1 &bull; a deep / basic understanding of sth &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">понимание / знание / осознание</div><div class="fcard-en">das Verst&auml;ndnis</div><div class="fcard-example">"A deep understanding of a subject is much more valuable than memorising facts."</div><div class="fcard-poem">Understanding — knowing the why, not just the what,<br>понимание — когда можешь объяснить другому.</div><div class="fcard-frage">&#x1F4AC; What is the difference between memorising something and truly understanding it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#31</div><div class="fcard-word">technique</div><div class="fcard-hint">NOUN &bull; B2 &bull; a learning / study technique &bull; Pl.: techniques</div></div><div class="fcard-back"><div class="fcard-ua">метод / приём / техника</div><div class="fcard-en">die Technik, die Methode</div><div class="fcard-example">"The most effective study technique is testing yourself — not just re-reading notes."</div><div class="fcard-poem">Technique — the how, after you know the what,<br>метод — умение, которое можно научить.</div><div class="fcard-frage">&#x1F4AC; What study techniques work best for you personally?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#32</div><div class="fcard-word">to analyse</div><div class="fcard-hint">VERB &bull; B2 &bull; analyse a text / situation / data &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">анализировать / разбирать / исследовать</div><div class="fcard-en">analysieren, untersuchen</div><div class="fcard-example">"Instead of describing what happened, try to analyse why it happened and what it means."</div><div class="fcard-poem">Analyse — take it apart to see how it works,<br>анализировать — понять изнутри.</div><div class="fcard-frage">&#x1F4AC; What do you prefer — describing facts, or analysing what they mean?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#33</div><div class="fcard-word">to summarise</div><div class="fcard-hint">VERB &bull; B1 &bull; summarise a text / key points &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">резюмировать / подводить итог / кратко излагать</div><div class="fcard-en">zusammenfassen</div><div class="fcard-example">"To summarise: the main argument is that education should focus on understanding, not memorising."</div><div class="fcard-poem">Summarise — keep the bones, cut the rest,<br>резюмировать — самое важное в двух словах.</div><div class="fcard-frage">&#x1F4AC; Can you summarise what you've learned today in three sentences?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#34</div><div class="fcard-word">to evaluate</div><div class="fcard-hint">VERB &bull; B2 &bull; evaluate sth critically / evaluate the evidence &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">оценивать / анализировать критически / давать оценку</div><div class="fcard-en">bewerten, auswerten</div><div class="fcard-example">"Good students don't just collect information — they evaluate it and decide what matters."</div><div class="fcard-poem">Evaluate — weigh it, don't just hold it,<br>оценивать — думать, а не просто знать.</div><div class="fcard-frage">&#x1F4AC; How do you evaluate whether information you find online is trustworthy?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#35</div><div class="fcard-word">to memorise</div><div class="fcard-hint">VERB &bull; B1 &bull; memorise facts / a list / a speech &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">запоминать / учить наизусть</div><div class="fcard-en">auswendig lernen</div><div class="fcard-example">"I memorised all the vocabulary the night before and forgot it all by the weekend."</div><div class="fcard-poem">Memorise — store it, but don't mistake it for knowing,<br>запомнить — ещё не значит понять.</div><div class="fcard-frage">&#x1F4AC; What is the best way to memorise new vocabulary or facts effectively?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#36</div><div class="fcard-word">critical</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; critical thinking / a critical approach</div></div><div class="fcard-back"><div class="fcard-ua">критический / аналитический / взыскательный</div><div class="fcard-en">kritisch, analytisch</div><div class="fcard-example">"Critical thinking means questioning what you read, not just accepting it as true."</div><div class="fcard-poem">Critical — not negative, just asking why,<br>критический — не значит против, значит думающий.</div><div class="fcard-frage">&#x1F4AC; Do you think schools teach critical thinking well enough?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#37</div><div class="fcard-word">detailed</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a detailed explanation / plan / answer</div></div><div class="fcard-back"><div class="fcard-ua">подробный / детальный / развёрнутый</div><div class="fcard-en">detailliert, ausf&uuml;hrlich</div><div class="fcard-example">"The teacher asked for a detailed explanation, not just a one-sentence answer."</div><div class="fcard-poem">Detailed — the whole picture, not just the outline,<br>подробный — ничего не упущено.</div><div class="fcard-frage">&#x1F4AC; Do you prefer giving detailed answers or keeping things brief and to the point?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#38</div><div class="fcard-word">thorough</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a thorough approach / check / investigation</div></div><div class="fcard-back"><div class="fcard-ua">тщательный / основательный / досконально выполненный</div><div class="fcard-en">gr&uuml;ndlich, sorgf&auml;ltig</div><div class="fcard-example">"She is a thorough worker — she never submits anything without checking it twice."</div><div class="fcard-poem">Thorough — leaving no stone unturned,<br>тщательный — делать правильно, а не быстро.</div><div class="fcard-frage">&#x1F4AC; Are you a thorough person, or do you prefer to work quickly and move on?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#39</div><div class="fcard-word">logical</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a logical argument / conclusion / approach</div></div><div class="fcard-back"><div class="fcard-ua">логичный / последовательный / обоснованный</div><div class="fcard-en">logisch, schl&uuml;ssig</div><div class="fcard-example">"Her argument was perfectly logical — each point followed clearly from the one before."</div><div class="fcard-poem">Logical — A leads to B leads to truth,<br>логичный — каждое звено на месте.</div><div class="fcard-frage">&#x1F4AC; Do you consider yourself a logical thinker? Give an example of when it helped you.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#40</div><div class="fcard-word">to back up your argument</div><div class="fcard-hint">PHRASE &bull; B2 &bull; back up sth with evidence</div></div><div class="fcard-back"><div class="fcard-ua">подкреплять аргумент / доказывать свою позицию</div><div class="fcard-en">ein Argument belegen / unterst&uuml;tzen</div><div class="fcard-example">"You need to back up your argument with real evidence, not just personal opinion."</div><div class="fcard-poem">&#x1F4CC; "Back up" = support with proof; essential in academic writing.<br>Подсказка: без доказательств аргумент не работает.</div><div class="fcard-frage">&#x1F4AC; How do you usually back up your arguments when discussing something?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#41</div><div class="fcard-word">in other words</div><div class="fcard-hint">PHRASE &bull; B1 &bull; used to rephrase or clarify &bull; always + comma</div></div><div class="fcard-back"><div class="fcard-ua">другими словами / то есть / иначе говоря</div><div class="fcard-en">mit anderen Worten, das hei&szlig;t</div><div class="fcard-example">"The results were not significant. In other words, we can't draw any firm conclusions."</div><div class="fcard-poem">&#x1F4CC; Use to simplify complex ideas — great in presentations and essays.<br>Подсказка: отличный способ перефразировать сложную мысль.</div><div class="fcard-frage">&#x1F4AC; Use "in other words" to explain what "critical thinking" means in simple terms.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#42</div><div class="fcard-word">to take sth into account</div><div class="fcard-hint">PHRASE &bull; B2 &bull; take sth into account / consideration</div></div><div class="fcard-back"><div class="fcard-ua">принимать во внимание / учитывать</div><div class="fcard-en">etw. in Betracht ziehen, ber&uuml;cksichtigen</div><div class="fcard-example">"When grading essays, the teacher takes effort and improvement into account, not just the result."</div><div class="fcard-poem">&#x1F4CC; "Take into consideration" = same meaning, slightly more formal.<br>Подсказка: "take into consideration" — чуть формальнее.</div><div class="fcard-frage">&#x1F4AC; What factors should a teacher take into account when grading a student's work?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#43</div><div class="fcard-word">to come to a conclusion</div><div class="fcard-hint">PHRASE &bull; B2 &bull; come to / reach a conclusion</div></div><div class="fcard-back"><div class="fcard-ua">прийти к выводу / сделать вывод</div><div class="fcard-en">zu einem Schluss kommen</div><div class="fcard-example">"After reviewing all the evidence, we came to the conclusion that the original theory was wrong."</div><div class="fcard-poem">&#x1F4CC; "Reach a conclusion" = same meaning; both are widely used.<br>Подсказка: "reach" и "come to" взаимозаменяемы.</div><div class="fcard-frage">&#x1F4AC; How do you usually come to a conclusion when you're not sure about something?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#44</div><div class="fcard-word">to base sth on</div><div class="fcard-hint">PHRASE &bull; B2 &bull; base a decision / argument on sth</div></div><div class="fcard-back"><div class="fcard-ua">основывать на чём-то / строить (аргумент) на</div><div class="fcard-en">etw. auf etw. basieren / st&uuml;tzen</div><div class="fcard-example">"Your conclusion should be based on the evidence, not on what you want to be true."</div><div class="fcard-poem">&#x1F4CC; Passive form is very common: "This is based on..." — learned or seen.<br>Подсказка: "based on" в пассивной форме — очень часто.</div><div class="fcard-frage">&#x1F4AC; Should important decisions be based more on facts or on personal values?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#45</div><div class="fcard-word">to quote sb</div><div class="fcard-hint">PHRASE &bull; B2 &bull; quote an expert / a source / sb's words</div></div><div class="fcard-back"><div class="fcard-ua">цитировать кого-то / ссылаться на источник</div><div class="fcard-en">jmdn. zitieren</div><div class="fcard-example">"You can quote the author directly, but always put their words in quotation marks."</div><div class="fcard-poem">&#x1F4CC; "As X said / argued / pointed out..." = natural alternatives to "quoted".<br>Подсказка: "as X argues" — ещё один удобный вариант.</div><div class="fcard-frage">&#x1F4AC; Why is it important to quote sources properly in academic writing?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#46</div><div class="fcard-word">as a result</div><div class="fcard-hint">PHRASE &bull; B1 &bull; as a result of sth / as a result, + clause &bull; always + comma</div></div><div class="fcard-back"><div class="fcard-ua">в результате / следовательно / поэтому</div><div class="fcard-en">als Ergebnis, dadurch, infolgedessen</div><div class="fcard-example">"She studied consistently for three months. As a result, her grades improved dramatically."</div><div class="fcard-poem">&#x1F4CC; Shows cause-and-effect — essential for academic and formal writing.<br>Подсказка: показывает причинно-следственную связь.</div><div class="fcard-frage">&#x1F4AC; Use "as a result" to explain something that changed in your life due to studying harder.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-2 -->
+
+        <!-- ===== DAY 3 ===== -->
+        <div class="day-content" data-day="3">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>More Than Grades: What Really Defines a Good Student?</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>What makes a good student? The answer is not a perfect record of grades. The most successful learners tend to have a specific combination of qualities: <b>confidence</b> in themselves, a <b>determined</b> attitude, and the ability to work with <b>peers</b> rather than against them.</p>
+            <p><b>Teamwork</b> is one of the most underrated skills in education. Schools often reward individual <b>achievement</b>, but the real world runs on collaboration. Being <b>supportive</b> of your classmates, sharing ideas, and learning from each other's mistakes all contribute to a learning <b>environment</b> that benefits everyone.</p>
+            <p>A good student also knows how to handle <b>competition</b>. Used healthily, it <b>motivates</b>. Used badly, it destroys. The key is your <b>attitude</b> towards it: do you <b>compete</b> to be better than others, or to be better than you were yesterday?</p>
+            <p>Every student has <b>potential</b>. The job of education is to help each person find it, develop it, and ultimately reach it. Whether a teacher <b>encourages</b> you or you have to push yourself, the journey is always worth taking.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#47</div><div class="fcard-word">peer</div><div class="fcard-hint">NOUN &bull; B2 &bull; a peer group / peer pressure &bull; Pl.: peers</div></div><div class="fcard-back"><div class="fcard-ua">ровесник / сверстник / одноклассник</div><div class="fcard-en">der Gleichaltrige, der Mitsch&uuml;ler</div><div class="fcard-example">"Peer pressure can push students to study harder — or to skip class altogether."</div><div class="fcard-poem">Peer — the one beside you on the same journey,<br>ровесник — идёте вместе, но каждый своим путём.</div><div class="fcard-frage">&#x1F4AC; Has peer pressure ever affected your choices at school, positively or negatively?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#48</div><div class="fcard-word">teamwork</div><div class="fcard-hint">NOUN &bull; B1 &bull; good teamwork &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">командная работа / работа в команде</div><div class="fcard-en">die Teamarbeit</div><div class="fcard-example">"The project was a success thanks to excellent teamwork — everyone contributed equally."</div><div class="fcard-poem">Teamwork — the sum stronger than its parts,<br>командная работа — вместе лучше.</div><div class="fcard-frage">&#x1F4AC; Do you prefer working alone or in a team? What are the advantages of each?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#49</div><div class="fcard-word">competition</div><div class="fcard-hint">NOUN &bull; B1 &bull; healthy / unhealthy competition &bull; Pl.: competitions</div></div><div class="fcard-back"><div class="fcard-ua">конкуренция / соревнование</div><div class="fcard-en">der Wettbewerb, die Konkurrenz</div><div class="fcard-example">"A little healthy competition between students can be motivating — but it can also create stress."</div><div class="fcard-poem">Competition — the spark that pushes you forward,<br>конкуренция — зависит, как к ней относиться.</div><div class="fcard-frage">&#x1F4AC; Is competition between students healthy or harmful in your opinion?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#50</div><div class="fcard-word">achievement</div><div class="fcard-hint">NOUN &bull; B2 &bull; a major achievement &bull; Pl.: achievements</div></div><div class="fcard-back"><div class="fcard-ua">достижение / успех / результат</div><div class="fcard-en">die Leistung, der Erfolg</div><div class="fcard-example">"Passing that exam was her greatest academic achievement and she was incredibly proud."</div><div class="fcard-poem">Achievement — the proof that effort was real,<br>достижение — то, что уже нельзя отнять.</div><div class="fcard-frage">&#x1F4AC; What is your greatest academic or personal achievement so far?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#51</div><div class="fcard-word">environment</div><div class="fcard-hint">NOUN &bull; B1 &bull; a learning / working environment &bull; Pl.: environments</div></div><div class="fcard-back"><div class="fcard-ua">окружение / среда / обстановка</div><div class="fcard-en">die Umgebung, das Umfeld</div><div class="fcard-example">"A supportive learning environment makes a huge difference to students' confidence."</div><div class="fcard-poem">Environment — what surrounds you shapes you,<br>среда — часть тебя, хочешь ты того или нет.</div><div class="fcard-frage">&#x1F4AC; How much does your learning environment affect how well you study?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#52</div><div class="fcard-word">attitude</div><div class="fcard-hint">NOUN &bull; B1 &bull; attitude to / towards sth &bull; Pl.: attitudes</div></div><div class="fcard-back"><div class="fcard-ua">отношение / настрой / позиция</div><div class="fcard-en">die Einstellung, die Haltung</div><div class="fcard-example">"Your attitude towards mistakes is everything — do you hide from them or learn from them?"</div><div class="fcard-poem">Attitude — the lens through which you see your work,<br>отношение — меняешь взгляд — меняешь результат.</div><div class="fcard-frage">&#x1F4AC; How does your attitude towards studying affect your actual results?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#53</div><div class="fcard-word">potential</div><div class="fcard-hint">NOUN &bull; B2 &bull; have / show / reach potential &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">потенциал / возможности</div><div class="fcard-en">das Potenzial</div><div class="fcard-example">"Every student has potential — the question is whether the school helps them find it."</div><div class="fcard-poem">Potential — the version of you that hasn't happened yet,<br>потенциал — то, кем ты ещё станешь.</div><div class="fcard-frage">&#x1F4AC; Do you feel you are reaching your full potential right now? What is holding you back?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#54</div><div class="fcard-word">confidence</div><div class="fcard-hint">NOUN &bull; B1 &bull; have / gain / build confidence &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">уверенность (в себе) / самоуверенность</div><div class="fcard-en">das Selbstvertrauen, die Selbstsicherheit</div><div class="fcard-example">"Confidence doesn't mean knowing all the answers — it means not being afraid of the questions."</div><div class="fcard-poem">Confidence — not knowing everything, just trusting yourself,<br>уверенность — идёшь, даже если боишься.</div><div class="fcard-frage">&#x1F4AC; How has your confidence as a learner changed over the years?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#55</div><div class="fcard-word">to encourage</div><div class="fcard-hint">VERB &bull; B1 &bull; encourage sb to do sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">поддерживать / ободрять / поощрять</div><div class="fcard-en">ermutigen, best&auml;rken</div><div class="fcard-example">"The best teachers encourage students to ask questions, not just to give right answers."</div><div class="fcard-poem">Encourage — the push that feels like a hand, not a shove,<br>ободрять — веришь в человека — он начинает верить сам.</div><div class="fcard-frage">&#x1F4AC; Who has encouraged you most in your education? What did they do or say?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#56</div><div class="fcard-word">to struggle (with)</div><div class="fcard-hint">VERB &bull; B1 &bull; struggle with sth / to do sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">испытывать трудности / с трудом справляться</div><div class="fcard-en">k&auml;mpfen (mit), sich abm&uuml;hen</div><div class="fcard-example">"I really struggle with maths — no matter how much I practise, it doesn't come naturally."</div><div class="fcard-poem">Struggle — the resistance that builds your strength,<br>бороться — не позор, а часть роста.</div><div class="fcard-frage">&#x1F4AC; What subject or skill do you most struggle with, and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#57</div><div class="fcard-word">to motivate</div><div class="fcard-hint">VERB &bull; B1 &bull; motivate sb to do sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">мотивировать / вдохновлять / стимулировать</div><div class="fcard-en">motivieren, anspornen</div><div class="fcard-example">"Good teachers don't just teach content — they motivate students to want to learn more."</div><div class="fcard-poem">Motivate — light the fire, not just fill the bucket,<br>мотивировать — дать желание, а не приказание.</div><div class="fcard-frage">&#x1F4AC; What motivates you most when studying — grades, curiosity, or something else?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#58</div><div class="fcard-word">to compete</div><div class="fcard-hint">VERB &bull; B1 &bull; compete with / against sb / for sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">соревноваться / конкурировать</div><div class="fcard-en">konkurrieren, sich messen</div><div class="fcard-example">"She doesn't compete with others — she only competes with the version of herself from yesterday."</div><div class="fcard-poem">Compete — the race where the track is your own growth,<br>соревноваться — лучший соперник — вчерашний ты.</div><div class="fcard-frage">&#x1F4AC; Do you compete with others or mainly with yourself when it comes to learning?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#59</div><div class="fcard-word">supportive</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a supportive teacher / environment / friend</div></div><div class="fcard-back"><div class="fcard-ua">поддерживающий / заботливый / оказывающий поддержку</div><div class="fcard-en">unterst&uuml;tzend, hilfsbereit</div><div class="fcard-example">"Having a supportive teacher made all the difference — I finally believed I could do it."</div><div class="fcard-poem">Supportive — the floor that holds you when you slip,<br>поддерживающий — рядом, когда тяжело.</div><div class="fcard-frage">&#x1F4AC; How important is a supportive environment for learning something difficult?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#60</div><div class="fcard-word">demanding</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a demanding course / job / teacher</div></div><div class="fcard-back"><div class="fcard-ua">требовательный / сложный / нелёгкий</div><div class="fcard-en">anspruchsvoll, fordernd</div><div class="fcard-example">"The course was demanding, but that's exactly why I learned so much from it."</div><div class="fcard-poem">Demanding — high expectations that make you reach higher,<br>требовательный — именно это и заставляет расти.</div><div class="fcard-frage">&#x1F4AC; Do you prefer a demanding teacher or a relaxed one? Why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#61</div><div class="fcard-word">talented</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a talented student / musician / athlete</div></div><div class="fcard-back"><div class="fcard-ua">талантливый / одарённый</div><div class="fcard-en">talentiert, begabt</div><div class="fcard-example">"Being talented is a good start — but without hard work, talent alone is rarely enough."</div><div class="fcard-poem">Talented — the seed, but effort is the water,<br>талантливый — хорошо, но мало без труда.</div><div class="fcard-frage">&#x1F4AC; Do you think talent or hard work is more important for success?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#62</div><div class="fcard-word">determined</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; determined to do sth &bull; a determined person</div></div><div class="fcard-back"><div class="fcard-ua">целеустремлённый / решительный / упорный</div><div class="fcard-en">entschlossen, zielstrebig</div><div class="fcard-example">"She was absolutely determined to pass the exam, no matter how many attempts it took."</div><div class="fcard-poem">Determined — the refusal to stop before the goal,<br>целеустремлённый — не сдаётся, пока не добьётся.</div><div class="fcard-frage">&#x1F4AC; Think of a time when being determined helped you achieve something difficult.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#63</div><div class="fcard-word">to do your best</div><div class="fcard-hint">PHRASE &bull; B1 &bull; do your best / give it your best</div></div><div class="fcard-back"><div class="fcard-ua">делать всё возможное / стараться изо всех сил</div><div class="fcard-en">sein Bestes geben, sich anstrengen</div><div class="fcard-example">"As long as you do your best, nobody can ask for more — including yourself."</div><div class="fcard-poem">&#x1F4CC; "Give it your best (shot)" = try as hard as possible, often for one chance.<br>Подсказка: "give it your best shot" — попробовать на полную.</div><div class="fcard-frage">&#x1F4AC; Do you always feel like you've done your best after an exam or piece of work?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#64</div><div class="fcard-word">to live up to expectations</div><div class="fcard-hint">PHRASE &bull; B2 &bull; live up to / fail to live up to expectations</div></div><div class="fcard-back"><div class="fcard-ua">соответствовать ожиданиям / оправдывать надежды</div><div class="fcard-en">den Erwartungen gerecht werden</div><div class="fcard-example">"She felt a lot of pressure to live up to her older sister's academic record."</div><div class="fcard-poem">&#x1F4CC; The opposite: "fail to live up to expectations" = disappoint.<br>Подсказка: быть на уровне — или разочаровать.</div><div class="fcard-frage">&#x1F4AC; Have you ever felt pressure to live up to someone else's expectations?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#65</div><div class="fcard-word">to stand out from the crowd</div><div class="fcard-hint">PHRASE &bull; B2 &bull; stand out from the crowd / from others</div></div><div class="fcard-back"><div class="fcard-ua">выделяться из толпы / быть заметным</div><div class="fcard-en">sich abheben, aus der Masse herausstechen</div><div class="fcard-example">"In a competitive job market, you need to find a way to stand out from the crowd."</div><div class="fcard-poem">&#x1F4CC; Can be positive (unique talent) or about being noticed for any reason.<br>Подсказка: выделяться — не всегда легко, но иногда важно.</div><div class="fcard-frage">&#x1F4AC; What is something you do or know that helps you stand out from the crowd?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#66</div><div class="fcard-word">to learn sth by heart</div><div class="fcard-hint">PHRASE &bull; B1 &bull; learn by heart / know by heart</div></div><div class="fcard-back"><div class="fcard-ua">учить наизусть / знать наизусть</div><div class="fcard-en">etw. auswendig lernen</div><div class="fcard-example">"I had to learn the whole poem by heart and recite it in front of the class — terrifying."</div><div class="fcard-poem">&#x1F4CC; "Know by heart" = already memorised; "learn by heart" = the process.<br>Подсказка: "знать" уже выучено; "учить" — процесс.</div><div class="fcard-frage">&#x1F4AC; What things have you learned by heart that you still remember today?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#67</div><div class="fcard-word">to get good grades</div><div class="fcard-hint">PHRASE &bull; B1 &bull; get / achieve good grades</div></div><div class="fcard-back"><div class="fcard-ua">получать хорошие оценки</div><div class="fcard-en">gute Noten bekommen</div><div class="fcard-example">"To get good grades, you need more than intelligence — you need consistency and good habits."</div><div class="fcard-poem">&#x1F4CC; "Achieve high grades" = more formal version.<br>Подсказка: "achieve high grades" — чуть официальнее.</div><div class="fcard-frage">&#x1F4AC; Do you think getting good grades is the most important goal of school?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#68</div><div class="fcard-word">to have a gift for sth</div><div class="fcard-hint">PHRASE &bull; B2 &bull; have a gift for languages / music / maths</div></div><div class="fcard-back"><div class="fcard-ua">иметь дар к чему-то / иметь природный талант</div><div class="fcard-en">eine Begabung f&uuml;r etw. haben</div><div class="fcard-example">"She has a real gift for languages — she picked up Spanish in just six months."</div><div class="fcard-poem">&#x1F4CC; A "natural gift" = born with; different from a learned skill.<br>Подсказка: дар — то, что дано от природы, не просто умение.</div><div class="fcard-frage">&#x1F4AC; Do you think you have a particular gift for any subject or skill?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#69</div><div class="fcard-word">to reach your potential</div><div class="fcard-hint">PHRASE &bull; B2 &bull; reach / fulfil / realise your potential</div></div><div class="fcard-back"><div class="fcard-ua">реализовать свой потенциал / раскрыться полностью</div><div class="fcard-en">sein Potenzial entfalten / aussch&ouml;pfen</div><div class="fcard-example">"School should help every student reach their potential — not just the ones who find it easy."</div><div class="fcard-poem">&#x1F4CC; "Fulfil your potential" = same meaning — slightly more formal.<br>Подсказка: "fulfil" и "reach" — оба правильны.</div><div class="fcard-frage">&#x1F4AC; What do you need to do to reach your full potential in the next few years?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-3 -->
+
+        </div><!-- /cards-sch -->
+
+        <div class="done-screen" id="done-sch">
+            <div class="done-icon">&#x1F393;</div>
+            <h2>All 69 cards learned!</h2>
+            <p>School vocabulary mastered &mdash; now go use it in real discussions and essays!</p>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <script>
+        const DAY_TOTALS = {1: 23, 2: 23, 3: 23};
+        let dayCounts = {1: 0, 2: 0, 3: 0};
+        let currentDay = 1;
+
+        function toggleArtikel(header) {
+            const body = header.nextElementSibling;
+            const btn = header.querySelector('.tagesartikel-toggle');
+            if (body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed'); body.classList.add('expanded');
+                btn.style.transform = 'rotate(180deg)';
+            } else {
+                body.classList.remove('expanded'); body.classList.add('collapsed');
+                btn.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
+            document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = DAY_TOTALS[currentDay]; const cnt = dayCounts[currentDay];
+            document.getElementById('bar-sch').style.width = (cnt / total * 100) + '%';
+            document.getElementById('num-sch').textContent = cnt;
+            document.getElementById('total-sch').textContent = total;
+            const allDone = Object.keys(DAY_TOTALS).every(function(d) { return dayCounts[d] === DAY_TOTALS[d]; });
+            document.getElementById('done-sch').classList.toggle('show', allDone);
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const dayEl = card.closest('.day-content');
+            const day = dayEl ? parseInt(dayEl.dataset.day) : currentDay;
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) { card.classList.remove('known'); btn.textContent = '✓ I know it'; dayCounts[day] = Math.max(0, dayCounts[day] - 1); }
+            else { card.classList.add('known'); btn.textContent = '✓ Learned!'; dayCounts[day]++; }
+            if (day === currentDay) updateProgress();
+        }
+
+        function flipAll() { document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped')); }
+        function resetAll() {
+            document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ I know it');
+            dayCounts[currentDay] = 0; updateProgress();
+        }
+        function shuffleCards() {
+            document.querySelectorAll('.day-content.active .card-grid').forEach(function(grid) {
+                const cards = [...grid.children]; cards.sort(() => Math.random() - 0.5); cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+        (function(){var T={"assignment":"[эса́йнмэнт]","deadline":"[дэ́длайн]","grade":"[грэйд]","essay":"[э́сэй]","subject":"[са́бджект]","timetable":"[та́ймтэйбл]","lecture":"[лэ́кчэ]","revision":"[рэви́жэн]","to revise":"[рэва́йз]","to submit":"[сэбми́т]","to concentrate":"[ко́нсэнтрэйт]","to pass / to fail":"[па:с / фэйл]","strict":"[стрикт]","academic":"[экэдэ́мик]","challenging":"[чэ́линджинг]","overwhelmed":"[оувэвэ́лмд]","to fall behind":"[фо:л биха́йнд]","to catch up":"[кэч ап]","to hand in":"[хэнд ин]","to take notes":"[тэйк ноутс]","to prepare for an exam":"[прэпэ́э фо: игзэ́м]","to give a presentation":"[гив э прэзэнтэ́йшэн]","to work under pressure":"[вё:к а́ндэ прэ́шэ]","knowledge":"[но́лидж]","research":"[ри:сё:ч]","source":"[со:с]","argument":"[а́:гьюмэнт]","evidence":"[э́видэнс]","progress":"[про́угрэс]","understanding":"[андэстэ́ндинг]","technique":"[тэкни́:к]","to analyse":"[э́нэлайз]","to summarise":"[са́мэрайз]","to evaluate":"[ива́льюэйт]","to memorise":"[мэ́мэрайз]","critical":"[кри́тикэл]","detailed":"[ди́тэйлд]","thorough":"[са́роу]","logical":"[ло́джикэл]","to back up your argument":"[бэк ап ё:р а:гьюмэнт]","in other words":"[ин а́зэ вё:дз]","to take sth into account":"[тэйк инту экаунт]","to come to a conclusion":"[кам ту э кэнклу́:жэн]","to base sth on":"[бэйс он]","to quote sb":"[квоут]","as a result":"[эз э рэза́лт]","peer":"[пиэ]","teamwork":"[ти:мвё:к]","competition":"[компэти́шэн]","achievement":"[эчи́:вмэнт]","environment":"[инва́йрэнмэнт]","attitude":"[э́титью:д]","potential":"[потэ́ншэл]","confidence":"[ко́нфидэнс]","to encourage":"[инка́ридж]","to struggle (with)":"[стра́гэл]","to motivate":"[мо́утивэйт]","to compete":"[кэмпи́:т]","supportive":"[сэпо́:тив]","demanding":"[димэ́ндинг]","talented":"[тэ́лэнтид]","determined":"[дитё:минд]","to do your best":"[ду: ё:р бэст]","to live up to expectations":"[лив ап ту экспэктэ́йшэнз]","to stand out from the crowd":"[стэнд аут фром зэ крауд]","to learn sth by heart":"[лё:н бай ха:т]","to get good grades":"[гет гуд грэйдз]","to have a gift for sth":"[хэв э гифт фо: самсинг]","to reach your potential":"[ри:ч ё:р потэ́ншэл]"};document.querySelectorAll('.fcard-word').forEach(function(el){var k=el.textContent.trim();if(T[k]){var d=document.createElement('div');d.className='fcard-trans';d.textContent=T[k];el.insertAdjacentElement('afterend',d);}});})();
+    </script>
+</body>
+</html>

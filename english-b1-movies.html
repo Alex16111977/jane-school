@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1&ndash;B2 Movies, Music &amp; Songs | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .progress-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 20px; height: 7px; margin: 0.5rem 0 0.25rem; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #a371f7, #c084fc); transition: width 0.4s ease; width: 0%; }
+        .progress-label { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .progress-label span { color: #c084fc; font-weight: 700; }
+        .controls { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.3rem; }
+        .ctrl-btn { padding: 0.45rem 0.9rem; border-radius: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--color-text-muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.4); color: #c084fc; }
+        .ctrl-btn.primary:hover { background: rgba(163,113,247,0.25); color: #fff; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 0.65rem; }
+        .fcard { position: relative; min-height: 155px; border-radius: 13px; background: rgba(13,17,23,0.82); backdrop-filter: blur(8px); border: 1.5px solid rgba(255,255,255,0.07); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; overflow: hidden; }
+        .fcard::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 13px 0 0 13px; background: #a371f7; }
+        .fcard::after { content: ''; position: absolute; top: 0; left: 4px; right: 0; height: 1px; background: linear-gradient(90deg, rgba(163,113,247,0.45), transparent); opacity: 0; transition: opacity 0.2s; }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+        .fcard-front { padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; display: flex; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 1rem; font-weight: 700; color: rgba(163,113,247,0.6); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.83rem; color: rgba(255,255,255,0.38); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.76rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+        .fcard-back { display: none; padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1.12rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en { font-size: 0.93rem; font-weight: 600; color: rgba(255,255,255,0.62); margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem; }
+        .fcard-en::before { content: 'DE'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem; border-radius: 5px; background: rgba(255,193,7,0.15); color: #ffd55a; border: 1px solid rgba(255,193,7,0.3); letter-spacing: 0.5px; flex-shrink: 0; }
+        .fcard-example { font-size: 0.84rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.97rem; font-style: italic; color: rgba(163,113,247,0.9); margin-top: 0.42rem; line-height: 1.55; border-left: 2px solid rgba(163,113,247,0.35); padding-left: 0.5rem; }
+        .fcard-frage { font-size: 0.83rem; color: rgba(52,211,153,0.85); margin-top: 0.5rem; line-height: 1.5; border-left: 2px solid rgba(52,211,153,0.3); padding-left: 0.5rem; }
+        .know-btn { display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem; border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28); color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer; width: fit-content; transition: all 0.2s; align-self: flex-start; }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+        .group-label { display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0.65rem; font-size: 0.77rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+        .done-screen { display: none; text-align: center; padding: 2rem 1rem; border-radius: 16px; background: rgba(13,17,23,0.6); border: 1px solid rgba(163,113,247,0.3); margin-top: 1.5rem; }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #c084fc; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+        .intro-box { background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02)); border: 1px solid rgba(163,113,247,0.22); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.3rem; font-size: 0.88rem; line-height: 1.6; color: rgba(230,230,235,0.8); }
+        .intro-box strong { color: #c084fc; }
+        @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; } .fcard-front, .fcard-back { min-height: 135px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; } .fcard-word { font-size: 1.08rem; } }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+        .day-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+        .day-tab { padding: 0.52rem 1.1rem; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color: #c084fc; }
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+        .tagesartikel { background: #fffdf7; border-left: 5px solid #b8860b; border-radius: 0 12px 12px 0; padding: 1.3rem 1.6rem 1.2rem; margin: 0 0 2rem 0; font-family: Georgia, 'Times New Roman', serif; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .tagesartikel-header { display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; user-select: none; gap: 0.8rem; }
+        .tagesartikel-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: #b8860b; font-family: sans-serif; margin-bottom: 0.3rem; font-weight: 600; }
+        .tagesartikel h3 { font-size: 1.05rem; font-weight: bold; color: #1a120a; margin: 0; line-height: 1.4; }
+        .tagesartikel-toggle { background: none; border: 1px solid #d4a017; border-radius: 50%; width: 28px; height: 28px; font-size: 0.75rem; cursor: pointer; color: #b8860b; padding: 0; flex-shrink: 0; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .tagesartikel-body { overflow: hidden; transition: max-height 0.35s ease; }
+        .tagesartikel-body.collapsed { max-height: 0; }
+        .tagesartikel-body.expanded { max-height: 9999px; }
+        .tagesartikel-body p { font-size: 0.95rem; line-height: 1.85; color: #1a120a; margin: 0.9rem 0 0; }
+        .tagesartikel b { color: #7a4f00; font-weight: 700; }
+        .fcard-trans { font-size: 0.76rem; color: rgba(163,113,247,0.65); margin-top: 0.13rem; letter-spacing: 0.1px; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">B1&ndash;B2 Movies, Music &amp; Songs</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Movies, Music &amp; Songs <span style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">B1&ndash;B2</span></h1>
+            <p class="page-subtitle">Cinema &bull; Lyrics &bull; Storytelling &mdash; 69 units: words, phrases &amp; expressions</p>
+        </div>
+
+        <div class="intro-box">
+            &#x1F3AC; <strong>For conversation practice:</strong> Learn the words &mdash; then use the <span style="color:rgba(52,211,153,0.9);">green questions</span> to talk about your favourite films and songs. Try to use as many new words as possible!
+        </div>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="switchDay(1)">&#x1F3AC; Film &amp; Cinema &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(2)">&#x1F3B5; Music &amp; Songs &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(3)">&#x1F3AD; Storytelling &bull; 23</button>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-mov"></div></div>
+        <div class="progress-label">Learned: <span id="num-mov">0</span> / <span id="total-mov">23</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Reveal all</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Reset</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Shuffle</button>
+        </div>
+
+        <div id="cards-mov">
+
+        <!-- ===== DAY 1 ===== -->
+        <div class="day-content active" data-day="1">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>Cinema Magic: What Makes a Film Truly Unforgettable?</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>What separates a great film from a forgettable one? The answer is rarely just the budget or the special effects. The most <b>unforgettable</b> films share something harder to define: they have a <b>plot</b> that feels both surprising and inevitable, <b>characters</b> who feel genuinely human, and a <b>soundtrack</b> that lives in your memory long after the credits roll.</p>
+            <p>A compelling <b>villain</b> is often what makes a story truly <b>dramatic</b>. Without real opposition, there is no tension. The best antagonists are not simply evil — they have reasons, history, and sometimes they are even right. This complexity is what makes a story <b>intense</b> and keeps the audience on the edge of their seats.</p>
+            <p>The <b>hero</b> or <b>heroine</b> does not need to be perfect — in fact, the most powerful <b>characters</b> are flawed. What matters is how they respond to pressure. Every great film has a key <b>scene</b> where the hero must choose: safety or courage, comfort or truth. That moment — the moral <b>twist</b>, if you will — is what audiences remember for years.</p>
+            <p>A good film can <b>inspire</b>, challenge, and change the way you see the world. The best ones do all three. And if it has a brilliant <b>sequel</b>? Even better.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">plot</div><div class="fcard-hint">NOUN &bull; B1 &bull; the plot of a film / novel &bull; Pl.: plots</div></div><div class="fcard-back"><div class="fcard-ua">сюжет / фабула / ход событий</div><div class="fcard-en">die Handlung, der Plot</div><div class="fcard-example">"The plot of this film is so complex that you have to watch it twice to understand everything."</div><div class="fcard-poem">Plot — the spine of every story told,<br>сюжет — без него нет фильма.</div><div class="fcard-frage">&#x1F4AC; Do you prefer films with a simple or complex plot? Give an example.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">villain</div><div class="fcard-hint">NOUN &bull; B1 &bull; the main villain &bull; Pl.: villains</div></div><div class="fcard-back"><div class="fcard-ua">злодей / отрицательный герой</div><div class="fcard-en">der B&ouml;sewicht, der Schurke</div><div class="fcard-example">"The villain in this film is so well-written that you almost feel sorry for him."</div><div class="fcard-poem">Villain — the one you love to hate,<br>злодей — часто интереснее героя.</div><div class="fcard-frage">&#x1F4AC; Who is your favourite villain from a film or series? What makes them memorable?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">hero / heroine</div><div class="fcard-hint">NOUN &bull; B1 &bull; the main hero &bull; Pl.: heroes</div></div><div class="fcard-back"><div class="fcard-ua">герой / героиня</div><div class="fcard-en">der Held, die Heldin</div><div class="fcard-example">"The hero of the story isn't always the strongest — often it's the bravest."</div><div class="fcard-poem">Hero — not born, but made in the hardest moment,<br>герой — становится им когда нужно.</div><div class="fcard-frage">&#x1F4AC; What qualities make a film hero truly inspiring?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">scene</div><div class="fcard-hint">NOUN &bull; B1 &bull; a scene from a film &bull; Pl.: scenes</div></div><div class="fcard-back"><div class="fcard-ua">сцена / эпизод</div><div class="fcard-en">die Szene</div><div class="fcard-example">"The opening scene draws you in immediately and doesn't let go."</div><div class="fcard-poem">Scene — a moment frozen on the screen,<br>сцена — из них складывается история.</div><div class="fcard-frage">&#x1F4AC; Describe a film scene you still remember vividly. What made it so powerful?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">character</div><div class="fcard-hint">NOUN &bull; B1 &bull; a main / minor character &bull; Pl.: characters</div></div><div class="fcard-back"><div class="fcard-ua">персонаж / герой</div><div class="fcard-en">die Figur, der Charakter</div><div class="fcard-example">"The most interesting characters are the ones with both strengths and real weaknesses."</div><div class="fcard-poem">Character — never perfect, that's the point,<br>персонаж — живой, если сделан с душой.</div><div class="fcard-frage">&#x1F4AC; Which film or book character do you relate to the most, and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">twist</div><div class="fcard-hint">NOUN &bull; B2 &bull; a twist at the end &bull; Pl.: twists</div></div><div class="fcard-back"><div class="fcard-ua">неожиданный поворот / сюрприз</div><div class="fcard-en">die Wendung, die &Uuml;berraschung</div><div class="fcard-example">"The final twist completely changed my understanding of everything that happened before."</div><div class="fcard-poem">Twist — the floor you stand on disappears,<br>поворот — всё, что было, вдруг иначе.</div><div class="fcard-frage">&#x1F4AC; Can you think of a film with a shocking twist? Did you like it or did it feel forced?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">sequel</div><div class="fcard-hint">NOUN &bull; B2 &bull; the sequel to a film &bull; Pl.: sequels</div></div><div class="fcard-back"><div class="fcard-ua">продолжение (фильма / книги)</div><div class="fcard-en">die Fortsetzung</div><div class="fcard-example">"The sequel was disappointing — it had none of the originality of the first film."</div><div class="fcard-poem">Sequel — returning to a world you loved,<br>продолжение — иногда лучше оригинала.</div><div class="fcard-frage">&#x1F4AC; Are sequels usually better or worse than the original? Give an example.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">soundtrack</div><div class="fcard-hint">NOUN &bull; B1 &bull; the film's soundtrack &bull; Pl.: soundtracks</div></div><div class="fcard-back"><div class="fcard-ua">саундтрек / музыка к фильму</div><div class="fcard-en">der Soundtrack, die Filmmusik</div><div class="fcard-example">"The soundtrack is so iconic you recognise it immediately after just two notes."</div><div class="fcard-poem">Soundtrack — music that carries you back,<br>саундтрек — слышишь и вспоминаешь всё.</div><div class="fcard-frage">&#x1F4AC; Which film soundtrack do you love so much that you listen to it outside the cinema?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">to portray</div><div class="fcard-hint">VERB &bull; B2 &bull; portray sb as sth / portray a character &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">изображать / играть роль / передавать образ</div><div class="fcard-en">darstellen, verk&ouml;rpern</div><div class="fcard-example">"She portrays the character so convincingly that you forget you're watching a performance."</div><div class="fcard-poem">Portray — become someone else, just for a while,<br>изображать — настолько точно, что забываешь.</div><div class="fcard-frage">&#x1F4AC; Who is your favourite actor who portrays complex characters really well?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">to inspire</div><div class="fcard-hint">VERB &bull; B1 &bull; inspire sb / inspire sb to do sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">вдохновлять / воодушевлять</div><div class="fcard-en">inspirieren, begeistern</div><div class="fcard-example">"The film inspired me to think differently about my own life and what really matters."</div><div class="fcard-poem">Inspire — you leave the cinema changed,<br>вдохновить — дать крылья там, где не ждал.</div><div class="fcard-frage">&#x1F4AC; Has a film or song ever truly inspired you to change something in your life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">to narrate</div><div class="fcard-hint">VERB &bull; B2 &bull; narrate a story / a documentary &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">рассказывать / повествовать / быть рассказчиком</div><div class="fcard-en">erz&auml;hlen, berichten</div><div class="fcard-example">"The story is narrated by the main character, looking back at his childhood years."</div><div class="fcard-poem">Narrate — the voice that holds the world together,<br>рассказывать — нить, на которую нанизан сюжет.</div><div class="fcard-frage">&#x1F4AC; Do you prefer films with a narrator, or stories told purely through action?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">to reveal</div><div class="fcard-hint">VERB &bull; B2 &bull; reveal a secret / the truth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">раскрывать / обнаруживать / открывать правду</div><div class="fcard-en">enth&uuml;llen, offenbaren</div><div class="fcard-example">"The last scene reveals that the detective was the killer all along."</div><div class="fcard-poem">Reveal — the curtain falls, and truth stands there,<br>раскрыть — тайное становится явным.</div><div class="fcard-frage">&#x1F4AC; Think of a film where a big secret is revealed. How did it make you feel?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">dramatic</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a dramatic scene / moment / change</div></div><div class="fcard-back"><div class="fcard-ua">драматичный / впечатляющий / резкий</div><div class="fcard-en">dramatisch, aufregend</div><div class="fcard-example">"The film has a dramatic ending that left the whole cinema completely silent."</div><div class="fcard-poem">Dramatic — everything at stake, in one moment,<br>драматичный — без полутонов, только крайности.</div><div class="fcard-frage">&#x1F4AC; Do you prefer dramatic, emotional films or lighter comedies? Why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">intense</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an intense experience / performance / scene</div></div><div class="fcard-back"><div class="fcard-ua">напряжённый / интенсивный / пронзительный</div><div class="fcard-en">intensiv, eindringlich</div><div class="fcard-example">"The first 20 minutes are so intense that you barely breathe — the tension never drops."</div><div class="fcard-poem">Intense — you feel it in your bones, not just your head,<br>напряжённый — захватывает целиком.</div><div class="fcard-frage">&#x1F4AC; What was the most intense film or TV scene you've ever watched?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">unforgettable</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an unforgettable experience / performance</div></div><div class="fcard-back"><div class="fcard-ua">незабываемый / незабвенный</div><div class="fcard-en">unvergesslich</div><div class="fcard-example">"The performance was absolutely unforgettable — I'm still thinking about it weeks later."</div><div class="fcard-poem">Unforgettable — it stays, even when you try to move on,<br>незабываемый — навсегда осталось.</div><div class="fcard-frage">&#x1F4AC; What film or concert moment was truly unforgettable for you, and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">breathtaking</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a breathtaking view / scene / performance</div></div><div class="fcard-back"><div class="fcard-ua">захватывающий дух / ошеломляющий</div><div class="fcard-en">atemberaubend, &uuml;berw&auml;ltigend</div><div class="fcard-example">"The final battle scene is breathtaking — the cinematography alone is worth watching."</div><div class="fcard-poem">Breathtaking — your lungs forget what they were doing,<br>захватывающий — стоишь, открыв рот.</div><div class="fcard-frage">&#x1F4AC; Describe a moment — in a film, in nature, or in life — that was truly breathtaking.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">keep sb on the edge of their seat</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this film keeps you on the edge of your seat</div></div><div class="fcard-back"><div class="fcard-ua">держать в напряжении / не давать расслабиться</div><div class="fcard-en">jmdn. in Spannung halten</div><div class="fcard-example">"The thriller keeps you on the edge of your seat from the first scene to the last."</div><div class="fcard-poem">&#x1F4CC; Literally: too tense to sit back comfortably!<br>Подсказка: захватывающий — нельзя расслабиться.</div><div class="fcard-frage">&#x1F4AC; Which film or series kept you on the edge of your seat the most?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">to blow your mind</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this film / song blows my mind &bull; informal</div></div><div class="fcard-back"><div class="fcard-ua">поражать / сносить крышу / ошеломлять</div><div class="fcard-en">&uuml;berw&auml;ltigen, umhauen</div><div class="fcard-example">"The special effects completely blew my mind — I'd never seen anything like it."</div><div class="fcard-poem">&#x1F4CC; Informal — great for enthusiasm and strong opinions!<br>Подсказка: разговорно, очень сильное восхищение.</div><div class="fcard-frage">&#x1F4AC; What piece of music, film, or art completely blew your mind?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">the plot thickens</div><div class="fcard-hint">PHRASE &bull; B2 &bull; used when things get more complicated</div></div><div class="fcard-back"><div class="fcard-ua">сюжет закручивается / дело принимает интересный оборот</div><div class="fcard-en">die Handlung wird komplizierter</div><div class="fcard-example">"'The detective's wife was also a suspect.' — 'Ah, the plot thickens!'"</div><div class="fcard-poem">&#x1F4CC; Can also be used humorously in real life about confusing situations.<br>Подсказка: можно использовать иронично, не только о фильмах.</div><div class="fcard-frage">&#x1F4AC; Think of a film where the plot really thickens — describe what happens.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">to steal the show</div><div class="fcard-hint">PHRASE &bull; B2 &bull; sb steals the show</div></div><div class="fcard-back"><div class="fcard-ua">затмить всех / стать гвоздём программы</div><div class="fcard-en">die Show stehlen, alle &uuml;berl&auml;nzen</div><div class="fcard-example">"The young actress completely stole the show — everyone was talking about her performance."</div><div class="fcard-poem">&#x1F4CC; Used for performances, people, or even unexpected moments.<br>Подсказка: не только о театре — и о жизни тоже.</div><div class="fcard-frage">&#x1F4AC; Can you think of someone who stole the show at a concert, event, or in a film?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#21</div><div class="fcard-word">based on a true story</div><div class="fcard-hint">PHRASE &bull; B1 &bull; this film is based on a true story</div></div><div class="fcard-back"><div class="fcard-ua">основано на реальных событиях</div><div class="fcard-en">auf einer wahren Geschichte beruhend</div><div class="fcard-example">"This film is based on a true story — that's what makes it so much more powerful."</div><div class="fcard-poem">&#x1F4CC; "Inspired by" = loosely based; "based on" = closer to real events.<br>Подсказка: "inspired by" — менее точно, чем "based on".</div><div class="fcard-frage">&#x1F4AC; Does knowing a film is based on a true story change how you feel about it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#22</div><div class="fcard-word">a twist in the tale</div><div class="fcard-hint">PHRASE &bull; B2 &bull; there's a twist in the tale</div></div><div class="fcard-back"><div class="fcard-ua">неожиданная концовка / сюрприз в конце</div><div class="fcard-en">eine unerwartete Wendung am Ende</div><div class="fcard-example">"The story seemed predictable, but there was a brilliant twist in the tale that changed everything."</div><div class="fcard-poem">&#x1F4CC; The final surprise that redefines everything before it.<br>Подсказка: финальный сюрприз, меняющий всё.</div><div class="fcard-frage">&#x1F4AC; Do you like stories with a twist in the tale, or do you prefer predictable endings?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#23</div><div class="fcard-word">against all odds</div><div class="fcard-hint">PHRASE &bull; B2 &bull; succeed / win against all odds</div></div><div class="fcard-back"><div class="fcard-ua">вопреки всему / несмотря ни на что</div><div class="fcard-en">wider alle Erwartungen, trotz aller Widrigkeiten</div><div class="fcard-example">"Against all odds, the small team won the championship and inspired the whole country."</div><div class="fcard-poem">&#x1F4CC; Very common in sports films and real-life success stories.<br>Подсказка: очень частая тема в спортивных фильмах.</div><div class="fcard-frage">&#x1F4AC; Can you think of a person or team that succeeded against all odds?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-1 -->
+
+        <!-- ===== DAY 2 ===== -->
+        <div class="day-content" data-day="2">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>The Power of Music: Why Songs Stay With Us Forever</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Why does a song stay in your head for days, while a conversation you had yesterday is already gone? The answer lies in how music works on the brain. A <b>catchy</b> <b>melody</b> activates the same reward centres as food or love. The <b>rhythm</b> connects to your heartbeat and breathing. And the <b>lyrics</b> — if they are <b>meaningful</b> — become part of how you understand your own life.</p>
+            <p>Music is organised into <b>verses</b> that tell the story and a <b>chorus</b> that repeats the central emotion. The <b>beat</b> drives you forward; the <b>genre</b> tells you how to feel before a single word is sung. These elements work together to create something <b>powerful</b> and <b>emotional</b> that no other art form quite replicates.</p>
+            <p>When an artist <b>releases</b> an <b>album</b>, they are offering a complete world. When they <b>perform</b> live, they create a moment that exists only once. Music can <b>move</b> you to tears, <b>uplift</b> you on your worst day, and <b>set the mood</b> for any moment in life. It is no wonder we keep it on repeat.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#24</div><div class="fcard-word">lyrics</div><div class="fcard-hint">NOUN &bull; B1 &bull; ALWAYS plural &bull; the lyrics of a song</div></div><div class="fcard-back"><div class="fcard-ua">слова песни / текст (всегда мн.ч.)</div><div class="fcard-en">der Liedtext, die Lyrics (Pl.)</div><div class="fcard-example">"The lyrics are so beautiful and meaningful that I learned them all by heart."</div><div class="fcard-poem">Lyrics — words that carry more than meaning,<br>слова песни — остаются, когда мелодия ушла.</div><div class="fcard-frage">&#x1F4AC; Do you usually pay attention to lyrics, or do you mostly focus on the melody?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#25</div><div class="fcard-word">chorus</div><div class="fcard-hint">NOUN &bull; B1 &bull; the chorus of a song &bull; Pl.: choruses</div></div><div class="fcard-back"><div class="fcard-ua">припев</div><div class="fcard-en">der Refrain</div><div class="fcard-example">"The chorus is so catchy that everyone was singing it on the way home from the concert."</div><div class="fcard-poem">Chorus — the part you never forget,<br>припев — именно его ты напеваешь.</div><div class="fcard-frage">&#x1F4AC; Can you think of a song with a chorus so good it stays in your head for days?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#26</div><div class="fcard-word">rhythm</div><div class="fcard-hint">NOUN &bull; B1 &bull; a fast / slow rhythm &bull; no plural (in this sense)</div></div><div class="fcard-back"><div class="fcard-ua">ритм</div><div class="fcard-en">der Rhythmus</div><div class="fcard-example">"The rhythm of this song is so infectious that you start tapping your feet immediately."</div><div class="fcard-poem">Rhythm — your body knows it before your brain,<br>ритм — ты начинаешь двигаться сам.</div><div class="fcard-frage">&#x1F4AC; What type of music has the kind of rhythm that makes you want to dance?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#27</div><div class="fcard-word">melody</div><div class="fcard-hint">NOUN &bull; B1 &bull; a beautiful / haunting melody &bull; Pl.: melodies</div></div><div class="fcard-back"><div class="fcard-ua">мелодия</div><div class="fcard-en">die Melodie</div><div class="fcard-example">"I heard that melody on the radio once and couldn't get it out of my head for a week."</div><div class="fcard-poem">Melody — it lives where words can't reach,<br>мелодия — говорит то, что нельзя сказать.</div><div class="fcard-frage">&#x1F4AC; Is there a melody that immediately transports you to a specific memory or place?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#28</div><div class="fcard-word">verse</div><div class="fcard-hint">NOUN &bull; B2 &bull; the first / second verse &bull; Pl.: verses</div></div><div class="fcard-back"><div class="fcard-ua">куплет / строфа</div><div class="fcard-en">die Strophe</div><div class="fcard-example">"People often know the chorus but can't remember the words of the second verse."</div><div class="fcard-poem">Verse — where the story of the song begins,<br>куплет — там, где начинается история.</div><div class="fcard-frage">&#x1F4AC; Do you know any song verses completely by heart?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#29</div><div class="fcard-word">beat</div><div class="fcard-hint">NOUN &bull; B1 &bull; a strong beat &bull; Pl.: beats</div></div><div class="fcard-back"><div class="fcard-ua">бит / ритм / такт</div><div class="fcard-en">der Beat, der Takt</div><div class="fcard-example">"This song has an incredible beat — it's impossible to stand still when you hear it."</div><div class="fcard-poem">Beat — the heart of every track,<br>бит — пульс, от которого всё идёт.</div><div class="fcard-frage">&#x1F4AC; What kind of beat do you prefer — fast and energetic, or slow and deep?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#30</div><div class="fcard-word">album</div><div class="fcard-hint">NOUN &bull; B1 &bull; release / record an album &bull; Pl.: albums</div></div><div class="fcard-back"><div class="fcard-ua">альбом</div><div class="fcard-en">das Album</div><div class="fcard-example">"Her latest album is completely different from everything she has recorded before."</div><div class="fcard-poem">Album — a whole world in one collection,<br>альбом — художник показывает себя целиком.</div><div class="fcard-frage">&#x1F4AC; Is there an album you listen to from start to finish without skipping a single track?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#31</div><div class="fcard-word">genre</div><div class="fcard-hint">NOUN &bull; B1 &bull; a music / film genre &bull; Pl.: genres</div></div><div class="fcard-back"><div class="fcard-ua">жанр</div><div class="fcard-en">das Genre, die Musikrichtung</div><div class="fcard-example">"My favourite genre is indie folk — I love the simplicity and emotional depth of the lyrics."</div><div class="fcard-poem">Genre — the map of where a song belongs,<br>жанр — помогает найти своё.</div><div class="fcard-frage">&#x1F4AC; Which music genre do you listen to most, and what does it say about you?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#32</div><div class="fcard-word">to perform</div><div class="fcard-hint">VERB &bull; B1 &bull; perform a song / at a concert &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">выступать / исполнять (на сцене)</div><div class="fcard-en">auftreten, darbringen</div><div class="fcard-example">"She performed the song with so much emotion that the whole audience went silent."</div><div class="fcard-poem">Perform — pour yourself into every note,<br>выступать — отдать часть себя слушателю.</div><div class="fcard-frage">&#x1F4AC; Would you ever like to perform in front of an audience? What would it feel like?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#33</div><div class="fcard-word">to release</div><div class="fcard-hint">VERB &bull; B1 &bull; release an album / single / film &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">выпускать (альбом, фильм) / издавать</div><div class="fcard-en">ver&ouml;ffentlichen, herausbringen</div><div class="fcard-example">"The band released their new album on Friday and it broke streaming records by Sunday."</div><div class="fcard-poem">Release — sending your art into the world,<br>выпустить — уже не только твоё.</div><div class="fcard-frage">&#x1F4AC; Have you ever been really excited about an upcoming album or film release?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#34</div><div class="fcard-word">to move sb</div><div class="fcard-hint">VERB &bull; B2 &bull; this song / film moved me &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">трогать / волновать / задевать за живое</div><div class="fcard-en">bewegen, r&uuml;hren</div><div class="fcard-example">"The final song moved me to tears — I wasn't expecting to feel so much."</div><div class="fcard-poem">Move — not your feet, but your heart,<br>тронуть — дотронуться до самого глубокого.</div><div class="fcard-frage">&#x1F4AC; What song or film has moved you most emotionally? Why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#35</div><div class="fcard-word">catchy</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a catchy tune / chorus / melody</div></div><div class="fcard-back"><div class="fcard-ua">запоминающийся / цепляющий / прилипчивый</div><div class="fcard-en">eingängig, einprägsam</div><div class="fcard-example">"The chorus is incredibly catchy — after hearing it once, you'll be humming it all week."</div><div class="fcard-poem">Catchy — it grabs you and refuses to let go,<br>запоминающийся — крутится в голове часами.</div><div class="fcard-frage">&#x1F4AC; Can you think of a song so catchy it almost drove you crazy?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#36</div><div class="fcard-word">meaningful</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a meaningful song / moment / connection</div></div><div class="fcard-back"><div class="fcard-ua">значимый / глубокий / наполненный смыслом</div><div class="fcard-en">bedeutungsvoll, tiefsinnig</div><div class="fcard-example">"Her songs are deeply meaningful — each one tells a real story from her life."</div><div class="fcard-poem">Meaningful — more than it seems at first listen,<br>значимый — слушаешь снова и снова.</div><div class="fcard-frage">&#x1F4AC; Do you prefer meaningful, deep music or just something fun and energetic?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#37</div><div class="fcard-word">powerful</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a powerful performance / voice / message</div></div><div class="fcard-back"><div class="fcard-ua">мощный / сильный / впечатляющий</div><div class="fcard-en">kraftvoll, stark</div><div class="fcard-example">"Her voice is incredibly powerful — it fills the entire concert hall without a microphone."</div><div class="fcard-poem">Powerful — hits you where you feel, not where you think,<br>мощный — такой, что невозможно не почувствовать.</div><div class="fcard-frage">&#x1F4AC; Who is the most powerful performer you have ever seen — live or on video?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#38</div><div class="fcard-word">emotional</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; an emotional song / moment / speech</div></div><div class="fcard-back"><div class="fcard-ua">эмоциональный / трогательный</div><div class="fcard-en">emotional, gef&uuml;hlvoll</div><div class="fcard-example">"The reunion scene is so emotional — I cried the first time I watched it."</div><div class="fcard-poem">Emotional — when your heart speaks louder than your head,<br>эмоциональный — чувствами, не словами.</div><div class="fcard-frage">&#x1F4AC; Are you an emotional person when it comes to music or films?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#39</div><div class="fcard-word">uplifting</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an uplifting song / story / experience</div></div><div class="fcard-back"><div class="fcard-ua">поднимающий настроение / вдохновляющий / окрыляющий</div><div class="fcard-en">aufmunternd, erhebend</div><div class="fcard-example">"This song is so uplifting that I always put it on when I'm feeling down."</div><div class="fcard-poem">Uplifting — the music that lifts your shoulders,<br>вдохновляющий — берёшь и идёшь дальше.</div><div class="fcard-frage">&#x1F4AC; Do you have a playlist of uplifting songs for difficult days? What's on it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#40</div><div class="fcard-word">to hit the charts</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this song / album hit the charts</div></div><div class="fcard-back"><div class="fcard-ua">попасть в чарты / стать хитом</div><div class="fcard-en">die Charts st&uuml;rmen / in die Charts einsteigen</div><div class="fcard-example">"Their new single hit the charts in 12 countries within the first week of release."</div><div class="fcard-poem">&#x1F4CC; "Top the charts" = reach number one. "Chart-topping" = adjective.<br>Подсказка: "top the charts" = занять первое место.</div><div class="fcard-frage">&#x1F4AC; Do you follow music charts, or do you just listen to what you personally like?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#41</div><div class="fcard-word">I can't get it out of my head</div><div class="fcard-hint">PHRASE &bull; B1 &bull; also: it's stuck in my head / it's an earworm</div></div><div class="fcard-back"><div class="fcard-ua">не могу выбросить из головы / приклеилось</div><div class="fcard-en">Ich kann es nicht aus dem Kopf kriegen</div><div class="fcard-example">"I heard that song at the supermarket and I can't get it out of my head — it's been 6 hours."</div><div class="fcard-poem">&#x1F4CC; "It's an earworm" = another very common expression for the same thing.<br>Подсказка: "earworm" — букв. «червяк в ухе», прилипшая мелодия.</div><div class="fcard-frage">&#x1F4AC; What song is most often stuck in your head without permission?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#42</div><div class="fcard-word">it gives me goosebumps</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this song / scene gives me goosebumps</div></div><div class="fcard-back"><div class="fcard-ua">мурашки по коже / мороз по коже</div><div class="fcard-en">es gibt mir G&auml;nsehaut</div><div class="fcard-example">"Every time I hear that song, it gives me goosebumps — there's something magical about it."</div><div class="fcard-poem">&#x1F4CC; "Goosebumps" = literal bumps on skin from cold or strong emotion.<br>Подсказка: гусиная кожа — от холода или от восхищения.</div><div class="fcard-frage">&#x1F4AC; What song or film moment reliably gives you goosebumps?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#43</div><div class="fcard-word">to set the mood</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this song / film sets the mood</div></div><div class="fcard-back"><div class="fcard-ua">создавать настроение / атмосферу</div><div class="fcard-en">die Stimmung setzen / schaffen</div><div class="fcard-example">"The slow piano intro sets the mood perfectly — you know immediately this won't be a comedy."</div><div class="fcard-poem">&#x1F4CC; Music, lighting, colour — all can "set the mood".<br>Подсказка: создать нужную атмосферу с самого начала.</div><div class="fcard-frage">&#x1F4AC; What music do you use to set the mood for studying, relaxing, or a special evening?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#44</div><div class="fcard-word">to sing along</div><div class="fcard-hint">PHRASE &bull; B1 &bull; sing along to a song &bull; NOT "sing along with a song"</div></div><div class="fcard-back"><div class="fcard-ua">петь вместе / подпевать</div><div class="fcard-en">mitsingen</div><div class="fcard-example">"By the end of the concert, the whole crowd was singing along to every single word."</div><div class="fcard-poem">&#x1F4CC; Always "sing along TO" — never drop the preposition.<br>Подсказка: правильно "sing along to" — без него нельзя.</div><div class="fcard-frage">&#x1F4AC; Do you sing along when you know a song, or do you prefer just to listen?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#45</div><div class="fcard-word">to relate to sth/sb</div><div class="fcard-hint">PHRASE &bull; B2 &bull; I really relate to this song / character</div></div><div class="fcard-back"><div class="fcard-ua">находить что-то близким себе / видеть себя в</div><div class="fcard-en">sich mit etw. identifizieren, nachvollziehen k&ouml;nnen</div><div class="fcard-example">"I love this song because I really relate to the feeling she's describing — it's my life exactly."</div><div class="fcard-poem">&#x1F4CC; "That's so relatable!" = informal adjective form, very common.<br>Подсказка: "relatable" — очень частое разговорное прилагательное.</div><div class="fcard-frage">&#x1F4AC; Do you have a song or film character that you strongly relate to personally?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#46</div><div class="fcard-word">to be on repeat</div><div class="fcard-hint">PHRASE &bull; B1 &bull; I've had this song on repeat all day</div></div><div class="fcard-back"><div class="fcard-ua">слушать на повторе / крутить снова и снова</div><div class="fcard-en">auf Dauerschleife laufen / auf Repeat sein</div><div class="fcard-example">"I've had this album on repeat for the past three days — I can't stop listening."</div><div class="fcard-poem">&#x1F4CC; One of the most natural ways to say you love a song right now.<br>Подсказка: "I've been playing it on repeat" — тоже верно.</div><div class="fcard-frage">&#x1F4AC; What song have you most recently had on repeat?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-2 -->
+
+        <!-- ===== DAY 3 ===== -->
+        <div class="day-content" data-day="3">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>Stories That Touch the Soul: The Art of Emotional Storytelling</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>What makes a story <b>moving</b>? It is rarely the budget or the production. The most powerful stories are the ones where you can feel the <b>tension</b> before a word is spoken. The <b>atmosphere</b> tells you how to feel. The <b>mood</b> wraps around you like weather. And when the <b>climax</b> arrives — that highest, most unbearable moment — you feel it in your chest.</p>
+            <p>Great storytelling works through <b>symbols</b> and <b>themes</b> rather than direct statements. The best directors and songwriters know that a well-chosen image or <b>message</b> can <b>express</b> what pages of dialogue cannot. They <b>capture</b> a feeling rather than explain it. They <b>reflect</b> the human condition rather than lecture about it.</p>
+            <p>That is why the greatest stories leave us <b>speechless</b>. That is why they <b>hit home</b>. That is why we leave the cinema and cannot speak for a few minutes — walking through the night air, still inside the world we just visited. There wasn't a dry eye in the house. And we wouldn't have it any other way.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#47</div><div class="fcard-word">tension</div><div class="fcard-hint">NOUN &bull; B2 &bull; build / create tension &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">напряжение / напряжённость</div><div class="fcard-en">die Spannung</div><div class="fcard-example">"The director builds tension so slowly that by the climax, you can barely breathe."</div><div class="fcard-poem">Tension — the silence before something breaks,<br>напряжение — воздух перед грозой.</div><div class="fcard-frage">&#x1F4AC; What is the most effective way to create tension in a film or story?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#48</div><div class="fcard-word">atmosphere</div><div class="fcard-hint">NOUN &bull; B1 &bull; create an atmosphere &bull; Pl.: atmospheres</div></div><div class="fcard-back"><div class="fcard-ua">атмосфера / настроение</div><div class="fcard-en">die Atmosph&auml;re, die Stimmung</div><div class="fcard-example">"The film has a dark, threatening atmosphere that stays with you long after it ends."</div><div class="fcard-poem">Atmosphere — invisible but you feel it everywhere,<br>атмосфера — нельзя объяснить, но ощущаешь.</div><div class="fcard-frage">&#x1F4AC; Can you describe the atmosphere of your all-time favourite film?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#49</div><div class="fcard-word">climax</div><div class="fcard-hint">NOUN &bull; B2 &bull; reach the climax &bull; Pl.: climaxes</div></div><div class="fcard-back"><div class="fcard-ua">кульминация / наивысший момент</div><div class="fcard-en">der H&ouml;hepunkt, der Klimax</div><div class="fcard-example">"The climax is so well-constructed that it leaves you breathless for several minutes."</div><div class="fcard-poem">Climax — the top of the mountain, then the fall,<br>кульминация — самая высокая точка.</div><div class="fcard-frage">&#x1F4AC; Describe the climax of a film you loved — what made it so powerful?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#50</div><div class="fcard-word">emotion</div><div class="fcard-hint">NOUN &bull; B1 &bull; express / feel an emotion &bull; Pl.: emotions</div></div><div class="fcard-back"><div class="fcard-ua">эмоция / чувство / переживание</div><div class="fcard-en">das Gef&uuml;hl, die Emotion</div><div class="fcard-example">"The best art makes you feel emotions you can't easily describe or name."</div><div class="fcard-poem">Emotion — the thing you can't fake for long,<br>эмоция — настоящая, когда накрывает.</div><div class="fcard-frage">&#x1F4AC; Why do people enjoy stories that make them feel strong, even painful, emotions?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#51</div><div class="fcard-word">symbol</div><div class="fcard-hint">NOUN &bull; B2 &bull; a symbol of sth &bull; Pl.: symbols</div></div><div class="fcard-back"><div class="fcard-ua">символ / знак / образ</div><div class="fcard-en">das Symbol</div><div class="fcard-example">"In the film, the red door is a powerful symbol of the choice the hero refuses to make."</div><div class="fcard-poem">Symbol — one thing that means a hundred more,<br>символ — смотришь на одно, думаешь о другом.</div><div class="fcard-frage">&#x1F4AC; Can you think of a powerful symbol from a film, song, or book?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#52</div><div class="fcard-word">message</div><div class="fcard-hint">NOUN &bull; B1 &bull; the message of a film / song &bull; Pl.: messages</div></div><div class="fcard-back"><div class="fcard-ua">послание / идея / смысл произведения</div><div class="fcard-en">die Botschaft, die Aussage</div><div class="fcard-example">"The message of the film is simple but powerful: it's never too late to change."</div><div class="fcard-poem">Message — what stays when you forget the plot,<br>послание — ради него всё и создавалось.</div><div class="fcard-frage">&#x1F4AC; What is the most powerful message you have received from a film or song?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#53</div><div class="fcard-word">theme</div><div class="fcard-hint">NOUN &bull; B2 &bull; the main theme &bull; Pl.: themes</div></div><div class="fcard-back"><div class="fcard-ua">тема / главная идея</div><div class="fcard-en">das Thema</div><div class="fcard-example">"The main theme of the novel is loss and the struggle to rebuild your life afterwards."</div><div class="fcard-poem">Theme — the question the story never stops asking,<br>тема — вопрос, пронизывающий всё.</div><div class="fcard-frage">&#x1F4AC; What themes interest you most in films and music: love, identity, freedom, justice?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#54</div><div class="fcard-word">mood</div><div class="fcard-hint">NOUN &bull; B1 &bull; create a mood &bull; Pl.: moods</div></div><div class="fcard-back"><div class="fcard-ua">настроение / атмосфера</div><div class="fcard-en">die Stimmung</div><div class="fcard-example">"The music perfectly captures the mood of the scene — dark, uncertain, and full of sadness."</div><div class="fcard-poem">Mood — the colour of the moment,<br>настроение — краска, которой нарисована сцена.</div><div class="fcard-frage">&#x1F4AC; How does the mood of a film affect your real mood after watching?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#55</div><div class="fcard-word">to capture (a feeling)</div><div class="fcard-hint">VERB &bull; B2 &bull; capture a feeling / moment / atmosphere &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">передавать / улавливать / воссоздавать</div><div class="fcard-en">einfangen, erfassen</div><div class="fcard-example">"This photograph captures the mood of that evening perfectly — I can still feel it."</div><div class="fcard-poem">Capture — stop time, hold the feeling still,<br>улавливать — как в ладонях удержать ветер.</div><div class="fcard-frage">&#x1F4AC; Can you think of a film or photo that perfectly captures a mood or feeling?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#56</div><div class="fcard-word">to reflect</div><div class="fcard-hint">VERB &bull; B2 &bull; reflect sth / reflect on sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">отражать / передавать / задуматься (над чем-то)</div><div class="fcard-en">widerspiegeln, reflektieren</div><div class="fcard-example">"Good art reflects the society it was created in — you can learn a lot about history from it."</div><div class="fcard-poem">Reflect — the mirror that shows us who we are,<br>отражать — истина, которую видишь в произведении.</div><div class="fcard-frage">&#x1F4AC; What films or songs best reflect the world we live in today?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#57</div><div class="fcard-word">to express</div><div class="fcard-hint">VERB &bull; B1 &bull; express yourself / express an emotion &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">выражать / выражать себя</div><div class="fcard-en">ausdr&uuml;cken</div><div class="fcard-example">"Music and art allow people to express feelings that words alone can't quite convey."</div><div class="fcard-poem">Express — bring what's inside to the outside,<br>выражать — то, что внутри, наконец видно.</div><div class="fcard-frage">&#x1F4AC; How do you personally best express your emotions — through music, art, writing?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#58</div><div class="fcard-word">touching</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a touching story / scene / gesture</div></div><div class="fcard-back"><div class="fcard-ua">трогательный / трогающий за душу</div><div class="fcard-en">ber&uuml;hrend, r&uuml;hrend</div><div class="fcard-example">"The final scene between the father and son is so touching — everyone was in tears."</div><div class="fcard-poem">Touching — it reaches somewhere deep you guard,<br>трогательный — до самого сердца.</div><div class="fcard-frage">&#x1F4AC; What was the most touching scene you've ever seen in a film or series?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#59</div><div class="fcard-word">gripping</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a gripping story / thriller / performance</div></div><div class="fcard-back"><div class="fcard-ua">захватывающий / не отпускающий</div><div class="fcard-en">packend, spannend</div><div class="fcard-example">"The series is so gripping that I watched all ten episodes in one weekend."</div><div class="fcard-poem">Gripping — it holds your attention hostage,<br>захватывающий — оторваться невозможно.</div><div class="fcard-frage">&#x1F4AC; What is the most gripping series or film you've watched recently?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#60</div><div class="fcard-word">moving</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a moving performance / story / speech</div></div><div class="fcard-back"><div class="fcard-ua">волнующий / трогательный / берущий за душу</div><div class="fcard-en">bewegend, ergreifend</div><div class="fcard-example">"His speech was so moving that even people who disagreed with him were in tears."</div><div class="fcard-poem">Moving — your heart shifts inside your chest,<br>волнующий — изнутри.</div><div class="fcard-frage">&#x1F4AC; Have you ever found a speech, poem, or piece of music truly moving?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#61</div><div class="fcard-word">thought-provoking</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a thought-provoking film / book / question</div></div><div class="fcard-back"><div class="fcard-ua">заставляющий задуматься</div><div class="fcard-en">zum Nachdenken anregend, nachdenklich stimmend</div><div class="fcard-example">"The film is thought-provoking — I'm still trying to figure out what I think about the ending."</div><div class="fcard-poem">Thought-provoking — you leave with more questions than answers,<br>заставляет думать — неделями после.</div><div class="fcard-frage">&#x1F4AC; What was the last film or book that was truly thought-provoking for you?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#62</div><div class="fcard-word">realistic</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a realistic portrayal / scenario / character</div></div><div class="fcard-back"><div class="fcard-ua">реалистичный / правдоподобный / жизненный</div><div class="fcard-en">realistisch, wirklichkeitsnah</div><div class="fcard-example">"The characters feel very realistic — they make mistakes and have normal human weaknesses."</div><div class="fcard-poem">Realistic — close enough to life to be uncomfortable,<br>реалистичный — мог бы произойти с тобой.</div><div class="fcard-frage">&#x1F4AC; Do you prefer realistic films about real life, or escapist fantasy worlds?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#63</div><div class="fcard-word">I didn't see that coming!</div><div class="fcard-hint">PHRASE &bull; B2 &bull; used after an unexpected twist or event</div></div><div class="fcard-back"><div class="fcard-ua">Я этого не ожидал(а)! / Вот это поворот!</div><div class="fcard-en">Das habe ich nicht kommen sehen!</div><div class="fcard-example">"'He was the villain the whole time!' — 'I know! I absolutely didn't see that coming!'"</div><div class="fcard-poem">&#x1F4CC; Works in films AND in real life for any shocking surprise.<br>Подсказка: использую когда ничего не предвещало.</div><div class="fcard-frage">&#x1F4AC; Think of a shocking plot twist in a film. Did you see it coming?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#64</div><div class="fcard-word">it left me speechless</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this film / moment left me speechless</div></div><div class="fcard-back"><div class="fcard-ua">это лишило меня дара речи / я был(а) поражён(а)</div><div class="fcard-en">es hat mich sprachlos gemacht</div><div class="fcard-example">"The last five minutes left me completely speechless — I just sat there in the dark cinema."</div><div class="fcard-poem">&#x1F4CC; "Speechless" = too surprised or moved to say anything.<br>Подсказка: можно сказать о хорошем и о плохом.</div><div class="fcard-frage">&#x1F4AC; What was the last thing that left you truly speechless?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#65</div><div class="fcard-word">to read between the lines</div><div class="fcard-hint">PHRASE &bull; B2 &bull; learn to read between the lines</div></div><div class="fcard-back"><div class="fcard-ua">читать между строк / понимать скрытый смысл</div><div class="fcard-en">zwischen den Zeilen lesen</div><div class="fcard-example">"If you read between the lines of the lyrics, the song is actually about losing his father."</div><div class="fcard-poem">&#x1F4CC; Find meaning not stated directly — in songs, films, or conversations.<br>Подсказка: понять то, что автор не сказал прямо.</div><div class="fcard-frage">&#x1F4AC; Can you think of a song or film where you had to read between the lines?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#66</div><div class="fcard-word">to hit home</div><div class="fcard-hint">PHRASE &bull; B2 &bull; the message / words / scene hit home</div></div><div class="fcard-back"><div class="fcard-ua">затронуть за живое / попасть в точку</div><div class="fcard-en">ins Herz treffen, zu Herzen gehen</div><div class="fcard-example">"That scene really hit home for me — it reminded me of my own family situation."</div><div class="fcard-poem">&#x1F4CC; "Home" = the personal, vulnerable core of who you are.<br>Подсказка: попало именно туда, где больно.</div><div class="fcard-frage">&#x1F4AC; Has a film scene or song lyric ever hit home for you in a personal way?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#67</div><div class="fcard-word">to leave an impression</div><div class="fcard-hint">PHRASE &bull; B2 &bull; this film left a strong impression on me</div></div><div class="fcard-back"><div class="fcard-ua">оставить впечатление / запомниться</div><div class="fcard-en">einen Eindruck hinterlassen</div><div class="fcard-example">"The film left such a strong impression that I still think about it years later."</div><div class="fcard-poem">&#x1F4CC; "Leave" = lasting; "make an impression" = first impact.<br>Подсказка: "leave" — о длительном, остающемся впечатлении.</div><div class="fcard-frage">&#x1F4AC; What film or song has left the strongest impression on you?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#68</div><div class="fcard-word">to make you think</div><div class="fcard-hint">PHRASE &bull; B1 &bull; a film / song that makes you think</div></div><div class="fcard-back"><div class="fcard-ua">заставить задуматься</div><div class="fcard-en">zum Nachdenken bringen</div><div class="fcard-example">"I didn't enjoy the film while watching, but it really made me think long afterwards."</div><div class="fcard-poem">&#x1F4CC; Great for recommendations: "Watch it — it'll really make you think."<br>Подсказка: это комплимент фильму или песне.</div><div class="fcard-frage">&#x1F4AC; Do you prefer films that make you think, or do you watch to switch off?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#69</div><div class="fcard-word">there wasn't a dry eye in the house</div><div class="fcard-hint">PHRASE &bull; C1 &bull; used after a very emotional performance</div></div><div class="fcard-back"><div class="fcard-ua">не осталось ни одного равнодушного / все были в слезах</div><div class="fcard-en">kein Auge blieb trocken</div><div class="fcard-example">"By the end of the performance, there wasn't a dry eye in the house — it was truly moving."</div><div class="fcard-poem">&#x1F4CC; Hyperbole — used for very emotional performances, not literally everyone.<br>Подсказка: преувеличение — но понятное всем.</div><div class="fcard-frage">&#x1F4AC; Have you ever been to a performance where there wasn't a dry eye in the house?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-3 -->
+
+        </div><!-- /cards-mov -->
+
+        <div class="done-screen" id="done-mov">
+            <div class="done-icon">&#x1F3AC;</div>
+            <h2>All 69 cards learned!</h2>
+            <p>You know your cinema and music vocabulary &mdash; time to use it in a real conversation!</p>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <script>
+        const DAY_TOTALS = {1: 23, 2: 23, 3: 23};
+        let dayCounts = {1: 0, 2: 0, 3: 0};
+        let currentDay = 1;
+
+        function toggleArtikel(header) {
+            const body = header.nextElementSibling;
+            const btn = header.querySelector('.tagesartikel-toggle');
+            if (body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed');
+                body.classList.add('expanded');
+                btn.style.transform = 'rotate(180deg)';
+            } else {
+                body.classList.remove('expanded');
+                body.classList.add('collapsed');
+                btn.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
+            document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = DAY_TOTALS[currentDay];
+            const cnt = dayCounts[currentDay];
+            document.getElementById('bar-mov').style.width = (cnt / total * 100) + '%';
+            document.getElementById('num-mov').textContent = cnt;
+            document.getElementById('total-mov').textContent = total;
+            const allDone = Object.keys(DAY_TOTALS).every(function(d) { return dayCounts[d] === DAY_TOTALS[d]; });
+            document.getElementById('done-mov').classList.toggle('show', allDone);
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const dayEl = card.closest('.day-content');
+            const day = dayEl ? parseInt(dayEl.dataset.day) : currentDay;
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) {
+                card.classList.remove('known');
+                btn.textContent = '✓ I know it';
+                dayCounts[day] = Math.max(0, dayCounts[day] - 1);
+            } else {
+                card.classList.add('known');
+                btn.textContent = '✓ Learned!';
+                dayCounts[day]++;
+            }
+            if (day === currentDay) updateProgress();
+        }
+
+        function flipAll() { document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped')); }
+        function resetAll() {
+            document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ I know it');
+            dayCounts[currentDay] = 0;
+            updateProgress();
+        }
+        (function(){var T={"plot":"[плот]","villain":"[ви́лэн]","hero / heroine":"[хи́эроу / хе́роуин]","scene":"[си:н]","character":"[кэ́рэктэ]","twist":"[твист]","sequel":"[си́куэл]","soundtrack":"[са́унтрэк]","to portray":"[по:трэ́й]","to inspire":"[инспа́йэ]","to narrate":"[нэрэ́йт]","to reveal":"[рэви́л]","dramatic":"[дрэмэ́тик]","intense":"[интэ́нс]","unforgettable":"[анфэгэ́тэбл]","breathtaking":"[брэ́ттэйкинг]","keep sb on the edge of their seat":"[ки:п он зи эдж]","to blow your mind":"[блоу ё:р майнд]","the plot thickens":"[плот си́кэнз]","to steal the show":"[сти:л зэ шоу]","based on a true story":"[бэйст он тру: сто́ри]","a twist in the tale":"[твист ин зэ тэйл]","against all odds":"[эгэ́нст о:л одз]","lyrics":"[ли́рикс]","chorus":"[ко́рэс]","rhythm":"[ри́зэм]","melody":"[мэ́лэди]","verse":"[вё:с]","beat":"[би:т]","album":"[э́лбэм]","genre":"[жо́нрэ]","to perform":"[пэфо́:м]","to release":"[рэли́:с]","to move sb":"[му:в]","catchy":"[кэ́тчи]","meaningful":"[ми́:нингфул]","powerful":"[па́уэфул]","emotional":"[имо́ушэнэл]","uplifting":"[аплифтинг]","to hit the charts":"[хит зэ ча:тс]","I can't get it out of my head":"[ай кэнт гет ит аут]","it gives me goosebumps":"[гивз ми: гу:збампс]","to set the mood":"[сэт зэ му:д]","to sing along":"[синг эло́нг]","to relate to sth/sb":"[рилэ́йт ту]","to be on repeat":"[би: он рипи́:т]","tension":"[тэ́ншэн]","atmosphere":"[э́тмэсфиэ]","climax":"[кла́ймэкс]","emotion":"[имо́ушэн]","symbol":"[си́мбэл]","message":"[мэ́сидж]","theme":"[си:м]","mood":"[му:д]","to capture (a feeling)":"[кэ́пчэ]","to reflect":"[рифлэ́кт]","to express":"[иксп рэ́с]","touching":"[та́чинг]","gripping":"[гри́пинг]","moving":"[му́:винг]","thought-provoking":"[со:т прэвоу́кинг]","realistic":"[риэли́стик]","I didn't see that coming!":"[ай ди́дэнт си:]","it left me speechless":"[лэфт ми: спи́:члэс]","to read between the lines":"[ри:д битви́:н зэ ла́йнс]","to hit home":"[хит хоум]","to leave an impression":"[ли:в эн импрэ́шэн]","to make you think":"[мэйк ю: синк]","there wasn't a dry eye in the house":"[дра́й ай ин зэ хаус]"};document.querySelectorAll('.fcard-word').forEach(function(el){var k=el.textContent.trim();if(T[k]){var d=document.createElement('div');d.className='fcard-trans';d.textContent=T[k];el.insertAdjacentElement('afterend',d);}});})();
+
+        function shuffleCards() {
+            document.querySelectorAll('.day-content.active .card-grid').forEach(function(grid) {
+                const cards = [...grid.children];
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+    </script>
+</body>
+</html>

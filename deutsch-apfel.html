@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apfel — Grammatik im Kontext | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ── tags ── */
+        .gtag {
+            display:inline-flex; align-items:center; border-radius:20px;
+            padding:0.18rem 0.6rem; font-size:0.74rem; font-weight:700;
+            text-decoration:none; transition:filter 0.15s, transform 0.12s, box-shadow 0.12s;
+            white-space:nowrap; letter-spacing:0.02em;
+        }
+        .gtag:hover { filter:brightness(1.25); transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,0.35); }
+        .gtag-fall    { background:rgba(244,167,185,0.2);  color:#f4a7b9; border:1px solid rgba(244,167,185,0.4); }
+        .gtag-artikel { background:rgba(88,166,255,0.18);  color:#7ab8ff; border:1px solid rgba(88,166,255,0.38); }
+        .gtag-plural  { background:rgba(185,240,160,0.17); color:#b9f0a0; border:1px solid rgba(185,240,160,0.38); }
+        .gtag-pronomen{ background:rgba(251,191,36,0.16);  color:#fbbf24; border:1px solid rgba(251,191,36,0.35); }
+        .gtag-zeit    { background:rgba(167,139,250,0.17); color:#c4b5fd; border:1px solid rgba(167,139,250,0.38); }
+        .gtag-modal   { background:rgba(45,212,191,0.15);  color:#2dd4bf; border:1px solid rgba(45,212,191,0.35); }
+        .gtag-modus   { background:rgba(248,113,113,0.15); color:#fca5a5; border:1px solid rgba(248,113,113,0.35); }
+        .gtag-satz    { background:rgba(148,163,184,0.13); color:#94a3b8; border:1px solid rgba(148,163,184,0.28); }
+
+        /* ── sentence card ── */
+        .sent-card {
+            border-radius:16px;
+            padding:1rem 1.1rem 0.85rem 1rem;
+            margin:0.45rem 0;
+            display:grid;
+            grid-template-columns:2.2rem 1fr;
+            gap:0 0.5rem;
+            border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.04);
+            backdrop-filter:blur(4px);
+            transition:border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.15s;
+            position:relative;
+            overflow:hidden;
+        }
+        .sent-card::before {
+            content:'';
+            position:absolute; left:0; top:0; bottom:0; width:3px;
+            background:rgba(255,255,255,0.1);
+            transition:background 0.2s;
+        }
+        .sent-card:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(0,0,0,0.35); border-color:rgba(255,255,255,0.14); }
+        .sent-card.unclear::before { background:linear-gradient(180deg,#f87171,#fca5a5); }
+        .sent-card.unclear { border-color:rgba(248,113,113,0.35); background:rgba(248,113,113,0.06); }
+        .sent-card.clear::before   { background:linear-gradient(180deg,#b9f0a0,#2dd4bf); }
+        .sent-card.clear   { border-color:rgba(185,240,160,0.3);  background:rgba(185,240,160,0.05); }
+        .sent-card.hidden  { display:none; }
+
+        .sent-left {
+            display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+            padding-top:0.1rem;
+        }
+        .sent-num {
+            font-size:0.7rem; color:rgba(230,230,235,0.22);
+            font-weight:600; line-height:1;
+        }
+        .sent-toggle {
+            width:28px; height:28px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; user-select:none; font-size:0.85rem;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+            transition:all 0.15s; flex-shrink:0;
+        }
+        .sent-toggle:hover { background:rgba(255,255,255,0.14); transform:scale(1.1); }
+        .sent-card.unclear .sent-toggle { background:rgba(248,113,113,0.2); border-color:rgba(248,113,113,0.4); }
+        .sent-card.clear   .sent-toggle { background:rgba(185,240,160,0.2); border-color:rgba(185,240,160,0.4); }
+
+        .sent-body { min-width:0; }
+        .sent-de {
+            font-size:1.02rem; font-weight:700;
+            color:rgba(230,230,235,0.97); margin-bottom:0.2rem;
+            line-height:1.4;
+        }
+        .sent-ru {
+            font-size:0.82rem; color:rgba(230,230,235,0.42);
+            margin-bottom:0.55rem; font-style:italic;
+        }
+        .sent-tags { display:flex; flex-wrap:wrap; gap:0.32rem; }
+
+        /* ── section header ── */
+        .section-hdr {
+            margin:2rem 0 0.6rem;
+            display:flex; align-items:center; gap:0.75rem;
+        }
+        .section-hdr-badge {
+            font-size:0.68rem; font-weight:900; letter-spacing:0.08em;
+            padding:0.2rem 0.65rem; border-radius:20px; flex-shrink:0;
+        }
+        .badge-a1 { background:linear-gradient(135deg,#3b82f6,#60a5fa); color:#fff; }
+        .badge-a2 { background:linear-gradient(135deg,#8b5cf6,#a78bfa); color:#fff; }
+        .badge-b1 { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1a1100; }
+        .section-hdr-title {
+            font-size:0.92rem; font-weight:700; color:rgba(230,230,235,0.65);
+            letter-spacing:0.01em;
+        }
+        .section-hdr-line {
+            flex:1; height:1px; background:rgba(255,255,255,0.07);
+        }
+
+        /* ── control panel ── */
+        .control-panel {
+            border-radius:18px;
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.04);
+            backdrop-filter:blur(8px);
+            padding:1.1rem 1.2rem;
+            margin-bottom:0.8rem;
+        }
+        .stats-row {
+            display:flex; gap:1.4rem; flex-wrap:wrap; align-items:center;
+            margin-bottom:0.7rem; font-size:0.86rem;
+        }
+        .stat-item { display:flex; align-items:center; gap:0.4rem; font-weight:600; }
+        .stat-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+        .progress-wrap {
+            background:rgba(255,255,255,0.08); border-radius:4px;
+            height:6px; margin:0 0 1rem; overflow:hidden;
+        }
+        .progress-fill {
+            height:100%;
+            background:linear-gradient(90deg,#60a5fa,#b9f0a0,#2dd4bf);
+            border-radius:4px; transition:width 0.4s ease;
+        }
+
+        .filter-row { display:flex; gap:0.45rem; flex-wrap:wrap; margin-bottom:1rem; }
+        .fbtn {
+            border:1px solid rgba(255,255,255,0.13);
+            background:rgba(255,255,255,0.05); border-radius:10px;
+            padding:0.38rem 0.95rem; font-size:0.82rem; cursor:pointer;
+            color:rgba(230,230,235,0.6); transition:all 0.15s; font-weight:600;
+        }
+        .fbtn:hover { background:rgba(255,255,255,0.1); color:rgba(230,230,235,0.9); }
+        .fbtn.on-all     { background:rgba(88,166,255,0.22); border-color:rgba(88,166,255,0.5); color:#7ab8ff; }
+        .fbtn.on-unclear { background:rgba(248,113,113,0.2); border-color:rgba(248,113,113,0.5); color:#fca5a5; }
+        .fbtn.on-clear   { background:rgba(185,240,160,0.2); border-color:rgba(185,240,160,0.5); color:#b9f0a0; }
+        .fbtn.on-none    { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25); color:rgba(230,230,235,0.8); }
+
+        .legend {
+            display:flex; flex-wrap:wrap; gap:0.55rem 1rem;
+            padding-top:0.8rem; border-top:1px solid rgba(255,255,255,0.07);
+        }
+        .legend-item {
+            display:flex; align-items:center; gap:0.35rem;
+            font-size:0.73rem; color:rgba(230,230,235,0.45);
+        }
+        .legend-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+        .reset-btn {
+            margin-left:auto; background:transparent;
+            border:1px solid rgba(255,255,255,0.1); border-radius:8px;
+            padding:0.25rem 0.75rem; font-size:0.77rem; cursor:pointer;
+            color:rgba(230,230,235,0.35); transition:all 0.15s;
+        }
+        .reset-btn:hover { border-color:rgba(255,255,255,0.22); color:rgba(230,230,235,0.7); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">›</span>
+            <span class="current">Grammatik im Kontext</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">← Zurück zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>Grammatik im Kontext 🍎</h1>
+            <p class="page-subtitle">Одно слово — вся грамматика. Кликай теги, чтобы открыть объяснение. Нажимай кружок, чтобы отмечать что непонятно.</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-dot" style="background:#b9f0a0"></div>
+                    <span id="count-clear">0</span>&nbsp;понятно
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background:#f87171"></div>
+                    <span id="count-unclear">0</span>&nbsp;надо разобраться
+                </div>
+                <span style="font-size:0.8rem;color:rgba(230,230,235,0.3);">из <span id="count-total">0</span></span>
+                <button class="reset-btn" onclick="resetAll()">Сбросить</button>
+            </div>
+            <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+            <div class="filter-row">
+                <button class="fbtn on-all" id="fbtn-all"    onclick="setFilter('all')">Все</button>
+                <button class="fbtn"        id="fbtn-unclear" onclick="setFilter('unclear')">❓ Непонятные</button>
+                <button class="fbtn"        id="fbtn-clear"   onclick="setFilter('clear')">✅ Понятные</button>
+                <button class="fbtn"        id="fbtn-none"    onclick="setFilter('none')">○ Без отметки</button>
+            </div>
+
+            <div class="legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#f4a7b9"></span>Падеж</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#7ab8ff"></span>Артикль</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#b9f0a0"></span>Plural</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>Местоимения</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#c4b5fd"></span>Времена</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Модальные гл.</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#fca5a5"></span>Залог / Наклонение</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#94a3b8"></span>Структура предл.</span>
+            </div>
+        </div>
+
+        <div id="sentences-container"></div>
+    </div>
+
+    <script>
+    const T  = (label,type,url) => ({label,type,url});
+    // Fälle → artikel#faelle (таблица всех падежей)
+    const F  = (label,url='deutsch-artikel.html#faelle') => T(label,'fall',url);
+    // Artikel
+    const A  = (label,url='deutsch-artikel.html#tab-bestimmt') => T(label,'artikel',url);
+    // Plural
+    const PL = (label,url='deutsch-plural.html#tab-logik') => T(label,'plural',url);
+    // Pronomen
+    const PR = (label,url='deutsch-pronomen.html#tab-personal') => T(label,'pronomen',url);
+    // Zeitformen
+    const Z  = (label,url='deutsch-zeitformen.html#tab-ueber') => T(label,'zeit',url);
+    // Modalverben
+    const M  = (label,url='deutsch-zwei-verben.html#tab-modal') => T(label,'modal',url);
+    // Modus (Passiv/Imperativ/Konjunktiv)
+    const MO = (label,url) => T(label,'modus',url);
+    // Satzstruktur
+    const S  = (label,url='deutsch-satzbau.html') => T(label,'satz',url);
+
+    const SECTIONS = [
+      { title:'Артикли, род и множественное число', badge:'A1', badgeClass:'badge-a1',
+        sentences:[
+          { de:'Das ist ein Apfel.', ru:'Это яблоко.',
+            tags:[A('unbestimmter Artikel','deutsch-artikel.html#tab-unbestimmt'), F('Nominativ'), A('Maskulinum','deutsch-artikel.html#tab-regeln')] },
+          { de:'Der Apfel ist rot.', ru:'Яблоко красное.',
+            tags:[A('bestimmter Artikel'), F('Nominativ'), S('Adj. prädikativ','deutsch-adjektive.html#tab-logik')] },
+          { de:'Das sind zwei Äpfel.', ru:'Это два яблока.',
+            tags:[PL('Plural'), PL('Umlaut (Äpfel)','deutsch-plural.html#tab-typen'), Z('sein — Präsens')] },
+          { de:'Die Äpfel sind rot.', ru:'Яблоки красные.',
+            tags:[PL('Plural'), A('Artikel Plural (die)','deutsch-plural.html#tab-logik'), S('Adj. prädikativ','deutsch-adjektive.html#tab-logik')] },
+          { de:'Das ist Johns Apfel.', ru:'Это яблоко Джона.',
+            tags:[F('Genitiv — Eigenname','deutsch-genitiv.html'), F('Nominativ')] },
+          { de:'Das sind Johns Äpfel.', ru:'Это яблоки Джона.',
+            tags:[F('Genitiv — Eigenname','deutsch-genitiv.html'), PL('Plural')] },
+          { de:'Ich habe einen Apfel.', ru:'У меня есть яблоко.',
+            tags:[F('Akkusativ'), A('ein → einen (m)','deutsch-artikel.html#faelle'), Z('haben — Präsens')] },
+          { de:'Ich habe zwei Äpfel.', ru:'У меня есть два яблока.',
+            tags:[F('Akkusativ'), PL('Plural'), Z('haben — Präsens')] },
+        ]
+      },
+      { title:'Личные и притяжательные местоимения', badge:'A2', badgeClass:'badge-a2',
+        sentences:[
+          { de:'Ich muss ihn ihm geben.', ru:'Я должен отдать его ему.',
+            tags:[M('Modalverb müssen'), M('Verbklammer','deutsch-zwei-verben.html#tab-klammer'), PR('ihn — Akkusativ'), PR('ihm — Dativ'), F('Akkusativ'), F('Dativ')] },
+          { de:'Ich gebe John seinen Apfel.', ru:'Я даю Джону его яблоко.',
+            tags:[PR('Possessivpronomen seinen','deutsch-pronomen.html#tab-possessiv'), F('Akkusativ'), F('Dativ (John)')] },
+          { de:'Er gibt ihn mir.', ru:'Он даёт его мне.',
+            tags:[PR('ihn — Akkusativ'), PR('mir — Dativ')] },
+          { de:'Er gibt ihn ihr.', ru:'Он даёт его ей.',
+            tags:[PR('ihn — Akkusativ'), PR('ihr — Dativ (ей)')] },
+          { de:'Sie gibt ihn uns.', ru:'Она даёт его нам.',
+            tags:[PR('ihn — Akkusativ'), PR('uns — Dativ')] },
+          { de:'Wir geben ihn ihnen.', ru:'Мы даём его им.',
+            tags:[PR('ihn — Akkusativ'), PR('ihnen — Dativ (им)')] },
+          { de:'Sie geben ihn dir / Ihnen.', ru:'Они дают его тебе / Вам.',
+            tags:[PR('dir — Dativ (ты)'), PR('Ihnen — Dativ (Вы)','deutsch-pronomen.html#tab-fallen'), S('Duzen vs. Siezen','deutsch-pronomen.html#tab-fallen')] },
+        ]
+      },
+      { title:'Вопросы, отрицание и времена', badge:'A2', badgeClass:'badge-a2',
+        sentences:[
+          { de:'Hast du einen Apfel?', ru:'У тебя есть яблоко?',
+            tags:[S('Ja/Nein-Frage','deutsch-satzbau.html#tab-wfragen'), F('Akkusativ'), Z('haben — Präsens')] },
+          { de:'Haben sie Äpfel?', ru:'У них есть яблоки?',
+            tags:[S('Ja/Nein-Frage','deutsch-satzbau.html#tab-wfragen'), PL('Plural')] },
+          { de:'Ich habe keinen Apfel.', ru:'У меня нет яблока.',
+            tags:[A('kein → keinen (m, Akk)','deutsch-artikel.html#kein'), F('Akkusativ'), S('Negation','deutsch-artikel.html#kein')] },
+          { de:'Er hat keinen Apfel.', ru:'У него нет яблока.',
+            tags:[A('kein/keine','deutsch-artikel.html#kein'), S('3. Person Sg. — hat')] },
+          { de:'Ich hatte gestern einen Apfel.', ru:'Вчера у меня было яблоко.',
+            tags:[Z('Präteritum — hatte'), F('Akkusativ')] },
+          { de:'Ich habe keinen Apfel gehabt.', ru:'У меня не было яблока.',
+            tags:[Z('Perfekt','deutsch-zeitformen.html#tab-perfekt'), Z('Partizip II — gehabt','deutsch-zeitformen.html#tab-perfekt'), A('kein → keinen','deutsch-artikel.html#kein'), S('Negation','deutsch-artikel.html#kein')] },
+          { de:'Hattest du einen Apfel?', ru:'У тебя было яблоко?',
+            tags:[S('Ja/Nein-Frage','deutsch-satzbau.html#tab-wfragen'), Z('Präteritum — hattest')] },
+          { de:'Was hast du gehabt?', ru:'Что у тебя было?',
+            tags:[S('W-Frage','deutsch-satzbau.html#tab-wfragen'), Z('Perfekt','deutsch-zeitformen.html#tab-perfekt'), Z('Partizip II','deutsch-zeitformen.html#tab-perfekt')] },
+          { de:'Ich werde morgen einen Apfel haben.', ru:'Завтра у меня будет яблоко.',
+            tags:[Z('Futur I — werden','deutsch-zeitformen.html#tab-futur'), M('Verbklammer','deutsch-zwei-verben.html#tab-klammer'), F('Akkusativ')] },
+          { de:'Ich esse jetzt einen Apfel.', ru:'Я сейчас ем яблоко.',
+            tags:[Z('Präsens (kein Continuous)'), F('Akkusativ'), S('jetzt = сейчас','deutsch-adverbien.html#tab-temporal')] },
+          { de:'Was machst du?', ru:'Что ты делаешь?',
+            tags:[S('W-Frage','deutsch-satzbau.html#tab-wfragen'), Z('Präsens')] },
+          { de:'Er aß einen Apfel.', ru:'Он ел яблоко.',
+            tags:[Z('Präteritum — starkes Verb'), Z('essen → aß'), F('Akkusativ')] },
+          { de:'Früher habe ich oft Äpfel gegessen.', ru:'Раньше я часто ел яблоки.',
+            tags:[Z('Perfekt','deutsch-zeitformen.html#tab-perfekt'), Z('Partizip II — gegessen','deutsch-zeitformen.html#tab-perfekt'), PL('Plural'), S('Häufigkeitsadverb oft','deutsch-adverbien.html#tab-temporal')] },
+        ]
+      },
+      { title:'Модальные глаголы', badge:'B1', badgeClass:'badge-b1',
+        sentences:[
+          { de:'Ich kann einen Apfel essen.', ru:'Я могу съесть яблоко.',
+            tags:[M('Modalverb können'), M('Verbklammer','deutsch-zwei-verben.html#tab-klammer'), M('Infinitiv am Ende'), F('Akkusativ')] },
+          { de:'Kannst du einen Apfel essen?', ru:'Ты можешь съесть яблоко?',
+            tags:[S('Ja/Nein-Frage','deutsch-satzbau.html#tab-wfragen'), M('Modalverb können'), M('Verbklammer','deutsch-zwei-verben.html#tab-klammer')] },
+          { de:'Ich könnte einen Apfel essen.', ru:'Я мог бы съесть яблоко.',
+            tags:[MO('Konjunktiv II','deutsch-grammatik-konj2.html#tab-prasens'), M('Modalverb können → könnte','deutsch-grammatik-konj2.html#tab-modalverben')] },
+          { de:'Ich darf einen Apfel essen.', ru:'Мне разрешено съесть яблоко.',
+            tags:[M('Modalverb dürfen'), M('Verbklammer','deutsch-zwei-verben.html#tab-klammer')] },
+          { de:'Ich sollte einen Apfel essen.', ru:'Мне следует съесть яблоко.',
+            tags:[M('Modalverb sollen → sollte','deutsch-grammatik-konj2.html#tab-modalverben'), MO('Konjunktiv II','deutsch-grammatik-konj2.html#tab-prasens')] },
+        ]
+      },
+      { title:'Imperativ, Passiv, Konjunktiv II', badge:'B1', badgeClass:'badge-b1',
+        sentences:[
+          { de:'Iss den Apfel!', ru:'Съешь яблоко!',
+            tags:[MO('Imperativ (du)','deutsch-verben.html'), Z('starkes Verb essen → iss'), F('Akkusativ'), A('bestimmter Artikel')] },
+          { de:'Iss den Apfel nicht!', ru:'Не ешь яблоко!',
+            tags:[MO('Imperativ','deutsch-verben.html'), S('Negation mit nicht')] },
+          { de:'Lass uns den Apfel essen!', ru:'Давайте съедим яблоко!',
+            tags:[MO('Imperativ wir (lassen)','deutsch-lassen.html'), M('Infinitiv am Ende')] },
+          { de:'Der Apfel wird von ihm gegessen.', ru:'Яблоко съедается им.',
+            tags:[MO('Passiv Präsens','deutsch-passiv.html#tab-grundlagen'), F('von + Dativ','deutsch-passiv.html#tab-grundlagen'), Z('Partizip II','deutsch-zeitformen.html#tab-perfekt')] },
+          { de:'Der Apfel wird gerade gegessen.', ru:'Яблоко сейчас съедают.',
+            tags:[MO('Passiv Präsens','deutsch-passiv.html#tab-grundlagen'), Z('Partizip II','deutsch-zeitformen.html#tab-perfekt'), S('gerade = сейчас','deutsch-adverbien.html#tab-modal')] },
+          { de:'Der Apfel wurde gegessen.', ru:'Яблоко было съедено.',
+            tags:[MO('Passiv Präteritum','deutsch-passiv.html#tab-zeitformen'), Z('Partizip II','deutsch-zeitformen.html#tab-perfekt')] },
+          { de:'Wenn ich einen Apfel hätte, würde ich ihn essen.', ru:'Если бы у меня было яблоко, я бы его съел.',
+            tags:[MO('Konjunktiv II','deutsch-grammatik-konj2.html#tab-prasens'), S('Nebensatz wenn','deutsch-grammatik-konj2.html#tab-wenn'), S('Verb-End im Nebensatz','deutsch-nebensaetze.html#tab-wortstellung'), F('Akkusativ')] },
+          { de:'Wenn ich einen Apfel gehabt hätte, hätte ich ihn gegessen.', ru:'Если бы у меня тогда было яблоко, я бы его съел.',
+            tags:[MO('Konjunktiv II Vergangenheit','deutsch-grammatik-konj2.html#tab-vergangenheit'), S('Nebensatz wenn','deutsch-grammatik-konj2.html#tab-wenn'), Z('Partizip II','deutsch-zeitformen.html#tab-perfekt')] },
+        ]
+      }
+    ];
+
+    // ── state ──
+    const LSKEY = 'apfel-v2';
+    function load()  { try { return JSON.parse(localStorage.getItem(LSKEY)) || {}; } catch(e) { return {}; } }
+    function save(s) { localStorage.setItem(LSKEY, JSON.stringify(s)); }
+    let state  = load();
+    let filter = 'all';
+    let total  = 0;
+
+    // ── build DOM ──
+    function render() {
+        const container = document.getElementById('sentences-container');
+        container.innerHTML = '';
+        total = 0;
+
+        SECTIONS.forEach((sec, si) => {
+            const hdr = document.createElement('div');
+            hdr.className = 'section-hdr';
+            hdr.innerHTML = `
+                <span class="section-hdr-badge ${sec.badgeClass}">${sec.badge}</span>
+                <span class="section-hdr-title">${sec.title}</span>
+                <span class="section-hdr-line"></span>`;
+            container.appendChild(hdr);
+
+            sec.sentences.forEach((sent, idx) => {
+                total++;
+                const id  = `${si}-${idx}`;
+                const st  = state[id] || '';
+                const ico = st==='unclear' ? '❓' : st==='clear' ? '✅' : '○';
+
+                const card = document.createElement('div');
+                card.className = 'sent-card' + (st==='unclear' ? ' unclear' : st==='clear' ? ' clear' : '');
+                card.id = 'card-' + id;
+
+                const tagsHtml = sent.tags.map(t =>
+                    `<a href="${t.url}" class="gtag gtag-${t.type}">${t.label}</a>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="sent-left">
+                        <span class="sent-num">${idx+1}</span>
+                        <span class="sent-toggle" id="tog-${id}" onclick="toggle('${id}')">${ico}</span>
+                    </div>
+                    <div class="sent-body">
+                        <div class="sent-de">${sent.de}</div>
+                        <div class="sent-ru">${sent.ru}</div>
+                        <div class="sent-tags">${tagsHtml}</div>
+                    </div>`;
+                container.appendChild(card);
+            });
+        });
+
+        applyFilter();
+        updateStats();
+    }
+
+    function toggle(id) {
+        const cur = state[id] || '';
+        state[id] = cur === '' ? 'unclear' : cur === 'unclear' ? 'clear' : '';
+        save(state);
+        const card = document.getElementById('card-' + id);
+        const tog  = document.getElementById('tog-' + id);
+        card.classList.remove('unclear','clear');
+        if (state[id]==='unclear') { card.classList.add('unclear'); tog.textContent='❓'; }
+        else if (state[id]==='clear') { card.classList.add('clear'); tog.textContent='✅'; }
+        else { tog.textContent='○'; }
+        applyFilter();
+        updateStats();
+    }
+
+    function updateStats() {
+        let cl=0, un=0;
+        Object.values(state).forEach(v => { if(v==='clear') cl++; if(v==='unclear') un++; });
+        document.getElementById('count-clear').textContent   = cl;
+        document.getElementById('count-unclear').textContent = un;
+        document.getElementById('count-total').textContent   = total;
+        const pct = total ? Math.round((cl/total)*100) : 0;
+        document.getElementById('progress-fill').style.width = pct+'%';
+    }
+
+    function setFilter(f) {
+        filter = f;
+        ['all','unclear','clear','none'].forEach(x => {
+            document.getElementById('fbtn-'+x).className = 'fbtn' + (x===f ? ' on-'+x : '');
+        });
+        applyFilter();
+    }
+
+    function applyFilter() {
+        document.querySelectorAll('.sent-card').forEach(card => {
+            if (filter==='all') { card.classList.remove('hidden'); return; }
+            const un = card.classList.contains('unclear');
+            const cl = card.classList.contains('clear');
+            const no = !un && !cl;
+            card.classList.toggle('hidden',
+                filter==='unclear' ? !un :
+                filter==='clear'   ? !cl : !no
+            );
+        });
+    }
+
+    function resetAll() {
+        if (!confirm('Сбросить все отметки?')) return;
+        state = {}; save(state); render();
+    }
+
+    render();
+    </script>
+</body>
+</html>

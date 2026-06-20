@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1&ndash;B2 Society &amp; Values | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 7px;
+            margin: 0.5rem 0 0.25rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #a371f7, #c084fc);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+        }
+        .progress-label span { color: #c084fc; font-weight: 700; }
+
+        .controls {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.3rem;
+        }
+        .ctrl-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary {
+            background: rgba(163,113,247,0.15);
+            border-color: rgba(163,113,247,0.4);
+            color: #c084fc;
+        }
+        .ctrl-btn.primary:hover { background: rgba(163,113,247,0.25); color: #fff; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 0.65rem;
+        }
+
+        .fcard {
+            position: relative;
+            min-height: 155px;
+            border-radius: 13px;
+            background: rgba(13,17,23,0.82);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .fcard::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 13px 0 0 13px;
+            background: #a371f7;
+        }
+        .fcard::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 4px; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(163,113,247,0.45), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+
+        .fcard-front {
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 155px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 1rem; font-weight: 700; color: rgba(163,113,247,0.6); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.83rem; color: rgba(255,255,255,0.38); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.76rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+
+        .fcard-back {
+            display: none;
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 155px;
+            flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1.12rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en {
+            font-size: 0.93rem; font-weight: 600; color: rgba(255,255,255,0.62);
+            margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .fcard-en::before {
+            content: 'DE'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem;
+            border-radius: 5px; background: rgba(255,193,7,0.15); color: #ffd55a;
+            border: 1px solid rgba(255,193,7,0.3); letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .fcard-example { font-size: 0.84rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.97rem; font-style: italic; color: rgba(163,113,247,0.9); margin-top: 0.42rem; line-height: 1.55; border-left: 2px solid rgba(163,113,247,0.35); padding-left: 0.5rem; }
+        .fcard-frage {
+            font-size: 0.83rem;
+            color: rgba(52,211,153,0.85);
+            margin-top: 0.5rem;
+            line-height: 1.5;
+            border-left: 2px solid rgba(52,211,153,0.3);
+            padding-left: 0.5rem;
+        }
+        .know-btn {
+            display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem;
+            border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28);
+            color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer;
+            width: fit-content; transition: all 0.2s; align-self: flex-start;
+        }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+
+        .group-label {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin: 1.5rem 0 0.65rem;
+            font-size: 0.77rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--color-text-muted);
+        }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+        .done-screen {
+            display: none; text-align: center; padding: 2rem 1rem;
+            border-radius: 16px; background: rgba(13,17,23,0.6);
+            border: 1px solid rgba(163,113,247,0.3); margin-top: 1.5rem;
+        }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #c084fc; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+
+        .intro-box {
+            background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02));
+            border: 1px solid rgba(163,113,247,0.22);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.3rem;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: rgba(230,230,235,0.8);
+        }
+        .intro-box strong { color: #c084fc; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .fcard-front, .fcard-back { min-height: 135px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; }
+            .fcard-word { font-size: 1.08rem; }
+        }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+
+        .day-tabs {
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
+            margin-bottom: 1.1rem;
+        }
+        .day-tab {
+            padding: 0.52rem 1.1rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .day-tab.active {
+            background: rgba(163,113,247,0.18);
+            border-color: rgba(163,113,247,0.5);
+            color: #c084fc;
+        }
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+
+        .tagesartikel {
+            background: #fffdf7;
+            border-left: 5px solid #b8860b;
+            border-radius: 0 12px 12px 0;
+            padding: 1.3rem 1.6rem 1.2rem;
+            margin: 0 0 2rem 0;
+            font-family: Georgia, 'Times New Roman', serif;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .tagesartikel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            gap: 0.8rem;
+        }
+        .tagesartikel-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #b8860b;
+            font-family: sans-serif;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+        .tagesartikel h3 {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #1a120a;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .tagesartikel-toggle {
+            background: none;
+            border: 1px solid #d4a017;
+            border-radius: 50%;
+            width: 28px; height: 28px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #b8860b;
+            padding: 0; flex-shrink: 0;
+            transition: transform 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 2px;
+        }
+        .tagesartikel-body {
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+        .tagesartikel-body.collapsed { max-height: 0; }
+        .tagesartikel-body.expanded { max-height: 9999px; }
+        .tagesartikel-body p {
+            font-size: 0.95rem;
+            line-height: 1.85;
+            color: #1a120a;
+            margin: 0.9rem 0 0;
+        }
+        .tagesartikel b { color: #7a4f00; font-weight: 700; }
+        .fcard-trans { font-size: 0.76rem; color: rgba(163,113,247,0.65); margin-top: 0.13rem; letter-spacing: 0.1px; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">B1&ndash;B2 Society &amp; Values</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Society &amp; Values <span style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">B1&ndash;B2</span></h1>
+            <p class="page-subtitle">Responsibility &bull; Equality &bull; Change &mdash; 69 units: words, phrases &amp; expressions</p>
+        </div>
+
+        <div class="intro-box">
+            &#x1F91D; <strong>For conversation practice:</strong> Learn the words &mdash; then use the <span style="color:rgba(52,211,153,0.9);">green questions</span> on the back of each card to start a discussion. Try to use as many B1&ndash;B2 words as possible in your answers.
+        </div>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="switchDay(1)">&#x1F4C5; Day 1 &bull; 23 cards</button>
+            <button class="day-tab" onclick="switchDay(2)">&#x1F4C5; Day 2 &bull; 23 cards</button>
+            <button class="day-tab" onclick="switchDay(3)">&#x1F4C5; Day 3 &bull; 23 cards</button>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-b1"></div></div>
+        <div class="progress-label">Learned: <span id="num-b1">0</span> / <span id="total-b1">23</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Reveal all</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Reset</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Shuffle</button>
+        </div>
+
+        <div id="cards-b1">
+
+            <!-- ===== DAY 1 ===== -->
+            <div class="day-content active" data-day="1">
+
+            <div class="tagesartikel">
+                <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                    <div>
+                        <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                        <h3>What Makes a Good Society? Values, Responsibility, and the Power of Community</h3>
+                    </div>
+                    <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+                </div>
+                <div class="tagesartikel-body collapsed">
+                <p>What does it mean to live in a good society? For many people, the answer starts with <b>community</b> — the feeling that you belong to something bigger than yourself. A strong <b>community</b> is one where people support each other, share responsibilities, and accept differences. But building this kind of society requires something more: it requires <b>responsibility</b>.</p>
+                <p><b>Responsibility</b> is not just about following rules. It is about choosing to act in a way that helps others — even when it is difficult. Many people <b>take for granted</b> the services and freedoms they enjoy, without thinking about who maintains them. Clean streets, safe schools, and functioning hospitals exist because people — not just governments — decide they matter.</p>
+                <p><b>Diversity</b> is another essential part of a healthy society. When different people with different backgrounds and ideas work together, the results are almost always better. Of course, diversity also brings <b>challenges</b> and <b>conflicts</b>. People have different values, different <b>attitudes</b>, and different ideas about what is fair. This can create tension — but it can also lead to growth, if people are willing to listen and <b>consider</b> other points of view.</p>
+                <p><b>Equality</b> means giving everyone the same <b>opportunities</b> — regardless of where they were born or who their parents are. When people feel that the system is fair, they are more likely to contribute and to <b>involve</b> themselves in public life. When they feel it is not, they disengage — and that is where real problems begin.</p>
+                <p>Building a just society is never finished. It is a continuous process of reflection, debate, and courage. But it starts with each of us asking: what can I do today to make this place a little better for everyone?</p>
+                </div>
+            </div>
+
+            <div class="group-label">&#x1F4D6; Nouns</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">responsibility</div><div class="fcard-hint">NOUN &bull; B1 &bull; responsibility for sth &bull; Pl.: responsibilities</div></div><div class="fcard-back"><div class="fcard-ua">ответственность</div><div class="fcard-en">die Verantwortung, die Pflicht</div><div class="fcard-example">"Parents have a responsibility to teach their children good values."</div><div class="fcard-poem">Responsibility — a weight you carry alone,<br>ответственность — её не отдать другому.</div><div class="fcard-frage">&#x1F4AC; Do you think young people today have a strong sense of responsibility? Why or why not?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">community</div><div class="fcard-hint">NOUN &bull; B1 &bull; a local / tight-knit community &bull; Pl.: communities</div></div><div class="fcard-back"><div class="fcard-ua">сообщество / местное сообщество</div><div class="fcard-en">die Gemeinschaft, das Viertel</div><div class="fcard-example">"A strong community supports its members in difficult times."</div><div class="fcard-poem">Community — every "me" becomes "we",<br>сообщество — я стал частью целого.</div><div class="fcard-frage">&#x1F4AC; What does your local community do well? What could be improved?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">diversity</div><div class="fcard-hint">NOUN &bull; B2 &bull; cultural / ethnic diversity &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">разнообразие / многообразие</div><div class="fcard-en">die Vielfalt, das Vielerlei</div><div class="fcard-example">"Diversity in the workplace often leads to more creative ideas and better results."</div><div class="fcard-poem">Diversity — not the same, but together strong,<br>разнообразие — сила в различиях.</div><div class="fcard-frage">&#x1F4AC; How does cultural diversity affect the city or country where you live?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">equality</div><div class="fcard-hint">NOUN &bull; B2 &bull; gender / racial equality &bull; &ne; inequality</div></div><div class="fcard-back"><div class="fcard-ua">равенство</div><div class="fcard-en">die Gleichheit, die Gleichberechtigung</div><div class="fcard-example">"Equality means everyone has the same rights and opportunities, regardless of background."</div><div class="fcard-poem">Equality — no higher, no lower,<br>равенство — одна высота для всех.</div><div class="fcard-frage">&#x1F4AC; Is true equality possible in modern society? What would need to change?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">opportunity</div><div class="fcard-hint">NOUN &bull; B1 &bull; opportunity to do sth / for sth &bull; Pl.: opportunities</div></div><div class="fcard-back"><div class="fcard-ua">возможность / шанс</div><div class="fcard-en">die M&ouml;glichkeit, die Chance</div><div class="fcard-example">"Education gives people the opportunity to change their lives for the better."</div><div class="fcard-poem">Opportunity — a door that opens once,<br>возможность — её можно упустить.</div><div class="fcard-frage">&#x1F4AC; What opportunities do young people have today that their grandparents didn't?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">challenge</div><div class="fcard-hint">NOUN &bull; B1 &bull; face a challenge / major challenge &bull; Pl.: challenges</div></div><div class="fcard-back"><div class="fcard-ua">вызов / трудность / проблема</div><div class="fcard-en">die Herausforderung, das Problem</div><div class="fcard-example">"Climate change is one of the biggest challenges facing our generation."</div><div class="fcard-poem">Challenge — a wall, or a ladder — you choose,<br>вызов — всё зависит, как ты смотришь.</div><div class="fcard-frage">&#x1F4AC; What is the biggest challenge facing your country right now?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">conflict</div><div class="fcard-hint">NOUN &bull; B1 &bull; conflict between / over sth &bull; Pl.: conflicts</div></div><div class="fcard-back"><div class="fcard-ua">конфликт / столкновение</div><div class="fcard-en">der Konflikt, der Streit</div><div class="fcard-example">"Conflicts often arise when people with different values have to work together."</div><div class="fcard-poem">Conflict — two truths that cannot both win,<br>конфликт — пока кто-то не уступит.</div><div class="fcard-frage">&#x1F4AC; How do you personally deal with conflict in your daily life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">attitude</div><div class="fcard-hint">NOUN &bull; B1 &bull; attitude to / towards sth &bull; Pl.: attitudes</div></div><div class="fcard-back"><div class="fcard-ua">отношение / позиция / взгляды</div><div class="fcard-en">die Einstellung, die Haltung</div><div class="fcard-example">"Your attitude towards failure can determine your future success."</div><div class="fcard-poem">Attitude — how you face the world each day,<br>отношение — зеркало твоей души.</div><div class="fcard-frage">&#x1F4AC; How can a positive attitude change the way you experience difficulties?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">to overcome</div><div class="fcard-hint">VERB &bull; B2 &bull; overcome a difficulty / obstacle &bull; overcame / overcome (irreg.)</div></div><div class="fcard-back"><div class="fcard-ua">преодолевать / справляться с</div><div class="fcard-en">&uuml;berwinden, bew&auml;ltigen</div><div class="fcard-example">"With hard work and support, most people can overcome serious difficulties."</div><div class="fcard-poem">Overcome — not around, but straight through,<br>преодолеть — вышел с другой стороны.</div><div class="fcard-frage">&#x1F4AC; Describe a challenge you have overcome. What helped you most?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">to affect</div><div class="fcard-hint">VERB &bull; B1 &bull; affect sb/sth &bull; &ne; effect (noun!) &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">влиять на / затрагивать</div><div class="fcard-en">beeinflussen, betreffen</div><div class="fcard-example">"Social media affects the way young people see themselves and the world around them."</div><div class="fcard-poem">Affect — a stone in still water — it spreads,<br>влиять — последствия шире, чем кажется.</div><div class="fcard-frage">&#x1F4AC; How does social media affect people's mental health, in your opinion?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">to involve</div><div class="fcard-hint">VERB &bull; B1 &bull; involve sb in sth / involve doing sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">включать / вовлекать / предполагать</div><div class="fcard-en">einbeziehen, beinhalten</div><div class="fcard-example">"Solving social problems involves the cooperation of governments and ordinary citizens."</div><div class="fcard-poem">Involve — everyone in, no one left out,<br>вовлекать — никто не остаётся в стороне.</div><div class="fcard-frage">&#x1F4AC; How can young people be more involved in political and social decision-making?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">to consider</div><div class="fcard-hint">VERB &bull; B1 &bull; consider sth / consider doing sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">считать / рассматривать / принимать во внимание</div><div class="fcard-en">ber&uuml;cksichtigen, betrachten</div><div class="fcard-example">"We should consider the needs of future generations when making decisions today."</div><div class="fcard-poem">Consider — all angles before you move,<br>рассмотреть — не спеши с выводами.</div><div class="fcard-frage">&#x1F4AC; What factors should governments consider most when making new laws?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">significant</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a significant change / effect / problem &bull; &ne; insignificant</div></div><div class="fcard-back"><div class="fcard-ua">значительный / важный / существенный</div><div class="fcard-en">bedeutend, erheblich</div><div class="fcard-example">"Poverty has a significant effect on children's health, education, and future prospects."</div><div class="fcard-poem">Significant — not just a detail, but a mark,<br>значительный — оставляет след.</div><div class="fcard-frage">&#x1F4AC; What is the most significant social problem in your country today?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">essential</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; essential for sb/sth &bull; it is essential that... &bull; stronger than "important"</div></div><div class="fcard-back"><div class="fcard-ua">необходимый / существенный / основной</div><div class="fcard-en">wesentlich, unverzichtbar</div><div class="fcard-example">"Clean water and access to education are essential for a decent quality of life."</div><div class="fcard-poem">Essential — remove it and the whole thing falls,<br>необходимый — без этого никак.</div><div class="fcard-frage">&#x1F4AC; What three things do you consider most essential for a happy life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">tolerant</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; tolerant of / towards sb &bull; &ne; intolerant</div></div><div class="fcard-back"><div class="fcard-ua">терпимый / толерантный</div><div class="fcard-en">tolerant, aufgeschlossen</div><div class="fcard-example">"A tolerant society accepts people with different beliefs, backgrounds, and lifestyles."</div><div class="fcard-poem">Tolerant — room for you and for me,<br>терпимый — разные, но вместе.</div><div class="fcard-frage">&#x1F4AC; Are there limits to tolerance? What should society never tolerate?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">aware</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; aware of sth &bull; be / become aware &bull; always used with "of"</div></div><div class="fcard-back"><div class="fcard-ua">осознающий / осведомлённый</div><div class="fcard-en">bewusst, informiert</div><div class="fcard-example">"Young people are more aware of environmental issues than older generations."</div><div class="fcard-poem">Aware — eyes open, not just looking,<br>осведомлённый — видишь, что скрыто.</div><div class="fcard-frage">&#x1F4AC; Are people in your country sufficiently aware of social inequality? Why or why not?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">I believe that...</div><div class="fcard-hint">PHRASE &bull; B1 &bull; more formal than "I think" &bull; spoken &amp; written</div></div><div class="fcard-back"><div class="fcard-ua">Я считаю, что... / Я полагаю, что...</div><div class="fcard-en">Ich glaube, dass... / Ich bin der Meinung, dass...</div><div class="fcard-example">"I believe that equal access to education is a basic human right."</div><div class="fcard-poem">&#x1F4CC; More considered than "I think" — sounds thought through.<br>Подсказка: звучит обдуманно, не импульсивно.</div><div class="fcard-frage">&#x1F4AC; Use this phrase to share your view on one important social issue.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">In my opinion...</div><div class="fcard-hint">PHRASE &bull; B1 &bull; standard for personal views &bull; written &amp; spoken &bull; always + comma</div></div><div class="fcard-back"><div class="fcard-ua">По моему мнению... / На мой взгляд...</div><div class="fcard-en">Meiner Meinung nach... / Meines Erachtens...</div><div class="fcard-example">"In my opinion, the government should do more to help people living in poverty."</div><div class="fcard-poem">&#x1F4CC; Always followed by a comma — In my opinion, + full sentence.<br>Подсказка: универсальная фраза для любого контекста.</div><div class="fcard-frage">&#x1F4AC; In your opinion, what is the most urgent problem governments need to solve?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">to make a difference</div><div class="fcard-hint">PHRASE &bull; B2 &bull; make a (big / real) difference &bull; very common expression</div></div><div class="fcard-back"><div class="fcard-ua">иметь значение / менять ситуацию к лучшему</div><div class="fcard-en">einen Unterschied machen, etwas bewirken</div><div class="fcard-example">"One person can make a difference — if they are willing to take action."</div><div class="fcard-poem">&#x1F50D; Literally: create a visible change — even a small action matters.<br>буквально: разница, которую можно заметить.</div><div class="fcard-frage">&#x1F4AC; Can one individual really make a difference in society, or does change only come from groups?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">to take sth for granted</div><div class="fcard-hint">PHRASE &bull; B2 &bull; take sth / sb for granted &bull; very common in discussion</div></div><div class="fcard-back"><div class="fcard-ua">принимать что-то как должное</div><div class="fcard-en">etw. als selbstverst&auml;ndlich betrachten</div><div class="fcard-example">"We often take clean water and electricity for granted — until we lose them."</div><div class="fcard-poem">&#x1F50D; To "grant" = to give. We forget it was a gift.<br>Подсказка: не замечаем то, что имеем — пока не потеряем.</div><div class="fcard-frage">&#x1F4AC; What rights or freedoms do people in your country take for granted?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#21</div><div class="fcard-word">on the one hand... on the other hand</div><div class="fcard-hint">PHRASE &bull; B2 &bull; essential for balanced arguments &bull; essays &amp; discussions</div></div><div class="fcard-back"><div class="fcard-ua">с одной стороны... с другой стороны</div><div class="fcard-en">einerseits... andererseits</div><div class="fcard-example">"On the one hand, technology connects us. On the other hand, it can isolate us."</div><div class="fcard-poem">&#x1F4CC; Use both parts together — never say "on the other hand" alone!<br>Подсказка: оба элемента нужны для полной мысли.</div><div class="fcard-frage">&#x1F4AC; Use this structure to discuss the advantages and disadvantages of social media.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#22</div><div class="fcard-word">to go through (difficult times)</div><div class="fcard-hint">PHRASE &bull; B1 &bull; go through a difficult period / experience / changes</div></div><div class="fcard-back"><div class="fcard-ua">переживать трудные времена / проходить через трудности</div><div class="fcard-en">schwere Zeiten durchmachen, durchgehen</div><div class="fcard-example">"Many families are going through difficult times because of the economic crisis."</div><div class="fcard-poem">&#x1F50D; "Go through" = experience something hard — can't say "pass through difficult times".<br>Подсказка: нельзя "pass through" в этом значении.</div><div class="fcard-frage">&#x1F4AC; Have you or someone close to you gone through a particularly difficult period? What helped?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#23</div><div class="fcard-word">as far as I'm concerned</div><div class="fcard-hint">PHRASE &bull; B2 &bull; signals a personal standpoint &bull; slightly stronger than "in my opinion"</div></div><div class="fcard-back"><div class="fcard-ua">что касается меня / с моей точки зрения</div><div class="fcard-en">was mich betrifft, meinerseits</div><div class="fcard-example">"As far as I'm concerned, honesty is the most important quality in a friend."</div><div class="fcard-poem">&#x1F4CC; Implies: "I don't care what others think — this is my position."<br>Подсказка: немного сильнее, чем "in my opinion".</div><div class="fcard-frage">&#x1F4AC; Use this phrase to express your personal view on a controversial topic.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+            </div><!-- /day-1 -->
+
+            <!-- ===== DAY 2 ===== -->
+            <div class="day-content" data-day="2">
+
+            <div class="tagesartikel">
+                <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                    <div>
+                        <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                        <h3>Justice, Tolerance, and Prejudice: The Hidden Challenges of Modern Life</h3>
+                    </div>
+                    <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+                </div>
+                <div class="tagesartikel-body collapsed">
+                <p><b>Tolerance</b> is easy to talk about and difficult to practise. Most people agree that we should accept others — but in reality, when someone challenges our worldview, <b>prejudice</b> quickly takes over. <b>Prejudice</b> does not always come from hatred. More often, it comes from fear and lack of knowledge. <b>Awareness</b> is the first step towards change.</p>
+                <p>When we understand where our assumptions come from, we can begin to question them. This requires effort — it is much easier to <b>struggle</b> with our own discomfort in silence than to admit that we might be wrong. But admitting it is precisely what growth looks like.</p>
+                <p><b>Justice</b> means that people are treated fairly — that the same rules apply to everyone. In practice, however, <b>inequality</b> is still widespread. Some people have more access to education, healthcare, and legal protection simply because of where they were born. This is not just unfair — it is a problem that <b>affects</b> the whole of society, because inequality reduces trust and solidarity.</p>
+                <p>The good news is that change is possible. Every generation has the power to <b>reduce</b> injustice — if it is willing to <b>support</b> those who are most affected, to <b>achieve</b> real reform, and to <b>contribute</b> to a more equal world. The <b>impact</b> of small acts of fairness should not be underestimated. When people feel they belong and are treated with dignity, society as a whole <b>benefits</b>.</p>
+                </div>
+            </div>
+
+            <div class="group-label">&#x1F4D6; Nouns</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#24</div><div class="fcard-word">tolerance</div><div class="fcard-hint">NOUN &bull; B1 &bull; tolerance of / towards sb/sth &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">терпимость / толерантность</div><div class="fcard-en">die Toleranz, die Duldsamkeit</div><div class="fcard-example">"Tolerance is the foundation of a peaceful, multicultural society."</div><div class="fcard-poem">Tolerance — room for both of us, not just me,<br>терпимость — не соглашаться, но принимать.</div><div class="fcard-frage">&#x1F4AC; Is it possible to be tolerant of views that you find deeply wrong?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#25</div><div class="fcard-word">prejudice</div><div class="fcard-hint">NOUN &bull; B2 &bull; prejudice against sb &bull; Pl.: prejudices</div></div><div class="fcard-back"><div class="fcard-ua">предрассудок / предубеждение</div><div class="fcard-en">das Vorurteil, die Voreingenommenheit</div><div class="fcard-example">"Prejudice often comes from a lack of personal contact with people who are different."</div><div class="fcard-poem">Prejudice — judging before you know,<br>предрассудок — видишь то, чего нет.</div><div class="fcard-frage">&#x1F4AC; Have you ever overcome a prejudice? What changed your mind?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#26</div><div class="fcard-word">awareness</div><div class="fcard-hint">NOUN &bull; B2 &bull; raise awareness of sth &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">осведомлённость / осознанность</div><div class="fcard-en">das Bewusstsein, die Bewusstheit</div><div class="fcard-example">"Raising awareness about mental health has helped reduce the shame around it."</div><div class="fcard-poem">Awareness — seeing what was always there,<br>осознанность — первый шаг к переменам.</div><div class="fcard-frage">&#x1F4AC; Which social issue needs more public awareness in your country?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#27</div><div class="fcard-word">justice</div><div class="fcard-hint">NOUN &bull; B1 &bull; social / criminal justice &bull; &ne; injustice</div></div><div class="fcard-back"><div class="fcard-ua">справедливость / правосудие</div><div class="fcard-en">die Gerechtigkeit, das Recht</div><div class="fcard-example">"Many people feel that the justice system does not treat everyone equally."</div><div class="fcard-poem">Justice — the same scale for everyone,<br>справедливость — редко, но возможна.</div><div class="fcard-frage">&#x1F4AC; Do you think the justice system in your country is fair? Give an example.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#28</div><div class="fcard-word">inequality</div><div class="fcard-hint">NOUN &bull; B2 &bull; social / economic inequality &bull; &ne; equality</div></div><div class="fcard-back"><div class="fcard-ua">неравенство / несправедливость</div><div class="fcard-en">die Ungleichheit, das Gef&auml;lle</div><div class="fcard-example">"Social inequality is growing in many developed countries, despite economic growth."</div><div class="fcard-poem">Inequality — same starting line? Not quite.<br>неравенство — не все стоят у одной черты.</div><div class="fcard-frage">&#x1F4AC; What is the main cause of inequality in your country — education, class, or something else?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#29</div><div class="fcard-word">benefit</div><div class="fcard-hint">NOUN &bull; B1 &bull; benefit of / for sth &bull; Pl.: benefits &bull; also VERB: benefit from</div></div><div class="fcard-back"><div class="fcard-ua">польза / преимущество / выгода</div><div class="fcard-en">der Vorteil, der Nutzen</div><div class="fcard-example">"The benefits of living in a diverse society include greater creativity and understanding."</div><div class="fcard-poem">Benefit — what you gain, not what you spend,<br>польза — то, что остаётся после.</div><div class="fcard-frage">&#x1F4AC; What are the main benefits of multiculturalism for a country?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#30</div><div class="fcard-word">impact</div><div class="fcard-hint">NOUN &bull; B2 &bull; have an impact on sb/sth &bull; positive / negative impact</div></div><div class="fcard-back"><div class="fcard-ua">воздействие / влияние / последствие</div><div class="fcard-en">die Auswirkung, der Einfluss</div><div class="fcard-example">"The impact of social media on political opinions is stronger than many people realise."</div><div class="fcard-poem">Impact — a force that changes what was,<br>влияние — невидимо, но ощутимо.</div><div class="fcard-frage">&#x1F4AC; What has been the greatest impact of the internet on society in your lifetime?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#31</div><div class="fcard-word">solution</div><div class="fcard-hint">NOUN &bull; B1 &bull; solution to / for a problem &bull; Pl.: solutions</div></div><div class="fcard-back"><div class="fcard-ua">решение / выход из ситуации</div><div class="fcard-en">die L&ouml;sung, der Ausweg</div><div class="fcard-example">"There is no simple solution to the problem of poverty — it requires long-term effort."</div><div class="fcard-poem">Solution — the other side of every problem,<br>решение — всегда существует, если искать.</div><div class="fcard-frage">&#x1F4AC; What do you think is the best solution to growing social inequality?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#32</div><div class="fcard-word">to struggle</div><div class="fcard-hint">VERB &bull; B1 &bull; struggle to do sth / with sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">бороться / испытывать трудности</div><div class="fcard-en">k&auml;mpfen, sich abm&uuml;hen</div><div class="fcard-example">"Many single parents struggle to balance work and family responsibilities."</div><div class="fcard-poem">Struggle — it doesn't come easily, but you try,<br>бороться — и это уже победа.</div><div class="fcard-frage">&#x1F4AC; What do you personally struggle with most in daily life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#33</div><div class="fcard-word">to contribute</div><div class="fcard-hint">VERB &bull; B2 &bull; contribute to sth &bull; contribute sth to sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">вносить вклад / способствовать / участвовать</div><div class="fcard-en">beitragen, mithelfen</div><div class="fcard-example">"Every person, regardless of age or background, can contribute to society in some way."</div><div class="fcard-poem">Contribute — the small brick that builds the wall,<br>вносить вклад — даже малое важно.</div><div class="fcard-frage">&#x1F4AC; In what ways do you currently contribute to your local community?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#34</div><div class="fcard-word">to achieve</div><div class="fcard-hint">VERB &bull; B1 &bull; achieve a goal / result / success &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">достигать / добиваться</div><div class="fcard-en">erreichen, erzielen</div><div class="fcard-example">"With determination and support, most people can achieve their goals."</div><div class="fcard-poem">Achieve — the finish line after the race,<br>достигать — шаг за шагом, не сразу.</div><div class="fcard-frage">&#x1F4AC; What is the most important thing you have achieved so far in your life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#35</div><div class="fcard-word">to support</div><div class="fcard-hint">VERB &bull; B1 &bull; support sb / sth &bull; support a cause / an idea &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">поддерживать / помогать / выступать за</div><div class="fcard-en">unterst&uuml;tzen, helfen</div><div class="fcard-example">"It is important to support people who are going through difficult times."</div><div class="fcard-poem">Support — a hand when you can't stand alone,<br>поддерживать — быть рядом, когда трудно.</div><div class="fcard-frage">&#x1F4AC; In what situations do you think governments have a duty to support citizens?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#36</div><div class="fcard-word">to reduce</div><div class="fcard-hint">VERB &bull; B1 &bull; reduce sth (to / by) &bull; &ne; increase &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">сокращать / уменьшать / снижать</div><div class="fcard-en">verringern, reduzieren</div><div class="fcard-example">"New policies are needed to reduce inequality in education and healthcare."</div><div class="fcard-poem">Reduce — less, until it no longer hurts,<br>уменьшать — ущерб, который ещё можно исправить.</div><div class="fcard-frage">&#x1F4AC; What is the most effective way to reduce poverty in a wealthy country?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#37</div><div class="fcard-word">effective</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an effective method / approach / solution &bull; &ne; ineffective</div></div><div class="fcard-back"><div class="fcard-ua">эффективный / действенный</div><div class="fcard-en">wirksam, effektiv</div><div class="fcard-example">"The most effective way to fight prejudice is through education and personal contact."</div><div class="fcard-poem">Effective — it works, and you can see it works,<br>эффективный — слова превращаются в результат.</div><div class="fcard-frage">&#x1F4AC; What do you think is the most effective way to teach tolerance to children?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#38</div><div class="fcard-word">relevant</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; relevant to sb/sth &bull; &ne; irrelevant &bull; NOT "relevant for" in formal English</div></div><div class="fcard-back"><div class="fcard-ua">актуальный / уместный / значимый</div><div class="fcard-en">relevant, bedeutsam</div><div class="fcard-example">"These issues are especially relevant to young people starting their adult lives."</div><div class="fcard-poem">Relevant — belongs here, in this conversation,<br>актуальный — именно сейчас, именно это.</div><div class="fcard-frage">&#x1F4AC; Which social issue is most relevant to your generation specifically?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#39</div><div class="fcard-word">unfair</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; unfair to sb / that... &bull; &ne; fair</div></div><div class="fcard-back"><div class="fcard-ua">несправедливый / нечестный</div><div class="fcard-en">ungerecht, unfair</div><div class="fcard-example">"It is unfair that people are often judged by their appearance rather than their abilities."</div><div class="fcard-poem">Unfair — the scale is tipped before you start,<br>несправедливый — правила не для всех.</div><div class="fcard-frage">&#x1F4AC; What is the most unfair aspect of the society you live in?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#40</div><div class="fcard-word">to be aware of</div><div class="fcard-hint">PHRASE &bull; B1 &bull; be / become aware of sth &bull; make sb aware of sth</div></div><div class="fcard-back"><div class="fcard-ua">осознавать / знать о / быть в курсе</div><div class="fcard-en">sich etw. bewusst sein, wissen &uuml;ber</div><div class="fcard-example">"We need to be aware of the effects our choices have on others and on the planet."</div><div class="fcard-poem">&#x1F4CC; Always "aware of" — never drop the preposition!<br>Подсказка: всегда с предлогом "of" — без него нельзя.</div><div class="fcard-frage">&#x1F4AC; Are most people in your country aware of the environmental impact of their lifestyle?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#41</div><div class="fcard-word">It depends on...</div><div class="fcard-hint">PHRASE &bull; B1 &bull; it depends on + noun / on whether + clause &bull; very frequent</div></div><div class="fcard-back"><div class="fcard-ua">Это зависит от... / Зависит от...</div><div class="fcard-en">Es kommt darauf an... / Es h&auml;ngt ab von...</div><div class="fcard-example">"Whether it works depends on how much effort people are willing to put in."</div><div class="fcard-poem">&#x1F4CC; Prevents quick generalisations — shows complex thinking.<br>Подсказка: нет простых ответов — и ты это показываешь.</div><div class="fcard-frage">&#x1F4AC; "Is immigration good for a country?" Answer using "It depends on..."</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#42</div><div class="fcard-word">to make progress</div><div class="fcard-hint">PHRASE &bull; B1 &bull; make progress on / in / towards sth &bull; no article before "progress"!</div></div><div class="fcard-back"><div class="fcard-ua">добиваться прогресса / делать успехи</div><div class="fcard-en">Fortschritte machen</div><div class="fcard-example">"Society has made progress on gender equality, but there is still a long way to go."</div><div class="fcard-poem">&#x1F50D; No article: "make progress" NOT "make a progress"!<br>Подсказка: прогресс — нельзя с артиклем "a/the".</div><div class="fcard-frage">&#x1F4AC; In what areas has your country made the most progress in the last 20 years?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#43</div><div class="fcard-word">to play a role</div><div class="fcard-hint">PHRASE &bull; B1 &bull; play a role / part in sth &bull; play a key / important / major role</div></div><div class="fcard-back"><div class="fcard-ua">играть роль / иметь значение в чём-то</div><div class="fcard-en">eine Rolle spielen</div><div class="fcard-example">"Schools play a crucial role in reducing social inequality between different groups."</div><div class="fcard-poem">&#x1F4CC; "Play a role" or "play a part" — both natural and common.<br>Подсказка: "key / important / crucial" усиливают значение.</div><div class="fcard-frage">&#x1F4AC; What role do ordinary citizens play in making society more just?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#44</div><div class="fcard-word">to take action</div><div class="fcard-hint">PHRASE &bull; B2 &bull; take action on / against sth &bull; common in formal &amp; informal use</div></div><div class="fcard-back"><div class="fcard-ua">предпринимать действия / действовать / принимать меры</div><div class="fcard-en">handeln, Ma&szlig;nahmen ergreifen</div><div class="fcard-example">"We cannot just talk about problems — we need to take action and create real change."</div><div class="fcard-poem">&#x1F4CC; "Take action" = do something concrete, not just discuss.<br>Подсказка: противоположность разговорам без последствий.</div><div class="fcard-frage">&#x1F4AC; In which area of society should your government take more urgent action?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#45</div><div class="fcard-word">to put yourself in someone's shoes</div><div class="fcard-hint">PHRASE &bull; B2 &bull; put yourself in sb's shoes / position</div></div><div class="fcard-back"><div class="fcard-ua">поставить себя на место другого</div><div class="fcard-en">sich in jmds. Lage versetzen</div><div class="fcard-example">"Before judging others, try to put yourself in their shoes and understand their situation."</div><div class="fcard-poem">&#x1F50D; Literally: wear their shoes and walk their path.<br>буквально: надеть их обувь — ощутить их путь.</div><div class="fcard-frage">&#x1F4AC; Whose shoes do you find it hardest to put yourself into — and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#46</div><div class="fcard-word">to be part of the problem</div><div class="fcard-hint">PHRASE &bull; B2 &bull; be part of the problem / solution &bull; challenges passive behaviour</div></div><div class="fcard-back"><div class="fcard-ua">быть частью проблемы / способствовать проблеме</div><div class="fcard-en">Teil des Problems sein</div><div class="fcard-example">"If we stay silent in the face of injustice, we become part of the problem."</div><div class="fcard-poem">&#x1F50D; The opposite: "be part of the solution" — a powerful contrast.<br>Подсказка: молчание тоже является позицией.</div><div class="fcard-frage">&#x1F4AC; In what situations might people be part of the problem without being aware of it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+            </div><!-- /day-2 -->
+
+            <!-- ===== DAY 3 ===== -->
+            <div class="day-content" data-day="3">
+
+            <div class="tagesartikel">
+                <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                    <div>
+                        <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                        <h3>Freedom, Rights, and Change: Who Is Responsible for a Better World?</h3>
+                    </div>
+                    <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+                </div>
+                <div class="tagesartikel-body collapsed">
+                <p>What does it mean to be free? For some people, <b>freedom</b> means the right to do whatever they want. For others, it means the right to live without fear, without <b>poverty</b>, and with access to the basics that make a good life possible. These two ideas are not always in conflict, but they often <b>demand</b> different things from society and government.</p>
+                <p>Every person has <b>rights</b>. But <b>rights</b> only matter if they are protected. Governments exist — in theory — to <b>protect</b> citizens from exploitation and harm. In practice, however, <b>welfare</b> systems are often underfunded, and the most vulnerable people suffer first when budgets are cut. It is not enough to declare that <b>equality</b> is a <b>value</b> — it must be built into every institution and law.</p>
+                <p><b>Traditions</b> are an important part of cultural identity, but they must be examined critically. Not every <b>tradition</b> deserves to be preserved. When a custom causes harm or <b>ignores</b> the <b>rights</b> of certain groups, society has a duty to question it. Each new <b>generation</b> inherits both the achievements and the mistakes of those who came before.</p>
+                <p>Change does not happen automatically. It requires people who are willing to <b>stand up for</b> what is <b>fair</b>, to <b>demand</b> that their leaders be <b>responsible</b>, and to <b>respect</b> the dignity of others. <b>Democracy</b> is not a gift; it is a practice. And like any practice, it <b>improves</b> only when we work at it.</p>
+                </div>
+            </div>
+
+            <div class="group-label">&#x1F4D6; Nouns</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#47</div><div class="fcard-word">freedom</div><div class="fcard-hint">NOUN &bull; B1 &bull; freedom of / to do sth &bull; Pl.: freedoms</div></div><div class="fcard-back"><div class="fcard-ua">свобода</div><div class="fcard-en">die Freiheit</div><div class="fcard-example">"Freedom of speech is a fundamental right in any democratic society."</div><div class="fcard-poem">Freedom — not the absence of walls, but the key,<br>свобода — это выбор, а не просто отсутствие цепей.</div><div class="fcard-frage">&#x1F4AC; Are there situations where freedom should be limited? If so, who decides?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#48</div><div class="fcard-word">rights</div><div class="fcard-hint">NOUN (plural) &bull; B1 &bull; human / civil / equal rights &bull; the right to do sth</div></div><div class="fcard-back"><div class="fcard-ua">права</div><div class="fcard-en">die Rechte (Pl.), das Recht</div><div class="fcard-example">"Every person has the right to education, healthcare, and a fair trial."</div><div class="fcard-poem">Rights — what no one should be able to take,<br>права — не подарок, а данность.</div><div class="fcard-frage">&#x1F4AC; Which rights do you think are most often ignored in the world today?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#49</div><div class="fcard-word">tradition</div><div class="fcard-hint">NOUN &bull; B1 &bull; follow / keep / challenge a tradition &bull; Pl.: traditions</div></div><div class="fcard-back"><div class="fcard-ua">традиция / обычай</div><div class="fcard-en">die Tradition, der Brauch</div><div class="fcard-example">"Some traditions bring communities together; others can hold them back."</div><div class="fcard-poem">Tradition — the echo of the ones before,<br>традиция — стоит ли её сохранять?</div><div class="fcard-frage">&#x1F4AC; Which traditions in your culture do you value most, and which would you change?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#50</div><div class="fcard-word">generation</div><div class="fcard-hint">NOUN &bull; B1 &bull; the younger / older / next generation &bull; Pl.: generations</div></div><div class="fcard-back"><div class="fcard-ua">поколение</div><div class="fcard-en">die Generation</div><div class="fcard-example">"Each generation faces different challenges from the one that came before it."</div><div class="fcard-poem">Generation — we inherit what we didn't build,<br>поколение — нам передали и проблемы, и решения.</div><div class="fcard-frage">&#x1F4AC; What do you think is the defining challenge of your generation?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#51</div><div class="fcard-word">value (n.)</div><div class="fcard-hint">NOUN &bull; B2 &bull; core / shared values &bull; Pl.: values (= principles)</div></div><div class="fcard-back"><div class="fcard-ua">ценность / принцип / убеждение</div><div class="fcard-en">der Wert, die Werte (Pl.)</div><div class="fcard-example">"Honesty, respect, and fairness are values that most societies share."</div><div class="fcard-poem">Value — what you'd keep even at a cost,<br>ценность — то, от чего не откажешься.</div><div class="fcard-frage">&#x1F4AC; What values were most important in the family you grew up in?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#52</div><div class="fcard-word">poverty</div><div class="fcard-hint">NOUN &bull; B1 &bull; live in poverty / reduce poverty &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">бедность / нищета</div><div class="fcard-en">die Armut</div><div class="fcard-example">"Poverty affects millions of people, even in some of the wealthiest countries in the world."</div><div class="fcard-poem">Poverty — not just money, but possibility denied,<br>бедность — ограничение с рождения.</div><div class="fcard-frage">&#x1F4AC; Is poverty a personal failure, a systemic problem, or both?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#53</div><div class="fcard-word">welfare</div><div class="fcard-hint">NOUN &bull; B2 &bull; social welfare / welfare state / child welfare &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">благополучие / социальное обеспечение / соцзащита</div><div class="fcard-en">das Wohlergehen, die Sozialhilfe</div><div class="fcard-example">"The government spends billions on welfare programmes to support vulnerable people."</div><div class="fcard-poem">Welfare — the net that catches those who fall,<br>соцзащита — страховка, которую держим все вместе.</div><div class="fcard-frage">&#x1F4AC; How generous should a country's welfare system be? Who should it support?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#54</div><div class="fcard-word">democracy</div><div class="fcard-hint">NOUN &bull; B1 &bull; a healthy / fragile / liberal democracy &bull; Pl.: democracies</div></div><div class="fcard-back"><div class="fcard-ua">демократия</div><div class="fcard-en">die Demokratie</div><div class="fcard-example">"Democracy only works when citizens are well-informed and actively engaged."</div><div class="fcard-poem">Democracy — the voice of many, not just one,<br>демократия — не дар, а ежедневный выбор.</div><div class="fcard-frage">&#x1F4AC; Do you think democracy is under threat in the modern world? Why or why not?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#55</div><div class="fcard-word">to demand</div><div class="fcard-hint">VERB &bull; B2 &bull; demand sth / demand that sb do sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">требовать / настаивать</div><div class="fcard-en">verlangen, fordern</div><div class="fcard-example">"Citizens are demanding greater transparency and accountability from their governments."</div><div class="fcard-poem">Demand — not asking politely, but insisting,<br>требовать — знаешь своё право.</div><div class="fcard-frage">&#x1F4AC; What should citizens demand from their governments above all else?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#56</div><div class="fcard-word">to respect</div><div class="fcard-hint">VERB &bull; B1 &bull; respect sb / respect sb's rights / decision &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">уважать / чтить / соблюдать (права)</div><div class="fcard-en">respektieren, achten</div><div class="fcard-example">"A civilised society must respect the rights and dignity of all its members."</div><div class="fcard-poem">Respect — not love, but recognition of worth,<br>уважать — видеть ценность в другом.</div><div class="fcard-frage">&#x1F4AC; Is it possible to respect someone whose values are very different from yours?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#57</div><div class="fcard-word">to ignore</div><div class="fcard-hint">VERB &bull; B1 &bull; ignore sth / ignore the fact that... &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">игнорировать / не замечать</div><div class="fcard-en">ignorieren, au&szlig;er Acht lassen</div><div class="fcard-example">"We can no longer afford to ignore the effects of climate change on future generations."</div><div class="fcard-poem">Ignore — close your eyes, but the problem stays,<br>игнорировать — не исчезнет, если не смотреть.</div><div class="fcard-frage">&#x1F4AC; What social problems do people most commonly ignore — and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#58</div><div class="fcard-word">to improve</div><div class="fcard-hint">VERB &bull; B1 &bull; improve sth / improve on sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">улучшать / совершенствовать</div><div class="fcard-en">verbessern, sich verbessern</div><div class="fcard-example">"Education can significantly improve people's quality of life and long-term opportunities."</div><div class="fcard-poem">Improve — a small step, but the direction matters,<br>улучшать — не сразу, но всё же вперёд.</div><div class="fcard-frage">&#x1F4AC; What aspect of your society would you most like to see improved in the next ten years?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#59</div><div class="fcard-word">to protect</div><div class="fcard-hint">VERB &bull; B1 &bull; protect sb/sth from / against sth &bull; regular verb</div></div><div class="fcard-back"><div class="fcard-ua">защищать / охранять / ограждать от</div><div class="fcard-en">sch&uuml;tzen, bewahren</div><div class="fcard-example">"Laws exist to protect citizens from exploitation, harm, and discrimination."</div><div class="fcard-poem">Protect — a wall around what matters most,<br>защищать — потому что это важно.</div><div class="fcard-frage">&#x1F4AC; Who or what do you feel most needs protection in today's society?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#60</div><div class="fcard-word">responsible</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; responsible for sth &bull; &ne; irresponsible</div></div><div class="fcard-back"><div class="fcard-ua">ответственный / несущий ответственность</div><div class="fcard-en">verantwortlich, verantwortungsbewusst</div><div class="fcard-example">"Every citizen should be responsible for their impact on the local environment."</div><div class="fcard-poem">Responsible — you own the outcome, good or bad,<br>ответственный — не перекладывает на других.</div><div class="fcard-frage">&#x1F4AC; Do you think corporations should be held more responsible for their environmental impact?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#61</div><div class="fcard-word">equal</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; equal rights / on equal terms &bull; &ne; unequal</div></div><div class="fcard-back"><div class="fcard-ua">равный / равноправный</div><div class="fcard-en">gleich, gleichberechtigt</div><div class="fcard-example">"In theory, all citizens are equal before the law — in practice, this is not always true."</div><div class="fcard-poem">Equal — same weight on both sides of the scale,<br>равный — в теории всегда, на практике — реже.</div><div class="fcard-frage">&#x1F4AC; In your country, are men and women truly equal in the workplace?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#62</div><div class="fcard-word">fair</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; fair to sb / fair that... &bull; &ne; unfair</div></div><div class="fcard-back"><div class="fcard-ua">справедливый / честный / разумный</div><div class="fcard-en">gerecht, fair</div><div class="fcard-example">"The tax system should be fair — those who earn more should contribute more."</div><div class="fcard-poem">Fair — not always equal, but always honest,<br>справедливый — иногда разные условия для равного результата.</div><div class="fcard-frage">&#x1F4AC; Do you think the tax system in your country is fair? What would you change?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+
+            <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+            <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#63</div><div class="fcard-word">There is no doubt that...</div><div class="fcard-hint">PHRASE &bull; B2 &bull; formal &bull; introduces a strong, confident claim</div></div><div class="fcard-back"><div class="fcard-ua">Нет сомнений в том, что... / Несомненно...</div><div class="fcard-en">Es steht au&szlig;er Frage, dass... / Zweifellos...</div><div class="fcard-example">"There is no doubt that social media has permanently changed the way we communicate."</div><div class="fcard-poem">&#x1F4CC; Use when you are confident — don't use for uncertain claims.<br>Подсказка: звучит как факт — только для сильных утверждений.</div><div class="fcard-frage">&#x1F4AC; Finish the sentence: "There is no doubt that in the future, society will..."</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#64</div><div class="fcard-word">The fact is that...</div><div class="fcard-hint">PHRASE &bull; B2 &bull; introduces reality / a hard truth &bull; counters an argument</div></div><div class="fcard-back"><div class="fcard-ua">Дело в том, что... / Правда в том, что...</div><div class="fcard-en">Tatsache ist, dass... / Es ist eine Tatsache, dass...</div><div class="fcard-example">"The fact is that poverty affects children's ability to learn and reach their potential."</div><div class="fcard-poem">&#x1F4CC; Introduces a reality the listener might not want to hear.<br>Подсказка: когда нужно указать на неудобную правду.</div><div class="fcard-frage">&#x1F4AC; Use "The fact is that..." to make a point about a social problem in your country.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#65</div><div class="fcard-word">to deal with</div><div class="fcard-hint">PHRASE &bull; B1 &bull; deal with a problem / situation / person &bull; very frequent phrasal verb</div></div><div class="fcard-back"><div class="fcard-ua">справляться с / иметь дело с / решать (проблему)</div><div class="fcard-en">umgehen mit, sich befassen mit</div><div class="fcard-example">"Governments around the world struggle to deal with the problem of homelessness."</div><div class="fcard-poem">&#x1F50D; "Deal with" = address and handle — very versatile!<br>Подсказка: одна из самых частых фраз в разговоре.</div><div class="fcard-frage">&#x1F4AC; How do you personally deal with stress or difficult emotions?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#66</div><div class="fcard-word">to be in charge of</div><div class="fcard-hint">PHRASE &bull; B2 &bull; be in charge of sth / sb &bull; "who is in charge?" = responsible</div></div><div class="fcard-back"><div class="fcard-ua">отвечать за / быть ответственным за / руководить</div><div class="fcard-en">zust&auml;ndig sein f&uuml;r, verantwortlich sein f&uuml;r</div><div class="fcard-example">"Who is in charge of making sure that these environmental laws are actually followed?"</div><div class="fcard-poem">&#x1F4CC; "In charge" = makes decisions AND bears responsibility.<br>Подсказка: не просто выполняет — а несёт ответственность.</div><div class="fcard-frage">&#x1F4AC; Who should be in charge of fighting climate change — governments or companies?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#67</div><div class="fcard-word">up to a point</div><div class="fcard-hint">PHRASE &bull; B2 &bull; used to partially agree &bull; very useful in discussions and essays</div></div><div class="fcard-back"><div class="fcard-ua">до определённой степени / отчасти</div><div class="fcard-en">bis zu einem gewissen Grad, in gewissem Ma&szlig;e</div><div class="fcard-example">"I agree with you up to a point, but I think there are other important factors too."</div><div class="fcard-poem">&#x1F4CC; Shows nuanced thinking — you're not 100% for or against.<br>Подсказка: избегаешь крайностей и показываешь взвешенность.</div><div class="fcard-frage">&#x1F4AC; "Social media is dangerous." Do you agree — up to a point, or completely?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#68</div><div class="fcard-word">to stand up for</div><div class="fcard-hint">PHRASE &bull; B2 &bull; stand up for sb/sth &bull; phrasal verb &bull; = defend actively</div></div><div class="fcard-back"><div class="fcard-ua">защищать / вступаться за / отстаивать</div><div class="fcard-en">eintreten f&uuml;r, sich einsetzen f&uuml;r</div><div class="fcard-example">"We must stand up for the rights of those who cannot speak for themselves."</div><div class="fcard-poem">&#x1F50D; Literally: stand on your feet for someone — don't stay sitting.<br>буквально: встать ради кого-то — не оставаться в стороне.</div><div class="fcard-frage">&#x1F4AC; When was the last time you stood up for something you believed in?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#69</div><div class="fcard-word">to look down on</div><div class="fcard-hint">PHRASE &bull; B2 &bull; look down on sb &bull; negative meaning — never complimentary</div></div><div class="fcard-back"><div class="fcard-ua">смотреть свысока на / пренебрегать / относиться с презрением</div><div class="fcard-en">auf jmdn. herabschauen, verachten</div><div class="fcard-example">"People sometimes look down on those with less money or education — and that is wrong."</div><div class="fcard-poem">&#x1F50D; Literally: you are higher up, they are below — but that's just arrogance.<br>буквально: смотришь вниз — но это не значит, что ты выше.</div><div class="fcard-frage">&#x1F4AC; Are there groups that are often looked down on in your society? Why does this happen?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+            </div>
+            </div><!-- /day-3 -->
+
+        </div><!-- #cards-b1 -->
+
+        <div class="done-screen" id="done-b1">
+            <div class="done-icon">&#x1F9E0;</div>
+            <h2>&#x1F3C6; All 3 days completed!</h2>
+            <p>Now use the green questions to practise speaking with a partner. Try to use as many new words as possible! &#x1F91D;</p>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        const DAY_TOTALS = {1: 23, 2: 23, 3: 23};
+        const dayCounts = {1: 0, 2: 0, 3: 0};
+        let currentDay = 1;
+
+        function toggleArtikel(header) {
+            const body = header.nextElementSibling;
+            const btn = header.querySelector('.tagesartikel-toggle');
+            if (body.classList.contains('collapsed')) {
+                body.classList.replace('collapsed', 'expanded');
+                btn.style.transform = 'rotate(180deg)';
+            } else {
+                body.classList.replace('expanded', 'collapsed');
+                btn.style.transform = '';
+            }
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
+            document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = DAY_TOTALS[currentDay];
+            const cnt = dayCounts[currentDay];
+            document.getElementById('bar-b1').style.width = (cnt / total * 100) + '%';
+            document.getElementById('num-b1').textContent = cnt;
+            document.getElementById('total-b1').textContent = total;
+            const allDone = Object.keys(DAY_TOTALS).every(function(d) {
+                return dayCounts[d] === DAY_TOTALS[d];
+            });
+            document.getElementById('done-b1').classList.toggle('show', allDone);
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const dayEl = card.closest('.day-content');
+            const day = dayEl ? parseInt(dayEl.dataset.day) : currentDay;
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) {
+                card.classList.remove('known');
+                btn.textContent = '✓ I know it';
+                dayCounts[day] = Math.max(0, dayCounts[day] - 1);
+            } else {
+                card.classList.add('known');
+                btn.textContent = '✓ Learned!';
+                dayCounts[day]++;
+            }
+            if (day === currentDay) updateProgress();
+        }
+
+        function flipAll() {
+            document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+        }
+
+        function resetAll() {
+            document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ I know it');
+            dayCounts[currentDay] = 0;
+            updateProgress();
+        }
+
+        function shuffleCards() {
+            document.querySelectorAll('.day-content.active .card-grid').forEach(function(grid) {
+                const cards = [...grid.children];
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+        (function(){var T={"responsibility":"[риспонсэби́литэ]","community":"[кэмью́нитэ]","diversity":"[дэйвё́:ситэ]","equality":"[ику́элитэ]","opportunity":"[опэтью́нитэ]","challenge":"[чэ́линдж]","conflict":"[ко́нфлект]","attitude":"[э́титью:д]","to overcome":"[оувэка́м]","to affect":"[эфэ́кт]","to involve":"[инво́лв]","to consider":"[кэнси́дэ]","significant":"[сигни́фикэнт]","essential":"[исэ́ншэл]","tolerant":"[то́лэрэнт]","aware":"[эвэ́э]","I believe that...":"[ай бэли́:в зэт]","In my opinion...":"[ин май эпи́нэн]","to make a difference":"[мэйк э ди́фэрэнс]","to take sth for granted":"[тэйк фо: гра́:нтид]","on the one hand... on the other hand":"[он зэ ван хэнд]","to go through (difficult times)":"[гоу сру:]","as far as I'm concerned":"[эз фа:р эз айм кэнсё:нд]","tolerance":"[то́лэрэнс]","prejudice":"[прэ́джудис]","awareness":"[эвэ́энэс]","justice":"[джа́стис]","inequality":"[инику́элитэ]","benefit":"[бэ́нэфит]","impact":"[и́мпэкт]","solution":"[сэлю́:шэн]","to struggle":"[стра́гэл]","to contribute":"[кэнтри́бью:т]","to achieve":"[эчи́:в]","to support":"[сэпо́:т]","to reduce":"[рэдью́:с]","effective":"[ифэ́ктив]","relevant":"[рэ́лэвэнт]","unfair":"[анфэ́э]","to be aware of":"[би: эвэ́э эв]","It depends on...":"[ит дипэ́ндз он]","to make progress":"[мэйк про́угрэс]","to play a role":"[плэй э роул]","to take action":"[тэйк э́кшэн]","to put yourself in someone's shoes":"[пут ё:сэлф ин са́мванз шу:з]","to be part of the problem":"[па:т эв зэ про́блэм]","freedom":"[фри́:дэм]","rights":"[ра́йтс]","tradition":"[трэди́шэн]","generation":"[джэнэрэ́йшэн]","value (n.)":"[вэ́льью:]","poverty":"[по́вэтэ]","welfare":"[вэ́лфээ]","democracy":"[дэмо́крэсэ]","to demand":"[дима́:нд]","to respect":"[рэспэ́кт]","to ignore":"[игно́:]","to improve":"[импру́:в]","to protect":"[прэтэ́кт]","responsible":"[риспо́нсэбл]","equal":"[и́:куэл]","fair":"[фэ:]","There is no doubt that...":"[зэ из ноу даут зэт]","The fact is that...":"[зэ фэкт из зэт]","to deal with":"[ди:л виз]","to be in charge of":"[би: ин ча:дж эв]","up to a point":"[ап ту э пойнт]","to stand up for":"[стэнд ап фо:]","to look down on":"[лук да́ун он]"};document.querySelectorAll('.fcard-word').forEach(function(el){var k=el.textContent.trim();if(T[k]){var d=document.createElement('div');d.className='fcard-trans';d.textContent=T[k];el.insertAdjacentElement('afterend',d);}});})();
+    </script>
+</body>
+</html>

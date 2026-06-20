@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1&ndash;B2 Real Life English | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .progress-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 20px; height: 7px; margin: 0.5rem 0 0.25rem; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #a371f7, #c084fc); transition: width 0.4s ease; width: 0%; }
+        .progress-label { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .progress-label span { color: #c084fc; font-weight: 700; }
+        .controls { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.3rem; }
+        .ctrl-btn { padding: 0.45rem 0.9rem; border-radius: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--color-text-muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.4); color: #c084fc; }
+        .ctrl-btn.primary:hover { background: rgba(163,113,247,0.25); color: #fff; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 0.65rem; }
+        .fcard { position: relative; min-height: 155px; border-radius: 13px; background: rgba(13,17,23,0.82); backdrop-filter: blur(8px); border: 1.5px solid rgba(255,255,255,0.07); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; overflow: hidden; }
+        .fcard::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 13px 0 0 13px; background: #a371f7; }
+        .fcard::after { content: ''; position: absolute; top: 0; left: 4px; right: 0; height: 1px; background: linear-gradient(90deg, rgba(163,113,247,0.45), transparent); opacity: 0; transition: opacity 0.2s; }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard:hover::after { opacity: 1; }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+        .fcard-front { padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; display: flex; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 1rem; font-weight: 700; color: rgba(163,113,247,0.6); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.22rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-hint { font-size: 0.83rem; color: rgba(255,255,255,0.38); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.76rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+        .fcard-back { display: none; padding: 1rem 1rem 0.85rem 1.25rem; min-height: 155px; flex-direction: column; justify-content: center; }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1.12rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-en { font-size: 0.93rem; font-weight: 600; color: rgba(255,255,255,0.62); margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem; }
+        .fcard-en::before { content: 'DE'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem; border-radius: 5px; background: rgba(255,193,7,0.15); color: #ffd55a; border: 1px solid rgba(255,193,7,0.3); letter-spacing: 0.5px; flex-shrink: 0; }
+        .fcard-example { font-size: 0.84rem; font-style: italic; color: rgba(255,255,255,0.4); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.97rem; font-style: italic; color: rgba(163,113,247,0.9); margin-top: 0.42rem; line-height: 1.55; border-left: 2px solid rgba(163,113,247,0.35); padding-left: 0.5rem; }
+        .fcard-frage { font-size: 0.83rem; color: rgba(52,211,153,0.85); margin-top: 0.5rem; line-height: 1.5; border-left: 2px solid rgba(52,211,153,0.3); padding-left: 0.5rem; }
+        .know-btn { display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem; border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28); color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer; width: fit-content; transition: all 0.2s; align-self: flex-start; }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+        .group-label { display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0.65rem; font-size: 0.77rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-text-muted); }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+        .done-screen { display: none; text-align: center; padding: 2rem 1rem; border-radius: 16px; background: rgba(13,17,23,0.6); border: 1px solid rgba(163,113,247,0.3); margin-top: 1.5rem; }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #c084fc; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+        .intro-box { background: linear-gradient(145deg, rgba(163,113,247,0.08), rgba(163,113,247,0.02)); border: 1px solid rgba(163,113,247,0.22); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.3rem; font-size: 0.88rem; line-height: 1.6; color: rgba(230,230,235,0.8); }
+        .intro-box strong { color: #c084fc; }
+        @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; } .fcard-front, .fcard-back { min-height: 135px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; } .fcard-word { font-size: 1.08rem; } }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+        .day-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+        .day-tab { padding: 0.52rem 1.1rem; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color: #c084fc; }
+        .day-content { display: none; }
+        .day-content.active { display: block; }
+        .tagesartikel { background: #fffdf7; border-left: 5px solid #b8860b; border-radius: 0 12px 12px 0; padding: 1.3rem 1.6rem 1.2rem; margin: 0 0 2rem 0; font-family: Georgia, 'Times New Roman', serif; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .tagesartikel-header { display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; user-select: none; gap: 0.8rem; }
+        .tagesartikel-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: #b8860b; font-family: sans-serif; margin-bottom: 0.3rem; font-weight: 600; }
+        .tagesartikel h3 { font-size: 1.05rem; font-weight: bold; color: #1a120a; margin: 0; line-height: 1.4; }
+        .tagesartikel-toggle { background: none; border: 1px solid #d4a017; border-radius: 50%; width: 28px; height: 28px; font-size: 0.75rem; cursor: pointer; color: #b8860b; padding: 0; flex-shrink: 0; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .tagesartikel-body { overflow: hidden; transition: max-height 0.35s ease; }
+        .tagesartikel-body.collapsed { max-height: 0; }
+        .tagesartikel-body.expanded { max-height: 9999px; }
+        .tagesartikel-body p { font-size: 0.95rem; line-height: 1.85; color: #1a120a; margin: 0.9rem 0 0; }
+        .tagesartikel b { color: #7a4f00; font-weight: 700; }
+        .fcard-trans { font-size: 0.76rem; color: rgba(163,113,247,0.65); margin-top: 0.13rem; letter-spacing: 0.1px; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">B1&ndash;B2 Real Life English</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Real Life English <span style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">B1&ndash;B2</span></h1>
+            <p class="page-subtitle">Work &bull; Relationships &bull; Everyday &mdash; 69 units: words, phrases &amp; expressions</p>
+        </div>
+
+        <div class="intro-box">
+            &#x1F511; <strong>For conversation practice:</strong> Learn the words &mdash; then use the <span style="color:rgba(52,211,153,0.9);">green questions</span> to discuss real situations from adult life. This vocabulary is essential for everyday English!
+        </div>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="switchDay(1)">&#x1F4BC; Work &amp; Money &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(2)">&#x1F91D; Relationships &bull; 23</button>
+            <button class="day-tab" onclick="switchDay(3)">&#x1F527; Daily Problems &bull; 23</button>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar-rl"></div></div>
+        <div class="progress-label">Learned: <span id="num-rl">0</span> / <span id="total-rl">23</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Reveal all</button>
+            <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Reset</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Shuffle</button>
+        </div>
+
+        <div id="cards-rl">
+
+        <!-- ===== DAY 1 ===== -->
+        <div class="day-content active" data-day="1">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>Money, Work, and Independence: The Adult Life Nobody Prepares You For</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Nobody tells you how hard it is to <b>make ends meet</b> until you're doing it yourself. You get your first real <b>salary</b>, and before you know it, the <b>rent</b> is due, the electricity <b>bill</b> has arrived, and you realise your <b>budget</b> is much smaller than your plans.</p>
+            <p>Building a <b>career</b> takes time. You <b>apply for</b> jobs, get rejected, try again. You start somewhere modest and work towards a <b>promotion</b>. You learn what your skills are <b>worth</b>. You discover what it means to <b>earn</b> something — not just receive it.</p>
+            <p>Financial independence also means learning to <b>save</b>. A small amount of <b>savings</b> changes how you feel about the world — suddenly you're not one bad week away from disaster. A <b>loan</b> might be necessary sometimes, but knowing you <b>owe</b> money to someone is never a comfortable feeling.</p>
+            <p>The goal is not to be rich. The goal is to be <b>stable</b> — to know that you can <b>afford</b> the things that matter without being permanently <b>broke</b>. That feeling is worth more than any salary figure.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#01</div><div class="fcard-word">salary</div><div class="fcard-hint">NOUN &bull; B1 &bull; earn a salary / a good / low salary &bull; Pl.: salaries</div></div><div class="fcard-back"><div class="fcard-ua">зарплата / оклад</div><div class="fcard-en">das Gehalt, der Lohn</div><div class="fcard-example">"She accepted the job offer even though the salary was lower than she expected."</div><div class="fcard-poem">Salary — the number that measures your month,<br>зарплата — сколько стоит твоё время.</div><div class="fcard-frage">&#x1F4AC; Do you think salary is the most important factor when choosing a job?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#02</div><div class="fcard-word">career</div><div class="fcard-hint">NOUN &bull; B1 &bull; build / pursue a career &bull; Pl.: careers</div></div><div class="fcard-back"><div class="fcard-ua">карьера / профессиональный путь</div><div class="fcard-en">die Karriere, der Beruf</div><div class="fcard-example">"She spent ten years building her career before finally feeling truly settled in her field."</div><div class="fcard-poem">Career — a journey, not a destination,<br>карьера — не место, а движение.</div><div class="fcard-frage">&#x1F4AC; What career would you choose if money were not a factor?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#03</div><div class="fcard-word">budget</div><div class="fcard-hint">NOUN &bull; B1 &bull; stick to / manage a budget &bull; Pl.: budgets</div></div><div class="fcard-back"><div class="fcard-ua">бюджет / финансовый план</div><div class="fcard-en">das Budget, der Haushalt</div><div class="fcard-example">"I try to stick to my monthly budget, but there's always something unexpected that breaks it."</div><div class="fcard-poem">Budget — the map between you and broke,<br>бюджет — план, который хочется игнорировать.</div><div class="fcard-frage">&#x1F4AC; Do you keep a personal budget? What helps you manage your money?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#04</div><div class="fcard-word">bill</div><div class="fcard-hint">NOUN &bull; B1 &bull; pay a bill / electricity / phone bill &bull; Pl.: bills</div></div><div class="fcard-back"><div class="fcard-ua">счёт (за услуги) / квитанция</div><div class="fcard-en">die Rechnung</div><div class="fcard-example">"Every month the bills arrive and remind you how much adult life actually costs."</div><div class="fcard-poem">Bill — the price of living, delivered by post,<br>счёт — взрослая жизнь в конверте.</div><div class="fcard-frage">&#x1F4AC; What bills do most young adults have to pay when they live alone for the first time?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#05</div><div class="fcard-word">rent</div><div class="fcard-hint">NOUN &bull; B1 &bull; pay rent / the rent is due &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">аренда / квартплата</div><div class="fcard-en">die Miete</div><div class="fcard-example">"Rent in the city centre is so expensive that most young people share flats."</div><div class="fcard-poem">Rent — the price of a roof over your head,<br>аренда — деньги за место, которое не твоё.</div><div class="fcard-frage">&#x1F4AC; Is it better to rent or buy a home? What are the advantages of each?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#06</div><div class="fcard-word">savings</div><div class="fcard-hint">NOUN &bull; B1 &bull; ALWAYS plural &bull; put money into savings</div></div><div class="fcard-back"><div class="fcard-ua">сбережения / накопления (всегда мн.ч.)</div><div class="fcard-en">die Ersparnisse (Pl.)</div><div class="fcard-example">"She used all her savings to start her own business — a terrifying but exciting decision."</div><div class="fcard-poem">Savings — the future you're building today,<br>сбережения — маленькие кусочки свободы.</div><div class="fcard-frage">&#x1F4AC; Do you have savings? What are you saving for?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#07</div><div class="fcard-word">loan</div><div class="fcard-hint">NOUN &bull; B2 &bull; take out / repay a loan &bull; Pl.: loans</div></div><div class="fcard-back"><div class="fcard-ua">кредит / займ / ссуда</div><div class="fcard-en">das Darlehen, der Kredit</div><div class="fcard-example">"Taking out a loan is sometimes necessary, but always think carefully before you do."</div><div class="fcard-poem">Loan — borrowed freedom with interest attached,<br>кредит — деньги сейчас, расплата потом.</div><div class="fcard-frage">&#x1F4AC; In what situations do you think it makes sense to take out a loan?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#08</div><div class="fcard-word">promotion</div><div class="fcard-hint">NOUN &bull; B2 &bull; get / earn a promotion &bull; Pl.: promotions</div></div><div class="fcard-back"><div class="fcard-ua">повышение по службе</div><div class="fcard-en">die Bef&ouml;rderung</div><div class="fcard-example">"After three years of hard work, she finally got the promotion she had been working towards."</div><div class="fcard-poem">Promotion — proof that your effort was seen,<br>повышение — когда труд наконец замечен.</div><div class="fcard-frage">&#x1F4AC; What qualities do you think a person needs to earn a promotion at work?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#09</div><div class="fcard-word">to afford</div><div class="fcard-hint">VERB &bull; B1 &bull; can / can't afford sth / to do sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">позволить себе (что-то) / иметь средства на</div><div class="fcard-en">sich etw. leisten k&ouml;nnen</div><div class="fcard-example">"I'd love to travel more, but I simply can't afford it right now — maybe next year."</div><div class="fcard-poem">Afford — the gap between wanting and having,<br>позволить себе — когда деньги и желание совпадают.</div><div class="fcard-frage">&#x1F4AC; What is something you can't afford right now but hope to one day?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#10</div><div class="fcard-word">to earn</div><div class="fcard-hint">VERB &bull; B1 &bull; earn money / a salary / respect &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">зарабатывать / получать (деньги, уважение)</div><div class="fcard-en">verdienen</div><div class="fcard-example">"He earns a good salary, but works such long hours that he barely has time to spend it."</div><div class="fcard-poem">Earn — give your time, receive what's fair,<br>зарабатывать — не получить, а добиться.</div><div class="fcard-frage">&#x1F4AC; What is the most important thing you have earned in your life — money, respect, or something else?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#11</div><div class="fcard-word">to owe</div><div class="fcard-hint">VERB &bull; B2 &bull; owe sb money / owe sth to sb &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">быть должным / задолжать</div><div class="fcard-en">schulden, schuldig sein</div><div class="fcard-example">"I still owe my friend €50 from last month — I keep forgetting to pay him back."</div><div class="fcard-poem">Owe — the weight of a promise not yet kept,<br>быть должным — пока не вернул — тяжело.</div><div class="fcard-frage">&#x1F4AC; How do you feel about owing money to friends or family rather than to a bank?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#12</div><div class="fcard-word">to save</div><div class="fcard-hint">VERB &bull; B1 &bull; save money / save up for sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">откладывать / экономить / копить</div><div class="fcard-en">sparen</div><div class="fcard-example">"I'm trying to save up for a trip to Japan — it takes discipline but it's worth it."</div><div class="fcard-poem">Save — the art of choosing later over now,<br>копить — маленькое «нет» сегодня ради «да» завтра.</div><div class="fcard-frage">&#x1F4AC; Are you good at saving money, or do you tend to spend everything you earn?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#13</div><div class="fcard-word">to apply for</div><div class="fcard-hint">VERB &bull; B1 &bull; apply for a job / a place / a loan &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">подавать заявку / заявление (на что-то)</div><div class="fcard-en">sich bewerben um</div><div class="fcard-example">"She applied for over 30 jobs before getting her first offer — persistence paid off."</div><div class="fcard-poem">Apply — put yourself forward, risk the no,<br>подавать заявку — шаг без гарантии.</div><div class="fcard-frage">&#x1F4AC; Have you ever applied for something and been rejected? How did you handle it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#14</div><div class="fcard-word">broke</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; be / go broke &bull; informal &bull; &ne; wealthy</div></div><div class="fcard-back"><div class="fcard-ua">на мели / без денег / обанкротившийся</div><div class="fcard-en">pleite, mittellos</div><div class="fcard-example">"I went completely broke after moving to a new city — I hadn't budgeted for everything."</div><div class="fcard-poem">Broke — when the account says stop and life says go,<br>на мели — деньги кончились раньше месяца.</div><div class="fcard-frage">&#x1F4AC; Have you ever been broke? What was the most useful lesson you learned from it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#15</div><div class="fcard-word">stable</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; a stable job / income / situation &bull; &ne; unstable</div></div><div class="fcard-back"><div class="fcard-ua">стабильный / надёжный / устойчивый</div><div class="fcard-en">stabil, gesichert</div><div class="fcard-example">"After years of uncertainty, she finally has a stable income and can plan for the future."</div><div class="fcard-poem">Stable — the ground that doesn't move beneath you,<br>стабильный — можешь строить планы.</div><div class="fcard-frage">&#x1F4AC; How important is financial stability to you compared to doing work you love?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#16</div><div class="fcard-word">worth it</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; be worth it / worth doing sth</div></div><div class="fcard-back"><div class="fcard-ua">того стоить / стоящий / оправданный</div><div class="fcard-en">es wert sein, sich lohnen</div><div class="fcard-example">"The course was expensive, but it was absolutely worth it — my career changed completely."</div><div class="fcard-poem">Worth it — the cost paid back with meaning,<br>того стоить — когда не жалеешь.</div><div class="fcard-frage">&#x1F4AC; What is something you've done that was difficult but absolutely worth it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#17</div><div class="fcard-word">to make ends meet</div><div class="fcard-hint">PHRASE &bull; B2 &bull; struggle / manage to make ends meet</div></div><div class="fcard-back"><div class="fcard-ua">сводить концы с концами / едва хватает денег</div><div class="fcard-en">&uuml;ber die Runden kommen</div><div class="fcard-example">"With rising prices, many families are struggling to make ends meet this year."</div><div class="fcard-poem">&#x1F4CC; "Ends" = the beginning and end of the month — just enough to connect them.<br>Подсказка: денег хватает ровно от зарплаты до зарплаты.</div><div class="fcard-frage">&#x1F4AC; At what point does a person stop just making ends meet and start building wealth?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#18</div><div class="fcard-word">to be in debt</div><div class="fcard-hint">PHRASE &bull; B2 &bull; be / get into / get out of debt</div></div><div class="fcard-back"><div class="fcard-ua">быть в долгах / иметь задолженность</div><div class="fcard-en">Schulden haben, verschuldet sein</div><div class="fcard-example">"Getting into debt is easy — getting out of it is the hard part."</div><div class="fcard-poem">&#x1F4CC; "In debt" = owing money; "in the red" = another informal expression.<br>Подсказка: "in the red" — тоже значит «в минусе».</div><div class="fcard-frage">&#x1F4AC; What is the best strategy to avoid getting into serious debt?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#19</div><div class="fcard-word">to live within your means</div><div class="fcard-hint">PHRASE &bull; B2 &bull; learn to live within your means</div></div><div class="fcard-back"><div class="fcard-ua">жить по средствам / не тратить больше, чем зарабатываешь</div><div class="fcard-en">nach seinen Verh&auml;ltnissen leben</div><div class="fcard-example">"Learning to live within your means is one of the most important adult skills."</div><div class="fcard-poem">&#x1F4CC; "Means" = your financial resources. Opposite: "live beyond your means".<br>Подсказка: "beyond your means" = тратить больше, чем зарабатываешь.</div><div class="fcard-frage">&#x1F4AC; Is it easy to live within your means today, given social media and advertising?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#20</div><div class="fcard-word">to apply for a job</div><div class="fcard-hint">PHRASE &bull; B1 &bull; apply for / get / land a job</div></div><div class="fcard-back"><div class="fcard-ua">подавать заявление о приёме на работу</div><div class="fcard-en">sich um eine Stelle bewerben</div><div class="fcard-example">"I applied for the job on a Monday and had an interview by Wednesday — it moved fast."</div><div class="fcard-poem">&#x1F4CC; "Land a job" = get a job (informal, implies effort).<br>Подсказка: "land a job" — разговорно, подразумевает, что старался.</div><div class="fcard-frage">&#x1F4AC; What advice would you give someone applying for their first job?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#21</div><div class="fcard-word">to get promoted</div><div class="fcard-hint">PHRASE &bull; B2 &bull; get / be promoted (passive)</div></div><div class="fcard-back"><div class="fcard-ua">получить повышение / быть повышенным</div><div class="fcard-en">bef&ouml;rdert werden</div><div class="fcard-example">"He got promoted after just one year — his manager said he was the most reliable person on the team."</div><div class="fcard-poem">&#x1F4CC; "Earn a promotion" = actively work for it. "Get promoted" = the result.<br>Подсказка: "earn" — процесс, "get" — результат.</div><div class="fcard-frage">&#x1F4AC; What factors help a person get promoted, apart from just doing their job well?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#22</div><div class="fcard-word">to be laid off</div><div class="fcard-hint">PHRASE &bull; B2 &bull; be laid off (= lose your job through redundancy)</div></div><div class="fcard-back"><div class="fcard-ua">быть уволенным (по сокращению) / потерять работу</div><div class="fcard-en">entlassen werden, gek&uuml;ndigt werden</div><div class="fcard-example">"He was laid off when the company downsized — it came as a complete shock."</div><div class="fcard-poem">&#x1F4CC; "Laid off" = redundancy (company problem); "fired" = dismissed (your fault).<br>Подсказка: "laid off" — сокращение; "fired" — уволен за проступок.</div><div class="fcard-frage">&#x1F4AC; What would you do first if you were suddenly laid off from a job?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#23</div><div class="fcard-word">to work overtime</div><div class="fcard-hint">PHRASE &bull; B2 &bull; work overtime / do overtime</div></div><div class="fcard-back"><div class="fcard-ua">работать сверхурочно</div><div class="fcard-en">&Uuml;berstunden machen</div><div class="fcard-example">"She's been working overtime every week for months — the extra money helps, but she's exhausted."</div><div class="fcard-poem">&#x1F4CC; "Overtime" = hours worked beyond the normal working day; often paid extra.<br>Подсказка: обычно оплачивается по повышенному тарифу.</div><div class="fcard-frage">&#x1F4AC; Is working overtime a sign of dedication or poor time management?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-1 -->
+
+        <!-- ===== DAY 2 ===== -->
+        <div class="day-content" data-day="2">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>The Art of Getting Along: Relationships in Real Life</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Real relationships — not the ones in films, but the ones in everyday life — require more than affection. They require <b>trust</b>, communication, and the willingness to sometimes be <b>honest</b> even when it is uncomfortable. <b>Friendship</b> deepens precisely in those moments.</p>
+            <p>Most <b>arguments</b> between people come from <b>misunderstandings</b>. Someone says something carelessly. The other person feels <b>offended</b>. What follows is often an <b>awkward</b> silence rather than an explanation. Learning to <b>apologise</b> quickly and genuinely — and to <b>forgive</b> just as quickly — is one of the most valuable skills a person can develop.</p>
+            <p>In the workplace, getting along with a <b>colleague</b> you don't naturally like is a skill in itself. In a neighbourhood, a difficult <b>neighbour</b> can make your daily life miserable — or manageable, depending on whether you can maintain a basic <b>relationship</b> of respect.</p>
+            <p>The best relationships are the ones where you feel you can <b>rely on</b> the other person completely. Where you don't need to make a good <b>impression</b> — because you already have one. Where you can <b>speak your mind</b> without fear. Those are rare. They are also everything.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#24</div><div class="fcard-word">friendship</div><div class="fcard-hint">NOUN &bull; B1 &bull; a close / lasting friendship &bull; Pl.: friendships</div></div><div class="fcard-back"><div class="fcard-ua">дружба</div><div class="fcard-en">die Freundschaft</div><div class="fcard-example">"Real friendship is tested not in happy times, but in the difficult ones."</div><div class="fcard-poem">Friendship — the house you return to without knocking,<br>дружба — там, где всегда рады.</div><div class="fcard-frage">&#x1F4AC; What is the most important quality in a true friendship?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#25</div><div class="fcard-word">trust</div><div class="fcard-hint">NOUN &bull; B1 &bull; build / lose / betray trust &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">доверие / вера</div><div class="fcard-en">das Vertrauen</div><div class="fcard-example">"Trust takes years to build and seconds to destroy — be careful with other people's trust."</div><div class="fcard-poem">Trust — the invisible thread between two people,<br>доверие — легко потерять, трудно вернуть.</div><div class="fcard-frage">&#x1F4AC; Has someone ever broken your trust? How did it change your relationship?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#26</div><div class="fcard-word">argument</div><div class="fcard-hint">NOUN &bull; B1 &bull; have an argument with sb (= quarrel) &bull; Pl.: arguments</div></div><div class="fcard-back"><div class="fcard-ua">ссора / спор / конфликт</div><div class="fcard-en">der Streit, der Konflikt</div><div class="fcard-example">"We had a big argument about something small — and then realised it wasn't about that at all."</div><div class="fcard-poem">Argument — rarely about what it seems to be,<br>ссора — обычно о чём-то другом.</div><div class="fcard-frage">&#x1F4AC; Do you prefer to resolve arguments immediately or wait until emotions calm down?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#27</div><div class="fcard-word">misunderstanding</div><div class="fcard-hint">NOUN &bull; B2 &bull; a simple / serious misunderstanding &bull; Pl.: misunderstandings</div></div><div class="fcard-back"><div class="fcard-ua">недоразумение / непонимание</div><div class="fcard-en">das Missverst&auml;ndnis</div><div class="fcard-example">"It was just a misunderstanding — she thought I was ignoring her, but I never got the message."</div><div class="fcard-poem">Misunderstanding — two people, one conversation, two meanings,<br>недоразумение — когда слышишь не то, что сказали.</div><div class="fcard-frage">&#x1F4AC; How do you usually clear up a misunderstanding with someone?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#28</div><div class="fcard-word">impression</div><div class="fcard-hint">NOUN &bull; B1 &bull; make / leave an impression &bull; Pl.: impressions</div></div><div class="fcard-back"><div class="fcard-ua">впечатление</div><div class="fcard-en">der Eindruck</div><div class="fcard-example">"First impressions matter — but they can be completely wrong, so don't rely on them."</div><div class="fcard-poem">Impression — what you leave in someone's mind,<br>впечатление — первое и последнее.</div><div class="fcard-frage">&#x1F4AC; How much do you think first impressions really tell us about a person?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#29</div><div class="fcard-word">relationship</div><div class="fcard-hint">NOUN &bull; B1 &bull; a relationship with / between sb &bull; Pl.: relationships</div></div><div class="fcard-back"><div class="fcard-ua">отношения / связь / взаимоотношения</div><div class="fcard-en">die Beziehung, das Verh&auml;ltnis</div><div class="fcard-example">"Building a good working relationship with your manager makes your job much easier."</div><div class="fcard-poem">Relationship — built slowly, lost quickly,<br>отношения — то, во что нужно вкладывать.</div><div class="fcard-frage">&#x1F4AC; What makes a working relationship between colleagues go well or badly?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#30</div><div class="fcard-word">neighbour</div><div class="fcard-hint">NOUN &bull; B1 &bull; a good / noisy neighbour &bull; Pl.: neighbours</div></div><div class="fcard-back"><div class="fcard-ua">сосед / соседка</div><div class="fcard-en">der Nachbar, die Nachbarin</div><div class="fcard-example">"My neighbour always says hello and sometimes brings food — that makes a huge difference."</div><div class="fcard-poem">Neighbour — the stranger closest to your life,<br>сосед — чужой, но рядом каждый день.</div><div class="fcard-frage">&#x1F4AC; Do you know your neighbours well? Do you think this matters in modern life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#31</div><div class="fcard-word">colleague</div><div class="fcard-hint">NOUN &bull; B1 &bull; a colleague at work &bull; Pl.: colleagues</div></div><div class="fcard-back"><div class="fcard-ua">коллега / сотрудник</div><div class="fcard-en">der Kollege, die Kollegin</div><div class="fcard-example">"She gets on really well with her colleagues — the team atmosphere is genuinely supportive."</div><div class="fcard-poem">Colleague — not always a friend, but important every day,<br>коллега — с ним проводишь больше времени, чем дома.</div><div class="fcard-frage">&#x1F4AC; What makes a colleague easy or difficult to work with?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#32</div><div class="fcard-word">to apologise</div><div class="fcard-hint">VERB &bull; B1 &bull; apologise to sb (for sth) &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">извиняться / приносить извинения</div><div class="fcard-en">sich entschuldigen</div><div class="fcard-example">"He apologised immediately and sincerely — that's what made it possible to move on."</div><div class="fcard-poem">Apologise — say it before pride stops you,<br>извиниться — чем быстрее, тем лучше.</div><div class="fcard-frage">&#x1F4AC; Do you find it easy to apologise, or does pride sometimes get in the way?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#33</div><div class="fcard-word">to forgive</div><div class="fcard-hint">VERB &bull; B2 &bull; forgive sb (for sth) &bull; irregular: forgave / forgiven</div></div><div class="fcard-back"><div class="fcard-ua">прощать / прощать кому-то</div><div class="fcard-en">vergeben, verzeihen</div><div class="fcard-example">"Forgiving someone doesn't mean forgetting what happened — it means choosing to move forward."</div><div class="fcard-poem">Forgive — not for them, but to free yourself,<br>прощать — ради себя, не ради них.</div><div class="fcard-frage">&#x1F4AC; Is there something that you believe is very difficult — or impossible — to forgive?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#34</div><div class="fcard-word">to gossip</div><div class="fcard-hint">VERB &bull; B2 &bull; gossip about sb &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">сплетничать / распускать слухи</div><div class="fcard-en">tratschen, klatschen</div><div class="fcard-example">"People who gossip a lot are rarely trusted — eventually everyone knows they can't keep a secret."</div><div class="fcard-poem">Gossip — saying about others what you'd hate said about you,<br>сплетничать — то, что потом возвращается.</div><div class="fcard-frage">&#x1F4AC; Why do people gossip? Is it ever harmless, or does it always cause damage?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#35</div><div class="fcard-word">to rely on</div><div class="fcard-hint">VERB &bull; B2 &bull; rely on sb/sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">полагаться на / рассчитывать на</div><div class="fcard-en">sich verlassen auf, z&auml;hlen auf</div><div class="fcard-example">"She's the one person I truly rely on — she's never once let me down."</div><div class="fcard-poem">Rely on — the one you call at 2am without hesitation,<br>полагаться — знаешь: не подведёт.</div><div class="fcard-frage">&#x1F4AC; Who in your life do you rely on most, and why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#36</div><div class="fcard-word">reliable</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; a reliable person / source / method &bull; &ne; unreliable</div></div><div class="fcard-back"><div class="fcard-ua">надёжный / верный / заслуживающий доверия</div><div class="fcard-en">zuverl&auml;ssig, verl&auml;sslich</div><div class="fcard-example">"Being reliable is one of the most valued qualities in any workplace or friendship."</div><div class="fcard-poem">Reliable — says they'll be there, and they are,<br>надёжный — слово и дело одно.</div><div class="fcard-frage">&#x1F4AC; Do you consider yourself a reliable person? Can you give an example?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#37</div><div class="fcard-word">honest</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; honest with sb / an honest person &bull; &ne; dishonest</div></div><div class="fcard-back"><div class="fcard-ua">честный / искренний / прямой</div><div class="fcard-en">ehrlich, aufrichtig</div><div class="fcard-example">"I appreciate people who are honest with me, even when the truth is difficult to hear."</div><div class="fcard-poem">Honest — the truth, even when silence is easier,<br>честный — говорит то, что думает.</div><div class="fcard-frage">&#x1F4AC; Is complete honesty always the right approach in relationships?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#38</div><div class="fcard-word">offended</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; feel offended by sth / easily offended</div></div><div class="fcard-back"><div class="fcard-ua">обиженный / задетый / оскорблённый</div><div class="fcard-en">beleidigt, verletzt</div><div class="fcard-example">"I was a bit offended at first, but then I realised she hadn't meant it badly."</div><div class="fcard-poem">Offended — when a word lands where it shouldn't,<br>обиженный — больно, даже если не хотели.</div><div class="fcard-frage">&#x1F4AC; Are you easily offended, or does it take a lot to actually upset you?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#39</div><div class="fcard-word">awkward</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an awkward situation / silence / person</div></div><div class="fcard-back"><div class="fcard-ua">неловкий / неудобный / неуклюжий</div><div class="fcard-en">unangenehm, peinlich</div><div class="fcard-example">"There was an awkward silence after I accidentally mentioned his ex-girlfriend's name."</div><div class="fcard-poem">Awkward — the pause where nobody knows what to say,<br>неловкий — тишина, от которой хочется убежать.</div><div class="fcard-frage">&#x1F4AC; Describe a social situation you find particularly awkward.</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#40</div><div class="fcard-word">to make a good impression</div><div class="fcard-hint">PHRASE &bull; B1 &bull; make a good / bad impression on sb</div></div><div class="fcard-back"><div class="fcard-ua">произвести хорошее впечатление</div><div class="fcard-en">einen guten Eindruck machen</div><div class="fcard-example">"She made such a good impression at the interview that they offered her the job the same day."</div><div class="fcard-poem">&#x1F4CC; "First impressions count" — but only you control yours.<br>Подсказка: первое впечатление — в твоих руках.</div><div class="fcard-frage">&#x1F4AC; What do you do to make a good impression when you meet someone important?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#41</div><div class="fcard-word">to keep in touch</div><div class="fcard-hint">PHRASE &bull; B1 &bull; keep in touch with sb / stay in touch</div></div><div class="fcard-back"><div class="fcard-ua">поддерживать связь / не теряться</div><div class="fcard-en">in Kontakt bleiben</div><div class="fcard-example">"We moved to different cities but promised to keep in touch — and actually, we did."</div><div class="fcard-poem">&#x1F4CC; "Stay in touch" = same meaning. "Keep in contact" = slightly more formal.<br>Подсказка: оба варианта — естественны и частые.</div><div class="fcard-frage">&#x1F4AC; How do you keep in touch with friends or family who live far away?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#42</div><div class="fcard-word">to fall out with sb</div><div class="fcard-hint">PHRASE &bull; B2 &bull; fall out with sb (over sth)</div></div><div class="fcard-back"><div class="fcard-ua">поссориться с кем-то / разругаться</div><div class="fcard-en">sich mit jmdm. zerstreiten</div><div class="fcard-example">"We fell out over something stupid and didn't speak for three months — now we laugh about it."</div><div class="fcard-poem">&#x1F4CC; Not the same as "fall out" (hair/teeth) — context is everything!<br>Подсказка: только о людях — не о предметах.</div><div class="fcard-frage">&#x1F4AC; Have you ever fallen out with a friend? How did you resolve it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#43</div><div class="fcard-word">to get along with sb</div><div class="fcard-hint">PHRASE &bull; B1 &bull; get along / on with sb &bull; also: get on well</div></div><div class="fcard-back"><div class="fcard-ua">ладить с кем-то / уживаться / хорошо относиться</div><div class="fcard-en">gut auskommen mit jmdm.</div><div class="fcard-example">"I don't always agree with him, but we get along really well — respect goes a long way."</div><div class="fcard-poem">&#x1F4CC; "Get on with" = British English; "get along with" = more universal.<br>Подсказка: "get on with" — британский вариант.</div><div class="fcard-frage">&#x1F4AC; Do you generally get along with people easily, or does it take time to warm up?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#44</div><div class="fcard-word">to let sb down</div><div class="fcard-hint">PHRASE &bull; B2 &bull; let sb down / let down your expectations</div></div><div class="fcard-back"><div class="fcard-ua">подводить кого-то / разочаровывать</div><div class="fcard-en">jmdn. entt&auml;uschen</div><div class="fcard-example">"I promised I'd be there, but I let her down — she never forgot it, and I don't blame her."</div><div class="fcard-poem">&#x1F4CC; Also: "feel let down" — when YOU are the disappointed one.<br>Подсказка: "feel let down" — это ты разочарован.</div><div class="fcard-frage">&#x1F4AC; Have you ever let someone down badly? How did you handle it afterwards?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#45</div><div class="fcard-word">to have a lot in common</div><div class="fcard-hint">PHRASE &bull; B1 &bull; have sth / a lot / nothing in common with sb</div></div><div class="fcard-back"><div class="fcard-ua">иметь много общего / быть похожими</div><div class="fcard-en">viel gemeinsam haben</div><div class="fcard-example">"We have so much in common that conversations never run dry — there's always something to discuss."</div><div class="fcard-poem">&#x1F4CC; Opposite: "have nothing in common" — great for contrasts in discussion.<br>Подсказка: противоположность — "have nothing in common".</div><div class="fcard-frage">&#x1F4AC; Do you think people need to have a lot in common to be good friends?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#46</div><div class="fcard-word">to speak your mind</div><div class="fcard-hint">PHRASE &bull; B2 &bull; speak your mind / feel free to speak your mind</div></div><div class="fcard-back"><div class="fcard-ua">говорить то, что думаешь / высказываться прямо</div><div class="fcard-en">seine Meinung offen sagen</div><div class="fcard-example">"She always speaks her mind — some people find it too direct, but I really respect it."</div><div class="fcard-poem">&#x1F4CC; Speaking your mind requires confidence — and good timing.<br>Подсказка: требует смелости и умения выбрать момент.</div><div class="fcard-frage">&#x1F4AC; Do you always speak your mind, or do you sometimes hold back? Why?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-2 -->
+
+        <!-- ===== DAY 3 ===== -->
+        <div class="day-content" data-day="3">
+        <div class="tagesartikel">
+            <div class="tagesartikel-header" onclick="toggleArtikel(this)">
+                <div>
+                    <div class="tagesartikel-label">&#x1F4F0; Reading article</div>
+                    <h3>Everyday Stress and the People Who Handle It Well</h3>
+                </div>
+                <button class="tagesartikel-toggle" tabindex="-1">&#x25BC;</button>
+            </div>
+            <div class="tagesartikel-body collapsed">
+            <p>Modern life is full of small disasters. The bus is delayed. You're stuck in a <b>queue</b> that isn't moving. Your <b>appointment</b> was cancelled without warning. You <b>run out of</b> time before the end of the day, and there are still three things on your list. You feel <b>frustrated</b>, then <b>exhausted</b>, then both.</p>
+            <p>The difference between people who cope well with daily <b>stress</b> and those who don't is rarely intelligence or luck. It is usually <b>routine</b>. When your morning is structured, when you know what to expect, even a <b>delay</b> becomes just an inconvenience rather than a crisis. <b>Managing</b> your time well protects your mental energy.</p>
+            <p>Of course, genuine <b>emergencies</b> happen. And when they do, the ability to stay <b>patient</b>, to not <b>rush</b> into bad decisions, to <b>deal with</b> what is in front of you — step by step — is invaluable. Making a <b>complaint</b> calmly and clearly is a skill. <b>Sorting things out</b> without drama is a superpower.</p>
+            <p>The most <b>efficient</b> people are not those who work the hardest. They are the ones who know when to slow down, when to ask for help, and when to simply <b>take a day off</b>.</p>
+            </div>
+        </div>
+
+        <div class="group-label">&#x1F4D6; Nouns</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#47</div><div class="fcard-word">stress</div><div class="fcard-hint">NOUN &bull; B1 &bull; be under stress / deal with stress &bull; no plural</div></div><div class="fcard-back"><div class="fcard-ua">стресс / напряжение</div><div class="fcard-en">der Stress</div><div class="fcard-example">"A certain amount of stress is normal — it's the long-term kind that causes real damage."</div><div class="fcard-poem">Stress — the gap between what you can handle and what you face,<br>стресс — когда требований больше, чем сил.</div><div class="fcard-frage">&#x1F4AC; What are your main sources of stress, and how do you manage them?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#48</div><div class="fcard-word">routine</div><div class="fcard-hint">NOUN &bull; B1 &bull; a daily / morning routine &bull; Pl.: routines</div></div><div class="fcard-back"><div class="fcard-ua">рутина / распорядок дня / привычный порядок</div><div class="fcard-en">die Routine, der Alltag</div><div class="fcard-example">"Having a consistent morning routine makes the rest of the day feel more manageable."</div><div class="fcard-poem">Routine — the script that stops you having to think too much,<br>рутина — освобождает голову для важного.</div><div class="fcard-frage">&#x1F4AC; Do you have a daily routine? Does it help you or does it feel boring?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#49</div><div class="fcard-word">appointment</div><div class="fcard-hint">NOUN &bull; B1 &bull; make / keep / miss an appointment &bull; Pl.: appointments</div></div><div class="fcard-back"><div class="fcard-ua">встреча / запись / назначенное время</div><div class="fcard-en">der Termin</div><div class="fcard-example">"I missed the appointment because I got the time wrong — rescheduling was a nightmare."</div><div class="fcard-poem">Appointment — time borrowed from the future,<br>встреча — обязательство перед часами.</div><div class="fcard-frage">&#x1F4AC; Are you good at keeping appointments, or do you often run late?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#50</div><div class="fcard-word">complaint</div><div class="fcard-hint">NOUN &bull; B2 &bull; make / file a complaint &bull; Pl.: complaints</div></div><div class="fcard-back"><div class="fcard-ua">жалоба / претензия / рекламация</div><div class="fcard-en">die Beschwerde, die Klage</div><div class="fcard-example">"She made a formal complaint to the manager and the problem was resolved within 24 hours."</div><div class="fcard-poem">Complaint — the voice that asks for what is fair,<br>жалоба — право, которым люди боятся пользоваться.</div><div class="fcard-frage">&#x1F4AC; Do you find it easy to make a complaint when a product or service is poor?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#51</div><div class="fcard-word">queue</div><div class="fcard-hint">NOUN &bull; B1 &bull; stand / wait in a queue &bull; Pl.: queues &bull; British English</div></div><div class="fcard-back"><div class="fcard-ua">очередь / хвост (очереди)</div><div class="fcard-en">die Schlange, die Warteschlange</div><div class="fcard-example">"The queue outside the post office stretched all the way around the corner — I gave up."</div><div class="fcard-poem">Queue — the democracy of waiting,<br>очередь — все равны перед временем.</div><div class="fcard-frage">&#x1F4AC; How patient are you in queues? What makes waiting feel more or less bearable?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#52</div><div class="fcard-word">delay</div><div class="fcard-hint">NOUN &bull; B1 &bull; a delay of / without delay &bull; Pl.: delays</div></div><div class="fcard-back"><div class="fcard-ua">задержка / опоздание / промедление</div><div class="fcard-en">die Versp&auml;tung, die Verz&ouml;gerung</div><div class="fcard-example">"There was a two-hour delay on the train — I missed the meeting and couldn't do anything about it."</div><div class="fcard-poem">Delay — time spent waiting for what was promised,<br>задержка — когда планы встречают реальность.</div><div class="fcard-frage">&#x1F4AC; How do you react when there's an unexpected delay — do you stay calm or get frustrated?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#53</div><div class="fcard-word">emergency</div><div class="fcard-hint">NOUN &bull; B1 &bull; in case of emergency &bull; Pl.: emergencies</div></div><div class="fcard-back"><div class="fcard-ua">чрезвычайная ситуация / экстренный случай</div><div class="fcard-en">der Notfall</div><div class="fcard-example">"Having some savings means that a real emergency doesn't become a financial disaster."</div><div class="fcard-poem">Emergency — when the unexpected becomes urgent,<br>чрезвычайная ситуация — готовишься всегда, надеешься никогда.</div><div class="fcard-frage">&#x1F4AC; How well prepared do you feel for a financial or personal emergency?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#54</div><div class="fcard-word">solution</div><div class="fcard-hint">NOUN &bull; B1 &bull; find / offer a solution &bull; Pl.: solutions</div></div><div class="fcard-back"><div class="fcard-ua">решение / выход из ситуации</div><div class="fcard-en">die L&ouml;sung</div><div class="fcard-example">"Instead of complaining, she focused on finding a practical solution — and found one."</div><div class="fcard-poem">Solution — the other side of every problem,<br>решение — всегда существует, если искать.</div><div class="fcard-frage">&#x1F4AC; Are you more of a problem-finder or a solution-finder in difficult situations?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x270F;&#xFE0F; Verbs &amp; Adjectives</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#55</div><div class="fcard-word">to complain</div><div class="fcard-hint">VERB &bull; B1 &bull; complain about / to sb (about sth) &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">жаловаться / выражать недовольство</div><div class="fcard-en">sich beschweren, klagen</div><div class="fcard-example">"He complains about everything but never actually does anything to change it."</div><div class="fcard-poem">Complain — the voice without the action,<br>жаловаться — легко, а делать что-то — трудно.</div><div class="fcard-frage">&#x1F4AC; Are you a person who complains a lot, or do you tend to just deal with things?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#56</div><div class="fcard-word">to manage</div><div class="fcard-hint">VERB &bull; B1 &bull; manage to do sth / manage sth &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">справляться / умудряться / управлять</div><div class="fcard-en">schaffen, bew&auml;ltigen</div><div class="fcard-example">"I don't know how she manages to stay calm under so much pressure — it's impressive."</div><div class="fcard-poem">Manage — not effortlessly, but you get there,<br>справляться — не идеально, но получается.</div><div class="fcard-frage">&#x1F4AC; How do you manage when everything seems to go wrong at once?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#57</div><div class="fcard-word">to rush</div><div class="fcard-hint">VERB &bull; B1 &bull; rush to do sth / don't rush &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">торопиться / спешить / мчаться</div><div class="fcard-en">sich beeilen, hetzen</div><div class="fcard-example">"Don't rush — a decision made in panic is rarely the right one."</div><div class="fcard-poem">Rush — speed without direction rarely helps,<br>торопиться — быстро, но не всегда правильно.</div><div class="fcard-frage">&#x1F4AC; Do you tend to rush things, or are you naturally careful and methodical?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#58</div><div class="fcard-word">to cancel</div><div class="fcard-hint">VERB &bull; B1 &bull; cancel a plan / appointment / order &bull; regular</div></div><div class="fcard-back"><div class="fcard-ua">отменять / аннулировать</div><div class="fcard-en">absagen, stornieren</div><div class="fcard-example">"She cancelled at the last minute — I'd been looking forward to it for weeks."</div><div class="fcard-poem">Cancel — the moment a plan becomes a memory,<br>отменить — разочарование в одно слово.</div><div class="fcard-frage">&#x1F4AC; How do you feel when someone cancels plans with you at the last minute?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#59</div><div class="fcard-word">exhausted</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; feel / be completely exhausted &bull; stronger than "tired"</div></div><div class="fcard-back"><div class="fcard-ua">изнурённый / вымотанный / без сил</div><div class="fcard-en">ersch&ouml;pft, ausgelaugt</div><div class="fcard-example">"By Friday evening I was completely exhausted — I'd been running on coffee and willpower all week."</div><div class="fcard-poem">Exhausted — empty past the point of tired,<br>вымотанный — когда даже отдых не сразу помогает.</div><div class="fcard-frage">&#x1F4AC; What do you do when you feel truly exhausted — do you push through or rest?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#60</div><div class="fcard-word">efficient</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; an efficient worker / system / method &bull; &ne; inefficient</div></div><div class="fcard-back"><div class="fcard-ua">эффективный / продуктивный / рациональный</div><div class="fcard-en">effizient, leistungsf&auml;hig</div><div class="fcard-example">"She's incredibly efficient — she finishes in two hours what takes most people a full day."</div><div class="fcard-poem">Efficient — no wasted effort, just results,<br>эффективный — делает нужное, а не просто много.</div><div class="fcard-frage">&#x1F4AC; What habits or tools make you more efficient in your daily life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#61</div><div class="fcard-word">patient</div><div class="fcard-hint">ADJECTIVE &bull; B1 &bull; be patient with sb/sth &bull; &ne; impatient</div></div><div class="fcard-back"><div class="fcard-ua">терпеливый / выдержанный</div><div class="fcard-en">geduldig</div><div class="fcard-example">"You need to be patient with yourself when learning something new — progress takes time."</div><div class="fcard-poem">Patient — waiting without making the wait worse,<br>терпеливый — знает: придёт своё время.</div><div class="fcard-frage">&#x1F4AC; Are you a patient person in general? What tests your patience most?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#62</div><div class="fcard-word">frustrated</div><div class="fcard-hint">ADJECTIVE &bull; B2 &bull; feel frustrated with / about sth</div></div><div class="fcard-back"><div class="fcard-ua">разочарованный / раздражённый / расстроенный</div><div class="fcard-en">frustriert, entt&auml;uscht</div><div class="fcard-example">"I felt genuinely frustrated when the system crashed and I lost two hours of work."</div><div class="fcard-poem">Frustrated — wanting the change that isn't coming,<br>разочарованный — старался, а не получается.</div><div class="fcard-frage">&#x1F4AC; What kind of situations make you most frustrated? How do you handle it?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        <div class="group-label">&#x1F4AC; Phrases &amp; Expressions</div>
+        <div class="card-grid">
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#63</div><div class="fcard-word">to be stuck in traffic</div><div class="fcard-hint">PHRASE &bull; B1 &bull; be / get stuck in traffic</div></div><div class="fcard-back"><div class="fcard-ua">стоять в пробке / застрять в пробке</div><div class="fcard-en">im Stau stehen / feststecken</div><div class="fcard-example">"I was stuck in traffic for 90 minutes and missed the beginning of the concert completely."</div><div class="fcard-poem">&#x1F4CC; "Stuck" = unable to move; also used for many other situations.<br>Подсказка: "stuck" — без движения, в любой ситуации.</div><div class="fcard-frage">&#x1F4AC; What do you do to stay calm or productive when you're stuck in traffic?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#64</div><div class="fcard-word">to lose track of time</div><div class="fcard-hint">PHRASE &bull; B2 &bull; I completely lost track of time</div></div><div class="fcard-back"><div class="fcard-ua">потерять счёт времени / не заметить, как время прошло</div><div class="fcard-en">die Zeit aus den Augen verlieren</div><div class="fcard-example">"I was so absorbed in the book that I completely lost track of time — it was 2am."</div><div class="fcard-poem">&#x1F4CC; Always happens when you're fully engaged in something — a good sign.<br>Подсказка: часто бывает, когда занимаешься любимым делом.</div><div class="fcard-frage">&#x1F4AC; What activity makes you lose track of time most easily?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#65</div><div class="fcard-word">to sort sth out</div><div class="fcard-hint">PHRASE &bull; B1 &bull; sort sth out / sort out a problem</div></div><div class="fcard-back"><div class="fcard-ua">разобраться с чем-то / решить проблему</div><div class="fcard-en">etw. kl&auml;ren / in Ordnung bringen</div><div class="fcard-example">"Let me sort this out — I'll call them and find out what actually happened."</div><div class="fcard-poem">&#x1F4CC; Very British and very common — works for problems, plans, and admin.<br>Подсказка: очень частое в британском английском.</div><div class="fcard-frage">&#x1F4AC; Is there something in your life right now that you need to sort out?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#66</div><div class="fcard-word">to run out of sth</div><div class="fcard-hint">PHRASE &bull; B1 &bull; run out of time / money / patience</div></div><div class="fcard-back"><div class="fcard-ua">закончиться / исчерпать запас (чего-либо)</div><div class="fcard-en">etw. aufgebraucht haben / etw. geht aus</div><div class="fcard-example">"We ran out of time before we could finish the last exercise — we'll continue next week."</div><div class="fcard-poem">&#x1F4CC; "Run out of ideas / patience / milk" — works for almost anything finite.<br>Подсказка: можно использовать буквально и переносно.</div><div class="fcard-frage">&#x1F4AC; What do you most often run out of — time, money, energy, or ideas?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#67</div><div class="fcard-word">to deal with</div><div class="fcard-hint">PHRASE &bull; B1 &bull; deal with a problem / situation / person</div></div><div class="fcard-back"><div class="fcard-ua">справляться с / иметь дело с / разбираться с</div><div class="fcard-en">mit etw. umgehen, sich k&uuml;mmern um</div><div class="fcard-example">"I'll deal with the complaint first thing in the morning when I have a clearer head."</div><div class="fcard-poem">&#x1F4CC; "Deal with" = face and handle — more active than just "manage".<br>Подсказка: активнее, чем "manage" — означает непосредственное действие.</div><div class="fcard-frage">&#x1F4AC; How do you deal with a difficult or unpleasant task that you've been avoiding?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#68</div><div class="fcard-word">to take a day off</div><div class="fcard-hint">PHRASE &bull; B1 &bull; take a day off / take time off</div></div><div class="fcard-back"><div class="fcard-ua">взять выходной / отгул / взять день отдыха</div><div class="fcard-en">sich freinehmen, einen freien Tag nehmen</div><div class="fcard-example">"She took a day off to recover — sometimes rest is the most productive thing you can do."</div><div class="fcard-poem">&#x1F4CC; "Call in sick" = say you're ill; "take a personal day" = take time for yourself.<br>Подсказка: "personal day" — официальный отгул по личным причинам.</div><div class="fcard-frage">&#x1F4AC; How often do you take a day off when you genuinely need to recharge?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+<div class="fcard" onclick="flipCard(this)"><div class="fcard-front"><div class="fcard-num">#69</div><div class="fcard-word">to be overwhelmed</div><div class="fcard-hint">PHRASE &bull; B2 &bull; be / feel overwhelmed by sth</div></div><div class="fcard-back"><div class="fcard-ua">быть перегруженным / не справляться / захлёбываться</div><div class="fcard-en">&uuml;berw&auml;ltigt / &uuml;berfordert sein</div><div class="fcard-example">"When I feel overwhelmed, I write everything down — seeing the list makes it less scary."</div><div class="fcard-poem">&#x1F4CC; "Overwhelmed" can be positive too: "overwhelmed with gratitude / joy".<br>Подсказка: может быть и позитивным: "overwhelmed with joy".</div><div class="fcard-frage">&#x1F4AC; What do you do when you feel completely overwhelmed by life?</div><div class="know-btn" onclick="markKnown(event,this)">&#x2713; I know it</div></div><div class="flip-tip">tap to flip</div></div>
+
+        </div>
+        </div><!-- /day-3 -->
+
+        </div><!-- /cards-rl -->
+
+        <div class="done-screen" id="done-rl">
+            <div class="done-icon">&#x1F511;</div>
+            <h2>All 69 cards learned!</h2>
+            <p>Real Life vocabulary unlocked &mdash; now go use it in the real world!</p>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <script>
+        const DAY_TOTALS = {1: 23, 2: 23, 3: 23};
+        let dayCounts = {1: 0, 2: 0, 3: 0};
+        let currentDay = 1;
+
+        function toggleArtikel(header) {
+            const body = header.nextElementSibling;
+            const btn = header.querySelector('.tagesartikel-toggle');
+            if (body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed'); body.classList.add('expanded');
+                btn.style.transform = 'rotate(180deg)';
+            } else {
+                body.classList.remove('expanded'); body.classList.add('collapsed');
+                btn.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
+            document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = DAY_TOTALS[currentDay]; const cnt = dayCounts[currentDay];
+            document.getElementById('bar-rl').style.width = (cnt / total * 100) + '%';
+            document.getElementById('num-rl').textContent = cnt;
+            document.getElementById('total-rl').textContent = total;
+            const allDone = Object.keys(DAY_TOTALS).every(function(d) { return dayCounts[d] === DAY_TOTALS[d]; });
+            document.getElementById('done-rl').classList.toggle('show', allDone);
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            const dayEl = card.closest('.day-content');
+            const day = dayEl ? parseInt(dayEl.dataset.day) : currentDay;
+            const wasKnown = card.classList.contains('known');
+            if (wasKnown) { card.classList.remove('known'); btn.textContent = '✓ I know it'; dayCounts[day] = Math.max(0, dayCounts[day] - 1); }
+            else { card.classList.add('known'); btn.textContent = '✓ Learned!'; dayCounts[day]++; }
+            if (day === currentDay) updateProgress();
+        }
+
+        function flipAll() { document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped')); }
+        function resetAll() {
+            document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
+            document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ I know it');
+            dayCounts[currentDay] = 0; updateProgress();
+        }
+        function shuffleCards() {
+            document.querySelectorAll('.day-content.active .card-grid').forEach(function(grid) {
+                const cards = [...grid.children]; cards.sort(() => Math.random() - 0.5); cards.forEach(c => grid.appendChild(c));
+            });
+            resetAll();
+        }
+        (function(){var T={"salary":"[сэ́лэрэ]","career":"[кэри́э]","budget":"[ба́джет]","bill":"[бил]","rent":"[рент]","savings":"[сэ́йвингз]","loan":"[лоун]","promotion":"[прэмо́ушэн]","to afford":"[эфо́:д]","to earn":"[ё:н]","to owe":"[оу]","to save":"[сэйв]","to apply for":"[эпла́й фо:]","broke":"[броук]","stable":"[стэ́йбл]","worth it":"[вё:с ит]","to make ends meet":"[мэйк эндз ми:т]","to be in debt":"[би: ин дэт]","to live within your means":"[лив видин ё:р ми:нз]","to apply for a job":"[эпла́й фо: э джоб]","to get promoted":"[гет прэмо́утид]","to be laid off":"[би: лэйд о:ф]","to work overtime":"[вё:к о́увэтайм]","friendship":"[фрэ́ндшип]","trust":"[траст]","argument":"[а́:гьюмэнт]","misunderstanding":"[мисандэстэ́ндинг]","impression":"[импрэ́шэн]","relationship":"[рилэ́йшэншип]","neighbour":"[нэ́йбэ]","colleague":"[ко́ли:г]","to apologise":"[эпо́лэджайз]","to forgive":"[фэги́в]","to gossip":"[го́сип]","to rely on":"[рила́й он]","reliable":"[рила́йэбл]","honest":"[о́нист]","offended":"[эфэ́ндид]","awkward":"[о́:квэд]","to make a good impression":"[мэйк э гуд импрэ́шэн]","to keep in touch":"[ки:п ин тач]","to fall out with sb":"[фо:л аут виз]","to get along with sb":"[гет эло́нг виз]","to let sb down":"[лет да́ун]","to have a lot in common":"[хэв э лот ин ко́мэн]","to speak your mind":"[спи:к ё:р майнд]","stress":"[стрэс]","routine":"[ру:ти́:н]","appointment":"[эпо́йнтмэнт]","complaint":"[кэмплэ́йнт]","queue":"[кью:]","delay":"[дэлэ́й]","emergency":"[имё́:джэнсэ]","solution":"[сэлю́:шэн]","to complain":"[кэмплэ́йн]","to manage":"[мэ́нидж]","to rush":"[раш]","to cancel":"[кэ́нсэл]","exhausted":"[игзо́:стид]","efficient":"[ифи́шэнт]","patient":"[пэ́йшэнт]","frustrated":"[фра́стрэйтид]","to be stuck in traffic":"[стак ин трэ́фик]","to lose track of time":"[лу:з трэк эв тайм]","to sort sth out":"[со:т ит аут]","to run out of sth":"[ран аут эв]","to deal with":"[ди:л виз]","to take a day off":"[тэйк э дэй о:ф]","to be overwhelmed":"[оувэвэ́лмд]"};document.querySelectorAll('.fcard-word').forEach(function(el){var k=el.textContent.trim();if(T[k]){var d=document.createElement('div');d.className='fcard-trans';d.textContent=T[k];el.insertAdjacentElement('afterend',d);}});})();
+    </script>
+</body>
+</html>

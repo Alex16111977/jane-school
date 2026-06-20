@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar in Context 🍎 | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ── tags ── */
+        .gtag {
+            display:inline-flex; align-items:center; border-radius:20px;
+            padding:0.18rem 0.6rem; font-size:0.74rem; font-weight:700;
+            text-decoration:none; transition:filter 0.15s, transform 0.12s, box-shadow 0.12s;
+            white-space:nowrap; letter-spacing:0.02em;
+        }
+        .gtag:hover { filter:brightness(1.25); transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,0.35); }
+        .gtag-art     { background:rgba(88,166,255,0.18);  color:#7ab8ff; border:1px solid rgba(88,166,255,0.38); }
+        .gtag-tense   { background:rgba(167,139,250,0.17); color:#c4b5fd; border:1px solid rgba(167,139,250,0.38); }
+        .gtag-modal   { background:rgba(45,212,191,0.15);  color:#2dd4bf; border:1px solid rgba(45,212,191,0.35); }
+        .gtag-passive { background:rgba(248,113,113,0.15); color:#fca5a5; border:1px solid rgba(248,113,113,0.35); }
+        .gtag-cond    { background:rgba(251,191,36,0.16);  color:#fbbf24; border:1px solid rgba(251,191,36,0.35); }
+        .gtag-question{ background:rgba(185,240,160,0.17); color:#b9f0a0; border:1px solid rgba(185,240,160,0.38); }
+        .gtag-neg     { background:rgba(244,167,185,0.2);  color:#f4a7b9; border:1px solid rgba(244,167,185,0.4); }
+        .gtag-struct  { background:rgba(148,163,184,0.13); color:#94a3b8; border:1px solid rgba(148,163,184,0.28); }
+
+        /* ── sentence card ── */
+        .sent-card {
+            border-radius:16px;
+            padding:1rem 1.1rem 0.85rem 1rem;
+            margin:0.45rem 0;
+            display:grid;
+            grid-template-columns:2.2rem 1fr;
+            gap:0 0.5rem;
+            border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.04);
+            backdrop-filter:blur(4px);
+            transition:border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.15s;
+            position:relative;
+            overflow:hidden;
+        }
+        .sent-card::before {
+            content:'';
+            position:absolute; left:0; top:0; bottom:0; width:3px;
+            background:rgba(255,255,255,0.1);
+            transition:background 0.2s;
+        }
+        .sent-card:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(0,0,0,0.35); border-color:rgba(255,255,255,0.14); }
+        .sent-card.unclear::before { background:linear-gradient(180deg,#f87171,#fca5a5); }
+        .sent-card.unclear { border-color:rgba(248,113,113,0.35); background:rgba(248,113,113,0.06); }
+        .sent-card.clear::before   { background:linear-gradient(180deg,#b9f0a0,#2dd4bf); }
+        .sent-card.clear   { border-color:rgba(185,240,160,0.3);  background:rgba(185,240,160,0.05); }
+        .sent-card.hidden  { display:none; }
+
+        .sent-left {
+            display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+            padding-top:0.1rem;
+        }
+        .sent-num {
+            font-size:0.7rem; color:rgba(230,230,235,0.22);
+            font-weight:600; line-height:1;
+        }
+        .sent-toggle {
+            width:28px; height:28px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; user-select:none; font-size:0.85rem;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+            transition:all 0.15s; flex-shrink:0;
+        }
+        .sent-toggle:hover { background:rgba(255,255,255,0.14); transform:scale(1.1); }
+        .sent-card.unclear .sent-toggle { background:rgba(248,113,113,0.2); border-color:rgba(248,113,113,0.4); }
+        .sent-card.clear   .sent-toggle { background:rgba(185,240,160,0.2); border-color:rgba(185,240,160,0.4); }
+
+        .sent-body { min-width:0; }
+        .sent-en {
+            font-size:1.02rem; font-weight:700;
+            color:rgba(230,230,235,0.97); margin-bottom:0.2rem;
+            line-height:1.4;
+        }
+        .sent-ru {
+            font-size:0.82rem; color:rgba(230,230,235,0.42);
+            margin-bottom:0.55rem; font-style:italic;
+        }
+        .sent-tags { display:flex; flex-wrap:wrap; gap:0.32rem; }
+
+        /* ── section header ── */
+        .section-hdr {
+            margin:2rem 0 0.6rem;
+            display:flex; align-items:center; gap:0.75rem;
+        }
+        .section-hdr-badge {
+            font-size:0.68rem; font-weight:900; letter-spacing:0.08em;
+            padding:0.2rem 0.65rem; border-radius:20px; flex-shrink:0;
+        }
+        .badge-a1 { background:linear-gradient(135deg,#3b82f6,#60a5fa); color:#fff; }
+        .badge-a2 { background:linear-gradient(135deg,#8b5cf6,#a78bfa); color:#fff; }
+        .badge-b1 { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1a1100; }
+        .section-hdr-title {
+            font-size:0.92rem; font-weight:700; color:rgba(230,230,235,0.65);
+            letter-spacing:0.01em;
+        }
+        .section-hdr-line {
+            flex:1; height:1px; background:rgba(255,255,255,0.07);
+        }
+
+        /* ── control panel ── */
+        .control-panel {
+            border-radius:18px;
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.04);
+            backdrop-filter:blur(8px);
+            padding:1.1rem 1.2rem;
+            margin-bottom:0.8rem;
+        }
+        .stats-row {
+            display:flex; gap:1.4rem; flex-wrap:wrap; align-items:center;
+            margin-bottom:0.7rem; font-size:0.86rem;
+        }
+        .stat-item { display:flex; align-items:center; gap:0.4rem; font-weight:600; }
+        .stat-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+        .progress-wrap {
+            background:rgba(255,255,255,0.08); border-radius:4px;
+            height:6px; margin:0 0 1rem; overflow:hidden;
+        }
+        .progress-fill {
+            height:100%;
+            background:linear-gradient(90deg,#60a5fa,#b9f0a0,#2dd4bf);
+            border-radius:4px; transition:width 0.4s ease;
+        }
+
+        .filter-row { display:flex; gap:0.45rem; flex-wrap:wrap; margin-bottom:1rem; }
+        .fbtn {
+            border:1px solid rgba(255,255,255,0.13);
+            background:rgba(255,255,255,0.05); border-radius:10px;
+            padding:0.38rem 0.95rem; font-size:0.82rem; cursor:pointer;
+            color:rgba(230,230,235,0.6); transition:all 0.15s; font-weight:600;
+        }
+        .fbtn:hover { background:rgba(255,255,255,0.1); color:rgba(230,230,235,0.9); }
+        .fbtn.on-all     { background:rgba(88,166,255,0.22); border-color:rgba(88,166,255,0.5); color:#7ab8ff; }
+        .fbtn.on-unclear { background:rgba(248,113,113,0.2); border-color:rgba(248,113,113,0.5); color:#fca5a5; }
+        .fbtn.on-clear   { background:rgba(185,240,160,0.2); border-color:rgba(185,240,160,0.5); color:#b9f0a0; }
+        .fbtn.on-none    { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25); color:rgba(230,230,235,0.8); }
+
+        .legend {
+            display:flex; flex-wrap:wrap; gap:0.55rem 1rem;
+            padding-top:0.8rem; border-top:1px solid rgba(255,255,255,0.07);
+        }
+        .legend-item {
+            display:flex; align-items:center; gap:0.35rem;
+            font-size:0.73rem; color:rgba(230,230,235,0.45);
+        }
+        .legend-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+        .reset-btn {
+            margin-left:auto; background:transparent;
+            border:1px solid rgba(255,255,255,0.1); border-radius:8px;
+            padding:0.25rem 0.75rem; font-size:0.77rem; cursor:pointer;
+            color:rgba(230,230,235,0.35); transition:all 0.15s;
+        }
+        .reset-btn:hover { border-color:rgba(255,255,255,0.22); color:rgba(230,230,235,0.7); }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">›</span>
+            <span class="current">Grammar in Context</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">← Back to English</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>Grammar in Context 🍎</h1>
+            <p class="page-subtitle">One word — all the grammar. Click tags to open the explanation. Press the circle to mark what's unclear.</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-dot" style="background:#b9f0a0"></div>
+                    <span id="count-clear">0</span>&nbsp;clear
+                </div>
+                <div class="stat-item">
+                    <div class="stat-dot" style="background:#f87171"></div>
+                    <span id="count-unclear">0</span>&nbsp;need to review
+                </div>
+                <span style="font-size:0.8rem;color:rgba(230,230,235,0.3);">of <span id="count-total">0</span></span>
+                <button class="reset-btn" onclick="resetAll()">Reset</button>
+            </div>
+            <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+            <div class="filter-row">
+                <button class="fbtn on-all" id="fbtn-all"     onclick="setFilter('all')">All</button>
+                <button class="fbtn"        id="fbtn-unclear"  onclick="setFilter('unclear')">❓ Unclear</button>
+                <button class="fbtn"        id="fbtn-clear"    onclick="setFilter('clear')">✅ Clear</button>
+                <button class="fbtn"        id="fbtn-none"     onclick="setFilter('none')">○ Not marked</button>
+            </div>
+
+            <div class="legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#7ab8ff"></span>Articles</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#c4b5fd"></span>Tenses</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span>Modals</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#fca5a5"></span>Passive</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>Conditionals</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#b9f0a0"></span>Questions</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#f4a7b9"></span>Negation</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#94a3b8"></span>Sentence structure</span>
+            </div>
+        </div>
+
+        <div id="sentences-container"></div>
+    </div>
+
+    <script>
+    const T   = (label, type, url) => ({label, type, url});
+    const BASE = 'englisch-grammar.html';
+
+    // Articles
+    const A  = (label, url=BASE+'#articles')       => T(label,'art',url);
+    // Tenses
+    const TN = (label, url=BASE+'#tenses')         => T(label,'tense',url);
+    // Modals
+    const M  = (label, url=BASE+'#modals')         => T(label,'modal',url);
+    // Passive
+    const P  = (label, url=BASE+'#passive')        => T(label,'passive',url);
+    // Conditionals
+    const C  = (label, url=BASE+'#conditionals')   => T(label,'cond',url);
+    // Questions
+    const Q  = (label, url=BASE+'#questions')      => T(label,'question',url);
+    // Negation
+    const N  = (label, url=BASE+'#negation')       => T(label,'neg',url);
+    // Sentence structure
+    const S  = (label, url=BASE)                   => T(label,'struct',url);
+
+    const SECTIONS = [
+      { title:'Articles, Plurals & Basic Sentences', badge:'A1', badgeClass:'badge-a1',
+        sentences:[
+          { en:'This is an apple.',      ru:'Это яблоко.',
+            tags:[A('indefinite article: a/an'), S('This is + noun')] },
+          { en:'The apple is red.',      ru:'Яблоко красное.',
+            tags:[A('definite article: the'), S('Subject + verb + adjective')] },
+          { en:'These are two apples.',  ru:'Это два яблока.',
+            tags:[A('no article — plural'), S('These are + noun'), S('Plural -s')] },
+          { en:'The apples are red.',    ru:'Яблоки красные.',
+            tags:[A('definite article — plural'), TN('Present Simple: are')] },
+          { en:"It's John's apple.",     ru:'Это яблоко Джона.',
+            tags:[S("Possessive 's"), A('definite reference')] },
+          { en:"Those are John's apples.", ru:'Это яблоки Джона.',
+            tags:[S("Possessive 's — plural"), A('no article — plural')] },
+          { en:'I have an apple.',       ru:'У меня есть яблоко.',
+            tags:[A('indefinite article: a/an'), TN('Present Simple: have')] },
+          { en:'I have two apples.',     ru:'У меня есть два яблока.',
+            tags:[A('no article — plural'), TN('Present Simple: have'), S('Plural -s')] },
+        ]
+      },
+      { title:'Questions & Negation', badge:'A1', badgeClass:'badge-a1',
+        sentences:[
+          { en:'Do you have an apple?',  ru:'У тебя есть яблоко?',
+            tags:[Q('Yes/No question: do'), A('indefinite article'), TN('Present Simple')] },
+          { en:'Does she have an apple?', ru:'У неё есть яблоко?',
+            tags:[Q('Yes/No question: does'), S('3rd person -s'), TN('Present Simple')] },
+          { en:"I don't have an apple.", ru:'У меня нет яблока.',
+            tags:[N("don't / doesn't"), A('indefinite article'), TN('Present Simple')] },
+          { en:"She doesn't have an apple.", ru:'У неё нет яблока.',
+            tags:[N("doesn't — 3rd person"), TN('Present Simple')] },
+          { en:'What do you have?',      ru:'Что у тебя есть?',
+            tags:[Q('Wh-question: what'), Q('Auxiliary do')] },
+          { en:'Who has an apple?',      ru:'У кого есть яблоко?',
+            tags:[Q('Subject question: who'), S('No auxiliary with subject question')] },
+          { en:"There isn't an apple.",  ru:'Здесь нет яблока.',
+            tags:[N("isn't / aren't"), S('There is/are'), A('indefinite article')] },
+        ]
+      },
+      { title:'Past Tenses & Time Expressions', badge:'A2', badgeClass:'badge-a2',
+        sentences:[
+          { en:'I ate an apple yesterday.',   ru:'Вчера я съел яблоко.',
+            tags:[TN('Past Simple — irregular: eat → ate'), A('indefinite article'), S('Time adverb: yesterday')] },
+          { en:'Did you eat an apple?',       ru:'Ты ел яблоко?',
+            tags:[Q('Yes/No question — Past Simple'), TN('Past Simple: did'), S('Infinitive after did')] },
+          { en:"I didn't eat an apple.",      ru:'Я не ел яблоко.',
+            tags:[N("didn't + infinitive"), TN('Past Simple negation')] },
+          { en:"I've already eaten the apple.", ru:'Я уже съел яблоко.',
+            tags:[TN('Present Perfect: have + past participle'), TN('Participle II: eaten'), S('already — word order'), A('definite article: the')] },
+          { en:'Have you ever eaten an apple?', ru:'Ты когда-нибудь ел яблоко?',
+            tags:[Q('Present Perfect question'), TN('ever — experience'), A('indefinite article')] },
+          { en:"I've never eaten an apple.",  ru:'Я никогда не ел яблоко.',
+            tags:[TN('Present Perfect'), N('never — negation'), A('indefinite article')] },
+          { en:'I was eating an apple when you called.', ru:'Я ел яблоко, когда ты позвонил.',
+            tags:[TN('Past Continuous: was/were + -ing'), TN('Past Simple: called'), S('when-clause')] },
+          { en:'I had eaten the apple before she arrived.', ru:'Я съел яблоко до того, как она приехала.',
+            tags:[TN('Past Perfect: had + past participle'), S('before-clause'), A('definite article')] },
+        ]
+      },
+      { title:'Present & Future Tenses', badge:'A2', badgeClass:'badge-a2',
+        sentences:[
+          { en:'I eat an apple every day.',   ru:'Я ем яблоко каждый день.',
+            tags:[TN('Present Simple — habit'), A('indefinite article'), S('Frequency: every day')] },
+          { en:"I'm eating an apple right now.", ru:'Я сейчас ем яблоко.',
+            tags:[TN("Present Continuous: am/is/are + -ing"), S('right now'), A('indefinite article')] },
+          { en:"I'm going to eat an apple later.", ru:'Я собираюсь съесть яблоко позже.',
+            tags:[TN('Future: going to — plan'), S('later — time adverb'), A('indefinite article')] },
+          { en:"I'll eat an apple tomorrow.",  ru:'Завтра я съем яблоко.',
+            tags:[TN("Future: will — spontaneous/prediction"), S('tomorrow'), A('indefinite article')] },
+          { en:"I'll be eating an apple at 5 pm.", ru:'В 5 часов я буду есть яблоко.',
+            tags:[TN('Future Continuous: will be + -ing'), S('at + time')] },
+          { en:"I'll have eaten the apple by then.", ru:'К тому времени я уже съем яблоко.',
+            tags:[TN('Future Perfect: will have + past participle'), S('by then'), A('definite article')] },
+        ]
+      },
+      { title:'Modal Verbs', badge:'A2', badgeClass:'badge-a2',
+        sentences:[
+          { en:'I can eat an apple.',          ru:'Я могу съесть яблоко.',
+            tags:[M('can — ability'), S('Modal + infinitive'), A('indefinite article')] },
+          { en:"I can't eat an apple.",        ru:'Я не могу съесть яблоко.',
+            tags:[M("can't — inability"), N('Negation with modal')] },
+          { en:'Can you eat an apple?',        ru:'Ты можешь съесть яблоко?',
+            tags:[Q('Modal question'), M('can')] },
+          { en:'You should eat an apple.',     ru:'Тебе следует съесть яблоко.',
+            tags:[M('should — advice'), A('indefinite article')] },
+          { en:'You must eat an apple.',       ru:'Ты должен съесть яблоко.',
+            tags:[M('must — obligation'), A('indefinite article')] },
+          { en:"You don't have to eat the apple.", ru:'Тебе не обязательно есть это яблоко.',
+            tags:[M("don't have to — no obligation"), N('vs. mustn\'t'), A('definite article')] },
+          { en:"You mustn't eat that apple.", ru:'Тебе нельзя есть это яблоко.',
+            tags:[M("mustn't — prohibition"), N('Negation: strong'), S('that — demonstrative')] },
+          { en:'She might eat an apple.',      ru:'Возможно, она съест яблоко.',
+            tags:[M('might — possibility (weak)'), A('indefinite article')] },
+          { en:'He must be eating an apple right now.', ru:'Он наверняка сейчас ест яблоко.',
+            tags:[M('must be + -ing — deduction'), TN('Modal + Continuous')] },
+        ]
+      },
+      { title:'Passive Voice', badge:'B1', badgeClass:'badge-b1',
+        sentences:[
+          { en:'The apple is eaten.',           ru:'Яблоко едят / Яблоко съедается.',
+            tags:[P('Passive: is/are + past participle'), TN('Present Simple Passive'), A('definite article')] },
+          { en:'The apple is being eaten.',     ru:'Яблоко сейчас едят.',
+            tags:[P('Passive: is being + past participle'), TN('Present Continuous Passive'), A('definite article')] },
+          { en:'The apple was eaten.',          ru:'Яблоко было съедено.',
+            tags:[P('Passive: was/were + past participle'), TN('Past Simple Passive'), A('definite article')] },
+          { en:'The apple has been eaten.',     ru:'Яблоко уже съедено.',
+            tags:[P('Passive: has/have been + past participle'), TN('Present Perfect Passive'), A('definite article')] },
+          { en:'The apple was eaten by her.',   ru:'Яблоко было съедено ею.',
+            tags:[P('Passive + by-agent'), S('by + agent'), A('definite article')] },
+          { en:'The apple will be eaten.',      ru:'Яблоко будет съедено.',
+            tags:[P('Future Passive: will be + past participle'), A('definite article')] },
+          { en:'The apple can be eaten.',       ru:'Яблоко можно съесть.',
+            tags:[P('Modal Passive: modal + be + past participle'), M('can — possibility')] },
+        ]
+      },
+      { title:'Conditionals', badge:'B1', badgeClass:'badge-b1',
+        sentences:[
+          { en:'If you eat an apple, you feel better.',
+            ru:'Если ты ешь яблоко, тебе становится лучше.',
+            tags:[C('Zero Conditional — general truth'), TN('Present Simple + Present Simple'), S('if-clause')] },
+          { en:"If you eat an apple, you'll feel better.",
+            ru:'Если ты съешь яблоко, тебе станет лучше.',
+            tags:[C('1st Conditional — real/likely'), TN("Present Simple + will"), S('if-clause')] },
+          { en:"If I had an apple, I would eat it.",
+            ru:'Если бы у меня было яблоко, я бы его съел.',
+            tags:[C('2nd Conditional — unreal/hypothetical'), TN('Past Simple + would + infinitive'), S('if-clause'), S('it — pronoun')] },
+          { en:"If I had had an apple, I would have eaten it.",
+            ru:'Если бы у меня тогда было яблоко, я бы его съел.',
+            tags:[C('3rd Conditional — past unreal'), TN('Past Perfect + would have + past participle'), S('if-clause')] },
+          { en:"If I were you, I'd eat the apple.",
+            ru:'На твоём месте я бы съел яблоко.',
+            tags:[C('2nd Conditional'), M('were — subjunctive mood'), S('If I were you')] },
+          { en:"I wish I had an apple.",
+            ru:'Жаль, что у меня нет яблока.',
+            tags:[C('wish + Past Simple — present unreal'), S('I wish — expressing regret')] },
+          { en:"I wish I had eaten the apple.",
+            ru:'Жаль, что я не съел яблоко.',
+            tags:[C('wish + Past Perfect — past regret'), TN('Past Perfect after wish'), A('definite article')] },
+        ]
+      },
+      { title:'Reported Speech & Advanced Structures', badge:'B1', badgeClass:'badge-b1',
+        sentences:[
+          { en:'Eat the apple!',
+            ru:'Съешь яблоко!',
+            tags:[S('Imperative'), A('definite article')] },
+          { en:"Don't eat the apple!",
+            ru:'Не ешь яблоко!',
+            tags:[S("Negative imperative: Don't + infinitive"), N('Negation'), A('definite article')] },
+          { en:"Let's eat the apple!",
+            ru:'Давайте съедим яблоко!',
+            tags:[S("Let's + infinitive — suggestion"), A('definite article')] },
+          { en:'She said she had eaten the apple.',
+            ru:'Она сказала, что съела яблоко.',
+            tags:[S('Reported speech'), TN('Backshift: Past Perfect'), A('definite article')] },
+          { en:'She asked if I had eaten the apple.',
+            ru:'Она спросила, ел ли я яблоко.',
+            tags:[S('Reported question with if'), TN('Backshift: Past Perfect'), A('definite article')] },
+          { en:'The apple I bought was delicious.',
+            ru:'Яблоко, которое я купил, было вкусным.',
+            tags:[S('Relative clause (no pronoun — contact clause)'), TN('Past Simple')] },
+          { en:'The apple that she chose was the biggest.',
+            ru:'Яблоко, которое она выбрала, было самым большим.',
+            tags:[S('Relative clause: that'), S('Superlative: the biggest'), A('definite article')] },
+          { en:'Having eaten the apple, she felt better.',
+            ru:'Съев яблоко, она почувствовала себя лучше.',
+            tags:[S('Participle clause: having + past participle'), TN('Perfect participle — before main action')] },
+        ]
+      }
+    ];
+
+    // ── state ──
+    const LSKEY = 'english-grammar-context-v1';
+    function load()  { try { return JSON.parse(localStorage.getItem(LSKEY)) || {}; } catch(e) { return {}; } }
+    function save(s) { localStorage.setItem(LSKEY, JSON.stringify(s)); }
+    let state  = load();
+    let filter = 'all';
+    let total  = 0;
+
+    // ── build DOM ──
+    function render() {
+        const container = document.getElementById('sentences-container');
+        container.innerHTML = '';
+        total = 0;
+
+        SECTIONS.forEach((sec, si) => {
+            const hdr = document.createElement('div');
+            hdr.className = 'section-hdr';
+            hdr.innerHTML = `
+                <span class="section-hdr-badge ${sec.badgeClass}">${sec.badge}</span>
+                <span class="section-hdr-title">${sec.title}</span>
+                <span class="section-hdr-line"></span>`;
+            container.appendChild(hdr);
+
+            sec.sentences.forEach((sent, idx) => {
+                total++;
+                const id  = `${si}-${idx}`;
+                const st  = state[id] || '';
+                const ico = st==='unclear' ? '❓' : st==='clear' ? '✅' : '○';
+
+                const card = document.createElement('div');
+                card.className = 'sent-card' + (st==='unclear' ? ' unclear' : st==='clear' ? ' clear' : '');
+                card.id = 'card-' + id;
+
+                const tagsHtml = sent.tags.map(t =>
+                    `<a href="${t.url}" class="gtag gtag-${t.type}">${t.label}</a>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="sent-left">
+                        <span class="sent-num">${idx+1}</span>
+                        <span class="sent-toggle" id="tog-${id}" onclick="toggle('${id}')">${ico}</span>
+                    </div>
+                    <div class="sent-body">
+                        <div class="sent-en">${sent.en}</div>
+                        <div class="sent-ru">${sent.ru}</div>
+                        <div class="sent-tags">${tagsHtml}</div>
+                    </div>`;
+                container.appendChild(card);
+            });
+        });
+
+        applyFilter();
+        updateStats();
+    }
+
+    function toggle(id) {
+        const cur = state[id] || '';
+        state[id] = cur === '' ? 'unclear' : cur === 'unclear' ? 'clear' : '';
+        save(state);
+        const card = document.getElementById('card-' + id);
+        const tog  = document.getElementById('tog-' + id);
+        card.classList.remove('unclear','clear');
+        if (state[id]==='unclear') { card.classList.add('unclear'); tog.textContent='❓'; }
+        else if (state[id]==='clear') { card.classList.add('clear'); tog.textContent='✅'; }
+        else { tog.textContent='○'; }
+        applyFilter();
+        updateStats();
+    }
+
+    function updateStats() {
+        let cl=0, un=0;
+        Object.values(state).forEach(v => { if(v==='clear') cl++; if(v==='unclear') un++; });
+        document.getElementById('count-clear').textContent   = cl;
+        document.getElementById('count-unclear').textContent = un;
+        document.getElementById('count-total').textContent   = total;
+        const pct = total ? Math.round((cl/total)*100) : 0;
+        document.getElementById('progress-fill').style.width = pct+'%';
+    }
+
+    function setFilter(f) {
+        filter = f;
+        ['all','unclear','clear','none'].forEach(x => {
+            document.getElementById('fbtn-'+x).className = 'fbtn' + (x===f ? ' on-'+x : '');
+        });
+        applyFilter();
+    }
+
+    function applyFilter() {
+        document.querySelectorAll('.sent-card').forEach(card => {
+            if (filter==='all') { card.classList.remove('hidden'); return; }
+            const un = card.classList.contains('unclear');
+            const cl = card.classList.contains('clear');
+            const no = !un && !cl;
+            card.classList.toggle('hidden',
+                filter==='unclear' ? !un :
+                filter==='clear'   ? !cl : !no
+            );
+        });
+    }
+
+    function resetAll() {
+        if (!confirm('Reset all marks?')) return;
+        state = {}; save(state); render();
+    }
+
+    render();
+    </script>
+</body>
+</html>

@@ -312,7 +312,8 @@
 
         /* ===== SEARCH ===== */
         .search-wrap {
-            margin: 0 0 1rem;
+            margin: 0 0 1.2rem;
+            position: relative;
         }
         .search-inner {
             display: flex;
@@ -355,56 +356,76 @@
             transition: color 0.15s;
         }
         .search-clear:hover { color: rgba(255,255,255,0.8); }
-        .search-count {
-            font-size: 0.78rem;
-            color: rgba(163,113,247,0.7);
-            margin-top: 0.45rem;
-            margin-left: 0.3rem;
-            min-height: 1.1em;
-            font-weight: 600;
+
+        /* Dropdown results panel */
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #16101f;
+            border: 1.5px solid rgba(163,113,247,0.4);
+            border-radius: 16px;
+            max-height: 60vh;
+            overflow-y: auto;
+            z-index: 999;
+            padding: 0.6rem 0.8rem 0.8rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.55);
         }
-        .search-results {
-            margin-bottom: 1.5rem;
+        .search-dropdown.open { display: block; }
+        .search-dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.3rem 0.3rem 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 0.5rem;
+        }
+        .search-count {
+            font-size: 0.76rem;
+            color: rgba(163,113,247,0.8);
+            font-weight: 700;
         }
         .sr-group-label {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 800;
             letter-spacing: 0.07em;
             text-transform: uppercase;
             color: rgba(255,255,255,0.28);
-            margin: 1.2rem 0 0.5rem;
-            padding-bottom: 0.35rem;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin: 0.9rem 0 0.4rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-        .sr-group-label:first-child { margin-top: 0; }
+        .sr-group-label:first-child { margin-top: 0.2rem; }
         .sr-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 0.85rem 1.1rem;
-            margin-bottom: 0.5rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 0.4rem;
             display: flex;
             align-items: flex-start;
-            gap: 0.8rem;
+            gap: 0.7rem;
             cursor: pointer;
             transition: background 0.15s, border-color 0.15s;
         }
         .sr-card:hover {
-            background: rgba(163,113,247,0.1);
-            border-color: rgba(163,113,247,0.4);
+            background: rgba(163,113,247,0.12);
+            border-color: rgba(163,113,247,0.45);
         }
         .sr-num {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 800;
-            color: rgba(163,113,247,0.6);
-            min-width: 1.5rem;
+            color: rgba(163,113,247,0.55);
+            min-width: 1.4rem;
             padding-top: 0.1rem;
             flex-shrink: 0;
         }
         .sr-text {
-            font-size: 0.94rem;
+            font-size: 0.91rem;
             color: rgba(255,255,255,0.88);
-            line-height: 1.5;
+            line-height: 1.45;
         }
         .sr-text mark {
             background: rgba(163,113,247,0.35);
@@ -414,29 +435,17 @@
             font-style: normal;
         }
         .sr-hint {
-            font-size: 0.76rem;
-            color: rgba(255,255,255,0.32);
-            margin-top: 0.2rem;
-        }
-        .sr-tab-badge {
-            font-size: 0.68rem;
-            background: rgba(163,113,247,0.15);
-            border: 1px solid rgba(163,113,247,0.3);
-            border-radius: 6px;
-            padding: 0.1rem 0.45rem;
-            color: rgba(163,113,247,0.85);
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-left: auto;
-            align-self: flex-start;
+            font-size: 0.73rem;
+            color: rgba(255,255,255,0.28);
+            margin-top: 0.15rem;
         }
         .sr-empty {
             text-align: center;
-            padding: 2.5rem 1rem;
+            padding: 2rem 1rem;
             color: rgba(255,255,255,0.3);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
-        .sr-empty span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+        .sr-empty span { font-size: 1.8rem; display: block; margin-bottom: 0.4rem; }
 
         /* ===== SUBSECTION HEADER inside tab ===== */
         .subsec {
@@ -501,11 +510,15 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="Frage suchen… z.B. „Homeoffice" oder „Konjunktiv"" autocomplete="off" oninput="doSearch(this.value)">
                 <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Löschen">&#x2715;</button>
             </div>
-            <div id="searchCount" class="search-count"></div>
+            <!-- Dropdown results -->
+            <div class="search-dropdown" id="searchDropdown">
+                <div class="search-dropdown-header">
+                    <span class="search-count" id="searchCount"></span>
+                    <span style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Klicken zum &Ouml;ffnen &bull; Esc zum Schlie&szlig;en</span>
+                </div>
+                <div id="searchResults"></div>
+            </div>
         </div>
-
-        <!-- ===== SEARCH RESULTS ===== -->
-        <div id="searchResults" class="search-results" style="display:none"></div>
 
         <div class="tabs" id="mainTabs">
             <button class="tab active" data-tab="zufall">&#x1F3B2; Zufallsfrage</button>
@@ -1488,8 +1501,14 @@
         // ===== SEARCH =====
         function buildSearchIndex() {
             const index = [];
+            const tabLabels = {
+                'tab-fragen': 'Alle Fragen',
+                'tab-sprache': 'Sprache & Lernen',
+                'tab-ziele': 'Ziele & Träume',
+            };
             document.querySelectorAll('.tab-content').forEach(tab => {
-                const tabId = tab.id; // e.g. tab-fragen
+                const tabId = tab.id;
+                if (!tabLabels[tabId]) return; // only question tabs
                 let currentSection = '';
                 tab.childNodes.forEach(node => {
                     if (node.nodeType !== 1) return;
@@ -1506,9 +1525,8 @@
                                 hint: hEl ? hEl.innerText.trim() : '',
                                 num: numEl ? numEl.innerText.trim() : '',
                                 section: currentSection,
-                                tabId: tabId,
-                                tabLabel: tabLabels[tabId] || tabId,
-                                el: node
+                                tabId,
+                                tabLabel: tabLabels[tabId],
                             });
                         }
                     }
@@ -1516,12 +1534,6 @@
             });
             return index;
         }
-
-        const tabLabels = {
-            'tab-fragen': 'Alle Fragen',
-            'tab-sprache': 'Sprache & Lernen',
-            'tab-ziele': 'Ziele & Träume',
-        };
 
         let searchIndex = null;
 
@@ -1533,24 +1545,20 @@
 
         function doSearch(val) {
             const q = val.trim();
+            const dropdown = document.getElementById('searchDropdown');
             const resultsBox = document.getElementById('searchResults');
-            const tabs = document.getElementById('mainTabs');
-            const tabContents = document.querySelectorAll('.tab-content');
             const countEl = document.getElementById('searchCount');
             const clearBtn = document.getElementById('searchClear');
 
             clearBtn.style.display = q ? 'block' : 'none';
 
             if (!q) {
-                resultsBox.style.display = 'none';
+                dropdown.classList.remove('open');
                 resultsBox.innerHTML = '';
-                tabs.style.display = '';
-                tabContents.forEach(c => c.style.display = '');
                 countEl.textContent = '';
                 return;
             }
 
-            // Build index once
             if (!searchIndex) searchIndex = buildSearchIndex();
 
             const lower = q.toLowerCase();
@@ -1560,40 +1568,34 @@
                 item.section.toLowerCase().includes(lower)
             );
 
-            // Hide tabs, show results panel
-            tabs.style.display = 'none';
-            tabContents.forEach(c => c.style.display = 'none');
-            resultsBox.style.display = 'block';
-
+            dropdown.classList.add('open');
             countEl.textContent = matches.length
                 ? `${matches.length} Ergebnis${matches.length === 1 ? '' : 'se'} gefunden`
-                : '';
+                : 'Nichts gefunden';
 
             if (!matches.length) {
                 resultsBox.innerHTML = `<div class="sr-empty"><span>🔍</span>Keine Fragen zu „${q}" gefunden.</div>`;
                 return;
             }
 
-            // Group by tab + section
+            // Group by section
             const groups = [];
             const seen = new Map();
             matches.forEach(m => {
                 const key = m.tabId + '||' + m.section;
                 if (!seen.has(key)) {
                     seen.set(key, []);
-                    groups.push({ key, tabLabel: m.tabLabel, section: m.section, items: seen.get(key) });
+                    groups.push({ tabLabel: m.tabLabel, section: m.section, items: seen.get(key) });
                 }
                 seen.get(key).push(m);
             });
 
             let html = '';
             groups.forEach(g => {
-                const secText = g.section
-                    ? `${g.tabLabel} › ${g.section}`
-                    : g.tabLabel;
+                const secText = g.section ? `${g.tabLabel} › ${g.section}` : g.tabLabel;
                 html += `<div class="sr-group-label">${secText}</div>`;
                 g.items.forEach(item => {
-                    html += `<div class="sr-card" onclick="jumpTo('${item.tabId}', this)" data-tab="${item.tabId}">
+                    html += `<div class="sr-card" onclick="jumpTo('${item.tabId}','${item.num}')">
                         <span class="sr-num">${item.num}</span>
                         <div>
                             <div class="sr-text">${highlight(item.text, q)}</div>
@@ -1602,45 +1604,45 @@
                     </div>`;
                 });
             });
-
             resultsBox.innerHTML = html;
         }
 
-        function jumpTo(tabId, card) {
+        function jumpTo(tabId, num) {
             clearSearch();
-            // Switch to the right tab
             const tabBtn = document.querySelector(`.tab[data-tab="${tabId.replace('tab-', '')}"]`);
             if (tabBtn) tabBtn.click();
-            // Find and highlight the matching card
-            const num = card.querySelector ? card.querySelector('.sr-num')?.textContent.trim() : '';
             setTimeout(() => {
-                const all = document.querySelectorAll('#' + tabId + ' .speak-question-card');
-                all.forEach(c => {
+                document.querySelectorAll('#' + tabId + ' .speak-question-card').forEach(c => {
                     const n = c.querySelector('.speak-q-num');
                     if (n && n.textContent.trim() === num) {
                         c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        c.style.transition = 'background 0.3s';
+                        c.style.transition = 'background 0.4s, border-color 0.4s';
                         c.style.background = 'rgba(163,113,247,0.22)';
-                        c.style.borderColor = 'rgba(163,113,247,0.6)';
-                        setTimeout(() => {
-                            c.style.background = '';
-                            c.style.borderColor = '';
-                        }, 1800);
+                        c.style.borderColor = 'rgba(163,113,247,0.65)';
+                        setTimeout(() => { c.style.background = ''; c.style.borderColor = ''; }, 1800);
                     }
                 });
             }, 80);
         }
 
         function clearSearch() {
-            const input = document.getElementById('searchInput');
-            input.value = '';
+            document.getElementById('searchInput').value = '';
             doSearch('');
-            input.focus();
         }
 
-        // Keyboard: Escape clears search
+        // Close dropdown on Escape or click outside
         document.getElementById('searchInput').addEventListener('keydown', e => {
-            if (e.key === 'Escape') clearSearch();
+            if (e.key === 'Escape') { clearSearch(); document.getElementById('searchInput').blur(); }
+        });
+        document.addEventListener('click', e => {
+            if (!document.getElementById('searchWrap').contains(e.target)) {
+                document.getElementById('searchDropdown').classList.remove('open');
+            }
+        });
+        document.getElementById('searchInput').addEventListener('focus', () => {
+            if (document.getElementById('searchInput').value.trim()) {
+                document.getElementById('searchDropdown').classList.add('open');
+            }
         });
 
         // ===== RANDOM QUESTION =====
