@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ninas Buchladen — Deutsche Lektüre | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900;9..144,900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .buch-page { font-family: 'Inter', -apple-system, sans-serif; color: rgba(248, 250, 252, 0.96); }
+        .buch-page * { box-sizing: border-box; }
+
+        /* ========== BOOK COVER ========== */
+        .book-cover {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 3rem 2.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 28px;
+            background:
+                radial-gradient(ellipse at top left, rgba(52, 211, 153, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at bottom right, rgba(251, 191, 36, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(6, 78, 59, 0.5) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        @media (min-width: 720px) {
+            .book-cover { grid-template-columns: 200px 1fr; align-items: center; padding: 3.5rem 3rem; }
+        }
+        .cover-book {
+            width: 180px;
+            height: 240px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 6px 14px 14px 6px;
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #78350f 100%);
+            box-shadow:
+                0 30px 60px rgba(0,0,0,0.5),
+                -3px 0 0 rgba(255,255,255,0.05),
+                inset 4px 0 0 rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            text-align: center;
+            transform: rotate(-3deg);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cover-book:hover { transform: rotate(0deg) scale(1.04); }
+        .cover-book::before {
+            content: '';
+            position: absolute;
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        .cover-book .ct-1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+        .cover-book .ct-2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.9rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            background: linear-gradient(180deg, #fff 0%, #fde68a 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+        .cover-book .ct-3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .cover-book .ct-corner {
+            position: absolute;
+            bottom: 16px;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .cover-info .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #6ee7b7;
+            background: rgba(52, 211, 153, 0.1);
+            padding: 0.4rem 0.85rem;
+            border-radius: 100px;
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            margin-bottom: 1.2rem;
+        }
+        .cover-info h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.5rem;
+            color: #fff;
+        }
+        .cover-info .subtitle {
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            margin: 0 0 1.2rem;
+        }
+        .cover-info p {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+            margin: 0 0 1.2rem;
+            line-height: 1.6;
+            max-width: 540px;
+        }
+        .cover-stats {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .cover-stat {
+            font-size: 0.78rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.75);
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+        .cover-stat strong { color: #fff; }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            margin: 0 0 1.2rem;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .progress-bar .pb-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+        .progress-bar .pb-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+        .progress-bar .pb-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34d399 0%, #fbbf24 100%);
+            border-radius: 100px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+        .progress-bar .pb-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* ========== CHAPTER NAV ========== */
+        .chapter-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+            gap: 0.4rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+        }
+        .chapter-nav button {
+            aspect-ratio: 1;
+            min-height: 40px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chapter-nav button:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .chapter-nav button.active {
+            background: linear-gradient(135deg, #34d399, #fbbf24);
+            border-color: transparent;
+            color: #0f172a;
+            box-shadow: 0 8px 24px rgba(52, 211, 153, 0.3);
+        }
+        .chapter-nav button.read {
+            border-color: rgba(52, 211, 153, 0.3);
+            color: #6ee7b7;
+        }
+
+        /* ========== READING SPREAD ========== */
+        .reading-spread {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        @media (min-width: 980px) {
+            .reading-spread { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+        }
+
+        /* ========== CHAPTER CARD ========== */
+        .chapter-card {
+            background: linear-gradient(180deg, rgba(252, 250, 245, 0.04) 0%, rgba(252, 250, 245, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2.4rem 2.4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #34d399 0%, #fbbf24 50%, #f97316 100%);
+            opacity: 0.7;
+        }
+        .chapter-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-num { color: #6ee7b7; font-weight: 700; }
+        .chapter-date { color: rgba(255,255,255,0.5); }
+        .chapter-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+            margin: 0 0 1.5rem;
+            color: #fff;
+        }
+        .chapter-body {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.1rem;
+            line-height: 1.85;
+            color: rgba(248, 250, 252, 0.92);
+        }
+        .chapter-body p { margin: 0 0 1.1rem; }
+        .chapter-body p:first-of-type::first-letter {
+            font-size: 3.8em;
+            float: left;
+            line-height: 0.85;
+            padding: 0.1em 0.1em 0 0;
+            font-weight: 900;
+            background: linear-gradient(135deg, #34d399, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Fraunces', serif;
+        }
+        .chapter-body h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #6ee7b7;
+            margin: 1.8rem 0 0.7rem;
+            letter-spacing: -0.01em;
+        }
+        .chapter-body h3:first-of-type { margin-top: 0.5rem; }
+        .chapter-body .vw {
+            color: #fde68a;
+            font-weight: 600;
+            background-image: linear-gradient(180deg, transparent 65%, rgba(251, 191, 36, 0.35) 65%);
+            padding: 0 1px;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-body .vw.vw-active {
+            background-image: linear-gradient(180deg, transparent 65%, rgba(251, 191, 36, 0.6) 65%);
+        }
+
+        /* ========== WORD TOOLTIP ========== */
+        #vw-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.97);
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            border-radius: 10px;
+            padding: 5px 12px 6px;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        #vw-tooltip .tip-ru {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #6ee7b7;
+            line-height: 1.3;
+        }
+        #vw-tooltip .tip-base {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 1px;
+        }
+        #vw-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(52, 211, 153, 0.5);
+        }
+
+        /* ========== VOCAB SIDEBAR ========== */
+        .vocab-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        @media (min-width: 980px) {
+            .vocab-sidebar { position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem); overflow-y: auto; padding-right: 0.4rem; }
+            .vocab-sidebar::-webkit-scrollbar { width: 6px; }
+            .vocab-sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 8px; }
+            .vocab-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 8px; }
+        }
+        .sidebar-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: rgba(255,255,255,0.5);
+            font-weight: 700;
+            margin: 0 0 0.4rem;
+            padding-left: 0.4rem;
+        }
+        .word-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            transition: all 0.2s ease;
+        }
+        .word-card:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+            border-color: rgba(52, 211, 153, 0.25);
+        }
+        .word-card .word-en {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fde68a;
+            margin-bottom: 0.1rem;
+            letter-spacing: -0.005em;
+        }
+        .word-card .word-trans {
+            display: grid;
+            gap: 0.1rem;
+            font-size: 0.82rem;
+        }
+        .word-card .word-trans .text-ru { color: rgba(248, 250, 252, 0.88); font-weight: 500; }
+        .word-card .word-trans .text-en {
+            color: rgba(110, 231, 183, 0.85);
+            font-style: italic;
+            font-size: 0.78rem;
+        }
+
+        /* ========== NAVIGATION (PREV/NEXT) ========== */
+        .reading-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .reading-nav button {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+            text-align: left;
+        }
+        .reading-nav button.next {
+            align-items: flex-end;
+            text-align: right;
+        }
+        .reading-nav button:hover:not(:disabled) {
+            background: rgba(52, 211, 153, 0.1);
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-2px);
+        }
+        .reading-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .reading-nav .nav-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            font-weight: 700;
+        }
+        .reading-nav .nav-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1rem;
+        }
+
+        /* ========== HIDE INACTIVE CHAPTERS ========== */
+        .chapter[data-active="false"] { display: none; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.90)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg buch-page">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Ninas Buchladen</span>
+        </nav>
+
+        <!-- BOOK COVER -->
+        <header class="book-cover">
+            <div class="cover-book">
+                <div class="ct-1">Roman</div>
+                <div class="ct-2">Ninas<br>Buch&shy;laden</div>
+                <div class="ct-3">Jenny Colgan</div>
+                <div class="ct-corner">B2 &rarr; C1</div>
+            </div>
+            <div class="cover-info">
+                <span class="eyebrow">&#x1F4D6; Deutsche Lekt&uuml;re</span>
+                <h1>Ninas Buchladen</h1>
+                <p class="subtitle">Ein Buch &uuml;ber B&uuml;cher &mdash; und die Orte, an denen man sie am liebsten liest.</p>
+                <p>Nina Redmond tr&auml;umt davon, einen Buchladen zu er&ouml;ffnen. Die Autorin Jenny Colgan erz&auml;hlt von Liebe, Ver&auml;nderung &mdash; und von K&auml;se. Jedes Kapitel ist ein Abschnitt aus der &Uuml;bersetzung: mit Vokabeln, die man wirklich braucht.</p>
+                <div class="cover-stats">
+                    <span class="cover-stat"><strong id="totalCount">1</strong> Kapitel</span>
+                    <span class="cover-stat"><strong>B2 &rarr; C1</strong> Niveau</span>
+                    <span class="cover-stat"><strong>Jenny Colgan</strong></span>
+                    <span class="cover-stat"><strong>~18</strong> Vokabeln</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROGRESS -->
+        <div class="progress-bar">
+            <span class="pb-label">Fortschritt</span>
+            <div class="pb-track"><div class="pb-fill" id="pbFill"></div></div>
+            <span class="pb-count" id="pbCount">1 / 1</span>
+        </div>
+
+        <!-- CHAPTER NAVIGATOR -->
+        <div class="chapter-nav" id="chapterNav"></div>
+
+        <!-- CHAPTERS -->
+        <div id="chaptersContainer">
+
+            <!-- ========== KAPITEL 1 ========== -->
+            <div class="chapter" data-num="1" data-active="true">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta">
+                            <span class="chapter-num">Kapitel 01</span>
+                            <span class="chapter-date">Einleitung</span>
+                        </div>
+                        <h2 class="chapter-title">Ansprache an den Leser</h2>
+                        <div class="chapter-body">
+                            <p>In diesem Buch gibt es keine <span class="vw">Widmung</span>, denn das ganze Buch ist Ihnen <span class="vw">gewidmet</span> &mdash; dem Leser. Allen Lesern.</p>
+                            <p>Es geht ums Lesen und um B&uuml;cher und darum, wie sie Ihr Leben ver&auml;ndern k&ouml;nnen &mdash; und ich bin sicher: zum Besseren. Au&szlig;erdem handelt mein Buch davon, was wir f&uuml;hlen, wenn wir voranschreiten und etwas Neues beginnen, davon, wie der Ort, an dem wir leben, unsere Gef&uuml;hle <span class="vw">beeinflusst</span>, und davon, wie Verliebtheit im wirklichen Leben der Liebe in B&uuml;chern &auml;hneln kann. Und dann ist da noch etwas &uuml;ber K&auml;se &mdash; und &uuml;ber einen Hund namens Parsley (also Petersilie).</p>
+                            <p>Vor allem aber geht es hier viel um B&uuml;cher, denn Nina Redmond, meine Heldin, tr&auml;umt davon, einen Buchladen zu er&ouml;ffnen. Au&szlig;erdem finden Sie einige n&uuml;tzliche Tipps, wo man am besten liest &mdash; denn ich hege die <span class="vw">altmodische</span> <span class="vw">&Uuml;berzeugung</span>, dass Lesen ein Vergn&uuml;gen ist, das man <span class="vw">sorgf&auml;ltig</span> h&uuml;ten sollte. Ich hoffe <span class="vw">aufrichtig</span>, dass Ihnen dieses Buch ebenso viel Freude bereitet wie mir das Schreiben.</p>
+
+                            <h3>&#x1F6C1; Die Badewanne</h3>
+                            <p>9:45 Uhr &mdash; das ist meine Lieblingsbadezeit, und das treibt meinen Mann in den <span class="vw">Wahnsinn</span>, denn er muss das Thermostat auf die richtige Temperatur einstellen (etwas k&uuml;hler als die Sonnenoberfl&auml;che) und sie st&auml;ndig <span class="vw">aufrechterhalten</span>. Bad&ouml;le mag ich allerdings nicht &mdash; die sind <span class="vw">widerlich</span>: Sie <span class="vw">&uuml;berziehen</span> alles mit einem Film. Taschenbücher sind in der Wanne ideal &mdash; denn selbst wenn das Schlimmste passiert, m&uuml;ssen Sie das Buch nur auf dem Heizk&ouml;rper trocknen. Ich lese oft ein E-Book und verraten Ihnen ein Geheimnis: Die Seiten bl&auml;ttere ich mit der Nase um. Vielleicht haben Sie keine so <span class="vw">pr&auml;chtige</span> schottisch-italienische Nase wie ich &mdash; aber nach etwas &Uuml;bung ist es m&ouml;glich. Falls jemand die Angewohnheit hat, ins Badezimmer zu <span class="vw">st&uuml;rmen</span>, sperren Sie die T&uuml;r ab.</p>
+                            <p>Meine Freundin Sez h&auml;lt ihr E-Book mit beiden H&auml;nden, wickelt es aber vorher in eine Plastikt&uuml;te ein. Vern&uuml;nftig.</p>
+
+                            <h3>&#x1F6CF; Das Bett</h3>
+                            <p>Das einzige Problem beim Lesen im Bett ist die K&uuml;rze. Zwei oder drei Seiten &mdash; und man f&auml;ngt an zu <span class="vw">d&ouml;sen</span>. Man kann immer wieder wegdriften, bevor man endg&uuml;ltig einschl&auml;ft. Wenn man dann am n&auml;chsten Abend das Buch zur Hand nimmt und sich fragt, ob da wirklich ein rosafarbenes Einhorn durch den Pr&uuml;fungssaal gerannt ist &mdash; ich muss Sie <span class="vw">entt&auml;uschen</span>: Nein. Man hat einfach ged&ouml;st. Ich habe meinen Figuren <span class="vw">wohlweislich</span> sehr unterschiedliche Namen gegeben, damit man sie nicht <span class="vw">verwechselt</span>.</p>
+
+                            <h3>&#x2600;&#xFE0F; Die Sonnenliege</h3>
+                            <p>Im Urlaub scheint die Sonnenliege der ideale Leseplatz zu sein. H&auml;lt man das Buch &uuml;ber sich, <span class="vw">erm&uuml;den</span> die Arme schnell, au&szlig;erdem <span class="vw">hinterl&auml;sst</span> das Buch einen buchf&ouml;rmigen Fleck auf der Haut. Liest man mit Sonne aufs Buch, muss man <span class="vw">blinzeln</span>. Liegt man auf dem Bauch, fallen <span class="vw">Schwei&szlig;tropfen</span> auf die Seiten. Die beste Variante ist einer dieser Liegest&uuml;hle mit einem kleinen Leinenbaldachin, unter dem man den Kopf <span class="vw">verbergen</span> kann. Ja, das sieht <span class="vw">albern</span> aus. Aber &mdash; hurra! &mdash; der Sieg geh&ouml;rt einem.</p>
+
+                            <h3>&#x1F6B6; Spaziergang auf der Stra&szlig;e</h3>
+                            <p>Es ist durchaus akzeptabel, mit einem Buch vor der Nase die Stra&szlig;e entlangzugehen. Die Menschen werden <span class="vw">nachsichtig</span> l&auml;cheln und einem den Weg freimachen (ich habe ein M&auml;dchen gesehen, das sich das Handgelenk <span class="vw">verstaucht</span> hatte, weil es vergaß, den Haltegriff in der Londoner U-Bahn loszulassen &mdash; es las &bdquo;Der geeignete Br&auml;utigam&ldquo;). Leider halten <span class="vw">heutzutage</span> alle Leute Smartphones vor sich und werden so zu einem ernsthaften <span class="vw">Hindernis</span>. Seien Sie vorsichtig.</p>
+
+                            <h3>&#x1F4DA; Der Buchclub</h3>
+                            <p>Falls Sie das hier f&uuml;r einen Buchclub lesen, <span class="vw">vermute</span> ich, es ist drei Uhr morgens am Vorabend des Treffens. Wenn man in Eile liest, kann es passieren, dass jemand fragt: &bdquo;Und was halten Sie von diesem Ende?&ldquo; &mdash; und man <span class="vw">verzweifelt</span> nickt. Daher m&ouml;chte ich Sie <span class="vw">beruhigen</span>: In meinem Buch gibt es kein &Uuml;berraschungsende. Ich muss allerdings <span class="vw">zugeben</span>, dass es hier eigentlich gar kein richtiges Ende gibt.</p>
+
+                            <h3>&#x1FAB4; Die H&auml;ngematte</h3>
+                            <p>Vor langer Zeit hatte ich einen netten Freund, der mir eine H&auml;ngematte mitbrachte und sie auf meiner winzigen Dachterrasse <span class="vw">aufh&auml;ngte</span>. Dort verbrachte ich viele gl&uuml;ckliche Stunden: <span class="vw">schaukeln</span> und lesen, dabei Snacks <span class="vw">knabbern</span>. Dann <span class="vw">heiratete</span> ich ihn, wir bekamen Kinder und einen Hund, und zogen dorthin, wo es st&auml;ndig regnete &mdash; aber ich glaube, die H&auml;ngematte liegt noch irgendwo im <span class="vw">Abstellraum</span>. Und das, meine Freunde, nennt man &bdquo;und sie lebten gl&uuml;cklich bis ans Ende ihrer Tage&ldquo;&hellip;</p>
+
+                            <h3>&#x23F1; Lesen in kurzen Momenten</h3>
+                            <p>Oh, das ist die sch&ouml;nste Zeit &uuml;berhaupt! Ich <span class="vw">ergattre</span> oft zehn Minuten, bevor ich die Kinder <span class="vw">abhole</span>, oder <span class="vw">nutze</span> eine Stunde nach dem Supermarkt, im Auto sitzend, der Welt gegen&uuml;ber <span class="vw">gleichg&uuml;ltig</span>. Das haben wir <span class="vw">verdient</span>.</p>
+
+                            <h3>&#x1F687; U-Bahn-Fahrten</h3>
+                            <p>In der U-Bahn zu lesen ist <span class="vw">herrlich</span>. Die U-Bahn ist so streng <span class="vw">geregelt</span>! Beobachten Sie die <span class="vw">glasigen</span> Blicke der Menschen, die durch die Stationen <span class="vw">hetzen</span> &mdash; und Ihr Gehirn wird dem Befehl <span class="vw">gehorchen</span>, Sie von all dem fortzubringen. Legen Sie das Telefon weg. Das wird Sie f&uuml;r die Notwendigkeit des Fahrens <span class="vw">entsch&auml;digen</span>.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">die Widmung</div><div class="word-trans"><span class="text-ru">посвящение</span><span class="text-en">dedication</span></div></div>
+                        <div class="word-card"><div class="word-en">beeinflussen</div><div class="word-trans"><span class="text-ru">влиять на</span><span class="text-en">to influence</span></div></div>
+                        <div class="word-card"><div class="word-en">die &Uuml;berzeugung</div><div class="word-trans"><span class="text-ru">убеждение</span><span class="text-en">conviction</span></div></div>
+                        <div class="word-card"><div class="word-en">sorgf&auml;ltig</div><div class="word-trans"><span class="text-ru">тщательно</span><span class="text-en">carefully</span></div></div>
+                        <div class="word-card"><div class="word-en">aufrichtig</div><div class="word-trans"><span class="text-ru">искренне</span><span class="text-en">sincerely</span></div></div>
+                        <div class="word-card"><div class="word-en">der Wahnsinn</div><div class="word-trans"><span class="text-ru">безумие</span><span class="text-en">madness</span></div></div>
+                        <div class="word-card"><div class="word-en">widerlich</div><div class="word-trans"><span class="text-ru">отвратительный</span><span class="text-en">disgusting</span></div></div>
+                        <div class="word-card"><div class="word-en">pr&auml;chtig</div><div class="word-trans"><span class="text-ru">великолепный</span><span class="text-en">magnificent</span></div></div>
+                        <div class="word-card"><div class="word-en">st&uuml;rmen</div><div class="word-trans"><span class="text-ru">врываться</span><span class="text-en">to burst in</span></div></div>
+                        <div class="word-card"><div class="word-en">d&ouml;sen</div><div class="word-trans"><span class="text-ru">дремать</span><span class="text-en">to doze</span></div></div>
+                        <div class="word-card"><div class="word-en">wohlweislich</div><div class="word-trans"><span class="text-ru">благоразумно</span><span class="text-en">wisely</span></div></div>
+                        <div class="word-card"><div class="word-en">verwechseln</div><div class="word-trans"><span class="text-ru">путать (между собой)</span><span class="text-en">to mix up</span></div></div>
+                        <div class="word-card"><div class="word-en">blinzeln</div><div class="word-trans"><span class="text-ru">щуриться</span><span class="text-en">to squint</span></div></div>
+                        <div class="word-card"><div class="word-en">albern</div><div class="word-trans"><span class="text-ru">нелепый</span><span class="text-en">silly</span></div></div>
+                        <div class="word-card"><div class="word-en">nachsichtig</div><div class="word-trans"><span class="text-ru">снисходительный</span><span class="text-en">indulgent</span></div></div>
+                        <div class="word-card"><div class="word-en">heutzutage</div><div class="word-trans"><span class="text-ru">в наши дни</span><span class="text-en">nowadays</span></div></div>
+                        <div class="word-card"><div class="word-en">das Hindernis</div><div class="word-trans"><span class="text-ru">препятствие</span><span class="text-en">obstacle</span></div></div>
+                        <div class="word-card"><div class="word-en">vermuten</div><div class="word-trans"><span class="text-ru">предполагать</span><span class="text-en">to suppose</span></div></div>
+                        <div class="word-card"><div class="word-en">beruhigen</div><div class="word-trans"><span class="text-ru">успокаивать</span><span class="text-en">to reassure</span></div></div>
+                        <div class="word-card"><div class="word-en">zugeben</div><div class="word-trans"><span class="text-ru">признавать</span><span class="text-en">to admit</span></div></div>
+                        <div class="word-card"><div class="word-en">schaukeln</div><div class="word-trans"><span class="text-ru">качаться</span><span class="text-en">to swing</span></div></div>
+                        <div class="word-card"><div class="word-en">knabbern</div><div class="word-trans"><span class="text-ru">грызть</span><span class="text-en">to nibble</span></div></div>
+                        <div class="word-card"><div class="word-en">der Abstellraum</div><div class="word-trans"><span class="text-ru">кладовка</span><span class="text-en">storage room</span></div></div>
+                        <div class="word-card"><div class="word-en">ergattern</div><div class="word-trans"><span class="text-ru">урвать, улучить</span><span class="text-en">to snatch</span></div></div>
+                        <div class="word-card"><div class="word-en">gleichg&uuml;ltig</div><div class="word-trans"><span class="text-ru">безразличный</span><span class="text-en">indifferent</span></div></div>
+                        <div class="word-card"><div class="word-en">herrlich</div><div class="word-trans"><span class="text-ru">восхитительный</span><span class="text-en">wonderful</span></div></div>
+                        <div class="word-card"><div class="word-en">glasig</div><div class="word-trans"><span class="text-ru">стеклянный (взгляд)</span><span class="text-en">glassy</span></div></div>
+                        <div class="word-card"><div class="word-en">hetzen</div><div class="word-trans"><span class="text-ru">мчаться</span><span class="text-en">to rush</span></div></div>
+                        <div class="word-card"><div class="word-en">gehorchen</div><div class="word-trans"><span class="text-ru">подчиняться</span><span class="text-en">to obey</span></div></div>
+                        <div class="word-card"><div class="word-en">entsch&auml;digen</div><div class="word-trans"><span class="text-ru">компенсировать</span><span class="text-en">to compensate</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== KAPITEL 2 ========== -->
+            <div class="chapter" data-num="2" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta">
+                            <span class="chapter-num">Kapitel 02</span>
+                            <span class="chapter-date">Lesetipps II</span>
+                        </div>
+                        <h2 class="chapter-title">Reisen, Kamine &amp; alles andere</h2>
+                        <div class="chapter-body">
+                            <h3>&#x2708;&#xFE0F; Reisen</h3>
+                            <p>Reisen sind <span class="vw">keineswegs</span> dasselbe wie &ouml;ffentliche Verkehrsmittel. Ich bin, wie Sie sich denken k&ouml;nnen, <span class="vw">kategorisch</span> dagegen, im Auto oder Flugzeug das Internet zu nutzen. Aber bestellen Sie in jedem Fall vorab einen Fensterplatz. Setzen Sie Kopfh&ouml;rer auf, finden Sie ruhige Musik und <span class="vw">schalten Sie ab</span> f&uuml;r einige Stunden. Die Ausnahme sind jene Momente, wenn Getr&auml;nke serviert werden und Sie bef&uuml;rchten, &uuml;bergangen zu werden &mdash; da werden Sie unruhig und k&ouml;nnen sich nicht konzentrieren. Legen Sie das Buch weg, starren Sie in eine Zeitschrift und tun Sie so, als w&auml;re es Ihnen v&ouml;llig gleichg&uuml;ltig. Ich habe es sogar in der Economy Class versucht, gleichzeitig zu essen, zu trinken, Musik zu h&ouml;ren und zu lesen. Tun Sie das nicht, es sei denn, Sie haben ein B&uuml;ndel <span class="vw">Bargeld</span> in der Tasche, um dem Nachbarn die Reinigung seiner Kleidung zu bezahlen.</p>
+
+                            <h3>&#x1F686; Z&uuml;ge</h3>
+                            <p>Z&uuml;ge sind zum Lesen wie <span class="vw">geschaffen</span>. Ich habe festgestellt, dass ein gutes Paar Kopfh&ouml;rer sehr n&uuml;tzlich ist, wenn man im Abteil sitzt und keine Polizei rufen kann, um <span class="vw">l&auml;rmende</span> Idioten zum Schweigen zu bringen. Nein, ich finde nicht, dass man sie ins Gef&auml;ngnis stecken sollte. Aber das Gegenteil finde ich auch nicht.</p>
+
+                            <h3>&#x1F525; Am Kamin</h3>
+                            <p>Wenn Sie keinen Kamin haben, tut es auch eine Kerze. Aber was ich wirklich <span class="vw">leidenschaftlich</span> <span class="vw">herbeisehne</span>, ist ein Abend vor einem gro&szlig;en, <span class="vw">gem&uuml;tlichen</span> Kamin mit einem guten Buch in den H&auml;nden &mdash; und je l&auml;nger das Buch, desto besser. Ich liebe lange Romane und eine gro&szlig;e Tasse Tee oder ein Glas Wein &mdash; je nachdem, wie weit es noch bis zum Wochenende ist oder wie sehr ich <span class="vw">dazu neige</span>, den Begriff Wochenende zu <span class="vw">dehnen</span>. Hunde zeigen &uuml;brigens mit erstaunlichem Geschick, dass man f&uuml;r ein gl&uuml;ckliches Leben nicht alle zwei Sekunden aufs Handy schauen muss.</p>
+
+                            <h3>&#x1F3E5; Das Krankenhaus</h3>
+                            <p>In Krankenh&auml;usern habe ich eine <span class="vw">Unmenge</span> Zeit verbracht: In einem habe ich gearbeitet, in einem anderen Kinder <span class="vw">zur Welt gebracht</span>, und diese Kinder fielen dementsprechend immer wieder von B&auml;umen und brachen sich Arme und Beine.</p>
+                            <p>In Krankenh&auml;usern verl&auml;uft die Zeit ganz anders als anderswo &mdash; sie ist dort verdammt langsam, sogar nachts. Und es herrscht ein leichtes Gef&uuml;hl des <span class="vw">Staunens</span> angesichts dessen, was ringsum geschieht, denn all jene wahren Dramen &mdash; Verlust und neues Leben, Freude und tiefstes <span class="vw">Leid</span> &mdash; regieren auf jedem Stockwerk des sterilen Geb&auml;udes. Hier gibt es Schrecken und Freude in jedem <span class="vw">ausdruckslosen</span> Schritt des Personals &uuml;ber das sorgf&auml;ltig gewischte Linoleum.</p>
+                            <p>Mir f&auml;llt es schwer, in Krankenh&auml;usern zu lesen &mdash; es ist, als bef&auml;nde man sich auf einem Schiff, das sich durch st&uuml;rmische Wellen k&auml;mpft, w&auml;hrend drau&szlig;en Menschen an Land ein gew&ouml;hnliches Leben f&uuml;hren, das Schiff aber nicht bemerken. Was ich jedoch entdeckt habe: Im Krankenhaus eignet sich <span class="vw">Lyrik</span> hervorragend. Kurze Gedichte, von denen man aufblicken kann und sich nicht ganz so <span class="vw">zerbrechlich</span> f&uuml;hlt, nicht ganz so abgekoppelt. Und das Krankenhaus ist auch ein guter Ort, an dem man leise f&uuml;r jemand anderen lesen kann.</p>
+                            <p>Deshalb lehne ich die <span class="vw">Emp&ouml;rung</span> ab, wenn Leute sich &uuml;ber Krankenhausshops beschweren, in denen nur Kuchen und Eis verkauft werden. Das Mindeste, was in Krankenh&auml;usern immer vorhanden sein sollte, ist Kuchen.</p>
+
+                            <h3>&#x1F333; Unter einem Baum im sonnigen Park</h3>
+                            <p>Nat&uuml;rlich! Und weiches Softeis, bitte, kein hartes.</p>
+
+                            <h3>&#x2728; Verschiedenes</h3>
+                            <p>Eine meiner <span class="vw">Leistungen</span>, auf die ich besonders stolz bin, ist das Lesen beim Stillen (legen Sie ein Kissen unter den Kopf des Babys!). Au&szlig;erdem lese ich beim F&ouml;hnen der Haare, beim Z&auml;hneputzen, beim Warten an der Ampel. Einmal habe ich mich w&auml;hrend einer schrecklich langweiligen Hochzeit im Bad eingeschlossen (nicht meiner eigenen!). Ich lese auf <span class="vw">Dienstreisen</span>, wenn ich allein in Restaurants essen muss (mit einem Buch ist man nie allein). Und wenn ich dorthin zur&uuml;ckdenke, wo alles begann &mdash; ich habe eine Million Stunden auf dem R&uuml;cksitz des alten Saab 99 meines Vaters gelesen, mit dem schlafenden Kopf meines j&uuml;ngeren Bruders auf meinen Knien.</p>
+                            <p>Erz&auml;hlen Sie mir also, wo Sie lesen. Denn jeder Tag mit einem Buch ist ein kleines bisschen besser als einer ohne, und ich w&uuml;nsche Ihnen nur die gl&uuml;cklichsten Tage.</p>
+                            <p><em>Und nun &mdash; lernen Sie Nina kennen&hellip;</em></p>
+                            <p><em>Ihre Jenny</em></p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">keineswegs</div><div class="word-trans"><span class="text-ru">никоим образом</span><span class="text-en">by no means</span></div></div>
+                        <div class="word-card"><div class="word-en">kategorisch</div><div class="word-trans"><span class="text-ru">категорически</span><span class="text-en">categorically</span></div></div>
+                        <div class="word-card"><div class="word-en">abschalten</div><div class="word-trans"><span class="text-ru">отключиться</span><span class="text-en">to switch off / unwind</span></div></div>
+                        <div class="word-card"><div class="word-en">das Bargeld</div><div class="word-trans"><span class="text-ru">наличные</span><span class="text-en">cash</span></div></div>
+                        <div class="word-card"><div class="word-en">geschaffen f&uuml;r</div><div class="word-trans"><span class="text-ru">созданный для</span><span class="text-en">made for</span></div></div>
+                        <div class="word-card"><div class="word-en">l&auml;rmend</div><div class="word-trans"><span class="text-ru">шумный</span><span class="text-en">noisy</span></div></div>
+                        <div class="word-card"><div class="word-en">leidenschaftlich</div><div class="word-trans"><span class="text-ru">страстно</span><span class="text-en">passionately</span></div></div>
+                        <div class="word-card"><div class="word-en">gem&uuml;tlich</div><div class="word-trans"><span class="text-ru">уютный</span><span class="text-en">cozy / comfortable</span></div></div>
+                        <div class="word-card"><div class="word-en">neigen zu</div><div class="word-trans"><span class="text-ru">склоняться к</span><span class="text-en">to tend to</span></div></div>
+                        <div class="word-card"><div class="word-en">dehnen</div><div class="word-trans"><span class="text-ru">растягивать</span><span class="text-en">to stretch</span></div></div>
+                        <div class="word-card"><div class="word-en">die Unmenge</div><div class="word-trans"><span class="text-ru">уйма, огромное количество</span><span class="text-en">vast amount</span></div></div>
+                        <div class="word-card"><div class="word-en">zur Welt bringen</div><div class="word-trans"><span class="text-ru">рожать</span><span class="text-en">to give birth to</span></div></div>
+                        <div class="word-card"><div class="word-en">das Staunen</div><div class="word-trans"><span class="text-ru">изумление</span><span class="text-en">amazement / wonder</span></div></div>
+                        <div class="word-card"><div class="word-en">das Leid</div><div class="word-trans"><span class="text-ru">горе, страдание</span><span class="text-en">grief / suffering</span></div></div>
+                        <div class="word-card"><div class="word-en">ausdruckslos</div><div class="word-trans"><span class="text-ru">невыразительный</span><span class="text-en">expressionless</span></div></div>
+                        <div class="word-card"><div class="word-en">die Lyrik</div><div class="word-trans"><span class="text-ru">поэзия, лирика</span><span class="text-en">poetry</span></div></div>
+                        <div class="word-card"><div class="word-en">die Emp&ouml;rung</div><div class="word-trans"><span class="text-ru">возмущение</span><span class="text-en">indignation</span></div></div>
+                        <div class="word-card"><div class="word-en">die Leistung</div><div class="word-trans"><span class="text-ru">достижение</span><span class="text-en">achievement</span></div></div>
+                        <div class="word-card"><div class="word-en">die Dienstreise</div><div class="word-trans"><span class="text-ru">деловая поездка</span><span class="text-en">business trip</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- ========== KAPITEL 3 ========== -->
+            <div class="chapter" data-num="3" data-active="false">
+                <div class="reading-spread">
+                    <article class="chapter-card">
+                        <div class="chapter-meta">
+                            <span class="chapter-num">Kapitel 03</span>
+                            <span class="chapter-date">Kapitel 1 des Romans</span>
+                        </div>
+                        <h2 class="chapter-title">Ninas Geschichte beginnt</h2>
+                        <div class="chapter-body">
+                            <p>Das Problem mit guten Dingen ist, dass sie sich sehr oft als schreckliche Dinge <span class="vw">tarnen</span>. Und w&auml;re es nicht wunderbar, wenn jemand in dem Moment, in dem man mit Schwierigkeiten k&auml;mpft, einem einfach auf die Schulter klopfen und sagen w&uuml;rde:</p>
+                            <p>&mdash; Keine Sorge, <span class="vw">es lohnt sich</span>! Im Moment sieht es furchtbar aus, aber ich verspreche: Am Ende wird alles gut!</p>
+                            <p>Und man w&uuml;rde ausrufen: &mdash; Danke, gute Fee!</p>
+                            <p>Ja, das w&auml;re n&uuml;tzlich, aber so l&auml;uft es nicht. Und deshalb k&auml;mpfen wir uns manchmal zu lange durch Dinge durch, die uns kein Gl&uuml;ck bringen, oder ziehen uns zu schnell zu etwas Realerem zur&uuml;ck &mdash; und oft ist es unm&ouml;glich genau zu sagen, was besser und was schlechter ist.</p>
+                            <p>Das Leben, das vor einem liegt, kann ziemlich <span class="vw">trostlos</span> wirken. Zumindest dachte Nina so.</p>
+                            <p>&#x2015;</p>
+                            <p>Nina Redmond, neunundrzwanzig Jahre alt, <span class="vw">befahl</span> sich, nicht in der &Ouml;ffentlichkeit zu weinen. Wenn Sie jemals versucht haben, sich selbst einen <span class="vw">Verweis</span> zu erteilen, wissen Sie, dass das nicht sonderlich hilft. Aber sie war auf der Arbeit! Und auf der Arbeit weint man nicht.</p>
+                            <p>Nina fragte sich, ob sich das jemand anderes auch erlaubte. Dann dachte sie, vielleicht war das bei allen so, sogar bei Katie Nison, mit ihren steifen, zu hell gef&auml;rbten Haaren und den schmalen Lippen und ihren Tabellen. Genau in diesem Moment stand Katie in der Ecke, die Arme <span class="vw">verschr&auml;nkt</span>, und beobachtete d&uuml;ster den Raum, nachdem sie vor dem kleinen Team eine mit seltsamen Ausdr&uuml;cken gespickte Rede gehalten hatte &mdash; sie sprach von <span class="vw">Stellenabbau</span> und davon, dass Birmingham es sich auch bei strikten <span class="vw">Sparmа&szlig;nahmen</span> nicht leisten k&ouml;nne, alle Bibliotheken <span class="vw">aufrechtzuerhalten</span>.</p>
+                            <p>Nina beschloss, dass Katie wahrscheinlich nie geweint hatte. Manche Menschen haben einfach keine <span class="vw">Tr&auml;nen</span>.</p>
+                            <p>Was Nina nicht wusste, war, dass Katie Nison auf dem Weg zur und von der Arbeit weinte &mdash; meist nach acht Uhr abends &mdash; jedes Mal, wenn sie jemanden wegen <span class="vw">Stellenabbau</span> entlassen musste oder gebeten wurde, das ohnehin schon magere <span class="vw">Budget</span> um ein paar Prozent zu k&uuml;rzen, wenn ihr befohlen wurde, die Aktenpr&uuml;fung nach neuen Regeln durchzuf&uuml;hren, oder wenn ihr Chef ihr freitags um vier Uhr nachmittags einen neuen Stapel <span class="vw">Verwaltungsarbeit</span> auftischte und selbst zum Skifahren fuhr &mdash; was mit ihm ziemlich h&auml;ufig vorkam.</p>
+                        </div>
+                    </article>
+                    <aside class="vocab-sidebar">
+                        <h3 class="sidebar-title">&#x1F4DA; Neue Vokabeln</h3>
+                        <div class="word-card"><div class="word-en">sich tarnen</div><div class="word-trans"><span class="text-ru">маскироваться</span><span class="text-en">to disguise / camouflage</span></div></div>
+                        <div class="word-card"><div class="word-en">sich lohnen</div><div class="word-trans"><span class="text-ru">стоить того</span><span class="text-en">to be worth it</span></div></div>
+                        <div class="word-card"><div class="word-en">trostlos</div><div class="word-trans"><span class="text-ru">унылый, безрадостный</span><span class="text-en">bleak / dreary</span></div></div>
+                        <div class="word-card"><div class="word-en">befehlen</div><div class="word-trans"><span class="text-ru">приказывать</span><span class="text-en">to command / order</span></div></div>
+                        <div class="word-card"><div class="word-en">der Verweis</div><div class="word-trans"><span class="text-ru">выговор</span><span class="text-en">reprimand</span></div></div>
+                        <div class="word-card"><div class="word-en">verschr&auml;nken</div><div class="word-trans"><span class="text-ru">скрещивать (руки)</span><span class="text-en">to cross / fold (arms)</span></div></div>
+                        <div class="word-card"><div class="word-en">der Stellenabbau</div><div class="word-trans"><span class="text-ru">сокращение штатов</span><span class="text-en">job cuts</span></div></div>
+                        <div class="word-card"><div class="word-en">die Sparma&szlig;nahmen</div><div class="word-trans"><span class="text-ru">режим экономии</span><span class="text-en">austerity measures</span></div></div>
+                        <div class="word-card"><div class="word-en">aufrechterhalten</div><div class="word-trans"><span class="text-ru">поддерживать, сохранять</span><span class="text-en">to maintain</span></div></div>
+                        <div class="word-card"><div class="word-en">die Tr&auml;nen</div><div class="word-trans"><span class="text-ru">слёзы</span><span class="text-en">tears</span></div></div>
+                        <div class="word-card"><div class="word-en">das Budget k&uuml;rzen</div><div class="word-trans"><span class="text-ru">сокращать бюджет</span><span class="text-en">to cut the budget</span></div></div>
+                        <div class="word-card"><div class="word-en">die Verwaltungsarbeit</div><div class="word-trans"><span class="text-ru">административная работа</span><span class="text-en">administrative work</span></div></div>
+                    </aside>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- READING NAV -->
+        <div class="reading-nav">
+            <button id="prevBtn" disabled>
+                <span class="nav-label">&larr; Vorheriges</span>
+                <span class="nav-title" id="prevTitle">&mdash;</span>
+            </button>
+            <button id="nextBtn" class="next">
+                <span class="nav-label">N&auml;chstes &rarr;</span>
+                <span class="nav-title" id="nextTitle">Die Badewanne</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chapters = Array.from(document.querySelectorAll('.chapter'));
+        const total = chapters.length;
+        const titles = chapters.map(ch => ch.querySelector('.chapter-title').textContent);
+        const nav = document.getElementById('chapterNav');
+        const pbFill = document.getElementById('pbFill');
+        const pbCount = document.getElementById('pbCount');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevTitle = document.getElementById('prevTitle');
+        const nextTitle = document.getElementById('nextTitle');
+
+        document.getElementById('totalCount').textContent = total;
+
+        const readSet = new Set([1]);
+        chapters.forEach((_, i) => {
+            const btn = document.createElement('button');
+            btn.textContent = String(i + 1).padStart(2, '0');
+            btn.dataset.num = i + 1;
+            if (i === 0) btn.classList.add('active');
+            btn.addEventListener('click', () => goToChapter(i + 1));
+            nav.appendChild(btn);
+        });
+
+        function goToChapter(n) {
+            n = Math.max(1, Math.min(total, n));
+            chapters.forEach(ch => ch.dataset.active = (Number(ch.dataset.num) === n) ? 'true' : 'false');
+            readSet.add(n);
+
+            nav.querySelectorAll('button').forEach(b => {
+                const num = Number(b.dataset.num);
+                b.classList.toggle('active', num === n);
+                b.classList.toggle('read', readSet.has(num) && num !== n);
+            });
+
+            pbFill.style.width = ((n / total) * 100) + '%';
+            pbCount.textContent = n + ' / ' + total;
+
+            prevBtn.disabled = (n <= 1);
+            nextBtn.disabled = (n >= total);
+            prevTitle.textContent = (n > 1) ? titles[n - 2] : '—';
+            nextTitle.textContent = (n < total) ? titles[n] : 'Ende';
+
+            window.scrollTo({ top: document.querySelector('.chapter-nav').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        prevBtn.addEventListener('click', () => {
+            const active = chapters.findIndex(ch => ch.dataset.active === 'true') + 1;
+            goToChapter(active - 1);
+        });
+        nextBtn.addEventListener('click', () => {
+            const active = chapters.findIndex(ch => ch.dataset.active === 'true') + 1;
+            goToChapter(active + 1);
+        });
+
+        goToChapter(1);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') prevBtn.click();
+            if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        // ========== WORD TOOLTIP ==========
+        const tooltip = document.createElement('div');
+        tooltip.id = 'vw-tooltip';
+        document.body.appendChild(tooltip);
+
+        // Exact lookup: all .vw word forms → {ru, base}
+        const WORD_MAP = {
+            'widmung':              { ru: 'посвящение',              base: 'die Widmung' },
+            'gewidmet':             { ru: 'посвящать',               base: 'widmen' },
+            'beeinflusst':          { ru: 'влиять на',               base: 'beeinflussen' },
+            'altmodische':          { ru: 'старомодный',             base: 'altmodisch' },
+            'überzeugung':          { ru: 'убеждение',               base: 'die Überzeugung' },
+            'sorgfältig':           { ru: 'тщательно',               base: 'sorgfältig' },
+            'aufrichtig':           { ru: 'искренне',                base: 'aufrichtig' },
+            'wahnsinn':             { ru: 'безумие',                 base: 'der Wahnsinn' },
+            'aufrechterhalten':     { ru: 'поддерживать',            base: 'aufrechterhalten' },
+            'aufrechtzuerhalten':   { ru: 'сохранять',               base: 'aufrechterhalten' },
+            'widerlich':            { ru: 'отвратительный',          base: 'widerlich' },
+            'überziehen':           { ru: 'покрывать (плёнкой)',     base: 'überziehen mit' },
+            'prächtige':            { ru: 'великолепный',            base: 'prächtig' },
+            'stürmen':              { ru: 'врываться',               base: 'stürmen' },
+            'dösen':                { ru: 'дремать',                 base: 'dösen' },
+            'wohlweislich':         { ru: 'благоразумно',            base: 'wohlweislich' },
+            'verwechselt':          { ru: 'путать (между собой)',    base: 'verwechseln' },
+            'unnötig':              { ru: 'ненужный',                base: 'unnötig' },
+            'ermüden':              { ru: 'уставать',                base: 'ermüden' },
+            'hinterlässt':          { ru: 'оставлять (след)',        base: 'hinterlassen' },
+            'blinzeln':             { ru: 'щуриться',                base: 'blinzeln' },
+            'schweißtropfen':       { ru: 'капля пота',              base: 'der Schweißtropfen' },
+            'verbergen':            { ru: 'прятать',                 base: 'verbergen' },
+            'albern':               { ru: 'нелепый',                 base: 'albern' },
+            'nachsichtig':          { ru: 'снисходительный',         base: 'nachsichtig' },
+            'verstaucht':           { ru: 'вывихнуть',               base: 'sich verstauchen' },
+            'heutzutage':           { ru: 'в наши дни',              base: 'heutzutage' },
+            'hindernis':            { ru: 'препятствие',             base: 'das Hindernis' },
+            'vermute':              { ru: 'предполагать',            base: 'vermuten' },
+            'verzweifelt':          { ru: 'отчаянный',               base: 'verzweifelt' },
+            'beruhigen':            { ru: 'успокаивать',             base: 'beruhigen' },
+            'zugeben':              { ru: 'признавать',              base: 'zugeben' },
+            'aufhängte':            { ru: 'вешать',                  base: 'aufhängen' },
+            'schaukeln':            { ru: 'качаться',                base: 'schaukeln' },
+            'knabbern':             { ru: 'грызть',                  base: 'knabbern' },
+            'heiratete':            { ru: 'жениться / выйти замуж',  base: 'heiraten' },
+            'abstellraum':          { ru: 'кладовка',                base: 'der Abstellraum' },
+            'ergattre':             { ru: 'урвать',                  base: 'ergattern' },
+            'abhole':               { ru: 'забирать',                base: 'abholen' },
+            'nutze':                { ru: 'использовать',            base: 'nutzen' },
+            'gleichgültig':         { ru: 'безразличный',            base: 'gleichgültig' },
+            'verdient':             { ru: 'заслуживать',             base: 'verdienen' },
+            'herrlich':             { ru: 'восхитительный',          base: 'herrlich' },
+            'geregelt':             { ru: 'упорядоченный',           base: 'geregelt' },
+            'glasigen':             { ru: 'стеклянный (взгляд)',     base: 'glasig' },
+            'hetzen':               { ru: 'мчаться',                 base: 'hetzen' },
+            'gehorchen':            { ru: 'подчиняться',             base: 'gehorchen' },
+            'entschädigen':         { ru: 'компенсировать',          base: 'entschädigen' },
+            'keineswegs':           { ru: 'никоим образом',          base: 'keineswegs' },
+            'kategorisch':          { ru: 'категорически',           base: 'kategorisch' },
+            'schalten sie ab':      { ru: 'отключиться',             base: 'abschalten' },
+            'bargeld':              { ru: 'наличные',                base: 'das Bargeld' },
+            'geschaffen':           { ru: 'созданный для',           base: 'geschaffen für' },
+            'lärmende':             { ru: 'шумный',                  base: 'lärmend' },
+            'leidenschaftlich':     { ru: 'страстно',                base: 'leidenschaftlich' },
+            'gemütlichen':          { ru: 'уютный',                  base: 'gemütlich' },
+            'dazu neige':           { ru: 'склоняться к',            base: 'neigen zu' },
+            'dehnen':               { ru: 'растягивать',             base: 'dehnen' },
+            'unmenge':              { ru: 'уйма, огромное кол-во',   base: 'die Unmenge' },
+            'zur welt gebracht':    { ru: 'рожать',                  base: 'zur Welt bringen' },
+            'staunens':             { ru: 'изумление',               base: 'das Staunen' },
+            'leid':                 { ru: 'горе, страдание',         base: 'das Leid' },
+            'ausdruckslosen':       { ru: 'невыразительный',         base: 'ausdruckslos' },
+            'lyrik':                { ru: 'поэзия',                  base: 'die Lyrik' },
+            'zerbrechlich':         { ru: 'хрупкий',                 base: 'zerbrechlich' },
+            'zerbrechilich':        { ru: 'хрупкий',                 base: 'zerbrechlich' },
+            'empörung':             { ru: 'возмущение',              base: 'die Empörung' },
+            'leistungen':           { ru: 'достижения',              base: 'die Leistung' },
+            'dienstreisen':         { ru: 'деловые поездки',         base: 'die Dienstreise' },
+            'tarnen':               { ru: 'маскироваться',           base: 'sich tarnen' },
+            'es lohnt sich':        { ru: 'стоит того',              base: 'sich lohnen' },
+            'trostlos':             { ru: 'унылый, безрадостный',    base: 'trostlos' },
+            'befahl':               { ru: 'приказывать',             base: 'befehlen' },
+            'verweis':              { ru: 'выговор',                 base: 'der Verweis' },
+            'verschränkt':          { ru: 'скрестить (руки)',        base: 'verschränken' },
+            'stellenabbau':         { ru: 'сокращение штатов',       base: 'der Stellenabbau' },
+            'sparmaßnahmen':        { ru: 'режим экономии',          base: 'die Sparmaßnahmen' },
+            'tränen':               { ru: 'слёзы',                   base: 'die Tränen' },
+            'budget':               { ru: 'сокращать бюджет',        base: 'das Budget kürzen' },
+            'verwaltungsarbeit':    { ru: 'административная работа', base: 'die Verwaltungsarbeit' },
+            'herbeisehne':          { ru: 'желанный',                base: 'herbeigesehnt' },
+        };
+
+        function findTranslation(clicked) {
+            return WORD_MAP[clicked.toLowerCase().trim()] || null;
+        }
+
+        let activeVw = null;
+
+        document.addEventListener('click', (e) => {
+            const vw = e.target.closest('.vw');
+            if (vw) {
+                e.stopPropagation();
+                if (activeVw === vw) {
+                    tooltip.style.display = 'none';
+                    vw.classList.remove('vw-active');
+                    activeVw = null;
+                    return;
+                }
+                if (activeVw) activeVw.classList.remove('vw-active');
+                const trans = findTranslation(vw.textContent.trim());
+                if (trans) {
+                    tooltip.innerHTML =
+                        '<span class="tip-ru">' + trans.ru + '</span>' +
+                        '<span class="tip-base">' + trans.base + '</span>';
+                    tooltip.style.display = 'block';
+                    const rect = vw.getBoundingClientRect();
+                    const scrollY = window.scrollY || document.documentElement.scrollTop;
+                    const tipH = tooltip.offsetHeight;
+                    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+                    tooltip.style.top  = (rect.top + scrollY - tipH - 10) + 'px';
+                    vw.classList.add('vw-active');
+                    activeVw = vw;
+                }
+            } else {
+                tooltip.style.display = 'none';
+                if (activeVw) activeVw.classList.remove('vw-active');
+                activeVw = null;
+            }
+        });
+
+    </script>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+</body>
+</html>

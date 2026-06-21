@@ -159,6 +159,42 @@
             color:rgba(230,230,235,0.35); transition:all 0.15s;
         }
         .reset-btn:hover { border-color:rgba(255,255,255,0.22); color:rgba(230,230,235,0.7); }
+
+        /* ── quiz panel ── */
+        .quiz-toggle-btn {
+            display:inline-flex; align-items:center; gap:0.25rem;
+            font-size:0.71rem; font-weight:700; letter-spacing:0.03em;
+            padding:0.2rem 0.6rem; border-radius:8px;
+            border:1px solid rgba(255,255,255,0.09);
+            background:rgba(255,255,255,0.03);
+            color:rgba(230,230,235,0.35); cursor:pointer;
+            transition:all 0.15s; margin-top:0.45rem;
+            font-family:inherit;
+        }
+        .quiz-toggle-btn:hover { background:rgba(88,166,255,0.1); border-color:rgba(88,166,255,0.3); color:#7ab8ff; }
+        .quiz-toggle-btn.active { background:rgba(88,166,255,0.13); border-color:rgba(88,166,255,0.38); color:#7ab8ff; }
+        .quiz-panel {
+            display:none; margin-top:0.55rem;
+            padding:0.65rem 0.85rem;
+            background:rgba(255,255,255,0.04);
+            border-radius:10px; border:1px solid rgba(255,255,255,0.08);
+        }
+        .quiz-panel.open { display:block; }
+        .quiz-tag { font-size:0.7rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:rgba(88,166,255,0.6); margin-bottom:0.5rem; }
+        .luecke-text { line-height:2.1; font-size:0.9rem; color:rgba(230,230,235,0.82); }
+        .lb { display:inline-flex; flex-wrap:wrap; gap:0.18rem; align-items:center; vertical-align:middle; margin:0 0.12rem; }
+        .lopt {
+            padding:0.15rem 0.55rem; border-radius:7px;
+            border:1px solid rgba(255,255,255,0.15);
+            background:rgba(255,255,255,0.07);
+            font-size:0.82rem; cursor:pointer;
+            color:rgba(230,230,235,0.85);
+            transition:all 0.15s; font-family:inherit; font-weight:600;
+        }
+        .lopt:hover:not([disabled]) { background:rgba(255,255,255,0.14); border-color:rgba(255,255,255,0.3); color:#fff; }
+        .lopt.correct { background:rgba(63,185,80,0.22); border-color:rgba(63,185,80,0.55); color:#b9f0a0; }
+        .lopt.wrong   { background:rgba(248,113,113,0.16); border-color:rgba(248,113,113,0.4); color:#fca5a5; text-decoration:line-through; }
+        .lopt.dim     { opacity:0.25; }
     </style>
 </head>
 <body class="dark-theme page-bg-image" style="background:transparent">
@@ -353,6 +389,148 @@
       }
     ];
 
+    // ── Lückentext exercises: each practices the grammar RULE with fresh vocabulary ──
+    const QUIZZES = [
+      // 0 — Artikel, Genus, Plural (A1)
+      [
+        {tag:'Nominativ — ein/eine/ein',
+         tmpl:'Das ist ___ Hund. Das ist ___ Schule. Das ist ___ Kind.',
+         blanks:[{o:['ein','eine','einen'],a:'ein'},{o:['ein','eine','einen'],a:'eine'},{o:['ein','eine','einen'],a:'ein'}]},
+        {tag:'Adjektiv prädikativ — keine Endung',
+         tmpl:'Der Himmel ist ___. Die Rose ist ___. Das Wetter ist ___.',
+         blanks:[{o:['blau','blaue','blauen'],a:'blau'},{o:['schön','schöne','schöner'],a:'schön'},{o:['gut','gute','guten'],a:'gut'}]},
+        {tag:'Plural mit Umlaut',
+         tmpl:'Ein Ball → viele ___. Ein Baum → viele ___. Ein Stuhl → viele ___.',
+         blanks:[{o:['Bälle','Balle','Balls'],a:'Bälle'},{o:['Bäume','Baume','Baums'],a:'Bäume'},{o:['Stühle','Stuhle','Stühlen'],a:'Stühle'}]},
+        {tag:'Plural-Artikel immer „die"',
+         tmpl:'___ Bücher sind neu. ___ Kinder spielen. ___ Autos stehen hier.',
+         blanks:[{o:['Der','Die','Das'],a:'Die'},{o:['Der','Die','Das'],a:'Die'},{o:['Der','Die','Das'],a:'Die'}]},
+        {tag:'Genitiv: Name + -s',
+         tmpl:'Das ist ___ Tasche. Das ist ___ Buch. Das ist ___ Auto.',
+         blanks:[{o:['Annas','Annen','Annens'],a:'Annas'},{o:['Peters','Petern','Petrs'],a:'Peters'},{o:['Marias','Marien','Mariens'],a:'Marias'}]},
+        {tag:'Genitiv + Plural',
+         tmpl:'Das sind ___ Schuhe. Das sind ___ Fotos. Das sind ___ Bücher.',
+         blanks:[{o:['Lenas','Lenen','Lenens'],a:'Lenas'},{o:['Toms','Tomen','Tomens'],a:'Toms'},{o:['Annas','Annen','Annens'],a:'Annas'}]},
+        {tag:'Akkusativ mask. — einen',
+         tmpl:'Ich kaufe ___ Hund. Ich sehe ___ Mann. Ich habe ___ Bruder.',
+         blanks:[{o:['ein','eine','einen'],a:'einen'},{o:['ein','eine','einen'],a:'einen'},{o:['ein','eine','einen'],a:'einen'}]},
+        {tag:'Akkusativ Plural — kein Artikel',
+         tmpl:'Ich habe zwei ___. Er kauft drei ___. Wir sehen viele ___.',
+         blanks:[{o:['Kindern','Kinder','Kindes'],a:'Kinder'},{o:['Bäumen','Bäume','Baumes'],a:'Bäume'},{o:['Katzens','Katze','Katzen'],a:'Katzen'}]},
+      ],
+      // 1 — Pronomen (A2)
+      [
+        {tag:'Akkusativ vs Dativ — er/ihn/ihm',
+         tmpl:'Ich sehe ___. (den Hund) Er hilft ___. (dem Freund) Sie fragt ___. (den Lehrer)',
+         blanks:[{o:['er','ihn','ihm'],a:'ihn'},{o:['er','ihn','ihm'],a:'ihm'},{o:['er','ihn','ihm'],a:'ihn'}]},
+        {tag:'Possessivpronomen sein- (Akkusativ)',
+         tmpl:'Ich sehe ___ Bruder. (Peter, mask.) Er nimmt ___ Auto. (Tom, neutr.) Sie trägt ___ Tasche. (Max, fem.)',
+         blanks:[{o:['sein','seinen','seinem'],a:'seinen'},{o:['sein','seinen','seinem'],a:'sein'},{o:['sein','seine','seiner'],a:'seine'}]},
+        {tag:'Dativ — ich → mir',
+         tmpl:'Er gibt ___ ein Buch. Sie schenkt ___ Blumen. Kannst du ___ helfen?',
+         blanks:[{o:['ich','mich','mir'],a:'mir'},{o:['ich','mich','mir'],a:'mir'},{o:['ich','mich','mir'],a:'mir'}]},
+        {tag:'sie — Akkusativ vs Dativ',
+         tmpl:'Er sieht ___. (Akk.) Er hilft ___. (Dat.) Er liebt ___. (Akk.)',
+         blanks:[{o:['sie','ihr','ihren'],a:'sie'},{o:['sie','ihr','ihren'],a:'ihr'},{o:['sie','ihr','ihren'],a:'sie'}]},
+        {tag:'Dativ — wir → uns',
+         tmpl:'Er erklärt ___ die Aufgabe. Sie hilft ___ gern. Kannst du ___ anrufen?',
+         blanks:[{o:['wir','unser','uns'],a:'uns'},{o:['wir','unser','uns'],a:'uns'},{o:['wir','unser','uns'],a:'uns'}]},
+        {tag:'Dativ Plural — sie → ihnen',
+         tmpl:'Wir geben ___ das Buch. Sie zeigt ___ den Weg. Er schickt ___ ein Paket.',
+         blanks:[{o:['sie','ihr','ihnen'],a:'ihnen'},{o:['sie','ihr','ihnen'],a:'ihnen'},{o:['sie','ihr','ihnen'],a:'ihnen'}]},
+        {tag:'du vs. Sie (formell)',
+         tmpl:'Zum Professor: „Können ___ mir helfen?" Zum Freund: „Kannst ___ mir helfen?" Zum Chef: „Haben ___ Zeit?"',
+         blanks:[{o:['du','Sie','ihr'],a:'Sie'},{o:['du','Sie','ihr'],a:'du'},{o:['du','Sie','ihr'],a:'Sie'}]},
+      ],
+      // 2 — Fragen, Negation, Zeitformen (A2)
+      [
+        {tag:'Ja/Nein-Frage — Inversion',
+         tmpl:'___ du Hunger? ___ er ein Auto? ___ sie (Pl.) zu Hause?',
+         blanks:[{o:['Habe','Hast','Hat'],a:'Hast'},{o:['Hat','Hast','Haben'],a:'Hat'},{o:['Ist','Sind','Hat'],a:'Sind'}]},
+        {tag:'haben — 3. Person Plural',
+         tmpl:'Wir ___ Hunger. Die Kinder ___ Angst. Die Lehrer ___ keine Zeit.',
+         blanks:[{o:['hat','habe','haben'],a:'haben'},{o:['hat','habe','haben'],a:'haben'},{o:['hat','habe','haben'],a:'haben'}]},
+        {tag:'kein- Akkusativ: mask./fem./neutr.',
+         tmpl:'Ich habe ___ Hund. (mask.) Er hat ___ Schwester. (fem.) Wir haben ___ Auto. (neutr.)',
+         blanks:[{o:['kein','keine','keinen'],a:'keinen'},{o:['kein','keine','keinen'],a:'keine'},{o:['kein','keine','keinen'],a:'kein'}]},
+        {tag:'haben — 3. Person Singular',
+         tmpl:'Er ___ viel Arbeit. Sie ___ ein Baby. Das Kind ___ Hunger.',
+         blanks:[{o:['habe','hat','haben'],a:'hat'},{o:['habe','hat','haben'],a:'hat'},{o:['habe','hat','haben'],a:'hat'}]},
+        {tag:'Präteritum — hatte',
+         tmpl:'Gestern ___ ich Fieber. Er ___ keine Zeit. Wir ___ viel Spaß.',
+         blanks:[{o:['habe','hätte','hatte'],a:'hatte'},{o:['hat','hätte','hatte'],a:'hatte'},{o:['haben','hatten','hätten'],a:'hatten'}]},
+        {tag:'Perfekt — Partizip II bilden',
+         tmpl:'Ich habe Deutsch ___. (lernen) Er hat Fußball ___. (spielen) Wir haben viel ___. (arbeiten)',
+         blanks:[{o:['lernen','gelernte','gelernt'],a:'gelernt'},{o:['spielen','gespielt','gespielen'],a:'gespielt'},{o:['gearbeitet','arbeite','arbeitete'],a:'gearbeitet'}]},
+        {tag:'Präteritum Frage — hatte (2. Sg.)',
+         tmpl:'___ du gestern Zeit? ___ du früher ein Fahrrad? ___ du als Kind Angst?',
+         blanks:[{o:['Hast','Hatte','Hattest'],a:'Hattest'},{o:['Hast','Hatte','Hattest'],a:'Hattest'},{o:['Hast','Hatte','Hattest'],a:'Hattest'}]},
+        {tag:'W-Fragen — Was / Wer / Wo',
+         tmpl:'___ hast du gegessen? ___ hat das gesagt? ___ wohnst du?',
+         blanks:[{o:['Was','Wer','Wo'],a:'Was'},{o:['Was','Wer','Wo'],a:'Wer'},{o:['Was','Wer','Wo'],a:'Wo'}]},
+        {tag:'Futur I — werden konjugieren',
+         tmpl:'Ich ___ morgen lernen. Du ___ bald fertig sein. Er ___ das verstehen.',
+         blanks:[{o:['werde','wirst','wird'],a:'werde'},{o:['werde','wirst','wird'],a:'wirst'},{o:['werde','wirst','wird'],a:'wird'}]},
+        {tag:'Präsens — essen (Vokalwechsel e→i)',
+         tmpl:'Ich ___ Brot. Du ___ Pizza. Er ___ Suppe.',
+         blanks:[{o:['esse','isst','essen'],a:'esse'},{o:['esse','isst','essen'],a:'isst'},{o:['esse','isst','essen'],a:'isst'}]},
+        {tag:'Präsens — machen (alle Personen)',
+         tmpl:'Ich ___ Sport. Du ___ Musik. Er ___ Hausaufgaben.',
+         blanks:[{o:['mache','machst','macht'],a:'mache'},{o:['mache','machst','macht'],a:'machst'},{o:['mache','machst','macht'],a:'macht'}]},
+        {tag:'Präteritum — starke Verben',
+         tmpl:'Er ___ einen Apfel. (essen) Sie ___ Wasser. (trinken) Ich ___ nach Berlin. (fahren)',
+         blanks:[{o:['isst','aß','gegessen'],a:'aß'},{o:['trinkt','trank','getrunken'],a:'trank'},{o:['fahrt','fuhr','gefahren'],a:'fuhr'}]},
+        {tag:'Perfekt — haben oder sein?',
+         tmpl:'Ich habe Fußball ___. (spielen) Er ist nach Hause ___. (gehen) Sie hat Musik ___. (hören)',
+         blanks:[{o:['spielen','gespielt','gespielen'],a:'gespielt'},{o:['gehen','gegehen','gegangen'],a:'gegangen'},{o:['hören','gehört','gegehört'],a:'gehört'}]},
+      ],
+      // 3 — Modalverben (B1)
+      [
+        {tag:'Modalverb + Infinitiv am Ende',
+         tmpl:'Ich kann gut ___. Er muss heute ___. Wir wollen morgen ___.',
+         blanks:[{o:['singe','singen','singt'],a:'singen'},{o:['arbeite','arbeitet','arbeiten'],a:'arbeiten'},{o:['reise','reisen','reist'],a:'reisen'}]},
+        {tag:'können — alle Personen',
+         tmpl:'Ich ___ schwimmen. Du ___ gut kochen. Er ___ nicht kommen.',
+         blanks:[{o:['kann','kannst','können'],a:'kann'},{o:['kann','kannst','können'],a:'kannst'},{o:['kann','kannst','können'],a:'kann'}]},
+        {tag:'Konjunktiv II — könnte',
+         tmpl:'Ich ___ dir helfen. Du ___ früher kommen. Er ___ das verstehen.',
+         blanks:[{o:['kann','konnte','könnte'],a:'könnte'},{o:['kannst','konntest','könntest'],a:'könntest'},{o:['kann','konnte','könnte'],a:'könnte'}]},
+        {tag:'dürfen — Erlaubnis und Verbot',
+         tmpl:'Hier ___ man nicht rauchen. Kinder ___ das nicht. Du ___ jetzt gehen.',
+         blanks:[{o:['darf','darfst','dürfen'],a:'darf'},{o:['darf','darfst','dürfen'],a:'dürfen'},{o:['darf','darfst','dürfen'],a:'darfst'}]},
+        {tag:'Konjunktiv II — sollte (совет)',
+         tmpl:'Du ___ mehr schlafen. Er ___ zum Arzt gehen. Wir ___ das nicht vergessen.',
+         blanks:[{o:['sollst','sollte','solltest'],a:'solltest'},{o:['soll','sollte','sollten'],a:'sollte'},{o:['sollen','sollten','solltet'],a:'sollten'}]},
+      ],
+      // 4 — Imperativ, Passiv, Konjunktiv II (B1)
+      [
+        {tag:'Imperativ du — Vokalwechsel',
+         tmpl:'___ das Buch! (lesen) ___ langsam! (sprechen) ___ das Fenster! (öffnen)',
+         blanks:[{o:['Lese','Lies','Lesen'],a:'Lies'},{o:['Spreche','Sprich','Sprechen'],a:'Sprich'},{o:['Öffne','Öffnet','Öffnen'],a:'Öffne'}]},
+        {tag:'Negation: nicht vs. kein-',
+         tmpl:'Ich kaufe ___ Buch. (кн.) Ich schlafe ___ gut. (не хор.) Er hat ___ Zeit. (нет вр.)',
+         blanks:[{o:['kein','nicht','keine'],a:'kein'},{o:['kein','nicht','keine'],a:'nicht'},{o:['kein','nicht','keine'],a:'keine'}]},
+        {tag:'Lass uns + Infinitiv',
+         tmpl:'___ uns tanzen! ___ uns essen! ___ uns anfangen!',
+         blanks:[{o:['Lassen','Lass','Lasst'],a:'Lass'},{o:['Lassen','Lass','Lasst'],a:'Lass'},{o:['Lassen','Lass','Lasst'],a:'Lass'}]},
+        {tag:'Passiv Präsens — wird + Partizip II',
+         tmpl:'Das Buch ___ gelesen. Das Lied ___ gesungen. Der Brief ___ geschrieben.',
+         blanks:[{o:['ist','wird','wurde'],a:'wird'},{o:['ist','wird','wurde'],a:'wird'},{o:['ist','wird','wurde'],a:'wird'}]},
+        {tag:'Partizip II — starke Verben',
+         tmpl:'Das Lied ist ___. (singen) Das Buch ist ___. (schreiben) Das Essen ist ___. (kochen)',
+         blanks:[{o:['gesungen','sungen','singte'],a:'gesungen'},{o:['schrieben','geschreibt','geschrieben'],a:'geschrieben'},{o:['gekocht','kochte','gekochen'],a:'gekocht'}]},
+        {tag:'Passiv Präs. vs. Prät. — wird / wurde',
+         tmpl:'Gestern ___ das Buch gelesen. Heute ___ das Haus gebaut. Früher ___ viel gesungen.',
+         blanks:[{o:['wird','wurde','worden'],a:'wurde'},{o:['wird','wurde','worden'],a:'wird'},{o:['wird','wurde','worden'],a:'wurde'}]},
+        {tag:'Konjunktiv II Präsens — würde / hätte / wäre',
+         tmpl:'Wenn ich Geld ___, würde ich reisen. Wenn er Zeit ___, käme er. Wenn wir früher aufgestanden ___, hätten wir den Zug genommen.',
+         blanks:[{o:['habe','hätte','hatte'],a:'hätte'},{o:['hat','hätte','hatte'],a:'hätte'},{o:['sind','wären','waren'],a:'wären'}]},
+        {tag:'Konjunktiv II Vergangenheit — hätte/wäre + Partizip II',
+         tmpl:'Wenn ich mehr geschlafen ___, wäre ich fit gewesen. Wenn er gelernt ___, hätte er bestanden. Wenn wir früher gegangen ___, hätten wir den Zug nicht verpasst.',
+         blanks:[{o:['habe','hätte','hatte'],a:'hätte'},{o:['habe','hätte','hatte'],a:'hätte'},{o:['waren','wären','wäre'],a:'wären'}]},
+      ],
+    ];
+
     // ── state ──
     const LSKEY = 'apfel-v2';
     function load()  { try { return JSON.parse(localStorage.getItem(LSKEY)) || {}; } catch(e) { return {}; } }
@@ -390,6 +568,14 @@
                     `<a href="${t.url}" class="gtag gtag-${t.type}">${t.label}</a>`
                 ).join('');
 
+                const quiz = QUIZZES[si] && QUIZZES[si][idx];
+                const quizHtml = quiz ? `
+                    <button class="quiz-toggle-btn" id="qtb-${id}" onclick="toggleQuiz('${id}')">🎯 Упражнение</button>
+                    <div class="quiz-panel" id="qp-${id}">
+                        ${quiz.tag ? `<div class="quiz-tag">📌 ${quiz.tag}</div>` : ''}
+                        ${buildLuecke(quiz, id)}
+                    </div>` : '';
+
                 card.innerHTML = `
                     <div class="sent-left">
                         <span class="sent-num">${idx+1}</span>
@@ -399,6 +585,7 @@
                         <div class="sent-de">${sent.de}</div>
                         <div class="sent-ru">${sent.ru}</div>
                         <div class="sent-tags">${tagsHtml}</div>
+                        ${quizHtml}
                     </div>`;
                 container.appendChild(card);
             });
@@ -406,6 +593,47 @@
 
         applyFilter();
         updateStats();
+    }
+
+    function buildLuecke(quiz, cardId) {
+        const parts = quiz.tmpl.split('___');
+        let html = '<p class="luecke-text">';
+        parts.forEach((part, i) => {
+            html += part;
+            if (i < quiz.blanks.length) {
+                const b   = quiz.blanks[i];
+                const bid = cardId + '-lb' + i;
+                const opts = b.o.map(opt =>
+                    `<button class="lopt" onclick="pickLopt('${bid}',this)">${opt}</button>`
+                ).join('');
+                html += `<span class="lb" id="${bid}" data-ans="${b.a}">${opts}</span>`;
+            }
+        });
+        html += '</p>';
+        return html;
+    }
+
+    function pickLopt(bid, btn) {
+        const span = document.getElementById(bid);
+        if (span.dataset.done) return;
+        span.dataset.done = '1';
+        const correct = span.dataset.ans;
+        const picked  = btn.textContent.trim();
+        span.querySelectorAll('.lopt').forEach(b => {
+            b.disabled = true;
+            const t = b.textContent.trim();
+            if (t === correct)      b.classList.add('correct');
+            else if (b === btn)     b.classList.add('wrong');
+            else                    b.classList.add('dim');
+        });
+    }
+
+    function toggleQuiz(id) {
+        const panel = document.getElementById('qp-' + id);
+        const btn   = document.getElementById('qtb-' + id);
+        const open  = panel.classList.toggle('open');
+        btn.classList.toggle('active', open);
+        btn.textContent = open ? '✖ Закрыть' : '🎯 Упражнение';
     }
 
     function toggle(id) {

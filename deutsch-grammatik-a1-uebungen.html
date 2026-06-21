@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Grammatik &ndash; &Uuml;bungen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        /* ===== exercise card ===== */
+        .ex-block {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(68, 147, 248, 0.22);
+            border-radius: 14px;
+            backdrop-filter: blur(8px);
+        }
+        .ex-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #79b8ff;
+            margin: 0 0 0.3rem;
+        }
+        .ex-subtitle {
+            font-size: 0.83rem;
+            color: var(--color-text-muted);
+            margin: 0 0 1.1rem;
+            line-height: 1.5;
+        }
+
+        /* ===== single question row ===== */
+        .q-row {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem 1.1rem 0.9rem;
+            margin-top: 0.8rem;
+            transition: border-color 0.2s;
+        }
+        .q-row.solved-ok  { border-color: rgba(63,185,80,0.4);  }
+        .q-row.solved-err { border-color: rgba(248,81,73,0.35); }
+        .q-row.revealed   { border-color: rgba(210,153,34,0.35);}
+
+        .q-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.55rem; }
+        .q-tag {
+            display: inline-block; padding: 0.18rem 0.55rem;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .tag-blue   { background: rgba(68,147,248,0.18); color: #79b8ff; }
+        .tag-green  { background: rgba(63,185,80,0.18);  color: #56d364; }
+        .tag-orange { background: rgba(210,153,34,0.18); color: #e3b341; }
+        .tag-purple { background: rgba(163,113,247,0.18);color: #c8a5ff; }
+        .tag-red    { background: rgba(248,81,73,0.18);  color: #ff8b85; }
+        .tag-teal   { background: rgba(56,189,248,0.15); color: #7dd3fc; }
+
+        .q-prompt {
+            font-size: 1rem; color: #fff; line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+        .q-prompt strong { color: #79b8ff; }
+        .q-hint {
+            font-size: 0.82rem; color: var(--color-text-muted);
+            font-style: italic; margin-bottom: 0.6rem;
+        }
+
+        .q-input {
+            width: 100%; box-sizing: border-box;
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff; font-size: 0.95rem;
+            outline: none; font-family: inherit;
+        }
+        .q-input:focus   { border-color: rgba(68,147,248,0.5); background: rgba(255,255,255,0.06); }
+        .q-input:disabled{ opacity: 0.6; cursor: not-allowed; }
+
+        .q-controls { display: flex; gap: 0.45rem; margin-top: 0.55rem; flex-wrap: wrap; }
+        .q-btn-check, .q-btn-show {
+            padding: 0.45rem 0.95rem; border-radius: 8px; border: none;
+            font-size: 0.83rem; font-weight: 600; cursor: pointer;
+            transition: all 0.15s; font-family: inherit;
+        }
+        .q-btn-check {
+            background: rgba(68,147,248,0.2); color: #79b8ff;
+            border: 1px solid rgba(68,147,248,0.3);
+        }
+        .q-btn-check:hover:not(:disabled) { background: rgba(68,147,248,0.3); }
+        .q-btn-check:disabled { opacity: 0.4; cursor: not-allowed; }
+        .q-btn-show {
+            background: transparent; color: var(--color-text-muted);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .q-btn-show:hover:not(:disabled) { background: rgba(255,255,255,0.06); color: #fff; }
+
+        .q-feedback { margin-top: 0.5rem; font-size: 0.87rem; font-weight: 500; min-height: 0; }
+        .q-feedback.ok  { color: #3fb950; }
+        .q-feedback.err { color: #f85149; }
+
+        .q-answer {
+            display: none; margin-top: 0.7rem;
+            padding: 0.75rem 1rem;
+            background: rgba(63,185,80,0.08);
+            border: 1px solid rgba(63,185,80,0.22);
+            border-radius: 8px;
+        }
+        .q-row.show-answer .q-answer { display: block; }
+        .q-answer-label { font-size: 0.76rem; color: #3fb950; font-weight: 700; margin-right: 0.3rem; }
+        .q-answer-text  { font-size: 0.96rem; color: #fff; }
+        .q-answer-text em { color: #3fb950; font-style: normal; font-weight: 700;
+            background: rgba(63,185,80,0.15); padding: 0 0.22em; border-radius: 3px; }
+        .q-answer-explain { font-size: 0.8rem; color: var(--color-text-muted);
+            margin: 0.45rem 0 0; line-height: 1.55; }
+        .q-answer-explain em { color: #79b8ff; font-style: normal; }
+        .q-answer-explain strong { color: #fff; }
+
+        /* ===== multiple-choice buttons ===== */
+        .mc-row { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.55rem; }
+        .mc-btn {
+            padding: 0.5rem 1.1rem; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.9rem; font-family: inherit;
+            cursor: pointer; transition: all 0.15s; font-weight: 500;
+        }
+        .mc-btn:hover:not(:disabled):not(.mc-used) { background: rgba(68,147,248,0.15); border-color: rgba(68,147,248,0.4); }
+        .mc-btn.mc-ok  { background: rgba(63,185,80,0.2); border-color: rgba(63,185,80,0.5); color: #3fb950; cursor: not-allowed; }
+        .mc-btn.mc-err { background: rgba(248,81,73,0.15); border-color: rgba(248,81,73,0.4); color: #f85149; cursor: not-allowed; }
+        .mc-btn.mc-used{ opacity: 0.35; cursor: not-allowed; }
+        .mc-feedback { font-size: 0.85rem; font-weight: 500; margin-top: 0.45rem; min-height: 0; }
+        .mc-feedback.ok  { color: #3fb950; }
+        .mc-feedback.err { color: #f85149; }
+
+        /* ===== score bar ===== */
+        .score-bar {
+            margin-top: 1.2rem; padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 10px; font-size: 0.88rem; color: var(--color-text-muted);
+        }
+
+        /* ===== cloze text ===== */
+        .cloze-text {
+            font-size: 0.97rem; line-height: 2.1;
+            color: rgba(230,230,235,0.9);
+        }
+        .cloze-inp {
+            display: inline-block; min-width: 90px;
+            padding: 0.1rem 0.4rem; margin: 0 0.15rem;
+            border-radius: 5px; border: none; border-bottom: 2px solid rgba(68,147,248,0.5);
+            background: rgba(68,147,248,0.07); color: #fff;
+            font-size: 0.93rem; font-family: inherit; outline: none;
+            vertical-align: baseline; transition: border-color 0.2s, background 0.2s;
+        }
+        .cloze-inp:focus    { border-color: #79b8ff; background: rgba(68,147,248,0.12); }
+        .cloze-inp.c-ok     { border-color: #3fb950; background: rgba(63,185,80,0.12); color: #56d364; }
+        .cloze-inp.c-err    { border-color: #f85149; background: rgba(248,81,73,0.09); color: #ff8b85; }
+        .cloze-inp:disabled { opacity: 0.7; cursor: not-allowed; }
+        .cloze-controls { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .cloze-btn {
+            padding: 0.5rem 1.1rem; border-radius: 8px; border: none;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .cloze-btn-check { background: rgba(68,147,248,0.2); color: #79b8ff; border: 1px solid rgba(68,147,248,0.3); }
+        .cloze-btn-show  { background: transparent; color: var(--color-text-muted); border: 1px solid rgba(255,255,255,0.15); }
+        .cloze-btn:hover:not(:disabled) { filter: brightness(1.2); }
+        .cloze-result { margin-top: 0.9rem; font-size: 0.88rem; color: var(--color-text-muted); }
+
+        /* ===== translation row ===== */
+        .tr-row {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 1rem 1.1rem 0.9rem;
+            margin-top: 0.8rem;
+        }
+        .tr-ru {
+            font-size: 1rem; color: #fff; margin-bottom: 0.2rem; font-weight: 500;
+        }
+        .tr-focus { color: #e3b341; }
+        .tr-tip   { font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 0.6rem; font-style: italic; }
+
+        /* ===== paraphrase row ===== */
+        .pp-orig {
+            font-size: 1rem; padding: 0.5rem 0.85rem;
+            background: rgba(68,147,248,0.06);
+            border-left: 3px solid rgba(68,147,248,0.45);
+            border-radius: 0 8px 8px 0; margin-bottom: 0.55rem; color: #fff;
+        }
+        .pp-orig strong { color: #79b8ff; }
+        .pp-task { font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 0.55rem; font-style: italic; }
+
+        /* ===== tip box ===== */
+        .tip-box {
+            font-size: 0.8rem; color: var(--color-text-muted);
+            margin-top: 1.1rem; padding: 0.65rem 0.9rem;
+            background: rgba(255,255,255,0.03); border-radius: 8px; line-height: 1.55;
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.83)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">A1 Grammatik &mdash; &Uuml;bungen</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left;padding-top:1rem">
+            <h1>A1 Grammatik &mdash; &Uuml;bungen</h1>
+            <p class="page-subtitle">5 Typen von &Uuml;bungen: von Mechanik bis Kommunikation</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="skobki">1. Раскрытие скобок</button>
+            <button class="tab" data-tab="transform">2. Трансформация</button>
+            <button class="tab" data-tab="cloze">3. Lückentext</button>
+            <button class="tab" data-tab="perevod">4. Перевод</button>
+            <button class="tab" data-tab="perifraz">5. Перифраз</button>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 1: Раскрытие скобок                                   -->
+        <!-- ========================================================= -->
+        <div class="tab-content active" id="tab-skobki">
+
+            <!-- 1a: Verb konjugieren -->
+            <div class="ex-block">
+                <p class="ex-title">1a &mdash; Глагол в правильной форме (Präsens)</p>
+                <p class="ex-subtitle">Поставьте глагол в скобках в нужную форму Präsens. Введите полное слово и нажмите «Prüfen».</p>
+
+                <!-- Q1 -->
+                <div class="q-row"
+                     data-answers="wohnt"
+                     data-explain="<strong>wohnen</strong>: Stamm <em>wohn</em> + Endung <em>-t</em> (er/sie/es).">
+                    <div class="q-tags"><span class="q-tag tag-blue">Präsens</span><span class="q-tag tag-green">er/sie/es</span></div>
+                    <p class="q-prompt">Maria _____ (wohnen) in Berlin.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Maria <em>wohnt</em> in Berlin.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="q-row"
+                     data-answers="kommen"
+                     data-explain="<strong>kommen</strong>: Stamm <em>komm</em> + Endung <em>-en</em> (wir).">
+                    <div class="q-tags"><span class="q-tag tag-blue">Präsens</span><span class="q-tag tag-orange">wir</span></div>
+                    <p class="q-prompt">Wir _____ (kommen) aus der Ukraine.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Wir <em>kommen</em> aus der Ukraine.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="q-row"
+                     data-answers="bin"
+                     data-explain="<strong>sein</strong> &mdash; нерегулярный глагол: <em>ich bin</em> (запомнить!).">
+                    <div class="q-tags"><span class="q-tag tag-red">sein</span><span class="q-tag tag-teal">ich</span></div>
+                    <p class="q-prompt">Ich _____ (sein) Lehrerin.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Ich <em>bin</em> Lehrerin.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="q-row"
+                     data-answers="hast"
+                     data-explain="<strong>haben</strong>: <em>du hast</em> &mdash; нерегулярная форма, без «b»!">
+                    <div class="q-tags"><span class="q-tag tag-red">haben</span><span class="q-tag tag-teal">du</span></div>
+                    <p class="q-prompt">Du _____ (haben) einen Hund.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Du <em>hast</em> einen Hund.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="q-row"
+                     data-answers="heißt"
+                     data-explain="<strong>heißen</strong>: Stamm endet auf <em>-ß</em>, du bekommst <em>heißt</em> (кein -est!).">
+                    <div class="q-tags"><span class="q-tag tag-blue">Präsens</span><span class="q-tag tag-green">er/sie/es</span></div>
+                    <p class="q-prompt">Sie _____ (heißen) Anna.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Sie <em>hei&szlig;t</em> Anna.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="q-row"
+                     data-answers="arbeitet"
+                     data-explain="Stamm auf <em>-t</em>: <em>arbeit</em> + <em>-et</em> (не -t!) &rarr; <strong>arbeitet</strong>. Phonetическое правило!">
+                    <div class="q-tags"><span class="q-tag tag-blue">Präsens</span><span class="q-tag tag-green">er/sie/es</span><span class="q-tag tag-orange">-t/-d-Stamm</span></div>
+                    <p class="q-prompt">Er _____ (arbeiten) bei BMW.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Er <em>arbeitet</em> bei BMW.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="q-row"
+                     data-answers="spricht"
+                     data-explain="<strong>sprechen</strong> &mdash; глагол с чередованием: e &rarr; i в 2-м и 3-м лице. <em>ich spreche, du sprichst, er <strong>spricht</strong></em>.">
+                    <div class="q-tags"><span class="q-tag tag-purple">Vokalwechsel</span><span class="q-tag tag-green">er/sie/es</span></div>
+                    <p class="q-prompt">Er _____ (sprechen) sehr gut Englisch.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Er <em>spricht</em> sehr gut Englisch.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="q-row"
+                     data-answers="können"
+                     data-explain="<strong>können</strong> (Modalverb): <em>wir können</em> = инфинитив (Modalverben в 1/3 лице мн.ч. = инфинитив).">
+                    <div class="q-tags"><span class="q-tag tag-teal">Modalverb</span><span class="q-tag tag-orange">wir</span></div>
+                    <p class="q-prompt">Wir _____ (können) gut kochen.</p>
+                    <input class="q-input" placeholder="Form eingeben…" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Wir <em>k&ouml;nnen</em> gut kochen.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="tip-box">&#x1F4A1; Paradigma <strong>machen</strong>: ich mach<strong>e</strong> &bull; du mach<strong>st</strong> &bull; er/sie/es mach<strong>t</strong> &bull; wir mach<strong>en</strong> &bull; ihr mach<strong>t</strong> &bull; sie/Sie mach<strong>en</strong></div>
+            </div>
+
+            <!-- 1b: Artikel -->
+            <div class="ex-block">
+                <p class="ex-title">1b &mdash; Richtiger Artikel / Pronomen wählen</p>
+                <p class="ex-subtitle">Выберите правильный вариант. Номинатив или Аккузатив &mdash; смотрите на роль в предложении.</p>
+
+                <!-- MC1 -->
+                <div class="q-row" data-mc-answer="Das" data-mc-id="mc1">
+                    <div class="q-tags"><span class="q-tag tag-blue">Artikel</span><span class="q-tag tag-teal">Neutrum</span></div>
+                    <p class="q-prompt">_____ Buch liegt auf dem Tisch. <span style="color:var(--color-text-muted);font-size:0.82rem;">(das Buch)</span></p>
+                    <div class="mc-row">
+                        <button class="mc-btn" onclick="checkMC(this,'mc1','Das')">Der</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc1','Das')">Die</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc1','Das')">Das</button>
+                    </div>
+                    <p class="mc-feedback" id="mc1-fb"></p>
+                    <div class="q-answer" style="display:none" id="mc1-ans">
+                        <span class="q-answer-label">&#x2705; Antwort:</span>
+                        <span class="q-answer-text"><em>Das</em> Buch liegt auf dem Tisch.</span>
+                        <p class="q-answer-explain"><em>das Buch</em> &rarr; bestimmter Artikel im Nominativ = <strong>das</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- MC2 -->
+                <div class="q-row" data-mc-answer="einen" data-mc-id="mc2">
+                    <div class="q-tags"><span class="q-tag tag-blue">Artikel</span><span class="q-tag tag-orange">Akkusativ</span><span class="q-tag tag-purple">Maskulinum</span></div>
+                    <p class="q-prompt">Ich habe _____ Bruder. <span style="color:var(--color-text-muted);font-size:0.82rem;">(der Bruder &rarr; Akkusativ)</span></p>
+                    <div class="mc-row">
+                        <button class="mc-btn" onclick="checkMC(this,'mc2','einen')">ein</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc2','einen')">einen</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc2','einen')">einem</button>
+                    </div>
+                    <p class="mc-feedback" id="mc2-fb"></p>
+                    <div class="q-answer" style="display:none" id="mc2-ans">
+                        <span class="q-answer-label">&#x2705; Antwort:</span>
+                        <span class="q-answer-text">Ich habe <em>einen</em> Bruder.</span>
+                        <p class="q-answer-explain">Maskulinum im <strong>Akkusativ</strong>: ein &rarr; <em>einen</em> (только мужской род меняется!).</p>
+                    </div>
+                </div>
+
+                <!-- MC3 -->
+                <div class="q-row" data-mc-answer="kein" data-mc-id="mc3">
+                    <div class="q-tags"><span class="q-tag tag-red">kein</span><span class="q-tag tag-teal">Neutrum</span></div>
+                    <p class="q-prompt">Er hat _____ Auto. <span style="color:var(--color-text-muted);font-size:0.82rem;">(das Auto &rarr; Negation)</span></p>
+                    <div class="mc-row">
+                        <button class="mc-btn" onclick="checkMC(this,'mc3','kein')">kein</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc3','kein')">keine</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc3','kein')">nicht</button>
+                    </div>
+                    <p class="mc-feedback" id="mc3-fb"></p>
+                    <div class="q-answer" style="display:none" id="mc3-ans">
+                        <span class="q-answer-label">&#x2705; Antwort:</span>
+                        <span class="q-answer-text">Er hat <em>kein</em> Auto.</span>
+                        <p class="q-answer-explain"><em>das Auto</em> (Neutrum) &rarr; <strong>kein Auto</strong>. Femininum и Plural: <em>keine</em>.</p>
+                    </div>
+                </div>
+
+                <!-- MC4 -->
+                <div class="q-row" data-mc-answer="Die" data-mc-id="mc4">
+                    <div class="q-tags"><span class="q-tag tag-blue">Artikel</span><span class="q-tag tag-purple">Femininum</span><span class="q-tag tag-teal">Nominativ</span></div>
+                    <p class="q-prompt">_____ Lehrerin ist sehr nett. <span style="color:var(--color-text-muted);font-size:0.82rem;">(die Lehrerin)</span></p>
+                    <div class="mc-row">
+                        <button class="mc-btn" onclick="checkMC(this,'mc4','Die')">Der</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc4','Die')">Die</button>
+                        <button class="mc-btn" onclick="checkMC(this,'mc4','Die')">Das</button>
+                    </div>
+                    <p class="mc-feedback" id="mc4-fb"></p>
+                    <div class="q-answer" style="display:none" id="mc4-ans">
+                        <span class="q-answer-label">&#x2705; Antwort:</span>
+                        <span class="q-answer-text"><em>Die</em> Lehrerin ist sehr nett.</span>
+                        <p class="q-answer-explain"><em>die Lehrerin</em> &mdash; Femininum, Nominativ &rarr; <strong>Die</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-skobki -->
+
+
+        <!-- ========================================================= -->
+        <!-- TAB 2: Трансформация предложений                          -->
+        <!-- ========================================================= -->
+        <div class="tab-content" id="tab-transform">
+
+            <!-- 2a: Negation -->
+            <div class="ex-block">
+                <p class="ex-title">2a &mdash; Утвердительное &rarr; Отрицательное</p>
+                <p class="ex-subtitle">Перепишите предложение с отрицанием. Используйте <strong>nicht</strong> (отрицание действия/прилагательного) или <strong>kein/keine/kein</strong> (отрицание существительного без артикля или с неопределённым артиклем).</p>
+
+                <div class="q-row"
+                     data-answers="Ich wohne nicht in Berlin."
+                     data-explain="Глагол отрицаем через <strong>nicht</strong>. Местоположение: <em>nicht</em> стоит в конце или перед предлогом. <em>wohne</em> + не подлежащее &rarr; nicht ставим в конец перед PP.">
+                    <div class="q-tags"><span class="q-tag tag-red">nicht</span></div>
+                    <p class="q-prompt">Ich wohne in Berlin. <span style="color:var(--color-text-muted);">&rarr; отрицание</span></p>
+                    <input class="q-input" placeholder="Ich wohne …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Ich wohne <em>nicht</em> in Berlin.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Er hat keinen Hund."
+                     data-explain="<em>einen Hund</em> (неопределённый артикль + существительное) &rarr; <strong>keinen Hund</strong>. Maskulinum Akk.: kein &rarr; <em>keinen</em>.">
+                    <div class="q-tags"><span class="q-tag tag-red">kein</span><span class="q-tag tag-orange">Akkusativ</span></div>
+                    <p class="q-prompt">Er hat einen Hund. <span style="color:var(--color-text-muted);">&rarr; отрицание</span></p>
+                    <input class="q-input" placeholder="Er hat …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Er hat <em>keinen</em> Hund.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Das ist nicht mein Buch."
+                     data-explain="<strong>nicht</strong> стоит перед <em>mein</em> (притяжательным местоимением), так как отрицаем атрибут.">
+                    <div class="q-tags"><span class="q-tag tag-red">nicht</span></div>
+                    <p class="q-prompt">Das ist mein Buch. <span style="color:var(--color-text-muted);">&rarr; отрицание</span></p>
+                    <input class="q-input" placeholder="Das ist …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Das ist <em>nicht</em> mein Buch.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Wir haben keine Zeit."
+                     data-explain="<em>Zeit</em> (Femininum) без артикля &rarr; <strong>keine Zeit</strong>. Если существительное без артикля или с <em>ein</em> &rarr; используем <em>kein</em>.">
+                    <div class="q-tags"><span class="q-tag tag-red">kein</span><span class="q-tag tag-purple">Femininum</span></div>
+                    <p class="q-prompt">Wir haben Zeit. <span style="color:var(--color-text-muted);">&rarr; отрицание</span></p>
+                    <input class="q-input" placeholder="Wir haben …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Wir haben <em>keine</em> Zeit.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2b: Fragen -->
+            <div class="ex-block">
+                <p class="ex-title">2b &mdash; Утвердительное &rarr; Вопрос</p>
+                <p class="ex-subtitle">Образуйте <strong>Ja/Nein-Frage</strong>: глагол на первое место, подлежащее — на второе.</p>
+
+                <div class="q-row"
+                     data-answers="Wohnst du in Berlin?"
+                     data-explain="Inversion: <strong>Wohnst</strong> + <em>du</em> ... ? Глагол выходит на первую позицию.">
+                    <div class="q-tags"><span class="q-tag tag-teal">Ja/Nein-Frage</span></div>
+                    <p class="q-prompt">Du wohnst in Berlin. <span style="color:var(--color-text-muted);">&rarr; Ja/Nein-Frage</span></p>
+                    <input class="q-input" placeholder="Wohnst …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Wohnst</em> du in Berlin?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Hat er einen Hund?"
+                    data-explain="<strong>Hat</strong> + <em>er</em> ... ? — глагол <em>haben</em> на первое место.">
+                    <div class="q-tags"><span class="q-tag tag-teal">Ja/Nein-Frage</span></div>
+                    <p class="q-prompt">Er hat einen Hund. <span style="color:var(--color-text-muted);">&rarr; Ja/Nein-Frage</span></p>
+                    <input class="q-input" placeholder="Hat …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Hat</em> er einen Hund?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Kannst du Deutsch sprechen?"
+                     data-explain="Modalverb <strong>Kannst</strong> на первое место, инфинитив <em>sprechen</em> — в конце.">
+                    <div class="q-tags"><span class="q-tag tag-teal">Ja/Nein-Frage</span><span class="q-tag tag-teal">Modalverb</span></div>
+                    <p class="q-prompt">Du kannst Deutsch sprechen. <span style="color:var(--color-text-muted);">&rarr; Ja/Nein-Frage</span></p>
+                    <input class="q-input" placeholder="Kannst …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Kannst</em> du Deutsch sprechen?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2c: W-Fragen -->
+            <div class="ex-block">
+                <p class="ex-title">2c &mdash; W-Frage bilden</p>
+                <p class="ex-subtitle">Образуйте вопрос с нужным вопросительным словом: <em>wo, woher, wie, wie alt, wann, was, wer</em>.</p>
+
+                <div class="q-row"
+                     data-answers="Wo wohnst du?"
+                     data-explain="<em>wo</em> = где. W-слово + глагол + подлежащее: <strong>Wo wohnst du?</strong>">
+                    <div class="q-tags"><span class="q-tag tag-blue">W-Frage</span><span class="q-tag tag-green">wo</span></div>
+                    <p class="q-prompt">Ich wohne in München. <span style="color:var(--color-text-muted);">&rarr; Wo…?</span></p>
+                    <input class="q-input" placeholder="Wo …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Wo</em> wohnst du?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Woher kommst du?"
+                     data-explain="<em>woher</em> = откуда. <strong>Woher kommst du?</strong>">
+                    <div class="q-tags"><span class="q-tag tag-blue">W-Frage</span><span class="q-tag tag-green">woher</span></div>
+                    <p class="q-prompt">Ich komme aus Polen. <span style="color:var(--color-text-muted);">&rarr; Woher…?</span></p>
+                    <input class="q-input" placeholder="Woher …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Woher</em> kommst du?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <div class="q-row"
+                     data-answers="Wie alt bist du?"
+                     data-explain="<em>wie alt</em> = сколько лет. <strong>Wie alt bist du?</strong>">
+                    <div class="q-tags"><span class="q-tag tag-blue">W-Frage</span><span class="q-tag tag-green">wie alt</span></div>
+                    <p class="q-prompt">Ich bin 14 Jahre alt. <span style="color:var(--color-text-muted);">&rarr; Wie alt…?</span></p>
+                    <input class="q-input" placeholder="Wie alt …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Wie alt</em> bist du?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-transform -->
+
+
+        <!-- ========================================================= -->
+        <!-- TAB 3: Lückentext (Cloze)                                 -->
+        <!-- ========================================================= -->
+        <div class="tab-content" id="tab-cloze">
+            <div class="ex-block">
+                <p class="ex-title">3a &mdash; Lückentext: Meine Familie</p>
+                <p class="ex-subtitle">Вставьте правильные формы глаголов <em>sein</em>, <em>haben</em>, <em>wohnen</em>, <em>heißen</em>, <em>kommen</em> в правильных лицах.</p>
+
+                <div style="margin-top:0.5rem">
+                    <p class="cloze-text">
+                        Ich
+                        <input class="cloze-inp" data-answer="heiße" placeholder="…" size="8">
+                        Anna und ich
+                        <input class="cloze-inp" data-answer="komme" placeholder="…" size="7">
+                        aus der Ukraine.
+                        Jetzt
+                        <input class="cloze-inp" data-answer="wohne" placeholder="…" size="7">
+                        ich in München.
+                        Ich
+                        <input class="cloze-inp" data-answer="bin" placeholder="…" size="5">
+                        15 Jahre alt und ich
+                        <input class="cloze-inp" data-answer="habe" placeholder="…" size="6">
+                        eine kleine Schwester.
+                        Sie
+                        <input class="cloze-inp" data-answer="heißt" placeholder="…" size="7">
+                        Lena und
+                        <input class="cloze-inp" data-answer="ist" placeholder="…" size="4">
+                        10 Jahre alt.
+                        Unsere Eltern
+                        <input class="cloze-inp" data-answer="kommen" placeholder="…" size="8">
+                        auch aus Kyjiw und
+                        <input class="cloze-inp" data-answer="sind" placeholder="…" size="5">
+                        sehr nett.
+                    </p>
+                    <div class="cloze-controls">
+                        <button class="cloze-btn cloze-btn-check" onclick="checkCloze(this)">Alle prüfen</button>
+                        <button class="cloze-btn cloze-btn-show" onclick="showCloze(this)">Alle zeigen</button>
+                    </div>
+                    <p class="cloze-result"></p>
+                </div>
+            </div>
+
+            <div class="ex-block">
+                <p class="ex-title">3b &mdash; Lückentext: Mein Tag</p>
+                <p class="ex-subtitle">Вставьте правильные формы глаголов в скобках.</p>
+
+                <div style="margin-top:0.5rem">
+                    <p class="cloze-text">
+                        Jeden Morgen
+                        <input class="cloze-inp" data-answer="stehe" placeholder="…" size="7">
+                        (aufstehen) ich um 7 Uhr auf.
+                        Dann
+                        <input class="cloze-inp" data-answer="frühstücke" placeholder="…" size="11">
+                        (frühstücken) ich mit meiner Familie.
+                        Um 8 Uhr
+                        <input class="cloze-inp" data-answer="gehe" placeholder="…" size="6">
+                        (gehen) ich in die Schule.
+                        In der Schule
+                        <input class="cloze-inp" data-answer="lerne" placeholder="…" size="7">
+                        (lernen) ich Deutsch und Mathe.
+                        Meine Freundin
+                        <input class="cloze-inp" data-answer="sitzt" placeholder="…" size="7">
+                        (sitzen) neben mir.
+                        Am Nachmittag
+                        <input class="cloze-inp" data-answer="spielen" placeholder="…" size="9">
+                        (spielen) wir zusammen Fußball.
+                    </p>
+                    <div class="cloze-controls">
+                        <button class="cloze-btn cloze-btn-check" onclick="checkCloze(this)">Alle prüfen</button>
+                        <button class="cloze-btn cloze-btn-show" onclick="showCloze(this)">Alle zeigen</button>
+                    </div>
+                    <p class="cloze-result"></p>
+                </div>
+            </div>
+
+            <div class="ex-block">
+                <p class="ex-title">3c &mdash; Lückentext: Artikel einsetzen</p>
+                <p class="ex-subtitle">Вставьте правильный артикль (определённый или неопределённый, с учётом падежа).</p>
+
+                <div style="margin-top:0.5rem">
+                    <p class="cloze-text">
+                        Das ist
+                        <input class="cloze-inp" data-answer="ein" placeholder="…" size="4">
+                        Schulranzen. (der Schulranzen)
+                        In
+                        <input class="cloze-inp" data-answer="dem" placeholder="…" size="4">
+                        Schulranzen sind Bücher.
+                        Ich habe
+                        <input class="cloze-inp" data-answer="einen" placeholder="…" size="6">
+                        Stift (der Stift) und
+                        <input class="cloze-inp" data-answer="ein" placeholder="…" size="4">
+                        Heft (das Heft).
+                        <input class="cloze-inp" data-answer="Die" placeholder="…" size="4">
+                        Tasche (die Tasche) ist blau.
+                        Ich mag
+                        <input class="cloze-inp" data-answer="die" placeholder="…" size="4">
+                        Schule sehr.
+                    </p>
+                    <div class="cloze-controls">
+                        <button class="cloze-btn cloze-btn-check" onclick="checkCloze(this)">Alle prüfen</button>
+                        <button class="cloze-btn cloze-btn-show" onclick="showCloze(this)">Alle zeigen</button>
+                    </div>
+                    <p class="cloze-result"></p>
+                </div>
+            </div>
+        </div><!-- /tab-cloze -->
+
+
+        <!-- ========================================================= -->
+        <!-- TAB 4: Перевод                                            -->
+        <!-- ========================================================= -->
+        <div class="tab-content" id="tab-perevod">
+            <div class="ex-block">
+                <p class="ex-title">4 &mdash; Übersetzen: Russisch &rarr; Deutsch</p>
+                <p class="ex-subtitle">Переведите предложения. Жёлтым выделена грамматика, которую нужно применить. Нажмите «Antwort zeigen», чтобы сверить.</p>
+
+                <!-- TR1 -->
+                <div class="tr-row">
+                    <p class="q-tags" style="margin:0 0 0.4rem"><span class="q-tag tag-red">sein</span><span class="q-tag tag-teal">Pronomen</span></p>
+                    <p class="tr-ru">Меня зовут <span class="tr-focus">Макс</span>, мне <span class="tr-focus">16 лет</span>, и я <span class="tr-focus">из Берлина</span>.</p>
+                    <p class="tr-tip">Подсказка: Ich heiße… / Ich bin … Jahre alt. / Ich komme aus…</p>
+                    <input class="q-input" placeholder="Ich heiße …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer"
+                         data-answers="Ich heiße Max, ich bin 16 Jahre alt und ich komme aus Berlin."
+                         style="display:block">
+                        <span class="q-answer-label">&#x2705; Musterantwort:</span>
+                        <span class="q-answer-text">Ich hei&szlig;e <em>Max</em>, ich <em>bin</em> 16 Jahre alt und ich <em>komme aus</em> Berlin.</span>
+                        <p class="q-answer-explain">Эти три фразы — <strong>визитная карточка на A1</strong>. Запомни их наизусть!</p>
+                    </div>
+                </div>
+
+                <!-- TR2 -->
+                <div class="tr-row">
+                    <p class="q-tags" style="margin:0 0 0.4rem"><span class="q-tag tag-orange">Akkusativ</span><span class="q-tag tag-blue">Artikel</span></p>
+                    <p class="tr-ru">У меня есть <span class="tr-focus">брат</span> и <span class="tr-focus">сестра</span>.</p>
+                    <p class="tr-tip">Подсказка: Ich habe … Bruder (masc.) und … Schwester (fem.).</p>
+                    <input class="q-input" placeholder="Ich habe …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer"
+                         data-answers="Ich habe einen Bruder und eine Schwester."
+                         style="display:block">
+                        <span class="q-answer-label">&#x2705; Musterantwort:</span>
+                        <span class="q-answer-text">Ich habe <em>einen</em> Bruder und <em>eine</em> Schwester.</span>
+                        <p class="q-answer-explain">Akkusativ: <em>ein</em> Bruder (masc.) &rarr; <strong>einen</strong>; <em>eine</em> Schwester (fem.) не меняется.</p>
+                    </div>
+                </div>
+
+                <!-- TR3 -->
+                <div class="tr-row">
+                    <p class="q-tags" style="margin:0 0 0.4rem"><span class="q-tag tag-red">kein</span><span class="q-tag tag-teal">Negation</span></p>
+                    <p class="tr-ru">У меня нет машины, но есть велосипед.</p>
+                    <p class="tr-tip">Подсказка: kein/kein/keine + Substantiv (das Auto, das Fahrrad).</p>
+                    <input class="q-input" placeholder="Ich habe …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer"
+                         data-answers="Ich habe kein Auto, aber ein Fahrrad."
+                         style="display:block">
+                        <span class="q-answer-label">&#x2705; Musterantwort:</span>
+                        <span class="q-answer-text">Ich habe <em>kein</em> Auto, aber <em>ein</em> Fahrrad.</span>
+                        <p class="q-answer-explain"><em>das Auto</em> (Neutrum) &rarr; kein Auto; <em>das Fahrrad</em> (Neutrum) &rarr; ein Fahrrad.</p>
+                    </div>
+                </div>
+
+                <!-- TR4 -->
+                <div class="tr-row">
+                    <p class="q-tags" style="margin:0 0 0.4rem"><span class="q-tag tag-teal">Modalverb</span><span class="q-tag tag-blue">können</span></p>
+                    <p class="tr-ru">Ты умеешь плавать?</p>
+                    <p class="tr-tip">Подсказка: können + Infinitiv. Вопрос &rarr; глагол на 1-е место.</p>
+                    <input class="q-input" placeholder="Kannst …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer"
+                         data-answers="Kannst du schwimmen?"
+                         style="display:block">
+                        <span class="q-answer-label">&#x2705; Musterantwort:</span>
+                        <span class="q-answer-text"><em>Kannst</em> du <em>schwimmen</em>?</span>
+                        <p class="q-answer-explain">Modalverb + Subjekt + Infinitiv am Ende: <strong>Kannst du schwimmen?</strong></p>
+                    </div>
+                </div>
+
+                <!-- TR5 -->
+                <div class="tr-row">
+                    <p class="q-tags" style="margin:0 0 0.4rem"><span class="q-tag tag-blue">W-Frage</span><span class="q-tag tag-green">wann</span></div>
+                    <p class="tr-ru">Когда начинается урок?</p>
+                    <p class="tr-tip">Подсказка: Wann + глагол + подлежащее? (der Unterricht)</p>
+                    <input class="q-input" placeholder="Wann …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer"
+                         data-answers="Wann beginnt der Unterricht?"
+                         style="display:block">
+                        <span class="q-answer-label">&#x2705; Musterantwort:</span>
+                        <span class="q-answer-text"><em>Wann</em> beginnt <em>der Unterricht</em>?</span>
+                        <p class="q-answer-explain">W-Frage: wann + V2 + Subjekt.</p>
+                    </div>
+                </div>
+
+                <div class="tip-box">&#x1F4AC; При переводе сначала определи: <strong>кто подлежащее?</strong> &rarr; <strong>какое время?</strong> &rarr; <strong>какой падеж у существительных?</strong> — и только потом пиши предложение.</div>
+            </div>
+        </div><!-- /tab-perevod -->
+
+
+        <!-- ========================================================= -->
+        <!-- TAB 5: Перифраз                                           -->
+        <!-- ========================================================= -->
+        <div class="tab-content" id="tab-perifraz">
+            <div class="ex-block">
+                <p class="ex-title">5 &mdash; Перифраз и трансформация смысла</p>
+                <p class="ex-subtitle">Перефразируйте предложение так, чтобы смысл остался тем же. Используйте предложенную конструкцию.</p>
+
+                <!-- PP1 -->
+                <div class="q-row"
+                     data-answers="Ich habe keine Geschwister."
+                     data-explain="<em>ein Einzelkind sein</em> = не иметь братьев/сестёр. Перифраз: <strong>Ich habe keine Geschwister.</strong> (<em>keine</em> = kein + Plural).">
+                    <div class="q-tags"><span class="q-tag tag-orange">kein + Plural</span></div>
+                    <div class="pp-orig">Ich bin ein Einzelkind. <span style="color:var(--color-text-muted);font-size:0.82rem;">(= у меня нет братьев и сестёр)</span></div>
+                    <p class="pp-task">Перефразируйте с помощью «<strong>haben + keine Geschwister</strong>»:</p>
+                    <input class="q-input" placeholder="Ich habe …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Ich habe <em>keine Geschwister</em>.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- PP2 -->
+                <div class="q-row"
+                     data-answers="Kannst du mir helfen?"
+                     data-explain="<em>bitte + Imperativ</em> &harr; <em>können + Infinitiv</em>. Просьба стала мягче.">
+                    <div class="q-tags"><span class="q-tag tag-teal">können</span><span class="q-tag tag-blue">Frage</span></div>
+                    <div class="pp-orig">Hilf mir bitte! <span style="color:var(--color-text-muted);font-size:0.82rem;">(просьба помочь)</span></div>
+                    <p class="pp-task">Перефразируйте вежливо с помощью «<strong>Kannst du …?</strong>»:</p>
+                    <input class="q-input" placeholder="Kannst du …?" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text"><em>Kannst</em> du mir helfen?</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- PP3 -->
+                <div class="q-row"
+                     data-answers="Ich wohne nicht in Hamburg."
+                     data-explain="Утверждение &laquo;Ich wohne in Berlin&raquo; переформулируем как отрицание проживания в другом городе.">
+                    <div class="q-tags"><span class="q-tag tag-red">nicht</span><span class="q-tag tag-blue">Negation</span></div>
+                    <div class="pp-orig">Ich wohne in Berlin, <strong>nicht</strong> in Hamburg.</div>
+                    <p class="pp-task">Скажите только вторую часть — где вы <em>не</em> живёте:</p>
+                    <input class="q-input" placeholder="Ich wohne …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Ich wohne <em>nicht</em> in Hamburg.</span>
+                        <p class="q-answer-explain"></p>
+                    </div>
+                </div>
+
+                <!-- PP4 -->
+                <div class="q-row"
+                     data-answers="Meine Schwester ist 12 Jahre alt."
+                     data-explain="«Sie hat 12 Jahre» — типичная ошибка! Возраст выражается через <strong>sein</strong>: <em>ist … Jahre alt</em>.">
+                    <div class="q-tags"><span class="q-tag tag-red">sein</span><span class="q-tag tag-orange">Alter</span></div>
+                    <div class="pp-orig">Meine Schwester hat 12 Jahre. <span style="color:#f85149;font-size:0.8rem;">(❌ типичная ошибка)</span></div>
+                    <p class="pp-task">Исправьте: возраст выражается через <strong>sein + Jahre alt</strong>:</p>
+                    <input class="q-input" placeholder="Meine Schwester ist …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Meine Schwester <em>ist</em> 12 Jahre alt.</span>
+                        <p class="q-answer-explain">В немецком возраст: <strong>sein + Zahl + Jahre alt</strong>, а не haben!</p>
+                    </div>
+                </div>
+
+                <!-- PP5 -->
+                <div class="q-row"
+                     data-answers="Das Buch gehört mir."
+                     data-explain="«Das ist mein Buch» &harr; «Das Buch gehört mir». <em>gehören + Dativ</em> = принадлежать кому-то.">
+                    <div class="q-tags"><span class="q-tag tag-purple">gehören + Dativ</span></div>
+                    <div class="pp-orig">Das ist <strong>mein</strong> Buch.</div>
+                    <p class="pp-task">Перефразируйте с помощью «<strong>gehören + Dativ</strong>» (Das Buch gehört …):</p>
+                    <input class="q-input" placeholder="Das Buch gehört …" autocomplete="off">
+                    <div class="q-controls">
+                        <button class="q-btn-check" onclick="checkA1(this)">Prüfen</button>
+                        <button class="q-btn-show" onclick="showA1(this)">Antwort zeigen</button>
+                    </div>
+                    <div class="q-feedback"></div>
+                    <div class="q-answer">
+                        <span class="q-answer-label">&#x2705; Richtig:</span>
+                        <span class="q-answer-text">Das Buch <em>geh&ouml;rt mir</em>.</span>
+                        <p class="q-answer-explain"><em>mir</em> = Dativ от <strong>ich</strong>. gehören + wem? &rarr; Dativ.</p>
+                    </div>
+                </div>
+
+                <div class="tip-box">&#x1F4AC; Перифраз — это коммуникативная гибкость: одна и та же мысль может быть выражена несколькими способами. На A1 учитесь переключаться между конструкциями <em>haben/sein</em>, <em>kein/nicht</em> и вопросными формами.</div>
+            </div>
+        </div><!-- /tab-perifraz -->
+
+    </div><!-- /page-content -->
+
+    <script>
+    // ── Tabs ──
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ── Text-input check ──
+    function normalize(s) {
+        return s.trim()
+            .replace(/ß/g,'ß')
+            .replace(/\s+/g,' ')
+            .toLowerCase();
+    }
+
+    function checkA1(btn) {
+        const row = btn.closest('.q-row');
+        const input = row.querySelector('.q-input');
+        const fb = row.querySelector('.q-feedback');
+        const answerDiv = row.querySelector('.q-answer');
+        const rawAnswers = (row.dataset.answers || '').split('|');
+        const explain = row.dataset.explain || '';
+
+        const val = input.value.trim();
+        if (!val) {
+            fb.textContent = '✏️ Введите ответ или нажмите «Antwort zeigen»';
+            fb.className = 'q-feedback err';
+            return;
+        }
+
+        const correct = rawAnswers.some(a => normalize(val) === normalize(a));
+
+        if (correct) {
+            row.classList.add('solved-ok');
+            row.classList.remove('solved-err');
+            fb.innerHTML = '✅ Richtig! Super!';
+            fb.className = 'q-feedback ok';
+        } else {
+            row.classList.add('solved-err');
+            row.classList.remove('solved-ok');
+            fb.innerHTML = '❌ Nicht ganz. Klicke <strong>Antwort zeigen</strong>.';
+            fb.className = 'q-feedback err';
+        }
+
+        if (explain && answerDiv) {
+            const ep = answerDiv.querySelector('.q-answer-explain');
+            if (ep && !ep.innerHTML) ep.innerHTML = explain;
+        }
+
+        input.disabled = true;
+        btn.disabled = true;
+    }
+
+    function showA1(btn) {
+        const row = btn.closest('.q-row');
+        const input = row.querySelector('.q-input');
+        const checkBtn = row.querySelector('.q-btn-check');
+        const explain = row.dataset.explain || '';
+
+        input.disabled = true;
+        if (checkBtn) checkBtn.disabled = true;
+        btn.disabled = true;
+
+        row.classList.add('show-answer', 'revealed');
+        row.classList.remove('solved-ok', 'solved-err');
+
+        const answerDiv = row.querySelector('.q-answer');
+        if (answerDiv && explain) {
+            const ep = answerDiv.querySelector('.q-answer-explain');
+            if (ep && !ep.innerHTML) ep.innerHTML = explain;
+        }
+    }
+
+    // ── Multiple-choice check ──
+    function checkMC(btn, mcId, correct) {
+        const row = btn.closest('.q-row');
+        const expected = row.dataset.mcAnswer;
+        const fb = document.getElementById(mcId + '-fb');
+        const ansDiv = document.getElementById(mcId + '-ans');
+
+        row.querySelectorAll('.mc-btn').forEach(b => {
+            b.disabled = true;
+            b.classList.add('mc-used');
+        });
+
+        if (btn.textContent.trim() === expected) {
+            btn.classList.remove('mc-used');
+            btn.classList.add('mc-ok');
+            fb.textContent = '✅ Richtig!';
+            fb.className = 'mc-feedback ok';
+            row.classList.add('solved-ok');
+        } else {
+            btn.classList.remove('mc-used');
+            btn.classList.add('mc-err');
+            fb.textContent = '❌ Falsch — die Antwort wird unten angezeigt.';
+            fb.className = 'mc-feedback err';
+            row.classList.add('solved-err');
+        }
+
+        if (ansDiv) ansDiv.style.display = 'block';
+    }
+
+    // ── Cloze check/show ──
+    function checkCloze(btn) {
+        const block = btn.closest('.ex-block');
+        const inputs = block.querySelectorAll('.cloze-inp');
+        let ok = 0, total = inputs.length;
+
+        inputs.forEach(inp => {
+            const ans = inp.dataset.answer || '';
+            if (normalize(inp.value) === normalize(ans)) {
+                inp.classList.add('c-ok'); inp.classList.remove('c-err');
+                ok++;
+            } else {
+                inp.classList.add('c-err'); inp.classList.remove('c-ok');
+            }
+            inp.disabled = true;
+        });
+
+        const result = block.querySelector('.cloze-result');
+        if (result) {
+            const pct = Math.round(ok / total * 100);
+            let color = ok === total ? '#3fb950' : ok >= total * 0.6 ? '#e3b341' : '#f85149';
+            result.innerHTML = `<span style="color:${color};font-weight:700">${ok}/${total}</span> richtig (${pct}%)`;
+        }
+        btn.disabled = true;
+        const showBtn = block.querySelector('.cloze-btn-show');
+        if (showBtn) showBtn.disabled = false;
+    }
+
+    function showCloze(btn) {
+        const block = btn.closest('.ex-block');
+        const inputs = block.querySelectorAll('.cloze-inp');
+        inputs.forEach(inp => {
+            inp.value = inp.dataset.answer || '';
+            inp.classList.add('c-ok'); inp.classList.remove('c-err');
+            inp.disabled = true;
+        });
+        btn.disabled = true;
+        const checkBtn = block.querySelector('.cloze-btn-check');
+        if (checkBtn) checkBtn.disabled = true;
+        const result = block.querySelector('.cloze-result');
+        if (result) result.innerHTML = '<span style="color:var(--color-text-muted)">Antworten angezeigt.</span>';
+    }
+
+    // ── Enter key on q-input ──
+    document.querySelectorAll('.q-input').forEach(inp => {
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const checkBtn = inp.closest('.q-row')?.querySelector('.q-btn-check');
+                if (checkBtn && !checkBtn.disabled) checkBtn.click();
+            }
+        });
+    });
+
+    // ── Enter key on cloze inputs: jump to next ──
+    document.querySelectorAll('.cloze-inp').forEach((inp, i, all) => {
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const next = all[i + 1];
+                if (next && !next.disabled) next.focus(); else inp.blur();
+            }
+        });
+    });
+    </script>
+</body>
+</html>
