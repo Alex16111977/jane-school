@@ -337,4 +337,76 @@
     });
   });
 
+
+  /* ════════════════════════════════════════
+     7. STREICHE-DURCH
+  ════════════════════════════════════════ */
+  document.querySelectorAll('.st-choice').forEach(choice => {
+    choice.addEventListener('click', () => {
+      const item = choice.closest('.st-item');
+      if (item.classList.contains('st-done')) return;
+      item.classList.add('st-done');
+      const clickedWrong = choice.dataset.wrong === 'true';
+      item.querySelectorAll('.st-choice').forEach(c => {
+        c.classList.add('st-locked');
+        if (c.dataset.wrong === 'true') c.classList.add('st-wrong');
+        else c.classList.add('st-right');
+      });
+      item.classList.add(clickedWrong ? 'st-ok' : 'st-err');
+      // update score
+      const ex = item.closest('.st-exercise');
+      if (ex) {
+        const block = ex.closest('.ex-block');
+        const total = ex.querySelectorAll('.st-item').length;
+        const done  = ex.querySelectorAll('.st-done').length;
+        const good  = ex.querySelectorAll('.st-ok').length;
+        let sc = block ? block.querySelector('.ex-score') : null;
+        if (sc) sc.innerHTML = `<span style="color:${scoreColor(good,done)};font-weight:700">${good}/${done}</span> richtig` + (done === total && good === total ? ' 🎉' : '');
+      }
+    });
+  });
+
+  /* ════════════════════════════════════════
+     8. SETZE EIN
+  ════════════════════════════════════════ */
+  document.querySelectorAll('.se-btn-check').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const block = btn.closest('.ex-block');
+      let ok = 0, total = 0;
+      block.querySelectorAll('.se-input').forEach(inp => {
+        const ans = (inp.dataset.answer || '').split('|').map(s => s.trim());
+        const val = inp.value.trim();
+        inp.disabled = true;
+        total++;
+        if (ans.some(a => norm(val) === norm(a))) { inp.classList.add('se-ok'); ok++; }
+        else { inp.classList.add('se-err'); inp.title = '✅ ' + ans[0]; }
+      });
+      const sc = block.querySelector('.se-score');
+      if (sc) sc.innerHTML = `<span style="color:${scoreColor(ok,total)};font-weight:700">${ok}/${total}</span> richtig` + (ok === total ? ' 🎉' : '');
+      btn.disabled = true;
+    });
+  });
+  document.querySelectorAll('.se-btn-reset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const block = btn.closest('.ex-block');
+      block.querySelectorAll('.se-input').forEach(inp => {
+        inp.value = ''; inp.disabled = false;
+        inp.classList.remove('se-ok','se-err'); inp.title = '';
+      });
+      const sc = block.querySelector('.se-score');
+      if (sc) sc.innerHTML = '';
+      const check = block.querySelector('.se-btn-check');
+      if (check) check.disabled = false;
+    });
+  });
+  /* enter key */
+  document.querySelectorAll('.se-input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const btn = inp.closest('.ex-block')?.querySelector('.se-btn-check');
+        if (btn && !btn.disabled) btn.click();
+      }
+    });
+  });
+
 })();

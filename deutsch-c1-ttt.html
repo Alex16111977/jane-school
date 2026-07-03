@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хрестики-нулики | C1 Gesellschaft | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .ttt-wrap { max-width: 640px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .ttt-score { display: flex; gap: 0.7rem; justify-content: center; margin: 0.4rem 0 1.1rem; }
+        .ttt-score-card {
+            flex: 1; max-width: 190px;
+            background: rgba(13,17,23,0.82);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 13px; padding: 0.7rem 0.9rem; text-align: center;
+        }
+        .ttt-score-card.ok { border-color: rgba(63,185,80,0.4); }
+        .ttt-score-card.bad { border-color: rgba(248,81,73,0.38); }
+        .ttt-score-mark { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+        .ttt-score-card.ok .ttt-score-mark { color: #6ee7a0; }
+        .ttt-score-card.bad .ttt-score-mark { color: #ff8a84; }
+        .ttt-score-name { font-size: 0.78rem; color: var(--color-text-muted); margin: 0.2rem 0 0.35rem; font-weight: 600; }
+        .ttt-score-num { font-size: 1.35rem; font-weight: 800; color: #fff; }
+
+        .ttt-status { text-align: center; font-size: 1.12rem; font-weight: 700; color: #fff; min-height: 1.6em; margin-bottom: 1rem; transition: color 0.2s; }
+        .ttt-status .accent { color: #c084fc; }
+
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0 auto 0.4rem; max-width: 420px; }
+        .ttt-cell {
+            aspect-ratio: 1 / 1; border-radius: 16px;
+            background: rgba(255,255,255,0.96); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.2rem; font-weight: 900;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ttt-cell:not(.filled):not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(163,113,247,0.28); background: #fff; }
+        .ttt-cell:disabled, .ttt-cell.filled { cursor: default; }
+        .ttt-cell .mark { display: inline-block; animation: markPop 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+        @keyframes markPop { from { opacity:0; transform: scale(0.3) rotate(-12deg);} to {opacity:1; transform: scale(1) rotate(0);} }
+        .ttt-cell.o .mark { color: #16a34a; }
+        .ttt-cell.x .mark { color: #ef4444; }
+        .ttt-cell.win { background: #eafff0; box-shadow: 0 0 0 3px #3fb950, 0 8px 22px rgba(63,185,80,0.45); }
+
+        .ttt-q {
+            margin: 1.3rem auto 0; max-width: 480px;
+            background: rgba(13,17,23,0.85);
+            border: 1.5px solid rgba(163,113,247,0.3);
+            border-radius: 16px; padding: 1.2rem 1.2rem 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: none;
+            animation: qIn 0.3s ease both;
+        }
+        .ttt-q.show { display: block; }
+        @keyframes qIn { from { opacity:0; transform: translateY(12px);} to {opacity:1; transform: translateY(0);} }
+        .ttt-q-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(163,113,247,0.85); font-weight: 700; margin-bottom: 0.45rem; }
+        .ttt-q-word { font-size: 1.7rem; font-weight: 800; color: #fff; margin-bottom: 0.2rem; line-height: 1.2; }
+        .ttt-q-sub { font-size: 0.86rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-opts { display: flex; flex-direction: column; gap: 0.55rem; }
+        .ttt-opt {
+            padding: 0.8rem 1rem; border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            color: #fff; font-size: 1.02rem; font-weight: 700; cursor: pointer; text-align: left;
+            transition: background 0.18s, border-color 0.18s, transform 0.12s;
+        }
+        .ttt-opt:hover:not(:disabled) { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.45); transform: translateX(3px); }
+        .ttt-opt:disabled { cursor: default; }
+        .ttt-opt.correct { background: rgba(63,185,80,0.2); border-color: #3fb950; color: #b6f5c6; }
+        .ttt-opt.wrong { background: rgba(248,81,73,0.16); border-color: #f85149; color: #ffc1bd; }
+        .ttt-feedback { text-align:center; font-size: 0.95rem; font-weight:700; margin-top: 0.9rem; min-height: 1.2em; }
+        .ttt-feedback.ok { color: #6ee7a0; }
+        .ttt-feedback.no { color: #ff8a84; }
+
+        .ttt-result {
+            margin: 1.3rem auto 0; max-width: 480px; text-align: center;
+            background: rgba(13,17,23,0.9); border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 16px; padding: 1.5rem 1.2rem; display: none; animation: qIn 0.35s ease both;
+        }
+        .ttt-result.show { display: block; }
+        .ttt-result-emoji { font-size: 2.6rem; }
+        .ttt-result-title { font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0.4rem 0 0.3rem; }
+        .ttt-result-sub { font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-result.win { border-color: rgba(63,185,80,0.5); }
+        .ttt-result.lose { border-color: rgba(248,81,73,0.4); }
+
+        .ttt-controls { display:flex; justify-content:center; align-items:center; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .ttt-btn {
+            display: inline-flex; align-items:center; gap: 0.5rem;
+            padding: 0.72rem 1.5rem; border-radius: 12px;
+            background: rgba(163,113,247,0.14); border: 1.5px solid rgba(163,113,247,0.4);
+            color: #c084fc; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
+        }
+        .ttt-btn:hover { background: rgba(163,113,247,0.26); color:#fff; transform: translateY(-2px); }
+        .ttt-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .ttt-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .ttt-wins { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 600; }
+        .ttt-wins b { color: #6ee7a0; }
+
+        @media (max-width: 480px) {
+            .ttt-q-word { font-size: 1.45rem; }
+            .ttt-cell { font-size: 2.6rem; border-radius: 13px; }
+            .ttt-board { gap: 0.5rem; }
+            .ttt-score-mark { font-size: 1.3rem; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Хрестики-нулики</span>
+        </nav>
+        <a href="deutsch-c1-gesellschaft.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до словника</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Хрестики-нулики <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">Tag 1</span></h1>
+            <p class="page-subtitle">Обери клітинку і переклади слово. Правильно &mdash; <b style="color:#6ee7a0;">&#9711;</b>, помилка &mdash; <b style="color:#ff8a84;">&#10005;</b>. Збери <b style="color:#6ee7a0;">3 &#9711; в ряд</b>! Кожен день &mdash; свої слова.</p>
+        </div>
+
+        <div class="ttt-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+
+            <div class="ttt-score">
+                <div class="ttt-score-card ok">
+                    <div class="ttt-score-mark">&#9711;</div>
+                    <div class="ttt-score-name">Правильно</div>
+                    <div class="ttt-score-num" id="score-ok">0</div>
+                </div>
+                <div class="ttt-score-card bad">
+                    <div class="ttt-score-mark">&#10005;</div>
+                    <div class="ttt-score-name">Помилки</div>
+                    <div class="ttt-score-num" id="score-bad">0</div>
+                </div>
+            </div>
+
+            <div class="ttt-status" id="status">Обери клітинку</div>
+
+            <div class="ttt-board" id="board"></div>
+
+            <div class="ttt-q" id="question">
+                <div class="ttt-q-label">Як сказати німецькою?</div>
+                <div class="ttt-q-word" id="q-word"></div>
+                <div class="ttt-q-sub">Правильна відповідь поставить &#9711;, помилка &mdash; &#10005;</div>
+                <div class="ttt-opts" id="q-opts"></div>
+                <div class="ttt-feedback" id="q-feedback"></div>
+            </div>
+
+            <div class="ttt-result" id="result">
+                <div class="ttt-result-emoji" id="result-emoji"></div>
+                <div class="ttt-result-title" id="result-title"></div>
+                <div class="ttt-result-sub" id="result-sub"></div>
+                <button class="ttt-btn" onclick="newGame()">&#8635; Грати ще раз</button>
+            </div>
+
+            <div class="ttt-controls">
+                <button class="ttt-btn ghost" onclick="newGame()">&#8635; Нова гра</button>
+                <span class="ttt-wins">Перемоги: <b id="wins">0</b></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_DAY = {"1": [{"de": "die Überzeugung", "ua": "переконання"}, {"de": "die Haltung", "ua": "позиція / ставлення"}, {"de": "die Weltanschauung", "ua": "світогляд"}, {"de": "das Vorurteil", "ua": "упередження / стереотип"}, {"de": "das Tabu", "ua": "табу"}, {"de": "der Widerspruch", "ua": "суперечність / протиріччя"}, {"de": "das Dilemma", "ua": "дилема"}, {"de": "der Zwiespalt", "ua": "внутрішній конфлікт / роздвоєність"}, {"de": "anecken (bei jdm.)", "ua": "натикатися на опір / бути незручним для інших"}, {"de": "sich abfinden (mit + Dat.)", "ua": "змиритися (з чимось) / прийняти як є"}, {"de": "nachhaltig", "ua": "сталий / тривалий / з довготривалим ефектом"}, {"de": "spaltend", "ua": "те, що розколює / поляризуючий"}, {"de": "nachvollziehbar", "ua": "зрозумілий / такий, що можна зрозуміти"}, {"de": "einschränken", "ua": "обмежувати / скорочувати"}, {"de": "überdenken", "ua": "переосмислювати / переглядати"}, {"de": "abwägen", "ua": "зважувати / обдумувати з усіх боків"}, {"de": "Ich bin der Meinung, dass...", "ua": "Я вважаю, що... / На мою думку, ..."}, {"de": "Ich sehe das etwas anders:", "ua": "Я бачу це дещо інакше: ..."}, {"de": "Ehrlich gesagt...", "ua": "Чесно кажучи..."}, {"de": "Das kommt darauf an, ob / wie...", "ua": "Це залежить від того, чи / як..."}, {"de": "mit dem Strom schwimmen", "ua": "плисти за течією / діяти як усі"}, {"de": "unter den Teppich kehren", "ua": "замітати під килим / приховувати проблему"}, {"de": "auf dem Spiel stehen", "ua": "бути під загрозою / стояти на кону"}], "2": [{"de": "die Ambivalenz", "ua": "двоїстість / суперечливі почуття"}, {"de": "die Selbsttäuschung", "ua": "самообман"}, {"de": "die Doppelmoral", "ua": "подвійна мораль"}, {"de": "die Scheinheiligkeit", "ua": "лицемірство"}, {"de": "die Entrüstung", "ua": "обурення"}, {"de": "die Polarisierung", "ua": "поляризація"}, {"de": "die Gratwanderung", "ua": "балансування на межі / крок по лезу"}, {"de": "die Solidarität", "ua": "солідарність"}, {"de": "aufhetzen (gegen + Akk.)", "ua": "підбурювати / натравлювати"}, {"de": "hinterfragen", "ua": "піддавати сумніву / критично осмислювати"}, {"de": "marginalisiert", "ua": "маргіналізований / відкинутий на узбіччя суспільства"}, {"de": "zwiespältig", "ua": "суперечливий / з подвійним відчуттям"}, {"de": "ausgewogen", "ua": "збалансований / об'єктивний"}, {"de": "sich durchsetzen", "ua": "домагатися свого / наполягати на своєму"}, {"de": "vereinfachen", "ua": "спрощувати / зводити до простого"}, {"de": "reflektieren (über + Akk.)", "ua": "рефлектувати / критично осмислювати"}, {"de": "Es lässt sich argumentieren, dass...", "ua": "Можна стверджувати, що..."}, {"de": "Was mich dabei beschäftigt, ist...", "ua": "Мене тут турбує / цікавить..."}, {"de": "Von meiner Warte aus...", "ua": "З моєї точки зору / зі своєї позиції..."}, {"de": "Ich tendiere dazu zu glauben, dass...", "ua": "Я схиляюся до думки, що..."}, {"de": "jemandem den Spiegel vorhalten", "ua": "показати комусь, яким він насправді є / вказати на недоліки"}, {"de": "das Ruder herumreißen", "ua": "різко змінити курс / виправити ситуацію в останній момент"}, {"de": "den Teufel an die Wand malen", "ua": "передбачати найгірше / малювати чорта на стіні"}], "3": [{"de": "die Chancengleichheit", "ua": "рівні можливості"}, {"de": "die Benachteiligung", "ua": "ущемлення / нерівне ставлення"}, {"de": "der Graben", "ua": "прірва / розрив (між групами людей)"}, {"de": "der Sündenbock", "ua": "козел відпущення"}, {"de": "die Echokammer", "ua": "ехо-камера / інформаційний пузир"}, {"de": "das Misstrauen", "ua": "недовіра / підозра"}, {"de": "das Leitbild", "ua": "ідеал / орієнтир / суспільний зразок"}, {"de": "die Eigenverantwortung", "ua": "особиста відповідальність"}, {"de": "der Mainstream", "ua": "мейнстрім / панівна суспільна думка"}, {"de": "sich distanzieren (von + Dat.)", "ua": "дистанціюватися / відмежуватися"}, {"de": "sich zuspitzen", "ua": "загострюватися / доходити до критичної точки"}, {"de": "polarisierend", "ua": "що поляризує / що розколює суспільство"}, {"de": "aufgeklärt", "ua": "просвічений / освічений (у широкому сенсі)"}, {"de": "kontraproduktiv", "ua": "контрпродуктивний / з зворотним ефектом"}, {"de": "instrumentalisieren", "ua": "інструменталізувати / використовувати у своїх цілях"}, {"de": "differenzieren", "ua": "диференціювати / розрізняти / нюансувати"}, {"de": "sich behaupten", "ua": "відстоювати себе / не здаватися"}, {"de": "Ich möchte hinzufügen, dass...", "ua": "Я хотів би додати, що..."}, {"de": "Wenn ich das richtig verstehe...", "ua": "Якщо я правильно розумію, ..."}, {"de": "ein zweischneidiges Schwert sein", "ua": "бути обопільним мечем / мати і добрий, і поганий бік"}, {"de": "auf keinen grünen Zweig kommen", "ua": "ніяк не досягти успіху / топтатися на місці"}, {"de": "gegen Windmühlen kämpfen", "ua": "боротися з вітряками / вести безперспективну боротьбу"}, {"de": "die Katze aus dem Sack lassen", "ua": "виказати / розкрити секрет / розкрити карти"}], "4": [{"de": "die Spaltung", "ua": "розкол / суспільний поділ"}, {"de": "der Diskurs", "ua": "дискурс / суспільна дискусія"}, {"de": "das Vorrecht", "ua": "привілей / перевага"}, {"de": "die Ausgrenzung", "ua": "виключення / маргіналізація"}, {"de": "das Machtgefälle", "ua": "нерівність влади / владна асиметрія"}, {"de": "die Gleichgültigkeit", "ua": "байдужість / апатія"}, {"de": "der Rückschritt", "ua": "крок назад / регрес"}, {"de": "der Anpassungsdruck", "ua": "тиск відповідності / примус пристосовуватися"}, {"de": "sich anpassen (an + Akk.)", "ua": "пристосовуватися / адаптуватися"}, {"de": "ausgrenzen", "ua": "виключати / відштовхувати"}, {"de": "verdrängen", "ua": "витісняти / пригнічувати / замовчувати"}, {"de": "eingestehen", "ua": "визнавати (щось неприємне) / зізнаватися"}, {"de": "verharmlosen", "ua": "применшувати / не брати серйозно"}, {"de": "selbstkritisch", "ua": "самокритичний"}, {"de": "vielschichtig", "ua": "багатошаровий / комплексний"}, {"de": "unzumutbar", "ua": "неприйнятний / нестерпний"}, {"de": "verharmlosend", "ua": "той що применшує / такий що не бере серйозно"}, {"de": "Um es auf den Punkt zu bringen...", "ua": "Щоб підвести підсумок... / Якщо коротко..."}, {"de": "Ich würde das differenzierter sehen.", "ua": "Я б дивився на це більш диференційовано."}, {"de": "Das lässt sich so nicht verallgemeinern.", "ua": "Це не можна так узагальнювати."}, {"de": "den Finger in die Wunde legen", "ua": "торкнутися хворого місця / вказати на болючу проблему"}, {"de": "über seinen Schatten springen", "ua": "переступити через себе / подолати власні обмеження"}, {"de": "Wasser auf jmds. Mühlen sein", "ua": "бути на руку комусь / лити воду на чиюсь мельницю"}], "5": [{"de": "die Berichterstattung", "ua": "висвітлення / репортаж"}, {"de": "die Desinformation", "ua": "дезінформація"}, {"de": "die Filterbubble", "ua": "фільтр-бульбашка"}, {"de": "das Narrativ", "ua": "наратив / суспільна оповідь"}, {"de": "die Meinungsfreiheit", "ua": "свобода думки / слова"}, {"de": "die Reichweite", "ua": "охоплення / досяжність"}, {"de": "der Shitstorm", "ua": "шиторм / онлайн-атака"}, {"de": "die Glaubwürdigkeit", "ua": "достовірність / авторитетність"}, {"de": "manipulieren", "ua": "маніпулювати"}, {"de": "verbreiten", "ua": "поширювати"}, {"de": "beeinflussen", "ua": "впливати"}, {"de": "missverstehen", "ua": "неправильно розуміти"}, {"de": "recherchieren", "ua": "досліджувати / перевіряти"}, {"de": "irreführend", "ua": "оманливий"}, {"de": "tendenziös", "ua": "тенденційний / упереджений"}, {"de": "glaubwürdig", "ua": "достовірний / авторитетний"}, {"de": "reißerisch", "ua": "сенсаційний / бульварний"}, {"de": "Ich habe Bedenken, ob...", "ua": "Я маю сумніви щодо того, чи..."}, {"de": "Es wäre falsch zu behaupten, dass...", "ua": "Було б неправильно стверджувати, що..."}, {"de": "Aus meiner Sicht gibt es hier einen Widerspruch:", "ua": "З мого погляду, тут є суперечність:"}, {"de": "jmdm. das Wort im Mund umdrehen", "ua": "перекручувати чужі слова"}, {"de": "kein Blatt vor den Mund nehmen", "ua": "не вибирати слів / говорити відверто"}, {"de": "etw. in ein falsches Licht rücken", "ua": "подавати у хибному світлі"}], "6": [{"de": "die Zugehörigkeit", "ua": "належність / приналежність"}, {"de": "die Vielfalt", "ua": "різноманітність"}, {"de": "die Diskriminierung", "ua": "дискримінація"}, {"de": "die Minderheit", "ua": "меншина"}, {"de": "das Klischee", "ua": "кліше / стереотип"}, {"de": "die Inklusion", "ua": "інклюзія / включення"}, {"de": "die Herkunft", "ua": "походження"}, {"de": "das Zusammenleben", "ua": "спільне життя / співіснування"}, {"de": "stigmatisieren", "ua": "стигматизувати"}, {"de": "integrieren", "ua": "інтегрувати / інтегруватися"}, {"de": "verurteilen", "ua": "засуджувати"}, {"de": "anerkennen", "ua": "визнавати / визнати"}, {"de": "diskriminieren", "ua": "дискримінувати"}, {"de": "vielfältig", "ua": "різноманітний"}, {"de": "inklusiv", "ua": "інклюзивний"}, {"de": "diskriminierend", "ua": "дискримінаційний"}, {"de": "klischeehaft", "ua": "заснований на кліше / шаблонний"}, {"de": "Ich sehe das als vielschichtiges Problem:", "ua": "Я бачу це як багатошарову проблему:"}, {"de": "Es kommt hier auf den Kontext an:", "ua": "Тут важливий контекст:"}, {"de": "Ich möchte das nicht pauschal beurteilen.", "ua": "Я не хочу судити огульно."}, {"de": "jmdn. in eine Schublade stecken", "ua": "ставити ярлик / класифікувати"}, {"de": "mit zweierlei Maß messen", "ua": "вимірювати подвійними мірками"}, {"de": "am gleichen Strang ziehen", "ua": "тягнути в одному напрямку"}], "7": [{"de": "der Populismus", "ua": "популізм"}, {"de": "die Transparenz", "ua": "прозорість"}, {"de": "die Bürgerbeteiligung", "ua": "участь громадян"}, {"de": "der Kompromiss", "ua": "компроміс"}, {"de": "die Rechenschaftspflicht", "ua": "підзвітність"}, {"de": "der Lobbyismus", "ua": "лобіювання"}, {"de": "die Meinungsvielfalt", "ua": "різноманіття думок"}, {"de": "das Machtmonopol", "ua": "монополія влади"}, {"de": "repräsentieren", "ua": "представляти"}, {"de": "kooperieren", "ua": "співпрацювати"}, {"de": "mobilisieren", "ua": "мобілізувати"}, {"de": "ablehnen", "ua": "відхиляти / відмовляти"}, {"de": "reformieren", "ua": "реформувати"}, {"de": "autokratisch", "ua": "авторитарний / автократичний"}, {"de": "pluralistisch", "ua": "плюралістичний"}, {"de": "korrupt", "ua": "корумпований"}, {"de": "demokratisch", "ua": "демократичний"}, {"de": "Das ist eine Frage der politischen Prioritäten.", "ua": "Це питання політичних пріоритетів."}, {"de": "Ich sehe da eine Verantwortung des Staates:", "ua": "Я бачу тут відповідальність держави:"}, {"de": "Das ist nicht so einfach zu lösen, weil...", "ua": "Це не так легко вирішити, тому що..."}, {"de": "Öl ins Feuer gießen", "ua": "підливати масла у вогонь"}, {"de": "die Weichen stellen", "ua": "закладати курс / ставити на рейки"}, {"de": "hinter den Kulissen", "ua": "за лаштунками"}], "8": [{"de": "die Ungleichheit", "ua": "нерівність"}, {"de": "die Umverteilung", "ua": "перерозподіл"}, {"de": "die Armut", "ua": "бідність"}, {"de": "das Sozialsystem", "ua": "соціальна система / соціальна захистна сітка"}, {"de": "der Wohlstand", "ua": "добробут / заможність"}, {"de": "die Bildungsgerechtigkeit", "ua": "справедливість в освіті"}, {"de": "das Einkommen", "ua": "дохід"}, {"de": "die Prekarität", "ua": "нестабільність / прекарність"}, {"de": "subventionieren", "ua": "субсидіювати"}, {"de": "umverteilen", "ua": "перерозподіляти"}, {"de": "regulieren", "ua": "регулювати"}, {"de": "investieren", "ua": "інвестувати"}, {"de": "privatisieren", "ua": "приватизувати"}, {"de": "prekär", "ua": "нестабільний / ризикований"}, {"de": "systemisch", "ua": "системний"}, {"de": "gerecht", "ua": "справедливий"}, {"de": "nachhaltig", "ua": "стійкий / сталий (в економічному сенсі)"}, {"de": "Das führt zu der Frage, wer davon profitiert:", "ua": "Це ставить питання, хто від цього виграє:"}, {"de": "Ich halte es für notwendig, dass...", "ua": "Я вважаю за необхідне, що..."}, {"de": "Das ist auf lange Sicht nicht tragbar.", "ua": "Це не є стійким у довгостроковій перспективі."}, {"de": "über die Verhältnisse leben", "ua": "жити не по засобах"}, {"de": "in die eigene Tasche wirtschaften", "ua": "набивати кишені / зловживати"}, {"de": "auf Kosten anderer leben", "ua": "жити за рахунок інших"}], "9": [{"de": "der Klimawandel", "ua": "зміна клімату"}, {"de": "die Digitalisierung", "ua": "цифровізація"}, {"de": "die Nachhaltigkeit", "ua": "стійкість / сталість"}, {"de": "der Paradigmenwechsel", "ua": "зміна парадигми"}, {"de": "die Ressource", "ua": "ресурс"}, {"de": "die Innovation", "ua": "інновація"}, {"de": "die Transformation", "ua": "трансформація"}, {"de": "der Generationenvertrag", "ua": "суспільний договір між поколіннями"}, {"de": "transformieren", "ua": "трансформувати"}, {"de": "digitalisieren", "ua": "оцифровувати / перетворювати на цифровий формат"}, {"de": "prognostizieren", "ua": "прогнозувати"}, {"de": "erschöpfen", "ua": "вичерпувати / виснажувати"}, {"de": "erneuern", "ua": "оновлювати / відновлювати"}, {"de": "zukunftsfähig", "ua": "перспективний / придатний для майбутнього"}, {"de": "erneuerbar", "ua": "відновлюваний"}, {"de": "fortschrittlich", "ua": "прогресивний"}, {"de": "ressourcenschonend", "ua": "ощадливий щодо ресурсів"}, {"de": "Auf lange Sicht gesehen...", "ua": "У довгостроковій перспективі..."}, {"de": "Es bleibt abzuwarten, ob...", "ua": "Залишається подивитися, чи..."}, {"de": "Ich mache mir Sorgen um...", "ua": "Я переймаюся щодо..."}, {"de": "den Kopf in den Sand stecken", "ua": "ховати голову в пісок"}, {"de": "auf dem Holzweg sein", "ua": "бути на хибному шляху"}, {"de": "etw. zum Laufen bringen", "ua": "запустити / налагодити роботу"}], "10": [{"de": "die Konjunktur", "ua": "кон'юнктура / економічний цикл"}, {"de": "die Inflation", "ua": "інфляція"}, {"de": "das Bruttoinlandsprodukt (BIP)", "ua": "валовий внутрішній продукт (ВВП)"}, {"de": "die Lieferkette", "ua": "ланцюг постачання"}, {"de": "der Standort", "ua": "місце розташування / виробничий майданчик"}, {"de": "die Rücklage", "ua": "резерв / фінансова подушка безпеки"}, {"de": "die Wettbewerbsfähigkeit", "ua": "конкурентоспроможність"}, {"de": "der Haushalt", "ua": "державний бюджет"}, {"de": "ankurbeln", "ua": "стимулювати / розкручувати (економіку)"}, {"de": "stagnieren", "ua": "стагнувати / застоювати"}, {"de": "fusionieren", "ua": "зливатися (про компанії) / об'єднуватися"}, {"de": "auslagern", "ua": "передавати на аутсорсинг / виносити за межі"}, {"de": "rentabel", "ua": "рентабельний / прибутковий"}, {"de": "wettbewerbsfähig", "ua": "конкурентоспроможний"}, {"de": "konjunkturbedingt", "ua": "кон'юнктурний / зумовлений економічним циклом"}, {"de": "exportorientiert", "ua": "орієнтований на експорт"}, {"de": "Das hängt eng mit der Wirtschaftslage zusammen.", "ua": "Це тісно пов'язане з економічною ситуацією."}, {"de": "Man muss die Kosten-Nutzen-Abwägung im Blick behalten.", "ua": "Треба враховувати співвідношення витрат і вигод."}, {"de": "Es geht letztendlich um die Frage der Wettbewerbsfähigkeit.", "ua": "Врешті-решт, мова йде про конкурентоспроможність."}, {"de": "rote Zahlen schreiben", "ua": "бути у мінусі / мати збитки"}, {"de": "auf Hochtouren laufen", "ua": "працювати на повну / на максимальних оборотах"}, {"de": "sich auf eigene Beine stellen", "ua": "стати на ноги / досягнути самостійності"}, {"de": "unter Druck geraten", "ua": "опинитися під тиском"}], "11": [{"de": "die Behörde", "ua": "орган влади / відомство"}, {"de": "der Antrag", "ua": "заява / клопотання"}, {"de": "die Zuständigkeit", "ua": "компетенція / підвідомчість"}, {"de": "die Genehmigung", "ua": "дозвіл / ухвала"}, {"de": "das Amt", "ua": "посада / відомство"}, {"de": "die Verordnung", "ua": "постанова / розпорядження"}, {"de": "die Gesetzgebung", "ua": "законодавство / законотворчість"}, {"de": "der Verwaltungsaufwand", "ua": "адміністративне навантаження / бюрократичні витрати"}, {"de": "beantragen", "ua": "подавати заяву / клопотати"}, {"de": "genehmigen", "ua": "затверджувати / видавати дозвіл"}, {"de": "umsetzen", "ua": "впроваджувати / реалізовувати"}, {"de": "zuständig (für + Akk.)", "ua": "відповідальний за / компетентний"}, {"de": "bürokratisch", "ua": "бюрократичний"}, {"de": "verbindlich", "ua": "обов'язковий / юридично зобов'язуючий"}, {"de": "staatlich", "ua": "державний"}, {"de": "verwaltungstechnisch", "ua": "з адміністративної точки зору"}, {"de": "Das fällt nicht in meinen Zuständigkeitsbereich.", "ua": "Це не входить до моїх повноважень."}, {"de": "Es besteht dringender Handlungsbedarf.", "ua": "Є нагальна потреба в діях / необхідно діяти терміново."}, {"de": "Im Rahmen der gesetzlichen Möglichkeiten...", "ua": "У межах законних можливостей..."}, {"de": "einen Antrag stellen", "ua": "подати заяву / подати клопотання"}, {"de": "ein Amt bekleiden", "ua": "обіймати посаду"}, {"de": "sich durch die Bürokratie kämpfen", "ua": "продиратися крізь бюрократію"}, {"de": "auf dem Dienstweg", "ua": "через офіційні канали / по службових каналах"}], "12": [{"de": "der Betrieb", "ua": "підприємство / завод / роботи"}, {"de": "die Branche", "ua": "галузь / сектор"}, {"de": "der Umsatz", "ua": "оборот / виручка"}, {"de": "die Nachfrage", "ua": "попит"}, {"de": "das Angebot", "ua": "пропозиція / асортимент"}, {"de": "der Kredit", "ua": "кредит / позика"}, {"de": "die Konkurrenz", "ua": "конкуренція / суперники"}, {"de": "der Verbraucher", "ua": "споживач"}, {"de": "steigen", "ua": "зростати / підніматися"}, {"de": "sinken", "ua": "знижуватися / падати"}, {"de": "wachsen", "ua": "рости / зростати"}, {"de": "sparen", "ua": "зберігати / економити"}, {"de": "bezahlbar", "ua": "доступний (за ціною)"}, {"de": "wirtschaftlich", "ua": "економічний / ощадливий"}, {"de": "günstig", "ua": "вигідний / дешевий / сприятливий"}, {"de": "verdienen", "ua": "заробляти / заслуговувати"}, {"de": "Die Nachfrage übersteigt das Angebot.", "ua": "Попит перевищує пропозицію."}, {"de": "Das lohnt sich kaum noch.", "ua": "Це ледве виправдовує себе. / Це майже не окупається."}, {"de": "Wir müssen sparsamer wirtschaften.", "ua": "Ми маємо вести справи більш ощадливо."}, {"de": "über die Runden kommen", "ua": "ледь зводити кінці з кінцями"}, {"de": "den Gürtel enger schnallen", "ua": "затягнути пасок / урізати витрати"}, {"de": "auf Kredit leben", "ua": "жити в борг / жити за рахунок кредитів"}, {"de": "Gewinne erzielen", "ua": "отримувати прибуток"}], "13": [{"de": "das Formular", "ua": "бланк / формуляр"}, {"de": "die Frist", "ua": "термін / дедлайн"}, {"de": "das Dokument", "ua": "документ"}, {"de": "die Gebühr", "ua": "мито / збір / плата"}, {"de": "der Ausweis", "ua": "посвідчення / документ, що засвідчує особу"}, {"de": "die Unterschrift", "ua": "підпис"}, {"de": "die Bescheinigung", "ua": "довідка / підтвердження"}, {"de": "die Meldung", "ua": "повідомлення / реєстрація / заява"}, {"de": "ausfüllen", "ua": "заповнювати (бланк / форму)"}, {"de": "einreichen", "ua": "подавати (документи) / подавати до розгляду"}, {"de": "unterschreiben", "ua": "підписувати"}, {"de": "abgeben", "ua": "здавати / подавати / передавати"}, {"de": "gültig", "ua": "дійсний / чинний"}, {"de": "offiziell", "ua": "офіційний"}, {"de": "schriftlich", "ua": "письмовий / у письмовій формі"}, {"de": "persönlich", "ua": "особисто / особистий"}, {"de": "Bitte füllen Sie das Formular vollständig aus.", "ua": "Будь ласка, заповніть бланк повністю."}, {"de": "Die Frist läuft in zwei Wochen ab.", "ua": "Термін закінчується через два тижні."}, {"de": "Das Dokument muss im Original vorgelegt werden.", "ua": "Документ потрібно надати в оригіналі."}, {"de": "einen Termin vereinbaren", "ua": "записатися на прийом / домовитися про зустріч"}, {"de": "etwas schriftlich bestätigen", "ua": "підтвердити щось письмово"}, {"de": "die Unterlagen einreichen", "ua": "подати документи / надати матеріали"}, {"de": "am Schalter vorsprechen", "ua": "з'явитися на прийом / прийти особисто до вікна"}], "14": [{"de": "der Preis", "ua": "ціна"}, {"de": "die Rechnung", "ua": "рахунок / квитанція"}, {"de": "der Lohn", "ua": "зарплата (погодинна)"}, {"de": "die Ausgabe", "ua": "витрата"}, {"de": "das Konto", "ua": "рахунок (банківський)"}, {"de": "der Rabatt", "ua": "знижка"}, {"de": "das Bargeld", "ua": "готівка"}, {"de": "der Einkauf", "ua": "покупки / шопінг"}, {"de": "kaufen", "ua": "купувати"}, {"de": "verkaufen", "ua": "продавати"}, {"de": "bezahlen", "ua": "платити / оплачувати"}, {"de": "kosten", "ua": "коштувати"}, {"de": "teuer", "ua": "дорогий"}, {"de": "billig", "ua": "дешевий"}, {"de": "kostenlos", "ua": "безкоштовний"}, {"de": "sparsam", "ua": "ощадливий"}, {"de": "Das ist mir zu teuer.", "ua": "Це для мене задорого."}, {"de": "Kann ich mit Karte bezahlen?", "ua": "Чи можна оплатити карткою?"}, {"de": "Wie viel kostet das?", "ua": "Скільки це коштує?"}, {"de": "etwas auf Raten kaufen", "ua": "купувати в розстрочку"}, {"de": "ein Schnäppchen machen", "ua": "зробити вигідну покупку / вхопити нагоду"}, {"de": "Geld ausgeben", "ua": "витрачати гроші"}, {"de": "die Preise vergleichen", "ua": "порівнювати ціни"}], "15": [{"de": "die Warteschlange", "ua": "черга"}, {"de": "das Büro", "ua": "офіс / кабінет"}, {"de": "der Brief", "ua": "лист"}, {"de": "die Adresse", "ua": "адреса"}, {"de": "der Stempel", "ua": "штамп / печатка"}, {"de": "die Kopie", "ua": "копія"}, {"de": "der Beamte / die Beamtin", "ua": "чиновник / державний службовець"}, {"de": "die Öffnungszeit", "ua": "години роботи"}, {"de": "warten", "ua": "чекати"}, {"de": "anrufen", "ua": "телефонувати / дзвонити"}, {"de": "schicken", "ua": "надсилати / відправляти"}, {"de": "anfragen", "ua": "запитувати / робити запит"}, {"de": "richtig", "ua": "правильний / вірний"}, {"de": "falsch", "ua": "неправильний / хибний"}, {"de": "einfach", "ua": "простий / легкий"}, {"de": "kompliziert", "ua": "складний"}, {"de": "Wann haben Sie geöffnet?", "ua": "Коли у вас є прийом? / Коли ви відкриті?"}, {"de": "Ich habe einen Fehler gemacht.", "ua": "Я зробив(ла) помилку."}, {"de": "Können Sie mir bitte helfen?", "ua": "Чи не могли б ви мені допомогти?"}, {"de": "auf eine Antwort warten", "ua": "чекати на відповідь"}, {"de": "einen Brief schicken", "ua": "надіслати листа"}, {"de": "eine Kopie machen", "ua": "зробити копію"}, {"de": "sich beschweren", "ua": "скаржитися / подавати скаргу"}]};
+        const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        let board, lock, activeCell = null;
+        let correctCount = 0, mistakeCount = 0, wins = 0;
+        let currentDay = 1;
+        let pool = WORDS_BY_DAY[currentDay];
+        let queue = [];
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function refillQueue(){ queue = shuffle(pool.slice()); }
+
+        function nextWord(){
+            if(queue.length === 0) refillQueue();
+            return queue.pop();
+        }
+
+        function buildDayTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            Object.keys(WORDS_BY_DAY).map(Number).sort((a,b)=>a-b).forEach(d=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentDay?' active':'');
+                b.textContent = 'Tag ' + d;
+                b.onclick = ()=>switchGameDay(d);
+                el.appendChild(b);
+            });
+        }
+
+        function switchGameDay(d){
+            currentDay = d;
+            pool = WORDS_BY_DAY[d];
+            document.getElementById('day-badge').textContent = 'Tag ' + d;
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', (i+1)===d));
+            newGame();
+        }
+
+        function renderBoard(){
+            const el = document.getElementById('board');
+            el.innerHTML = '';
+            board.forEach((v,i)=>{
+                const b = document.createElement('button');
+                b.className = 'ttt-cell' + (v? ' filled '+v.toLowerCase() : '');
+                b.dataset.i = i;
+                if(v){ b.innerHTML = '<span class="mark">'+(v==='X'?'&#10005;':'&#9711;')+'</span>'; b.disabled = true; }
+                else { b.onclick = ()=>onPick(i); }
+                el.appendChild(b);
+            });
+        }
+
+        function setStatus(html){ document.getElementById('status').innerHTML = html; }
+        function updateScore(){
+            document.getElementById('score-ok').textContent = correctCount;
+            document.getElementById('score-bad').textContent = mistakeCount;
+        }
+
+        function onPick(i){
+            if(lock || board[i]) return;
+            activeCell = i; lock = true; askQuestion();
+        }
+
+        function askQuestion(){
+            const correct = nextWord();
+            const others = shuffle(pool.filter(w=>w.de!==correct.de));
+            const opts = shuffle([correct, others[0], others[1]]);
+            document.getElementById('q-word').textContent = correct.ua;
+            const fb = document.getElementById('q-feedback');
+            fb.textContent = ''; fb.className = 'ttt-feedback';
+            const box = document.getElementById('q-opts');
+            box.innerHTML = '';
+            opts.forEach(o=>{
+                const btn = document.createElement('button');
+                btn.className = 'ttt-opt';
+                btn.textContent = o.de;
+                btn.onclick = ()=>answer(btn, o.de===correct.de, correct);
+                box.appendChild(btn);
+            });
+            const q = document.getElementById('question');
+            q.classList.add('show');
+            q.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+
+        function answer(btn, isCorrect, correct){
+            [...document.querySelectorAll('.ttt-opt')].forEach(b=>{
+                b.disabled = true;
+                if(b.textContent===correct.de) b.classList.add('correct');
+            });
+            const fb = document.getElementById('q-feedback');
+            if(isCorrect){
+                fb.textContent = '✓ Правильно! ◯';
+                fb.className = 'ttt-feedback ok';
+                board[activeCell] = 'O';
+                correctCount++;
+            } else {
+                btn.classList.add('wrong');
+                fb.textContent = '✗ ' + correct.ua + ' = ' + correct.de + ' — ставимо ✕';
+                fb.className = 'ttt-feedback no';
+                board[activeCell] = 'X';
+                mistakeCount++;
+            }
+            updateScore();
+            setTimeout(()=>{
+                document.getElementById('question').classList.remove('show');
+                renderBoard();
+                if(checkEnd()) return;
+                setStatus('Обери наступну клітинку');
+                lock = false;
+            }, isCorrect ? 750 : 1500);
+        }
+
+        function checkEnd(){
+            for(const L of LINES){
+                if(L.every(i=>board[i]==='O')){ highlight(L); endGame('win'); return true; }
+            }
+            const full = board.every(v=>v);
+            const canStillWin = LINES.some(L=>L.every(i=>board[i]!=='X'));
+            if(full || !canStillWin){ endGame('lose'); return true; }
+            return false;
+        }
+
+        function highlight(line){ line.forEach(i=>{ const c=document.querySelector('.ttt-cell[data-i=\"'+i+'\"]'); if(c) c.classList.add('win'); }); }
+
+        function endGame(kind){
+            lock = true;
+            const r = document.getElementById('result');
+            const emoji = document.getElementById('result-emoji');
+            const title = document.getElementById('result-title');
+            const sub = document.getElementById('result-sub');
+            r.className = 'ttt-result show ' + (kind==='win'?'win':'lose');
+            if(kind==='win'){
+                emoji.textContent='🎉';
+                title.textContent='Три в ряд! Ти виграв!';
+                sub.textContent = 'Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                wins++; document.getElementById('wins').textContent = wins;
+                setStatus('<span class="accent">Перемога! 🎉 Три &#9711; в ряд</span>');
+            } else {
+                emoji.textContent='😕';
+                title.textContent='Лінія не зібралася';
+                sub.textContent = 'Помилки заблокували всі ряди. Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                setStatus('Цього разу не вийшло — спробуй ще');
+            }
+        }
+
+        function newGame(){
+            board = ['','','','','','','','',''];
+            lock = false; activeCell = null;
+            correctCount = 0; mistakeCount = 0;
+            refillQueue();
+            updateScore();
+            document.getElementById('question').classList.remove('show');
+            document.getElementById('result').classList.remove('show');
+            setStatus('Обери клітинку');
+            renderBoard();
+        }
+
+        buildDayTabs();
+        newGame();
+    </script>
+</body>
+</html>

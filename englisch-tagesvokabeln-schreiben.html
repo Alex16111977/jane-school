@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Письмовий тренажёр | Daily Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .wr-wrap { max-width: 680px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .wr-rounds { display:flex; gap:0.5rem; justify-content:center; align-items:center; margin-bottom: 0.8rem; }
+        .wr-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size: 0.85rem; font-weight: 800;
+            background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.45);
+        }
+        .wr-dot.active { background: rgba(163,113,247,0.2); border-color: #a371f7; color:#c084fc; }
+        .wr-dot.done { background: rgba(63,185,80,0.2); border-color: #3fb950; color:#86efac; }
+
+        .wr-dir {
+            text-align:center; font-size: 1.05rem; font-weight: 800; color:#fff; margin-bottom: 0.3rem;
+        }
+        .wr-dir .arrow { color:#c084fc; }
+        .wr-sub { text-align:center; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.2rem; }
+
+        .wr-list { display:flex; flex-direction: column; gap: 0.55rem; }
+        .wr-row {
+            display:grid; grid-template-columns: 1fr 1fr auto; gap: 0.7rem; align-items: center;
+            background: rgba(13,17,23,0.8); border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 0.6rem 0.8rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .wr-row.correct { border-color: rgba(63,185,80,0.5); background: rgba(13,23,17,0.8); }
+        .wr-row.wrong { border-color: rgba(248,81,73,0.5); background: rgba(23,14,14,0.8); }
+        .wr-prompt { font-size: 1.05rem; font-weight: 800; color:#fff; }
+        .wr-prompt .tip { display:block; font-size: 0.72rem; font-weight:600; color: rgba(255,255,255,0.32); margin-top:0.1rem; }
+        .wr-input {
+            width: 100%; box-sizing: border-box;
+            padding: 0.55rem 0.7rem; border-radius: 9px;
+            background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.14);
+            color: #fff; font-size: 1rem; font-weight: 600; font-family: inherit;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .wr-input:focus { outline: none; border-color: rgba(163,113,247,0.6); background: rgba(163,113,247,0.08); }
+        .wr-input:disabled { opacity: 0.9; }
+        .wr-row.correct .wr-input { border-color: rgba(63,185,80,0.5); color:#b6f5c6; }
+        .wr-row.wrong .wr-input { border-color: rgba(248,81,73,0.5); }
+        .wr-mark { font-size: 1.2rem; font-weight: 900; min-width: 1.4rem; text-align:center; }
+        .wr-row.correct .wr-mark { color:#6ee7a0; }
+        .wr-row.wrong .wr-mark { color:#ff8a84; }
+
+        .wr-fix { grid-column: 1 / -1; display:flex; flex-wrap:wrap; align-items:center; gap:0.6rem; font-size: 0.88rem; }
+        .wr-fix .corr { color:#ffd9a0; font-weight:700; }
+        .wr-fix .corr b { color:#ffe9c2; }
+        .wr-accept {
+            padding: 0.3rem 0.7rem; border-radius: 8px; cursor:pointer;
+            background: rgba(63,185,80,0.14); border: 1.5px solid rgba(63,185,80,0.4);
+            color:#86efac; font-size: 0.8rem; font-weight: 700; font-family: inherit;
+        }
+        .wr-accept:hover { background: rgba(63,185,80,0.25); color:#fff; }
+
+        .wr-controls { display:flex; justify-content:center; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .wr-btn {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.75rem 1.7rem; border-radius: 12px;
+            background: rgba(163,113,247,0.16); border: 1.5px solid rgba(163,113,247,0.45);
+            color:#c084fc; font-size: 0.98rem; font-weight: 800; cursor:pointer; font-family: inherit;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .wr-btn:hover { background: rgba(163,113,247,0.28); color:#fff; transform: translateY(-2px); }
+        .wr-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .wr-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .wr-btn:disabled { opacity: 0.4; cursor: default; transform:none; }
+
+        .wr-msg { text-align:center; font-size: 0.95rem; font-weight: 700; margin-top: 0.9rem; min-height: 1.3em; }
+        .wr-msg.ok { color:#6ee7a0; }
+        .wr-msg.no { color:#ff8a84; }
+
+        .wr-done {
+            text-align:center; background: rgba(13,17,23,0.9); border: 1.5px solid rgba(63,185,80,0.5);
+            border-radius: 16px; padding: 2rem 1.2rem; display:none; animation: fadeUp 0.4s ease both;
+        }
+        .wr-done.show { display:block; }
+        @keyframes fadeUp { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
+        .wr-done .emoji { font-size: 3rem; }
+        .wr-done h2 { color:#fff; margin: 0.5rem 0 0.3rem; }
+        .wr-done p { color: var(--color-text-muted); margin: 0 0 1.2rem; }
+
+        @media (max-width: 560px) {
+            .wr-row { grid-template-columns: 1fr; gap: 0.4rem; }
+            .wr-mark { text-align:left; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch-tagesvokabeln.html">Daily Words</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Письмовий тренажёр</span>
+        </nav>
+        <a href="englisch-tagesvokabeln.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до словника</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Письмовий тренажёр <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">17.05 B1 Phrasen</span></h1>
+            <p class="page-subtitle">Пиши переклади у стовпчик. Коли всі правильні &mdash; наступний раунд. <b style="color:#c084fc;">5 раундів</b>, напрямок чергується: 🇬🇧→🇺🇦, потім 🇺🇦→🇬🇧 &mdash; так слово закарбовується в обидва боки.</p>
+        </div>
+
+        <div class="wr-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+            <div class="wr-rounds" id="rounds"></div>
+            <div class="wr-dir" id="dir"></div>
+            <div class="wr-sub" id="dir-sub"></div>
+
+            <div class="wr-list" id="list"></div>
+
+            <div class="wr-msg" id="msg"></div>
+
+            <div class="wr-controls">
+                <button class="wr-btn" id="check-btn" onclick="checkRound()">&#10003; Перевірити</button>
+                <button class="wr-btn" id="next-btn" onclick="nextRound()" style="display:none;">Далі &#8594;</button>
+                <button class="wr-btn ghost" onclick="startDay(currentDay)">&#8635; Спочатку</button>
+            </div>
+
+            <div class="wr-done" id="done">
+                <div class="emoji">🏆</div>
+                <h2>Усі 5 раундів пройдено!</h2>
+                <p id="done-sub">Ти прописав слова дня в обидва боки. Сильна робота!</p>
+                <button class="wr-btn" onclick="startDay(currentDay)">&#8635; Ще раз цей день</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_DAY = {"d1705": [{"de": "take part in sth", "ua": "брати участь у чомусь"}, {"de": "be in favour of", "ua": "бути за щось / підтримувати"}, {"de": "make up one's mind", "ua": "прийняти рішення / визначитися"}, {"de": "come up with sth", "ua": "придумати / знайти ідею"}, {"de": "go along with sb/sth", "ua": "погоджуватися з кимось / підтримувати"}, {"de": "get along with sb", "ua": "ладнати з кимось"}, {"de": "let sb down", "ua": "підвести когось / розчарувати"}, {"de": "be keen on sth", "ua": "захоплюватися чимось / любити"}, {"de": "look after sb/sth", "ua": "піклуватися про когось / доглядати"}, {"de": "make a difference", "ua": "мати значення / щось змінювати"}, {"de": "deal with sth", "ua": "справлятися з чимось / вирішувати"}, {"de": "run out of sth", "ua": "вичерпати запаси / закінчитися"}, {"de": "be responsible for", "ua": "відповідати за щось"}, {"de": "raise awareness", "ua": "підвищувати обізнаність"}, {"de": "take advantage of sth", "ua": "скористатися чимось"}, {"de": "on purpose", "ua": "навмисно / спеціально"}, {"de": "in spite of", "ua": "незважаючи на / попри"}, {"de": "at first sight", "ua": "з першого погляду"}, {"de": "as a result", "ua": "у результаті / внаслідок цього"}, {"de": "in the long run", "ua": "у довгостроковій перспективі / зрештою"}], "d1805": [{"de": "spend time on sth", "ua": "витрачати час на щось"}, {"de": "be into sth", "ua": "захоплюватися чимось / \"тащитися\" від"}, {"de": "take up a hobby", "ua": "почати займатися хобі"}, {"de": "give sth a try", "ua": "спробувати щось (вперше)"}, {"de": "hang out (with sb)", "ua": "тусуватися / проводити час разом"}, {"de": "binge-watch", "ua": "дивитися серіал підряд (всі серії за раз)"}, {"de": "catchy", "ua": "той що западає / прилипчивий (пісня)"}, {"de": "the plot", "ua": "сюжет (книги, фільму)"}, {"de": "recommend", "ua": "рекомендувати / радити"}, {"de": "underrated", "ua": "недооцінений (хороший але мало хто знає)"}, {"de": "work out", "ua": "тренуватися (зал, фітнес)"}, {"de": "go for a run / walk", "ua": "піти на пробіжку / на прогулянку"}, {"de": "be in shape", "ua": "бути в (хорошій) формі"}, {"de": "team up with sb", "ua": "об'єднатися з кимось (у команду)"}, {"de": "cheer sb on", "ua": "підбадьорювати / вболівати за"}, {"de": "be up for sth", "ua": "бути за / погоджуватися / хотіти (на план)"}, {"de": "chill (out)", "ua": "розслабитися / відпочивати"}, {"de": "crash at sb's place", "ua": "переночувати у когось (неформально)"}, {"de": "lose track of time", "ua": "забути про час / не помітити, як пролетіли години"}, {"de": "it's a blast", "ua": "крутезно / шалено весело (подія)"}], "d1905": [{"de": "scroll through sth", "ua": "гортати щось (стрічку, пости)"}, {"de": "be addicted to sth", "ua": "бути залежним від чогось"}, {"de": "keep in touch (with sb)", "ua": "підтримувати зв'язок з кимось"}, {"de": "go viral", "ua": "стати вірусним / поширитися"}, {"de": "be worth + -ing", "ua": "варто / заслуговує на увагу"}, {"de": "be aware of sth", "ua": "усвідомлювати / знати про щось"}, {"de": "have an effect on", "ua": "мати вплив / ефект на щось"}, {"de": "cut down on sth", "ua": "скоротити / зменшити споживання"}, {"de": "give off (CO₂)", "ua": "виділяти / випускати (CO₂)"}, {"de": "be fed up with sth", "ua": "бути ситим по горло / набридло"}, {"de": "struggle with sth", "ua": "мати труднощі з чимось / боротися"}, {"de": "make progress", "ua": "робити прогрес / просуватися вперед"}, {"de": "hand in sth", "ua": "здати / подати (роботу)"}, {"de": "keep up with sb/sth", "ua": "встигати / не відставати від"}, {"de": "be good at sth", "ua": "бути гарним у чомусь / вміти"}, {"de": "afford (to do sth)", "ua": "дозволити собі / мати змогу"}, {"de": "turn out (to be)", "ua": "виявитися / виявитися, що"}, {"de": "bring up a topic", "ua": "підняти тему / порушити питання"}, {"de": "figure out", "ua": "зрозуміти / розібратися"}, {"de": "end up + -ing", "ua": "зрештою зробити / опинитися"}], "d2005": [{"de": "How's it going?", "ua": "як справи? / як життя?"}, {"de": "Long time no see!", "ua": "давно не бачились!"}, {"de": "What have you been up to?", "ua": "чим займався/займалась? (нещодавно)"}, {"de": "Nice to see you again", "ua": "приємно знову зустрітися"}, {"de": "How have you been?", "ua": "як живеш? (після перерви)"}, {"de": "No way!", "ua": "та ну! / не може бути!"}, {"de": "Are you serious?", "ua": "серйозно? / ти жартуєш?"}, {"de": "That's awesome!", "ua": "це круто! / клас!"}, {"de": "Tell me more!", "ua": "розкажи більше! / далі!"}, {"de": "I get it", "ua": "я зрозумів(ла) / ясно"}, {"de": "I totally agree", "ua": "я повністю згоден / на 100%"}, {"de": "Same here", "ua": "те саме / я теж"}, {"de": "I don't think so", "ua": "не думаю / не схоже"}, {"de": "kind of / sort of", "ua": "наче / типу того / трохи"}, {"de": "It depends", "ua": "як коли / залежить"}, {"de": "Take your time", "ua": "не поспішай"}, {"de": "Never mind", "ua": "забудь / не важливо"}, {"de": "I'll let you know", "ua": "я тобі скажу / повідомлю"}, {"de": "It's up to you", "ua": "тобі вирішувати / як хочеш"}, {"de": "just in case", "ua": "про всяк випадок"}], "d2105": [{"de": "dream of (doing) sth", "ua": "мріяти про щось"}, {"de": "aim to do sth", "ua": "мати на меті / прагнути"}, {"de": "set a goal", "ua": "поставити мету"}, {"de": "work towards sth", "ua": "працювати в напрямку чогось"}, {"de": "make it happen", "ua": "втілити / зробити реальністю"}, {"de": "apply for sth", "ua": "подавати заявку на (роботу, навчання)"}, {"de": "major in sth", "ua": "спеціалізуватися (в універі)"}, {"de": "graduate (from)", "ua": "закінчити (школу, університет)"}, {"de": "take a gap year", "ua": "взяти gap-рік (рік перерви після школи)"}, {"de": "land a job", "ua": "отримати роботу (особливо вдало)"}, {"de": "plan ahead", "ua": "планувати наперед"}, {"de": "put sth off", "ua": "відкладати (не на сьогодні — potlachne)"}, {"de": "stick to a plan", "ua": "дотримуватися плану"}, {"de": "change one's mind", "ua": "передумати"}, {"de": "weigh the options", "ua": "зважити всі варіанти"}, {"de": "step out of your comfort zone", "ua": "вийти із зони комфорту"}, {"de": "learn from mistakes", "ua": "вчитися на помилках"}, {"de": "give it your all", "ua": "викластися повністю"}, {"de": "push through (sth)", "ua": "переборювати / продовжувати попри труднощі"}, {"de": "follow your passion", "ua": "слідувати своїй пристрасті"}], "d2205": [{"de": "wake up", "ua": "прокидатися"}, {"de": "get out of bed", "ua": "встати з ліжка"}, {"de": "brush your teeth", "ua": "чистити зуби"}, {"de": "take a shower", "ua": "приймати душ"}, {"de": "get dressed", "ua": "одягатися"}, {"de": "tidy up", "ua": "прибирати (легкий безлад)"}, {"de": "do the dishes", "ua": "мити посуд"}, {"de": "take out the trash", "ua": "виносити сміття"}, {"de": "make the bed", "ua": "застилати ліжко"}, {"de": "do the laundry", "ua": "прати білизну"}, {"de": "have breakfast", "ua": "снідати"}, {"de": "grab a bite", "ua": "швидко перекусити"}, {"de": "run errands", "ua": "займатися дрібними справами (пошта, банк, аптека)"}, {"de": "set the table", "ua": "накривати на стіл"}, {"de": "clear up the mess", "ua": "прибрати безлад (після чогось)"}, {"de": "wind down", "ua": "заспокоюватися ввечері / \"відключатися\""}, {"de": "doze off", "ua": "задрімати (непомітно)"}, {"de": "set an alarm", "ua": "поставити будильник"}, {"de": "stay up late", "ua": "пізно лягати спати"}, {"de": "sleep in", "ua": "виспатися / поспати довше (вихідні)"}], "d2305": [{"de": "clear sky", "ua": "ясне небо"}, {"de": "boiling hot", "ua": "пекельно жарко"}, {"de": "heatwave", "ua": "спека (хвиля спеки)"}, {"de": "sunbathe", "ua": "засмагати"}, {"de": "shade", "ua": "тінь"}, {"de": "pouring (rain)", "ua": "лити (\"it's pouring\")"}, {"de": "thunderstorm", "ua": "гроза (з громом)"}, {"de": "soaked (to the bone)", "ua": "промокнути до нитки"}, {"de": "lightning", "ua": "блискавка"}, {"de": "drizzle", "ua": "мряка / мрячити"}, {"de": "freezing", "ua": "морозити / страшно холодно"}, {"de": "snowfall", "ua": "снігопад"}, {"de": "icy (roads)", "ua": "крижаний / слизький"}, {"de": "shiver", "ua": "тремтіти (від холоду)"}, {"de": "bundle up", "ua": "тепло вдягтися (шарф, шапка, куртка)"}, {"de": "breathtaking view", "ua": "захоплива панорама"}, {"de": "dense forest", "ua": "густий ліс"}, {"de": "wildlife", "ua": "дика природа / дикі тварини"}, {"de": "fresh air", "ua": "свіже повітря"}, {"de": "go camping", "ua": "ходити в наметовий похід"}], "d2405": [{"de": "hit the gym", "ua": "піти в зал (розмовно)"}, {"de": "lift weights", "ua": "піднімати вагу"}, {"de": "break a sweat", "ua": "спітніти (почати потіти)"}, {"de": "build muscle", "ua": "наростити м'язи"}, {"de": "burn calories", "ua": "спалювати калорії"}, {"de": "eat clean", "ua": "їсти правильно (чиста / необроблена їжа)"}, {"de": "stay hydrated", "ua": "пити достатньо води"}, {"de": "cut out junk food", "ua": "відмовитися від фастфуду"}, {"de": "get enough sleep", "ua": "висипатися / достатньо спати"}, {"de": "boost your immune system", "ua": "зміцнити імунітет"}, {"de": "catch a cold", "ua": "підхопити простуду"}, {"de": "feel under the weather", "ua": "почуватися погано (не зовсім хворий)"}, {"de": "take painkillers", "ua": "приймати знеболювальні"}, {"de": "see a doctor", "ua": "піти до лікаря"}, {"de": "recover from sth", "ua": "одужати від чогось"}, {"de": "clear your mind", "ua": "очистити голову / звільнити думки"}, {"de": "take a break", "ua": "зробити перерву"}, {"de": "burn out", "ua": "вигоріти (емоційно виснажитися)"}, {"de": "cope with stress", "ua": "справлятися зі стресом"}, {"de": "recharge your batteries", "ua": "відновитися / поповнити запас сил"}], "d2505": [{"de": "charge the battery", "ua": "заряджати батарею"}, {"de": "update the software", "ua": "оновити програму / ПО"}, {"de": "reset the device", "ua": "скинути пристрій (до заводських налаштувань)"}, {"de": "back up your data", "ua": "зробити резервну копію (бекап)"}, {"de": "screen time", "ua": "час за екраном (телефон, ноут)"}, {"de": "browse the web", "ua": "серфити в інтернеті"}, {"de": "post a video", "ua": "опублікувати відео"}, {"de": "gain followers", "ua": "набрати підписників"}, {"de": "share a link", "ua": "поділитися посиланням"}, {"de": "follow an account", "ua": "підписатися на акаунт"}, {"de": "text someone", "ua": "написати смс / в чат"}, {"de": "video call", "ua": "відеодзвінок"}, {"de": "send a voice message", "ua": "відправити голосове"}, {"de": "block someone", "ua": "заблокувати когось"}, {"de": "forward a message", "ua": "переслати повідомлення"}, {"de": "fake news", "ua": "фейкові новини"}, {"de": "a scam", "ua": "шахрайство / обман"}, {"de": "a strong password", "ua": "надійний пароль"}, {"de": "cyberbullying", "ua": "кібербулінг / онлайн-цькування"}, {"de": "log out", "ua": "вийти з акаунту"}], "d2605": [{"de": "afford to do sth", "ua": "могти собі дозволити"}, {"de": "on sale", "ua": "зі знижкою / розпродаж"}, {"de": "a receipt", "ua": "чек / квитанція"}, {"de": "a refund", "ua": "повернення грошей"}, {"de": "try sth on", "ua": "приміряти (одяг)"}, {"de": "be out of stock", "ua": "немає в наявності"}, {"de": "a discount", "ua": "знижка"}, {"de": "window shopping", "ua": "просто дивитись вітрини (не купувати)"}, {"de": "pay by card", "ua": "платити карткою"}, {"de": "go over budget", "ua": "перевищити бюджет"}, {"de": "save up for sth", "ua": "збирати / відкладати гроші на щось"}, {"de": "borrow money", "ua": "позичити гроші (взяти в борг)"}, {"de": "a checkout", "ua": "каса (в супермаркеті)"}, {"de": "a bargain", "ua": "вигідна покупка / дешево"}, {"de": "spend money on sth", "ua": "витрачати гроші на щось"}, {"de": "a second-hand shop", "ua": "секонд-хенд / крамниця вживаних речей"}, {"de": "make a purchase", "ua": "зробити покупку"}, {"de": "change (noun)", "ua": "решта (гроші)"}, {"de": "a loyalty card", "ua": "картка лояльності / бонусна картка"}, {"de": "in cash", "ua": "готівкою"}], "d2705": [{"de": "feel overwhelmed", "ua": "відчувати себе перевантаженим"}, {"de": "anxious", "ua": "тривожний / неспокійний"}, {"de": "frustrated", "ua": "фрустрований / в безвиході"}, {"de": "embarrassed", "ua": "соромно / бентежно"}, {"de": "be fed up with", "ua": "бути ситим по горло / набридло"}, {"de": "relieved", "ua": "з полегшенням / полегшений"}, {"de": "proud of sb/sth", "ua": "пишатися кимось/чимось"}, {"de": "confident", "ua": "впевнений у собі"}, {"de": "be in a good mood", "ua": "бути в хорошому настрої"}, {"de": "cheer sb up", "ua": "підняти комусь настрій"}, {"de": "calm down", "ua": "заспокоїтись"}, {"de": "burst into tears", "ua": "розплакатись (раптово)"}, {"de": "lose one's temper", "ua": "вийти з себе / розізлитися"}, {"de": "get on sb's nerves", "ua": "дратувати когось / діяти на нерви"}, {"de": "feel left out", "ua": "відчувати себе відкинутим"}, {"de": "jealous of", "ua": "заздрити комусь"}, {"de": "disappointed with/in", "ua": "розчарований"}, {"de": "mixed feelings", "ua": "змішані почуття"}, {"de": "homesick", "ua": "сумувати за домом"}, {"de": "take sth personally", "ua": "сприймати особисто / близько до серця"}], "d2805": [{"de": "take notes", "ua": "робити записи / занотовувати"}, {"de": "hand in homework", "ua": "здавати домашнє завдання"}, {"de": "fail an exam", "ua": "провалити іспит"}, {"de": "revise for a test", "ua": "готуватися / повторювати до тесту"}, {"de": "a deadline", "ua": "дедлайн / крайній термін"}, {"de": "compulsory", "ua": "обов'язковий"}, {"de": "a subject", "ua": "предмет (шкільний)"}, {"de": "a scholarship", "ua": "стипендія (за успіхи)"}, {"de": "learn sth by heart", "ua": "вивчити напам'ять"}, {"de": "drop out of school", "ua": "покинути школу / відрахуватися"}, {"de": "do research", "ua": "проводити дослідження"}, {"de": "get a good grade", "ua": "отримати гарну оцінку"}, {"de": "higher education", "ua": "вища освіта"}, {"de": "a timetable", "ua": "розклад (уроків)"}, {"de": "motivate yourself", "ua": "мотивувати себе"}, {"de": "pass with flying colours", "ua": "скласти блискуче / з відзнакою"}, {"de": "attend a class", "ua": "відвідати / бути присутнім на занятті"}, {"de": "copy / cheat", "ua": "списувати"}, {"de": "a gap year", "ua": "рік паузи між школою і вузом"}, {"de": "a school report", "ua": "табель / шкільне свідоцтво"}], "d2905": [{"de": "climate change", "ua": "зміна клімату"}, {"de": "global warming", "ua": "глобальне потепління"}, {"de": "a carbon footprint", "ua": "вуглецевий слід"}, {"de": "renewable energy", "ua": "відновлювана енергія"}, {"de": "pollute the air", "ua": "забруднювати повітря"}, {"de": "a natural disaster", "ua": "природна катастрофа"}, {"de": "endangered species", "ua": "вид під загрозою вимирання"}, {"de": "deforestation", "ua": "вирубка лісів"}, {"de": "a drought", "ua": "посуха"}, {"de": "a flood", "ua": "повінь / паводок"}, {"de": "reduce, reuse, recycle", "ua": "зменшити, повторно використати, переробити"}, {"de": "eco-friendly", "ua": "екологічний / безпечний для природи"}, {"de": "save energy", "ua": "економити енергію"}, {"de": "sustainable", "ua": "сталий / стійкий (екологічно)"}, {"de": "a habitat", "ua": "середовище існування / оселище"}, {"de": "solar panels", "ua": "сонячні панелі"}, {"de": "go green", "ua": "ставати екологічнішим"}, {"de": "plant a tree", "ua": "посадити дерево"}, {"de": "waste (noun)", "ua": "відходи / сміття / марнотратство"}, {"de": "melt", "ua": "танути / плавитися"}], "d3005": [{"de": "book a flight", "ua": "забронювати рейс"}, {"de": "check in", "ua": "реєструватися (рейс/готель)"}, {"de": "a boarding pass", "ua": "посадковий талон"}, {"de": "customs", "ua": "митниця"}, {"de": "delayed", "ua": "затриманий (рейс, поїзд)"}, {"de": "a hostel", "ua": "хостел"}, {"de": "a package holiday", "ua": "тур-пакет (все включено)"}, {"de": "cancel a trip", "ua": "скасувати поїздку"}, {"de": "get around", "ua": "пересуватися / добиратися"}, {"de": "sightseeing", "ua": "огляд пам'яток"}, {"de": "a souvenir", "ua": "сувенір"}, {"de": "jet lag", "ua": "джетлаг (зміна часових поясів)"}, {"de": "travel light", "ua": "подорожувати з мінімумом речей"}, {"de": "a local", "ua": "місцевий житель"}, {"de": "hitchhike", "ua": "їхати автостопом"}, {"de": "exchange rate", "ua": "курс обміну валют"}, {"de": "a road trip", "ua": "подорож на автомобілі"}, {"de": "take a connecting flight", "ua": "летіти з пересадкою"}, {"de": "go off the beaten track", "ua": "з'їхати з туристичного шляху / кудись незвичайне"}, {"de": "a travel insurance", "ua": "туристична страховка"}], "d3105": [{"de": "apply for a job", "ua": "подати заявку / подаватися на роботу"}, {"de": "a CV / résumé", "ua": "резюме"}, {"de": "a job interview", "ua": "співбесіда"}, {"de": "be promoted", "ua": "отримати підвищення"}, {"de": "resign", "ua": "звільнитися / піти з роботи"}, {"de": "a part-time job", "ua": "робота на неповний день / підробіток"}, {"de": "work overtime", "ua": "працювати понаднормово"}, {"de": "earn a living", "ua": "заробляти на життя"}, {"de": "a salary", "ua": "зарплата (місячна)"}, {"de": "take a day off", "ua": "взяти вихідний"}, {"de": "teamwork", "ua": "командна робота"}, {"de": "be self-employed", "ua": "бути самозайнятим / фрілансером"}, {"de": "work from home", "ua": "працювати вдома"}, {"de": "a career path", "ua": "кар'єрний шлях"}, {"de": "job security", "ua": "стабільність роботи"}, {"de": "networking", "ua": "налагодження ділових зв'язків"}, {"de": "experience", "ua": "досвід (робочий)"}, {"de": "a shift", "ua": "зміна (на роботі)"}, {"de": "set up a business", "ua": "відкрити бізнес / заснувати компанію"}, {"de": "qualifications", "ua": "кваліфікація / дипломи"}], "d0106": [{"de": "overwhelmed", "ua": "перевантажений (почуттями) / пригнічений"}, {"de": "anxious", "ua": "тривожний / неспокійний"}, {"de": "resilient", "ua": "психологічно стійкий / витривалий"}, {"de": "empathy", "ua": "емпатія / співчуття"}, {"de": "self-conscious", "ua": "ніяковіти / почуватися незручно"}, {"de": "dread", "ua": "боятися (чогось) / жах"}, {"de": "cope with", "ua": "справлятися / впоратися з"}, {"de": "be in denial", "ua": "заперечувати реальність / відмовлятися визнавати"}, {"de": "burn out", "ua": "вигоріти / емоційно виснажитися"}, {"de": "suppress emotions", "ua": "пригнічувати / придушувати почуття"}, {"de": "come to terms with", "ua": "примиритися / прийняти (ситуацію)"}, {"de": "be torn between", "ua": "розриватися між (двома варіантами)"}, {"de": "reassure", "ua": "заспокоїти / запевнити"}, {"de": "be on edge", "ua": "бути на нервах / напруженим"}, {"de": "bottled-up feelings", "ua": "стримані / накопичені почуття"}, {"de": "pent-up frustration", "ua": "накопичена / стримана фрустрація"}, {"de": "sense of belonging", "ua": "почуття приналежності"}, {"de": "feel at ease", "ua": "почуватися вільно / спокійно"}, {"de": "mood swings", "ua": "перепади настрою"}, {"de": "emotional resilience", "ua": "емоційна стійкість"}], "d0206": [{"de": "elaborate on", "ua": "детальніше пояснити / розвинути думку"}, {"de": "draw a conclusion", "ua": "зробити висновок"}, {"de": "hypothesis", "ua": "гіпотеза"}, {"de": "empirical evidence", "ua": "емпіричні дані / докази"}, {"de": "peer review", "ua": "рецензування (колегами) / експертна перевірка"}, {"de": "cite a source", "ua": "цитувати джерело / посилатися на джерело"}, {"de": "plagiarism", "ua": "плагіат"}, {"de": "coherent argument", "ua": "зв'язний / логічний аргумент"}, {"de": "contradict", "ua": "суперечити / заперечувати"}, {"de": "on the contrary", "ua": "навпаки"}, {"de": "dissertation", "ua": "дисертація / дипломна робота"}, {"de": "take notes", "ua": "робити нотатки / конспектувати"}, {"de": "revise for an exam", "ua": "готуватися до іспиту / повторювати матеріал"}, {"de": "attend a lecture", "ua": "відвідувати лекцію"}, {"de": "outcome", "ua": "результат / підсумок"}, {"de": "abstract thinking", "ua": "абстрактне мислення"}, {"de": "make an inference", "ua": "зробити умовивід / вивести умовивід"}, {"de": "challenge assumptions", "ua": "ставити під сумнів припущення"}, {"de": "evaluate", "ua": "оцінювати / аналізувати"}, {"de": "keep track of", "ua": "відстежувати / слідкувати за"}], "d0306": [{"de": "go viral", "ua": "стати вірусним (в мережі)"}, {"de": "algorithm", "ua": "алгоритм (соціальних мереж)"}, {"de": "digital footprint", "ua": "цифровий слід"}, {"de": "trolling", "ua": "тролінг / провокація в інтернеті"}, {"de": "screen time", "ua": "екранний час"}, {"de": "encryption", "ua": "шифрування (даних)"}, {"de": "phishing", "ua": "фішинг (e-mail шахрайство)"}, {"de": "data breach", "ua": "витік даних"}, {"de": "hack into", "ua": "зламати (систему / акаунт)"}, {"de": "privacy settings", "ua": "налаштування конфіденційності"}, {"de": "artificial intelligence", "ua": "штучний інтелект"}, {"de": "cloud storage", "ua": "хмарне сховище"}, {"de": "automate", "ua": "автоматизувати"}, {"de": "lag", "ua": "зависати / затримка (сигналу)"}, {"de": "stream", "ua": "стримити / дивитися онлайн"}, {"de": "deepfake", "ua": "діпфейк (підроблене відео / фото)"}, {"de": "disruptive technology", "ua": "підривна / революційна технологія"}, {"de": "remote access", "ua": "віддалений доступ"}, {"de": "bandwidth", "ua": "пропускна здатність мережі"}, {"de": "digital detox", "ua": "цифровий детокс (відмова від гаджетів)"}], "d0406": [{"de": "inequality", "ua": "нерівність"}, {"de": "prejudice", "ua": "упередженість / забобони"}, {"de": "discrimination", "ua": "дискримінація"}, {"de": "privilege", "ua": "привілей"}, {"de": "stereotype", "ua": "стереотип"}, {"de": "raise awareness", "ua": "підвищувати обізнаність / привертати увагу"}, {"de": "grassroots movement", "ua": "рух знизу / громадська ініціатива"}, {"de": "social mobility", "ua": "соціальна мобільність"}, {"de": "welfare state", "ua": "соціальна держава / держава добробуту"}, {"de": "take a stand", "ua": "зайняти позицію / відстоювати переконання"}, {"de": "empowerment", "ua": "надання прав / розширення можливостей"}, {"de": "consent", "ua": "згода / дозвіл"}, {"de": "dignity", "ua": "гідність"}, {"de": "solidarity", "ua": "солідарність"}, {"de": "accountability", "ua": "відповідальність / підзвітність"}, {"de": "controversial", "ua": "суперечливий / спірний"}, {"de": "compromise", "ua": "компроміс / іти на компроміс"}, {"de": "oppression", "ua": "гноблення / утиск"}, {"de": "lobby for", "ua": "лобіювати / відстоювати інтереси"}, {"de": "sustainable development", "ua": "сталий розвиток"}], "d0506": [{"de": "carry out", "ua": "виконувати / здійснювати"}, {"de": "bring about", "ua": "призводити до / спричиняти"}, {"de": "look into", "ua": "досліджувати / перевіряти"}, {"de": "build up", "ua": "накопичувати / нарощувати"}, {"de": "call off", "ua": "скасовувати (захід, зустріч)"}, {"de": "figure out", "ua": "розібратися / зрозуміти"}, {"de": "come across as", "ua": "справляти враження (якогось)"}, {"de": "account for", "ua": "пояснювати / складати (відсоток)"}, {"de": "narrow down", "ua": "звужувати (вибір) / конкретизувати"}, {"de": "stand for", "ua": "означати / представляти / підтримувати"}, {"de": "take over", "ua": "перебирати на себе / захоплювати"}, {"de": "fall through", "ua": "зірватися / не відбутися"}, {"de": "set out to do sth", "ua": "ставити за мету / братися за щось"}, {"de": "make up for", "ua": "компенсувати / надолужити"}, {"de": "cut back on", "ua": "скорочувати / зменшувати витрати"}, {"de": "give in", "ua": "поступитися / здатися"}, {"de": "put off", "ua": "відкладати / відстрочувати"}, {"de": "keep up with", "ua": "встигати / іти в ногу з"}, {"de": "run out of", "ua": "закінчуватися / вичерпати"}, {"de": "get out of hand", "ua": "вийти з-під контролю"}], "d0606": [{"de": "carbon footprint", "ua": "вуглецевий слід"}, {"de": "greenhouse gas", "ua": "парниковий газ"}, {"de": "fossil fuels", "ua": "викопне паливо"}, {"de": "emissions", "ua": "викиди (газів / забруднень)"}, {"de": "climate crisis", "ua": "кліматична криза"}, {"de": "renewable energy", "ua": "відновлювана енергія"}, {"de": "sustainable", "ua": "екологічно збалансований / стійкий"}, {"de": "recycle", "ua": "переробляти (відходи)"}, {"de": "go green", "ua": "переходити на екологічний спосіб життя"}, {"de": "offset carbon emissions", "ua": "компенсувати вуглецеві викиди"}, {"de": "biodiversity", "ua": "біорізноманіття"}, {"de": "deforestation", "ua": "вирубка лісів"}, {"de": "endangered species", "ua": "вид під загрозою вимирання"}, {"de": "habitat destruction", "ua": "знищення середовища проживання"}, {"de": "ecosystem", "ua": "екосистема"}, {"de": "drought", "ua": "посуха"}, {"de": "flood", "ua": "повінь / затоплення"}, {"de": "landfill", "ua": "сміттєзвалище / полігон відходів"}, {"de": "solar panel", "ua": "сонячна батарея / панель"}, {"de": "melting ice caps", "ua": "танення льодовикових шапок"}], "d0706": [{"de": "revenue", "ua": "дохід / виручка"}, {"de": "deficit", "ua": "дефіцит"}, {"de": "inflation", "ua": "інфляція"}, {"de": "merger", "ua": "злиття (компаній)"}, {"de": "stakeholder", "ua": "зацікавлена сторона"}, {"de": "outsource", "ua": "передавати на аутсорс"}, {"de": "viable", "ua": "здійсненний / рентабельний"}, {"de": "forecast", "ua": "прогнозувати / прогноз"}, {"de": "benchmark", "ua": "еталон / порівняльний показник"}, {"de": "go bankrupt", "ua": "збанкрутувати"}, {"de": "brand loyalty", "ua": "лояльність до бренду"}, {"de": "turnaround", "ua": "оздоровлення бізнесу / зміна курсу"}, {"de": "negotiate", "ua": "вести переговори / домовлятися"}, {"de": "supply chain", "ua": "ланцюг постачання"}, {"de": "overhead costs", "ua": "накладні / загальні витрати"}, {"de": "launch a product", "ua": "запустити продукт / вивести на ринок"}, {"de": "bottom line", "ua": "чистий прибуток / суть справи"}, {"de": "be in the red", "ua": "бути в мінусі / нести збитки"}, {"de": "terms and conditions", "ua": "умови (договору / угоди)"}, {"de": "portfolio", "ua": "портфель (інвестицій / робіт)"}], "d0806": [{"de": "diagnosis", "ua": "діагноз"}, {"de": "chronic illness", "ua": "хронічне захворювання"}, {"de": "side effects", "ua": "побічні ефекти"}, {"de": "prescription", "ua": "рецепт (медичний)"}, {"de": "immune system", "ua": "імунна система"}, {"de": "outbreak", "ua": "спалах (хвороби)"}, {"de": "symptom", "ua": "симптом"}, {"de": "prognosis", "ua": "прогноз (медичний)"}, {"de": "contagious", "ua": "заразний / інфекційний"}, {"de": "recovery", "ua": "одужання / відновлення"}, {"de": "clinical trial", "ua": "клінічне випробування"}, {"de": "allergy", "ua": "алергія"}, {"de": "inflammation", "ua": "запалення"}, {"de": "antibiotics", "ua": "антибіотики"}, {"de": "check-up", "ua": "медичний огляд / профілактичний огляд"}, {"de": "blood pressure", "ua": "кров'яний тиск"}, {"de": "mental health", "ua": "психічне здоров'я"}, {"de": "relapse", "ua": "рецидив / повернення симптомів"}, {"de": "immune to", "ua": "мати імунітет до / не піддаватися"}, {"de": "well-being", "ua": "добробут / благополуччя"}], "d0906": [{"de": "compelling", "ua": "захопливий / переконливий"}, {"de": "aesthetic", "ua": "естетичний / естетика"}, {"de": "satirical", "ua": "сатиричний"}, {"de": "portrayal", "ua": "зображення / трактування (у мистецтві)"}, {"de": "bias", "ua": "упередженість / нахил"}, {"de": "censorship", "ua": "цензура"}, {"de": "propaganda", "ua": "пропаганда"}, {"de": "mainstream", "ua": "масова культура / мейнстрім"}, {"de": "point of view", "ua": "точка зору / перспектива"}, {"de": "thought-provoking", "ua": "такий, що змушує думати / провокаційний"}, {"de": "plot twist", "ua": "несподіваний поворот сюжету"}, {"de": "narrative", "ua": "нарратив / розповідь / оповідна лінія"}, {"de": "metaphor", "ua": "метафора"}, {"de": "contemporary", "ua": "сучасний / нинішній"}, {"de": "avant-garde", "ua": "авангард / авангардний"}, {"de": "nuanced", "ua": "тонкий / зважений / з відтінками"}, {"de": "immersive", "ua": "занурюючий / повністю захоплюючий"}, {"de": "genre", "ua": "жанр"}, {"de": "depict", "ua": "зображувати / відображати"}, {"de": "be a reflection of", "ua": "бути відображенням чогось"}], "d1006": [{"de": "bite the bullet", "ua": "стиснути зуби / зробити неприємне"}, {"de": "beat around the bush", "ua": "ходити навколо / говорити не по суті"}, {"de": "cut to the chase", "ua": "переходити до суті / не витрачати часу"}, {"de": "the ball is in your court", "ua": "тепер твій хід / рішення за тобою"}, {"de": "on the fence", "ua": "бути невизначеним / коливатися"}, {"de": "a blessing in disguise", "ua": "прихований успіх / несподіване благо"}, {"de": "the tip of the iceberg", "ua": "верхівка айсберга (видима частина більшої проблеми)"}, {"de": "get the hang of it", "ua": "зрозуміти як щось робити / навчитися"}, {"de": "once in a blue moon", "ua": "раз на рік по обіді / дуже рідко"}, {"de": "pull someone's leg", "ua": "жартувати / дурити (невинно)"}, {"de": "in hot water", "ua": "в складному становищі / в проблемах"}, {"de": "add fuel to the fire", "ua": "підлити масла у вогонь"}, {"de": "hit the nail on the head", "ua": "влучити в точку / сказати точно"}, {"de": "let the cat out of the bag", "ua": "проговоритися / видати секрет"}, {"de": "read between the lines", "ua": "читати між рядків"}, {"de": "play it by ear", "ua": "діяти за обставинами / імпровізувати"}, {"de": "jump to conclusions", "ua": "робити поспішні висновки"}, {"de": "take with a grain of salt", "ua": "ставитися скептично / не сприймати буквально"}, {"de": "break the ice", "ua": "розрядити атмосферу / розтопити лід"}, {"de": "be on the same page", "ua": "бути на одній хвилі / однаково розуміти"}], "d1106": [{"de": "breakthrough", "ua": "проривне відкриття / прорив"}, {"de": "variable", "ua": "змінна (в дослідженні)"}, {"de": "replicate", "ua": "відтворювати / повторювати (досвід)"}, {"de": "correlation", "ua": "кореляція / зв'язок між явищами"}, {"de": "paradigm shift", "ua": "зміна парадигми / революційна зміна поглядів"}, {"de": "placebo", "ua": "плацебо"}, {"de": "longitudinal study", "ua": "лонгітюдне / довгострокове дослідження"}, {"de": "yield results", "ua": "давати результати"}, {"de": "simulate", "ua": "симулювати / моделювати"}, {"de": "peer-reviewed journal", "ua": "рецензований науковий журнал"}, {"de": "prototype", "ua": "прототип"}, {"de": "cutting-edge", "ua": "передовий / найсучасніший"}, {"de": "scalable", "ua": "масштабований / придатний для розширення"}, {"de": "groundbreaking", "ua": "революційний / новаторський"}, {"de": "nanotechnology", "ua": "нанотехнологія"}, {"de": "genome", "ua": "геном"}, {"de": "quantitative", "ua": "кількісний (що вимірюється числами)"}, {"de": "field of study", "ua": "галузь дослідження / наукова дисципліна"}, {"de": "observe", "ua": "спостерігати / помічати"}, {"de": "innovation", "ua": "інновація / нововведення"}], "d1206": [{"de": "legislation", "ua": "законодавство / закони"}, {"de": "verdict", "ua": "вирок / рішення суду"}, {"de": "due process", "ua": "належна правова процедура"}, {"de": "jurisdiction", "ua": "юрисдикція / підсудність"}, {"de": "sanction", "ua": "санкція / накладати санкції"}, {"de": "constitution", "ua": "конституція"}, {"de": "amendment", "ua": "поправка (до закону / конституції)"}, {"de": "veto", "ua": "вето / накладати вето"}, {"de": "coalition", "ua": "коаліція"}, {"de": "impose", "ua": "накладати / запроваджувати (примусово)"}, {"de": "civil rights", "ua": "громадянські права"}, {"de": "referendum", "ua": "референдум"}, {"de": "ratify", "ua": "ратифікувати (договір, угоду)"}, {"de": "sovereignty", "ua": "суверенітет"}, {"de": "corruption", "ua": "корупція"}, {"de": "treaty", "ua": "міжнародний договір / угода"}, {"de": "diplomatic immunity", "ua": "дипломатичний імунітет"}, {"de": "enforcement", "ua": "виконання / забезпечення дотримання (закону)"}, {"de": "bipartisan", "ua": "двопартійний / надпартійний"}, {"de": "impeach", "ua": "оголосити імпічмент / притягнути до відповідальності"}], "d1306": [{"de": "albeit", "ua": "хоча і, навіть якщо"}, {"de": "hence", "ua": "тому, отже, звідси"}, {"de": "notwithstanding", "ua": "незважаючи на"}, {"de": "henceforth", "ua": "відтепер, з цього моменту"}, {"de": "nevertheless", "ua": "тим не менш, однак"}, {"de": "scrutinize", "ua": "ретельно вивчати, перевіряти"}, {"de": "imply", "ua": "натякати, мати на увазі"}, {"de": "substantiate", "ua": "підкріпити доказами"}, {"de": "concede", "ua": "визнавати, поступатися"}, {"de": "refute", "ua": "спростовувати"}, {"de": "presuppose", "ua": "передбачати, припускати заздалегідь"}, {"de": "corroborate", "ua": "підтверджувати (доказами)"}, {"de": "articulate", "ua": "чітко висловлювати / виразний (прикм.)"}, {"de": "draw on", "ua": "спиратися на, використовувати"}, {"de": "insofar as", "ua": "настільки, наскільки; оскільки"}, {"de": "as opposed to", "ua": "на відміну від, а не"}, {"de": "to a certain extent", "ua": "певною мірою"}, {"de": "contingent on", "ua": "залежний від, обумовлений"}, {"de": "by and large", "ua": "загалом, у цілому"}, {"de": "pursuant to", "ua": "відповідно до"}], "d1406": [{"de": "have a profound impact on", "ua": "мати глибокий вплив на"}, {"de": "play a crucial role", "ua": "відігравати ключову роль"}, {"de": "give rise to", "ua": "давати початок, призводити до"}, {"de": "pose a threat", "ua": "становити загрозу"}, {"de": "shed light on", "ua": "пролити світло на, прояснити"}, {"de": "reach a consensus", "ua": "досягти консенсусу"}, {"de": "strike a balance", "ua": "знайти баланс, досягти рівноваги"}, {"de": "take into account", "ua": "брати до уваги"}, {"de": "bear in mind", "ua": "пам'ятати, мати на увазі"}, {"de": "under the circumstances", "ua": "за даних обставин"}, {"de": "in stark contrast to", "ua": "у різкому контрасті з"}, {"de": "run counter to", "ua": "суперечити, йти проти"}, {"de": "draw a distinction between", "ua": "провести межу між, розрізняти"}, {"de": "at the expense of", "ua": "за рахунок, ціною"}, {"de": "come to a standstill", "ua": "зупинитися, застопоритися"}, {"de": "beyond reasonable doubt", "ua": "поза розумним сумнівом"}, {"de": "be subject to", "ua": "підлягати, залежати від"}, {"de": "in light of", "ua": "у світлі, зважаючи на"}, {"de": "hold sb accountable", "ua": "притягати до відповідальності"}, {"de": "cast doubt on", "ua": "ставити під сумнів"}], "d1506": [{"de": "ambiguous", "ua": "неоднозначний, двозначний"}, {"de": "discrepancy", "ua": "розбіжність, невідповідність"}, {"de": "stagnation", "ua": "застій, стагнація"}, {"de": "misconception", "ua": "хибне уявлення, помилкова думка"}, {"de": "vague", "ua": "нечіткий, розмитий, невизначений"}, {"de": "alleviate", "ua": "полегшувати, пом'якшувати"}, {"de": "deteriorate", "ua": "погіршуватися"}, {"de": "exacerbate", "ua": "загострювати, погіршувати"}, {"de": "tackle", "ua": "братися за, вирішувати (проблему)"}, {"de": "culminate in", "ua": "досягти кульмінації у, завершитися"}, {"de": "inherent", "ua": "притаманний, невід'ємний"}, {"de": "predominantly", "ua": "переважно, головним чином"}, {"de": "pragmatic", "ua": "прагматичний, практичний"}, {"de": "plausible", "ua": "правдоподібний, переконливий"}, {"de": "prevailing", "ua": "панівний, переважний"}, {"de": "entail", "ua": "вимагати, передбачати"}, {"de": "scrutiny", "ua": "ретельна перевірка, пильний контроль"}, {"de": "foster", "ua": "сприяти, культивувати, розвивати"}, {"de": "advocate for", "ua": "відстоювати, виступати за"}, {"de": "nuance", "ua": "нюанс, тонкість, відтінок"}], "d1606": [{"de": "ubiquitous", "ua": "повсюдний, вічно присутній"}, {"de": "paradox", "ua": "парадокс"}, {"de": "rhetoric", "ua": "риторика (часто — порожні слова)"}, {"de": "conjecture", "ua": "здогадка, припущення без доказів"}, {"de": "tacit", "ua": "мовчазний, негласний, невисловлений"}, {"de": "convoluted", "ua": "заплутаний, надто складний"}, {"de": "elusive", "ua": "невловимий, важкодосяжний"}, {"de": "complacent", "ua": "самозадоволений, той, що спочив на лаврах"}, {"de": "stringent", "ua": "суворий, жорсткий (про правила)"}, {"de": "prerogative", "ua": "прерогатива, виключне право"}, {"de": "juxtapose", "ua": "зіставляти, розташовувати поряд для порівняння"}, {"de": "instigate", "ua": "ініціювати, підбурювати"}, {"de": "impede", "ua": "заважати, перешкоджати"}, {"de": "circumvent", "ua": "обходити (закон, правило)"}, {"de": "resonate with", "ua": "відгукуватися у, близько торкатися"}, {"de": "epitome of", "ua": "уособлення, квінтесенція"}, {"de": "be fraught with", "ua": "бути сповненим (проблем, небезпеки)"}, {"de": "in the wake of", "ua": "після, слідом за (чогось)"}, {"de": "stand one's ground", "ua": "стояти на своєму, не відступати"}, {"de": "draw on one's reserves", "ua": "черпати з резервів сил / знань"}]};
+        const DAYS = [["d1705", "17.05 B1 Phrasen"], ["d1805", "18.05 Hobbies"], ["d1905", "19.05 Topics"], ["d2005", "20.05 Conversation"], ["d2105", "21.05 Future"], ["d2205", "22.05 Home"], ["d2305", "23.05 Weather"], ["d2405", "24.05 Health"], ["d2505", "25.05 Tech"], ["d2605", "26.05 Shopping"], ["d2705", "27.05 Feelings"], ["d2805", "28.05 School"], ["d2905", "29.05 Environment"], ["d3005", "30.05 Travel"], ["d3105", "31.05 Work"], ["d0106", "01.06 Emotions B2"], ["d0206", "02.06 Academic B2"], ["d0306", "03.06 Digital B2"], ["d0406", "04.06 Society B2"], ["d0506", "05.06 Phrasal B2"], ["d0606", "06.06 Climate B2"], ["d0706", "07.06 Business B2"], ["d0806", "08.06 Medicine B2"], ["d0906", "09.06 Culture B2"], ["d1006", "10.06 Idioms B2+"], ["d1106", "11.06 Science B2"], ["d1206", "12.06 Law B2"], ["d1306", "13.06 Formal B2+"], ["d1406", "14.06 Colloc. B2+"], ["d1506", "15.06 Nuances C1"], ["d1606", "16.06 C1 Challenge"]];
+        const LABELS = {"d1705": "17.05 B1 Phrasen", "d1805": "18.05 Hobbies", "d1905": "19.05 Topics", "d2005": "20.05 Conversation", "d2105": "21.05 Future", "d2205": "22.05 Home", "d2305": "23.05 Weather", "d2405": "24.05 Health", "d2505": "25.05 Tech", "d2605": "26.05 Shopping", "d2705": "27.05 Feelings", "d2805": "28.05 School", "d2905": "29.05 Environment", "d3005": "30.05 Travel", "d3105": "31.05 Work", "d0106": "01.06 Emotions B2", "d0206": "02.06 Academic B2", "d0306": "03.06 Digital B2", "d0406": "04.06 Society B2", "d0506": "05.06 Phrasal B2", "d0606": "06.06 Climate B2", "d0706": "07.06 Business B2", "d0806": "08.06 Medicine B2", "d0906": "09.06 Culture B2", "d1006": "10.06 Idioms B2+", "d1106": "11.06 Science B2", "d1206": "12.06 Law B2", "d1306": "13.06 Formal B2+", "d1406": "14.06 Colloc. B2+", "d1506": "15.06 Nuances C1", "d1606": "16.06 C1 Challenge"};
+        const ROUNDS = 5;
+
+        let currentDay = DAYS[0][0];
+        let pool = WORDS_BY_DAY[currentDay];
+        let round = 1;
+        let rows = [];
+        let overridden = [];
+        let checked = false;
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function norm(s){
+            return (s||'').toLowerCase()
+                .replace(/\([^)]*\)/g,' ')
+                .replace(/[’ʼ`´]/g,"'")
+                .replace(/[.,!?;:…\-–—]/g,'')
+                .replace(/\s+/g,' ').trim();
+        }
+        const STOP = new Set(['sth','sb','swh','oneself','ones','one','my','your','his','her','its','our','their']);
+        function normEn(s){
+            let toks = norm(s).replace(/'/g,'').split(' ').filter(Boolean).filter(t=>!STOP.has(t));
+            if(['to','a','an','the'].includes(toks[0])) toks = toks.slice(1);
+            return toks.join(' ');
+        }
+        function isCorrect(input, expected, dir){
+            const inN = dir==='de2ua' ? norm(input) : normEn(input);
+            if(!inN) return false;
+            return expected.split(/[\/;]/).map(s=>s.trim()).filter(Boolean).some(v=>{
+                const eN = dir==='de2ua' ? norm(v) : normEn(v);
+                return eN && inN === eN;
+            });
+        }
+
+        function dirOf(r){ return r % 2 === 1 ? 'de2ua' : 'ua2de'; }
+
+        function buildDayTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            DAYS.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentDay?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>startDay(d);
+                el.appendChild(b);
+            });
+        }
+
+        function renderRounds(){
+            const el = document.getElementById('rounds');
+            el.innerHTML = '';
+            for(let r=1;r<=ROUNDS;r++){
+                const d = document.createElement('div');
+                d.className = 'wr-dot' + (r<round?' done':'') + (r===round?' active':'');
+                d.textContent = r<round ? '✓' : r;
+                el.appendChild(d);
+            }
+        }
+
+        function startDay(d){
+            currentDay = d;
+            pool = WORDS_BY_DAY[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', DAYS[i][0]===d));
+            round = 1;
+            rows = shuffle(pool.slice()); // порядок задаємо лише раз (1-й раунд) — далі він зберігається
+            document.getElementById('done').classList.remove('show');
+            renderRound();
+        }
+
+        function renderRound(){
+            checked = false;
+            overridden = rows.map(()=>false);
+            renderRounds();
+
+            const dir = dirOf(round);
+            document.getElementById('dir').innerHTML = dir==='de2ua'
+                ? '🇬🇧 <span class="arrow">&#8594;</span> 🇺🇦 &mdash; пиши українською'
+                : '🇺🇦 <span class="arrow">&#8594;</span> 🇬🇧 &mdash; пиши англійською';
+            document.getElementById('dir-sub').textContent = 'Раунд ' + round + ' з ' + ROUNDS + ' · ' + rows.length + ' слів';
+
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            rows.forEach((w, i)=>{
+                const prompt = dir==='de2ua' ? w.de : w.ua;
+                const row = document.createElement('div');
+                row.className = 'wr-row';
+                row.dataset.i = i;
+                row.innerHTML =
+                    '<div class="wr-prompt">' + escapeHtml(prompt) + '</div>' +
+                    '<input class="wr-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-i="' + i + '">' +
+                    '<div class="wr-mark"></div>';
+                list.appendChild(row);
+            });
+            // Enter -> next field / check
+            const inputs = [...list.querySelectorAll('.wr-input')];
+            inputs.forEach((inp, idx)=>{
+                inp.addEventListener('keydown', e=>{
+                    if(e.key==='Enter'){
+                        e.preventDefault();
+                        if(idx < inputs.length-1){
+                            const nx = inputs[idx+1];
+                            nx.focus({preventScroll:true});
+                            // плавно ведемо вид за поточним словом (по центру)
+                            nx.closest('.wr-row').scrollIntoView({behavior:'smooth', block:'center'});
+                        } else {
+                            checkRound();
+                        }
+                    }
+                });
+            });
+            if(inputs[0]) inputs[0].focus();
+
+            document.getElementById('msg').textContent = '';
+            document.getElementById('msg').className = 'wr-msg';
+            document.getElementById('check-btn').style.display = '';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function checkRound(){
+            const dir = dirOf(round);
+            const list = document.getElementById('list');
+            let allOk = true;
+            rows.forEach((w, i)=>{
+                const row = list.querySelector('.wr-row[data-i="'+i+'"]');
+                const inp = row.querySelector('.wr-input');
+                const expected = dir==='de2ua' ? w.ua : w.de;
+                const ok = overridden[i] || isCorrect(inp.value, expected, dir);
+                row.classList.remove('correct','wrong');
+                row.classList.add(ok ? 'correct' : 'wrong');
+                row.querySelector('.wr-mark').textContent = ok ? '✓' : '✗';
+                inp.disabled = ok;
+                // remove old fix block
+                const oldFix = row.querySelector('.wr-fix');
+                if(oldFix) oldFix.remove();
+                if(!ok){
+                    allOk = false;
+                    const fix = document.createElement('div');
+                    fix.className = 'wr-fix';
+                    fix.innerHTML = '<span class="corr">Правильно: <b>' + escapeHtml(expected) + '</b></span>' +
+                        '<button class="wr-accept" type="button">&#10003; зарахувати мою відповідь</button>';
+                    fix.querySelector('.wr-accept').onclick = ()=>acceptRow(i);
+                    row.appendChild(fix);
+                }
+            });
+            checked = true;
+            const msg = document.getElementById('msg');
+            if(allOk){
+                msg.textContent = round < ROUNDS ? '✓ Усе правильно! Натисни «Далі»' : '✓ Останній раунд пройдено!';
+                msg.className = 'wr-msg ok';
+                document.getElementById('check-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = round < ROUNDS ? '' : 'none';
+                if(round >= ROUNDS) finishAll();
+            } else {
+                const wrongCount = rows.filter((w,i)=>!(overridden[i] || isCorrect(list.querySelector('.wr-row[data-i="'+i+'"] .wr-input').value, dirOf(round)==='de2ua'?w.ua:w.de, dirOf(round)))).length;
+                msg.textContent = 'Ще не все — виправ ' + wrongCount + ' і перевір знову (або «зарахувати», якщо це синонім)';
+                msg.className = 'wr-msg no';
+            }
+        }
+
+        function acceptRow(i){
+            overridden[i] = true;
+            const row = document.getElementById('list').querySelector('.wr-row[data-i="'+i+'"]');
+            row.classList.remove('wrong'); row.classList.add('correct');
+            row.querySelector('.wr-mark').textContent = '✓';
+            row.querySelector('.wr-input').disabled = true;
+            const fix = row.querySelector('.wr-fix'); if(fix) fix.remove();
+            // re-evaluate all
+            const stillWrong = [...document.querySelectorAll('.wr-row')].some(r=>r.classList.contains('wrong'));
+            if(!stillWrong){
+                const msg = document.getElementById('msg');
+                msg.textContent = round < ROUNDS ? '✓ Усе правильно! Натисни «Далі»' : '✓ Останній раунд пройдено!';
+                msg.className = 'wr-msg ok';
+                document.getElementById('check-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = round < ROUNDS ? '' : 'none';
+                if(round >= ROUNDS) finishAll();
+            }
+        }
+
+        function nextRound(){
+            if(round < ROUNDS){ round++; renderRound(); window.scrollTo({top:0, behavior:'smooth'}); }
+        }
+
+        function finishAll(){
+            renderRounds();
+            setTimeout(()=>{
+                document.getElementById('done').classList.add('show');
+                document.getElementById('done').scrollIntoView({behavior:'smooth', block:'center'});
+            }, 400);
+        }
+
+        buildDayTabs();
+        startDay(DAYS[0][0]);
+    </script>
+</body>
+</html>

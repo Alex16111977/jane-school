@@ -290,6 +290,63 @@
             font-weight: 700;
         }
 
+        /* ===== Anzeige in Portionen (по 5) ===== */
+        .fcard.batch-hidden,
+        .group-label.batch-hidden,
+        .card-grid.batch-hidden { display: none; }
+
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .fcard.batch-reveal { animation: cardReveal 0.55s cubic-bezier(0.22,0.61,0.36,1) both; }
+
+        .show-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 1.7rem 0 0.4rem;
+        }
+        .show-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.72rem 1.6rem;
+            border-radius: 12px;
+            background: rgba(163,113,247,0.1);
+            border: 1.5px solid rgba(163,113,247,0.28);
+            color: #c084fc;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+        }
+        .show-more-btn:hover {
+            background: rgba(163,113,247,0.2);
+            border-color: rgba(163,113,247,0.5);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .show-more-btn .smb-arrow { transition: transform 0.2s; font-size: 1.05rem; }
+        .show-more-btn:hover .smb-arrow { transform: translateY(3px); }
+        .show-more-btn .smb-rest {
+            font-size: 0.76rem; font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            padding-left: 0.55rem; margin-left: 0.1rem;
+            border-left: 1px solid rgba(255,255,255,0.14);
+        }
+        .show-more-btn:hover .smb-rest { color: rgba(255,255,255,0.7); }
+        .show-more-btn.done {
+            background: rgba(63,185,80,0.1);
+            border-color: rgba(63,185,80,0.3);
+            color: #86efac;
+        }
+        .show-more-btn.done:hover {
+            background: rgba(63,185,80,0.18);
+            border-color: rgba(63,185,80,0.5);
+            color: #fff;
+        }
+        .show-more-btn.done .smb-rest { color: rgba(255,255,255,0.45); }
+
     </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
@@ -347,6 +404,11 @@
             <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Alle aufdecken</button>
             <button class="ctrl-btn" onclick="resetAll()">&#x21BA; Zur&uuml;cksetzen</button>
             <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Mischen</button>
+            <a class="ctrl-btn" href="deutsch-c1-ttt.html" style="text-decoration:none;">&#x274C;&#x2B55; Хрестики-нулики</a>
+            <a class="ctrl-btn" href="deutsch-c1-schreiben.html" style="text-decoration:none;">&#x270D;&#xFE0F; Письмовий тренажёр</a>
+            <a class="ctrl-btn" href="deutsch-c1-matching.html" style="text-decoration:none;">&#x1F517; Сопоставлення</a>
+            <a class="ctrl-btn" href="deutsch-c1-kategorien.html" style="text-decoration:none;">&#x1F5C2;&#xFE0F; Категорії</a>
+            <a class="ctrl-btn" href="deutsch-c1-karten.html" style="text-decoration:none;">&#x1F0CF; Картки</a>
         </div>
 
         <div id="cards-c1">
@@ -1643,6 +1705,71 @@
         const dayCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0};
         let currentDay = 1;
 
+        const BATCH_STEP = 5;
+        const dayBatches = {};
+
+        function applyBatch(day, animate) {
+            const dayEl = document.querySelector('.day-content[data-day="' + day + '"]');
+            if (!dayEl) return;
+            const cards = [...dayEl.querySelectorAll('.fcard')];
+            const visible = dayBatches[day] || BATCH_STEP;
+            let order = 0;
+            cards.forEach(function(c, i) {
+                if (i < visible) {
+                    const wasHidden = c.classList.contains('batch-hidden');
+                    c.classList.remove('batch-hidden');
+                    if (animate && wasHidden) {
+                        c.classList.remove('batch-reveal');
+                        void c.offsetWidth;
+                        c.style.animationDelay = (order * 0.06) + 's';
+                        c.classList.add('batch-reveal');
+                        order++;
+                    }
+                } else {
+                    c.classList.add('batch-hidden');
+                }
+            });
+            dayEl.querySelectorAll('.card-grid').forEach(function(grid) {
+                const anyVisible = [...grid.querySelectorAll('.fcard')].some(function(c) {
+                    return !c.classList.contains('batch-hidden');
+                });
+                grid.classList.toggle('batch-hidden', !anyVisible);
+                const label = grid.previousElementSibling;
+                if (label && label.classList.contains('group-label')) {
+                    label.classList.toggle('batch-hidden', !anyVisible);
+                }
+            });
+            const btn = dayEl.querySelector('.show-more-btn');
+            if (btn) {
+                const total = cards.length;
+                const shown = Math.min(visible, total);
+                const rest = total - shown;
+                if (rest <= 0) {
+                    btn.classList.add('done');
+                    btn.innerHTML = '&#x2713; Alle ' + total + ' angezeigt <span class="smb-rest">einklappen</span>';
+                } else {
+                    btn.classList.remove('done');
+                    const next = Math.min(BATCH_STEP, rest);
+                    btn.innerHTML = '<span class="smb-arrow">&#x2193;</span> Weitere ' + next + ' anzeigen <span class="smb-rest">noch ' + rest + '</span>';
+                }
+            }
+        }
+
+        function toggleMore(day) {
+            const dayEl = document.querySelector('.day-content[data-day="' + day + '"]');
+            if (!dayEl) return;
+            const total = dayEl.querySelectorAll('.fcard').length;
+            const visible = dayBatches[day] || BATCH_STEP;
+            if (visible >= total) {
+                dayBatches[day] = BATCH_STEP;
+                applyBatch(day, false);
+                dayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                dayBatches[day] = visible + BATCH_STEP;
+                applyBatch(day, true);
+            }
+        }
+
 
         function toggleArtikel(header) {
             const body = header.nextElementSibling;
@@ -1662,6 +1789,7 @@
             document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
             document.querySelector('.day-content[data-day="' + day + '"]').classList.add('active');
             document.querySelectorAll('.day-tab')[day - 1].classList.add('active');
+            applyBatch(day, false);
             updateProgress();
         }
 
@@ -1700,13 +1828,15 @@
         }
 
         function flipAll() {
-            document.querySelectorAll('.day-content.active .fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+            document.querySelectorAll('.day-content.active .fcard:not(.flipped):not(.batch-hidden)').forEach(c => c.classList.add('flipped'));
         }
 
         function resetAll() {
             document.querySelectorAll('.day-content.active .fcard').forEach(c => c.classList.remove('flipped', 'known'));
             document.querySelectorAll('.day-content.active .know-btn').forEach(b => b.textContent = '✓ Ich kenne es');
             dayCounts[currentDay] = 0;
+            dayBatches[currentDay] = BATCH_STEP;
+            applyBatch(currentDay, false);
             updateProgress();
         }
 
@@ -1717,7 +1847,21 @@
                 cards.forEach(c => grid.appendChild(c));
             });
             resetAll();
+            applyBatch(currentDay, true);
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.day-content').forEach(function(dayEl) {
+                const day = parseInt(dayEl.dataset.day);
+                if (!(day in dayBatches)) dayBatches[day] = BATCH_STEP;
+                const wrap = document.createElement('div');
+                wrap.className = 'show-more-wrap';
+                wrap.innerHTML = '<button class="show-more-btn" onclick="toggleMore(' + day + ')"></button>';
+                dayEl.appendChild(wrap);
+                applyBatch(day, false);
+            });
+            updateProgress();
+        });
     </script>
 </body>
 </html>
