@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Категорії за значенням | Book Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .sw-wrap { max-width: 980px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .sw-bar { text-align:center; margin-bottom: 0.9rem; }
+        .sw-stat { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 600; }
+        .sw-stat b { color:#fff; }
+        .sw-stat .miss { color:#ff8a84; }
+
+        .sw-pool {
+            display:flex; flex-wrap:wrap; gap: 0.5rem; justify-content:center;
+            background: rgba(255,255,255,0.03); border: 1.5px dashed rgba(255,255,255,0.12);
+            border-radius: 14px; padding: 1rem; min-height: 56px; margin-bottom: 1.4rem;
+        }
+        .sw-hint { text-align:center; font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 0.7rem; }
+        .sw-hint b { color:#c084fc; }
+
+        .sw-chip {
+            padding: 0.5rem 0.9rem; border-radius: 10px;
+            background: rgba(13,17,23,0.9); border: 1.5px solid rgba(255,255,255,0.14);
+            color:#fff; font-size: 0.96rem; font-weight: 700; cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, transform 0.1s;
+        }
+        .sw-chip:hover { border-color: rgba(163,113,247,0.5); background: rgba(163,113,247,0.12); }
+        .sw-chip.sel { border-color:#a371f7; background: rgba(163,113,247,0.25); box-shadow: 0 0 0 2px rgba(163,113,247,0.3); transform: translateY(-2px); }
+        .sw-chip.wrong { animation: shake 0.4s; border-color:#f85149; background: rgba(248,81,73,0.18); }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+        .sw-cols { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+        .sw-cat-head { margin-bottom: 0.5rem; text-align:center; line-height:1.25; }
+        .sw-cat-head .nm { font-size: 0.98rem; font-weight: 800; display:block; }
+        .sw-cat-head .gloss { font-size: 0.76rem; color: var(--color-text-muted); font-weight: 600; }
+        .sw-cat-head .cnt { font-size: 0.76rem; color: rgba(255,255,255,0.4); font-weight: 600; }
+        .sw-drop {
+            background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 0.7rem; min-height: 170px;
+            display:flex; flex-direction:column; gap: 0.5rem; transition: border-color 0.2s, background 0.2s;
+        }
+        .sw-drop.target { border-color: rgba(163,113,247,0.55); background: rgba(163,113,247,0.07); }
+        .sw-placed {
+            padding: 0.5rem 0.7rem; border-radius: 9px;
+            background: rgba(13,23,17,0.9); border: 1.5px solid rgba(63,185,80,0.5);
+            color:#cdeed6; font-size: 0.9rem; font-weight: 700; animation: pop 0.3s ease both;
+        }
+        @keyframes pop { from {opacity:0; transform:scale(0.85);} to {opacity:1; transform:scale(1);} }
+        .sw-placed .ua { display:block; font-size: 0.76rem; font-weight: 600; color: rgba(134,239,172,0.75); margin-top:0.15rem; }
+
+        .sw-cat-1 .sw-cat-head .nm { color:#c084fc; }
+        .sw-cat-2 .sw-cat-head .nm { color:#6ee7a0; }
+        .sw-cat-3 .sw-cat-head .nm { color:#f5b86b; }
+        .sw-cat-4 .sw-cat-head .nm { color:#7cc4ff; }
+
+        .sw-controls { display:flex; justify-content:center; gap: 0.6rem; margin-top: 1.4rem; flex-wrap: wrap; }
+        .sw-btn {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.72rem 1.6rem; border-radius: 12px;
+            background: rgba(163,113,247,0.16); border: 1.5px solid rgba(163,113,247,0.45);
+            color:#c084fc; font-size: 0.95rem; font-weight: 800; cursor:pointer; font-family: inherit;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .sw-btn:hover { background: rgba(163,113,247,0.28); color:#fff; transform: translateY(-2px); }
+        .sw-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .sw-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+
+        .sw-done {
+            text-align:center; background: rgba(13,17,23,0.9); border: 1.5px solid rgba(63,185,80,0.5);
+            border-radius: 16px; padding: 2rem 1.2rem; display:none; margin-top: 1.3rem; animation: fadeUp 0.4s ease both;
+        }
+        .sw-done.show { display:block; }
+        @keyframes fadeUp { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
+        .sw-done .emoji { font-size: 3rem; }
+        .sw-done h2 { color:#fff; margin: 0.5rem 0 0.3rem; }
+        .sw-done p { color: var(--color-text-muted); margin: 0 0 1.2rem; }
+
+        @media (max-width: 680px) {
+            .sw-cols { grid-template-columns: 1fr; gap: 0.7rem; }
+            .sw-drop { min-height: 70px; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+            .sw-chip { font-size: 0.9rem; padding: 0.45rem 0.7rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch-buchwoerter.html">Слова з книги</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Категорії за значенням</span>
+        </nav>
+        <a href="englisch-buchwoerter.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до слів з книги</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Категорії за значенням <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">Слова з книги</span></h1>
+            <p class="page-subtitle">Розклади слова за <b style="color:#c084fc;">значенням</b> у правильну тему. Клікни слово, потім потрібну категорію. Помилка повертає слово назад.</p>
+        </div>
+
+        <div class="sw-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+
+            <div class="sw-bar">
+                <span class="sw-stat">Розкладено: <b id="stat-placed">0</b>/<b id="stat-total">0</b> · <span class="miss">помилки: <b id="stat-miss">0</b></span></span>
+            </div>
+
+            <div class="sw-hint">Клікни <b>слово</b>, потім — тему, до якої воно підходить за змістом</div>
+            <div class="sw-pool" id="pool"></div>
+
+            <div class="sw-cols" id="cols"></div>
+
+            <div class="sw-controls">
+                <button class="sw-btn ghost" onclick="startBatch(currentBatch)">&#8635; Спочатку</button>
+            </div>
+
+            <div class="sw-done" id="done">
+                <div class="emoji">🏆</div>
+                <h2>Усі слова розкладено!</h2>
+                <p id="done-sub"></p>
+                <button class="sw-btn" onclick="startBatch(currentBatch)">&#8635; Ще раз цю частину</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DATA = {"b1": {"categories": [{"en": "📖 Книга та її частини", "ua": "розділ, одиниця, джерело…"}, {"en": "⚡ Дії", "ua": "дієслова — що можна робити"}, {"en": "🔍 Якості", "ua": "який? — величезний, доведений…"}, {"en": "🧭 Життя та правила", "ua": "шлях, час, закон, місце"}], "items": [{"en": "framework", "ua": "структура, каркас (ідей)", "cat": "📖 Книга та її частини"}, {"en": "unit", "ua": "одиниця, елемент", "cat": "📖 Книга та її частини"}, {"en": "appendix", "ua": "додаток (у кінці книги)", "cat": "📖 Книга та її частини"}, {"en": "source", "ua": "джерело", "cat": "📖 Книга та її частини"}, {"en": "included", "ua": "включений; включно", "cat": "📖 Книга та її частини"}, {"en": "ship", "ua": "відправляти, випускати", "cat": "⚡ Дії"}, {"en": "optimize", "ua": "оптимізувати", "cat": "⚡ Дії"}, {"en": "perform", "ua": "виконувати; виступати", "cat": "⚡ Дії"}, {"en": "quit", "ua": "кидати, припиняти", "cat": "⚡ Дії"}, {"en": "entertain", "ua": "розважати", "cat": "⚡ Дії"}, {"en": "proven", "ua": "доведений, перевірений", "cat": "🔍 Якості"}, {"en": "irreducible", "ua": "неподільний", "cat": "🔍 Якості"}, {"en": "immense", "ua": "величезний", "cat": "🔍 Якості"}, {"en": "atomic", "ua": "атомний; крихітний", "cat": "🔍 Якості"}, {"en": "along the way", "ua": "по дорозі; у процесі", "cat": "🧭 Життя та правила"}, {"en": "sophomore year", "ua": "другий рік навчання (США)", "cat": "🧭 Життя та правила"}, {"en": "law", "ua": "закон, правило", "cat": "🧭 Життя та правила"}, {"en": "vault", "ua": "сховище, сейф", "cat": "🧭 Життя та правила"}]}, "b2": {"categories": [{"en": "⚾ Удар", "ua": "замах, бита, зіткнення"}, {"en": "🤕 Тіло та травми", "ua": "череп, тканина, перелом, рука…"}, {"en": "🩸 Допомога", "ua": "сорочка, кров, тримали прямо"}, {"en": "⏱️ Час та рух", "ua": "негайно, за мить, наростати, вниз…"}], "items": [{"en": "take a full swing", "ua": "замахнутися на повну", "cat": "⚾ Удар"}, {"en": "bat", "ua": "бита", "cat": "⚾ Удар"}, {"en": "slip out", "ua": "вислизнути", "cat": "⚾ Удар"}, {"en": "strike", "ua": "вдарити", "cat": "⚾ Удар"}, {"en": "force", "ua": "сила", "cat": "⚾ Удар"}, {"en": "slam into", "ua": "врізатися у", "cat": "⚾ Удар"}, {"en": "collision", "ua": "зіткнення", "cat": "⚾ Удар"}, {"en": "distorted", "ua": "деформований", "cat": "🤕 Тіло та травми"}, {"en": "tissue", "ua": "тканина", "cat": "🤕 Тіло та травми"}, {"en": "skull", "ua": "череп", "cat": "🤕 Тіло та травми"}, {"en": "swell", "ua": "набрякати", "cat": "🤕 Тіло та травми"}, {"en": "fracture", "ua": "перелом", "cat": "🤕 Тіло та травми"}, {"en": "shattered", "ua": "розтрощений", "cat": "🤕 Тіло та травми"}, {"en": "sockets", "ua": "очні западини", "cat": "🤕 Тіло та травми"}, {"en": "injured", "ua": "травмований", "cat": "🤕 Тіло та травми"}, {"en": "my sides", "ua": "мої боки", "cat": "🤕 Тіло та травми"}, {"en": "hand", "ua": "рука", "cat": "🤕 Тіло та травми"}, {"en": "take off one's back", "ua": "зняти з себе", "cat": "🩸 Допомога"}, {"en": "handed", "ua": "передав", "cat": "🩸 Допомога"}, {"en": "plug", "ua": "заткнути", "cat": "🩸 Допомога"}, {"en": "stream", "ua": "потік", "cat": "🩸 Допомога"}, {"en": "red", "ua": "червоний", "cat": "🩸 Допомога"}, {"en": "looped", "ua": "обвила (руку)", "cat": "🩸 Допомога"}, {"en": "upright", "ua": "прямо, вертикально", "cat": "🩸 Допомога"}, {"en": "immediately", "ua": "негайно", "cat": "⏱️ Час та рух"}, {"en": "surge", "ua": "різко наростати", "cat": "⏱️ Час та рух"}, {"en": "throughout", "ua": "по всьому", "cat": "⏱️ Час та рух"}, {"en": "in a fraction of (a second)", "ua": "за частку секунди", "cat": "⏱️ Час та рух"}, {"en": "run over", "ua": "швидко переглянути", "cat": "⏱️ Час та рух"}, {"en": "down the hill", "ua": "вниз пагорбом", "cat": "⏱️ Час та рух"}, {"en": "mattered", "ua": "мало значення", "cat": "⏱️ Час та рух"}]}, "b3": {"categories": [{"en": "🚑 Дорога до лікарні", "ua": "тротуар, каталка, вертоліт…"}, {"en": "🏥 Стан та лікування", "ua": "свідомість, напад, втома, впоратися…"}, {"en": "👁️ Око та ніс", "ua": "висякатися, випинатися, поступово…"}, {"en": "💔 Емоції та люди", "ua": "новина, сльози, священник, час…"}], "items": [{"en": "roll out", "ua": "викотити", "cat": "🚑 Дорога до лікарні"}, {"en": "toward", "ua": "у напрямку", "cat": "🚑 Дорога до лікарні"}, {"en": "across", "ua": "через", "cat": "🚑 Дорога до лікарні"}, {"en": "rattle", "ua": "деренчати", "cat": "🚑 Дорога до лікарні"}, {"en": "sidewalk", "ua": "тротуар", "cat": "🚑 Дорога до лікарні"}, {"en": "bumpy", "ua": "вибоїстий", "cat": "🚑 Дорога до лікарні"}, {"en": "push", "ua": "штовхати", "cat": "🚑 Дорога до лікарні"}, {"en": "climb into", "ua": "залізти в", "cat": "🚑 Дорога до лікарні"}, {"en": "ride", "ua": "поїздка", "cat": "🚑 Дорога до лікарні"}, {"en": "sprint onto", "ua": "вибігти на", "cat": "🚑 Дорога до лікарні"}, {"en": "wheel into", "ua": "завезти в", "cat": "🚑 Дорога до лікарні"}, {"en": "pass off", "ua": "передати далі", "cat": "🚑 Дорога до лікарні"}, {"en": "enter", "ua": "увійти", "cat": "🚑 Дорога до лікарні"}, {"en": "ground floor", "ua": "перший поверх", "cat": "🚑 Дорога до лікарні"}, {"en": "stall", "ua": "глохнути, зупинятися", "cat": "🏥 Стан та лікування"}, {"en": "rapid", "ua": "швидкий", "cat": "🏥 Стан та лікування"}, {"en": "handle", "ua": "впоратися", "cat": "🏥 Стан та лікування"}, {"en": "shut down", "ua": "відключитися", "cat": "🏥 Стан та лікування"}, {"en": "entirely", "ua": "повністю", "cat": "🏥 Стан та лікування"}, {"en": "supply", "ua": "постачати", "cat": "🏥 Стан та лікування"}, {"en": "pump", "ua": "качати", "cat": "🏥 Стан та лікування"}, {"en": "condition", "ua": "стан", "cat": "🏥 Стан та лікування"}, {"en": "collapse", "ua": "знепритомніти", "cat": "🏥 Стан та лікування"}, {"en": "fatigue", "ua": "втома", "cat": "🏥 Стан та лікування"}, {"en": "consciousness", "ua": "свідомість", "cat": "🏥 Стан та лікування"}, {"en": "seizure", "ua": "судомний напад", "cat": "🏥 Стан та лікування"}, {"en": "unconscious", "ua": "непритомний", "cat": "🏥 Стан та лікування"}, {"en": "severe", "ua": "тяжкий", "cat": "🏥 Стан та лікування"}, {"en": "induce", "ua": "викликати штучно", "cat": "🏥 Стан та лікування"}, {"en": "regain", "ua": "відновити", "cat": "🏥 Стан та лікування"}, {"en": "rebound", "ua": "відновлюватися", "cat": "🏥 Стан та лікування"}, {"en": "schedule", "ua": "призначити", "cat": "🏥 Стан та лікування"}, {"en": "blow", "ua": "дути; удар", "cat": "👁️ Око та ніс"}, {"en": "sniff", "ua": "шморгати носом", "cat": "👁️ Око та ніс"}, {"en": "blow one's nose", "ua": "висякатися", "cat": "👁️ Око та ніс"}, {"en": "outward", "ua": "назовні", "cat": "👁️ Око та ніс"}, {"en": "bulge", "ua": "випинатися", "cat": "👁️ Око та ніс"}, {"en": "hold", "ua": "тримати", "cat": "👁️ Око та ніс"}, {"en": "precariously", "ua": "хитко", "cat": "👁️ Око та ніс"}, {"en": "gradually", "ua": "поступово", "cat": "👁️ Око та ніс"}, {"en": "slide back", "ua": "ковзнути назад", "cat": "👁️ Око та ніс"}, {"en": "seep out", "ua": "просочуватися", "cat": "👁️ Око та ніс"}, {"en": "boxing match", "ua": "боксерський поєдинок", "cat": "👁️ Око та ніс"}, {"en": "break the news", "ua": "повідомити новину", "cat": "💔 Емоції та люди"}, {"en": "choke back tears", "ua": "стримати сльози", "cat": "💔 Емоції та люди"}, {"en": "remain", "ua": "залишатися", "cat": "💔 Емоції та люди"}, {"en": "yet", "ua": "ще (не)", "cat": "💔 Емоції та люди"}, {"en": "priest", "ua": "священник", "cat": "💔 Емоції та люди"}, {"en": "decade", "ua": "десятиліття", "cat": "💔 Емоції та люди"}, {"en": "fade", "ua": "згасати", "cat": "💔 Емоції та люди"}, {"en": "restlessly", "ua": "неспокійно", "cat": "💔 Емоції та люди"}, {"en": "wide awake", "ua": "зовсім не сонний", "cat": "💔 Емоції та люди"}, {"en": "mercifully", "ua": "на щастя", "cat": "💔 Емоції та люди"}]}};
+        const BATCHES = [["b1", "📖 Частина 1 • 03.07"], ["b2", "📖 Частина 2 • 04.07"], ["b3", "📖 Частина 3 • 04.07"]];
+        const LABELS = {"b1": "Частина 1 • 03.07", "b2": "Частина 2 • 04.07", "b3": "Частина 3 • 04.07"};
+
+        let currentBatch = BATCHES[0][0];
+        let batch = DATA[currentBatch];
+        let total, placed, mistakes, selChip;
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+        function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function buildBatchTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            BATCHES.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentBatch?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>startBatch(d);
+                el.appendChild(b);
+            });
+        }
+
+        function startBatch(d){
+            currentBatch = d;
+            batch = DATA[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', BATCHES[i][0]===d));
+            render();
+        }
+
+        function render(){
+            const items = batch.items;
+            total = items.length; placed = 0; mistakes = 0; selChip = null;
+            document.getElementById('done').classList.remove('show');
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-placed').textContent = '0';
+            document.getElementById('stat-miss').textContent = '0';
+
+            const poolEl = document.getElementById('pool');
+            poolEl.innerHTML = '';
+            shuffle(items.slice()).forEach(w=>{
+                const c = document.createElement('div');
+                c.className='sw-chip'; c.dataset.cat=w.cat; c.dataset.ua=w.ua;
+                c.textContent = w.en;
+                c.onclick = ()=>selectChip(c);
+                poolEl.appendChild(c);
+            });
+
+            const cols = document.getElementById('cols');
+            cols.innerHTML='';
+            batch.categories.forEach((cat,idx)=>{
+                const cnt = items.filter(w=>w.cat===cat.en).length;
+                const col = document.createElement('div');
+                col.className='sw-cat sw-cat-'+(idx+1);
+                col.innerHTML = '<div class="sw-cat-head"><span class="nm">'+escapeHtml(cat.en)+'</span>'
+                    + '<span class="gloss">'+escapeHtml(cat.ua)+'</span> <span class="cnt">('+cnt+')</span></div>';
+                const drop = document.createElement('div');
+                drop.className='sw-drop'; drop.dataset.cat=cat.en;
+                drop.onclick = ()=>dropInto(drop);
+                col.appendChild(drop);
+                cols.appendChild(col);
+            });
+        }
+
+        function selectChip(c){
+            if(selChip===c){ c.classList.remove('sel'); selChip=null; document.querySelectorAll('.sw-drop').forEach(d=>d.classList.remove('target')); return; }
+            if(selChip) selChip.classList.remove('sel');
+            selChip = c; c.classList.add('sel');
+            document.querySelectorAll('.sw-drop').forEach(d=>d.classList.add('target'));
+        }
+
+        function dropInto(drop){
+            if(!selChip) return;
+            const chip = selChip;
+            document.querySelectorAll('.sw-drop').forEach(d=>d.classList.remove('target'));
+            if(chip.dataset.cat === drop.dataset.cat){
+                const p = document.createElement('div');
+                p.className='sw-placed';
+                p.innerHTML = escapeHtml(chip.textContent) + '<span class="ua">'+escapeHtml(chip.dataset.ua)+'</span>';
+                drop.appendChild(p);
+                chip.remove();
+                selChip=null;
+                placed++;
+                document.getElementById('stat-placed').textContent = placed;
+                if(placed===total) finish();
+            } else {
+                mistakes++;
+                document.getElementById('stat-miss').textContent = mistakes;
+                chip.classList.remove('sel');
+                chip.classList.add('wrong');
+                selChip=null;
+                setTimeout(()=>chip.classList.remove('wrong'), 450);
+            }
+        }
+
+        function finish(){
+            document.getElementById('done-sub').textContent = 'Слів: ' + total + ' · Помилок: ' + mistakes;
+            setTimeout(()=>{
+                document.getElementById('done').classList.add('show');
+                document.getElementById('done').scrollIntoView({behavior:'smooth', block:'center'});
+            }, 350);
+        }
+
+        buildBatchTabs();
+        startBatch(BATCHES[0][0]);
+    </script>
+</body>
+</html>

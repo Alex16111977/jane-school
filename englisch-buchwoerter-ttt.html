@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хрестики-нулики | Book Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .ttt-wrap { max-width: 640px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .ttt-score { display: flex; gap: 0.7rem; justify-content: center; margin: 0.4rem 0 1.1rem; }
+        .ttt-score-card {
+            flex: 1; max-width: 190px;
+            background: rgba(13,17,23,0.82);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 13px; padding: 0.7rem 0.9rem; text-align: center;
+        }
+        .ttt-score-card.ok { border-color: rgba(63,185,80,0.4); }
+        .ttt-score-card.bad { border-color: rgba(248,81,73,0.38); }
+        .ttt-score-mark { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+        .ttt-score-card.ok .ttt-score-mark { color: #6ee7a0; }
+        .ttt-score-card.bad .ttt-score-mark { color: #ff8a84; }
+        .ttt-score-name { font-size: 0.78rem; color: var(--color-text-muted); margin: 0.2rem 0 0.35rem; font-weight: 600; }
+        .ttt-score-num { font-size: 1.35rem; font-weight: 800; color: #fff; }
+
+        .ttt-status { text-align: center; font-size: 1.12rem; font-weight: 700; color: #fff; min-height: 1.6em; margin-bottom: 1rem; transition: color 0.2s; }
+        .ttt-status .accent { color: #c084fc; }
+
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0 auto 0.4rem; max-width: 420px; }
+        .ttt-cell {
+            aspect-ratio: 1 / 1; border-radius: 16px;
+            background: rgba(255,255,255,0.96); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.2rem; font-weight: 900;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ttt-cell:not(.filled):not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(163,113,247,0.28); background: #fff; }
+        .ttt-cell:disabled, .ttt-cell.filled { cursor: default; }
+        .ttt-cell .mark { display: inline-block; animation: markPop 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+        @keyframes markPop { from { opacity:0; transform: scale(0.3) rotate(-12deg);} to {opacity:1; transform: scale(1) rotate(0);} }
+        .ttt-cell.o .mark { color: #16a34a; }
+        .ttt-cell.x .mark { color: #ef4444; }
+        .ttt-cell.win { background: #eafff0; box-shadow: 0 0 0 3px #3fb950, 0 8px 22px rgba(63,185,80,0.45); }
+
+        .ttt-q {
+            margin: 1.3rem auto 0; max-width: 480px;
+            background: rgba(13,17,23,0.85);
+            border: 1.5px solid rgba(163,113,247,0.3);
+            border-radius: 16px; padding: 1.2rem 1.2rem 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: none;
+            animation: qIn 0.3s ease both;
+        }
+        .ttt-q.show { display: block; }
+        @keyframes qIn { from { opacity:0; transform: translateY(12px);} to {opacity:1; transform: translateY(0);} }
+        .ttt-q-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(163,113,247,0.85); font-weight: 700; margin-bottom: 0.45rem; }
+        .ttt-q-word { font-size: 1.7rem; font-weight: 800; color: #fff; margin-bottom: 0.2rem; line-height: 1.2; }
+        .ttt-q-sub { font-size: 0.86rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-opts { display: flex; flex-direction: column; gap: 0.55rem; }
+        .ttt-opt {
+            padding: 0.8rem 1rem; border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            color: #fff; font-size: 1.02rem; font-weight: 700; cursor: pointer; text-align: left;
+            transition: background 0.18s, border-color 0.18s, transform 0.12s;
+        }
+        .ttt-opt:hover:not(:disabled) { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.45); transform: translateX(3px); }
+        .ttt-opt:disabled { cursor: default; }
+        .ttt-opt.correct { background: rgba(63,185,80,0.2); border-color: #3fb950; color: #b6f5c6; }
+        .ttt-opt.wrong { background: rgba(248,81,73,0.16); border-color: #f85149; color: #ffc1bd; }
+        .ttt-feedback { text-align:center; font-size: 0.95rem; font-weight:700; margin-top: 0.9rem; min-height: 1.2em; }
+        .ttt-feedback.ok { color: #6ee7a0; }
+        .ttt-feedback.no { color: #ff8a84; }
+
+        .ttt-result {
+            margin: 1.3rem auto 0; max-width: 480px; text-align: center;
+            background: rgba(13,17,23,0.9); border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 16px; padding: 1.5rem 1.2rem; display: none; animation: qIn 0.35s ease both;
+        }
+        .ttt-result.show { display: block; }
+        .ttt-result-emoji { font-size: 2.6rem; }
+        .ttt-result-title { font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0.4rem 0 0.3rem; }
+        .ttt-result-sub { font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-result.win { border-color: rgba(63,185,80,0.5); }
+        .ttt-result.lose { border-color: rgba(248,81,73,0.4); }
+
+        .ttt-controls { display:flex; justify-content:center; align-items:center; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .ttt-btn {
+            display: inline-flex; align-items:center; gap: 0.5rem;
+            padding: 0.72rem 1.5rem; border-radius: 12px;
+            background: rgba(163,113,247,0.14); border: 1.5px solid rgba(163,113,247,0.4);
+            color: #c084fc; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
+        }
+        .ttt-btn:hover { background: rgba(163,113,247,0.26); color:#fff; transform: translateY(-2px); }
+        .ttt-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .ttt-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .ttt-wins { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 600; }
+        .ttt-wins b { color: #6ee7a0; }
+
+        @media (max-width: 480px) {
+            .ttt-q-word { font-size: 1.45rem; }
+            .ttt-cell { font-size: 2.6rem; border-radius: 13px; }
+            .ttt-board { gap: 0.5rem; }
+            .ttt-score-mark { font-size: 1.3rem; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch-buchwoerter.html">Слова з книги</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Хрестики-нулики</span>
+        </nav>
+        <a href="englisch-buchwoerter.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до слів з книги</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Хрестики-нулики <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">Слова з книги</span></h1>
+            <p class="page-subtitle">Обери клітинку і переклади слово. Правильно &mdash; <b style="color:#6ee7a0;">&#9711;</b>, помилка &mdash; <b style="color:#ff8a84;">&#10005;</b>. Збери <b style="color:#6ee7a0;">3 &#9711; в ряд</b>!</p>
+        </div>
+
+        <div class="ttt-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+
+            <div class="ttt-score">
+                <div class="ttt-score-card ok">
+                    <div class="ttt-score-mark">&#9711;</div>
+                    <div class="ttt-score-name">Правильно</div>
+                    <div class="ttt-score-num" id="score-ok">0</div>
+                </div>
+                <div class="ttt-score-card bad">
+                    <div class="ttt-score-mark">&#10005;</div>
+                    <div class="ttt-score-name">Помилки</div>
+                    <div class="ttt-score-num" id="score-bad">0</div>
+                </div>
+            </div>
+
+            <div class="ttt-status" id="status">Обери клітинку</div>
+
+            <div class="ttt-board" id="board"></div>
+
+            <div class="ttt-q" id="question">
+                <div class="ttt-q-label">Як сказати англійською?</div>
+                <div class="ttt-q-word" id="q-word"></div>
+                <div class="ttt-q-sub">Правильна відповідь поставить &#9711;, помилка &mdash; &#10005;</div>
+                <div class="ttt-opts" id="q-opts"></div>
+                <div class="ttt-feedback" id="q-feedback"></div>
+            </div>
+
+            <div class="ttt-result" id="result">
+                <div class="ttt-result-emoji" id="result-emoji"></div>
+                <div class="ttt-result-title" id="result-title"></div>
+                <div class="ttt-result-sub" id="result-sub"></div>
+                <button class="ttt-btn" onclick="newGame()">&#8635; Грати ще раз</button>
+            </div>
+
+            <div class="ttt-controls">
+                <button class="ttt-btn ghost" onclick="newGame()">&#8635; Нова гра</button>
+                <span class="ttt-wins">Перемоги: <b id="wins">0</b></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_BATCH = {"b1": [{"en": "framework", "ua": "структура, система, каркас (ідей)"}, {"en": "along the way", "ua": "по дорозі; у процесі, поступово"}, {"en": "entertain", "ua": "розважати"}, {"en": "vault", "ua": "сховище, сейф; склепіння"}, {"en": "ship", "ua": "відправляти, випускати (продукт)"}, {"en": "optimize", "ua": "оптимізувати, покращувати"}, {"en": "quit", "ua": "кидати, припиняти, здаватися"}, {"en": "proven", "ua": "доведений, перевірений"}, {"en": "irreducible", "ua": "неподільний; який не можна спростити далі"}, {"en": "unit", "ua": "одиниця, елемент"}, {"en": "immense", "ua": "величезний, надзвичайний"}, {"en": "source", "ua": "джерело"}, {"en": "atomic", "ua": "атомний; крихітний (як атом)"}, {"en": "perform", "ua": "виконувати; виступати"}, {"en": "law", "ua": "закон, правило"}, {"en": "appendix", "ua": "додаток (у кінці книги)"}, {"en": "sophomore year", "ua": "другий рік навчання (10-й клас, США)"}, {"en": "included", "ua": "включений; включно"}], "b2": [{"en": "take a full swing", "ua": "замахнутися на повну силу"}, {"en": "bat", "ua": "бита (бейсбольна)"}, {"en": "slip out", "ua": "вислизнути (з рук)"}, {"en": "strike", "ua": "вдарити; влучити"}, {"en": "force", "ua": "сила"}, {"en": "distorted", "ua": "деформований, спотворений"}, {"en": "collision", "ua": "зіткнення"}, {"en": "tissue", "ua": "тканина (тіла)"}, {"en": "slam into", "ua": "врізатися у, вдаритися об"}, {"en": "skull", "ua": "череп"}, {"en": "immediately", "ua": "негайно, одразу"}, {"en": "swell", "ua": "набрякати, опухати"}, {"en": "surge", "ua": "різко наростати; хвиля, сплеск"}, {"en": "throughout", "ua": "по всьому; протягом усього"}, {"en": "in a fraction of (a second)", "ua": "за частку (секунди)"}, {"en": "fracture", "ua": "перелом; зламати"}, {"en": "shattered", "ua": "роздроблений, розтрощений"}, {"en": "sockets", "ua": "очні западини"}, {"en": "run over", "ua": "швидко переглянути; переїхати"}, {"en": "red", "ua": "червоний"}, {"en": "take off one's back", "ua": "зняти з себе (зі спини)"}, {"en": "hand", "ua": "рука (кисть); передавати"}, {"en": "handed", "ua": "передав, вручив"}, {"en": "plug", "ua": "заткнути, затампонувати"}, {"en": "stream", "ua": "потік, струмінь"}, {"en": "injured", "ua": "травмований, поранений"}, {"en": "looped", "ua": "обвив, обвила (руку)"}, {"en": "down the hill", "ua": "вниз пагорбом"}, {"en": "my sides", "ua": "мої боки"}, {"en": "upright", "ua": "вертикально, прямо"}, {"en": "mattered", "ua": "мало значення"}], "b3": [{"en": "stall", "ua": "глохнути, зупинятися; «зависати»"}, {"en": "rapid", "ua": "швидкий, стрімкий"}, {"en": "handle", "ua": "справлятися з; ручка"}, {"en": "shut down", "ua": "відключатися, зупиняти роботу"}, {"en": "entirely", "ua": "повністю, цілком"}, {"en": "supply", "ua": "постачати; запас"}, {"en": "roll out", "ua": "викочувати"}, {"en": "toward", "ua": "до, у напрямку"}, {"en": "across", "ua": "через, на той бік"}, {"en": "rattle", "ua": "деренчати, трястися"}, {"en": "sidewalk", "ua": "тротуар"}, {"en": "bumpy", "ua": "нерівний, вибоїстий"}, {"en": "push", "ua": "штовхати"}, {"en": "pump", "ua": "качати; помпа, насос"}, {"en": "climb into", "ua": "залізти в, забратися в"}, {"en": "remain", "ua": "залишатися"}, {"en": "ride", "ua": "поїздка; їхати"}, {"en": "break the news", "ua": "повідомити (важку) новину"}, {"en": "choke back tears", "ua": "стримувати сльози"}, {"en": "pass off", "ua": "передати далі; видати за щось"}, {"en": "sprint onto", "ua": "вибігти на (щодуху)"}, {"en": "wheel into", "ua": "завезти (на каталці) в"}, {"en": "condition", "ua": "стан; умова"}, {"en": "yet", "ua": "ще (не); проте"}, {"en": "enter", "ua": "входити"}, {"en": "ground floor", "ua": "перший поверх"}, {"en": "priest", "ua": "священник"}, {"en": "decade", "ua": "десятиліття"}, {"en": "fade", "ua": "згасати, тьмяніти"}, {"en": "restlessly", "ua": "неспокійно"}, {"en": "collapse", "ua": "впасти, знепритомніти"}, {"en": "fatigue", "ua": "втома, виснаження"}, {"en": "wide awake", "ua": "зовсім не сонний, бадьорий"}, {"en": "mercifully", "ua": "на щастя; милосердно"}, {"en": "rebound", "ua": "відновлюватися; відскакувати"}, {"en": "regain", "ua": "повернути собі, відновити"}, {"en": "blow", "ua": "дути; удар"}, {"en": "sniff", "ua": "шморгати носом; нюхати"}, {"en": "blow one's nose", "ua": "висякатися"}, {"en": "outward", "ua": "назовні"}, {"en": "bulge", "ua": "випинатися, вибалушуватися"}, {"en": "hold", "ua": "тримати(ся)"}, {"en": "precariously", "ua": "хитко, ненадійно"}, {"en": "gradually", "ua": "поступово"}, {"en": "slide back", "ua": "ковзнути назад, повернутися на місце"}, {"en": "seep out", "ua": "просочуватися (назовні)"}, {"en": "schedule", "ua": "призначати, планувати; розклад"}, {"en": "boxing match", "ua": "боксерський поєдинок"}, {"en": "consciousness", "ua": "свідомість, притомність"}, {"en": "seizure", "ua": "судомний напад"}, {"en": "unconscious", "ua": "непритомний"}, {"en": "severe", "ua": "тяжкий, серйозний, сильний"}, {"en": "induce", "ua": "викликати, спричинити; ввести (штучно)"}]};
+        const BATCHES = [["b1", "📖 Частина 1 • 03.07"], ["b2", "📖 Частина 2 • 04.07"], ["b3", "📖 Частина 3 • 04.07"]];
+        const LABELS = {"b1": "Частина 1 • 03.07", "b2": "Частина 2 • 04.07", "b3": "Частина 3 • 04.07"};
+        const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        let board, lock, activeCell = null;
+        let correctCount = 0, mistakeCount = 0, wins = 0;
+        let currentBatch = BATCHES[0][0];
+        let pool = WORDS_BY_BATCH[currentBatch];
+        let queue = [];
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function refillQueue(){ queue = shuffle(pool.slice()); }
+
+        function nextWord(){
+            if(queue.length === 0) refillQueue();
+            return queue.pop();
+        }
+
+        function buildBatchTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            BATCHES.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentBatch?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>switchGameBatch(d);
+                el.appendChild(b);
+            });
+        }
+
+        function switchGameBatch(d){
+            currentBatch = d;
+            pool = WORDS_BY_BATCH[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', BATCHES[i][0]===d));
+            newGame();
+        }
+
+        function renderBoard(){
+            const el = document.getElementById('board');
+            el.innerHTML = '';
+            board.forEach((v,i)=>{
+                const b = document.createElement('button');
+                b.className = 'ttt-cell' + (v? ' filled '+v.toLowerCase() : '');
+                b.dataset.i = i;
+                if(v){ b.innerHTML = '<span class="mark">'+(v==='X'?'&#10005;':'&#9711;')+'</span>'; b.disabled = true; }
+                else { b.onclick = ()=>onPick(i); }
+                el.appendChild(b);
+            });
+        }
+
+        function setStatus(html){ document.getElementById('status').innerHTML = html; }
+        function updateScore(){
+            document.getElementById('score-ok').textContent = correctCount;
+            document.getElementById('score-bad').textContent = mistakeCount;
+        }
+
+        function onPick(i){
+            if(lock || board[i]) return;
+            activeCell = i; lock = true; askQuestion();
+        }
+
+        function askQuestion(){
+            const correct = nextWord();
+            const others = shuffle(pool.filter(w=>w.en!==correct.en));
+            const opts = shuffle([correct, others[0], others[1]]);
+            document.getElementById('q-word').textContent = correct.ua;
+            const fb = document.getElementById('q-feedback');
+            fb.textContent = ''; fb.className = 'ttt-feedback';
+            const box = document.getElementById('q-opts');
+            box.innerHTML = '';
+            opts.forEach(o=>{
+                const btn = document.createElement('button');
+                btn.className = 'ttt-opt';
+                btn.textContent = o.en;
+                btn.onclick = ()=>answer(btn, o.en===correct.en, correct);
+                box.appendChild(btn);
+            });
+            const q = document.getElementById('question');
+            q.classList.add('show');
+            q.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+
+        function answer(btn, isCorrect, correct){
+            [...document.querySelectorAll('.ttt-opt')].forEach(b=>{
+                b.disabled = true;
+                if(b.textContent===correct.en) b.classList.add('correct');
+            });
+            const fb = document.getElementById('q-feedback');
+            if(isCorrect){
+                fb.textContent = '✓ Правильно! ◯';
+                fb.className = 'ttt-feedback ok';
+                board[activeCell] = 'O';
+                correctCount++;
+            } else {
+                btn.classList.add('wrong');
+                fb.textContent = '✗ ' + correct.ua + ' = ' + correct.en + ' — ставимо ✕';
+                fb.className = 'ttt-feedback no';
+                board[activeCell] = 'X';
+                mistakeCount++;
+            }
+            updateScore();
+            setTimeout(()=>{
+                document.getElementById('question').classList.remove('show');
+                renderBoard();
+                if(checkEnd()) return;
+                setStatus('Обери наступну клітинку');
+                lock = false;
+            }, isCorrect ? 750 : 1500);
+        }
+
+        function checkEnd(){
+            for(const L of LINES){
+                if(L.every(i=>board[i]==='O')){ highlight(L); endGame('win'); return true; }
+            }
+            const full = board.every(v=>v);
+            const canStillWin = LINES.some(L=>L.every(i=>board[i]!=='X'));
+            if(full || !canStillWin){ endGame('lose'); return true; }
+            return false;
+        }
+
+        function highlight(line){ line.forEach(i=>{ const c=document.querySelector('.ttt-cell[data-i="'+i+'"]'); if(c) c.classList.add('win'); }); }
+
+        function endGame(kind){
+            lock = true;
+            const r = document.getElementById('result');
+            const emoji = document.getElementById('result-emoji');
+            const title = document.getElementById('result-title');
+            const sub = document.getElementById('result-sub');
+            r.className = 'ttt-result show ' + (kind==='win'?'win':'lose');
+            if(kind==='win'){
+                emoji.textContent='🎉';
+                title.textContent='Три в ряд! Ти виграв!';
+                sub.textContent = 'Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                wins++; document.getElementById('wins').textContent = wins;
+                setStatus('<span class="accent">Перемога! 🎉 Три &#9711; в ряд</span>');
+            } else {
+                emoji.textContent='😕';
+                title.textContent='Лінія не зібралася';
+                sub.textContent = 'Помилки заблокували всі ряди. Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                setStatus('Цього разу не вийшло — спробуй ще');
+            }
+        }
+
+        function newGame(){
+            board = ['','','','','','','','',''];
+            lock = false; activeCell = null;
+            correctCount = 0; mistakeCount = 0;
+            refillQueue();
+            updateScore();
+            document.getElementById('question').classList.remove('show');
+            document.getElementById('result').classList.remove('show');
+            setStatus('Обери клітинку');
+            renderBoard();
+        }
+
+        buildBatchTabs();
+        document.getElementById('day-badge').textContent = LABELS[currentBatch];
+        newGame();
+    </script>
+</body>
+</html>

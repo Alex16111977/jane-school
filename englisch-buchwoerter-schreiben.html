@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Письмовий тренажёр | Book Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .wr-wrap { max-width: 680px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .wr-rounds { display:flex; gap:0.5rem; justify-content:center; align-items:center; margin-bottom: 0.8rem; }
+        .wr-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size: 0.85rem; font-weight: 800;
+            background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.45);
+        }
+        .wr-dot.active { background: rgba(163,113,247,0.2); border-color: #a371f7; color:#c084fc; }
+        .wr-dot.done { background: rgba(63,185,80,0.2); border-color: #3fb950; color:#86efac; }
+
+        .wr-dir {
+            text-align:center; font-size: 1.05rem; font-weight: 800; color:#fff; margin-bottom: 0.3rem;
+        }
+        .wr-dir .arrow { color:#c084fc; }
+        .wr-sub { text-align:center; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.2rem; }
+
+        .wr-list { display:flex; flex-direction: column; gap: 0.55rem; }
+        .wr-row {
+            display:grid; grid-template-columns: 1fr 1fr auto; gap: 0.7rem; align-items: center;
+            background: rgba(13,17,23,0.8); border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 0.6rem 0.8rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .wr-row.correct { border-color: rgba(63,185,80,0.5); background: rgba(13,23,17,0.8); }
+        .wr-row.wrong { border-color: rgba(248,81,73,0.5); background: rgba(23,14,14,0.8); }
+        .wr-prompt { font-size: 1.05rem; font-weight: 800; color:#fff; }
+        .wr-prompt .tip { display:block; font-size: 0.72rem; font-weight:600; color: rgba(255,255,255,0.32); margin-top:0.1rem; }
+        .wr-input {
+            width: 100%; box-sizing: border-box;
+            padding: 0.55rem 0.7rem; border-radius: 9px;
+            background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.14);
+            color: #fff; font-size: 1rem; font-weight: 600; font-family: inherit;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .wr-input:focus { outline: none; border-color: rgba(163,113,247,0.6); background: rgba(163,113,247,0.08); }
+        .wr-input:disabled { opacity: 0.9; }
+        .wr-row.correct .wr-input { border-color: rgba(63,185,80,0.5); color:#b6f5c6; }
+        .wr-row.wrong .wr-input { border-color: rgba(248,81,73,0.5); }
+        .wr-mark { font-size: 1.2rem; font-weight: 900; min-width: 1.4rem; text-align:center; }
+        .wr-row.correct .wr-mark { color:#6ee7a0; }
+        .wr-row.wrong .wr-mark { color:#ff8a84; }
+
+        .wr-fix { grid-column: 1 / -1; display:flex; flex-wrap:wrap; align-items:center; gap:0.6rem; font-size: 0.88rem; }
+        .wr-fix .corr { color:#ffd9a0; font-weight:700; }
+        .wr-fix .corr b { color:#ffe9c2; }
+        .wr-accept {
+            padding: 0.3rem 0.7rem; border-radius: 8px; cursor:pointer;
+            background: rgba(63,185,80,0.14); border: 1.5px solid rgba(63,185,80,0.4);
+            color:#86efac; font-size: 0.8rem; font-weight: 700; font-family: inherit;
+        }
+        .wr-accept:hover { background: rgba(63,185,80,0.25); color:#fff; }
+
+        .wr-controls { display:flex; justify-content:center; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .wr-btn {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.75rem 1.7rem; border-radius: 12px;
+            background: rgba(163,113,247,0.16); border: 1.5px solid rgba(163,113,247,0.45);
+            color:#c084fc; font-size: 0.98rem; font-weight: 800; cursor:pointer; font-family: inherit;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .wr-btn:hover { background: rgba(163,113,247,0.28); color:#fff; transform: translateY(-2px); }
+        .wr-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .wr-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .wr-btn:disabled { opacity: 0.4; cursor: default; transform:none; }
+
+        .wr-msg { text-align:center; font-size: 0.95rem; font-weight: 700; margin-top: 0.9rem; min-height: 1.3em; }
+        .wr-msg.ok { color:#6ee7a0; }
+        .wr-msg.no { color:#ff8a84; }
+
+        .wr-done {
+            text-align:center; background: rgba(13,17,23,0.9); border: 1.5px solid rgba(63,185,80,0.5);
+            border-radius: 16px; padding: 2rem 1.2rem; display:none; animation: fadeUp 0.4s ease both;
+        }
+        .wr-done.show { display:block; }
+        @keyframes fadeUp { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
+        .wr-done .emoji { font-size: 3rem; }
+        .wr-done h2 { color:#fff; margin: 0.5rem 0 0.3rem; }
+        .wr-done p { color: var(--color-text-muted); margin: 0 0 1.2rem; }
+
+        @media (max-width: 560px) {
+            .wr-row { grid-template-columns: 1fr; gap: 0.4rem; }
+            .wr-mark { text-align:left; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch-buchwoerter.html">Слова з книги</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Письмовий тренажёр</span>
+        </nav>
+        <a href="englisch-buchwoerter.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до слів з книги</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Письмовий тренажёр <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">Слова з книги</span></h1>
+            <p class="page-subtitle">Пиши переклади у стовпчик. Коли всі правильні &mdash; наступний раунд. <b style="color:#c084fc;">5 раундів</b>, напрямок чергується: 🇬🇧→🇺🇦, потім 🇺🇦→🇬🇧 &mdash; так слово закарбовується в обидва боки.</p>
+        </div>
+
+        <div class="wr-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+            <div class="wr-rounds" id="rounds"></div>
+            <div class="wr-dir" id="dir"></div>
+            <div class="wr-sub" id="dir-sub"></div>
+
+            <div class="wr-list" id="list"></div>
+
+            <div class="wr-msg" id="msg"></div>
+
+            <div class="wr-controls">
+                <button class="wr-btn" id="check-btn" onclick="checkRound()">&#10003; Перевірити</button>
+                <button class="wr-btn" id="next-btn" onclick="nextRound()" style="display:none;">Далі &#8594;</button>
+                <button class="wr-btn ghost" onclick="startBatch(currentBatch)">&#8635; Спочатку</button>
+            </div>
+
+            <div class="wr-done" id="done">
+                <div class="emoji">🏆</div>
+                <h2>Усі 5 раундів пройдено!</h2>
+                <p id="done-sub">Ти прописав слова з книги в обидва боки. Сильна робота!</p>
+                <button class="wr-btn" onclick="startBatch(currentBatch)">&#8635; Ще раз цю частину</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_BATCH = {"b1": [{"en": "framework", "ua": "структура, система, каркас (ідей)"}, {"en": "along the way", "ua": "по дорозі / у процесі / поступово"}, {"en": "entertain", "ua": "розважати"}, {"en": "vault", "ua": "сховище / сейф / склепіння"}, {"en": "ship", "ua": "відправляти / випускати (продукт) / корабель"}, {"en": "optimize", "ua": "оптимізувати / покращувати"}, {"en": "quit", "ua": "кидати / припиняти / здаватися"}, {"en": "proven", "ua": "доведений / перевірений"}, {"en": "irreducible", "ua": "неподільний / який не можна спростити далі"}, {"en": "unit", "ua": "одиниця / елемент"}, {"en": "immense", "ua": "величезний / надзвичайний"}, {"en": "source", "ua": "джерело"}, {"en": "atomic", "ua": "атомний / крихітний (як атом)"}, {"en": "perform", "ua": "виконувати / виступати"}, {"en": "law", "ua": "закон / правило"}, {"en": "appendix", "ua": "додаток (у кінці книги) / апендикс"}, {"en": "sophomore year", "ua": "другий рік навчання (10-й клас, США)"}, {"en": "included", "ua": "включений / включно"}], "b2": [{"en": "take a full swing", "ua": "замахнутися на повну силу / зробити повний замах"}, {"en": "bat", "ua": "бита / кажан"}, {"en": "slip out", "ua": "вислизнути (з рук)"}, {"en": "strike", "ua": "вдарити / влучити"}, {"en": "force", "ua": "сила"}, {"en": "distorted", "ua": "деформований / спотворений"}, {"en": "collision", "ua": "зіткнення"}, {"en": "tissue", "ua": "тканина (тіла) / серветка"}, {"en": "slam into", "ua": "врізатися у / вдаритися об"}, {"en": "skull", "ua": "череп"}, {"en": "immediately", "ua": "негайно / одразу"}, {"en": "swell", "ua": "набрякати / опухати"}, {"en": "surge", "ua": "різко наростати / хвиля / сплеск"}, {"en": "throughout", "ua": "по всьому / протягом усього"}, {"en": "in a fraction of a second", "ua": "за частку секунди / за мить"}, {"en": "fracture", "ua": "перелом / зламати"}, {"en": "shattered", "ua": "роздроблений / розтрощений"}, {"en": "sockets", "ua": "очні западини / розетки"}, {"en": "run over", "ua": "швидко переглянути / повторити / переїхати"}, {"en": "red", "ua": "червоний"}, {"en": "take off one's back", "ua": "зняти з себе / зняти зі спини"}, {"en": "hand", "ua": "рука / передавати"}, {"en": "handed", "ua": "передав / вручив"}, {"en": "plug", "ua": "заткнути / затампонувати"}, {"en": "stream", "ua": "потік / струмінь / текти"}, {"en": "injured", "ua": "травмований / поранений"}, {"en": "looped", "ua": "обвив / обвила"}, {"en": "down the hill", "ua": "вниз пагорбом / з гори"}, {"en": "my sides", "ua": "мої боки"}, {"en": "upright", "ua": "вертикально / прямо"}, {"en": "mattered", "ua": "мало значення / був важливим"}], "b3": [{"en": "stall", "ua": "глохнути / зупинятися / зависати"}, {"en": "rapid", "ua": "швидкий / стрімкий"}, {"en": "handle", "ua": "справлятися з / впоратися / ручка"}, {"en": "shut down", "ua": "відключатися / зупиняти роботу"}, {"en": "entirely", "ua": "повністю / цілком"}, {"en": "supply", "ua": "постачати / запас"}, {"en": "roll out", "ua": "викочувати / викотити"}, {"en": "toward", "ua": "до / у напрямку"}, {"en": "across", "ua": "через / на той бік"}, {"en": "rattle", "ua": "деренчати / трястися"}, {"en": "sidewalk", "ua": "тротуар"}, {"en": "bumpy", "ua": "нерівний / вибоїстий"}, {"en": "push", "ua": "штовхати"}, {"en": "pump", "ua": "качати / насос / помпа"}, {"en": "climb into", "ua": "залізти в / забратися в"}, {"en": "remain", "ua": "залишатися"}, {"en": "ride", "ua": "поїздка / їхати"}, {"en": "break the news", "ua": "повідомити новину / повідомити важку новину"}, {"en": "choke back tears", "ua": "стримувати сльози / стримати сльози"}, {"en": "pass off", "ua": "передати далі / видати за"}, {"en": "sprint onto", "ua": "вибігти на"}, {"en": "wheel into", "ua": "завезти в / закотити в"}, {"en": "condition", "ua": "стан / умова"}, {"en": "yet", "ua": "ще / ще не / проте"}, {"en": "enter", "ua": "входити / увійти"}, {"en": "ground floor", "ua": "перший поверх"}, {"en": "priest", "ua": "священник / священик"}, {"en": "decade", "ua": "десятиліття"}, {"en": "fade", "ua": "згасати / тьмяніти / слабшати"}, {"en": "restlessly", "ua": "неспокійно"}, {"en": "collapse", "ua": "впасти / знепритомніти / колапс"}, {"en": "fatigue", "ua": "втома / виснаження"}, {"en": "wide awake", "ua": "зовсім не сонний / бадьорий"}, {"en": "mercifully", "ua": "на щастя / милосердно"}, {"en": "rebound", "ua": "відновлюватися / відскакувати"}, {"en": "regain", "ua": "повернути собі / відновити"}, {"en": "blow", "ua": "дути / удар"}, {"en": "sniff", "ua": "шморгати носом / нюхати"}, {"en": "blow one's nose", "ua": "висякатися"}, {"en": "outward", "ua": "назовні"}, {"en": "bulge", "ua": "випинатися / вибалушуватися"}, {"en": "hold", "ua": "тримати / триматися"}, {"en": "precariously", "ua": "хитко / ненадійно"}, {"en": "gradually", "ua": "поступово"}, {"en": "slide back", "ua": "ковзнути назад / повернутися на місце"}, {"en": "seep out", "ua": "просочуватися"}, {"en": "schedule", "ua": "призначати / планувати / розклад"}, {"en": "boxing match", "ua": "боксерський поєдинок / бій з боксу"}, {"en": "consciousness", "ua": "свідомість / притомність"}, {"en": "seizure", "ua": "судомний напад / напад"}, {"en": "unconscious", "ua": "непритомний"}, {"en": "severe", "ua": "тяжкий / серйозний / сильний"}, {"en": "induce", "ua": "викликати / спричинити / ввести штучно"}]};
+        const BATCHES = [["b1", "📖 Частина 1 • 03.07"], ["b2", "📖 Частина 2 • 04.07"], ["b3", "📖 Частина 3 • 04.07"]];
+        const LABELS = {"b1": "Частина 1 • 03.07", "b2": "Частина 2 • 04.07", "b3": "Частина 3 • 04.07"};
+        const ROUNDS = 5;
+
+        let currentBatch = BATCHES[0][0];
+        let pool = WORDS_BY_BATCH[currentBatch];
+        let round = 1;
+        let rows = [];
+        let overridden = [];
+        let checked = false;
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function norm(s){
+            return (s||'').toLowerCase()
+                .replace(/\([^)]*\)/g,' ')
+                .replace(/[’ʼ`´]/g,"'")
+                .replace(/[.,!?;:…\-–—]/g,'')
+                .replace(/\s+/g,' ').trim();
+        }
+        const STOP = new Set(['sth','sb','swh','oneself','ones','one','my','your','his','her','its','our','their']);
+        function normEn(s){
+            let toks = norm(s).replace(/'/g,'').split(' ').filter(Boolean).filter(t=>!STOP.has(t));
+            if(['to','a','an','the'].includes(toks[0])) toks = toks.slice(1);
+            return toks.join(' ');
+        }
+        function isCorrect(input, expected, dir){
+            const inN = dir==='en2ua' ? norm(input) : normEn(input);
+            if(!inN) return false;
+            return expected.split(/[\/;]/).map(s=>s.trim()).filter(Boolean).some(v=>{
+                const eN = dir==='en2ua' ? norm(v) : normEn(v);
+                return eN && inN === eN;
+            });
+        }
+
+        function dirOf(r){ return r % 2 === 1 ? 'en2ua' : 'ua2en'; }
+
+        function buildBatchTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            BATCHES.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentBatch?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>startBatch(d);
+                el.appendChild(b);
+            });
+        }
+
+        function renderRounds(){
+            const el = document.getElementById('rounds');
+            el.innerHTML = '';
+            for(let r=1;r<=ROUNDS;r++){
+                const d = document.createElement('div');
+                d.className = 'wr-dot' + (r<round?' done':'') + (r===round?' active':'');
+                d.textContent = r<round ? '✓' : r;
+                el.appendChild(d);
+            }
+        }
+
+        function startBatch(d){
+            currentBatch = d;
+            pool = WORDS_BY_BATCH[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', BATCHES[i][0]===d));
+            round = 1;
+            rows = shuffle(pool.slice()); // порядок задаємо лише раз (1-й раунд) — далі він зберігається
+            document.getElementById('done').classList.remove('show');
+            renderRound();
+        }
+
+        function renderRound(){
+            checked = false;
+            overridden = rows.map(()=>false);
+            renderRounds();
+
+            const dir = dirOf(round);
+            document.getElementById('dir').innerHTML = dir==='en2ua'
+                ? '🇬🇧 <span class="arrow">&#8594;</span> 🇺🇦 &mdash; пиши українською'
+                : '🇺🇦 <span class="arrow">&#8594;</span> 🇬🇧 &mdash; пиши англійською';
+            document.getElementById('dir-sub').textContent = 'Раунд ' + round + ' з ' + ROUNDS + ' · ' + rows.length + ' слів';
+
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            rows.forEach((w, i)=>{
+                const prompt = dir==='en2ua' ? w.en : w.ua;
+                const row = document.createElement('div');
+                row.className = 'wr-row';
+                row.dataset.i = i;
+                row.innerHTML =
+                    '<div class="wr-prompt">' + escapeHtml(prompt) + '</div>' +
+                    '<input class="wr-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-i="' + i + '">' +
+                    '<div class="wr-mark"></div>';
+                list.appendChild(row);
+            });
+            // Enter -> next field / check
+            const inputs = [...list.querySelectorAll('.wr-input')];
+            inputs.forEach((inp, idx)=>{
+                inp.addEventListener('keydown', e=>{
+                    if(e.key==='Enter'){
+                        e.preventDefault();
+                        if(idx < inputs.length-1){
+                            const nx = inputs[idx+1];
+                            nx.focus({preventScroll:true});
+                            // плавно ведемо вид за поточним словом (по центру)
+                            nx.closest('.wr-row').scrollIntoView({behavior:'smooth', block:'center'});
+                        } else {
+                            checkRound();
+                        }
+                    }
+                });
+            });
+            if(inputs[0]) inputs[0].focus();
+
+            document.getElementById('msg').textContent = '';
+            document.getElementById('msg').className = 'wr-msg';
+            document.getElementById('check-btn').style.display = '';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function checkRound(){
+            const dir = dirOf(round);
+            const list = document.getElementById('list');
+            let allOk = true;
+            rows.forEach((w, i)=>{
+                const row = list.querySelector('.wr-row[data-i="'+i+'"]');
+                const inp = row.querySelector('.wr-input');
+                const expected = dir==='en2ua' ? w.ua : w.en;
+                const ok = overridden[i] || isCorrect(inp.value, expected, dir);
+                row.classList.remove('correct','wrong');
+                row.classList.add(ok ? 'correct' : 'wrong');
+                row.querySelector('.wr-mark').textContent = ok ? '✓' : '✗';
+                inp.disabled = ok;
+                // remove old fix block
+                const oldFix = row.querySelector('.wr-fix');
+                if(oldFix) oldFix.remove();
+                if(!ok){
+                    allOk = false;
+                    const fix = document.createElement('div');
+                    fix.className = 'wr-fix';
+                    fix.innerHTML = '<span class="corr">Правильно: <b>' + escapeHtml(expected) + '</b></span>' +
+                        '<button class="wr-accept" type="button">&#10003; зарахувати мою відповідь</button>';
+                    fix.querySelector('.wr-accept').onclick = ()=>acceptRow(i);
+                    row.appendChild(fix);
+                }
+            });
+            checked = true;
+            const msg = document.getElementById('msg');
+            if(allOk){
+                msg.textContent = round < ROUNDS ? '✓ Усе правильно! Натисни «Далі»' : '✓ Останній раунд пройдено!';
+                msg.className = 'wr-msg ok';
+                document.getElementById('check-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = round < ROUNDS ? '' : 'none';
+                if(round >= ROUNDS) finishAll();
+            } else {
+                const wrongCount = rows.filter((w,i)=>!(overridden[i] || isCorrect(list.querySelector('.wr-row[data-i="'+i+'"] .wr-input').value, dirOf(round)==='en2ua'?w.ua:w.en, dirOf(round)))).length;
+                msg.textContent = 'Ще не все — виправ ' + wrongCount + ' і перевір знову (або «зарахувати», якщо це синонім)';
+                msg.className = 'wr-msg no';
+            }
+        }
+
+        function acceptRow(i){
+            overridden[i] = true;
+            const row = document.getElementById('list').querySelector('.wr-row[data-i="'+i+'"]');
+            row.classList.remove('wrong'); row.classList.add('correct');
+            row.querySelector('.wr-mark').textContent = '✓';
+            row.querySelector('.wr-input').disabled = true;
+            const fix = row.querySelector('.wr-fix'); if(fix) fix.remove();
+            // re-evaluate all
+            const stillWrong = [...document.querySelectorAll('.wr-row')].some(r=>r.classList.contains('wrong'));
+            if(!stillWrong){
+                const msg = document.getElementById('msg');
+                msg.textContent = round < ROUNDS ? '✓ Усе правильно! Натисни «Далі»' : '✓ Останній раунд пройдено!';
+                msg.className = 'wr-msg ok';
+                document.getElementById('check-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = round < ROUNDS ? '' : 'none';
+                if(round >= ROUNDS) finishAll();
+            }
+        }
+
+        function nextRound(){
+            if(round < ROUNDS){ round++; renderRound(); window.scrollTo({top:0, behavior:'smooth'}); }
+        }
+
+        function finishAll(){
+            renderRounds();
+            setTimeout(()=>{
+                document.getElementById('done').classList.add('show');
+                document.getElementById('done').scrollIntoView({behavior:'smooth', block:'center'});
+            }, 400);
+        }
+
+        buildBatchTabs();
+        startBatch(BATCHES[0][0]);
+    </script>
+</body>
+</html>

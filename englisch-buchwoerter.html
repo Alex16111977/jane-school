@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+
+        /* ===== BATCH CHIPS ===== */
+        .batch-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.8rem 0 1.2rem; }
+        .batch-chip {
+            padding: 0.32rem 0.8rem;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .batch-chip:hover { color: #fff; }
+        .batch-chip.active {
+            background: rgba(245,158,11,0.14);
+            border-color: rgba(245,158,11,0.5);
+            color: #fbbf24;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 7px;
+            margin: 0.5rem 0 0.25rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #4493f8, #a371f7);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+        }
+        .progress-label span { color: #79b8ff; font-weight: 700; }
+
+        /* ===== CONTROLS ===== */
+        .controls { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.3rem; }
+        .ctrl-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .ctrl-btn.primary {
+            background: rgba(68,147,248,0.15);
+            border-color: rgba(68,147,248,0.4);
+            color: #79b8ff;
+        }
+        .ctrl-btn.primary:hover { background: rgba(68,147,248,0.25); color: #fff; }
+
+        /* ===== CARD GRID ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 0.65rem;
+        }
+
+        /* ===== FLASHCARD ===== */
+        .fcard {
+            position: relative;
+            min-height: 145px;
+            border-radius: 13px;
+            background: rgba(13,17,23,0.82);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .fcard::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: 13px 0 0 13px;
+            background: #4493f8;
+        }
+        .fcard:hover { transform: translateY(-3px); box-shadow: 0 7px 24px rgba(0,0,0,0.32); }
+        .fcard.known { border-color: rgba(63,185,80,0.32); background: rgba(13,23,17,0.85); }
+        .fcard.known::before { background: #3fb950; }
+
+        .fcard-front {
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 145px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-front { display: none; }
+        .fcard-num { font-size: 0.67rem; font-weight: 700; color: rgba(68,147,248,0.5); letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .fcard-word { font-size: 1.05rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .fcard-tr { font-size: 0.88rem; font-weight: 700; color: #fbbf24; margin-top: 0.3rem; }
+        .fcard-ipa { font-size: 0.74rem; color: rgba(255,255,255,0.38); margin-top: 0.15rem; }
+        .fcard-hint { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 0.35rem; }
+        .flip-tip { position: absolute; bottom: 0.5rem; right: 0.65rem; font-size: 0.68rem; color: rgba(255,255,255,0.2); pointer-events: none; }
+        .fcard.flipped .flip-tip { display: none; }
+
+        .fcard-back {
+            display: none;
+            padding: 1rem 1rem 0.85rem 1.25rem;
+            min-height: 145px;
+            flex-direction: column; justify-content: center;
+        }
+        .fcard.flipped .fcard-back { display: flex; }
+        .fcard-ua { font-size: 1rem; font-weight: 700; color: #86efac; line-height: 1.3; }
+        .fcard-de {
+            font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.62);
+            margin-top: 0.28rem; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .fcard-de::before {
+            content: 'DE'; font-size: 0.56rem; font-weight: 800; padding: 0.04rem 0.3rem;
+            border-radius: 5px; background: rgba(255,204,0,0.14); color: #ffd54f;
+            border: 1px solid rgba(255,204,0,0.26); letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .fcard-example { font-size: 0.75rem; font-style: italic; color: rgba(255,255,255,0.35); margin-top: 0.45rem; line-height: 1.45; }
+        .fcard-poem { font-size: 0.92rem; font-style: italic; color: #c084fc; margin-top: 0.5rem; line-height: 1.6; border-left: 3px solid rgba(192,132,252,0.5); padding-left: 0.6rem; text-shadow: 0 0 12px rgba(192,132,252,0.3); }
+        .know-btn {
+            display: inline-block; margin-top: 0.65rem; padding: 0.24rem 0.7rem;
+            border-radius: 7px; background: rgba(63,185,80,0.11); border: 1px solid rgba(63,185,80,0.28);
+            color: #3fb950; font-size: 0.73rem; font-weight: 700; cursor: pointer;
+            width: fit-content; transition: all 0.2s; align-self: flex-start;
+        }
+        .know-btn:hover { background: rgba(63,185,80,0.2); }
+        .fcard.known .know-btn { background: rgba(63,185,80,0.24); border-color: #3fb950; color: #fff; }
+
+        /* ===== GROUP DIVIDER ===== */
+        .group-label {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin: 1.5rem 0 0.65rem;
+            font-size: 0.77rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--color-text-muted);
+        }
+        .group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+        /* ===== DONE SCREEN ===== */
+        .done-screen {
+            display: none; text-align: center; padding: 2rem 1rem;
+            border-radius: 16px; background: rgba(13,23,17,0.6);
+            border: 1px solid rgba(63,185,80,0.3); margin-top: 1.5rem;
+        }
+        .done-screen.show { display: block; }
+        .done-screen .done-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .done-screen h2 { color: #3fb950; margin: 0 0 0.4rem; font-size: 1.3rem; }
+        .done-screen p { color: var(--color-text-muted); margin: 0; font-size: 0.9rem; }
+
+        @media (max-width: 600px) {
+            .card-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .fcard-front, .fcard-back { min-height: 125px; padding: 0.85rem 0.75rem 0.75rem 0.95rem; }
+            .fcard-word { font-size: 0.93rem; }
+        }
+        @media (max-width: 360px) { .card-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.84)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Слова з книги</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.93rem;margin-bottom:0.6rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:0.4rem; margin-bottom:0.2rem;">
+            <h1 style="margin-bottom:0.15rem;">Слова з книги &#x1F4D6;</h1>
+            <p class="page-subtitle">слова, які зустрілись у книзі &mdash; з українською транскрипцією &bull; клікни картку щоб перевернути &bull; зелений = вивчено</p>
+        </div>
+
+        <!-- ===== EXERCISES ===== -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.2rem 0 0.4rem;">
+            <a href="englisch-buchwoerter-ttt.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.95rem; border-radius:10px; background:rgba(245,158,11,0.1); border:1.5px solid rgba(245,158,11,0.32); color:#fbbf24; font-size:0.85rem; font-weight:700;">&#x274C;&#x2B55; Хрестики-нулики</a>
+            <a href="englisch-buchwoerter-schreiben.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.95rem; border-radius:10px; background:rgba(245,158,11,0.1); border:1.5px solid rgba(245,158,11,0.32); color:#fbbf24; font-size:0.85rem; font-weight:700;">&#x270D;&#xFE0F; Письмовий тренажёр</a>
+            <a href="englisch-buchwoerter-matching.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.95rem; border-radius:10px; background:rgba(245,158,11,0.1); border:1.5px solid rgba(245,158,11,0.32); color:#fbbf24; font-size:0.85rem; font-weight:700;">&#x1F517; Сопоставлення</a>
+            <a href="englisch-buchwoerter-kategorien.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.95rem; border-radius:10px; background:rgba(245,158,11,0.1); border:1.5px solid rgba(245,158,11,0.32); color:#fbbf24; font-size:0.85rem; font-weight:700;">&#x1F5C2;&#xFE0F; Категорії</a>
+            <a href="englisch-buchwoerter-karten.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.95rem; border-radius:10px; background:rgba(245,158,11,0.1); border:1.5px solid rgba(245,158,11,0.32); color:#fbbf24; font-size:0.85rem; font-weight:700;">&#x1F0CF; Картки</a>
+        </div>
+
+        <!-- BATCH FILTER -->
+        <div class="batch-chips" id="batchChips"></div>
+
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="cardsBar"></div></div>
+        <div class="progress-label">Вивчено: <span id="cardsNum">0</span> / <span id="cardsTotal">0</span></div>
+        <div class="controls">
+            <button class="ctrl-btn primary" onclick="flipAll()">&#x1F501; Відкрити всі</button>
+            <button class="ctrl-btn" onclick="resetCards()">&#x21BA; Скинути</button>
+            <button class="ctrl-btn" onclick="shuffleCards()">&#x1F500; Перемішати</button>
+        </div>
+        <div id="cardsWrap"></div>
+        <div class="done-screen" id="cardsDone">
+            <div class="done-icon">&#x1F3C6;</div>
+            <h2>Всі слова вивчені!</h2>
+            <p>Читай далі та скидай нові слова &#x1F4DA;</p>
+        </div>
+
+    </div><!-- .page-content -->
+
+    <script>
+        /* ══════════════════════════════════════════
+           СЛОВА З КНИГИ — нові партії додаються сюди
+           (і в 5 сторінок-тренажерів: -ttt, -schreiben,
+            -matching, -kategorien, -karten)
+           ══════════════════════════════════════════ */
+        const BATCHES = [
+            { id: 'b1', label: '&#x1F4D6; Частина 1 &bull; 03.07' },
+            { id: 'b2', label: '&#x1F4D6; Частина 2 &bull; 04.07' },
+            { id: 'b3', label: '&#x1F4D6; Частина 3 &bull; 04.07' }
+        ];
+
+        const WORDS = [
+            { batch: 'b1', en: 'framework', ipa: '/ˈfreɪmwɜːk/', tr: '[фрЕймвьорк]', ua: 'структура, система, каркас (ідей)', de: 'das Ger&uuml;st / der Rahmen', hint: 'noun • B2', ex: '"This book offers a framework for building better habits."', poem: 'A house needs a frame, a plan needs one too&mdash;<br>a framework of habits will carry you through!' },
+            { batch: 'b1', en: 'along the way', ipa: '/əˌlɒŋ ðə ˈweɪ/', tr: '[елОнг зе вЕй]', ua: 'по дорозі; у процесі, поступово', de: 'unterwegs / im Laufe der Zeit', hint: 'phrase • B1', ex: '"You will learn a lot along the way."', poem: 'The goal is the star, but don\'t fly too fast&mdash;<br>you learn along the way, and the lessons last!' },
+            { batch: 'b1', en: 'entertain', ipa: '/ˌentəˈteɪn/', tr: '[ентетЕйн]', ua: 'розважати; (розглядати ідею)', de: 'unterhalten', hint: 'verb • B1', ex: '"A good book should entertain and teach at the same time."', poem: 'A story, a joke, a light in the brain&mdash;<br>a good book knows how to entertain!' },
+            { batch: 'b1', en: 'vault', ipa: '/vɔːlt/', tr: '[вОлт]', ua: 'сховище, сейф; склепіння', de: 'der Tresor / das Gew&ouml;lbe', hint: 'noun • B2', ex: '"The gold is kept in a bank vault."', poem: 'Lock up your treasures, keep them tight&mdash;<br>a vault keeps your gold out of sight!' },
+            { batch: 'b1', en: 'ship', ipa: '/ʃɪp/', tr: '[шИп]', ua: 'відправляти, випускати (продукт); корабель', de: 'versenden / ausliefern', hint: 'verb • B1', ex: '"Great creators ship their work even when it\'s not perfect."', poem: 'Don\'t polish forever, loosen your grip&mdash;<br>when the work is ready, it\'s time to ship!' },
+            { batch: 'b1', en: 'optimize', ipa: '/ˈɒptɪmaɪz/', tr: '[Оптімайз]', ua: 'оптимізувати, покращувати', de: 'optimieren', hint: 'verb • B2', ex: '"Athletes optimize every detail of their training."', poem: 'A little bit better, day after day&mdash;<br>optimize small things and you\'re on your way!' },
+            { batch: 'b1', en: 'quit', ipa: '/kwɪt/', tr: '[квІт]', ua: 'кидати, припиняти, здаватися', de: 'aufh&ouml;ren / aufgeben', hint: 'verb • A2', ex: '"Winners never quit, and quitters never win."', poem: 'When it\'s hard, take a breath, then commit&mdash;<br>real champions never quit!' },
+            { batch: 'b1', en: 'proven', ipa: '/ˈpruːvn/', tr: '[прУвн]', ua: 'доведений, перевірений', de: 'bew&auml;hrt / erwiesen', hint: 'adjective • B1', ex: '"This is a proven method that works for thousands of people."', poem: 'No magic, no guessing, no luck to be shown&mdash;<br>trust what is proven, tested and known!' },
+            { batch: 'b1', en: 'irreducible', ipa: '/ˌɪrɪˈdjuːsəbl/', tr: '[ірідьЮсебл]', ua: 'неподільний, який не можна спростити далі', de: 'nicht weiter reduzierbar', hint: 'adjective • C1', ex: '"Habits are the irreducible units of self-improvement."', poem: 'Cut it and cut it as small as can be&mdash;<br>irreducible: the smallest degree!' },
+            { batch: 'b1', en: 'unit', ipa: '/ˈjuːnɪt/', tr: '[Юніт]', ua: 'одиниця, елемент', de: 'die Einheit', hint: 'noun • A2', ex: '"Each habit is a fundamental unit of your daily system."', poem: 'One little piece of a much bigger fate&mdash;<br>each unit counts, so make each one great!' },
+            { batch: 'b1', en: 'immense', ipa: '/ɪˈmens/', tr: '[імЕнс]', ua: 'величезний, надзвичайний', de: 'riesig / enorm', hint: 'adjective • B2', ex: '"Tiny changes can lead to immense results."', poem: 'From something so tiny, results so intense&mdash;<br>small daily habits bring gains immense!' },
+            { batch: 'b1', en: 'source', ipa: '/sɔːs/', tr: '[сОрс]', ua: 'джерело', de: 'die Quelle', hint: 'noun • B1', ex: '"Small habits are the source of incredible power."', poem: 'Find where it starts, then follow the course&mdash;<br>every great river begins at its source!' },
+            { batch: 'b1', en: 'atomic', ipa: '/əˈtɒmɪk/', tr: '[етОмік]', ua: 'атомний; крихітний (як атом), базовий', de: 'atomar / winzig klein', hint: 'adjective • B2', ex: '"Atomic habits are tiny changes with remarkable power."', poem: 'Tiny as atoms, but mighty in force&mdash;<br>atomic habits can change your course!' },
+            { batch: 'b1', en: 'perform', ipa: '/pəˈfɔːm/', tr: '[пефОрм]', ua: 'виконувати; виступати', de: 'ausf&uuml;hren / auftreten', hint: 'verb • B1', ex: '"She performs the same routine every morning."', poem: 'Practice each morning, come rain or storm&mdash;<br>it\'s how you prepare that helps you perform!' },
+            { batch: 'b1', en: 'law', ipa: '/lɔː/', tr: '[лО]', ua: 'закон, правило', de: 'das Gesetz', hint: 'noun • B1', ex: '"The book explains the four laws of behavior change."', poem: 'Four simple rules without a flaw&mdash;<br>behavior change follows the law!' },
+            { batch: 'b1', en: 'appendix', ipa: '/əˈpendɪks/', tr: '[епЕндікс]', ua: 'додаток (у кінці книги); апендикс', de: 'der Anhang', hint: 'noun • B2', ex: '"The appendix at the end of the book has extra tips."', poem: 'The story is done, but wait &mdash; there\'s more&mdash;<br>the appendix hides an extra door!' },
+            { batch: 'b1', en: 'sophomore year', ipa: '/ˈsɒfəmɔː jɪə/', tr: '[сОфемор йІр]', ua: 'другий рік навчання (10-й клас / 2-й курс, США)', de: 'das zweite Highschool-Jahr', hint: 'phrase • B2 (амер.)', ex: '"In my sophomore year, everything changed."', poem: 'Second year of school, still finding your gear&mdash;<br>that\'s what they call the sophomore year!' },
+            { batch: 'b1', en: 'included', ipa: '/ɪnˈkluːdɪd/', tr: '[інклУдід]', ua: 'включений; включно', de: 'enthalten / inbegriffen', hint: 'adjective • B1', ex: '"All the examples are included in the appendix."', poem: 'Nothing forgotten, nothing excluded&mdash;<br>everything you need is already included!' },
+            { batch: 'b2', en: 'take a full swing', ipa: '/ˌteɪk ə ˌfʊl ˈswɪŋ/', tr: '[тейк е фул свІнг]', ua: 'замахнутися на повну силу', de: 'voll ausholen', hint: 'phrase • B2', ex: '"My classmate took a full swing, and the bat slipped out of his hands."', poem: 'Step up to the plate and give it your all&mdash;<br>take a full swing and follow the ball!' },
+            { batch: 'b2', en: 'bat', ipa: '/bæt/', tr: '[бЕт]', ua: 'бита (бейсбольна); кажан', de: 'der Schl&auml;ger / die Fledermaus', hint: 'noun • A2', ex: '"I was hit in the face with a baseball bat."', poem: 'Wooden and heavy, it swings with a crack&mdash;<br>the bat sends the baseball flying back!' },
+            { batch: 'b2', en: 'slip out', ipa: '/ˌslɪp ˈaʊt/', tr: '[сліп Аут]', ua: 'вислизнути (з рук)', de: 'entgleiten / herausrutschen', hint: 'phrasal verb • B1', ex: '"The bat slipped out of his hands and came flying toward me."', poem: 'Hold it tight or it will fly&mdash;<br>things slip out and wave goodbye!' },
+            { batch: 'b2', en: 'strike', ipa: '/straɪk/', tr: '[стрАйк]', ua: 'вдарити; влучити', de: 'schlagen / treffen', hint: 'verb • B1', ex: '"The bat struck me directly between the eyes."', poem: 'Fast and sudden, out of the blue&mdash;<br>a strike you never saw coming through!' },
+            { batch: 'b2', en: 'force', ipa: '/fɔːs/', tr: '[фОрс]', ua: 'сила', de: 'die Kraft / die Wucht', hint: 'noun • B1', ex: '"The bat smashed into my face with such force."', poem: 'Push and power make things move&mdash;<br>force is the muscle with something to prove!' },
+            { batch: 'b2', en: 'distorted', ipa: '/dɪˈstɔːtɪd/', tr: '[дістОртід]', ua: 'деформований, спотворений', de: 'verformt / verzerrt', hint: 'adjective • B2', ex: '"The hit crushed his nose into a distorted U-shape."', poem: 'Bent out of shape, not looking right&mdash;<br>distorted forms are a strange, strange sight!' },
+            { batch: 'b2', en: 'collision', ipa: '/kəˈlɪʒn/', tr: '[келІжн]', ua: 'зіткнення', de: 'der Zusammensto&szlig;', hint: 'noun • B2', ex: '"The collision sent the soft tissue of my brain slamming into my skull."', poem: 'Two things meet where they shouldn\'t be&mdash;<br>a collision is crash energy!' },
+            { batch: 'b2', en: 'tissue', ipa: '/ˈtɪʃuː/', tr: '[тІшью]', ua: 'тканина (тіла); серветка', de: 'das Gewebe / das Taschentuch', hint: 'noun • B2', ex: '"The soft tissue of the brain is very fragile."', poem: 'Layer by layer, cell by cell&mdash;<br>tissue is where our bodies dwell!' },
+            { batch: 'b2', en: 'slam into', ipa: '/ˈslæm ˌɪntə/', tr: '[слЕм інту]', ua: 'врізатися у, вдаритися об', de: 'prallen gegen / knallen in', hint: 'phrasal verb • B2', ex: '"His brain slammed into the inside of his skull."', poem: 'No gentle touch, no soft hello&mdash;<br>slam into something and feel the blow!' },
+            { batch: 'b2', en: 'skull', ipa: '/skʌl/', tr: '[скАл]', ua: 'череп', de: 'der Sch&auml;del', hint: 'noun • B1', ex: '"He had multiple skull fractures."', poem: 'A helmet of bone, a natural wall&mdash;<br>the skull protects the brain of us all!' },
+            { batch: 'b2', en: 'immediately', ipa: '/ɪˈmiːdiətli/', tr: '[імІдіетлі]', ua: 'негайно, одразу', de: 'sofort', hint: 'adverb • A2', ex: '"Immediately, a wave of swelling surged throughout my head."', poem: 'Not in a minute, not in a while&mdash;<br>immediately means now &mdash; no denial!' },
+            { batch: 'b2', en: 'swell', ipa: '/swel/', tr: '[свЕл]', ua: 'набрякати, опухати', de: 'anschwellen', hint: 'verb • B2', ex: '"My head began to swell right after the hit."', poem: 'Bigger and puffy, tender and round&mdash;<br>injuries swell without a sound!' },
+            { batch: 'b2', en: 'surge', ipa: '/sɜːdʒ/', tr: '[сЕрдж]', ua: 'різко наростати; хвиля, сплеск', de: 'aufwallen / die Welle', hint: 'verb/noun • C1', ex: '"A wave of swelling surged throughout my head."', poem: 'Like a wave that rises fast and high&mdash;<br>feelings surge and multiply!' },
+            { batch: 'b2', en: 'throughout', ipa: '/θruːˈaʊt/', tr: '[сруАут]', ua: 'по всьому; протягом усього', de: '&uuml;berall in / w&auml;hrend', hint: 'preposition • B2', ex: '"The swelling spread throughout my head."', poem: 'From start to end, from wall to wall&mdash;<br>throughout means everywhere, covering all!' },
+            { batch: 'b2', en: 'in a fraction of (a second)', ipa: '/ɪn ə ˈfrækʃn əv ə ˈsekənd/', tr: '[ін е фрЕкшн ов е сЕконд]', ua: 'за частку (секунди), за мить', de: 'im Bruchteil (einer Sekunde)', hint: 'phrase • B2', ex: '"In a fraction of a second, I had a broken nose and two shattered eye sockets."', poem: 'Faster than blinking, quicker than sound&mdash;<br>in a fraction of a second the world spins around!' },
+            { batch: 'b2', en: 'fracture', ipa: '/ˈfræktʃə/', tr: '[фрЕкче]', ua: 'перелом; зламати(ся)', de: 'der Bruch / brechen', hint: 'noun/verb • B2', ex: '"He had a broken nose and multiple skull fractures."', poem: 'A crack in the bone the X-ray will show&mdash;<br>a fracture needs time to heal and grow!' },
+            { batch: 'b2', en: 'shattered', ipa: '/ˈʃætəd/', tr: '[шЕтед]', ua: 'роздроблений, розтрощений', de: 'zertr&uuml;mmert', hint: 'adjective • B2', ex: '"Both of his eye sockets were shattered."', poem: 'Broken to pieces beyond repair&mdash;<br>shattered like glass flying through air!' },
+            { batch: 'b2', en: 'sockets', ipa: '/ˈsɒkɪts/', tr: '[сОкітс]', ua: 'очні западини (eye sockets); розетки', de: 'die Augenh&ouml;hlen / die Steckdosen', hint: 'noun • B2', ex: '"The impact shattered both of his eye sockets."', poem: 'Hollows of bone where the eyes sit tight&mdash;<br>sockets guard your windows of light!' },
+            { batch: 'b2', en: 'run over', ipa: '/ˌrʌn ˈəʊvə/', tr: '[ран Оуве]', ua: 'швидко переглянути, повторити; переїхати', de: 'durchgehen / &uuml;berfahren', hint: 'phrasal verb • B2', ex: '"The nurse ran over a list of questions."', poem: 'Check it again from the top once more&mdash;<br>run over the list like you did before!' },
+            { batch: 'b2', en: 'red', ipa: '/red/', tr: '[рЕд]', ua: 'червоний', de: 'rot', hint: 'adjective • A1', ex: '"The shirt quickly turned red with blood."', poem: 'The colour of fire, of blood, of the rose&mdash;<br>red is the loudest colour that glows!' },
+            { batch: 'b2', en: 'take off one\'s back', ipa: '/ˌteɪk ˈɒf wʌnz ˈbæk/', tr: '[тейк Оф ванз бЕк]', ua: 'зняти з себе (зі спини)', de: '(das Hemd) ausziehen', hint: 'idiom • B2', ex: '"One friend took the shirt off his back and handed it to me."', poem: 'The kindest gift a friend can lend&mdash;<br>the shirt off his back, a true best friend!' },
+            { batch: 'b2', en: 'hand', ipa: '/hænd/', tr: '[хЕнд]', ua: 'рука (кисть); передавати', de: 'die Hand / reichen', hint: 'noun/verb • A1', ex: '"Random hands touched my sides, holding me upright."', poem: 'It holds, it gives, it waves, it makes&mdash;<br>a hand is there for all it takes!' },
+            { batch: 'b2', en: 'handed', ipa: '/ˈhændɪd/', tr: '[хЕндід]', ua: 'передав, вручив (past від hand)', de: 'reichte / &uuml;bergab', hint: 'verb (past) • A2', ex: '"He took off his shirt and handed it to me."', poem: 'From my hand into yours it went&mdash;<br>handed over, given and sent!' },
+            { batch: 'b2', en: 'plug', ipa: '/plʌɡ/', tr: '[плАг]', ua: 'заткнути, затампонувати; вилка', de: 'zustopfen / der Stecker', hint: 'verb/noun • B2', ex: '"I used the shirt to plug my broken nose."', poem: 'Stop the flow and block the way&mdash;<br>plug the hole and save the day!' },
+            { batch: 'b2', en: 'stream', ipa: '/striːm/', tr: '[стрІм]', ua: 'потік, струмінь; текти', de: 'der Strom / str&ouml;men', hint: 'noun/verb • B1', ex: '"A stream of blood was spilling out of my nose."', poem: 'Steady and flowing, it finds its way&mdash;<br>a stream keeps moving night and day!' },
+            { batch: 'b2', en: 'injured', ipa: '/ˈɪndʒəd/', tr: '[Інджед]', ua: 'травмований, поранений', de: 'verletzt', hint: 'adjective • B1', ex: '"The injured boy was taken to the nurse\'s office."', poem: 'Hurt but alive, in need of care&mdash;<br>the injured heal with time and air!' },
+            { batch: 'b2', en: 'looped', ipa: '/luːpt/', tr: '[лУпт]', ua: 'обвив, обвила (руку); зробив петлю', de: 'schlang (den Arm um)', hint: 'verb (past) • B2', ex: '"My teacher looped her arm in mine and we walked slowly."', poem: 'A circle of care, an arm held tight&mdash;<br>she looped it through mine and held me right!' },
+            { batch: 'b2', en: 'down the hill', ipa: '/ˌdaʊn ðə ˈhɪl/', tr: '[даун зе хІл]', ua: 'вниз пагорбом, з гори', de: 'den H&uuml;gel hinunter', hint: 'phrase • A2', ex: '"We walked across the field and down the hill."', poem: 'Step by step, the slope leads low&mdash;<br>down the hill is the way to go!' },
+            { batch: 'b2', en: 'my sides', ipa: '/maɪ ˈsaɪdz/', tr: '[май сАйдз]', ua: 'мої боки', de: 'meine Seiten', hint: 'phrase • A2', ex: '"Random hands touched my sides, holding me upright."', poem: 'Left and right, where ribs reside&mdash;<br>helping hands held both my sides!' },
+            { batch: 'b2', en: 'upright', ipa: '/ˈʌpraɪt/', tr: '[Апрайт]', ua: 'вертикально, прямо (не падаючи)', de: 'aufrecht', hint: 'adverb • B2', ex: '"Hands held me upright as we walked."', poem: 'Shoulders back and head held high&mdash;<br>stay upright and touch the sky!' },
+            { batch: 'b2', en: 'mattered', ipa: '/ˈmætəd/', tr: '[мЕтед]', ua: 'мало значення (past від matter)', de: 'war wichtig', hint: 'verb (past) • B1', ex: '"Nobody realized that every minute mattered."', poem: 'Small or big, it left its trace&mdash;<br>every minute mattered in that race!' },
+            { batch: 'b3', en: 'stall', ipa: '/stɔːl/', tr: '[стОл]', ua: 'глохнути, зупинятися; «зависати»', de: 'abw&uuml;rgen / ins Stocken geraten', hint: 'verb • B2', ex: '"My brain began to stall, and my body started shutting down."', poem: 'The engine coughs, the answers slow&mdash;<br>when systems stall, they just won\'t go!' },
+            { batch: 'b3', en: 'rapid', ipa: '/ˈræpɪd/', tr: '[рЕпід]', ua: 'швидкий, стрімкий', de: 'schnell / rasant', hint: 'adjective • B1', ex: '"The rapid swelling was dangerous for my brain."', poem: 'No time to wait, it\'s moving fast&mdash;<br>rapid means quick from first to last!' },
+            { batch: 'b3', en: 'handle', ipa: '/ˈhændl/', tr: '[хЕндл]', ua: 'справлятися з; ручка', de: 'bew&auml;ltigen / der Griff', hint: 'verb/noun • B1', ex: '"The small hospital could not handle my injuries."', poem: 'Whatever comes, don\'t run and hide&mdash;<br>handle the problem, turn the tide!' },
+            { batch: 'b3', en: 'shut down', ipa: '/ˌʃʌt ˈdaʊn/', tr: '[шат дАун]', ua: 'відключатися, зупиняти роботу', de: 'sich abschalten / herunterfahren', hint: 'phrasal verb • B1', ex: '"Soon my body began to shut down."', poem: 'The lights go off, the screens go grey&mdash;<br>shut down means stopping work today!' },
+            { batch: 'b3', en: 'entirely', ipa: '/ɪnˈtaɪəli/', tr: '[інтАйелі]', ua: 'повністю, цілком', de: 'v&ouml;llig / ganz', hint: 'adverb • B2', ex: '"Then I stopped breathing entirely."', poem: 'Not a half, not just a part&mdash;<br>entirely means all, with all your heart!' },
+            { batch: 'b3', en: 'supply', ipa: '/səˈplaɪ/', tr: '[сеплАй]', ua: 'постачати; запас', de: 'liefern / der Vorrat', hint: 'verb/noun • B1', ex: '"The paramedics supplied me with oxygen."', poem: 'What you need, delivered right&mdash;<br>supply keeps everything alright!' },
+            { batch: 'b3', en: 'roll out', ipa: '/ˌrəʊl ˈaʊt/', tr: '[роул Аут]', ua: 'викочувати', de: 'hinausrollen', hint: 'phrasal verb • B2', ex: '"They rolled me out toward the helicopter."', poem: 'Wheels are turning, off we go&mdash;<br>roll it out, nice and slow!' },
+            { batch: 'b3', en: 'toward', ipa: '/təˈwɔːd/', tr: '[тевОрд]', ua: 'до, у напрямку', de: 'in Richtung / auf ... zu', hint: 'preposition • B1', ex: '"They rolled me out toward the waiting helicopter."', poem: 'Point your steps and face the goal&mdash;<br>toward the place that calls your soul!' },
+            { batch: 'b3', en: 'across', ipa: '/əˈkrɒs/', tr: '[екрОс]', ua: 'через, на той бік', de: '&uuml;ber / quer durch', hint: 'preposition • A2', ex: '"They pushed me across the bumpy sidewalk."', poem: 'From this side over to the other view&mdash;<br>across the street, across the blue!' },
+            { batch: 'b3', en: 'rattle', ipa: '/ˈrætl/', tr: '[рЕтл]', ua: 'деренчати, трястися', de: 'rattern / klappern', hint: 'verb • B2', ex: '"The stretcher rattled across the bumpy sidewalk."', poem: 'Shake and clatter, bounce and roll&mdash;<br>things rattle when the road takes toll!' },
+            { batch: 'b3', en: 'sidewalk', ipa: '/ˈsaɪdwɔːk/', tr: '[сАйдвок]', ua: 'тротуар (амер.)', de: 'der B&uuml;rgersteig', hint: 'noun • A2', ex: '"The wheels rattled on the sidewalk."', poem: 'Beside the road, a path of stone&mdash;<br>the sidewalk leads you safely home!' },
+            { batch: 'b3', en: 'bumpy', ipa: '/ˈbʌmpi/', tr: '[бАмпі]', ua: 'нерівний, вибоїстий', de: 'holprig', hint: 'adjective • B1', ex: '"The sidewalk was bumpy, and every bump hurt."', poem: 'Up and down and shake and thump&mdash;<br>a bumpy road has bump on bump!' },
+            { batch: 'b3', en: 'push', ipa: '/pʊʃ/', tr: '[пУш]', ua: 'штовхати', de: 'schieben / dr&uuml;cken', hint: 'verb • A1', ex: '"They pushed the stretcher toward the helicopter."', poem: 'Muscles working, wheels that fly&mdash;<br>push it forward, don\'t ask why!' },
+            { batch: 'b3', en: 'pump', ipa: '/pʌmp/', tr: '[пАмп]', ua: 'качати; помпа, насос', de: 'pumpen / die Pumpe', hint: 'verb/noun • B1', ex: '"The machine pumped air into my lungs."', poem: 'In and out, a steady thump&mdash;<br>life keeps flowing with a pump!' },
+            { batch: 'b3', en: 'climb into', ipa: '/ˌklaɪm ˈɪntə/', tr: '[клайм Інту]', ua: 'залізти в, забратися в', de: 'hineinklettern / einsteigen', hint: 'phrasal verb • A2', ex: '"My mom climbed into the helicopter with me."', poem: 'One leg up and then the other&mdash;<br>climb into the seat beside your mother!' },
+            { batch: 'b3', en: 'remain', ipa: '/rɪˈmeɪn/', tr: '[рімЕйн]', ua: 'залишатися', de: 'bleiben', hint: 'verb • B1', ex: '"She remained calm during the flight."', poem: 'When others leave or fade away&mdash;<br>the strong remain and choose to stay!' },
+            { batch: 'b3', en: 'ride', ipa: '/raɪd/', tr: '[рАйд]', ua: 'поїздка; їхати', de: 'die Fahrt / fahren', hint: 'noun/verb • A2', ex: '"It was the longest ride of her life."', poem: 'Buckle up, enjoy the glide&mdash;<br>every journey starts with a ride!' },
+            { batch: 'b3', en: 'break the news', ipa: '/ˌbreɪk ðə ˈnjuːz/', tr: '[брейк зе ньЮз]', ua: 'повідомити (важку) новину', de: 'die Nachricht &uuml;berbringen', hint: 'idiom • B2', ex: '"My dad drove home to break the news to my siblings."', poem: 'Hard to say and hard to choose&mdash;<br>gently, kindly break the news!' },
+            { batch: 'b3', en: 'choke back tears', ipa: '/ˌtʃəʊk bæk ˈtɪəz/', tr: '[чоук бек тІез]', ua: 'стримувати сльози', de: 'die Tr&auml;nen unterdr&uuml;cken', hint: 'idiom • B2', ex: '"He choked back tears as he spoke."', poem: 'Eyes are burning, throat is tight&mdash;<br>choke back tears and hold on tight!' },
+            { batch: 'b3', en: 'pass off', ipa: '/ˌpɑːs ˈɒf/', tr: '[пас Оф]', ua: 'передати далі; видати за щось', de: 'weiterreichen / ausgeben als', hint: 'phrasal verb • B2', ex: '"The doctors passed me off to the helicopter team."', poem: 'From hand to hand the task must go&mdash;<br>pass it off and let it flow!' },
+            { batch: 'b3', en: 'sprint onto', ipa: '/ˌsprɪnt ˈɒntə/', tr: '[спрінт Онту]', ua: 'вибігти на (щодуху)', de: 'sprinten auf', hint: 'phrasal verb • B2', ex: '"The medical team sprinted onto the landing pad."', poem: 'Faster, faster, feet that fly&mdash;<br>sprint onto the field, the finish is nigh!' },
+            { batch: 'b3', en: 'wheel into', ipa: '/ˌwiːl ˈɪntə/', tr: '[віл Інту]', ua: 'завезти (на каталці) в', de: 'hineinrollen / hineinschieben', hint: 'phrasal verb • B2', ex: '"They wheeled me into the emergency room."', poem: 'Rolling quickly through the door&mdash;<br>wheeled into the hospital floor!' },
+            { batch: 'b3', en: 'condition', ipa: '/kənˈdɪʃn/', tr: '[кендІшн]', ua: 'стан; умова', de: 'der Zustand / die Bedingung', hint: 'noun • B1', ex: '"I was in critical condition."', poem: 'How you are and how you feel&mdash;<br>your condition shows what\'s real!' },
+            { batch: 'b3', en: 'yet', ipa: '/jet/', tr: '[йЕт]', ua: 'ще (не); проте', de: 'noch (nicht) / dennoch', hint: 'adverb • A2', ex: '"The danger had not passed yet."', poem: 'Not right now, but wait and see&mdash;<br>yet means soon it still may be!' },
+            { batch: 'b3', en: 'enter', ipa: '/ˈentə/', tr: '[Ентер]', ua: 'входити', de: 'betreten / eintreten', hint: 'verb • A2', ex: '"My parents entered the hospital through the ground floor."', poem: 'Open the door and step inside&mdash;<br>enter the room with steady stride!' },
+            { batch: 'b3', en: 'ground floor', ipa: '/ˌɡraʊnd ˈflɔː/', tr: '[граунд флОр]', ua: 'перший поверх', de: 'das Erdgeschoss', hint: 'noun • A2', ex: '"The emergency room was on the ground floor."', poem: 'No stairs to climb, no lift to call&mdash;<br>the ground floor greets you first of all!' },
+            { batch: 'b3', en: 'priest', ipa: '/priːst/', tr: '[прІст]', ua: 'священник', de: 'der Priester', hint: 'noun • B1', ex: '"A priest came to sit with my parents."', poem: 'In hardest hours, calm and blessed&mdash;<br>a priest brings comfort to the stressed!' },
+            { batch: 'b3', en: 'decade', ipa: '/ˈdekeɪd/', tr: '[дЕкейд]', ua: 'десятиліття', de: 'das Jahrzehnt', hint: 'noun • B1', ex: '"A decade earlier, they had sat in the same room."', poem: 'Ten long years, a slice of time&mdash;<br>a decade passes like a rhyme!' },
+            { batch: 'b3', en: 'fade', ipa: '/feɪd/', tr: '[фЕйд]', ua: 'згасати, тьмяніти, слабшати', de: 'verblassen / schwinden', hint: 'verb • B2', ex: '"The evening light began to fade."', poem: 'Colours soften, sounds grow low&mdash;<br>things fade away and gently go!' },
+            { batch: 'b3', en: 'restlessly', ipa: '/ˈrestləsli/', tr: '[рЕстлеслі]', ua: 'неспокійно', de: 'unruhig', hint: 'adverb • B2', ex: '"My parents waited restlessly for any news."', poem: 'Pacing, turning, can\'t sit still&mdash;<br>restlessly against your will!' },
+            { batch: 'b3', en: 'collapse', ipa: '/kəˈlæps/', tr: '[колЕпс]', ua: 'впасти, знепритомніти; колапс', de: 'zusammenbrechen', hint: 'verb/noun • B2', ex: '"She almost collapsed from fear and fatigue."', poem: 'Legs give way, the world goes grey&mdash;<br>collapse and fall &mdash; then rise someday!' },
+            { batch: 'b3', en: 'fatigue', ipa: '/fəˈtiːɡ/', tr: '[фетІг]', ua: 'втома, виснаження', de: 'die Ersch&ouml;pfung', hint: 'noun • C1', ex: '"Fatigue finally overcame the whole family."', poem: 'Heavy eyelids, weary bones&mdash;<br>fatigue speaks in tired tones!' },
+            { batch: 'b3', en: 'wide awake', ipa: '/ˌwaɪd əˈweɪk/', tr: '[вайд евЕйк]', ua: 'зовсім не сонний, бадьорий', de: 'hellwach', hint: 'phrase • B1', ex: '"She lay wide awake all night."', poem: 'Eyes wide open, thoughts that race&mdash;<br>wide awake at midnight\'s pace!' },
+            { batch: 'b3', en: 'mercifully', ipa: '/ˈmɜːsɪfəli/', tr: '[мЕрсіфулі]', ua: 'на щастя; милосердно', de: 'gn&auml;digerweise / zum Gl&uuml;ck', hint: 'adverb • C1', ex: '"Mercifully, I have no memory of that night."', poem: 'When fate is kind and softens the blow&mdash;<br>mercifully, some pain lets go!' },
+            { batch: 'b3', en: 'rebound', ipa: '/rɪˈbaʊnd/', tr: '[рібАунд]', ua: 'відновлюватися; відскакувати', de: 'sich erholen / zur&uuml;ckprallen', hint: 'verb • B2', ex: '"My body began to rebound within days."', poem: 'Down but never out for good&mdash;<br>rebound stronger, knew you would!' },
+            { batch: 'b3', en: 'regain', ipa: '/rɪˈɡeɪn/', tr: '[рігЕйн]', ua: 'повернути собі, відновити', de: 'wiedererlangen', hint: 'verb • B2', ex: '"I slowly regained consciousness."', poem: 'What was lost can come again&mdash;<br>regain your strength, regain your reign!' },
+            { batch: 'b3', en: 'blow', ipa: '/bləʊ/', tr: '[блОу]', ua: 'дути; удар', de: 'blasen / der Schlag', hint: 'verb/noun • A2', ex: '"The blow to my head was severe."', poem: 'The wind can blow, a fist can too&mdash;<br>one moves the leaves, one bruises you!' },
+            { batch: 'b3', en: 'sniff', ipa: '/snɪf/', tr: '[снІф]', ua: 'шморгати носом; нюхати', de: 'schniefen / schn&uuml;ffeln', hint: 'verb • B1', ex: '"Every time I sniffed, my eye hurt."', poem: 'A little breath up through the nose&mdash;<br>sniff the air and smell the rose!' },
+            { batch: 'b3', en: 'blow one\'s nose', ipa: '/ˌbləʊ wʌnz ˈnəʊz/', tr: '[блоу ванз нОуз]', ua: 'висякатися', de: 'sich die Nase putzen', hint: 'phrase • B1', ex: '"I couldn\'t blow my nose without pain."', poem: 'Grab a tissue, hold it close&mdash;<br>it\'s time to gently blow your nose!' },
+            { batch: 'b3', en: 'outward', ipa: '/ˈaʊtwəd/', tr: '[Аутвед]', ua: 'назовні', de: 'nach au&szlig;en', hint: 'adverb • B2', ex: '"My eyeball bulged outward when I sneezed."', poem: 'From the inside to the light&mdash;<br>outward goes the path of flight!' },
+            { batch: 'b3', en: 'bulge', ipa: '/bʌldʒ/', tr: '[бАлдж]', ua: 'випинатися, вибалушуватися', de: 'hervortreten / sich w&ouml;lben', hint: 'verb • C1', ex: '"When I blew my nose, my eye bulged outward."', poem: 'Pressed from inside, round and tight&mdash;<br>it starts to bulge &mdash; a swollen sight!' },
+            { batch: 'b3', en: 'hold', ipa: '/həʊld/', tr: '[хОулд]', ua: 'тримати(ся)', de: 'halten', hint: 'verb • A1', ex: '"The bone could barely hold my eye in place."', poem: 'Fingers close and grip so tight&mdash;<br>hold on firmly, hold on right!' },
+            { batch: 'b3', en: 'precariously', ipa: '/prɪˈkeəriəsli/', tr: '[прікЕріеслі]', ua: 'хитко, ненадійно', de: 'unsicher / prek&auml;r', hint: 'adverb • C1', ex: '"My eyeball sat precariously in the shattered socket."', poem: 'On the edge, about to fall&mdash;<br>precariously balanced, that says it all!' },
+            { batch: 'b3', en: 'gradually', ipa: '/ˈɡrædʒuəli/', tr: '[грЕджуелі]', ua: 'поступово', de: 'allm&auml;hlich', hint: 'adverb • B1', ex: '"Gradually, my eye slid back into place."', poem: 'Little by little, day by day&mdash;<br>gradually finds its way!' },
+            { batch: 'b3', en: 'slide back', ipa: '/ˌslaɪd ˈbæk/', tr: '[слайд бЕк]', ua: 'ковзнути назад, повернутися на місце', de: 'zur&uuml;ckgleiten', hint: 'phrasal verb • B2', ex: '"The eye gradually slid back into place."', poem: 'Where it was, it goes once more&mdash;<br>slide back gently, as before!' },
+            { batch: 'b3', en: 'seep out', ipa: '/ˌsiːp ˈaʊt/', tr: '[сіп Аут]', ua: 'просочуватися (назовні)', de: 'heraussickern', hint: 'phrasal verb • C1', ex: '"Air seeped out through the crack in the bone."', poem: 'Drop by drop, a quiet route&mdash;<br>slowly things can seep right out!' },
+            { batch: 'b3', en: 'schedule', ipa: '/ˈʃedjuːl/', tr: '[шЕдьюл]', ua: 'призначати, планувати; розклад', de: 'planen / der Zeitplan', hint: 'verb/noun • B1', ex: '"The doctors scheduled my surgery."', poem: 'Plan the day and set the date&mdash;<br>a schedule keeps you never late!' },
+            { batch: 'b3', en: 'boxing match', ipa: '/ˈbɒksɪŋ mætʃ/', tr: '[бОксінг метч]', ua: 'боксерський поєдинок', de: 'der Boxkampf', hint: 'noun • B1', ex: '"I looked like I had been in a boxing match."', poem: 'Gloves are up, the bell will ring&mdash;<br>a boxing match &mdash; may the best one swing!' },
+            { batch: 'b3', en: 'consciousness', ipa: '/ˈkɒnʃəsnəs/', tr: '[кОншеснес]', ua: 'свідомість, притомність', de: 'das Bewusstsein', hint: 'noun • C1', ex: '"I was slipping in and out of consciousness."', poem: 'The light inside that lets you see&mdash;<br>consciousness is you being free!' },
+            { batch: 'b3', en: 'seizure', ipa: '/ˈsiːʒə/', tr: '[сІже]', ua: 'судомний напад', de: 'der Krampfanfall', hint: 'noun • C1', ex: '"I had my first seizure on the way to the hospital."', poem: 'A storm inside the brain runs wild&mdash;<br>a seizure shakes both man and child!' },
+            { batch: 'b3', en: 'unconscious', ipa: '/ʌnˈkɒnʃəs/', tr: '[анкОншес]', ua: 'непритомний', de: 'bewusstlos', hint: 'adjective • B2', ex: '"I was unconscious when we reached the hospital."', poem: 'Eyes are closed, the world is gone&mdash;<br>unconscious minds still carry on!' },
+            { batch: 'b3', en: 'severe', ipa: '/sɪˈvɪə/', tr: '[сівІе]', ua: 'тяжкий, серйозний, сильний', de: 'schwer / schlimm', hint: 'adjective • B2', ex: '"The injury was severe, but not hopeless."', poem: 'Not a scratch, not something small&mdash;<br>severe means serious, most of all!' },
+            { batch: 'b3', en: 'induce', ipa: '/ɪnˈdjuːs/', tr: '[індьЮс]', ua: 'викликати, спричинити; ввести (штучно)', de: 'herbeif&uuml;hren / k&uuml;nstlich einleiten', hint: 'verb • C1', ex: '"The doctors put me in a medically induced coma."', poem: 'Make it happen, bring it on&mdash;<br>induce the sleep till danger\'s gone!' }
+        ];
+
+        /* ══════════ STATE ══════════ */
+        let activeBatch = 'all';
+        let knownCount = 0;
+
+        function getWords() {
+            return activeBatch === 'all' ? WORDS : WORDS.filter(w => w.batch === activeBatch);
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function renderBatchChips() {
+            const wrap = document.getElementById('batchChips');
+            let html = '<div class="batch-chip' + (activeBatch === 'all' ? ' active' : '') + '" onclick="setBatch(\'all\')">Всі слова (' + WORDS.length + ')</div>';
+            BATCHES.forEach(b => {
+                const n = WORDS.filter(w => w.batch === b.id).length;
+                html += '<div class="batch-chip' + (activeBatch === b.id ? ' active' : '') + '" onclick="setBatch(\'' + b.id + '\')">' + b.label + ' (' + n + ')</div>';
+            });
+            wrap.innerHTML = html;
+        }
+
+        function setBatch(id) {
+            activeBatch = id;
+            renderBatchChips();
+            renderCards();
+        }
+
+        /* ══════════ FLASHCARDS ══════════ */
+        function renderCards(order) {
+            const words = order || getWords();
+            const wrap = document.getElementById('cardsWrap');
+            let html = '';
+            let lastBatch = null;
+            words.forEach((w, i) => {
+                if (!order && w.batch !== lastBatch) {
+                    if (lastBatch !== null) html += '</div>';
+                    const b = BATCHES.find(x => x.id === w.batch);
+                    html += '<div class="group-label">' + b.label + '</div><div class="card-grid">';
+                    lastBatch = w.batch;
+                } else if (order && i === 0) {
+                    html += '<div class="card-grid">';
+                }
+                const num = String(WORDS.indexOf(w) + 1).padStart(2, '0');
+                html += '<div class="fcard" onclick="flipCard(this)">'
+                    + '<div class="fcard-front"><div class="fcard-num">#' + num + '</div>'
+                    + '<div class="fcard-word">' + w.en + '</div>'
+                    + '<div class="fcard-tr">' + w.tr + '</div>'
+                    + '<div class="fcard-ipa">' + w.ipa + '</div>'
+                    + '<div class="fcard-hint">' + w.hint + '</div></div>'
+                    + '<div class="fcard-back"><div class="fcard-ua">' + w.ua + '</div>'
+                    + '<div class="fcard-de">' + w.de + '</div>'
+                    + '<div class="fcard-example">' + w.ex + '</div>'
+                    + '<div class="fcard-poem">' + w.poem + '</div>'
+                    + '<div class="know-btn" onclick="markKnown(event, this)">&#x2713; Я знаю це</div></div>'
+                    + '<div class="flip-tip">tap to flip</div></div>';
+            });
+            if (words.length) html += '</div>';
+            wrap.innerHTML = html;
+            knownCount = 0;
+            updateCardsProgress();
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+
+        function markKnown(e, btn) {
+            e.stopPropagation();
+            const card = btn.closest('.fcard');
+            if (card.classList.contains('known')) {
+                card.classList.remove('known');
+                btn.innerHTML = '&#x2713; Я знаю це';
+                knownCount = Math.max(0, knownCount - 1);
+            } else {
+                card.classList.add('known');
+                btn.innerHTML = '&#x2713; Вивчено!';
+                knownCount++;
+            }
+            updateCardsProgress();
+        }
+
+        function updateCardsProgress() {
+            const total = getWords().length;
+            document.getElementById('cardsTotal').textContent = total;
+            document.getElementById('cardsNum').textContent = knownCount;
+            document.getElementById('cardsBar').style.width = (total ? knownCount / total * 100 : 0) + '%';
+            document.getElementById('cardsDone').classList.toggle('show', total > 0 && knownCount === total);
+        }
+
+        function flipAll() {
+            document.querySelectorAll('#cardsWrap .fcard:not(.flipped)').forEach(c => c.classList.add('flipped'));
+        }
+
+        function resetCards() { renderCards(); }
+
+        function shuffleCards() { renderCards(shuffle(getWords())); }
+
+        /* ══════════ INIT ══════════ */
+        renderBatchChips();
+        renderCards();
+    </script>
+</body>
+</html>

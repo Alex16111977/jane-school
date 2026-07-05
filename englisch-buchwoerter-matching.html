@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сопоставлення | Book Words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .mt-wrap { max-width: 820px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .mt-bar { display:flex; justify-content:center; align-items:center; gap:1.2rem; margin-bottom: 1rem; flex-wrap:wrap; }
+        .mt-rounds { display:flex; gap:0.45rem; }
+        .mt-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center; font-size: 0.8rem; font-weight: 800;
+            background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.45);
+        }
+        .mt-dot.active { background: rgba(163,113,247,0.2); border-color: #a371f7; color:#c084fc; }
+        .mt-dot.done { background: rgba(63,185,80,0.2); border-color: #3fb950; color:#86efac; }
+        .mt-stat { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 600; }
+        .mt-stat b { color:#fff; }
+        .mt-stat .miss { color:#ff8a84; }
+
+        .mt-hint { text-align:center; font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 1.1rem; }
+
+        .mt-grid { display:grid; grid-template-columns: minmax(150px, 0.8fr) 1.4fr; gap: 0.7rem 1.2rem; }
+        .mt-col { display:flex; flex-direction:column; gap: 0.6rem; }
+        .mt-col-head { font-size:0.74rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:700; color: rgba(163,113,247,0.8); margin-bottom: 0.1rem; text-align:center; }
+
+        .mt-item {
+            position: relative;
+            padding: 0.7rem 0.9rem; border-radius: 11px;
+            background: rgba(13,17,23,0.82); border: 1.5px solid rgba(255,255,255,0.1);
+            color:#fff; font-size: 0.96rem; font-weight: 600; cursor: pointer;
+            transition: border-color 0.18s, background 0.18s, transform 0.1s;
+            min-height: 1.2em; line-height: 1.4;
+        }
+        .mt-item.de { font-weight: 800; display:flex; align-items:center; }
+        .mt-item.def { font-weight: 500; color: rgba(255,255,255,0.9); }
+        .mt-item:hover:not(.done) { border-color: rgba(163,113,247,0.5); background: rgba(163,113,247,0.1); }
+        .mt-item.sel { border-color:#a371f7; background: rgba(163,113,247,0.22); box-shadow: 0 0 0 2px rgba(163,113,247,0.3); }
+        .mt-item.done {
+            border-color: rgba(63,185,80,0.55); background: rgba(13,23,17,0.85); color:#cdeed6; cursor: default;
+        }
+        .mt-item.wrong { animation: shake 0.4s; border-color:#f85149; background: rgba(248,81,73,0.16); }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+        .mt-badge {
+            position:absolute; top:-8px; right:-8px;
+            width: 22px; height: 22px; border-radius:50%;
+            background:#3fb950; color:#06210f; font-size:0.72rem; font-weight:900;
+            display:none; align-items:center; justify-content:center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index:2;
+        }
+        .mt-item.done .mt-badge { display:flex; }
+        .mt-reveal {
+            display:none; margin-top: 0.4rem; padding-top: 0.4rem;
+            border-top: 1px dashed rgba(63,185,80,0.3);
+            font-size: 0.85rem; font-weight: 700; color:#86efac;
+        }
+        .mt-item.done .mt-reveal { display:block; animation: fadeIn 0.3s ease both; }
+        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+        .mt-controls { display:flex; justify-content:center; gap: 0.6rem; margin-top: 1.4rem; flex-wrap: wrap; }
+        .mt-btn {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.72rem 1.6rem; border-radius: 12px;
+            background: rgba(163,113,247,0.16); border: 1.5px solid rgba(163,113,247,0.45);
+            color:#c084fc; font-size: 0.95rem; font-weight: 800; cursor:pointer; font-family: inherit;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .mt-btn:hover { background: rgba(163,113,247,0.28); color:#fff; transform: translateY(-2px); }
+        .mt-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .mt-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .mt-next { display:none; }
+
+        .mt-msg { text-align:center; font-size: 0.95rem; font-weight: 700; margin-top: 1rem; min-height: 1.2em; }
+        .mt-msg.ok { color:#6ee7a0; }
+
+        .mt-done {
+            text-align:center; background: rgba(13,17,23,0.9); border: 1.5px solid rgba(63,185,80,0.5);
+            border-radius: 16px; padding: 2rem 1.2rem; display:none; margin-top: 1.3rem; animation: fadeUp 0.4s ease both;
+        }
+        .mt-done.show { display:block; }
+        @keyframes fadeUp { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
+        .mt-done .emoji { font-size: 3rem; }
+        .mt-done h2 { color:#fff; margin: 0.5rem 0 0.3rem; }
+        .mt-done p { color: var(--color-text-muted); margin: 0 0 1.2rem; }
+
+        @media (max-width: 560px) {
+            .mt-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+            .mt-col.pair-right { margin-top: 0.3rem; }
+            .mt-item { font-size: 0.9rem; padding: 0.6rem 0.7rem; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch-buchwoerter.html">Слова з книги</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Сопоставлення</span>
+        </nav>
+        <a href="englisch-buchwoerter.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до слів з книги</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Сопоставлення <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">Слова з книги</span></h1>
+            <p class="page-subtitle">З&apos;єднай англійське слово з його <b style="color:#c084fc;">поясненням англійською</b>. Після правильної пари відкриється український переклад. Слова йдуть групами.</p>
+        </div>
+
+        <div class="mt-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+
+            <div class="mt-bar">
+                <div class="mt-rounds" id="rounds"></div>
+                <div class="mt-stat">Пар: <b id="stat-matched">0</b>/<b id="stat-total">0</b> · <span class="miss">помилки: <b id="stat-miss">0</b></span></div>
+            </div>
+
+            <div class="mt-hint">Клікни <b style="color:#c084fc;">слово</b> зліва, потім його <b style="color:#9af0b4;">пояснення</b> справа</div>
+
+            <div class="mt-grid">
+                <div class="mt-col"><div class="mt-col-head">🇬🇧 Слово</div><div id="col-left" class="mt-col"></div></div>
+                <div class="mt-col pair-right"><div class="mt-col-head">🇬🇧 Пояснення</div><div id="col-right" class="mt-col"></div></div>
+            </div>
+
+            <div class="mt-msg" id="msg"></div>
+
+            <div class="mt-controls">
+                <button class="mt-btn mt-next" id="next-btn" onclick="nextChunk()">Далі &#8594;</button>
+                <button class="mt-btn ghost" onclick="startBatch(currentBatch)">&#8635; Спочатку</button>
+            </div>
+
+            <div class="mt-done" id="done">
+                <div class="emoji">🏆</div>
+                <h2>Усі пари зібрано!</h2>
+                <p id="done-sub"></p>
+                <button class="mt-btn" onclick="startBatch(currentBatch)">&#8635; Ще раз цю частину</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_BATCH = {"b1": [{"en": "framework", "ua": "структура, система, каркас (ідей)", "def": "a basic structure of ideas that supports a system or plan"}, {"en": "along the way", "ua": "по дорозі; у процесі, поступово", "def": "during the process of doing something or going somewhere"}, {"en": "entertain", "ua": "розважати", "def": "to keep someone interested and amused"}, {"en": "vault", "ua": "сховище, сейф; склепіння", "def": "a strong locked room where money or valuables are kept"}, {"en": "ship", "ua": "відправляти, випускати (продукт)", "def": "to send out or deliver a product to people"}, {"en": "optimize", "ua": "оптимізувати, покращувати", "def": "to make something as good or effective as possible"}, {"en": "quit", "ua": "кидати, припиняти, здаватися", "def": "to stop doing something or give up"}, {"en": "proven", "ua": "доведений, перевірений", "def": "shown to be true or effective by tests or experience"}, {"en": "irreducible", "ua": "неподільний; який не можна спростити далі", "def": "impossible to make smaller or simpler"}, {"en": "unit", "ua": "одиниця, елемент", "def": "a single complete part of something bigger"}, {"en": "immense", "ua": "величезний, надзвичайний", "def": "extremely large in size or degree"}, {"en": "source", "ua": "джерело", "def": "the place or thing where something comes from"}, {"en": "atomic", "ua": "атомний; крихітний (як атом)", "def": "extremely small, like an atom; relating to atoms"}, {"en": "perform", "ua": "виконувати; виступати", "def": "to do an action, task, or routine"}, {"en": "law", "ua": "закон, правило", "def": "a rule that says how something works or must be done"}, {"en": "appendix", "ua": "додаток (у кінці книги)", "def": "an extra section at the end of a book"}, {"en": "sophomore year", "ua": "другий рік навчання (10-й клас, США)", "def": "the second year at high school or college in the USA"}, {"en": "included", "ua": "включений; включно", "def": "contained as a part of something"}], "b2": [{"en": "take a full swing", "ua": "замахнутися на повну силу", "def": "to swing a bat or club as hard as you can"}, {"en": "bat", "ua": "бита (бейсбольна)", "def": "a wooden stick used to hit the ball in baseball"}, {"en": "slip out", "ua": "вислизнути (з рук)", "def": "to slide out of your hands or a place by accident"}, {"en": "strike", "ua": "вдарити; влучити", "def": "to hit someone or something hard"}, {"en": "force", "ua": "сила", "def": "physical power or strength of a hit or movement"}, {"en": "distorted", "ua": "деформований, спотворений", "def": "pulled or bent out of its normal shape"}, {"en": "collision", "ua": "зіткнення", "def": "a crash — when two things hit each other hard"}, {"en": "tissue", "ua": "тканина (тіла)", "def": "the soft material that living bodies are made of"}, {"en": "slam into", "ua": "врізатися у, вдаритися об", "def": "to crash into something with great force"}, {"en": "skull", "ua": "череп", "def": "the bones of the head that protect the brain"}, {"en": "immediately", "ua": "негайно, одразу", "def": "right away, without any delay"}, {"en": "swell", "ua": "набрякати, опухати", "def": "to grow bigger, often after an injury"}, {"en": "surge", "ua": "різко наростати; хвиля", "def": "to rise or spread suddenly and powerfully, like a wave"}, {"en": "throughout", "ua": "по всьому; протягом усього", "def": "in every part of something; during the whole time"}, {"en": "in a fraction of (a second)", "ua": "за частку (секунди)", "def": "in an extremely short moment of time"}, {"en": "fracture", "ua": "перелом; зламати", "def": "a break or crack in a bone"}, {"en": "shattered", "ua": "роздроблений, розтрощений", "def": "broken into many small pieces"}, {"en": "sockets", "ua": "очні западини", "def": "the hollow parts of the skull where the eyes sit"}, {"en": "run over", "ua": "швидко переглянути, повторити", "def": "to look through or repeat something quickly"}, {"en": "red", "ua": "червоний", "def": "the colour of blood or fire"}, {"en": "take off one's back", "ua": "зняти з себе (зі спини)", "def": "to take off a piece of clothing you are wearing (to give it away)"}, {"en": "hand", "ua": "рука; передавати", "def": "the body part at the end of the arm; (verb) to give"}, {"en": "handed", "ua": "передав, вручив", "def": "gave something to someone (past of \"hand\")"}, {"en": "plug", "ua": "заткнути, затампонувати", "def": "to block a hole so nothing can flow through"}, {"en": "stream", "ua": "потік, струмінь", "def": "a continuous flow of liquid"}, {"en": "injured", "ua": "травмований, поранений", "def": "hurt or physically harmed"}, {"en": "looped", "ua": "обвив, обвила (руку)", "def": "wrapped or circled around something (past of \"loop\")"}, {"en": "down the hill", "ua": "вниз пагорбом", "def": "from the top of a hill toward the bottom"}, {"en": "my sides", "ua": "мої боки", "def": "the left and right parts of your body"}, {"en": "upright", "ua": "вертикально, прямо", "def": "standing straight, not falling or leaning"}, {"en": "mattered", "ua": "мало значення", "def": "was important (past of \"matter\")"}], "b3": [{"en": "stall", "ua": "глохнути, зупинятися", "def": "to suddenly stop working or moving"}, {"en": "rapid", "ua": "швидкий, стрімкий", "def": "happening very quickly"}, {"en": "handle", "ua": "справлятися з", "def": "to deal with or manage something"}, {"en": "shut down", "ua": "відключатися", "def": "to stop working or functioning"}, {"en": "entirely", "ua": "повністю, цілком", "def": "completely, totally"}, {"en": "supply", "ua": "постачати; запас", "def": "to give someone what is needed"}, {"en": "roll out", "ua": "викочувати", "def": "to move something out on wheels"}, {"en": "toward", "ua": "до, у напрямку", "def": "in the direction of something"}, {"en": "across", "ua": "через, на той бік", "def": "from one side to the other"}, {"en": "rattle", "ua": "деренчати, трястися", "def": "to shake and make short knocking sounds"}, {"en": "sidewalk", "ua": "тротуар", "def": "a paved path for walking next to a street"}, {"en": "bumpy", "ua": "нерівний, вибоїстий", "def": "not smooth, full of holes and bumps"}, {"en": "push", "ua": "штовхати", "def": "to press something to move it away from you"}, {"en": "pump", "ua": "качати; насос", "def": "to force liquid or air to move somewhere"}, {"en": "climb into", "ua": "залізти в", "def": "to get into something using your hands and legs"}, {"en": "remain", "ua": "залишатися", "def": "to stay in the same place or state"}, {"en": "ride", "ua": "поїздка", "def": "a journey in a vehicle"}, {"en": "break the news", "ua": "повідомити (важку) новину", "def": "to tell someone important (often bad) news"}, {"en": "choke back tears", "ua": "стримувати сльози", "def": "to try hard not to cry"}, {"en": "pass off", "ua": "передати далі", "def": "to hand someone or something over to another person"}, {"en": "sprint onto", "ua": "вибігти на", "def": "to run onto a place at full speed"}, {"en": "wheel into", "ua": "завезти (на каталці) в", "def": "to push someone on wheels into a place"}, {"en": "condition", "ua": "стан; умова", "def": "the state that someone or something is in"}, {"en": "yet", "ua": "ще (не); проте", "def": "until now; despite that"}, {"en": "enter", "ua": "входити", "def": "to come or go into a place"}, {"en": "ground floor", "ua": "перший поверх", "def": "the floor of a building at street level"}, {"en": "priest", "ua": "священник", "def": "a person who leads religious ceremonies"}, {"en": "decade", "ua": "десятиліття", "def": "a period of ten years"}, {"en": "fade", "ua": "згасати, тьмяніти", "def": "to slowly become weaker or less bright"}, {"en": "restlessly", "ua": "неспокійно", "def": "in a way that shows you cannot relax"}, {"en": "collapse", "ua": "впасти, знепритомніти", "def": "to fall down suddenly, often from weakness"}, {"en": "fatigue", "ua": "втома, виснаження", "def": "extreme tiredness"}, {"en": "wide awake", "ua": "зовсім не сонний", "def": "completely awake, not sleepy at all"}, {"en": "mercifully", "ua": "на щастя; милосердно", "def": "luckily — when something bad could have been worse"}, {"en": "rebound", "ua": "відновлюватися", "def": "to recover quickly after a difficult time"}, {"en": "regain", "ua": "повернути собі, відновити", "def": "to get something back again"}, {"en": "blow", "ua": "дути; удар", "def": "to push air out; a hard hit"}, {"en": "sniff", "ua": "шморгати носом", "def": "to breathe in quickly through the nose"}, {"en": "blow one's nose", "ua": "висякатися", "def": "to clear your nose by pushing air through it"}, {"en": "outward", "ua": "назовні", "def": "toward the outside"}, {"en": "bulge", "ua": "випинатися", "def": "to stick out in a round shape"}, {"en": "hold", "ua": "тримати(ся)", "def": "to keep something in place"}, {"en": "precariously", "ua": "хитко, ненадійно", "def": "in an unstable way, likely to fall"}, {"en": "gradually", "ua": "поступово", "def": "slowly, step by step over time"}, {"en": "slide back", "ua": "ковзнути назад", "def": "to move smoothly back into place"}, {"en": "seep out", "ua": "просочуватися", "def": "to flow out slowly through small holes"}, {"en": "schedule", "ua": "призначати; розклад", "def": "to plan something for a certain time"}, {"en": "boxing match", "ua": "боксерський поєдинок", "def": "a fight between two boxers in a ring"}, {"en": "consciousness", "ua": "свідомість, притомність", "def": "the state of being awake and aware"}, {"en": "seizure", "ua": "судомний напад", "def": "a sudden attack when the body shakes and the brain stops working normally"}, {"en": "unconscious", "ua": "непритомний", "def": "not awake and not aware of anything"}, {"en": "severe", "ua": "тяжкий, серйозний", "def": "very bad or serious"}, {"en": "induce", "ua": "викликати, спричинити (штучно)", "def": "to make something happen, often with medicine"}]};
+        const BATCHES = [["b1", "📖 Частина 1 • 03.07"], ["b2", "📖 Частина 2 • 04.07"], ["b3", "📖 Частина 3 • 04.07"]];
+        const LABELS = {"b1": "Частина 1 • 03.07", "b2": "Частина 2 • 04.07", "b3": "Частина 3 • 04.07"};
+        const BATCH = 6;
+
+        let currentBatch = BATCHES[0][0];
+        let pool = WORDS_BY_BATCH[currentBatch];
+        let chunks = [];
+        let chunkIdx = 0;
+        let matched, selLeft, selRight, mistakes, matchNo, lockClick;
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function buildBatchTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            BATCHES.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentBatch?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>startBatch(d);
+                el.appendChild(b);
+            });
+        }
+
+        function makeChunks(arr){
+            const out=[]; const a=shuffle(arr.slice());
+            for(let i=0;i<a.length;i+=BATCH) out.push(a.slice(i,i+BATCH));
+            return out;
+        }
+
+        function startBatch(d){
+            currentBatch = d;
+            pool = WORDS_BY_BATCH[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', BATCHES[i][0]===d));
+            chunks = makeChunks(pool);
+            chunkIdx = 0;
+            mistakes = 0;
+            document.getElementById('done').classList.remove('show');
+            document.getElementById('stat-miss').textContent = '0';
+            renderChunk();
+        }
+
+        function renderRounds(){
+            const el = document.getElementById('rounds');
+            el.innerHTML = '';
+            for(let r=0;r<chunks.length;r++){
+                const d=document.createElement('div');
+                d.className='mt-dot'+(r<chunkIdx?' done':'')+(r===chunkIdx?' active':'');
+                d.textContent = r<chunkIdx ? '✓' : (r+1);
+                el.appendChild(d);
+            }
+        }
+
+        function renderChunk(){
+            const chunk = chunks[chunkIdx];
+            matched = new Set(); selLeft=null; selRight=null; matchNo=0; lockClick=false;
+            renderRounds();
+
+            const items = chunk.map((w,i)=>({en:w.en, ua:w.ua, def:w.def, id:i}));
+            const leftShuf = shuffle(items.slice());
+            const rightShuf = shuffle(items.slice());
+
+            const colL = document.getElementById('col-left');
+            const colR = document.getElementById('col-right');
+            colL.innerHTML=''; colR.innerHTML='';
+            leftShuf.forEach(it=>{
+                const el=document.createElement('div');
+                el.className='mt-item de'; el.dataset.id=it.id; el.dataset.side='L';
+                el.innerHTML = '<span>'+escapeHtml(it.en)+'</span><span class="mt-badge"></span>';
+                el.onclick=()=>pick(el,'L');
+                colL.appendChild(el);
+            });
+            rightShuf.forEach(it=>{
+                const el=document.createElement('div');
+                el.className='mt-item def'; el.dataset.id=it.id; el.dataset.side='R';
+                el.dataset.ua = it.ua;
+                el.innerHTML = escapeHtml(it.def) + '<span class="mt-reveal"></span><span class="mt-badge"></span>';
+                el.onclick=()=>pick(el,'R');
+                colR.appendChild(el);
+            });
+
+            document.getElementById('stat-matched').textContent='0';
+            document.getElementById('stat-total').textContent=chunk.length;
+            document.getElementById('msg').textContent='';
+            document.getElementById('msg').className='mt-msg';
+            document.getElementById('next-btn').style.display='none';
+        }
+
+        function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function pick(el, side){
+            if(lockClick) return;
+            if(el.classList.contains('done')) return;
+            if(side==='L'){
+                if(selLeft) selLeft.classList.remove('sel');
+                selLeft = el; el.classList.add('sel');
+            } else {
+                if(selRight) selRight.classList.remove('sel');
+                selRight = el; el.classList.add('sel');
+            }
+            if(selLeft && selRight) evaluate();
+        }
+
+        function evaluate(){
+            const L=selLeft, R=selRight;
+            if(L.dataset.id === R.dataset.id){
+                matchNo++;
+                [L,R].forEach(x=>{
+                    x.classList.remove('sel'); x.classList.add('done');
+                    x.querySelector('.mt-badge').textContent = matchNo;
+                });
+                // reveal Ukrainian on the definition tile
+                const rev = R.querySelector('.mt-reveal');
+                if(rev) rev.textContent = '🇺🇦 ' + R.dataset.ua;
+                matched.add(L.dataset.id);
+                selLeft=null; selRight=null;
+                document.getElementById('stat-matched').textContent = matched.size;
+                if(matched.size === chunks[chunkIdx].length) chunkDone();
+            } else {
+                lockClick=true;
+                L.classList.add('wrong'); R.classList.add('wrong');
+                mistakes++;
+                document.getElementById('stat-miss').textContent = mistakes;
+                setTimeout(()=>{
+                    [L,R].forEach(x=>{ x.classList.remove('wrong','sel'); });
+                    selLeft=null; selRight=null; lockClick=false;
+                }, 500);
+            }
+        }
+
+        function chunkDone(){
+            const msg=document.getElementById('msg');
+            renderRounds();
+            if(chunkIdx < chunks.length-1){
+                msg.textContent='✓ Групу зібрано! Натисни «Далі»';
+                msg.className='mt-msg ok';
+                document.getElementById('next-btn').style.display='inline-flex';
+            } else {
+                msg.textContent='';
+                document.getElementById('rounds').querySelectorAll('.mt-dot').forEach((d)=>{ d.className='mt-dot done'; d.textContent='✓'; });
+                document.getElementById('done-sub').textContent = 'Слів: ' + pool.length + ' · Помилок: ' + mistakes;
+                setTimeout(()=>{
+                    document.getElementById('done').classList.add('show');
+                    document.getElementById('done').scrollIntoView({behavior:'smooth', block:'center'});
+                }, 350);
+            }
+        }
+
+        function nextChunk(){
+            if(chunkIdx < chunks.length-1){ chunkIdx++; renderChunk(); window.scrollTo({top:0,behavior:'smooth'}); }
+        }
+
+        buildBatchTabs();
+        startBatch(BATCHES[0][0]);
+    </script>
+</body>
+</html>
