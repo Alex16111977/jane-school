@@ -1205,6 +1205,7 @@
             <button class="mode-btn" data-mode="leitner">&#x1F3B4; Leitner</button>
             <button class="mode-btn" data-mode="story">&#x1F4D6; Text</button>
             <button class="mode-btn" data-mode="bilder">&#x1F3A8; Bilder</button>
+            <button class="mode-btn" data-mode="audio">&#x1F3A7; Audio</button>
         </div>
 
         <!-- Progress -->
@@ -5680,6 +5681,7 @@
         // ===== RENDER ROUTER =====
         function renderVocab() {
             if (speedTimer) { clearInterval(speedTimer); speedTimer = null; }
+            stopAudio();
             var key = currentLevel + ':' + currentTopic;
             var data = getData();
             var grid = document.getElementById('vocab-grid');
@@ -5710,9 +5712,455 @@
             else if (currentMode === 'story') renderStory(grid, data, lvl);
             else if (currentMode === 'bilder') renderBilder(grid, data, lvl);
             else if (currentMode === 'synonyme') renderSynonyme(grid);
+            else if (currentMode === 'audio') renderAudio(grid, data, lvl);
 
             updateProgressBar(data);
         }
+
+        // ===== MODE: AUDIO (Vorlesen / hands-free) =====
+        var audioState = {
+            playing: false, idx: 0, order: [], data: [], lvl: '', sig: null,
+            voices: { de: null, sl: null }, wakeLock: null, timer: null, gen: 0,
+            _voiceInit: false,
+            settings: { speed: 0.9, readMode: 'full', repeatWord: false, gap: 900, shuffle: false, loop: true }
+        };
+
+        function decodeEntities(s) {
+            var el = document.createElement('textarea');
+            el.innerHTML = String(s == null ? '' : s);
+            return el.value;
+        }
+        function cleanGerman(s) {
+            return decodeEntities(s).replace(/\|/g, '').replace(/­/g, '').trim();
+        }
+        function transText(s) {
+            // item[1] is "переклад / english" -> read only the first (Slavic) part
+            return decodeEntities(String(s || '').split(' / ')[0]).trim();
+        }
+        function shuffleArr(a) {
+            for (var i = a.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var t = a[i]; a[i] = a[j]; a[j] = t;
+            }
+            return a;
+        }
+        function pickVoices() {
+            var vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+            function find(prefixes) {
+                for (var p = 0; p < prefixes.length; p++)
+                    for (var i = 0; i < vs.length; i++)
+                        if (vs[i].lang && vs[i].lang.toLowerCase().indexOf(prefixes[p]) === 0) return vs[i];
+                return null;
+            }
+            audioState.voices.de = find(['de']);
+            audioState.voices.sl = find(['uk', 'ru']); // Ukrainian, fallback Russian, else default
+        }
+        function speakStep(text, voice, cb) {
+            if (!window.speechSynthesis) { if (cb) cb(); return; }
+            text = (text || '').trim();
+            if (!text) { if (cb) cb(); return; }
+            var u = new SpeechSynthesisUtterance(text);
+            if (voice) { u.voice = voice; u.lang = voice.lang; }
+            u.rate = audioState.settings.speed;
+            u.onend = function () { if (cb) cb(); };
+            u.onerror = function () { if (cb) cb(); };
+            speechSynthesis.speak(u);
+        }
+        function requestWake() {
+            try {
+                if ('wakeLock' in navigator && navigator.wakeLock) {
+                    navigator.wakeLock.request('screen').then(function (wl) { audioState.wakeLock = wl; }).catch(function () {});
+                }
+            } catch (e) {}
+        }
+        function releaseWake() {
+            try { if (audioState.wakeLock) { audioState.wakeLock.release(); audioState.wakeLock = null; } } catch (e) {}
+        }
+        function setMediaSession(item) {
+            if (!('mediaSession' in navigator)) return;
+            try {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: cleanGerman(item[0]),
+                    artist: transText(item[1]),
+                    album: 'NeoStudy · ' + (TOPIC_META[currentTopic] ? decodeEntities(TOPIC_META[currentTopic].title) : 'Vokabeln')
+                });
+                navigator.mediaSession.setActionHandler('play', function () { if (!audioState.playing) startAudio(); });
+                navigator.mediaSession.setActionHandler('pause', function () { if (audioState.playing) pauseAudio(); });
+                navigator.mediaSession.setActionHandler('nexttrack', function () { advanceAudio(1); });
+                navigator.mediaSession.setActionHandler('previoustrack', function () { advanceAudio(-1); });
+            } catch (e) {}
+        }
+        function playCurrentAudio() {
+            if (!audioState.playing) return;
+            var myGen = audioState.gen;
+            var item = audioState.data[audioState.order[audioState.idx]];
+            if (!item) { pauseAudio(); return; }
+            updateAudioUI();
+            setMediaSession(item);
+            var de = audioState.voices.de, sl = audioState.voices.sl, s = audioState.settings;
+            var steps = [{ t: cleanGerman(item[0]), v: de }];
+            if (s.repeatWord) steps.push({ t: cleanGerman(item[0]), v: de });
+            if (s.readMode !== 'word') steps.push({ t: transText(item[1]), v: sl });
+            if (s.readMode === 'full' && item[3]) steps.push({ t: decodeEntities(item[3]), v: de });
+            var i = 0;
+            function next() {
+                if (myGen !== audioState.gen || !audioState.playing) return;
+                if (i >= steps.length) {
+                    audioState.timer = setTimeout(function () {
+                        if (myGen !== audioState.gen || !audioState.playing) return;
+                        advanceAudio(1);
+                    }, s.gap + 400);
+                    return;
+                }
+                var st = steps[i++];
+                speakStep(st.t, st.v, function () {
+                    if (myGen !== audioState.gen || !audioState.playing) return;
+                    audioState.timer = setTimeout(next, s.gap);
+                });
+            }
+            next();
+        }
+        function advanceAudio(dir) {
+            if (!audioState.order.length) return;
+            audioState.idx += dir;
+            if (audioState.idx >= audioState.order.length) {
+                if (audioState.settings.loop) { audioState.idx = 0; }
+                else { audioState.idx = audioState.order.length - 1; pauseAudio(); updateAudioUI(); return; }
+            }
+            if (audioState.idx < 0) audioState.idx = 0;
+            audioState.gen++;
+            if (audioState.timer) { clearTimeout(audioState.timer); audioState.timer = null; }
+            if (window.speechSynthesis) speechSynthesis.cancel();
+            if (audioState.playing) playCurrentAudio(); else updateAudioUI();
+        }
+        function startAudio() {
+            if (!window.speechSynthesis) { alert('Ваш браузер не підтримує озвучку (Web Speech API).'); return; }
+            pickVoices();
+            audioState.playing = true;
+            audioState.gen++;
+            requestWake();
+            playCurrentAudio();
+            updateAudioUI();
+        }
+        function pauseAudio() {
+            audioState.playing = false;
+            audioState.gen++;
+            if (audioState.timer) { clearTimeout(audioState.timer); audioState.timer = null; }
+            if (window.speechSynthesis) speechSynthesis.cancel();
+            releaseWake();
+            updateAudioUI();
+        }
+        function stopAudio() {
+            audioState.playing = false;
+            audioState.gen++;
+            if (audioState.timer) { clearTimeout(audioState.timer); audioState.timer = null; }
+            if (window.speechSynthesis) speechSynthesis.cancel();
+            stopAudioFile();
+            releaseWake();
+        }
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible' && audioState.playing) requestWake();
+        });
+
+        function ensureAudioStyle() {
+            if (document.getElementById('audio-style')) return;
+            var st = document.createElement('style');
+            st.id = 'audio-style';
+            st.textContent =
+                '.audio-player{max-width:620px;margin:0 auto;}' +
+                '.audio-now{text-align:center;min-height:180px;display:flex;flex-direction:column;justify-content:center;gap:.6rem;padding:1.8rem 1.2rem;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}' +
+                '.audio-word{font-size:2.5rem;font-weight:700;color:#fff;line-height:1.1;}' +
+                '.audio-trans{font-size:1.2rem;color:#9aa4b2;}' +
+                '.audio-example{font-size:1rem;color:#6e7681;font-style:italic;}' +
+                '.audio-progress{text-align:center;color:#8b949e;margin:1rem 0 .2rem;font-variant-numeric:tabular-nums;letter-spacing:.02em;}' +
+                '.audio-controls{display:flex;justify-content:center;align-items:center;gap:1.4rem;margin:.8rem 0 .4rem;}' +
+                '.audio-btn{width:66px;height:66px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .1s ease,background .2s;}' +
+                '.audio-btn:active{transform:scale(.9);}' +
+                '.audio-main{width:92px;height:92px;font-size:2.1rem;background:linear-gradient(135deg,#3fb950,#2ea043);border:none;box-shadow:0 8px 24px rgba(63,185,80,.35);}' +
+                '.audio-settings{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.4rem;}' +
+                '.audio-set-group{display:flex;gap:.25rem;background:rgba(255,255,255,.03);padding:.3rem;border-radius:13px;border:1px solid rgba(255,255,255,.06);}' +
+                '.audio-chip{padding:.5rem .85rem;border-radius:10px;border:1px solid transparent;background:transparent;color:#8b949e;font-size:.85rem;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;}' +
+                '.audio-chip.active{background:rgba(63,185,80,.15);color:#56d364;border-color:rgba(63,185,80,.3);}' +
+                '.audio-hint{text-align:center;color:#6e7681;font-size:.82rem;margin-top:1.3rem;line-height:1.55;}';
+            document.head.appendChild(st);
+        }
+
+        function updateAudioUI() {
+            var playBtn = document.getElementById('audio-play');
+            if (!playBtn) return;
+            playBtn.innerHTML = audioState.playing ? '&#9208;' : '&#9654;';
+            var item = audioState.data[audioState.order[audioState.idx]];
+            var w = document.getElementById('audio-word');
+            var t = document.getElementById('audio-trans');
+            var e = document.getElementById('audio-example');
+            var p = document.getElementById('audio-progress');
+            if (item && w) {
+                w.innerHTML = item[0];
+                t.textContent = transText(item[1]);
+                e.innerHTML = (audioState.settings.readMode === 'full' && item[3]) ? '«' + item[3] + '»' : '';
+            }
+            if (p) p.textContent = (audioState.order.length ? (audioState.idx + 1) : 0) + ' / ' + audioState.order.length;
+            var chips = document.querySelectorAll('.audio-chip'), s = audioState.settings;
+            for (var i = 0; i < chips.length; i++) {
+                var c = chips[i], set = c.getAttribute('data-set'), val = c.getAttribute('data-val'), on = false;
+                if (set === 'speed') on = parseFloat(val) === s.speed;
+                else if (set === 'readMode') on = val === s.readMode;
+                else if (set === 'gap') on = parseInt(val, 10) === s.gap;
+                else if (set === 'repeatWord') on = s.repeatWord;
+                else if (set === 'shuffle') on = s.shuffle;
+                else if (set === 'loop') on = s.loop;
+                c.classList.toggle('active', on);
+            }
+        }
+        function rebuildAudioOrder() {
+            audioState.order = audioState.data.map(function (_, i) { return i; });
+            if (audioState.settings.shuffle) shuffleArr(audioState.order);
+            audioState.idx = 0;
+        }
+        function applyAudioSetting(set, val) {
+            var s = audioState.settings;
+            if (set === 'speed') s.speed = parseFloat(val);
+            else if (set === 'readMode') s.readMode = val;
+            else if (set === 'gap') s.gap = parseInt(val, 10);
+            else if (set === 'repeatWord') s.repeatWord = !s.repeatWord;
+            else if (set === 'shuffle') { s.shuffle = !s.shuffle; rebuildAudioOrder(); }
+            else if (set === 'loop') s.loop = !s.loop;
+            updateAudioUI();
+            if (audioState.playing && set !== 'loop') {
+                audioState.gen++;
+                if (audioState.timer) { clearTimeout(audioState.timer); audioState.timer = null; }
+                if (window.speechSynthesis) speechSynthesis.cancel();
+                playCurrentAudio();
+            }
+        }
+
+        function renderAudioTTS(grid, data, lvl) {
+            ensureAudioStyle();
+            audioState.data = data;
+            audioState.lvl = lvl;
+            var sig = currentLevel + ':' + currentTopic;
+            if (audioState.sig !== sig) { audioState.sig = sig; audioState.idx = 0; }
+            rebuildAudioOrder();
+            if (window.speechSynthesis && !audioState._voiceInit) {
+                audioState._voiceInit = true;
+                try { speechSynthesis.onvoiceschanged = pickVoices; } catch (e) {}
+            }
+            pickVoices();
+
+            var noSpeech = !window.speechSynthesis;
+            grid.innerHTML =
+                '<div class="audio-player">' +
+                    '<div class="audio-now">' +
+                        '<div class="audio-word" id="audio-word">—</div>' +
+                        '<div class="audio-trans" id="audio-trans"></div>' +
+                        '<div class="audio-example" id="audio-example"></div>' +
+                    '</div>' +
+                    '<div class="audio-progress" id="audio-progress"></div>' +
+                    '<div class="audio-controls">' +
+                        '<button class="audio-btn" id="audio-prev" aria-label="Zurück">&#9198;</button>' +
+                        '<button class="audio-btn audio-main" id="audio-play" aria-label="Play/Pause">&#9654;</button>' +
+                        '<button class="audio-btn" id="audio-next" aria-label="Weiter">&#9197;</button>' +
+                    '</div>' +
+                    '<div class="audio-settings">' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="speed" data-val="0.7">0.7×</button>' +
+                            '<button class="audio-chip" data-set="speed" data-val="0.9">0.9×</button>' +
+                            '<button class="audio-chip" data-set="speed" data-val="1.1">1.1×</button>' +
+                        '</div>' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="readMode" data-val="word">Слово</button>' +
+                            '<button class="audio-chip" data-set="readMode" data-val="trans">+ переклад</button>' +
+                            '<button class="audio-chip" data-set="readMode" data-val="full">+ приклад</button>' +
+                        '</div>' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="gap" data-val="500">Пауза S</button>' +
+                            '<button class="audio-chip" data-set="gap" data-val="900">M</button>' +
+                            '<button class="audio-chip" data-set="gap" data-val="1500">L</button>' +
+                        '</div>' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="repeatWord" data-val="1">2× слово</button>' +
+                            '<button class="audio-chip" data-set="shuffle" data-val="1">🔀 Мікс</button>' +
+                            '<button class="audio-chip" data-set="loop" data-val="1">🔁 Цикл</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="audio-hint">' +
+                        (noSpeech
+                            ? '⚠️ Цей браузер не підтримує озвучку.'
+                            : '🎧 Натисни ▶, встав навушники — читатиме само. Екран не гасне під час відтворення.') +
+                    '</div>' +
+                '</div>';
+
+            document.getElementById('audio-play').addEventListener('click', function () {
+                if (audioState.playing) pauseAudio(); else startAudio();
+            });
+            document.getElementById('audio-prev').addEventListener('click', function () { advanceAudio(-1); });
+            document.getElementById('audio-next').addEventListener('click', function () { advanceAudio(1); });
+            var settingsEl = grid.querySelector('.audio-settings');
+            settingsEl.addEventListener('click', function (ev) {
+                var chip = ev.target.closest ? ev.target.closest('.audio-chip') : null;
+                if (!chip) return;
+                applyAudioSetting(chip.getAttribute('data-set'), chip.getAttribute('data-val'));
+            });
+            updateAudioUI();
+        }
+
+        // ----- Background audio: pre-generated tracks (play with screen off) -----
+        var AUDIO_MANIFEST = null, audioManifestTried = false;
+        var AUDIO_VER = '2';   // bump when tracks are regenerated, to bust stale caches
+        var audioFile = { el: null, cues: [], idx: 0, deck: null };
+
+        function loadAudioManifest(cb) {
+            if (audioManifestTried) { if (cb) cb(); return; }
+            audioManifestTried = true;
+            var done = function (arr) {
+                AUDIO_MANIFEST = {};
+                (arr || []).forEach(function (k) { AUDIO_MANIFEST[k] = true; });
+                if (cb) cb();
+            };
+            try {
+                fetch('audio/manifest.json', { cache: 'no-store' })
+                    .then(function (r) { return r.ok ? r.json() : []; })
+                    .then(done).catch(function () { done([]); });
+            } catch (e) { done([]); }
+        }
+
+        function renderAudio(grid, data, lvl) {
+            ensureAudioStyle();
+            if (!audioManifestTried) {
+                loadAudioManifest(function () { if (currentMode === 'audio') renderVocab(); });
+            }
+            var deckKey = currentLevel + ':' + currentTopic;
+            if (AUDIO_MANIFEST && AUDIO_MANIFEST[deckKey]) renderAudioFile(grid, deckKey);
+            else renderAudioTTS(grid, data, lvl);
+        }
+
+        function fmtTime(sec) {
+            sec = Math.max(0, Math.floor(sec || 0));
+            var m = Math.floor(sec / 60), s = sec % 60;
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+        function stopAudioFile() {
+            if (audioFile.el) {
+                try { audioFile.el.pause(); } catch (e) {}
+                audioFile.el.ontimeupdate = null; audioFile.el.onended = null;
+                audioFile.el.onplay = null; audioFile.el.onpause = null;
+            }
+        }
+        function fileCueIndex(time) {
+            var cs = audioFile.cues, idx = 0;
+            for (var i = 0; i < cs.length; i++) { if (cs[i].t <= time + 0.02) idx = i; else break; }
+            return idx;
+        }
+        function updateFileUI() {
+            var el = audioFile.el; if (!el) return;
+            var cue = audioFile.cues[audioFile.idx];
+            var w = document.getElementById('audio-word'), t = document.getElementById('audio-trans'),
+                e = document.getElementById('audio-example'), p = document.getElementById('audio-progress'),
+                pb = document.getElementById('audio-play');
+            if (cue && w) { w.innerHTML = cue.w; t.textContent = cue.tr; e.innerHTML = cue.ex ? ('«' + cue.ex + '»') : ''; }
+            if (p) p.textContent = (audioFile.cues.length ? (audioFile.idx + 1) : 0) + ' / ' + audioFile.cues.length +
+                '  ·  ' + fmtTime(el.currentTime) + ' / ' + fmtTime(el.duration);
+            if (pb) pb.innerHTML = (!el.paused) ? '&#9208;' : '&#9654;';
+            var chips = document.querySelectorAll('.audio-chip');
+            for (var i = 0; i < chips.length; i++) {
+                var c = chips[i], set = c.getAttribute('data-set'), val = c.getAttribute('data-val'), on = false;
+                if (set === 'speed') on = parseFloat(val) === el.playbackRate;
+                else if (set === 'loopf') on = el.loop;
+                c.classList.toggle('active', on);
+            }
+        }
+        function fileMediaSession() {
+            if (!('mediaSession' in navigator)) return;
+            var cue = audioFile.cues[audioFile.idx]; if (!cue) return;
+            try {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: decodeEntities(cue.w),
+                    artist: cue.tr,
+                    album: 'NeoStudy · ' + (TOPIC_META[currentTopic] ? decodeEntities(TOPIC_META[currentTopic].title) : 'Vokabeln')
+                });
+                navigator.mediaSession.setActionHandler('play', function () { if (audioFile.el) audioFile.el.play(); });
+                navigator.mediaSession.setActionHandler('pause', function () { if (audioFile.el) audioFile.el.pause(); });
+                navigator.mediaSession.setActionHandler('previoustrack', function () { fileSeek(-1); });
+                navigator.mediaSession.setActionHandler('nexttrack', function () { fileSeek(1); });
+            } catch (e) {}
+        }
+        function fileSeek(dir) {
+            var el = audioFile.el; if (!el || !audioFile.cues.length) return;
+            var ni = audioFile.idx + dir;
+            if (ni < 0) ni = 0;
+            if (ni >= audioFile.cues.length) ni = audioFile.cues.length - 1;
+            audioFile.idx = ni;
+            try { el.currentTime = audioFile.cues[ni].t + 0.01; } catch (e) {}
+            updateFileUI(); fileMediaSession();
+        }
+        function renderAudioFile(grid, deckKey) {
+            var base = deckKey.replace(':', '__');
+            audioFile.deck = deckKey; audioFile.cues = []; audioFile.idx = 0;
+            grid.innerHTML =
+                '<div class="audio-player">' +
+                    '<div style="text-align:center;margin-bottom:.9rem;">' +
+                        '<span style="display:inline-block;padding:.32rem .85rem;border-radius:999px;background:rgba(63,185,80,.14);color:#56d364;font-size:.8rem;border:1px solid rgba(63,185,80,.3);">🎧 Офлайн-аудіо · грає з вимкненим екраном</span>' +
+                    '</div>' +
+                    '<div class="audio-now">' +
+                        '<div class="audio-word" id="audio-word">…</div>' +
+                        '<div class="audio-trans" id="audio-trans"></div>' +
+                        '<div class="audio-example" id="audio-example"></div>' +
+                    '</div>' +
+                    '<div class="audio-progress" id="audio-progress"></div>' +
+                    '<div class="audio-controls">' +
+                        '<button class="audio-btn" id="audio-prev" aria-label="Zurück">&#9198;</button>' +
+                        '<button class="audio-btn audio-main" id="audio-play" aria-label="Play/Pause">&#9654;</button>' +
+                        '<button class="audio-btn" id="audio-next" aria-label="Weiter">&#9197;</button>' +
+                    '</div>' +
+                    '<div class="audio-settings">' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="speed" data-val="0.7">0.7×</button>' +
+                            '<button class="audio-chip" data-set="speed" data-val="0.9">0.9×</button>' +
+                            '<button class="audio-chip" data-set="speed" data-val="1">1×</button>' +
+                            '<button class="audio-chip" data-set="speed" data-val="1.25">1.25×</button>' +
+                        '</div>' +
+                        '<div class="audio-set-group">' +
+                            '<button class="audio-chip" data-set="loopf" data-val="1">🔁 Цикл</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="audio-hint">🎧 Справжнє аудіо: постав ▶, заблокуй екран і поклади в кишеню &mdash; гратиме далі. Керування — з локскрину або навушників.</div>' +
+                '</div>';
+
+            var el = document.createElement('audio');
+            el.id = 'audio-el'; el.src = 'audio/' + base + '.m4a?v=' + AUDIO_VER; el.preload = 'auto'; el.loop = true; el.playbackRate = 0.9;
+            grid.querySelector('.audio-player').appendChild(el);
+            audioFile.el = el;
+
+            el.ontimeupdate = function () {
+                var ni = fileCueIndex(el.currentTime);
+                if (ni !== audioFile.idx) { audioFile.idx = ni; fileMediaSession(); }
+                updateFileUI();
+            };
+            el.onplay = function () { updateFileUI(); };
+            el.onpause = function () { updateFileUI(); };
+            el.onended = function () { updateFileUI(); };
+            el.onloadedmetadata = function () { updateFileUI(); };
+
+            document.getElementById('audio-play').addEventListener('click', function () {
+                if (el.paused) { var pr = el.play(); if (pr && pr.catch) pr.catch(function () {}); } else el.pause();
+            });
+            document.getElementById('audio-prev').addEventListener('click', function () { fileSeek(-1); });
+            document.getElementById('audio-next').addEventListener('click', function () { fileSeek(1); });
+            grid.querySelector('.audio-settings').addEventListener('click', function (ev) {
+                var chip = ev.target.closest ? ev.target.closest('.audio-chip') : null; if (!chip) return;
+                var set = chip.getAttribute('data-set'), val = chip.getAttribute('data-val');
+                if (set === 'speed') el.playbackRate = parseFloat(val);
+                else if (set === 'loopf') el.loop = !el.loop;
+                updateFileUI();
+            });
+
+            fetch('audio/' + base + '.json?v=' + AUDIO_VER, { cache: 'no-store' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (j) { if (j && j.cards) { audioFile.cues = j.cards; audioFile.idx = 0; updateFileUI(); fileMediaSession(); } })
+                .catch(function () {});
+            updateFileUI();
+        }
+        loadAudioManifest();
 
         // ===== MODE: SYNONYME =====
         var SYNONYME = [
