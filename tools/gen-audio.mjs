@@ -177,10 +177,14 @@ else targets = DEFAULT_DECKS;
 
 console.log(`Generating ${targets.length} deck(s) -> ${OUTDIR}`);
 const done = [];
+<<<<<<< HEAD
 for (const k of targets) {
   try { const r = buildDeck(k, vocab); if (r) done.push(r); }
   catch (e) { console.log('✗ ' + k + '  FAILED: ' + (e && e.message ? e.message : e)); }
 }
+=======
+for (const k of targets) { const r = buildDeck(k, vocab); if (r) done.push(r); }
+>>>>>>> 0b5509583f20e456243c0f3eed6110aefaf93838
 
 // update manifest
 const manFile = path.join(OUTDIR, 'manifest.json');
