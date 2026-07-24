@@ -216,6 +216,13 @@ const last = nums[1] || nums[0] || 20;
 const html = fs.readFileSync(HTML, 'utf8');
 const extras = extractExtras(html);
 
+if (args.includes('--cues-only')) {
+  const days = writeCuesJs();
+  console.log(`audio/c1-audio-cues.js rebuilt: ${days.length} day(s) -> [${days.join(', ')}]`);
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  process.exit(0);
+}
+
 if (dry) {
   let grand = 0;
   for (let d = first; d <= last; d++) {
@@ -235,7 +242,7 @@ console.log(`Generating C1 audio, days ${first}..${last} -> ${OUTDIR}`);
 for (let d = first; d <= last; d++) {
   const m4a = path.join(OUTDIR, 'c1__day' + String(d).padStart(2, '0') + '.m4a');
   if (!force && fs.existsSync(m4a)) { console.log(`• day ${d} already done (skip; --force to redo)`); continue; }
-  try { buildDay(d, extras); }
+  try { buildDay(d, extras); writeCuesJs(); }   // refresh cues after every day (crash-safe)
   catch (e) { console.log('✗ day ' + d + '  FAILED: ' + (e && e.message ? e.message : e)); }
 }
 const days = writeCuesJs();
