@@ -227,7 +227,7 @@ function buildChapter(ch) {
   fs.writeFileSync(listFile, list.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'), 'utf8');
   const m4a = path.join(OUTDIR, `ah__${ch}.m4a`);
   execFileSync('ffmpeg', ['-f', 'concat', '-safe', '0', '-i', listFile,
-    '-c:a', 'aac', '-b:a', BITRATE, '-ac', '1', '-ar', String(SR), m4a, '-y', '-loglevel', 'error']);
+    '-c:a', 'aac', '-b:a', BITRATE, '-ac', '1', '-ar', String(SR), '-movflags', '+faststart', m4a, '-y', '-loglevel', 'error']);
   const total = Math.round(t * 1000) / 1000;
   fs.writeFileSync(path.join(OUTDIR, `ah__${ch}.json`),
     JSON.stringify({ chapter: ch, total, voiceEn: VOICE_EN, voiceUk: VOICE_UK, cards: cues }));
