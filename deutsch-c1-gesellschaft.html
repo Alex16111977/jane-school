@@ -6218,6 +6218,145 @@
             var _sd=parseInt(localStorage.getItem('c1day'),10);
             if(_sd>1 && document.querySelector('.day-content[data-day="'+_sd+'"]')) switchDay(_sd);
         });
+
+        // ===== Audio-Modus: Offline-Track pro Tag (neuronale Stimmen) =====
+        var c1a = { el:null, cues:[], idx:0, day:null, repeat:Infinity, plays:0, rate:0.9 };
+        var c1aNumMap = null;
+
+        function c1aBuildNumMap(){
+            c1aNumMap = {};
+            document.querySelectorAll('.fcard').forEach(function(card){
+                var n = card.querySelector('.fcard-num'); if(!n) return;
+                var num = parseInt(n.textContent.replace('#','').trim(),10);
+                if(!isNaN(num)) c1aNumMap[num] = card;
+            });
+        }
+        function c1aAvailable(){
+            var ks = Object.keys(window.C1_AUDIO||{}).map(Number).sort(function(a,b){return a-b;});
+            return ks.length ? ks.join(', ') : '—';
+        }
+        function c1aCardHtml(num){
+            if(!c1aNumMap) c1aBuildNumMap();
+            var card = c1aNumMap[num];
+            var ex = (window.C1_EXTRAS||{})[String(num)] || {};
+            var word='&hellip;', ua='', example='';
+            if(card){
+                var w=card.querySelector('.fcard-word'); if(w) word=w.innerHTML;
+                var u=card.querySelector('.fcard-ua'); if(u) ua=u.innerHTML;
+                var e=card.querySelector('.fcard-example'); if(e) example=e.innerHTML;
+            }
+            var html = '<div class="c1a-word">'+word+'</div>'+
+                '<div class="c1a-ua">'+ua+'</div>'+
+                (example?'<div class="c1a-example">'+example+'</div>':'');
+            var extra='';
+            if(ex.s && ex.s.length) extra += '<div class="c1a-syn">&asymp; '+ex.s.join(', ')+'</div>';
+            if(ex.a && ex.a.length) extra += '<div class="c1a-ant">&ne; '+ex.a.join(', ')+'</div>';
+            if(ex.r && ex.r.length) extra += '<div class="c1a-rl">'+ex.r.map(function(c){return '<span class="c1a-chip">'+c+'</span>';}).join('')+'</div>';
+            if(ex.p) extra += '<div class="c1a-p">&#x270D;&#xFE0F; '+ex.p+'</div>';
+            if(extra) html += '<div class="c1a-extras">'+extra+'</div>';
+            return html;
+        }
+        function c1aFmt(sec){ sec=Math.max(0,Math.floor(sec||0)); var m=Math.floor(sec/60),s=sec%60; return m+':'+(s<10?'0':'')+s; }
+        function c1aCueIndex(time){ var cs=c1a.cues,idx=0; for(var i=0;i<cs.length;i++){ if(cs[i].t<=time+0.02) idx=i; else break; } return idx; }
+        function c1aUpdate(){
+            var el=c1a.el; if(!el) return;
+            var cue=c1a.cues[c1a.idx];
+            var now=document.getElementById('c1a-now'), pr=document.getElementById('c1a-progress'), pb=document.getElementById('c1a-play');
+            if(cue && now) now.innerHTML = c1aCardHtml(cue.n);
+            if(pr) pr.textContent=(c1a.cues.length?(c1a.idx+1):0)+' / '+c1a.cues.length+'  ·  '+c1aFmt(el.currentTime)+' / '+c1aFmt(el.duration)+
+                (c1a.repeat!==Infinity && c1a.repeat>1?('  ·  🔁 '+(Math.min(c1a.plays,c1a.repeat-1)+1)+'/'+c1a.repeat):'');
+            if(pb) pb.innerHTML=(!el.paused)?'&#9208;':'&#9654;';
+            var chips=document.querySelectorAll('#c1a-body .c1a-c');
+            for(var i=0;i<chips.length;i++){
+                var c=chips[i], set=c.getAttribute('data-set'), val=c.getAttribute('data-val'), on=false;
+                if(set==='speed') on=parseFloat(val)===el.playbackRate;
+                else if(set==='repeat'){ var rv=parseInt(val,10); on=(rv===0)?(c1a.repeat===Infinity):(c1a.repeat===rv); }
+                c.classList.toggle('active',on);
+            }
+        }
+        function c1aMedia(){
+            if(!('mediaSession' in navigator)) return;
+            var cue=c1a.cues[c1a.idx]; if(!cue) return;
+            var card=c1aNumMap?c1aNumMap[cue.n]:null;
+            var word=card&&card.querySelector('.fcard-word')?card.querySelector('.fcard-word').textContent:'',
+                ua=card&&card.querySelector('.fcard-ua')?card.querySelector('.fcard-ua').textContent:'';
+            try{
+                navigator.mediaSession.metadata=new MediaMetadata({title:word||'Wort',artist:ua||'',album:'C1 Gesellschaft · Tag '+c1a.day});
+                navigator.mediaSession.setActionHandler('play',function(){ if(c1a.el) c1a.el.play(); });
+                navigator.mediaSession.setActionHandler('pause',function(){ if(c1a.el) c1a.el.pause(); });
+                navigator.mediaSession.setActionHandler('previoustrack',function(){ c1aSeek(-1); });
+                navigator.mediaSession.setActionHandler('nexttrack',function(){ c1aSeek(1); });
+            }catch(e){}
+        }
+        function c1aSeek(dir){
+            var el=c1a.el; if(!el||!c1a.cues.length) return;
+            var ni=c1a.idx+dir; if(ni<0)ni=0; if(ni>=c1a.cues.length)ni=c1a.cues.length-1;
+            c1a.idx=ni; try{ el.currentTime=c1a.cues[ni].t+0.01; }catch(e){}
+            c1aUpdate(); c1aMedia();
+        }
+        function openC1Audio(){
+            var overlay=document.getElementById('c1a-overlay');
+            var label=document.getElementById('c1a-daylabel');
+            var body=document.getElementById('c1a-body');
+            var tabBtn=document.querySelectorAll('.day-tab')[currentDay-1];
+            label.textContent = tabBtn ? tabBtn.textContent.split('•')[0].trim() : ('Tag '+currentDay);
+            var data=(window.C1_AUDIO||{})[String(currentDay)];
+            overlay.classList.add('open');
+            if(!data || !data.c || !data.c.length){
+                body.innerHTML='<div class="c1a-none">Für <b>Tag '+currentDay+'</b> gibt es noch kein Audio.<br>Vertont sind bisher: <b>Tag '+c1aAvailable()+'</b>.</div>';
+                return;
+            }
+            c1aBuildNumMap();
+            c1a.day=currentDay; c1a.cues=data.c.map(function(p){return {n:p[0],t:p[1]};}); c1a.idx=0; c1a.plays=0;
+            body.innerHTML =
+                '<div class="c1a-now" id="c1a-now"></div>'+
+                '<div class="c1a-progress" id="c1a-progress"></div>'+
+                '<div class="c1a-controls">'+
+                    '<button class="c1a-btn" id="c1a-prev" aria-label="Zurück">&#9198;</button>'+
+                    '<button class="c1a-btn c1a-main" id="c1a-play" aria-label="Play/Pause">&#9654;</button>'+
+                    '<button class="c1a-btn" id="c1a-next" aria-label="Weiter">&#9197;</button>'+
+                '</div>'+
+                '<div class="c1a-settings">'+
+                    '<div class="c1a-group">'+
+                        '<button class="c1a-c" data-set="speed" data-val="0.7">0.7×</button>'+
+                        '<button class="c1a-c" data-set="speed" data-val="0.9">0.9×</button>'+
+                        '<button class="c1a-c" data-set="speed" data-val="1">1×</button>'+
+                        '<button class="c1a-c" data-set="speed" data-val="1.25">1.25×</button>'+
+                    '</div>'+
+                    '<div class="c1a-group">'+
+                        '<span style="align-self:center;color:#7a839a;font-size:.78rem;padding:0 .3rem;">🔁</span>'+
+                        '<button class="c1a-c" data-set="repeat" data-val="1">1×</button>'+
+                        '<button class="c1a-c" data-set="repeat" data-val="3">3×</button>'+
+                        '<button class="c1a-c" data-set="repeat" data-val="5">5×</button>'+
+                        '<button class="c1a-c" data-set="repeat" data-val="0">∞</button>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="c1a-hint">&#9654; starten, Bildschirm sperren, in die Tasche &mdash; läuft weiter. Steuerung vom Sperrbildschirm oder über Kopfhörer.</div>';
+            var el=document.createElement('audio');
+            el.id='c1a-el'; el.src='audio/c1__day'+String(currentDay).padStart(2,'0')+'.m4a'; el.preload='auto'; el.playbackRate=c1a.rate;
+            body.appendChild(el); c1a.el=el;
+            el.ontimeupdate=function(){ var ni=c1aCueIndex(el.currentTime); if(ni!==c1a.idx){ c1a.idx=ni; c1aMedia(); } c1aUpdate(); };
+            el.onplay=c1aUpdate; el.onpause=c1aUpdate; el.onloadedmetadata=c1aUpdate;
+            el.onended=function(){ c1a.plays++; if(c1a.plays<c1a.repeat){ try{el.currentTime=0;}catch(e){} var p=el.play(); if(p&&p.catch)p.catch(function(){}); } else { c1a.plays=0; } c1aUpdate(); };
+            document.getElementById('c1a-play').addEventListener('click',function(){ if(el.paused){ var p=el.play(); if(p&&p.catch)p.catch(function(){}); } else el.pause(); });
+            document.getElementById('c1a-prev').addEventListener('click',function(){ c1aSeek(-1); });
+            document.getElementById('c1a-next').addEventListener('click',function(){ c1aSeek(1); });
+            body.querySelector('.c1a-settings').addEventListener('click',function(ev){
+                var chip=ev.target.closest?ev.target.closest('.c1a-c'):null; if(!chip) return;
+                var set=chip.getAttribute('data-set'), val=chip.getAttribute('data-val');
+                if(set==='speed'){ el.playbackRate=parseFloat(val); c1a.rate=el.playbackRate; }
+                else if(set==='repeat'){ var n=parseInt(val,10); c1a.repeat=(n===0)?Infinity:n; c1a.plays=0; }
+                c1aUpdate();
+            });
+            c1aUpdate(); c1aMedia();
+        }
+        function closeC1Audio(){
+            var overlay=document.getElementById('c1a-overlay');
+            if(overlay) overlay.classList.remove('open');
+            if(c1a.el){ try{c1a.el.pause();}catch(e){} c1a.el.src=''; c1a.el=null; }
+            if('mediaSession' in navigator){ try{ navigator.mediaSession.metadata=null; }catch(e){} }
+        }
+        document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeC1Audio(); });
     </script>
 </body>
 </html>
