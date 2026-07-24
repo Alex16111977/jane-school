@@ -40,6 +40,12 @@ const GAP_INNER = 0.45;      // pause between the parts of one card
 const GAP_CARD = 1.15;       // pause between cards
 const LEAD_IN = 0.30;        // silence at the very start
 
+// Ukrainian translations of the synonyms/antonyms/collocations (spoken after the German set).
+const UA_EXTRAS_FILE = path.join(ROOT, 'tools', 'c1-ua-extras.json');
+let uaExtras = {};
+try { uaExtras = JSON.parse(fs.readFileSync(UA_EXTRAS_FILE, 'utf8')); }
+catch (e) { console.log('note: tools/c1-ua-extras.json missing — Ukrainian extras will be skipped'); }
+
 // ---------- entity decode ----------
 const ENT = {
   '&uuml;': 'ü', '&auml;': 'ä', '&ouml;': 'ö', '&szlig;': 'ß',
@@ -156,6 +162,16 @@ function buildDay(day, extras) {
   const cues = [];
   let t = 0;
   const push = (file) => { list.push(file); t += wavDuration(file); };
+  // Speak a German field (with label), then its Ukrainian translation.
+  const pushField = (label, deArr, uaArr, sep) => {
+    if (!deArr || !deArr.length) return;
+    push(silence(GAP_INNER));
+    const dw = edgeClip(VOICE_DE, label + deArr.map(cleanSpeech).join(sep)); if (dw) push(dw);
+    if (uaArr && uaArr.length) {
+      push(silence(GAP_INNER));
+      const uw = edgeClip(VOICE_UK, uaArr.map(cleanSpeech).join(sep)); if (uw) push(uw);
+    }
+  };
 
   push(silence(LEAD_IN));
   cards.forEach((c) => {
@@ -165,8 +181,12 @@ function buildDay(day, extras) {
     const trWav = edgeClip(VOICE_UK, uaText(c.ua)); if (trWav) push(trWav);
     const exSpeak = cleanSpeech(c.example);
     if (exSpeak) { push(silence(GAP_INNER)); const exWav = edgeClip(VOICE_DE, exSpeak); if (exWav) push(exWav); }
-    const extraSpeak = extrasSpeech(extras[String(c.num)]);
-    if (extraSpeak) { push(silence(GAP_INNER)); const xWav = edgeClip(VOICE_DE, extraSpeak); if (xWav) push(xWav); }
+    const ex = extras[String(c.num)] || {};
+    const uex = uaExtras[String(c.num)] || {};
+    pushField('Synonyme: ', ex.s, uex.s, ', ');            // German synonyms, then Ukrainian
+    pushField('Gegenteil: ', ex.a, uex.a, ', ');           // German antonyms, then Ukrainian
+    pushField('Typische Wendungen: ', ex.r, uex.r, '. ');  // German collocations, then Ukrainian
+    if (ex.p) { const pSpeak = cleanSpeech(ex.p); if (pSpeak) { push(silence(GAP_INNER)); const pWav = edgeClip(VOICE_DE, pSpeak); if (pWav) push(pWav); } }
     push(silence(GAP_CARD));
     cues.push([c.num, Math.round(cueT * 1000) / 1000]);
   });
