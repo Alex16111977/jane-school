@@ -45,11 +45,15 @@ const VOICE_DE = process.env.EDGE_VOICE_DE || 'de-DE-KatjaNeural';
 const VOICE_UK = process.env.EDGE_VOICE_UK || 'uk-UA-PolinaNeural';
 const SR = 24000;
 const BITRATE = '48k';
-const GAP_INNER = 0.45;   // before head UA / example / a field's first item
-const GAP_MID = 0.40;     // between pairs inside a field
-const GAP_PAIR = 0.22;    // between a German word and its Ukrainian translation
-const GAP_CARD = 1.15;    // between cards
-const LEAD_IN = 0.30;
+const GAP_INNER = 0.38;   // before head UA / example / a field's first item
+const GAP_MID = 0.30;     // between pairs inside a field
+const GAP_PAIR = 0.10;    // between a German word and its Ukrainian translation (snappy)
+const GAP_CARD = 0.90;    // between cards
+const LEAD_IN = 0.25;
+// edge-tts bakes ~0.2s lead + up to ~0.9s trailing silence into every clip; strip it
+// (keep ~30ms) so the gaps above are the ONLY pauses the listener hears.
+const TRIM = 'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse,' +
+             'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse';
 
 // ---------- entity decode / cleanup ----------
 const ENT = {
@@ -255,7 +259,7 @@ const have = jobs.map(j => j.id).filter(id => fs.existsSync(path.join(MP3DIR, id
 const toConv = have.filter(id => !fs.existsSync(path.join(WAVDIR, id + '.wav')));
 console.log(`Converting ${toConv.length}/${have.length} clips to wav...`);
 await pool(toConv, 8, async (id) => {
-  await execFileP('ffmpeg', ['-i', path.join(MP3DIR, id + '.mp3'), '-ar', String(SR), '-ac', '1', '-c:a', 'pcm_s16le', path.join(WAVDIR, id + '.wav'), '-y', '-loglevel', 'error']);
+  await execFileP('ffmpeg', ['-i', path.join(MP3DIR, id + '.mp3'), '-ar', String(SR), '-ac', '1', '-af', TRIM, '-c:a', 'pcm_s16le', path.join(WAVDIR, id + '.wav'), '-y', '-loglevel', 'error']);
 });
 
 // 3) stitch each day
