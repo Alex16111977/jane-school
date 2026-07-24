@@ -12,7 +12,9 @@ import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = path.join(ROOT, 'deutsch-c1-gesellschaft.html');
 const scratch = process.argv[2];
-if (!scratch) { console.error('need scratchDir'); process.exit(1); }
+if (!scratch) { console.error('need scratchDir [firstDay] [lastDay]'); process.exit(1); }
+const FIRST = parseInt(process.argv[3] || '1', 10);
+const LAST = parseInt(process.argv[4] || '20', 10);
 const dir = path.join(scratch, 'c1ua');
 
 const ENT = { '&uuml;':'ü','&auml;':'ä','&ouml;':'ö','&szlig;':'ß','&Uuml;':'Ü','&Auml;':'Ä','&Ouml;':'Ö','&amp;':'&','&nbsp;':' ' };
@@ -27,7 +29,7 @@ const extras = extractExtras(html);
 
 // expected German lengths per card, days 1..20
 const expected = {};
-for(let d=1;d<=20;d++){ for(const num of parseDayCards(html,d)){ const ex=extras[String(num)]||{}; const s=(ex.s||[]).map(clean),a=(ex.a||[]).map(clean),r=(ex.r||[]).map(clean); if(!s.length&&!a.length&&!r.length)continue; expected[num]={s:s.length,a:a.length,r:r.length}; } }
+for(let d=FIRST;d<=LAST;d++){ for(const num of parseDayCards(html,d)){ const ex=extras[String(num)]||{}; const s=(ex.s||[]).map(clean),a=(ex.a||[]).map(clean),r=(ex.r||[]).map(clean); if(!s.length&&!a.length&&!r.length)continue; expected[num]={s:s.length,a:a.length,r:r.length}; } }
 
 // merge out files
 const merged = {};
@@ -53,11 +55,14 @@ console.log(`strings still containing Latin/German letters: ${latin.length}`);
 latin.slice(0,40).forEach(e=>console.log('  ⚠ '+e));
 
 if(errs.length===0){
-  // write compact, keyed by num, only s/a/r
-  const out={};
-  Object.keys(expected).map(Number).sort((a,b)=>a-b).forEach(n=>{ const g=merged[n]; out[n]={s:g.s||[],a:g.a||[],r:g.r||[]}; });
-  fs.writeFileSync(path.join(ROOT,'tools','c1-ua-extras.json'), JSON.stringify(out));
-  console.log(`\n✓ wrote tools/c1-ua-extras.json (${Object.keys(out).length} cards)`);
+  // MERGE new range into the existing file (keep previously-translated days)
+  const outFile = path.join(ROOT,'tools','c1-ua-extras.json');
+  let all={}; try { all=JSON.parse(fs.readFileSync(outFile,'utf8')); } catch(e){}
+  const before=Object.keys(all).length;
+  Object.keys(expected).map(Number).sort((a,b)=>a-b).forEach(n=>{ const g=merged[n]; all[String(n)]={s:g.s||[],a:g.a||[],r:g.r||[]}; });
+  const sorted={}; Object.keys(all).map(Number).sort((a,b)=>a-b).forEach(n=>sorted[n]=all[n]);
+  fs.writeFileSync(outFile, JSON.stringify(sorted));
+  console.log(`\n✓ merged ${Object.keys(expected).length} cards (days ${FIRST}-${LAST}); total in file: ${before} -> ${Object.keys(sorted).length}`);
 } else {
   console.log('\n✗ NOT writing output — fix mismatches first. Bad cards: '+[...new Set(errs.map(e=>e.match(/#(\d+)/)[1]))].join(', '));
 }
