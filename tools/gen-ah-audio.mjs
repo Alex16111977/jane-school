@@ -40,9 +40,9 @@ const VOICE_EN = process.env.EDGE_VOICE_EN || 'en-US-AvaMultilingualNeural';
 const VOICE_UK = process.env.EDGE_VOICE_UK || 'uk-UA-PolinaNeural';
 const SR = 24000;
 const BITRATE = '48k';
-const GAP_INNER = 0.45;
-const GAP_CARD = 1.15;
-const LEAD_IN = 0.30;
+const GAP_INNER = 0.22;
+const GAP_CARD = 0.5;
+const LEAD_IN = 0.15;
 
 // ---------- text cleanup (defensive; source data has no tags/entities today) ----------
 const ENT = {
