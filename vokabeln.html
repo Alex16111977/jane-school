@@ -6007,7 +6007,7 @@
         // ----- Background audio: pre-generated tracks (play with screen off) -----
         var AUDIO_MANIFEST = null, audioManifestTried = false;
         var AUDIO_VER = '2';   // bump when tracks are regenerated, to bust stale caches
-        var audioFile = { el: null, cues: [], idx: 0, deck: null };
+        var audioFile = { el: null, cues: [], idx: 0, deck: null, repeat: Infinity, plays: 0 };
 
         function loadAudioManifest(cb) {
             if (audioManifestTried) { if (cb) cb(); return; }
@@ -6058,14 +6058,16 @@
                 e = document.getElementById('audio-example'), p = document.getElementById('audio-progress'),
                 pb = document.getElementById('audio-play');
             if (cue && w) { w.innerHTML = cue.w; t.textContent = cue.tr; e.innerHTML = cue.ex ? ('«' + cue.ex + '»') : ''; }
+            var cyc = (audioFile.repeat !== Infinity && audioFile.repeat > 1)
+                ? ('  ·  ♻ ' + (Math.min(audioFile.plays, audioFile.repeat - 1) + 1) + '/' + audioFile.repeat) : '';
             if (p) p.textContent = (audioFile.cues.length ? (audioFile.idx + 1) : 0) + ' / ' + audioFile.cues.length +
-                '  ·  ' + fmtTime(el.currentTime) + ' / ' + fmtTime(el.duration);
+                '  ·  ' + fmtTime(el.currentTime) + ' / ' + fmtTime(el.duration) + cyc;
             if (pb) pb.innerHTML = (!el.paused) ? '&#9208;' : '&#9654;';
             var chips = document.querySelectorAll('.audio-chip');
             for (var i = 0; i < chips.length; i++) {
                 var c = chips[i], set = c.getAttribute('data-set'), val = c.getAttribute('data-val'), on = false;
                 if (set === 'speed') on = parseFloat(val) === el.playbackRate;
-                else if (set === 'loopf') on = el.loop;
+                else if (set === 'repeat') { var rv = parseInt(val, 10); on = (rv === 0) ? (audioFile.repeat === Infinity) : (audioFile.repeat === rv); }
                 c.classList.toggle('active', on);
             }
         }
@@ -6120,14 +6122,20 @@
                             '<button class="audio-chip" data-set="speed" data-val="1.25">1.25×</button>' +
                         '</div>' +
                         '<div class="audio-set-group">' +
-                            '<button class="audio-chip" data-set="loopf" data-val="1">🔁 Цикл</button>' +
+                            '<span style="align-self:center;color:#8b949e;font-size:.8rem;padding:0 .35rem;">🔁</span>' +
+                            '<button class="audio-chip" data-set="repeat" data-val="1">1×</button>' +
+                            '<button class="audio-chip" data-set="repeat" data-val="2">2×</button>' +
+                            '<button class="audio-chip" data-set="repeat" data-val="3">3×</button>' +
+                            '<button class="audio-chip" data-set="repeat" data-val="5">5×</button>' +
+                            '<button class="audio-chip" data-set="repeat" data-val="0">∞</button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="audio-hint">🎧 Справжнє аудіо: постав ▶, заблокуй екран і поклади в кишеню &mdash; гратиме далі. Керування — з локскрину або навушників.</div>' +
                 '</div>';
 
             var el = document.createElement('audio');
-            el.id = 'audio-el'; el.src = 'audio/' + base + '.m4a?v=' + AUDIO_VER; el.preload = 'auto'; el.loop = true; el.playbackRate = 0.9;
+            el.id = 'audio-el'; el.src = 'audio/' + base + '.m4a?v=' + AUDIO_VER; el.preload = 'auto'; el.loop = false; el.playbackRate = 0.9;
+            audioFile.plays = 0;
             grid.querySelector('.audio-player').appendChild(el);
             audioFile.el = el;
 
@@ -6138,7 +6146,16 @@
             };
             el.onplay = function () { updateFileUI(); };
             el.onpause = function () { updateFileUI(); };
-            el.onended = function () { updateFileUI(); };
+            el.onended = function () {
+                audioFile.plays++;
+                if (audioFile.plays < audioFile.repeat) {
+                    try { el.currentTime = 0; } catch (e) {}
+                    var pr = el.play(); if (pr && pr.catch) pr.catch(function () {});
+                } else {
+                    audioFile.plays = 0;   // finished all cycles; next ▶ starts a fresh set
+                }
+                updateFileUI();
+            };
             el.onloadedmetadata = function () { updateFileUI(); };
 
             document.getElementById('audio-play').addEventListener('click', function () {
@@ -6150,7 +6167,7 @@
                 var chip = ev.target.closest ? ev.target.closest('.audio-chip') : null; if (!chip) return;
                 var set = chip.getAttribute('data-set'), val = chip.getAttribute('data-val');
                 if (set === 'speed') el.playbackRate = parseFloat(val);
-                else if (set === 'loopf') el.loop = !el.loop;
+                else if (set === 'repeat') { var n = parseInt(val, 10); audioFile.repeat = (n === 0) ? Infinity : n; audioFile.plays = 0; }
                 updateFileUI();
             });
 
