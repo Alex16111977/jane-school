@@ -72,6 +72,40 @@ html{background:#0a0a14;}
 .fc-done h2{color:#fff;margin:.5rem 0 .3rem;}
 .fc-done p{color:var(--color-text-muted);margin:0 0 1.2rem;}
 @media(max-width:480px){.fc-term{font-size:1.6rem;}.fc-ua{font-size:1.4rem;}.ch-tab{padding:.4rem .7rem;font-size:.78rem;}}
+/* per-word speaker buttons */
+.spk-btn{display:inline-flex;align-items:center;justify-content:center;width:1.55rem;height:1.55rem;margin-left:.35rem;border-radius:50%;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.18);color:inherit;font-size:.78rem;cursor:pointer;vertical-align:middle;transition:background .15s,transform .15s;flex:none;line-height:1;}
+.spk-btn:hover{background:rgba(56,189,248,.28);transform:scale(1.1);}
+.spk-btn:active{transform:scale(.9);}
+.spk-btn.playing{background:rgba(56,189,248,.42);animation:spkPulse 1s ease-in-out infinite;}
+@keyframes spkPulse{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.55);}50%{box-shadow:0 0 0 7px rgba(56,189,248,0);}}
+.ah-item .spk-btn{width:1.4rem;height:1.4rem;}
+/* audio mode: offline per-chapter track */
+.aha-overlay{position:fixed;inset:0;background:rgba(5,8,14,.82);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:1rem;}
+.aha-overlay.open{display:flex;}
+.aha-modal{position:relative;width:100%;max-width:420px;max-height:90vh;overflow:auto;background:rgba(15,19,28,.98);border:1.5px solid rgba(163,113,247,.35);border-radius:20px;padding:1.5rem 1.3rem;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.aha-close{position:absolute;top:.7rem;right:.9rem;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.4rem;cursor:pointer;line-height:1;padding:.2rem;}
+.aha-close:hover{color:#fff;}
+.aha-badge{text-align:center;margin-bottom:.8rem;}
+.aha-badge span{display:inline-block;font-size:.72rem;font-weight:700;color:#c084fc;background:rgba(163,113,247,.14);border:1px solid rgba(163,113,247,.35);padding:.3rem .7rem;border-radius:20px;}
+.aha-chlabel{text-align:center;font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:.9rem;}
+.aha-now{text-align:center;min-height:5.5rem;}
+.aha-word{font-size:1.5rem;font-weight:800;color:#fff;}
+.aha-tr{font-size:.85rem;color:rgba(255,255,255,.4);margin-top:.15rem;}
+.aha-ua{font-size:1.2rem;font-weight:800;color:#86efac;margin-top:.35rem;}
+.aha-ex{font-size:.88rem;color:rgba(255,255,255,.62);margin-top:.4rem;line-height:1.45;}
+.aha-progress{text-align:center;font-size:.78rem;color:rgba(255,255,255,.4);margin:.9rem 0;}
+.aha-controls{display:flex;align-items:center;justify-content:center;gap:1.1rem;}
+.aha-btn{width:3rem;height:3rem;border-radius:50%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;}
+.aha-btn:hover{background:rgba(255,255,255,.14);transform:translateY(-2px);}
+.aha-btn.aha-main{width:3.7rem;height:3.7rem;background:rgba(163,113,247,.25);border-color:rgba(163,113,247,.55);font-size:1.5rem;}
+.aha-btn.aha-main:hover{background:rgba(163,113,247,.4);}
+.aha-settings{display:flex;flex-direction:column;gap:.5rem;align-items:center;margin-top:1.2rem;}
+.aha-group{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;}
+.aha-c{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.7);border-radius:999px;padding:.24rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;}
+.aha-c.active{background:rgba(163,113,247,.3);border-color:#a371f7;color:#fff;}
+.aha-hint{margin-top:1rem;color:rgba(255,255,255,.35);font-size:.74rem;text-align:center;line-height:1.5;}
+.aha-none{text-align:center;color:rgba(255,255,255,.65);padding:1.2rem .5rem;font-size:.95rem;line-height:1.55;}
+@media(max-width:480px){.aha-modal{padding:1.2rem 1rem;}.aha-word{font-size:1.3rem;}.aha-ua{font-size:1.05rem;}}
 </style></head>
 <body class="dark-theme page-bg-image" style="background:transparent">
 <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0a1420 0%,#0e1422 55%,#080c16 100%)"></div>
@@ -103,11 +137,21 @@ html{background:#0a0a14;}
 <div class="fc-face fc-back"><span class="fc-tag">&#x1F1FA;&#x1F1E6; Переклад</span><div id="back-body"></div><span class="fc-hint-flip">клікни, щоб перевернути</span></div>
 </div></div>
 <div class="fc-nav"><button class="fc-btn fc-round ghost" onclick="prev()" title="Назад">&#8592;</button><button class="fc-btn" onclick="flip()">&#8635; Перевернути</button><button class="fc-btn fc-round ghost" onclick="next()" title="Далі">&#8594;</button></div>
-<div class="fc-tools"><button class="fc-btn ghost" onclick="shuffleDeck()">&#x1F500; Перемішати</button><button class="fc-btn ghost" onclick="toggleSide()">&#x1F504; <span id="side-lbl">Спочатку слово</span></button><button class="fc-btn ghost" onclick="restart()">&#8635; Спочатку</button></div>
+<div class="fc-tools"><button class="fc-btn ghost" onclick="shuffleDeck()">&#x1F500; Перемішати</button><button class="fc-btn ghost" onclick="toggleSide()">&#x1F504; <span id="side-lbl">Спочатку слово</span></button><button class="fc-btn ghost" onclick="restart()">&#8635; Спочатку</button><button class="fc-btn ghost" onclick="openAhAudio()">&#x1F3A7; Аудіо розділу</button></div>
 <div class="fc-hint">Пробіл / Enter — перевернути &bull; &larr; &rarr; — гортати</div>
 <div class="fc-done" id="done"><div class="emoji">&#x1F389;</div><h2>Розділ пройдено!</h2><p id="done-sub"></p><button class="fc-btn" onclick="reviewUnlearned()">&#9851; Повторити невивчені</button> <button class="fc-btn ghost" onclick="restart()">&#8635; Весь розділ</button></div>
 </div>
 </div></div>
+
+<div class="aha-overlay" id="aha-overlay" onclick="if(event.target===this)closeAhAudio()">
+<div class="aha-modal">
+<button class="aha-close" onclick="closeAhAudio()" aria-label="Закрити">&times;</button>
+<div class="aha-badge"><span>&#x1F3A7; Офлайн-аудіо &middot; грає при заблокованому екрані</span></div>
+<div class="aha-chlabel" id="aha-chlabel"></div>
+<div id="aha-body"></div>
+</div>
+</div>
+<script src="audio/ah-audio-cues.js"></script>
 
 <script>
 const DATA={
@@ -2623,6 +2667,8 @@ const CHSHORT={"c0":"Вступ","c1":"Розділ 1","c2":"Розділ 2","c3
 // high-frequency core words of the book — shown with a ⭐
 const FREQ=new Set(["habit","cue","craving","response","reward","behavior","identity","system","environment","trigger","outcome","goal","motivation","willpower","routine","improvement","process","self-control","temptation","addiction","addict","addicted","desire","brain","context","signal","vote","cast a vote","obvious","attractive","satisfying","invisible","unattractive","unsatisfying","law","practice","repeat","associate","perform","crave","resist","avoid","pattern","feedback loop","automatic","conscious","effort","reduce","create","design","energy","exposure","belief","become","shape","notice","improve","compound","focus","stick with","stick to","frequency","dopamine","supernormal","anticipate","anticipation","imitate","prediction","predict","motive","reframe","mind-set"]);
 function isFreq(w){return FREQ.has((w.en||'').toLowerCase());}
+// tag each card with its original (pre-dedup) chapter index — audio cue files key on this
+CH.forEach(([c])=>DATA[c].forEach((w,i)=>{w._i=i;}));
 // dedupe each chapter by english (keep first occurrence) — safety net for merges
 CH.forEach(([c])=>{const seen={};DATA[c]=DATA[c].filter(w=>{const k=(w.en||'').toLowerCase().replace(/[’']/g,"'").trim();if(seen[k])return false;seen[k]=1;return true;});});
 // build flat index for search
@@ -2634,8 +2680,9 @@ function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function buildTabs(){const el=document.getElementById('ch-tabs');el.innerHTML='';CH.forEach(([d,lbl])=>{const b=document.createElement('button');b.className='ch-tab'+(d===currentCh?' active':'');b.textContent=lbl;b.onclick=()=>startCh(d);el.appendChild(b);});}
 function startCh(d){currentCh=d;[...document.querySelectorAll('.ch-tab')].forEach((t,i)=>t.classList.toggle('active',CH[i][0]===d));learned[d]=learned[d]||{};deck=DATA[d].slice();idx=0;flipped=false;sideWord=true;document.getElementById('side-lbl').textContent='Спочатку слово';document.getElementById('done').classList.remove('show');render();}
-function transBlock(w){return '<div class="fc-ua">'+esc(w.ua)+'</div>'+(w.ex?'<div class="fc-def">'+esc(w.ex)+'</div>':'')+'<div class="fc-ref">'+esc(w.en)+' '+esc(w.tr)+'</div>';}
-function wordBlock(w){return (isFreq(w)?'<div class="fc-freq">&#11088; часте слово</div>':'')+'<div class="fc-term">'+esc(w.en)+'</div><div class="fc-tr">'+esc(w.tr)+'</div><div class="fc-ipa">'+esc(w.ipa)+'</div>';}
+function spk(ch,i,kind,title){return '<button class="spk-btn" onclick="event.stopPropagation();playSeg(\''+ch+'\','+i+',\''+kind+'\',this)" title="'+title+'" aria-label="'+title+'">&#x1F50A;</button>';}
+function transBlock(w){return '<div class="fc-ua">'+esc(w.ua)+spk(currentCh,w._i,'t','Слухати переклад')+'</div>'+(w.ex?'<div class="fc-def">'+esc(w.ex)+'</div>':'')+'<div class="fc-ref">'+esc(w.en)+' '+esc(w.tr)+'</div>';}
+function wordBlock(w){return (isFreq(w)?'<div class="fc-freq">&#11088; часте слово</div>':'')+'<div class="fc-term">'+esc(w.en)+spk(currentCh,w._i,'w','Слухати вимову')+'</div><div class="fc-tr">'+esc(w.tr)+'</div><div class="fc-ipa">'+esc(w.ipa)+'</div>';}
 function render(){const card=document.getElementById('card');if(!deck.length)return;const w=deck[idx];flipped=false;card.classList.remove('flipped');
 document.getElementById('front-body').innerHTML=sideWord?wordBlock(w):transBlock(w);
 document.getElementById('back-body').innerHTML=sideWord?transBlock(w):wordBlock(w);
@@ -2675,7 +2722,7 @@ const hits=ALL.filter(w=>norm(w.en).includes(v)||norm(w.ua).includes(v)||norm(w.
 let html='<div class="ah-rcount">Знайдено: '+hits.length+'</div>';
 if(!hits.length){html+='<div class="ah-empty">Нічого не знайдено для «'+esc(raw.trim())+'». Спробуй інше слово.</div>';}
 hits.forEach(w=>{html+='<div class="ah-item" onclick="openCard(\''+w.ch+'\','+w.i+')">'+
-'<div>'+(isFreq(w)?'<span class="freq">&#11088;</span>':'')+'<span class="en">'+hl(w.en,v)+'</span><span class="tr">'+esc(w.tr)+'</span><span class="ipa">'+esc(w.ipa)+'</span></div>'+
+'<div>'+(isFreq(w)?'<span class="freq">&#11088;</span>':'')+'<span class="en">'+hl(w.en,v)+'</span>'+spk(w.ch,w._i,'w','Слухати вимову')+'<span class="tr">'+esc(w.tr)+'</span><span class="ipa">'+esc(w.ipa)+'</span></div>'+
 '<div class="ua">'+hl(w.ua,v)+'</div>'+
 '<div class="ex">'+hl(w.ex,v)+'</div>'+
 '<span class="ch">'+CHSHORT[w.ch]+'</span></div>';});
@@ -2687,4 +2734,83 @@ clr.addEventListener('click',function(){q.value='';doSearch('');q.focus();});
 
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}else if(e.key==='ArrowRight'){e.preventDefault();next();}else if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
 buildTabs();startCh(CH[0][0]);
+
+// ===== per-word audio (offline neural voice, seeks into the chapter track) =====
+let wordAudioEl=null,wordAudioBtn=null,wordAudioOnTime=null;
+function playSeg(ch,i,kind,btn){
+ const data=(window.AH_AUDIO||{})[ch];if(!data||!data.c)return;
+ const cue=data.c.find(p=>p[0]===i);if(!cue)return;
+ const start=kind==='w'?cue[1]:cue[2],end=kind==='w'?cue[2]:cue[4];
+ if(!wordAudioEl){wordAudioEl=new Audio();wordAudioEl.preload='none';}
+ if(wordAudioOnTime){wordAudioEl.removeEventListener('timeupdate',wordAudioOnTime);wordAudioOnTime=null;}
+ if(wordAudioBtn)wordAudioBtn.classList.remove('playing');
+ wordAudioBtn=btn||null;
+ const src='audio/ah__'+ch+'.m4a';
+ const doPlay=()=>{try{wordAudioEl.currentTime=start;}catch(e){}const p=wordAudioEl.play();if(p&&p.catch)p.catch(()=>{});if(btn)btn.classList.add('playing');};
+ if(wordAudioEl.getAttribute('data-src')!==src){wordAudioEl.setAttribute('data-src',src);wordAudioEl.src=src;wordAudioEl.addEventListener('loadedmetadata',doPlay,{once:true});}
+ else doPlay();
+ wordAudioOnTime=()=>{if(wordAudioEl.currentTime>=end-0.02){wordAudioEl.pause();if(btn)btn.classList.remove('playing');}};
+ wordAudioEl.addEventListener('timeupdate',wordAudioOnTime);
+}
+
+// ===== Audio-mode: offline track for the whole chapter (neural voices) =====
+var aha={el:null,cues:[],idx:0,ch:null,repeat:Infinity,plays:0,rate:0.9};
+function ahaFmt(sec){sec=Math.max(0,Math.floor(sec||0));const m=Math.floor(sec/60),s=sec%60;return m+':'+(s<10?'0':'')+s;}
+function ahaCueIndex(time){const cs=aha.cues;let idx=0;for(let i=0;i<cs.length;i++){if(cs[i].t<=time+0.02)idx=i;else break;}return idx;}
+function ahaCardHtml(i){const w=DATA[aha.ch].find(c=>c._i===i);if(!w)return'';return '<div class="aha-word">'+esc(w.en)+'</div><div class="aha-tr">'+esc(w.tr)+'</div><div class="aha-ua">'+esc(w.ua)+'</div>'+(w.ex?'<div class="aha-ex">'+esc(w.ex)+'</div>':'');}
+function ahaUpdate(){const el=aha.el;if(!el)return;const cue=aha.cues[aha.idx];
+ const now=document.getElementById('aha-now'),pr=document.getElementById('aha-progress'),pb=document.getElementById('aha-play');
+ if(cue&&now)now.innerHTML=ahaCardHtml(cue.i);
+ if(pr)pr.textContent=(aha.cues.length?(aha.idx+1):0)+' / '+aha.cues.length+'  ·  '+ahaFmt(el.currentTime)+' / '+ahaFmt(el.duration)+(aha.repeat!==Infinity&&aha.repeat>1?('  ·  🔁 '+(Math.min(aha.plays,aha.repeat-1)+1)+'/'+aha.repeat):'');
+ if(pb)pb.innerHTML=(!el.paused)?'&#9208;':'&#9654;';
+ document.querySelectorAll('#aha-body .aha-c').forEach(c=>{const set=c.getAttribute('data-set'),val=c.getAttribute('data-val');let on=false;
+  if(set==='speed')on=parseFloat(val)===el.playbackRate;
+  else if(set==='repeat'){const rv=parseInt(val,10);on=(rv===0)?(aha.repeat===Infinity):(aha.repeat===rv);}
+  c.classList.toggle('active',on);});}
+function ahaMedia(){if(!('mediaSession'in navigator))return;const cue=aha.cues[aha.idx];if(!cue)return;const w=DATA[aha.ch].find(c=>c._i===cue.i);
+ try{navigator.mediaSession.metadata=new MediaMetadata({title:(w?w.en:'Word'),artist:(w?w.ua:''),album:'Atomic Habits · '+(CHSHORT[aha.ch]||aha.ch)});
+ navigator.mediaSession.setActionHandler('play',()=>{if(aha.el)aha.el.play();});
+ navigator.mediaSession.setActionHandler('pause',()=>{if(aha.el)aha.el.pause();});
+ navigator.mediaSession.setActionHandler('previoustrack',()=>ahaSeek(-1));
+ navigator.mediaSession.setActionHandler('nexttrack',()=>ahaSeek(1));}catch(e){}}
+function ahaSeek(dir){const el=aha.el;if(!el||!aha.cues.length)return;let ni=aha.idx+dir;if(ni<0)ni=0;if(ni>=aha.cues.length)ni=aha.cues.length-1;
+ aha.idx=ni;try{el.currentTime=aha.cues[ni].t+0.01;}catch(e){}ahaUpdate();ahaMedia();}
+function ahaAvailable(){const ks=Object.keys(window.AH_AUDIO||{});return ks.length?ks.map(k=>CHSHORT[k]||k).join(', '):'—';}
+function openAhAudio(){
+ const overlay=document.getElementById('aha-overlay'),label=document.getElementById('aha-chlabel'),body=document.getElementById('aha-body');
+ label.textContent=CHSHORT[currentCh]||currentCh;
+ const data=(window.AH_AUDIO||{})[currentCh];
+ overlay.classList.add('open');
+ if(!data||!data.c||!data.c.length){body.innerHTML='<div class="aha-none">Для «'+(CHSHORT[currentCh]||currentCh)+'» аудіо ще нема.<br>Готово: '+ahaAvailable()+'.</div>';return;}
+ aha.ch=currentCh;aha.cues=data.c.map(p=>({i:p[0],t:p[1],w:p[2],u:p[3],e:p[4]}));aha.idx=0;aha.plays=0;
+ body.innerHTML='<div class="aha-now" id="aha-now"></div><div class="aha-progress" id="aha-progress"></div>'+
+  '<div class="aha-controls"><button class="aha-btn" id="aha-prev" aria-label="Назад">&#9198;</button><button class="aha-btn aha-main" id="aha-play" aria-label="Play/Pause">&#9654;</button><button class="aha-btn" id="aha-next" aria-label="Далі">&#9197;</button></div>'+
+  '<div class="aha-settings"><div class="aha-group">'+
+  '<button class="aha-c" data-set="speed" data-val="0.7">0.7×</button><button class="aha-c" data-set="speed" data-val="0.9">0.9×</button><button class="aha-c" data-set="speed" data-val="1">1×</button><button class="aha-c" data-set="speed" data-val="1.25">1.25×</button></div>'+
+  '<div class="aha-group"><span style="align-self:center;color:rgba(255,255,255,.4);font-size:.78rem;padding:0 .3rem;">🔁</span>'+
+  '<button class="aha-c" data-set="repeat" data-val="1">1×</button><button class="aha-c" data-set="repeat" data-val="3">3×</button><button class="aha-c" data-set="repeat" data-val="5">5×</button><button class="aha-c" data-set="repeat" data-val="0">∞</button></div></div>'+
+  '<div class="aha-hint">&#9654; постав play, заблокуй екран, поклади в кишеню — грає далі. Керування з екрана блокування чи навушників.</div>';
+ const el=document.createElement('audio');
+ el.id='aha-el';el.src='audio/ah__'+currentCh+'.m4a';el.preload='auto';el.playbackRate=aha.rate;
+ body.appendChild(el);aha.el=el;
+ el.ontimeupdate=()=>{const ni=ahaCueIndex(el.currentTime);if(ni!==aha.idx){aha.idx=ni;ahaMedia();}ahaUpdate();};
+ el.onplay=ahaUpdate;el.onpause=ahaUpdate;el.onloadedmetadata=ahaUpdate;
+ el.onended=()=>{aha.plays++;if(aha.plays<aha.repeat){try{el.currentTime=0;}catch(e){}const p=el.play();if(p&&p.catch)p.catch(()=>{});}else{aha.plays=0;}ahaUpdate();};
+ document.getElementById('aha-play').addEventListener('click',()=>{if(el.paused){const p=el.play();if(p&&p.catch)p.catch(()=>{});}else el.pause();});
+ document.getElementById('aha-prev').addEventListener('click',()=>ahaSeek(-1));
+ document.getElementById('aha-next').addEventListener('click',()=>ahaSeek(1));
+ body.querySelector('.aha-settings').addEventListener('click',(ev)=>{
+  const chip=ev.target.closest?ev.target.closest('.aha-c'):null;if(!chip)return;
+  const set=chip.getAttribute('data-set'),val=chip.getAttribute('data-val');
+  if(set==='speed'){el.playbackRate=parseFloat(val);aha.rate=el.playbackRate;}
+  else if(set==='repeat'){const n=parseInt(val,10);aha.repeat=(n===0)?Infinity:n;aha.plays=0;}
+  ahaUpdate();});
+ ahaUpdate();ahaMedia();
+}
+function closeAhAudio(){
+ const overlay=document.getElementById('aha-overlay');if(overlay)overlay.classList.remove('open');
+ if(aha.el){try{aha.el.pause();}catch(e){}aha.el.src='';aha.el=null;}
+ if('mediaSession'in navigator){try{navigator.mediaSession.metadata=null;}catch(e){}}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAhAudio();});
 </script></body></html>
