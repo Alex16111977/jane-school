@@ -110,10 +110,13 @@
         </div>
 
         <!-- ===== A2 — Aufbau ===== -->
-        <div style="display:flex; align-items:center; gap:0.7rem; margin:2rem 0 0.7rem;">
+        <div style="display:flex; align-items:center; gap:0.7rem; margin:2rem 0 0.7rem; flex-wrap:wrap;">
             <span style="background:linear-gradient(135deg,#4493f8,#79b8ff); color:#001a3d; font-weight:900; font-size:0.78rem; padding:0.3rem 0.8rem; border-radius:50px; letter-spacing:0.08em;">A2</span>
             <h3 style="margin:0; font-size:1.05rem; color:#79b8ff;">Aufbau &mdash; Schule-Standard</h3>
-            <span style="color:rgba(230,230,235,0.5); font-size:0.82rem; margin-left:auto;">jetzt baust du S&auml;tze richtig</span>
+            <div style="margin-left:auto; display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap;">
+                <span style="color:rgba(230,230,235,0.5); font-size:0.82rem;">jetzt baust du S&auml;tze richtig</span>
+                <button onclick="openD2A()" style="cursor:pointer; background:linear-gradient(135deg,rgba(68,147,248,0.24),rgba(121,184,255,0.14)); border:1px solid rgba(68,147,248,0.5); color:#dbe9ff; font-size:0.8rem; font-weight:700; padding:0.35rem 0.85rem; border-radius:999px; display:inline-flex; align-items:center; gap:0.35rem; white-space:nowrap; font-family:inherit;">&#x1F3A7; Audio-&Uuml;berblick</button>
+            </div>
         </div>
         <div class="subjects" style="justify-content:flex-start; max-width:100%;">
             <a href="deutsch-verwechslungen.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.3);">
@@ -288,6 +291,11 @@
                 <span class="subject-icon">&#x1F4D6;</span>
                 <h3>Ninas Buchladen &mdash; Lekt&uuml;re</h3>
                 <p>Jenny Colgan &middot; B2 &rarr; C1 &middot; mit Vokabeln</p>
+            </a>
+            <a href="deutsch-sapiens.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border:2px solid #dc2626;">
+                <span class="subject-icon">&#x1F9E0;</span>
+                <h3>Sapiens &mdash; Kapitel 1</h3>
+                <p>Harari auf Deutsch &middot; B1 &rarr; B2 &middot; 8 Abschnitte mit Vokabeln</p>
             </a>
             <a href="deutsch-reflexivverben.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.3);">
                 <span class="subject-icon">&#x1F503;</span>
@@ -1013,6 +1021,63 @@
 
     </div>
 
+    <!-- ===== A2 Audio-Überblick: Player (docked bottom bar, not a full-screen overlay --
+         the rest of the page stays scrollable/clickable while it plays) ===== -->
+    <style>
+        .d2a-dock{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;flex-direction:column;font-family:inherit;}
+        .d2a-dock.open{display:flex;}
+        .d2a-panel{display:none;background:#0d1420;border-top:1px solid rgba(68,147,248,.25);box-shadow:0 -6px 24px rgba(0,0,0,.35);padding:.9rem 1rem .7rem;max-height:48vh;overflow-y:auto;}
+        .d2a-panel.open{display:block;}
+        .d2a-now{text-align:left;display:flex;flex-direction:column;gap:.5rem;}
+        .d2a-word{font-size:1.1rem;font-weight:800;color:#fff;line-height:1.3;}
+        .d2a-ru{font-size:.92rem;color:#9cc4ff;line-height:1.5;}
+        .d2a-example{font-size:.86rem;color:#aeb8c8;font-style:italic;line-height:1.5;}
+        .d2a-settings{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:.9rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.08);}
+        .d2a-group{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;}
+        .d2a-c{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#c9d1db;border-radius:999px;padding:.22rem .62rem;font-size:.76rem;cursor:pointer;font-family:inherit;}
+        .d2a-c.active{background:rgba(68,147,248,.28);border-color:#4493f8;color:#fff;}
+        .d2a-hint{margin-top:.7rem;color:#7a8494;font-size:.72rem;text-align:left;line-height:1.45;}
+        .d2a-bar{display:flex;align-items:center;gap:.55rem;background:linear-gradient(160deg,#131c2b,#0d121c);border-top:1px solid rgba(68,147,248,.35);box-shadow:0 -8px 26px rgba(0,0,0,.45);padding:.5rem .6rem;}
+        .d2a-bar-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(68,147,248,.35);background:rgba(68,147,248,.1);color:#e8edf5;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .d2a-bar-btn:hover{background:rgba(68,147,248,.22);}
+        .d2a-bar-main{width:44px;height:44px;font-size:1.15rem;background:linear-gradient(135deg,#4493f8,#79b8ff);color:#001a3d;border:none;}
+        .d2a-bar-info{flex:1;min-width:0;cursor:pointer;background:none;border:none;padding:0;text-align:left;font:inherit;color:inherit;}
+        .d2a-bar-text{color:#e8edf5;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .d2a-bar-progress{color:#7a8494;font-size:.7rem;margin-top:.1rem;}
+        .d2a-bar-close{background:none;border:none;color:#8b95a5;font-size:1.4rem;line-height:1;cursor:pointer;flex-shrink:0;padding:0 .2rem;}
+        .d2a-bar-close:hover{color:#fff;}
+    </style>
+    <div class="d2a-dock" id="d2a-dock">
+        <div class="d2a-panel" id="d2a-panel">
+            <div class="d2a-now" id="d2a-now"></div>
+            <div class="d2a-settings">
+                <div class="d2a-group">
+                    <button class="d2a-c" data-set="speed" data-val="0.85">0.85&times;</button>
+                    <button class="d2a-c" data-set="speed" data-val="1">1&times;</button>
+                    <button class="d2a-c" data-set="speed" data-val="1.15">1.15&times;</button>
+                    <button class="d2a-c" data-set="speed" data-val="1.3">1.3&times;</button>
+                </div>
+                <div class="d2a-group">
+                    <span style="align-self:center;color:#7a8494;font-size:.78rem;padding:0 .3rem;">🔁</span>
+                    <button class="d2a-c" data-set="repeat" data-val="1">1&times;</button>
+                    <button class="d2a-c" data-set="repeat" data-val="2">2&times;</button>
+                    <button class="d2a-c" data-set="repeat" data-val="0">&#8734;</button>
+                </div>
+            </div>
+            <div class="d2a-hint">Bildschirm sperren, in die Tasche &mdash; l&auml;uft weiter. Steuerung vom Sperrbildschirm oder &uuml;ber Kopfh&ouml;rer.</div>
+        </div>
+        <div class="d2a-bar">
+            <button class="d2a-bar-btn" id="d2a-prev" aria-label="Zur&uuml;ck">&#9198;</button>
+            <button class="d2a-bar-btn d2a-bar-main" id="d2a-play" aria-label="Play/Pause">&#9654;</button>
+            <button class="d2a-bar-btn" id="d2a-next" aria-label="Weiter">&#9197;</button>
+            <button class="d2a-bar-info" id="d2a-bar-info" type="button" aria-label="Details ein-/ausblenden">
+                <div class="d2a-bar-text" id="d2a-bar-text"></div>
+                <div class="d2a-bar-progress" id="d2a-bar-progress"></div>
+            </button>
+            <button class="d2a-bar-close" onclick="closeD2A()" aria-label="Schlie&szlig;en">&times;</button>
+        </div>
+    </div>
+
     <!-- Помощник с заданиями -->
     <section style="position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:2rem 2rem 3rem;">
         <div style="background:rgba(13,17,23,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:2rem; backdrop-filter:blur(8px);">
@@ -1636,6 +1701,104 @@
 
         updateCounts();
         applyFilter();
+    })();
+    </script>
+
+    <!-- ===== A2 Audio-Überblick: Player-Logik ===== -->
+    <script src="audio/deutsch-a2-cues.js"></script>
+    <script>
+    (function() {
+        var d2a = { el: null, cues: [], idx: 0, repeat: 1, plays: 0, rate: 1 };
+
+        function fmt(sec) { sec = Math.max(0, Math.floor(sec || 0)); var m = Math.floor(sec / 60), s = sec % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+        function cueIndex(time) { var cs = d2a.cues, idx = 0; for (var i = 0; i < cs.length; i++) { if (cs[i].t <= time + 0.02) idx = i; else break; } return idx; }
+        function cardHtml(cue) {
+            if (!cue) return '';
+            return '<div class="d2a-word">' + cue.de + '</div>' +
+                '<div class="d2a-ru">' + cue.ru + '</div>' +
+                (cue.ex ? '<div class="d2a-example">' + cue.ex + '</div>' : '');
+        }
+        function togglePanel(force) {
+            var panel = document.getElementById('d2a-panel'); if (!panel) return;
+            var open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+            panel.classList.toggle('open', open);
+        }
+        function update() {
+            var el = d2a.el; if (!el) return;
+            var cue = d2a.cues[d2a.idx];
+            var now = document.getElementById('d2a-now'), pb = document.getElementById('d2a-play');
+            var barText = document.getElementById('d2a-bar-text'), barProg = document.getElementById('d2a-bar-progress');
+            if (now) now.innerHTML = cardHtml(cue);
+            if (barText) barText.textContent = cue ? cue.de : '';
+            var progressStr = (d2a.cues.length ? (d2a.idx + 1) : 0) + ' / ' + d2a.cues.length + '  ·  ' + fmt(el.currentTime) + ' / ' + fmt(el.duration) +
+                (d2a.repeat !== Infinity && d2a.repeat > 1 ? ('  ·  🔁 ' + (Math.min(d2a.plays, d2a.repeat - 1) + 1) + '/' + d2a.repeat) : '');
+            if (barProg) barProg.textContent = progressStr;
+            if (pb) pb.innerHTML = (!el.paused) ? '&#9208;' : '&#9654;';
+            var chips = document.querySelectorAll('#d2a-dock .d2a-c');
+            for (var i = 0; i < chips.length; i++) {
+                var c = chips[i], set = c.getAttribute('data-set'), val = c.getAttribute('data-val'), on = false;
+                if (set === 'speed') on = parseFloat(val) === el.playbackRate;
+                else if (set === 'repeat') { var rv = parseInt(val, 10); on = (rv === 0) ? (d2a.repeat === Infinity) : (d2a.repeat === rv); }
+                c.classList.toggle('active', on);
+            }
+        }
+        function media() {
+            if (!('mediaSession' in navigator)) return;
+            var cue = d2a.cues[d2a.idx]; if (!cue) return;
+            try {
+                navigator.mediaSession.metadata = new MediaMetadata({ title: cue.de || 'Deutsch A2', artist: 'Deutsch A2 · Überblick', album: 'NeoStudy' });
+                navigator.mediaSession.setActionHandler('play', function() { if (d2a.el) d2a.el.play(); });
+                navigator.mediaSession.setActionHandler('pause', function() { if (d2a.el) d2a.el.pause(); });
+                navigator.mediaSession.setActionHandler('previoustrack', function() { seek(-1); });
+                navigator.mediaSession.setActionHandler('nexttrack', function() { seek(1); });
+            } catch (e) {}
+        }
+        function seek(dir) {
+            var el = d2a.el; if (!el || !d2a.cues.length) return;
+            var ni = d2a.idx + dir; if (ni < 0) ni = 0; if (ni >= d2a.cues.length) ni = d2a.cues.length - 1;
+            d2a.idx = ni; try { el.currentTime = d2a.cues[ni].t + 0.01; } catch (e) {}
+            update(); media();
+        }
+        window.openD2A = function() {
+            var dock = document.getElementById('d2a-dock');
+            dock.classList.add('open');
+            var data = window.DEUTSCH_A2_AUDIO;
+            if (!data || !data.c || !data.c.length) {
+                togglePanel(true);
+                document.getElementById('d2a-now').innerHTML = '<div style="color:#c9d1db;padding:1rem 0;">Audio wird noch vorbereitet &mdash; versuch es sp&auml;ter noch einmal.</div>';
+                return;
+            }
+            if (d2a.el) { try { d2a.el.pause(); } catch (e) {} try { d2a.el.remove(); } catch (e) {} d2a.el = null; }
+            d2a.cues = data.c; d2a.idx = 0; d2a.plays = 0;
+            var el = document.createElement('audio');
+            el.id = 'd2a-el'; el.src = 'audio/deutsch-a2-overview.m4a'; el.preload = 'auto'; el.playbackRate = d2a.rate;
+            dock.appendChild(el); d2a.el = el;
+            el.ontimeupdate = function() { var ni = cueIndex(el.currentTime); if (ni !== d2a.idx) { d2a.idx = ni; media(); } update(); };
+            el.onplay = update; el.onpause = update; el.onloadedmetadata = update;
+            el.onended = function() { d2a.plays++; if (d2a.plays < d2a.repeat) { try { el.currentTime = 0; } catch (e) {} var p = el.play(); if (p && p.catch) p.catch(function() {}); } else { d2a.plays = 0; } update(); };
+            document.getElementById('d2a-play').onclick = function() { if (el.paused) { var p = el.play(); if (p && p.catch) p.catch(function() {}); } else el.pause(); };
+            document.getElementById('d2a-prev').onclick = function() { seek(-1); };
+            document.getElementById('d2a-next').onclick = function() { seek(1); };
+            document.getElementById('d2a-bar-info').onclick = function() { togglePanel(); };
+            document.querySelector('#d2a-dock .d2a-settings').onclick = function(ev) {
+                var chip = ev.target.closest ? ev.target.closest('.d2a-c') : null; if (!chip) return;
+                var set = chip.getAttribute('data-set'), val = chip.getAttribute('data-val');
+                if (set === 'speed') { el.playbackRate = parseFloat(val); d2a.rate = el.playbackRate; }
+                else if (set === 'repeat') { var n = parseInt(val, 10); d2a.repeat = (n === 0) ? Infinity : n; d2a.plays = 0; }
+                update();
+            };
+            togglePanel(true);
+            update(); media();
+            var p = el.play(); if (p && p.catch) p.catch(function() {});
+        };
+        window.closeD2A = function() {
+            var dock = document.getElementById('d2a-dock');
+            if (dock) dock.classList.remove('open');
+            togglePanel(false);
+            if (d2a.el) { try { d2a.el.pause(); } catch (e) {} d2a.el.src = ''; d2a.el.remove(); d2a.el = null; }
+            if ('mediaSession' in navigator) { try { navigator.mediaSession.metadata = null; } catch (e) {} }
+        };
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') togglePanel(false); });
     })();
     </script>
 </body>

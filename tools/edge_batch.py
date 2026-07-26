@@ -27,11 +27,15 @@ async def one(sem, job, outdir):
         for _attempt in range(4):
             try:
                 communicate = edge_tts.Communicate(job["text"], job["voice"])
-                await communicate.save(path)
+                # A hung websocket (e.g. the machine sleeping mid-request) can otherwise
+                # block this task -- and asyncio.gather() with it -- forever with no
+                # error and no output; a hard per-request timeout guarantees forward
+                # progress (this attempt fails and the next one is retried instead).
+                await asyncio.wait_for(communicate.save(path), timeout=25)
                 if os.path.exists(path) and os.path.getsize(path) > 0:
                     print("OK", job["id"], flush=True)
                     return
-            except Exception as e:  # noqa: BLE001 - retry loop, report last error
+            except Exception as e:  # noqa: BLE001 - retry loop, report last error (incl. asyncio.TimeoutError)
                 last = e
         print("FAIL", job["id"], str(last)[:200].replace("\n", " "), flush=True)
 
