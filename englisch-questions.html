@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions &amp; Answers | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.12rem 0.5rem;
+            border-radius: 6px;
+            margin-right: 0.35rem;
+            vertical-align: middle;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        .t-subj { background: rgba(68,147,248,0.16);  color: #79b8ff; }
+        .t-obj  { background: rgba(163,113,247,0.16); color: #c8a5ff; }
+        .t-ind  { background: rgba(63,185,80,0.16);   color: #56d364; }
+        .t-bad  { background: rgba(248,81,73,0.16);   color: #ff8080; }
+        .t-ok   { background: rgba(63,185,80,0.16);   color: #56d364; }
+
+        .slots {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 0.3rem;
+            margin: 0.6rem 0;
+        }
+        .slot {
+            flex: 1;
+            min-width: 78px;
+            border-radius: 9px;
+            padding: 0.5rem 0.55rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .slot span {
+            display: block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.38);
+            margin-bottom: 0.2rem;
+        }
+        .slot.s1 { background: rgba(163,113,247,0.13); border-color: rgba(163,113,247,0.3); }
+        .slot.s2 { background: rgba(245,158,11,0.13);  border-color: rgba(245,158,11,0.3); }
+        .slot.s3 { background: rgba(68,147,248,0.13);  border-color: rgba(68,147,248,0.3); }
+        .slot.s4 { background: rgba(63,185,80,0.13);   border-color: rgba(63,185,80,0.3); }
+
+        .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 620px) { .pair-grid { grid-template-columns: 1fr; } }
+        .pair-cell {
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.83rem;
+            line-height: 1.5;
+        }
+        .pair-cell .lbl {
+            display: block;
+            font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em;
+            text-transform: uppercase; margin-bottom: 0.3rem; opacity: 0.85;
+        }
+        .pair-cell.a .lbl { color: #79b8ff; }
+        .pair-cell.b .lbl { color: #c8a5ff; }
+        .pair-cell .ru { display: block; color: rgba(255,255,255,0.45); font-size: 0.76rem; margin-top: 0.15rem; }
+
+        .dlg {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            padding: 0.8rem 1rem;
+            font-size: 0.86rem;
+            line-height: 1.8;
+            margin-top: 0.5rem;
+        }
+        .dlg .a { color: #79b8ff; font-weight: 700; }
+        .dlg .b { color: #56d364; font-weight: 700; }
+        .dlg .hi { color: #fff; font-weight: 700; background: rgba(163,113,247,0.18); padding: 0.05rem 0.3rem; border-radius: 5px; }
+
+        .flip {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.84rem;
+        }
+        .flip:last-child { border-bottom: none; }
+        .flip-a { color: rgba(255,255,255,0.55); }
+        .flip-b { color: rgba(255,255,255,0.9); }
+        .flip-b b { color: #56d364; }
+        .flip-arrow { color: rgba(255,255,255,0.28); font-size: 1rem; }
+        @media (max-width: 620px) {
+            .flip { grid-template-columns: 1fr; }
+            .flip-arrow { display: none; }
+            .flip-a { font-size: 0.79rem; }
+        }
+
+        .word-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+        .wchip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .wchip b { color: #79b8ff; }
+        .mini-note { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.55; margin-top: 0.5rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Questions</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Questions &amp; Answers</h1>
+            <p class="page-subtitle">Косвенные вопросы, вопрос к подлежащему, tags и echo &mdash; всё, что сложнее школьного <em>Do you like&hellip;?</em></p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="form">Схема вопроса</button>
+            <button class="tab" data-tab="words">Вопросительные слова</button>
+            <button class="tab" data-tab="indirect">Косвенные вопросы</button>
+            <button class="tab" data-tab="tags">Tags &amp; Echo</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+        <!-- ============ TAB 1: FORM ============ -->
+        <div class="tab-content active" id="tab-form">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F527;</span>
+                    <div>
+                        <h2>Как собирается вопрос</h2>
+                        <p class="lesson-header-sub">И один случай, когда всё правило отменяется</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Инверсия:</strong> вспомогательный глагол встаёт <em>перед</em> подлежащим.<br>
+                    <em>You <strong>are</strong> leaving today.</em> &rarr; <em><strong>Are</strong> you leaving today?</em><br>
+                    В простых временах вспомогательного нет &mdash; тогда берём <strong>do / does / did</strong>:<br>
+                    <em>You like train journeys.</em> &rarr; <em><strong>Do</strong> you like train journeys?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9F1; Слоты вопроса</h3>
+                    <div class="slots">
+                        <div class="slot s1"><span>1</span>Wh-слово</div>
+                        <div class="slot s2"><span>2</span>Aux</div>
+                        <div class="slot s3"><span>3</span>Subject</div>
+                        <div class="slot s4"><span>4</span>Verb + &hellip;</div>
+                    </div>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Wh-</th><th>Aux</th><th>Subject</th><th>Verb</th></tr>
+                        <tr><td>&mdash;</td><td>Are</td><td>you</td><td>leaving today?</td></tr>
+                        <tr><td>&mdash;</td><td>Has</td><td>the train</td><td>got a buffet?</td></tr>
+                        <tr><td>Where</td><td>can</td><td>we</td><td>sit?</td></tr>
+                        <tr><td>&mdash;</td><td>Do</td><td>you</td><td>like train journeys?</td></tr>
+                        <tr><td>&mdash;</td><td>Did</td><td>they</td><td>arrive at six?</td></tr>
+                        <tr><td>What</td><td>shall</td><td>we</td><td>do?</td></tr>
+                        <tr><td>How</td><td>does</td><td>this camera</td><td>work?</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Если вспомогательных два &mdash; вперёд идёт <strong>только первый</strong>:<br>
+                    <em>I <strong>could have</strong> reserved a seat.</em> &rarr; <em><strong>Could</strong> I <strong>have</strong> reserved a seat?</em><br>
+                    &#x1F4CC; Глагол <strong>be</strong> сам по себе тоже уходит вперёд, без do:<br>
+                    <em>The train was late.</em> &rarr; <em><strong>Was</strong> the train late?</em> &middot; <em>Where <strong>is</strong> my ticket?</em></p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #4493f8; background:rgba(68,147,248,0.06);">
+                    <h3 style="color:#79b8ff;">&#x2B50; Вопрос к подлежащему &mdash; инверсии НЕТ</h3>
+                    <p style="font-size:0.87rem;color:rgba(255,255,255,0.8);">Если <em>who / what / which</em> сами являются подлежащим, порядок слов остаётся как в утверждении. И никакого <strong>do</strong>.</p>
+                    <div class="pair-grid" style="margin-top:0.5rem;">
+                        <div class="pair-cell a"><span class="lbl">Подлежащее &mdash; без do</span><strong>Who saw</strong> the detective?<span class="ru">кто-то увидел детектива &mdash; кто?</span></div>
+                        <div class="pair-cell b"><span class="lbl">Дополнение &mdash; с do</span><strong>Who did</strong> the detective <strong>see</strong>?<span class="ru">детектив кого-то увидел &mdash; кого?</span></div>
+
+                        <div class="pair-cell a"><span class="lbl">Подлежащее</span><strong>Who invited</strong> you to the party? ~ Laura did.</div>
+                        <div class="pair-cell b"><span class="lbl">Дополнение</span><strong>Who did you invite</strong> to the party? ~ Oh, lots of people.</div>
+
+                        <div class="pair-cell a"><span class="lbl">Подлежащее</span><strong>Who can give</strong> me some help?<br><strong>What happens</strong> next?<br><strong>Which biscuits taste</strong> the best?<br><strong>How many people know</strong> the secret?</div>
+                        <div class="pair-cell b"><span class="lbl">Дополнение / обстоятельство</span><strong>What will tomorrow bring?</strong><br><strong>Whose is</strong> this umbrella?<br><strong>When are</strong> you coming back?<br><strong>Why did</strong> everyone laugh?</div>
+                    </div>
+                    <p class="mini-note">&#x1F511; Проверка: замени вопросительное слово на <em>someone/something</em>. Если получилось <em><strong>Someone</strong> saw the detective</em> &mdash; это подлежащее, do не нужен.<br>
+                    <span class="q-tag t-bad">ЧАСТАЯ ОШИБКА</span> <s>Who did see the detective?</s> &mdash; если только это не эмфаза «кто же всё-таки увидел».</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Зачем вообще нужен вопрос</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>Спросить информацию</td><td>What time is the next train? ~ Ten eleven.</td></tr>
+                        <tr><td>Просьба</td><td><strong>Can I have</strong> one then, please?</td></tr>
+                        <tr><td>Предложение</td><td><strong>Shall we take</strong> the early train?</td></tr>
+                        <tr><td>Предложить помощь</td><td><strong>Can I help</strong> you?</td></tr>
+                        <tr><td>Спросить разрешения</td><td><strong>May I take</strong> one of these timetables?</td></tr>
+                        <tr><td>Риторический вопрос</td><td>What do you think will happen? ~ <strong>Who knows?</strong><br>Fancy meeting you here. <strong>It's a small world, isn't it?</strong></td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4AC; Вопрос без инверсии &mdash; в живой речи</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.75);">В разговоре вопрос может звучать как утверждение &mdash; с вопросительной интонацией вверх. Так делают, когда переспрашивают или уточняют сказанное.</p>
+                    <div class="dlg">
+                        <span class="a">A:</span> I need a return ticket to Paddington. &nbsp; <span class="b">B:</span> <span class="hi">You're travelling when?</span> ~ Tomorrow.<br>
+                        <span class="hi">The machine gives change?</span> ~ No, it doesn't.<br>
+                        <span class="hi">You're travelling tomorrow?</span> ~ Yes.<br>
+                        <span class="hi">The car is what colour?</span> ~ Blue. &nbsp;|&nbsp; <span class="hi">They went which way?</span> ~ That way.
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Только когда это продолжение разговора. В начале беседы так спрашивать нельзя.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; Короткие ответы</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Вопрос</th><th>Да</th><th>Нет</th></tr>
+                        <tr><td>Is it raining?</td><td>Yes, it <strong>is</strong>.</td><td>No, it <strong>isn't</strong>.</td></tr>
+                        <tr><td>Have you finished?</td><td>Yes, I <strong>have</strong>.</td><td>No, I <strong>haven't</strong>.</td></tr>
+                        <tr><td>Do you play the piano?</td><td>Yes, I <strong>do</strong>.</td><td>No, I <strong>don't</strong>.</td></tr>
+                        <tr><td>Did Roger cut the grass?</td><td>Yes, he <strong>did</strong>.</td><td>No, he <strong>didn't</strong>.</td></tr>
+                    </table>
+                    <p class="mini-note"><span class="q-tag t-bad">НЕ</span> <s>Do you play the piano? ~ Yes, I play.</s> &rarr; <em>Yes, I <strong>do</strong>.</em><br>
+                    &#x1F4CC; Голое «yes/no» часто звучит резко &mdash; добавляй комментарий:<br>
+                    <em>Were you late? ~ Yes, I missed the bus. &middot; Did Carl find his wallet? ~ No, he didn't, unfortunately.</em><br>
+                    <em>Were you late? ~ <strong>I'm afraid I was. / Of course I wasn't.</strong></em><br>
+                    &#x1F4CC; Вопрос к подлежащему &mdash; ответ через <em>подлежащее + вспомогательный</em>:<br>
+                    <em>Who's got a hair drier? ~ <strong>Neil has.</strong> / просто <strong>Neil.</strong> &middot; Which shoes fit best? ~ <strong>These do.</strong></em><br>
+                    &#x26A0;&#xFE0F; На просьбу или приглашение коротким «No» отвечать невежливо &mdash; нужно объяснение:<br>
+                    <em>Can I borrow your pen? ~ <strong>Sorry, I'm using it</strong> to fill this form in.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2: QUESTION WORDS ============ -->
+        <div class="tab-content" id="tab-words">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2753;</span>
+                    <div>
+                        <h2>Вопросительные слова</h2>
+                        <p class="lesson-header-sub">what или which, who или whom, и куда девать предлог</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Все девять слов</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Слово</th><th>Пример</th><th>Класс</th><th>Ответ содержит</th></tr>
+                        <tr><td>who, whom</td><td>Who won?</td><td>местоимение</td><td>someone</td></tr>
+                        <tr><td>what</td><td>What happened? / What sport(s)?</td><td>местоим. / определитель</td><td>something / a sport</td></tr>
+                        <tr><td>which</td><td>Which is best? / Which sport?</td><td>местоим. / определитель</td><td>one of them</td></tr>
+                        <tr><td>whose</td><td>Whose was the idea? / Whose idea?</td><td>местоим. / определитель</td><td>someone's</td></tr>
+                        <tr><td>where</td><td>Where shall we go?</td><td>наречие места</td><td>somewhere</td></tr>
+                        <tr><td>when</td><td>When did it happen?</td><td>наречие времени</td><td>some time</td></tr>
+                        <tr><td>why</td><td>Why are you here?</td><td>наречие причины</td><td>for some reason</td></tr>
+                        <tr><td>how</td><td>How do you open it? / How wide is it? / How are you?</td><td>наречие / прилагательное</td><td>somehow</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; what или which?</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell a"><span class="lbl">what &mdash; выбор открыт</span><strong>What</strong> sport do you play?<span class="ru">вариантов много: теннис, гольф, футбол&hellip;</span></div>
+                        <div class="pair-cell b"><span class="lbl">which &mdash; выбор из известного</span><strong>Which</strong> way do we go now?<span class="ru">вариантов мало: направо или налево</span></div>
+                        <div class="pair-cell a"><span class="lbl">what</span><strong>What</strong> do you do in your spare time?</div>
+                        <div class="pair-cell b"><span class="lbl">which</span><strong>Which</strong> is the best route?</div>
+                    </div>
+                    <p class="mini-note">&#x1F511; <strong>what</strong> относится к неопределённому <em>a</em>, <strong>which</strong> &mdash; к определённому <em>the</em>.<br>
+                    Часто можно и так, и так: <em>What/Which newspaper do you read? &middot; What/Which size do you take?</em><br>
+                    &#x1F4CC; Только <strong>which</strong> сочетается с <em>one/ones</em> и с <em>of</em>:<br>
+                    <em><strong>Which ones</strong> do you want? &middot; <strong>Which of</strong> these postcards shall we send?</em><br>
+                    &#x1F4CC; <strong>what</strong> может намекать, что вариантов нет вообще:<br>
+                    <em>Why don't you invite a few friends? ~ <strong>What friends?</strong> I haven't got any friends.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F464; who / what / which &mdash; про людей и не про людей</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Люди</th><th>Не люди</th></tr>
+                        <tr><td><strong>Who</strong> is your maths teacher?</td><td><strong>Which</strong> supermarket is cheapest?</td></tr>
+                        <tr><td><strong>Which</strong> teacher do you have?</td><td><strong>What</strong> book are you reading?</td></tr>
+                        <tr><td><strong>What</strong> idiot wrote this?</td><td><strong>What</strong> do you do in the evenings?</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>who</strong> &mdash; только местоимение, существительное после него ставить нельзя:<br>
+                    <span class="q-tag t-bad">НЕТ</span> <s>Who teacher do you have?</s> &nbsp; <s>Who of the teachers do you have?</s><br>
+                    <span class="q-tag t-ok">ДА</span> <em><strong>Which</strong> teacher do you have? &middot; <strong>Which of</strong> the teachers&hellip;?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; Куда девать предлог</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell a"><span class="lbl">Обычная речь &mdash; предлог в конце</span><strong>Who</strong> was the parcel addressed <strong>to</strong>?<br><strong>Where</strong> does Maria come <strong>from</strong>?<br><strong>What</strong> are young people interested <strong>in</strong>?<br><strong>Who</strong> were you talking <strong>to</strong>?</div>
+                        <div class="pair-cell b"><span class="lbl">Формально &mdash; предлог впереди</span><strong>To whom</strong> was the parcel addressed?<br><strong>On what evidence</strong> was it decided to make the arrest?<br><strong>To whom</strong> were you talking?</div>
+                    </div>
+                    <p class="mini-note">&#x1F4CC; <strong>whom</strong> &mdash; формальная и слегка устаревшая форма для дополнения. В обычной речи говорят <strong>who</strong>:<br>
+                    <em><strong>Who</strong> did you invite?</em> (обычно) / <em><strong>Whom</strong> did you invite?</em> (формально)<br>
+                    &#x26A0;&#xFE0F; Но <strong>since</strong> всегда идёт впереди: <em><strong>Since when</strong> has this area been closed?</em> (часто с оттенком удивления; нейтральнее <em>How long&hellip;?</em>)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CF; how &mdash; самое многофункциональное</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>Способ</td><td><strong>How</strong> do you open this bottle?</td></tr>
+                        <tr><td>Образ действия</td><td><strong>How</strong> did the children behave?</td></tr>
+                        <tr><td>Степень</td><td><strong>How wide</strong> is the river? &middot; <strong>How soon</strong> can you let me know?</td></tr>
+                        <tr><td>Самочувствие / впечатление</td><td><strong>How are</strong> you? &middot; <strong>How did you like</strong> the party? &middot; <strong>How are you getting on</strong> at college?</td></tr>
+                    </table>
+                    <div class="word-chips" style="margin-top:0.6rem;">
+                        <span class="wchip"><b>How old</b> is this building?</span>
+                        <span class="wchip"><b>How far</b> did you walk?</span>
+                        <span class="wchip"><b>How often</b> does it need servicing?</span>
+                        <span class="wchip"><b>How long</b> can you stay?</span>
+                        <span class="wchip"><b>How many</b> people live here?</span>
+                        <span class="wchip"><b>How much</b> is the ticket?</span>
+                        <span class="wchip"><b>What time</b> is the next train?</span>
+                        <span class="wchip"><b>What colour</b> shirt was he wearing?</span>
+                        <span class="wchip"><b>What kind/sort/type of</b> computer?</span>
+                        <span class="wchip"><b>What make</b> is your car?</span>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>How&hellip;?</strong> &mdash; про самочувствие и впечатление. <strong>What&hellip; like?</strong> &mdash; про качество:<br>
+                    <em><strong>How's</strong> your brother? ~ Oh, he's fine.</em> <span style="color:rgba(255,255,255,0.4)">(как дела)</span><br>
+                    <em><strong>What's</strong> your brother <strong>like</strong>? ~ Well, he's much quieter than I am.</em> <span style="color:rgba(255,255,255,0.4)">(что за человек)</span><br>
+                    <em><strong>What</strong> does your brother <strong>look like</strong>? ~ He's taller than me, dark hair.</em> <span style="color:rgba(255,255,255,0.4)">(как выглядит)</span><br>
+                    &#x1F4A1; <strong>How come&hellip;?</strong> = разговорное «почему», и инверсии после него НЕТ:<br>
+                    <em><strong>How come</strong> all these papers have been left here?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4A1; why &mdash; особые схемы + усилители</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>Why the</strong> panic?</td><td>= What is the reason for the panic?</td></tr>
+                        <tr><td>Look at our prices &mdash; <strong>why pay</strong> more?</td><td>= Why should you pay more?</td></tr>
+                        <tr><td><strong>Why not</strong> stay for a while?</td><td>= Why don't you stay&hellip;? &mdash; предложение</td></tr>
+                        <tr><td><strong>Why don't</strong> we take a break now?</td><td>предложение</td></tr>
+                        <tr><td><strong>Why didn't</strong> you tell me this before?</td><td>упрёк</td></tr>
+                    </table>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.7);margin-top:0.8rem;">Усилить вопрос можно так:</p>
+                    <div class="word-chips">
+                        <span class="wchip">When <b>exactly</b> are you coming back?</span>
+                        <span class="wchip"><b>Just</b> what will tomorrow bring?</span>
+                        <span class="wchip"><b>About</b> how many people live here?</span>
+                        <span class="wchip">What <b>else</b> should I do?</span>
+                        <span class="wchip">Who <b>else</b> did you invite?</span>
+                        <span class="wchip">What <b>on earth</b> will tomorrow bring?</span>
+                        <span class="wchip"><b>What ever</b> can the matter be?</span>
+                        <span class="wchip"><b>However</b> did you manage to find us?</span>
+                        <span class="wchip"><b>Who ever</b> invited that awful man?</span>
+                    </div>
+                    <p class="mini-note"><strong>on earth</strong> и <strong>ever</strong> означают, что говорящий совсем не понимает ответа &mdash; чаще всего это удивление.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3: INDIRECT ============ -->
+        <div class="tab-content" id="tab-indirect">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F91D;</span>
+                    <div>
+                        <h2>Косвенные вопросы</h2>
+                        <p class="lesson-header-sub">Самая частая ошибка на экзамене &mdash; и самый быстрый способ звучать вежливо</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Правило одно:</strong> после вводной фразы вопрос превращается в придаточное &mdash; <strong>инверсия исчезает</strong>, порядок слов как в утверждении.<br>
+                    <span class="q-tag t-bad">НЕТ</span> <s>Could you tell me where <b>is</b> the station?</s><br>
+                    <span class="q-tag t-ok">ДА</span> <em>Could you tell me where the station <b>is</b>?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2194;&#xFE0F; Прямой &rarr; косвенный</h3>
+                    <div class="flip">
+                        <div class="flip-a">Where is Queen Street?</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Could you tell me <b>where Queen Street is</b>?</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">What are the rules?</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">We need to know <b>what the rules are</b>.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">How much are you getting paid?</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Can I ask you <b>how much you're getting paid</b>?</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">Who owns this building?</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">I'm trying to find out <b>who owns this building</b>.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">When does the train get in?</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Do you know <b>when the train gets in</b>?</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">Do you have a room? <em>(yes/no)</em></div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">I was wondering <b>if/whether you have a room</b>.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">Could you give me a lift? <em>(yes/no)</em></div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">I was wondering <b>if/whether you could give me a lift</b>.</div>
+                    </div>
+                    <p class="mini-note">&#x1F511; Два шага:<br>
+                    1&#xFE0F;&#x20E3; Убрать инверсию &mdash; подлежащее возвращается перед глаголом.<br>
+                    2&#xFE0F;&#x20E3; Убрать <strong>do / does / did</strong> и вернуть окончание глаголу: <em>Where <s>does</s> he <strong>live</strong>?</em> &rarr; <em>&hellip;where he <strong>lives</strong>.</em><br>
+                    &#x26A0;&#xFE0F; Для yes/no-вопросов нужно <strong>if</strong> или <strong>whether</strong> &mdash; без них никак.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5DD;&#xFE0F; Вводные фразы</h3>
+                    <div class="word-chips">
+                        <span class="wchip"><b>Could you tell me</b>&hellip;?</span>
+                        <span class="wchip"><b>Do you know</b>&hellip;?</span>
+                        <span class="wchip"><b>Can I ask you</b>&hellip;?</span>
+                        <span class="wchip"><b>Would you mind telling me</b>&hellip;?</span>
+                        <span class="wchip"><b>I'd like to know</b>&hellip;</span>
+                        <span class="wchip"><b>I was wondering</b>&hellip;</span>
+                        <span class="wchip"><b>We need to know</b>&hellip;</span>
+                        <span class="wchip"><b>I'm trying to find out</b>&hellip;</span>
+                        <span class="wchip"><b>Have you any idea</b>&hellip;?</span>
+                        <span class="wchip"><b>I wonder</b>&hellip;</span>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Знак вопроса ставится только если <strong>главная</strong> часть &mdash; вопрос:<br>
+                    <em>Could you tell me where she lives<strong>?</strong></em> &nbsp;vs&nbsp; <em>We need to know where she lives<strong>.</strong></em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F31F; Зачем это нужно на практике</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);">Прямой вопрос незнакомому человеку может звучать резко. Косвенный &mdash; мягче и вежливее.</p>
+                    <div class="pair-grid">
+                        <div class="pair-cell a"><span class="lbl">Прямо &mdash; резковато</span>Where is the station?<span class="ru">похоже на требование</span></div>
+                        <div class="pair-cell b"><span class="lbl">Косвенно &mdash; вежливо</span>Excuse me, could you tell me where the station is?</div>
+                        <div class="pair-cell a"><span class="lbl">Прямо</span>How much do you earn?<span class="ru">бестактно</span></div>
+                        <div class="pair-cell b"><span class="lbl">Косвенно</span>Can I ask you how much you're getting paid for the job?</div>
+                    </div>
+                    <p class="mini-note">&#x1F4A1; Можно и с инфинитивом: <em>Could you tell me <strong>how to get</strong> there?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F500; Вопросы с or</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>Are you coming back today <strong>or</strong> tomorrow? ~ Today.</td><td>выбор из двух</td></tr>
+                        <tr><td>Did you speak to a man <strong>or</strong> a woman? ~ It was a woman.</td><td>&mdash;</td></tr>
+                        <tr><td>Are you coming back today, <strong>or</strong> are you staying overnight?</td><td>or соединяет два предложения</td></tr>
+                        <tr><td>Are you coming back today <strong>or aren't you</strong>? ~ Yes, I am.</td><td>&#x26A0;&#xFE0F; звучит нетерпеливо</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F50A; Интонация: голос идёт <strong>вверх</strong> на первом варианте и <strong>вниз</strong> после <em>or</em>.<br>
+                    &#x26A0;&#xFE0F; Не путай: <em>Have you got any brothers or sisters?</em> &mdash; это <strong>не</strong> выбор, а один yes/no-вопрос: <em>~ Yes, I've got two sisters.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 4: TAGS & ECHO ============ -->
+        <div class="tab-content" id="tab-tags">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Question tags, отрицательные и echo-вопросы</h2>
+                        <p class="lesson-header-sub">Три схемы tags &mdash; и почему интонация меняет смысл</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F527; Форма tag</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);">Tag берёт <strong>вспомогательный глагол + местоимение</strong> из главной части.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>It's raining, <strong>isn't it</strong>?</td><td>be</td></tr>
+                        <tr><td>You've finished, <strong>haven't you</strong>?</td><td>have</td></tr>
+                        <tr><td>We can go now, <strong>can't we</strong>?</td><td>модальный</td></tr>
+                        <tr><td>Louise works at the hospital, <strong>doesn't she</strong>?</td><td>простое время &rarr; do</td></tr>
+                        <tr><td>You came home late, <strong>didn't you</strong>?</td><td>простое прошедшее &rarr; did</td></tr>
+                        <tr><td>It isn't raining, <strong>is it</strong>?</td><td>минус &rarr; плюс</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Тонкости формы:<br>
+                    <strong>there</strong> в tag остаётся: <em>There were lots of people, <strong>weren't there</strong>?</em><br>
+                    <strong>this/that/these/those</strong> в tag превращаются в <em>it/they</em>: <em>That was lucky, <strong>wasn't it</strong>? &middot; Those are nice, <strong>aren't they</strong>?</em><br>
+                    <strong>I am</strong> &rarr; <em>I'm late, <strong>aren't I</strong>?</em><br>
+                    <strong>everyone / someone / anyone</strong> &rarr; <em>they</em>: <em>Anyone could just walk in here, <strong>couldn't they</strong>?</em><br>
+                    Формально: <em>Progress is being made, <strong>is it not</strong>?</em></p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #a371f7; background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">&#x1F4CB; Три схемы &mdash; и они значат разное</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th></th><th>Главная часть</th><th>Tag</th><th>Пример</th></tr>
+                        <tr><td><strong>A</strong></td><td>+</td><td>&ndash;</td><td>It's your birthday, <strong>isn't it</strong>?</td></tr>
+                        <tr><td><strong>B</strong></td><td>&ndash;</td><td>+</td><td>It isn't your birthday, <strong>is it</strong>?</td></tr>
+                        <tr><td><strong>C</strong></td><td>+</td><td>+</td><td>It's your birthday, <strong>is it</strong>?</td></tr>
+                    </table>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);margin-top:0.9rem;"><strong style="color:#c8a5ff;">A (+ / &ndash;)</strong> &mdash; прошу подтвердить или просто поддерживаю разговор:<br>
+                    <em>It's difficult to find your way around this building, isn't it? ~ Yes, I'm always getting lost.</em><br>
+                    <em>That was fun, wasn't it? ~ Yes, I really enjoyed it.</em></p>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);margin-top:0.7rem;"><strong style="color:#c8a5ff;">B (&ndash; / +)</strong> &mdash; то же самое, плюс осторожная просьба или недовольство:<br>
+                    <em>You haven't heard the exam results, have you? ~ No, sorry, I haven't.</em><br>
+                    <em>You couldn't lend me ten pounds, could you? ~ Yes, OK.</em> <span style="color:rgba(255,255,255,0.4)">(вежливая просьба)</span><br>
+                    <em>You aren't staying in bed all day, are you?</em> <span style="color:rgba(255,255,255,0.4)">(надеюсь, что нет!)</span></p>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);margin-top:0.7rem;"><strong style="color:#c8a5ff;">C (+ / +)</strong> &mdash; «а, так вот как» &mdash; я только что это понял из твоих слов:<br>
+                    <em>I shall have to light the fire soon. ~ Oh, <strong>you have coal fires, do you?</strong></em><br>
+                    <em>I can't help you just at the moment. ~ <strong>You're busy, are you?</strong> ~ Very busy, I'm afraid.</em></p>
+                    <p class="mini-note">&#x2696;&#xFE0F; Сравни A и C:<br>
+                    <em>We can't move this cupboard. ~ It's heavy, <strong>isn't it</strong>?</em> <span style="color:rgba(255,255,255,0.4)">(я и так знал, что тяжёлый)</span><br>
+                    <em>We can't move this cupboard. ~ It's heavy, <strong>is it</strong>?</em> <span style="color:rgba(255,255,255,0.4)">(только сейчас понял с твоих слов)</span></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50A; Интонация решает всё</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell a"><span class="lbl">Голос вниз &#x2198;</span>It's cold, isn't it? &#x2198;<span class="ru">я уверен, просто поддерживаю беседу</span></div>
+                        <div class="pair-cell b"><span class="lbl">Голос вверх &#x2197;</span>You have central heating, don't you? &#x2197;<span class="ru">я правда не знаю — это настоящий вопрос</span></div>
+                    </div>
+                    <p class="mini-note">&#x1F4CC; Tags после повелительного наклонения: <em>Pass me the salt, <strong>will/would/can/could you</strong>? &middot; Have a nice holiday, <strong>won't you</strong>? &middot; Don't forget your key, <strong>will you</strong>?</em><br>
+                    После <strong>let's</strong>: <em>Let's have a rest now, <strong>shall we</strong>?</em><br>
+                    &#x26A0;&#xFE0F; Разговорные tags <em>yes? no? right? OK?</em> существуют, но на экзамене лучше нормальные:<br>
+                    <em>You like London, no? &middot; I'll be outside, right? &middot; We're going to start now, OK?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2757; Отрицательные вопросы</h3>
+                    <div class="dlg">
+                        <span class="a">Claire:</span> I'll tell you more when I see you next week.<br>
+                        <span class="b">Anna:</span> <span class="hi">Can't you ring me?</span><br>
+                        <span class="a">Claire:</span> No, unfortunately. My phone's still out of order.<br>
+                        <span class="b">Anna:</span> <span class="hi">Haven't they repaired it yet?</span><br>
+                        <span class="a">Claire:</span> No. It's an awful nuisance. It's over a week now.<br>
+                        <span class="b">Anna:</span> <span class="hi">Why don't you refuse to pay your bill?</span>
+                    </div>
+                    <table class="unit-table" style="margin-top:0.7rem;">
+                        <tr><th>Смысл</th><th>Пример</th></tr>
+                        <tr><td>Удивление</td><td><strong>Haven't they repaired</strong> your phone? <em>(я думал, должны были)</em></td></tr>
+                        <tr><td>Жалоба / упрёк</td><td><strong>Can't you be quiet?</strong> I'm trying to concentrate.<br><strong>Why haven't they repaired it?</strong></td></tr>
+                        <tr><td>Предложение</td><td><strong>Why don't we</strong> take a break now? &middot; <strong>Why not use</strong> your credit card?</td></tr>
+                        <tr><td>Критика</td><td><strong>Why didn't you tell</strong> me this before? You should have told me.</td></tr>
+                        <tr><td>Просьба подтвердить</td><td><strong>Didn't I see</strong> you on television last night? <em>(= I saw you, didn't I?)</em></td></tr>
+                        <tr><td>Просто вопрос</td><td><strong>Who hasn't returned</strong> this library book? &middot; <strong>What can't you</strong> understand?</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F527; Форма: <strong>n't</strong> сразу после вспомогательного глагола.<br>
+                    <span class="q-tag t-ok">ДА</span> <em><strong>Haven't you</strong> finished yet?</em> &nbsp; <span class="q-tag t-bad">НЕТ</span> <s>Have not you finished yet?</s><br>
+                    Формально <em>not</em> идёт после подлежащего: <em>Have you <strong>not</strong> finished yet? &middot; Why does the government <strong>not</strong> take action?</em><br>
+                    <strong>am not</strong> &rarr; <em><strong>aren't</strong> I</em>: <em>Why aren't I getting paid for this?</em><br>
+                    &#x26A0;&#xFE0F; <strong>Ответ по-английски, не по-русски:</strong> <em>no</em> подтверждает отрицание, <em>yes</em> отменяет его.<br>
+                    <em>Haven't they repaired it yet? ~ <strong>No</strong>, it's an awful nuisance.</em> <span style="color:rgba(255,255,255,0.4)">(не починили)</span><br>
+                    <em>~ <strong>Yes</strong>, they did it yesterday.</em> <span style="color:rgba(255,255,255,0.4)">(починили)</span></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4E2; Echo-вопросы &mdash; «что-что?»</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);">Когда не расслышал или не веришь своим ушам. Голос идёт <strong>вверх</strong> на вопросительном слове.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>I often eat bits of wood. ~ <strong>What do you eat? / You eat what?</strong></td><td>не поверил</td></tr>
+                        <tr><td>My father knew Ronald Reagan. ~ <strong>Who did he know? / He knew who?</strong></td><td>&mdash;</td></tr>
+                        <tr><td>Did you see the naked lady? ~ <strong>Did I see the what?</strong></td><td>&mdash;</td></tr>
+                        <tr><td>I often eat bits of wood. ~ <strong>You eat bits of wood?</strong></td><td>проверяю, правильно ли расслышал</td></tr>
+                        <tr><td>&mdash; ~ <strong>What?!</strong></td><td>само по себе тоже работает</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F440; Echo tags &mdash; «да ну?»</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);">Показывают интерес к тому, что тебе только что сказали. После <strong>плюса</strong> &mdash; плюсовой tag, после <strong>минуса</strong> &mdash; минусовой.</p>
+                    <div class="dlg">
+                        <span class="a">A:</span> We're moving house soon. &nbsp; <span class="b">B:</span> <span class="hi">Oh, are you?</span><br>
+                        <span class="a">A:</span> Max played the part brilliantly. &nbsp; <span class="b">B:</span> <span class="hi">Did he really?</span><br>
+                        <span class="a">A:</span> The boss isn't very well. &nbsp; <span class="b">B:</span> <span class="hi">Isn't she?</span><br>
+                        <span class="a">A:</span> My brothers can't swim. &nbsp; <span class="b">B:</span> <span class="hi">Can't they?</span>
+                    </div>
+                    <p class="mini-note">&#x1F50A; Голос <strong>вверх</strong> = искренний интерес. Голос <strong>вниз</strong> = «мне неинтересно».<br>
+                    &#x1F4CC; Можно добавить короткое подтверждение перед tag &mdash; «я так и думал»:<br>
+                    <em>We're moving house soon. ~ <strong>You are, are you?</strong> &middot; Max played the part brilliantly. ~ <strong>He did, did he?</strong></em><br>
+                    Если короткая часть <em>противоречит</em> сказанному &mdash; это удивление или недоверие:<br>
+                    <em>We're moving house soon. ~ <strong>You aren't, are you?</strong></em><br>
+                    &#x1F4CC; Минусовой tag после плюса = согласие, оба и так это знали:<br>
+                    <em>Max played the part brilliantly. ~ <strong>Yes, didn't he?</strong> &middot; It's a lovely day. ~ <strong>It is, isn't it?</strong></em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5: QUIZ ============ -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Quiz &mdash; 14 вопросов</h2>
+                        <p class="lesson-header-sub">Порядок слов, косвенные вопросы, tags</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="quiz-question" data-answer="whowrote">
+                        <p><strong>1.</strong> _____ this letter? <em>(кто-то написал письмо &mdash; кто?)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'whodidwrite')">Who did write</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whowrote')">Who wrote</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whodidwrote')">Who did wrote</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="whodidyousee">
+                        <p><strong>2.</strong> _____ at the party? <em>(ты кого-то видела &mdash; кого?)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'whosawyou')">Who saw you</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whodidyousee')">Who did you see</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whoyousaw')">Who you saw</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="thestationis">
+                        <p><strong>3.</strong> Could you tell me where _____?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'isthestation')">is the station</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'thestationis')">the station is</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'doesthestation')">does the station be</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="helives">
+                        <p><strong>4.</strong> Do you know where _____?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'doeshelive')">does he live</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'helives')">he lives</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'helive')">he live</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="ifwhether">
+                        <p><strong>5.</strong> I was wondering _____ you could give me a lift.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'that')">that</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'ifwhether')">if / whether</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'nothing')">(ничего)</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="whichteacher">
+                        <p><strong>6.</strong> _____ do you have for maths?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'whoteacher')">Who teacher</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whichteacher')">Which teacher</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whomteacher')">Whom teacher</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="whatslike">
+                        <p><strong>7.</strong> Хочешь узнать, что твоя подруга за человек. Спрашиваешь:</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'howisshe')">How is she?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whatslike')">What's she like?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'howlooks')">How does she look like?</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="doesntshe">
+                        <p><strong>8.</strong> Louise works at the hospital, _____?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'isntshe')">isn't she</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'doesntshe')">doesn't she</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'didntshe')">didn't she</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="werentthere">
+                        <p><strong>9.</strong> There were lots of people, _____?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'werentthey')">weren't they</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'werentthere')">weren't there</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'didntthey')">didn't they</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="arenti">
+                        <p><strong>10.</strong> I'm late, _____?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'amnoti')">am not I</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'arenti')">aren't I</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'isntit')">isn't it</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="no">
+                        <p><strong>11.</strong> Haven't they repaired your phone yet? ~ _____, it's still broken.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'yes')">Yes</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'no')">No</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'yestheyhave')">Yes, they have</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="yesido">
+                        <p><strong>12.</strong> Do you play the piano? ~ _____.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'yesiplay')">Yes, I play</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'yesido')">Yes, I do</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'yesiam')">Yes, I am</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="areyou">
+                        <p><strong>13.</strong> We're moving house soon. ~ Oh, _____? <em>(интерес)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'arentyou')">aren't you</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'areyou')">are you</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'doyou')">do you</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="whowasitto">
+                        <p><strong>14.</strong> Неформальный вариант вопроса <em>To whom was the parcel addressed?</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'whowasitto')">Who was the parcel addressed to?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'towhoparcel')">To who the parcel was addressed?</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'whomparcel')">Whom the parcel was addressed?</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="que-score"></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        const Q_TOTAL = 14;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === q.dataset.answer) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! ✅';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite ❌';
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('que-score');
+            if (qDone === Q_TOTAL) {
+                if (qScore === Q_TOTAL) scoreEl.innerHTML = '🌟 ' + qScore + '/' + Q_TOTAL + ' — Perfect!';
+                else if (qScore >= 11) scoreEl.innerHTML = '✅ ' + qScore + '/' + Q_TOTAL + ' — Great!';
+                else if (qScore >= 8)  scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' — Good, повтори «Косвенные вопросы»';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' — пройди вкладки ещё раз 💪';
+                scoreEl.style.color = qScore >= 11 ? 'var(--color-green)' : qScore >= 8 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>

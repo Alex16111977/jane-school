@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emphasis &amp; Inversion | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .m-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.12rem 0.5rem;
+            border-radius: 6px;
+            margin-right: 0.35rem;
+            vertical-align: middle;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        .t-it   { background: rgba(68,147,248,0.16);  color: #79b8ff; }
+        .t-what { background: rgba(163,113,247,0.16); color: #c8a5ff; }
+        .t-inv  { background: rgba(245,158,11,0.16);  color: #fbbf24; }
+        .t-bad  { background: rgba(248,81,73,0.16);   color: #ff8080; }
+        .t-ok   { background: rgba(63,185,80,0.16);   color: #56d364; }
+
+        .base-line {
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.18);
+            border-radius: 9px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 0.65rem;
+        }
+        .base-line b { color: #fff; }
+
+        .variant {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .variant:last-child { border-bottom: none; }
+        .v-label {
+            flex-shrink: 0;
+            width: 108px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.42);
+            padding-top: 0.15rem;
+        }
+        .v-body { flex: 1; font-size: 0.87rem; line-height: 1.6; color: rgba(255,255,255,0.85); }
+        .v-body b { color: #fff; }
+        .v-body .hl { color: #c8a5ff; font-weight: 700; }
+        .v-body .ru { display: block; color: rgba(255,255,255,0.42); font-style: italic; font-size: 0.79rem; }
+        @media (max-width: 620px) {
+            .variant { flex-direction: column; gap: 0.15rem; }
+            .v-label { width: auto; }
+        }
+
+        .flip {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.83rem;
+        }
+        .flip:last-child { border-bottom: none; }
+        .flip-a { color: rgba(255,255,255,0.55); }
+        .flip-b { color: rgba(255,255,255,0.9); }
+        .flip-b b { color: #fbbf24; }
+        .flip-arrow { color: rgba(255,255,255,0.28); font-size: 1rem; }
+        @media (max-width: 620px) {
+            .flip { grid-template-columns: 1fr; }
+            .flip-arrow { display: none; }
+            .flip-a { font-size: 0.79rem; }
+        }
+
+        .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 620px) { .pair-grid { grid-template-columns: 1fr; } }
+        .pair-cell {
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.83rem;
+            line-height: 1.5;
+        }
+        .pair-cell .lbl {
+            display: block;
+            font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em;
+            text-transform: uppercase; margin-bottom: 0.3rem; opacity: 0.85;
+        }
+        .pair-cell.x .lbl { color: #79b8ff; }
+        .pair-cell.y .lbl { color: #56d364; }
+        .pair-cell .ru { display: block; color: rgba(255,255,255,0.45); font-size: 0.76rem; margin-top: 0.15rem; }
+
+        .dlg {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 11px;
+            padding: 0.8rem 1rem;
+            font-size: 0.86rem;
+            line-height: 1.8;
+            margin-top: 0.5rem;
+        }
+        .dlg .a { color: #79b8ff; font-weight: 700; }
+        .dlg .b { color: #56d364; font-weight: 700; }
+        .dlg .hi { color: #fff; font-weight: 700; background: rgba(163,113,247,0.18); padding: 0.05rem 0.3rem; border-radius: 5px; }
+
+        .word-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+        .wchip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .wchip b { color: #fbbf24; }
+        .mini-note { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.55; margin-top: 0.5rem; }
+        .stress { text-decoration: underline; text-decoration-color: #fbbf24; text-decoration-thickness: 2px; text-underline-offset: 3px; color: #fff; font-weight: 700; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Emphasis &amp; Inversion</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Emphasis &amp; Inversion</h1>
+            <p class="page-subtitle">В русском акцент делают порядком слов. В английском порядок жёсткий &mdash; поэтому есть специальные конструкции.</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="cleft">It was&hellip; / What I&hellip;</button>
+            <button class="tab" data-tab="inv">Инверсия</button>
+            <button class="tab" data-tab="front">Вынос вперёд</button>
+            <button class="tab" data-tab="thereit">there и it</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+        <!-- ============ TAB 1: CLEFT ============ -->
+        <div class="tab-content active" id="tab-cleft">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Cleft-предложения</h2>
+                        <p class="lesson-header-sub">Разрезаем предложение надвое, чтобы подсветить одну часть</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Проблема:</strong> в русском «Именно <em>ты</em> мне сказала» получается перестановкой слов. В английском порядок SVO жёсткий &mdash; так не переставишь.<br>
+                    <strong>Решение:</strong> две конструкции &mdash; <span class="m-tag t-it">It was &hellip; who/that &hellip;</span> и <span class="m-tag t-what">What &hellip; is &hellip;</span></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; Схема с it: <em>It + be + подсветка + who/that&hellip;</em></h3>
+                    <div class="base-line">Обычное предложение: <b>England won the World Cup in 1966.</b></div>
+                    <div class="variant">
+                        <div class="v-label">Подлежащее</div>
+                        <div class="v-body">It was <span class="hl">England</span> <b>who</b> won the World Cup in 1966.<span class="ru">именно Англия, а не кто-то другой</span></div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Дополнение</div>
+                        <div class="v-body">It was <span class="hl">the World Cup</span> (<b>that</b>) England won in 1966.<span class="ru">именно чемпионат мира</span></div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Обстоятельство</div>
+                        <div class="v-body">It was <span class="hl">in 1966</span> (<b>that</b>) England won the World Cup.<span class="ru">именно в 1966-м</span></div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">С «не то»</div>
+                        <div class="v-body">It was <span class="hl">England</span>, <b>not</b> Germany, who won the World Cup.<br>It was <span class="hl">in 1966</span>, <b>not</b> 1970, that it happened.</div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Целое придаточное</div>
+                        <div class="v-body">It was <span class="hl">because they were playing in London</span> that England had an advantage.</div>
+                    </div>
+                    <p class="mini-note">&#x1F511; <strong>who / which</strong> &mdash; для подлежащего. Для дополнения и обстоятельства обычно <strong>that</strong> (или вообще ничего).<br>
+                    &#x26A0;&#xFE0F; Местоимение после <em>be</em> в объектной форме: <em>It was <strong>me</strong> who told you</em>, а не <s>It was I</s>.<br>
+                    &#x1F4CC; То, что подсвечиваем, обычно связано с предыдущей фразой:<br>
+                    <em>The Sixties was the decade of the Beatles. And it was <strong>in 1966</strong> that England won the World Cup.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E3; Схема с what: <em>What&hellip; + be + подсветка</em></h3>
+                    <div class="base-line">Обычное предложение: <b>A technical fault caused the delay.</b></div>
+                    <div class="variant">
+                        <div class="v-label">Причина</div>
+                        <div class="v-body"><b>What caused the delay</b> was <span class="hl">a technical fault</span>.</div>
+                    </div>
+                    <div class="base-line" style="margin-top:0.8rem;">Обычное предложение: <b>The guests played mini-golf after tea.</b></div>
+                    <div class="variant">
+                        <div class="v-label">Что играли</div>
+                        <div class="v-body"><b>What the guests played after tea</b> was <span class="hl">mini-golf</span>.</div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Что делали</div>
+                        <div class="v-body"><b>What the guests did after tea</b> was <span class="hl">(to) play mini-golf</span>.</div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Что произошло</div>
+                        <div class="v-body"><b>What happened after tea</b> was <span class="hl">(that) the guests played mini-golf</span>.</div>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>who</strong> в этой схеме нельзя &mdash; нужно существительное впереди:<br>
+                    <span class="m-tag t-bad">НЕТ</span> <s>Who played mini-golf were the guests.</s> &nbsp; <span class="m-tag t-ok">ДА</span> <em><strong>The people who</strong> played mini-golf were the guests.</em><br>
+                    &#x1F4CC; Действие подсвечиваем через <strong>What&hellip; did was (to) do</strong> &mdash; работает со всеми временами:<br>
+                    <em>What the guests <strong>are doing</strong> is playing mini-golf. &middot; What I've done is send a letter of complaint. &middot; What we could do is (to) hire a car.</em><br>
+                    &#x1F4CC; Порядок можно перевернуть:<br>
+                    <em>They've got some personal organizers here. ~ Oh, good. <strong>A personal organizer is what I need.</strong></em><br>
+                    &#x1F4CC; Есть и варианты с <strong>when</strong> и <strong>where</strong>:<br>
+                    <em>1966 was (the year) when England won the World Cup. &middot; The sports hall is (the place) where the students do the exam.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Как это звучит в разговоре</h3>
+                    <div class="dlg">
+                        <span class="a">Susan:</span> Why weren't you at the music practice yesterday?<br>
+                        <span class="b">Emma:</span> I didn't know there was one. How did you find out about it?<br>
+                        <span class="a">Susan:</span> <span class="hi">It was you who told me.</span> Don't you remember? You told me yourself last week.<br>
+                        <span class="b">Emma:</span> Oh, yes. I'd forgotten. I've got a terrible memory.<br>
+                        <span class="a">Susan:</span> <span class="hi">What you need is a personal organizer.</span><br>
+                        <span class="b">Emma:</span> Oh, <span class="hi">I do want to be in it.</span> I'd love to play in the orchestra.
+                    </div>
+                    <p class="mini-note">Три приёма в одном диалоге: <em>It was you who&hellip;</em> (кто именно), <em>What you need is&hellip;</em> (что именно), <em>I do want&hellip;</em> (эмфатический do).</p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f59e0b; background:rgba(245,158,11,0.06);">
+                    <h3 style="color:#fbbf24;">&#x1F4AA; Эмфатический do &mdash; «да правда же»</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);">В простых временах для акцента вставляем <strong>do / does / did</strong> + инфинитив без to.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Обычно</th><th>С акцентом</th></tr>
+                        <tr><td>I want to be in the orchestra.</td><td>I <strong>do</strong> want to be in the orchestra.</td></tr>
+                        <tr><td>The garden looks nice.</td><td>The garden <strong>does</strong> look nice.</td></tr>
+                        <tr><td>I posted the letter.</td><td>I <strong>did</strong> post the letter. I'm absolutely certain.</td></tr>
+                        <tr><td>Come in.</td><td><strong>Do</strong> come in. &middot; <strong>Do</strong> be careful. &middot; <strong>Do</strong> let's get started.</td></tr>
+                    </table>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);margin-top:0.8rem;">Если вспомогательный глагол уже есть &mdash; просто ставим на него ударение:</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>You <span class="stress">can</span> dial direct to Brazil. Carlos said you couldn't.</td><td>&mdash;</td></tr>
+                        <tr><td>I <span class="stress">haven't</span> taken your calculator, I tell you.</td><td>&mdash;</td></tr>
+                        <tr><td>Are you tired? ~ Yes, I <span class="stress">am</span>. I'm exhausted.</td><td>&mdash;</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F4CC; Иногда do подсвечивает не «да/нет», а другую часть смысла:<br>
+                    <em>We <strong>might</strong> go away for the weekend. We haven't decided.</em> <span style="color:rgba(255,255,255,0.4)">(возможно, но не точно)</span><br>
+                    <em>I <strong>did</strong> have a personal organizer, but I lost it.</em> <span style="color:rgba(255,255,255,0.4)">(в прошлом, а не сейчас)</span><br>
+                    Усилители-наречия: <em>The garden <strong>really</strong> does look nice. &middot; You can <strong>indeed</strong> dial direct. &middot; certainly, definitely.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50A; Ударение голосом</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>I <span class="stress">hate</span> supermarkets.</td><td>подчёркиваем чувство</td></tr>
+                        <tr><td>I hate <span class="stress">supermarkets</span> (not little shops).</td><td>подчёркиваем объект &mdash; контраст</td></tr>
+                        <tr><td>I wanted <span class="stress">plain</span> paper, not ruled.</td><td>контраст</td></tr>
+                        <tr><td>I've got a <span class="stress">terrible</span> memory.</td><td>сила чувства</td></tr>
+                        <tr><td>The talk was <span class="stress">extremely</span> interesting. &middot; It's a <span class="stress">huge</span> building.</td><td>&mdash;</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F4A1; Повтор тоже усиливает: <em>I've been <strong>very very very</strong> busy. &middot; We had a <strong>long, long</strong> wait. &middot; This has happened <strong>many, many</strong> times. &middot; What a <strong>terrible, terrible</strong> tragedy!</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Все способы усиления &mdash; одной таблицей</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Приём</th><th>Пример</th></tr>
+                        <tr><td>Ударение</td><td>I saw a <span class="stress">ghost</span>.</td></tr>
+                        <tr><td>Эмфатический глагол</td><td>I <span class="stress">did</span> see a ghost.</td></tr>
+                        <tr><td>Схема с it</td><td><strong>It was a ghost that I saw.</strong></td></tr>
+                        <tr><td>Схема с what</td><td><strong>What I saw was a ghost.</strong></td></tr>
+                        <tr><td>Вынос вперёд</td><td><strong>The ghost</strong> I clearly saw.</td></tr>
+                        <tr><td>Возвратное местоимение</td><td>I saw it <strong>myself</strong>.</td></tr>
+                        <tr><td>on earth / ever</td><td>What <strong>on earth</strong> did you see?</td></tr>
+                        <tr><td>Наречия степени</td><td>I <strong>really</strong> saw it. &middot; I was <strong>so</strong> scared.</td></tr>
+                        <tr><td>Инверсия после отрицания</td><td><strong>Never have I seen</strong> anything like it.</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2: INVERSION ============ -->
+        <div class="tab-content" id="tab-inv">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F504;</span>
+                    <div>
+                        <h2>Инверсия после отрицания</h2>
+                        <p class="lesson-header-sub">Never have I&hellip; &middot; Not only did she&hellip; &mdash; приём уровня C1</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Правило:</strong> если отрицательное слово или выражение уходит <strong>в начало</strong> предложения, дальше идёт <strong>вопросительный порядок слов</strong>: вспомогательный глагол &rarr; подлежащее.<br>
+                    <em>I have <strong>never</strong> seen such behaviour.</em> &rarr; <em><strong>Never</strong> <span style="color:#fbbf24">have I</span> seen such behaviour.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2194;&#xFE0F; До и после</h3>
+                    <div class="flip">
+                        <div class="flip-a">The company did not break the law at any time.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">At no time <b>did the company</b> break the law.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">You should not travel alone under any circumstances.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Under no circumstances <b>should you</b> travel alone.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">I have never seen such extraordinary behaviour.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Never in my life <b>have I</b> seen such extraordinary behaviour.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">The phone had been cut off. There wasn't any electricity either.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">The phone had been disconnected. Nor <b>was there</b> any electricity.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">We seldom had any time to ourselves.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Seldom <b>did we</b> have any time to ourselves.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">It's only hot enough to sit outside in summer.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Only in summer <b>is it</b> hot enough to sit outside.</div>
+                    </div>
+                    <div class="flip">
+                        <div class="flip-a">Jeff hadn't been back to the village since his childhood.</div>
+                        <div class="flip-arrow">&rarr;</div>
+                        <div class="flip-b">Not since his childhood <b>had Jeff</b> been back to the village.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CC; Слова, которые запускают инверсию</h3>
+                    <div class="word-chips">
+                        <span class="wchip"><b>never</b></span>
+                        <span class="wchip"><b>never before</b></span>
+                        <span class="wchip"><b>rarely</b></span>
+                        <span class="wchip"><b>seldom</b></span>
+                        <span class="wchip"><b>hardly</b> &hellip; when</span>
+                        <span class="wchip"><b>scarcely</b> &hellip; when</span>
+                        <span class="wchip"><b>no sooner</b> &hellip; than</span>
+                        <span class="wchip"><b>not only</b> &hellip; but also</span>
+                        <span class="wchip"><b>not until</b></span>
+                        <span class="wchip"><b>not since</b></span>
+                        <span class="wchip"><b>at no time</b></span>
+                        <span class="wchip"><b>on no account</b></span>
+                        <span class="wchip"><b>under no circumstances</b></span>
+                        <span class="wchip"><b>in no way</b></span>
+                        <span class="wchip"><b>little</b> did he know</span>
+                        <span class="wchip"><b>only then / only after / only if</b></span>
+                        <span class="wchip"><b>nor / neither</b></span>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Отрицательное слово должно относиться <strong>ко всему предложению</strong>, а не к одному существительному. <em>No one came</em> &mdash; тут инверсии нет, потому что <em>no one</em> просто подлежащее.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x23F1;&#xFE0F; hardly / no sooner &mdash; «едва&hellip; как»</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>Hardly had</strong> I sat down <strong>when</strong> the phone rang.</td><td>едва я сел, как зазвонил телефон</td></tr>
+                        <tr><td><strong>Scarcely had</strong> we arrived <strong>when</strong> it started raining.</td><td>&mdash;</td></tr>
+                        <tr><td><strong>No sooner had</strong> she left <strong>than</strong> he called.</td><td>&#x26A0;&#xFE0F; после <em>no sooner</em> идёт <strong>than</strong>, не <em>when</em></td></tr>
+                    </table>
+                    <p class="mini-note">В обеих схемах первое действие в <strong>past perfect</strong>, второе &mdash; в <strong>past simple</strong>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2795; not only &hellip; but also</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>Not only did she</strong> pass the exam, <strong>but she also</strong> got the highest mark.</td><td>&mdash;</td></tr>
+                        <tr><td><strong>Not only was</strong> the hotel expensive, <strong>but it was also</strong> dirty.</td><td>&mdash;</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AD; Стиль: где это уместно</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell x"><span class="lbl">Формально / литературно</span>Under no circumstances should you sign the form.<br>Never in my life have I seen such behaviour.<span class="ru">эссе, статья, официальное письмо, литература</span></div>
+                        <div class="pair-cell y"><span class="lbl">Разговорно</span><strong>No way</strong> am I going to let this happen!<span class="ru">единственный неформальный вариант инверсии</span></div>
+                    </div>
+                    <p class="mini-note">&#x1F4A1; Для эссе на экзамене одна-две таких конструкции сразу поднимают уровень текста. Больше &mdash; уже перебор.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Где ещё в английском бывает инверсия</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Случай</th><th>Пример</th></tr>
+                        <tr><td>Вопросы</td><td>What <strong>did the man</strong> want? &middot; <strong>Have you</strong> heard the news?</td></tr>
+                        <tr><td>so / neither / nor</td><td>I saw the man and <strong>so did Paul</strong>.</td></tr>
+                        <tr><td>После отрицания в начале</td><td><strong>In no circumstances should you</strong> sign the form.</td></tr>
+                        <tr><td>Условие без if</td><td><strong>Had you signed</strong> the form, you would have lost your rights.<br><strong>Were I</strong> you, I'd say nothing. &middot; <strong>Should you</strong> need help, call me.</td></tr>
+                        <tr><td>Обстоятельство места впереди</td><td>On the doorstep <strong>stood an old man</strong>. &middot; <strong>Here is</strong> the news.</td></tr>
+                        <tr><td>После прямой речи</td><td>'Are you ready?' <strong>asked Jane</strong>.</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3: FRONTING ============ -->
+        <div class="tab-content" id="tab-front">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2B05;&#xFE0F;</span>
+                    <div>
+                        <h2>Вынос вперёд и порядок информации</h2>
+                        <p class="lesson-header-sub">Старое &mdash; в начало, новое &mdash; в конец. Это главное правило английского текста.</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Закон английского предложения:</strong><br>
+                    &#x1F538; <strong>Начало</strong> = то, что собеседник уже знает (старое, связь с предыдущим)<br>
+                    &#x1F538; <strong>Конец</strong> = новая информация, ради которой ты говоришь<br>
+                    <em>I hate <b>supermarkets</b>. <b>They're</b> so crowded. And they're <b>expensive</b>. <b>The prices</b> horrify me.</em><br>
+                    Каждое предложение начинается с уже известного и заканчивается новым.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; Что можно вынести вперёд</h3>
+                    <div class="variant">
+                        <div class="v-label">Обстоятельство</div>
+                        <div class="v-body">They spent the morning sightseeing. <b>In the afternoon</b>, they resumed their journey south.<span class="ru">делает последовательность событий яснее</span></div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Дополнение</div>
+                        <div class="v-body"><b>Dogs</b> I love, but cats I can't stand.<br>Jason deals with the post. <b>The routine letters</b> he answers himself. The rest he passes on to the boss.<span class="ru">контраст</span></div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Именная часть</div>
+                        <div class="v-body">They enjoyed the holiday. <b>Best of all</b> was the constant sunshine.<br>The scheme has many good points. <b>An advantage</b> is the low cost.</div>
+                    </div>
+                    <div class="variant">
+                        <div class="v-label">Место (+ инверсия)</div>
+                        <div class="v-body"><b>Outside the house</b> was a furniture van.<br><b>On the table</b> lay a newspaper. &middot; <b>Inside its walls</b> sit the European leaders.</div>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; При выносе <strong>дополнения</strong> инверсии НЕТ:<br>
+                    <span class="m-tag t-ok">ДА</span> <em>Dogs I love.</em> &nbsp; <span class="m-tag t-bad">НЕТ</span> <s>Dogs love I.</s><br>
+                    А при выносе <strong>места</strong> инверсия ЕСТЬ &mdash; но только с глаголами <em>be, come, go, lie, sit, stand</em>:<br>
+                    <span class="m-tag t-ok">ДА</span> <em>Outside the house <strong>was a furniture van</strong>.</em><br>
+                    <span class="m-tag t-bad">НЕТ</span> <s>Outside the house were talking two women.</s> &rarr; <em>Outside the house <strong>two women were talking</strong>.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4E2; Here / There в начале</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>Here is</strong> an announcement for passengers on flight TW513.</td><td>инверсия, потому что дальше существительное</td></tr>
+                        <tr><td>And <strong>there goes</strong> Williams! Into the lead!</td><td>&mdash;</td></tr>
+                        <tr><td><strong>There he goes</strong>, look! &middot; Oh, <strong>here they are</strong>.</td><td>&#x26A0;&#xFE0F; с местоимением инверсии НЕТ</td></tr>
+                    </table>
+                    <p class="mini-note"><span class="m-tag t-bad">НЕТ</span> <s>Here an announcement is.</s> &nbsp; <s>There goes he.</s></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9F5; Как связывать предложения между собой</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.75);">Подлежащее следующего предложения должно цепляться за предыдущее. Способы:</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>Повтор слова</td><td>&hellip; especially in London and <strong>Brighton</strong>. <strong>Brighton</strong> became famous after 1784.</td></tr>
+                        <tr><td>Местоимение</td><td>The houses of these periods are well-proportioned. <strong>They</strong> can be seen in many towns.</td></tr>
+                        <tr><td>Пересказ другими словами</td><td>&hellip; between 1700 and 1830. <strong>This period</strong> covers the building styles&hellip;</td></tr>
+                        <tr><td>Абстрактное существительное</td><td>Someone threw a stone through the window. <strong>This incident</strong> upset everyone.<br>Lucy had finally made up her mind. <strong>The decision</strong> had not been easy.<br>Brian is an impossible person. <strong>His rudeness</strong> puts people off.</td></tr>
+                        <tr><td>Контраст</td><td>The towns were expanding rapidly. <strong>The villages, on the other hand,</strong>&hellip;</td></tr>
+                        <tr><td>Обстоятельство впереди</td><td><strong>Previously,</strong> towns had grown naturally.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F4A1; Одну и ту же мысль часто можно повернуть по-разному &mdash; выбирай ту версию, которая начинается со <em>старого</em>:<br>
+                    <em>The girls did well. <strong>Celia</strong> got the first prize.</em> &nbsp;|&nbsp; <em>There were lots of prizes. <strong>The first prize</strong> went to Celia.</em><br>
+                    <em>This has been an eventful year. <strong>September saw</strong> our move to new offices.</em> (= We moved in September.)</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 4: THERE / IT ============ -->
+        <div class="tab-content" id="tab-thereit">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4E6;</span>
+                    <div>
+                        <h2>Пустые подлежащие there и it</h2>
+                        <p class="lesson-header-sub">Слова, которые ничего не значат, но без них предложение не строится</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Зачем они нужны:</strong> английскому предложению обязательно нужно подлежащее. Если настоящее подлежащее &mdash; новая информация или длинное придаточное, его отправляют в конец, а спереди ставят пустышку.<br>
+                    <span class="m-tag t-it">there</span> = <em>нечто существует</em> &nbsp;&nbsp; <span class="m-tag t-what">it</span> = <em>это что-то определённое / погода / время</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4E6; there + be</h3>
+                    <div class="base-line">Проблема: <s>A Chinese restaurant is round the corner.</s> &mdash; так почти не говорят.<br>Решение: <b>There's a Chinese restaurant round the corner.</b></div>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>С обстоятельством</td><td><strong>There was</strong> a furniture van outside the house. &middot; <strong>There's</strong> a concert next week.</td></tr>
+                        <tr><td>Без обстоятельства</td><td>I'm afraid <strong>there's</strong> a problem. &middot; <strong>There's been</strong> an accident.</td></tr>
+                        <tr><td>Отрицание и вопрос</td><td><strong>There wasn't</strong> a van outside. &middot; <strong>Are there</strong> any letters for me?</td></tr>
+                        <tr><td>Question tag</td><td>There's a concert next week, <strong>isn't there</strong>?</td></tr>
+                        <tr><td>Согласование по тому, что после</td><td><strong>There is</strong> a letter. / <strong>There are</strong> some letters.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; После <strong>there</strong> идёт <em>неопределённая</em> именная группа: <em>a/an, some, any, no</em>, число или квантификатор (<em>a lot of, many, several, enough, plenty of</em>). Слова <em>the, this, my</em> там обычно не стоят.<br>
+                    <em>There are seven days in a week. &middot; There's far too much traffic. &middot; There isn't enough memory in the computer.</em><br>
+                    &#x1F50A; Произношение: <em>there</em>-подлежащее слабое /&eth;&#601;/, <em>there</em>-наречие «там» &mdash; /&eth;e&#601;/:<br>
+                    <em>There /&eth;&#601;/ was a van there /&eth;e&#601;/, outside the house.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CE; there + причастие и относительное придаточное</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>There was</strong> a van <strong>blocking</strong> the road.</td><td>= A van was blocking the road.</td></tr>
+                        <tr><td><strong>There was</strong> a van <strong>parked</strong> outside the house.</td><td>= A van was parked outside.</td></tr>
+                        <tr><td><strong>There was</strong> a noise <strong>that woke</strong> me up.</td><td>для однократного действия нужно придаточное</td></tr>
+                        <tr><td><strong>There's</strong> a small matter <strong>which we need to discuss</strong>.</td><td>&mdash;</td></tr>
+                    </table>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.75);margin-top:0.8rem;"><strong>there</strong> + другие глаголы (формально / литературно):</p>
+                    <div class="word-chips">
+                        <span class="wchip">There <b>stands</b> an ancient tower</span>
+                        <span class="wchip">There <b>follows</b> a broadcast</span>
+                        <span class="wchip">There <b>occurred</b> a strange incident</span>
+                        <span class="wchip">There <b>arose / arrived / came / exist / lie / live / remain / result / take place</b></span>
+                    </div>
+                    <p class="mini-note">Ещё варианты: <em>There <strong>doesn't seem to be</strong> enough memory. &middot; There <strong>appears to have been</strong> an accident. &middot; There <strong>seems (to be)</strong> no reason for alarm.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4A0; Пустое it</h3>
+                    <div class="base-line">Проблема: <s>To make new friends is difficult.</s> &mdash; тяжело читается.<br>Решение: <b>It's difficult to make new friends.</b></div>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>it + прилагательное + to/that</td><td><strong>It's</strong> difficult to make new friends. &middot; <strong>It was</strong> a pity so few people came.</td></tr>
+                        <tr><td>it + глагол + придаточное</td><td><strong>It</strong> amazes me how much money some people earn.</td></tr>
+                        <tr><td>Пустое дополнение</td><td>I find <strong>it</strong> difficult to make new friends. &middot; We all thought <strong>it</strong> a pity so few people came.<br>The government has made <strong>it</strong> clear that no money will be available.</td></tr>
+                        <tr><td>it + seem / appear / happen / turn out / prove</td><td><strong>It seems</strong> the phone is out of order. &middot; <strong>It happened that</strong> I had my camera with me.<br><strong>It looks as if</strong> we're going to get some snow.</td></tr>
+                        <tr><td>Погода, время, расстояние</td><td><strong>It's</strong> getting dark. &middot; <strong>It was</strong> cold yesterday. &middot; <strong>Is it</strong> five o'clock yet? &middot; <strong>It's</strong> only a short walk.</td></tr>
+                    </table>
+                    <p class="mini-note">С герундием работают оба варианта: <em>Making new friends is difficult. / It's difficult making new friends.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; there или it?</h3>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);"><strong>there + be</strong> = нечто <em>существует</em> (что-то неопределённое). <strong>it + be</strong> = <em>называет или описывает</em> нечто уже известное.</p>
+                    <div class="pair-grid" style="margin-top:0.5rem;">
+                        <div class="pair-cell x"><span class="lbl">there</span><strong>There's</strong> a young lady at the door.<span class="ru">= A young lady is at the door</span></div>
+                        <div class="pair-cell y"><span class="lbl">it</span><strong>It's</strong> Lorraine.<span class="ru">= The young lady is Lorraine</span></div>
+
+                        <div class="pair-cell x"><span class="lbl">there</span><strong>There's</strong> a wind today.<span class="ru">= A wind exists</span></div>
+                        <div class="pair-cell y"><span class="lbl">it</span>Yes, <strong>it's</strong> windy.<span class="ru">= The weather is windy</span></div>
+
+                        <div class="pair-cell x"><span class="lbl">there</span><strong>There weren't</strong> any classes.<span class="ru">= No classes took place</span></div>
+                        <div class="pair-cell y"><span class="lbl">it</span><strong>It was</strong> Saturday.<span class="ru">= The day was Saturday</span></div>
+
+                        <div class="pair-cell x"><span class="lbl">there</span><strong>There isn't</strong> any truth in the story.<span class="ru">= The story has no truth in it</span></div>
+                        <div class="pair-cell y"><span class="lbl">it</span><strong>It isn't</strong> true what they say.<span class="ru">= What they say isn't true</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5: QUIZ ============ -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Quiz &mdash; 14 вопросов</h2>
+                        <p class="lesson-header-sub">Эмфаза, инверсия, there / it</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="quiz-question" data-answer="itwasyouwho">
+                        <p><strong>1.</strong> Подчеркни, кто именно сказал: <em>You told me.</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'itwasyouwho')">It was you who told me.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'itwasyoutold')">It was you told who me.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'whattoldme')">What told me was you.</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="whatineed">
+                        <p><strong>2.</strong> Подчеркни, что именно нужно: <em>I need a holiday.</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'whoineed')">Who I need is a holiday.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'whatineed')">What I need is a holiday.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'thatineed')">That I need is a holiday.</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="havei">
+                        <p><strong>3.</strong> Never in my life _____ seen such behaviour.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'ihave')">I have</button>
+                            <button class="quiz-btn" onclick="checkM(this,'havei')">have I</button>
+                            <button class="quiz-btn" onclick="checkM(this,'didi')">did I</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="shouldyou">
+                        <p><strong>4.</strong> Under no circumstances _____ sign this form.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'youshould')">you should</button>
+                            <button class="quiz-btn" onclick="checkM(this,'shouldyou')">should you</button>
+                            <button class="quiz-btn" onclick="checkM(this,'youare')">you are</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="than">
+                        <p><strong>5.</strong> No sooner had she left _____ he called.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'when')">when</button>
+                            <button class="quiz-btn" onclick="checkM(this,'than')">than</button>
+                            <button class="quiz-btn" onclick="checkM(this,'that')">that</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="didshe">
+                        <p><strong>6.</strong> Not only _____ pass, but she got the highest mark.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'shedid')">she did</button>
+                            <button class="quiz-btn" onclick="checkM(this,'didshe')">did she</button>
+                            <button class="quiz-btn" onclick="checkM(this,'shepassed')">she passed</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="did">
+                        <p><strong>7.</strong> I _____ post the letter &mdash; I'm absolutely certain!</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'did')">did</button>
+                            <button class="quiz-btn" onclick="checkM(this,'do')">do</button>
+                            <button class="quiz-btn" onclick="checkM(this,'have')">have</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="dogsilove">
+                        <p><strong>8.</strong> Вынеси дополнение вперёд: <em>I love dogs, but I can't stand cats.</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'dogsloveI')">Dogs love I, but cats can't stand I.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'dogsilove')">Dogs I love, but cats I can't stand.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'dogsdoilove')">Dogs do I love, but cats do I not.</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="wasavan">
+                        <p><strong>9.</strong> Outside the house _____.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'avanwas')">a van was</button>
+                            <button class="quiz-btn" onclick="checkM(this,'wasavan')">was a van</button>
+                            <button class="quiz-btn" onclick="checkM(this,'therewasvan')">was there a van</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="heretheyare">
+                        <p><strong>10.</strong> Where are my keys? Oh, _____!</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'herearethey')">here are they</button>
+                            <button class="quiz-btn" onclick="checkM(this,'heretheyare')">here they are</button>
+                            <button class="quiz-btn" onclick="checkM(this,'thereare')">there are they</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="there">
+                        <p><strong>11.</strong> _____'s a young lady at the door.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'it')">It</button>
+                            <button class="quiz-btn" onclick="checkM(this,'there')">There</button>
+                            <button class="quiz-btn" onclick="checkM(this,'that')">That</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="it">
+                        <p><strong>12.</strong> Who is it? ~ _____'s Lorraine.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'there')">There</button>
+                            <button class="quiz-btn" onclick="checkM(this,'it')">It</button>
+                            <button class="quiz-btn" onclick="checkM(this,'this')">This</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="itsdifficult">
+                        <p><strong>13.</strong> Естественнее звучит:</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'tomakeis')">To make new friends is difficult.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'itsdifficult')">It's difficult to make new friends.</button>
+                            <button class="quiz-btn" onclick="checkM(this,'thereisdifficult')">There is difficult to make new friends.</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="hadyou">
+                        <p><strong>14.</strong> _____ signed the form, you would have lost your rights.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkM(this,'ifyouhad')">If had you</button>
+                            <button class="quiz-btn" onclick="checkM(this,'hadyou')">Had you</button>
+                            <button class="quiz-btn" onclick="checkM(this,'youhad')">You had</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="emp-score"></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        const M_TOTAL = 14;
+        let mScore = 0, mDone = 0;
+        function checkM(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            mDone++;
+            if (answer === q.dataset.answer) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! ✅';
+                feedback.style.color = 'var(--color-green)';
+                mScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite ❌';
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('emp-score');
+            if (mDone === M_TOTAL) {
+                if (mScore === M_TOTAL) scoreEl.innerHTML = '🌟 ' + mScore + '/' + M_TOTAL + ' — Perfect!';
+                else if (mScore >= 11) scoreEl.innerHTML = '✅ ' + mScore + '/' + M_TOTAL + ' — Great!';
+                else if (mScore >= 8)  scoreEl.innerHTML = mScore + '/' + M_TOTAL + ' — Good, повтори вкладку «Инверсия»';
+                else scoreEl.innerHTML = mScore + '/' + M_TOTAL + ' — пройди вкладки ещё раз 💪';
+                scoreEl.style.color = mScore >= 11 ? 'var(--color-green)' : mScore >= 8 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>

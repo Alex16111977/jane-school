@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantifiers: all, most, few, either | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.12rem 0.5rem;
+            border-radius: 6px;
+            margin-right: 0.35rem;
+            vertical-align: middle;
+            letter-spacing: 0.03em;
+        }
+        .t-pl  { background: rgba(68,147,248,0.16);  color: #79b8ff; }
+        .t-un  { background: rgba(63,185,80,0.16);   color: #56d364; }
+        .t-sg  { background: rgba(245,158,11,0.16);  color: #fbbf24; }
+        .t-bad { background: rgba(248,81,73,0.16);   color: #ff8080; }
+        .t-ok  { background: rgba(163,113,247,0.16); color: #c8a5ff; }
+
+        .scale {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+        }
+        .scale-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.55rem 0.8rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .scale-bar {
+            flex-shrink: 0;
+            width: 62px;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.09);
+            overflow: hidden;
+        }
+        .scale-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#4493f8,#79b8ff); }
+        .scale-label { flex-shrink: 0; width: 92px; font-size: 0.75rem; font-weight: 800; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.04em; }
+        .scale-words { flex: 1; font-size: 0.83rem; color: rgba(255,255,255,0.82); line-height: 1.5; }
+        .scale-words b { color: #fff; }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+        @media (max-width: 620px) { .two-cols { grid-template-columns: 1fr; } }
+        .cbox { border-radius: 12px; padding: 0.9rem 1rem; }
+        .cbox-pl { background: rgba(68,147,248,0.08);  border: 1px solid rgba(68,147,248,0.22); }
+        .cbox-un { background: rgba(63,185,80,0.08);   border: 1px solid rgba(63,185,80,0.22); }
+        .cbox-t  { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.45rem; }
+        .cbox-pl .cbox-t { color: #79b8ff; }
+        .cbox-un .cbox-t { color: #56d364; }
+        .cbox ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+        .cbox li { font-size: 0.82rem; color: rgba(255,255,255,0.78); line-height: 1.45; }
+
+        .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 620px) { .pair-grid { grid-template-columns: 1fr; } }
+        .pair-cell {
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.83rem;
+            line-height: 1.5;
+        }
+        .pair-cell .lbl {
+            display: block;
+            font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em;
+            text-transform: uppercase; margin-bottom: 0.3rem; opacity: 0.8;
+        }
+        .pair-cell.pos .lbl { color: #56d364; }
+        .pair-cell.neg .lbl { color: #ff8080; }
+        .pair-cell .ru { display: block; color: rgba(255,255,255,0.45); font-size: 0.76rem; margin-top: 0.15rem; }
+
+        .pattern-row {
+            display: flex;
+            gap: 0.8rem;
+            align-items: baseline;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.84rem;
+        }
+        .pattern-row:last-child { border-bottom: none; }
+        .pattern-name {
+            flex-shrink: 0; width: 190px;
+            font-weight: 700; color: #79b8ff; font-size: 0.78rem;
+        }
+        .pattern-ex { flex: 1; color: rgba(255,255,255,0.78); }
+        .pattern-ex b { color: #fff; }
+        @media (max-width: 620px) {
+            .pattern-row { flex-direction: column; gap: 0.15rem; }
+            .pattern-name { width: auto; }
+        }
+
+        .mini-note { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.55; margin-top: 0.5rem; }
+        .word-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+        .wchip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .wchip b { color: #79b8ff; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Quantifiers</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Quantifiers</h1>
+            <p class="page-subtitle">all &middot; most &middot; both &middot; either &middot; neither &middot; every &middot; each &middot; few &middot; little &middot; none &mdash; сколько именно</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="size">Много / мало</button>
+            <button class="tab" data-tab="whole">Всё / часть</button>
+            <button class="tab" data-tab="some">some / any / no</button>
+            <button class="tab" data-tab="patterns">Схемы + other</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+        <!-- ============ TAB 1: LARGE / SMALL ============ -->
+        <div class="tab-content active" id="tab-size">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CF;</span>
+                    <div>
+                        <h2>Большое и малое количество</h2>
+                        <p class="lesson-header-sub">a lot of &middot; many &middot; much &middot; a few &middot; a little &mdash; и почему это разные слова</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Первый вопрос всегда один:</strong> существительное <span class="q-tag t-pl">PLURAL</span> (можно посчитать: books, people, trains) или <span class="q-tag t-un">UNCOUNTABLE</span> (нельзя: money, traffic, time, advice)?<br>
+                    От этого зависит <strong>всё</strong>: many/much, few/little, number/amount.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CA; Шкала количества</h3>
+                    <div class="scale">
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:100%"></div></div>
+                            <div class="scale-label">100 %</div>
+                            <div class="scale-words"><b>all</b>, every, each, both, the whole</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:75%"></div></div>
+                            <div class="scale-label">Больше пол.</div>
+                            <div class="scale-words"><b>most</b>, the majority of, more than half</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:60%"></div></div>
+                            <div class="scale-label">Много</div>
+                            <div class="scale-words"><b>a lot of</b>, lots of, plenty of, many, much, a large number of, a great deal of</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:45%"></div></div>
+                            <div class="scale-label">Нейтрально</div>
+                            <div class="scale-words"><b>some</b>, several, a number of, enough</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:22%"></div></div>
+                            <div class="scale-label">Мало (+)</div>
+                            <div class="scale-words"><b>a few</b>, a little, a bit of, a handful of &mdash; «немного, но есть»</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:10%"></div></div>
+                            <div class="scale-label">Мало (&ndash;)</div>
+                            <div class="scale-words"><b>few</b>, little, not many, not much, hardly any &mdash; «почти нет»</div>
+                        </div>
+                        <div class="scale-row">
+                            <div class="scale-bar"><div class="scale-fill" style="width:0%"></div></div>
+                            <div class="scale-label">0 %</div>
+                            <div class="scale-words"><b>no</b>, none of, neither (из двух)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F522; a lot of / many / much</h3>
+                    <div class="two-cols">
+                        <div class="cbox cbox-pl">
+                            <div class="cbox-t">&#x1F4D8; PLURAL &mdash; исчисляемые</div>
+                            <ul>
+                                <li><strong>a lot of / lots of</strong> people work here</li>
+                                <li><strong>many</strong> tourists</li>
+                                <li><strong>a large number of</strong> letters</li>
+                                <li><strong>several</strong> people</li>
+                                <li><strong>a few</strong> night clubs</li>
+                                <li><strong>numerous</strong> difficulties</li>
+                            </ul>
+                        </div>
+                        <div class="cbox cbox-un">
+                            <div class="cbox-t">&#x1F4D7; UNCOUNTABLE &mdash; неисчисляемые</div>
+                            <ul>
+                                <li><strong>a lot of / lots of</strong> fun</li>
+                                <li><strong>much</strong> traffic</li>
+                                <li><strong>a large amount of</strong> electricity</li>
+                                <li><strong>a great deal of</strong> electricity</li>
+                                <li><strong>a little / a bit of</strong> money</li>
+                                <li><strong>plenty of</strong> time</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="mini-note">&#x1F511; <strong>many</strong> = только с plural, <strong>much</strong> = только с uncountable, <strong>a lot of</strong> = с обоими.</p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #a371f7; background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">&#x2B50; Главное правило: где many/much, а где a lot of</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th></th><th>Обычный вариант</th></tr>
+                        <tr><td><span class="q-tag t-ok">+</span> Утверждение</td><td>There are <strong>a lot of</strong> tourists here.</td></tr>
+                        <tr><td><span class="q-tag t-bad">&ndash;</span> Отрицание</td><td>There aren't <strong>many</strong> tourists here.</td></tr>
+                        <tr><td><span class="q-tag t-sg">?</span> Вопрос</td><td>Are there <strong>many</strong> tourists here? &middot; How <strong>much</strong> support is there?</td></tr>
+                    </table>
+                    <p class="mini-note">То есть: <strong>a lot of</strong> в плюсе, <strong>many/much</strong> в минусе и в вопросе. Это разговорная норма.<br>
+                    &#x1F4CC; Но <strong>many/much</strong> в утверждении звучат <em>формально</em> и вполне возможны в письме:<br>
+                    <em>Many tourists come here year after year. &middot; Many crimes go unreported.</em><br>
+                    &#x1F4CC; А <strong>a lot of</strong> в отрицании/вопросе &mdash; разговорно и тоже нормально:<br>
+                    <em>There aren't a lot of tourists here. &middot; Is there a lot of support for the idea?</em></p>
+                    <p class="mini-note">&#x26A0;&#xFE0F; После <strong>very / so / too / as / how</strong> &mdash; только many/much, <strong>не</strong> a lot of:<br>
+                    <em>Very many crimes go unreported. &middot; There were <strong>so many</strong> people we couldn't get in. &middot; There's <strong>too much</strong> concrete here. &middot; <strong>How much</strong> support is there?</em><br>
+                    &#x1F4A1; <strong>lots of</strong> = неформальнее, чем a lot of. <strong>a great many</strong> = довольно формально.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; a few / few и a little / little &mdash; разница в НАСТРОЕНИИ</h3>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);">Артикль <strong>a</strong> меняет смысл на противоположный по эмоции.</p>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">a few / a little &mdash; позитив</span>«немного, но это нормально»<span class="ru">некоторое количество ЕСТЬ</span></div>
+                        <div class="pair-cell neg"><span class="lbl">few / little &mdash; негатив</span>«мало, почти нет»<span class="ru">количество НЕДОСТАТОЧНО</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">a few</span>Yes, there are <strong>a few</strong> tourists here.<span class="ru">да, туристы есть &mdash; это курорт</span></div>
+                        <div class="pair-cell neg"><span class="lbl">few</span>No, there are <strong>few</strong> tourists here.<span class="ru">нет, туристов почти нет</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">a little</span>There was <strong>a little</strong> traffic.<span class="ru">какое-то движение было</span></div>
+                        <div class="pair-cell neg"><span class="lbl">little</span>There was <strong>little</strong> traffic.<span class="ru">движения почти не было</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">a few</span>I've still got <strong>a little</strong> money, fortunately.<span class="ru">к счастью, деньги ещё есть</span></div>
+                        <div class="pair-cell neg"><span class="lbl">only a few</span>There are <strong>only a few</strong> clubs in the city.<span class="ru">only делает смысл негативным</span></div>
+                    </div>
+                    <table class="unit-table" style="margin-top:0.8rem;">
+                        <tr><th></th><th><span class="q-tag t-pl">PLURAL</span></th><th><span class="q-tag t-un">UNCOUNT.</span></th></tr>
+                        <tr><td>Немного (позитив)</td><td><strong>a few</strong> books</td><td><strong>a little</strong> / <strong>a bit of</strong> money</td></tr>
+                        <tr><td>Мало (негатив)</td><td><strong>few</strong> books</td><td><strong>little</strong> money</td></tr>
+                        <tr><td>Разговорный вариант</td><td><strong>not many</strong> books</td><td><strong>not much</strong> money</td></tr>
+                        <tr><td>Совсем чуть-чуть</td><td><strong>very few</strong> / <strong>hardly any</strong> books</td><td><strong>very little</strong> / <strong>hardly any</strong> money</td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F4A1; В живой речи вместо few/little чаще говорят <strong>not many / not much</strong>. Few и little без артикля звучат книжно.<br>
+                    <strong>quite a few</strong> / <strong>quite a lot of</strong> = «довольно много» (не мало!): <em>There are quite a few night clubs in the city.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Особые схемы с many и few</h3>
+                    <div class="pattern-row">
+                        <div class="pattern-name">the / these / those / my + few</div>
+                        <div class="pattern-ex">The <b>few</b> hotels in the area are always full. &middot; Can you eat up these <b>few</b> peas? &middot; one of his <b>many</b> girlfriends</div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">many a + ед. число <em>(литературно)</em></div>
+                        <div class="pattern-ex"><b>Many a</b> ship has come to grief off the coast. &middot; I've driven along this road <b>many a time</b>.<br><em style="color:rgba(255,255,255,0.42)">в обычной речи: many times / lots of times</em></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">как дополнение <em>(литературно)</em></div>
+                        <div class="pattern-ex">The disadvantages of the scheme are <b>many</b>.<br><em style="color:rgba(255,255,255,0.42)">нормальнее: The scheme has many disadvantages / a lot of disadvantages.</em></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4A1; Синонимы &mdash; чтобы не повторять «a lot of»</h3>
+                    <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:0.2rem;"><strong style="color:#79b8ff;">Много:</strong></p>
+                    <div class="word-chips">
+                        <span class="wchip"><b>a large number of</b> people</span>
+                        <span class="wchip"><b>a great deal of</b> electricity</span>
+                        <span class="wchip"><b>a large amount of</b> money</span>
+                        <span class="wchip"><b>a huge amount of</b> work</span>
+                        <span class="wchip"><b>numerous</b> difficulties</span>
+                        <span class="wchip"><b>masses of</b> time <em>(informal)</em></span>
+                        <span class="wchip"><b>heaps of / loads of</b> time <em>(informal)</em></span>
+                    </div>
+                    <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin:0.7rem 0 0.2rem;"><strong style="color:#79b8ff;">Мало:</strong></p>
+                    <div class="word-chips">
+                        <span class="wchip"><b>several</b> people</span>
+                        <span class="wchip"><b>a handful of</b> people</span>
+                        <span class="wchip"><b>a small number of</b> letters</span>
+                        <span class="wchip"><b>a small / tiny amount of</b> electricity</span>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>number</strong> &rarr; только для plural, <strong>amount / deal</strong> &rarr; только для uncountable.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F37D;&#xFE0F; enough и plenty of</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>enough</strong> = достаточно</td><td>There aren't <strong>enough</strong> people to play that game. &middot; Have we <strong>enough</strong> time for a coffee?</td></tr>
+                        <tr><td><strong>enough of</strong> + определитель</td><td>I've written <strong>enough of</strong> this essay for today.</td></tr>
+                        <tr><td><strong>plenty of</strong> = более чем достаточно</td><td>There'll be <strong>plenty of</strong> people to lend a hand. &middot; We've got <strong>plenty of</strong> time.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>plenty of</strong> &mdash; всегда о хорошем. Если «слишком много» в плохом смысле &mdash; <strong>too many / too much</strong>:<br>
+                    <em>There were <strong>too many</strong> people to look round properly.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2: WHOLE / PART ============ -->
+        <div class="tab-content" id="tab-whole">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F967;</span>
+                    <div>
+                        <h2>Целое и часть</h2>
+                        <p class="lesson-header-sub">all &middot; most &middot; half &middot; none &middot; whole &middot; both &middot; either &middot; neither &middot; every &middot; each</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Ключевая развилка &mdash; общее или конкретное:</strong><br>
+                    <strong>Most people</strong> want a quiet life. <em>(люди вообще &mdash; без of)</em><br>
+                    <strong>Most of the people</strong> here are strangers to me. <em>(конкретная группа &mdash; of + the/my/these)</em><br>
+                    <span style="color:#ff8080">НЕ:</span> <s>most of people</s> &middot; <s>the most of the pubs</s></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F30D; all / most &mdash; общее vs конкретное</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">без of &mdash; обобщение</span><strong>All</strong> rabbits love green food.<span class="ru">кролики вообще</span></div>
+                        <div class="pair-cell neg"><span class="lbl">of + определитель</span><strong>All (of)</strong> our rabbits died from some disease.<span class="ru">наши кролики</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">без of</span><strong>Most</strong> pollution could be avoided.<span class="ru">загрязнение вообще</span></div>
+                        <div class="pair-cell neg"><span class="lbl">of + определитель</span><strong>Most of</strong> the pubs around here serve food.<span class="ru">именно эти пабы</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">без of</span><strong>Half</strong> the normal playing time.<span class="ru">of можно опустить после all и half</span></div>
+                        <div class="pair-cell neg"><span class="lbl">of обязателен с местоимением</span>We had rabbits, but <strong>all of them</strong> died.<span class="ru">перед them/us/it &mdash; всегда of</span></div>
+                    </div>
+                    <p class="mini-note">&#x1F4CC; После <strong>all</strong> и <strong>half</strong> слово <strong>of</strong> можно убрать: <em>all (of) the systems, half (of) the tape.</em><br>
+                    Но перед местоимением &mdash; только с of: <em>all <strong>of</strong> them, half <strong>of</strong> it.</em><br>
+                    Синонимы most: <em>the majority of</em> (&#x2194; the minority of), <em>more than half</em> (&#x2194; less than half).</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6AB; none &mdash; ноль</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>None of</strong> the rabbits survived. They all died.</td><td>ни один</td></tr>
+                        <tr><td><strong>None of</strong> these jackets fit me any more.</td><td>ни одна</td></tr>
+                        <tr><td><span class="q-tag t-bad">НЕ</span> <s>All of the rabbits didn't survive.</s></td><td>отрицание с all звучит криво</td></tr>
+                        <tr><td><strong>Not all</strong> the rabbits died. Some of them survived.</td><td>not all = «не все» (часть выжила)</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>none</strong> используется без существительного (или с of), <strong>no</strong> &mdash; только перед существительным:<br>
+                    <em>There is <strong>no</strong> alternative.</em> vs <em><strong>None of them</strong> are easy.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F370; whole &mdash; целый</h3>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);"><strong>whole</strong> &mdash; это прилагательное, поэтому идёт <em>после</em> определителя, а не до.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th><span class="q-tag t-ok">ДА</span></th><th><span class="q-tag t-bad">НЕТ</span></th></tr>
+                        <tr><td>Did you copy <strong>the whole</strong> tape?</td><td><s>the all tape</s></td></tr>
+                        <tr><td><strong>This whole</strong> idea is crazy.</td><td><s>all this idea</s></td></tr>
+                        <tr><td>You didn't eat <strong>a whole</strong> chicken!</td><td>&mdash;</td></tr>
+                        <tr><td colspan="2" style="padding-top:0.5rem;">Можно и с of: <em>Did you copy <strong>the whole of</strong> the tape?</em></td></tr>
+                    </table>
+                    <p class="mini-note">Сравни: <em>We spent <strong>all day / the whole day</strong> on the beach.</em> (с утра до вечера) &nbsp;vs&nbsp; <em>We spent <strong>every day</strong> (of the week) on the beach.</em> (каждый день)</p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #58a6ff; background:rgba(88,166,255,0.06);">
+                    <h3 style="color:#79b8ff;">&#x270C;&#xFE0F; both / either / neither &mdash; ТОЛЬКО про два</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Слово</th><th>Значение</th><th>Пример</th></tr>
+                        <tr><td><strong>both</strong></td><td>и тот, и другой</td><td>The police set up barriers at <strong>both</strong> ends of the street.</td></tr>
+                        <tr><td><strong>either</strong></td><td>тот или другой (любой из двух)</td><td>You can write with <strong>either</strong> hand.</td></tr>
+                        <tr><td><strong>neither</strong></td><td>ни тот, ни другой</td><td><strong>Neither</strong> car is very economical to run.</td></tr>
+                    </table>
+                    <table class="unit-table" style="margin-top:0.7rem;">
+                        <tr><th></th><th>Позитив</th><th>Негатив</th></tr>
+                        <tr><td><strong>Два</strong></td><td><strong>Both</strong> prisoners escaped.</td><td><strong>Neither of</strong> the prisoners escaped.</td></tr>
+                        <tr><td><strong>Три+</strong></td><td><strong>All</strong> the prisoners escaped.</td><td><strong>None of</strong> the prisoners escaped.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x2705; Схемы both = схемы all: <em>Both decks / Both the decks / Both of the decks play tapes.</em> &middot; <em>They <strong>both</strong> play tapes.</em> &middot; <em>police caught them <strong>both</strong> / <strong>both of them</strong>.</em><br>
+                    <span class="q-tag t-bad">НЕ</span> <s>the both decks</s><br>
+                    &#x26A0;&#xFE0F; <strong>either / both</strong> не ставятся перед отрицанием:<br>
+                    <span class="q-tag t-ok">ДА</span> <em><strong>Neither of</strong> those pictures are any good.</em> &nbsp; <span class="q-tag t-bad">НЕТ</span> <s>Either/Both of those pictures aren't any good.</s><br>
+                    В позиции не-подлежащего <strong>neither</strong> звучит формальнее: <em>I don't like <strong>either</strong> of those pictures</em> (обычно) / <em>I like <strong>neither</strong> of those pictures</em> (формально).</p>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f59e0b; background:rgba(245,158,11,0.06);">
+                    <h3 style="color:#fbbf24;">&#x1F511; every vs each &mdash; тонкая, но важная разница</h3>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);">Оба идут с <span class="q-tag t-sg">SINGULAR</span> существительным и <strong>singular</strong> глаголом.</p>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">every &mdash; все вместе</span><strong>Every</strong> shop was open.<span class="ru">= all the shops; подразумевает большое число</span></div>
+                        <div class="pair-cell neg"><span class="lbl">each &mdash; по одному, отдельно</span>We went into <strong>each</strong> shop in turn.<span class="ru">рассматриваем каждый по очереди</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">every</span><strong>Every</strong> child is conditioned by its environment.<span class="ru">все дети</span></div>
+                        <div class="pair-cell neg"><span class="lbl">each</span><strong>Each</strong> child was given a medal with his or her name on it.<span class="ru">индивидуально для каждого</span></div>
+                    </div>
+                    <table class="unit-table" style="margin-top:0.8rem;">
+                        <tr><th></th><th>every</th><th>each</th></tr>
+                        <tr><td>Сколько минимум</td><td>от <strong>трёх</strong></td><td>от <strong>двух</strong>: on each side of the van</td></tr>
+                        <tr><td>Регулярность</td><td><strong>every</strong> four weeks &middot; <strong>every</strong> other weekend</td><td>each Thursday (реже)</td></tr>
+                        <tr><td>almost / nearly</td><td>almost <strong>every</strong> building &#x2705;</td><td><s>almost each</s> &#x274C;</td></tr>
+                        <tr><td>Схема с of</td><td><s>every of the students</s> &#x274C;</td><td><strong>Each of</strong> the students has a personal tutor. &#x2705;</td></tr>
+                        <tr><td>Без существительного</td><td><s>Every can choose</s> &#x274C;</td><td><strong>Each</strong> can choose its own half day. &#x2705;</td></tr>
+                        <tr><td>После существительного</td><td>&mdash;</td><td>The tickets are &pound;5 <strong>each</strong>. &middot; They <strong>each</strong> received a souvenir.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; После every/each <strong>нельзя</strong> отрицательный глагол:<br>
+                    <span class="q-tag t-bad">НЕТ</span> <s>Every/Each door wasn't locked.</s> &nbsp; <span class="q-tag t-ok">ДА</span> <em><strong>None of</strong> the doors were locked.</em><br>
+                    <strong>not every</strong> = «не все»: <em>Not every door was locked. Some of them were open.</em><br>
+                    <strong>every single</strong> = «каждый без исключения»: <em>Every single child was given a medal.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; part и «часть чего-то»</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>This next <strong>part of</strong> the film is exciting.</td><td>обычное существительное с определителем</td></tr>
+                        <tr><td>(A) <strong>part of</strong> the film was shot in Iceland.</td><td>как квантификатор &mdash; можно без артикля</td></tr>
+                        <tr><td><span class="q-tag t-bad">НЕ</span> <s>part of the students</s></td><td>part только с <strong>ед. числом</strong>; для людей &mdash; <em>some of the students</em></td></tr>
+                        <tr><td>I was out <strong>most of</strong> the day.</td><td><span class="q-tag t-bad">НЕ</span> <s>the most part of the day</s></td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Итоговая таблица &mdash; какое слово с каким существительным</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Количество</th><th><span class="q-tag t-sg">SG</span> letter</th><th><span class="q-tag t-pl">PL</span> letters</th><th><span class="q-tag t-un">UNC</span> money</th></tr>
+                        <tr><td>Всё</td><td>the whole letter &middot; every/each letter</td><td>all letters &middot; all (of) the letters</td><td>all money &middot; all (of) the money</td></tr>
+                        <tr><td>Из двух</td><td>either / neither letter</td><td>both (your) letters</td><td>&mdash;</td></tr>
+                        <tr><td>Большинство</td><td>&mdash;</td><td>most letters &middot; most of my letters</td><td>most money &middot; most of my money</td></tr>
+                        <tr><td>Много</td><td>much of this letter</td><td>a lot of / many letters</td><td>a lot of / much money</td></tr>
+                        <tr><td>Нейтрально</td><td>part of that letter</td><td>some letters &middot; a number of letters</td><td>some money &middot; an amount of money</td></tr>
+                        <tr><td>Мало (+)</td><td>&mdash;</td><td>a few / several letters</td><td>a little / a bit of money</td></tr>
+                        <tr><td>Мало (&ndash;)</td><td>&mdash;</td><td>few / not many / hardly any letters</td><td>little / not much / hardly any money</td></tr>
+                        <tr><td>Половина</td><td>half (of) the letter</td><td>half (of) the letters</td><td>half (of) the money</td></tr>
+                        <tr><td>Ноль</td><td>no letter &middot; neither letter</td><td>no letters &middot; none of the letters</td><td>no money &middot; none of the money</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3: SOME / ANY / NO ============ -->
+        <div class="tab-content" id="tab-some">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F500;</span>
+                    <div>
+                        <h2>some / any / no</h2>
+                        <p class="lesson-header-sub">Не «плюс = some, минус = any» &mdash; всё чуть интереснее</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">У some два разных значения:</strong><br>
+                    &#x1F538; <strong>/s&#601;m/</strong> безударное = просто «какое-то количество» &mdash; замена артиклю a/an во множественном:<br>
+                    <em>There were <strong>some</strong> people in the garden.</em><br>
+                    &#x1F538; <strong>/s&#652;m/</strong> ударное = «некоторые, но не все»:<br>
+                    <em><strong>Some</strong> fish can change their sex.</em> (некоторые рыбы, а другие нет)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D0; Базовое распределение</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><span class="q-tag t-ok">+</span></td><td>I've got <strong>some</strong> wood.</td></tr>
+                        <tr><td><span class="q-tag t-bad">&ndash;</span></td><td>I haven't got <strong>any</strong> wood.</td></tr>
+                        <tr><td><span class="q-tag t-sg">?</span></td><td>Have you got <strong>any</strong> wood?</td></tr>
+                    </table>
+                    <p class="mini-note"><strong>any</strong> означает «количество может быть и нулевым» &mdash; поэтому оно уместно там, где мы не знаем.<br>
+                    You'll need a hammer, <strong>some</strong> nails and <strong>some</strong> wood. <em>(some nails = a number of nails)</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x274C; В отрицаниях &mdash; почти всегда any</h3>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);">Включая «скрытые» отрицания: <strong>never, hardly, without</strong>.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>I can't find <strong>any</strong> nails.</td><td>&mdash;</td></tr>
+                        <tr><td>I <strong>never</strong> find <strong>any</strong> spare time.</td><td>never &rarr; any</td></tr>
+                        <tr><td>We've won <strong>hardly any</strong> games this season.</td><td>hardly &rarr; any</td></tr>
+                        <tr><td>I'd like to get this settled <strong>without any</strong> hassle.</td><td>without &rarr; any</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; С <strong>единственным</strong> числом в отрицании тоже можно any:<br>
+                    <em>Pass me the hammer. ~ I can't see <strong>any</strong> hammer / <strong>a</strong> hammer.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; В вопросах &mdash; any нейтрально, some «ждёт да»</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">any &mdash; ответ открыт</span>Have you got <strong>any</strong> nails? ~ Yes./No./I don't know.<span class="ru">я правда не знаю ответа</span></div>
+                        <div class="pair-cell neg"><span class="lbl">some &mdash; жду «да»</span>Did you catch <strong>some</strong> fish?<span class="ru">я уверен, что ты поймал</span></div>
+
+                        <div class="pair-cell pos"><span class="lbl">any</span>Did you catch <strong>any</strong> fish? ~ Yes, a few / No, not many.<span class="ru">нейтрально</span></div>
+                        <div class="pair-cell neg"><span class="lbl">some &mdash; предложение / просьба</span>Would you like <strong>some</strong> cornflakes?<br>Could you lend me <strong>some</strong> money?<span class="ru">вежливое предложение или просьба</span></div>
+                    </div>
+                    <p class="mini-note">&#x1F511; Предлагаешь или просишь &rarr; <strong>some</strong>. Просто спрашиваешь &rarr; <strong>any</strong>.<br>
+                    То же с составными словами: <em>Have you got <strong>anything/something</strong> suitable to wear? &middot; Could you do <strong>something</strong> for me? &middot; There isn't <strong>anywhere</strong> to leave your coat.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F31F; any = «любой, неважно какой»</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>You can choose <strong>any</strong> colour you like.</td><td>любой цвет</td></tr>
+                        <tr><td>Play <strong>any</strong> music. I don't mind what you play.</td><td>какая угодно музыка</td></tr>
+                        <tr><td>The delegation will be here at <strong>any</strong> minute.</td><td>в любую минуту</td></tr>
+                        <tr><td><strong>Any</strong> passer-by will be able to direct you.</td><td>любой прохожий подойдёт</td></tr>
+                        <tr><td>The door isn't locked. <strong>Anyone</strong> can just walk in.</td><td>кто угодно</td></tr>
+                        <tr><td>What do you want for lunch? ~ Oh, <strong>anything</strong>. I don't mind.</td><td>что угодно</td></tr>
+                    </table>
+                    <p class="mini-note">Сравни: из <strong>двух</strong> &rarr; <em>You can have <strong>either</strong> of them.</em> &nbsp;|&nbsp; из <strong>трёх+</strong> &rarr; <em>You can have <strong>any</strong> of them.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F31F; Особые значения some</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>some</strong> + ед. ч. = «какой-то неизвестный»</td><td><strong>Some</strong> idiot dropped a milk bottle. &middot; The flight was delayed for <strong>some</strong> reason.</td></tr>
+                        <tr><td><strong>some day / some time</strong> = когда-нибудь</td><td>I'll be famous <strong>some day</strong>. &middot; You must come and see me <strong>some time</strong>.</td></tr>
+                        <tr><td><strong>some</strong> /s&#652;m/ = восхищение</td><td>That was <strong>some</strong> parade! <em>(вот это был парад!)</em></td></tr>
+                        <tr><td><strong>some</strong> + число = «примерно»</td><td><strong>Some</strong> twenty people attended the meeting.</td></tr>
+                    </table>
+                    <p class="mini-note">Наоборот с any: <em>This isn't just <strong>any</strong> parade. It's a rather special one.</em> (не какой-то там)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6AB; no &mdash; сильное отрицание</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td>There is <strong>no</strong> alternative.</td><td>эмфатичнее, чем <em>There isn't any alternative.</em></td></tr>
+                        <tr><td>There are <strong>no</strong> rivers in Saudi Arabia.</td><td>с plural</td></tr>
+                        <tr><td>The driver had <strong>no</strong> time to stop.</td><td>с uncountable</td></tr>
+                        <tr><td><strong>No</strong> warning was given.</td><td>в подлежащем &mdash; только no</td></tr>
+                        <tr><td><span class="q-tag t-bad">НЕ</span> <s>Any warning was not given.</s></td><td>any не может начинать предложение как подлежащее</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>no</strong> нельзя без существительного &mdash; вместо него <strong>none</strong>:<br>
+                    <em>There are several routes up the mountain. <strong>None (of them)</strong> are easy.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4A1; Сравни all и some</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Общее</th><th>Конкретное</th></tr>
+                        <tr><td><strong>All</strong> fish can swim.</td><td><strong>All of</strong> these fish are mine.</td></tr>
+                        <tr><td><strong>Some</strong> fish can change their sex.</td><td><strong>Some of</strong> these fish are blue.</td></tr>
+                    </table>
+                    <p class="mini-note">В <em>if</em>-предложении можно и some, и any &mdash; some звучит позитивнее:<br>
+                    <em>If you need some/any help, do let me know.</em><br>
+                    <strong>any</strong> в главном предложении может означать условие:<br>
+                    <em><strong>Any</strong> problems will be dealt with by our agent.</em> = If there are any problems&hellip;</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 4: PATTERNS + OTHER ============ -->
+        <div class="tab-content" id="tab-patterns">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9F1;</span>
+                    <div>
+                        <h2>Схемы построения + another / other</h2>
+                        <p class="lesson-header-sub">Где ставить of, где его нельзя, и как обойтись без существительного</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Самая частая ошибка:</strong> лишнее или потерянное <strong>of</strong>.<br>
+                    <span style="color:#ff8080">&#x274C;</span> <s>most of people</s> &nbsp; <span style="color:#56d364">&#x2705;</span> most people / most of <strong>the</strong> people<br>
+                    Правило: <strong>of</strong> появляется только тогда, когда дальше идёт <strong>the / my / these / them</strong>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F527; Все схемы &mdash; на одной странице</h3>
+                    <div class="pattern-row">
+                        <div class="pattern-name">квантификатор + сущ.</div>
+                        <div class="pattern-ex"><b>every</b> system &middot; <b>both</b> decks &middot; <b>most</b> music &middot; <b>all</b> systems</div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">кв. + определитель + сущ.<br><em style="font-weight:400;color:rgba(255,255,255,0.4)">только all, both, half</em></div>
+                        <div class="pattern-ex"><b>all the</b> systems &middot; <b>both these</b> decks &middot; <b>half my</b> tapes</div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">кв. + <b>of</b> + определитель + сущ.</div>
+                        <div class="pattern-ex"><b>all of the</b> systems &middot; <b>both of these</b> decks &middot; <b>most of my</b> tapes<br><em style="color:rgba(255,255,255,0.42)">работает с: all, both, most, half, none, either, neither, each, some, many, much, more, one/two/three&hellip;<br>исключения (of нельзя): <b>every</b> и <b>no</b></em></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">кв. + <b>of</b> + местоимение</div>
+                        <div class="pattern-ex"><b>all of them</b> &middot; <b>both of these</b> &middot; <b>none of us</b></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">кв. + <b>one</b></div>
+                        <div class="pattern-ex"><b>each one</b> &middot; <b>either one</b> &middot; <b>every one</b> &middot; <b>each one of</b> the systems<br><em style="color:rgba(255,255,255,0.42)">только: either, neither, every, each, any</em></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">без существительного</div>
+                        <div class="pattern-ex"><b>Most</b> have two decks. &middot; <b>Some</b> sell food. &middot; <b>Two</b> have car parks.<br><em style="color:rgba(255,255,255,0.42)">можно все, кроме <b>every</b> и <b>no</b></em></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">местоимение + кв.</div>
+                        <div class="pattern-ex">I've heard it <b>all</b> before. &middot; We tested them <b>both</b>.<br><em style="color:rgba(255,255,255,0.42)">только all и both</em></div>
+                    </div>
+                    <div class="pattern-row">
+                        <div class="pattern-name">в середине (как наречие)</div>
+                        <div class="pattern-ex">We <b>all</b> agreed. &middot; They were <b>both</b> tested. &middot; The rabbits <b>all</b> died.<br><em style="color:rgba(255,255,255,0.42)">только all, both, each &mdash; ставятся туда же, где always/never</em></div>
+                    </div>
+                    <p class="mini-note">&#x26A0;&#xFE0F; <strong>most</strong> в середине предложения не бывает &mdash; там нужно наречие <strong>mostly</strong>:<br>
+                    <em>Package systems <strong>mostly</strong> have two cassette decks.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; Квантификатор без существительного</h3>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);">Если из контекста ясно, о чём речь &mdash; существительное можно не повторять.</p>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>Most</strong> have coffee shops.</td><td>= most department stores</td></tr>
+                        <tr><td><strong>Many</strong> also have hairdressing salons.</td><td>= <strong>Many of them</strong> also have&hellip;</td></tr>
+                        <tr><td><strong>A few</strong> are outside the West End.</td><td>&mdash;</td></tr>
+                        <tr><td><strong>A lot</strong> serve lunches.</td><td>&#x26A0;&#xFE0F; без of, если нет существительного!</td></tr>
+                        <tr><td><strong>A lot of them / of the stores</strong> serve lunches.</td><td>of &mdash; только с существительным/местоимением</td></tr>
+                        <tr><td>There are plenty <strong>to choose from</strong>.</td><td>plenty без of</td></tr>
+                        <tr><td>The area has millions of visitors, <strong>a large number</strong> arriving by car.</td><td>&mdash;</td></tr>
+                    </table>
+                    <p class="mini-note">&#x274C; <strong>every</strong> и <strong>no</strong> без существительного не работают:<br>
+                    <s>Every can choose its own half day.</s> &rarr; <em><strong>Each</strong> can choose its own half day.</em><br>
+                    <s>There is no.</s> &rarr; <em>There are <strong>none</strong>.</em><br>
+                    &#x1F4A1; <strong>all</strong> как местоимение звучит непривычно: обычно <em>They <strong>all</strong> open on Saturday</em>, а не <em>All open on Saturday</em>. Но с придаточным &mdash; нормально: <em><strong>All I know</strong> is&hellip; / <strong>All you need</strong> is love.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2795; another и some more &mdash; ещё</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><th>Тип</th><th>Слово</th><th>Пример</th></tr>
+                        <tr><td><span class="q-tag t-sg">SG</span></td><td><strong>another</strong></td><td>Have <strong>another</strong> sausage. ~ No thanks, I've had enough.</td></tr>
+                        <tr><td><span class="q-tag t-pl">PL</span></td><td><strong>some more</strong></td><td>Have <strong>some more</strong> beans. ~ Thank you.</td></tr>
+                        <tr><td><span class="q-tag t-un">UNC</span></td><td><strong>some more</strong></td><td>Have <strong>some more</strong> cheese. ~ Yes, I will.</td></tr>
+                    </table>
+                    <p class="mini-note"><strong>another</strong> пишется <em>одним словом</em> и имеет два значения:<br>
+                    &#x1F538; ещё один такой же: <em>We really need <strong>another</strong> car. One isn't enough for us.</em><br>
+                    &#x1F538; другой, не этот: <em>I'm going to sell this car and get <strong>another</strong> one.</em><br>
+                    В отрицаниях/вопросах вместо some more &rarr; <strong>any more</strong>: <em>There aren't <strong>any more</strong> sausages, I'm afraid.</em><br>
+                    Перед <strong>more</strong> можно: <em>a few more lessons, a lot more food, a little more effort, much more time.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; other / others / the other</h3>
+                    <table class="unit-table" style="margin-top:0.4rem;">
+                        <tr><td><strong>other</strong> = другой, иной</td><td>You're supposed to go out through the <strong>other</strong> door.</td></tr>
+                        <tr><td><strong>the other (one)</strong> = второй из двух</td><td>You take one bag and I'll take the <strong>other</strong> (one).</td></tr>
+                        <tr><td><strong>the others / the rest</strong> = все остальные</td><td>They ate half the sandwiches. <strong>The others</strong> were thrown away.</td></tr>
+                        <tr><td><strong>others</strong> = другие (не все)</td><td>Some pubs serve food, but <strong>others</strong> don't.</td></tr>
+                        <tr><td><strong>the other day/week</strong></td><td>= недавно: I saw Miranda <strong>the other day</strong>.</td></tr>
+                    </table>
+                    <p class="mini-note">&#x26A0;&#xFE0F; Когда существительное опускаем, во множественном добавляем <strong>-s</strong>:<br>
+                    <em>These letters are yours, and <strong>the others</strong> are mine.</em> (= the other ones)<br>
+                    &#x1F4CC; <strong>another</strong> + число + сущ. &mdash; даже если число больше одного:<br>
+                    <em>We decided to stay on for <strong>another three days</strong>.</em> = for three more days<br>
+                    <em>There are two <strong>other</strong> rooms / two more rooms / another two rooms upstairs.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5: QUIZ ============ -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Quiz &mdash; 14 вопросов</h2>
+                        <p class="lesson-header-sub">Выбери правильный квантификатор</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="quiz-question" data-answer="much">
+                        <p><strong>1.</strong> There isn't _____ traffic on a Sunday.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'many')">many</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'much')">much</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'few')">few</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="mostpeople">
+                        <p><strong>2.</strong> _____ want a quiet life. <em>(люди вообще)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'mostofpeople')">Most of people</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'mostpeople')">Most people</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'themostpeople')">The most people</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="afew">
+                        <p><strong>3.</strong> Don't worry, we've still got _____ minutes left.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'few')">few</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'afew')">a few</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'alittle')">a little</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="little">
+                        <p><strong>4.</strong> He has _____ interest in politics &mdash; he never votes.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'alittle')">a little</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'little')">little</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'afew')">a few</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="neither">
+                        <p><strong>5.</strong> I looked at two flats. _____ of them was big enough.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'none')">None</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'neither')">Neither</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'both')">Both</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="every">
+                        <p><strong>6.</strong> _____ student in the school got a certificate. <em>(все, их 400)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'all')">All</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'every')">Every</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'everyof')">Every of the</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="eachof">
+                        <p><strong>7.</strong> _____ the students has a personal tutor.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'everyof')">Every of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'eachof')">Each of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'eitherof')">Either of</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="thewhole">
+                        <p><strong>8.</strong> Did you watch _____ film?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'theall')">the all</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'allthe')">all the</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'thewhole')">the whole</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="some">
+                        <p><strong>9.</strong> Would you like _____ coffee? <em>(предлагаю)</em></p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'any')">any</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'some')">some</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'many')">many</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="any">
+                        <p><strong>10.</strong> I never have _____ spare time.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'some')">some</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'any')">any</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'no')">no</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="none">
+                        <p><strong>11.</strong> There are several routes. _____ of them are easy.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'no')">No</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'none')">None</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'neither')">Neither</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="alot">
+                        <p><strong>12.</strong> A: Do many people come here? &nbsp; B: Yes, _____ serve lunches too.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'alotof')">a lot of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'alot')">a lot</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'muchof')">much of</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="another">
+                        <p><strong>13.</strong> Have _____ sausage &mdash; there are plenty left.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'somemore')">some more</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'another')">another</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'anothers')">an other</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="somany">
+                        <p><strong>14.</strong> There were _____ people that we couldn't get in.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'soalotof')">so a lot of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'somany')">so many</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'somuch')">so much</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="q-score"></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        const Q_TOTAL = 14;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! ✅';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite ❌';
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('q-score');
+            if (qDone === Q_TOTAL) {
+                if (qScore === Q_TOTAL) scoreEl.innerHTML = '🌟 ' + qScore + '/' + Q_TOTAL + ' — Perfect!';
+                else if (qScore >= 11) scoreEl.innerHTML = '✅ ' + qScore + '/' + Q_TOTAL + ' — Great!';
+                else if (qScore >= 8)  scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' — Good, повтори вкладку «Всё / часть»';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' — пройди вкладки ещё раз 💪';
+                scoreEl.style.color = qScore >= 11 ? 'var(--color-green)' : qScore >= 8 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>
