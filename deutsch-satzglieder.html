@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satzglieder, Attribute und Satzbau | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    .ex { font-size:0.97rem; line-height:1.75; margin:0.5rem 0 0; }
+    .ex div { padding:0.12rem 0; }
+    .ex b { color:#fff; }
+    .why { color:rgba(230,230,235,0.6); font-size:0.86rem; margin-top:0.4rem; font-style:italic; }
+    .gray { color:rgba(230,230,235,0.55); }
+    .ok-l { color:#86efac; }
+    .no-l { color:#f85149; text-decoration:line-through; }
+    .arr { color:var(--color-accent); font-weight:700; }
+
+    /* Satzglied-Farben */
+    .sg { padding:0.1rem 0.35rem; border-radius:5px; font-weight:600; white-space:nowrap; }
+    .sg-p { background:rgba(244,114,182,0.18); color:#f9a8d4; }   /* Prädikat */
+    .sg-s { background:rgba(121,184,255,0.16); color:#93c5fd; }   /* Subjekt */
+    .sg-o { background:rgba(63,185,80,0.16);   color:#86efac; }   /* Objekt */
+    .sg-a { background:rgba(251,191,36,0.15);  color:#fcd34d; }   /* Adverbial */
+    .sg-t { background:rgba(167,139,250,0.16); color:#c4b5fd; }   /* Attribut */
+
+    .legend { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.6rem; font-size:0.82rem; }
+
+    /* Satzbau-Zeile */
+    .row { display:flex; flex-wrap:wrap; gap:0.45rem; align-items:baseline; margin:0.35rem 0;
+           font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.95rem; }
+
+    /* Satzklammer */
+    .klammer { display:inline-block; border-top:2px solid var(--color-accent); border-left:2px solid var(--color-accent);
+               border-right:2px solid var(--color-accent); border-radius:6px 6px 0 0; padding:0.15rem 0.4rem 0;
+               margin-top:0.9rem; position:relative; }
+    .klammer::before { content:'Satzklammer'; position:absolute; top:-1.05rem; left:50%; transform:translateX(-50%);
+                       font-size:0.65rem; color:var(--color-accent); letter-spacing:0.07em; text-transform:uppercase;
+                       font-family:inherit; white-space:nowrap; }
+
+    .sl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px;
+               border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.sl { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:460px; }
+    table.sl th { background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+                  text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.sl td { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top;
+                  color:rgba(230,230,235,0.82); }
+    table.sl td b { color:#fff; }
+    table.sl tbody tr:hover { background:rgba(255,255,255,0.035); }
+
+    /* Trainer */
+    .tr-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tr-sent { font-size:1.15rem; color:#fff; text-align:center; margin:0.3rem 0; line-height:1.8; }
+    .tr-sent u { text-decoration:none; background:rgba(244,114,182,0.2); border-bottom:2px solid var(--color-accent);
+                 padding:0.1rem 0.3rem; border-radius:4px; }
+    .tr-sub { text-align:center; color:rgba(230,230,235,0.5); font-size:0.85rem; margin-bottom:1rem; }
+    .tr-opts { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.5rem; max-width:640px; margin:0 auto; }
+    .tr-opt { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); border-radius:9px;
+              padding:0.65rem 0.8rem; color:#fff; font-size:0.92rem; font-weight:600; cursor:pointer;
+              font-family:inherit; transition:all .15s; }
+    .tr-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(244,114,182,0.1); }
+    .tr-opt.good { background:rgba(63,185,80,0.2); border-color:#86efac; color:#86efac; }
+    .tr-opt.bad  { background:rgba(248,81,73,0.18); border-color:#f85149; color:#f85149; }
+    .tr-opt:disabled { cursor:default; }
+    .tr-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-fb { margin-top:0.9rem; font-size:0.95rem; min-height:2.8rem; text-align:center; line-height:1.6; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; line-height:1.5; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; line-height:1.55; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+
+    @media (max-width:640px) { .tr-sent { font-size:0.98rem; } .row { font-size:0.85rem; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Satzglieder</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Satzglieder, Attribute und Satzbau</h1>
+            <p class="page-subtitle">Aus welchen Teilen besteht ein deutscher Satz — und warum steht was wo · по PONS «Die große Grammatik»</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="glieder">&#x1F9E9; 4 Satzglieder</button>
+            <button class="tab" data-tab="proben">&#x1F52C; Die zwei Proben</button>
+            <button class="tab" data-tab="attribute">&#x1F3F7;&#xFE0F; Attribute</button>
+            <button class="tab" data-tab="bau">&#x1F3D7;&#xFE0F; Satzbau</button>
+            <button class="tab" data-tab="arten">&#x2753; Satzarten</button>
+            <button class="tab" data-tab="gefuege">&#x1F517; Reihe &amp; Gefüge</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="uebungen">&#x270D;&#xFE0F; Übungen</button>
+        </div>
+
+        <!-- ==================== SATZGLIEDER ==================== -->
+        <div class="tab-content active" id="tab-glieder">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Vier Satzglieder — mehr gibt es nicht</h2>
+                        <p class="lesson-header-sub">Prädikat · Subjekt · Objekt · Adverbial. Всё остальное — детали внутри них</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Wort ≠ Satzglied</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        Член предложения может состоять из <strong>одного слова или целой группы</strong>.
+                        Группа передвигается по предложению <strong>только целиком</strong> — это и есть определение члена предложения.
+                    </p>
+                    <div class="row" style="margin-top:0.8rem;">
+                        <span class="sg sg-s">Der Journalist</span>
+                        <span class="sg sg-p">schreibt</span>
+                        <span class="sg sg-o">den langen Bericht</span>
+                        <span class="sg sg-a">in größter Eile</span>.
+                    </div>
+                    <div class="legend">
+                        <span class="sg sg-p">Prädikat</span>
+                        <span class="sg sg-s">Subjekt</span>
+                        <span class="sg sg-o">Objekt</span>
+                        <span class="sg sg-a">Adverbial</span>
+                        <span class="sg sg-t">Attribut (kein Satzglied!)</span>
+                    </div>
+                    <p class="why">Слово <em>langen</em> само по себе двигаться не может — оно прилипло к <em>Bericht</em>.
+                    Значит это <b>Attribut</b>, часть члена предложения, а не отдельный член.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; Satzgliedfragen — как найти каждый</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Satzglied</th><th>Frage</th><th>Beispiel</th></tr>
+                        <tr><td><span class="sg sg-p">Prädikat</span></td><td>Was tut das Subjekt? / Was geschieht?</td>
+                            <td>Die Theater-AG <b>probt</b> ein Stück. · Die Kulisse <b>wackelt</b>.</td></tr>
+                        <tr><td><span class="sg sg-s">Subjekt</span> <span class="gray">(Nominativ)</span></td><td>Wer? / Was?</td>
+                            <td><b>Herr Martin</b> trägt heute Zeitungen aus.</td></tr>
+                        <tr><td><span class="sg sg-o">Akkusativobjekt</span></td><td>Wen? / Was?</td>
+                            <td>Patrick deckt <b>den Tisch</b>.</td></tr>
+                        <tr><td><span class="sg sg-o">Dativobjekt</span></td><td>Wem?</td>
+                            <td>Patrick hilft <b>seinem Vater</b>.</td></tr>
+                        <tr><td><span class="sg sg-o">Genitivobjekt</span></td><td>Wessen?</td>
+                            <td>Er war sich <b>seiner Schuld</b> bewusst.</td></tr>
+                        <tr><td><span class="sg sg-o">Präpositionalobjekt</span></td><td>An wen? Worauf? …</td>
+                            <td>Sie legt den Zettel <b>auf den Tisch</b>.</td></tr>
+                        <tr><td><span class="sg sg-a">Temporaladverbial</span></td><td>Wann? Wie lange?</td>
+                            <td>Ich mache es <b>jetzt</b>.</td></tr>
+                        <tr><td><span class="sg sg-a">Modaladverbial</span></td><td>Wie? Auf welche Weise?</td>
+                            <td>Ich mache es <b>so</b>.</td></tr>
+                        <tr><td><span class="sg sg-a">Lokaladverbial</span></td><td>Wo? Wohin?</td>
+                            <td>Ich mache es <b>dort</b>.</td></tr>
+                        <tr><td><span class="sg sg-a">Kausaladverbial</span></td><td>Warum? Wozu?</td>
+                            <td>Ich mache es <b>deshalb</b>.</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2699;&#xFE0F; Das Prädikat — сердце предложения</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Всегда содержит <strong>спрягаемую форму глагола (Personalform)</strong>, которая согласуется с подлежащим (Kongruenz).
+                    </p>
+                    <div class="ex">
+                        <div><b>Einteilig:</b> Sie <span class="sg sg-p">kauft</span> nur Röcke. · Die Tasche <span class="sg sg-p">liegt</span> auf dem Tisch.</div>
+                        <div style="margin-top:0.4rem;"><b>Mehrteilig:</b></div>
+                        <div style="padding-left:0.8rem;">Sven <span class="sg sg-p">hat</span> sich gut <span class="sg sg-p">vorbereitet</span>. <span class="gray">(Perfekt)</span></div>
+                        <div style="padding-left:0.8rem;">Die Kulisse <span class="sg sg-p">wird</span> <span class="sg sg-p">aufgebaut</span>. <span class="gray">(Passiv)</span></div>
+                        <div style="padding-left:0.8rem;">Das Ensemble <span class="sg sg-p">wird</span> viel Beifall <span class="sg sg-p">ernten</span>. <span class="gray">(Futur I)</span></div>
+                        <div style="padding-left:0.8rem;">Ich <span class="sg sg-p">möchte</span> beim nächsten Stück <span class="sg sg-p">mitspielen</span>. <span class="gray">(Modalverb + Infinitiv)</span></div>
+                        <div style="padding-left:0.8rem;">Alle Schauspieler <span class="sg sg-p">räumen</span> die Aula <span class="sg sg-p">auf</span>. <span class="gray">(trennbares Verb)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; Das Prädikativ — особый случай</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        После глаголов <strong>sein, werden, bleiben, scheinen, heißen, nennen</strong> идёт обязательное дополнение к сказуемому.
+                        Убрать нельзя — предложение развалится.
+                    </p>
+                    <div class="ex">
+                        <div><span class="sg sg-s">Dieser Käfer</span> <span class="sg sg-p">ist</span> <b>winzig</b>. &nbsp;
+                            <span class="no-l">Es ist.</span> <span class="gray">← без Prädikativ бессмыслица</span></div>
+                        <div style="margin-top:0.4rem;">Peter wird <b>Anwalt</b>. <span class="gray">(Nomen → prädikativer Nominativ)</span></div>
+                        <div>Das Mädchen ist <b>groß</b>. <span class="gray">(Adjektiv)</span></div>
+                        <div>All seine Mühen waren <b>vergebens</b>. <span class="gray">(Adverb)</span></div>
+                    </div>
+                    <p class="why">&#x1F4A1; <b>Prädikativer Nominativ</b> — второе слово в именительном падеже, но это не подлежащее:<br>
+                    <em>Mein Bruder heißt <b>Felix</b>.</em> · <em>Überstunden bleiben <b>die Ausnahme</b>.</em><br>
+                    Формально это дополнение к сказуемому, но по смыслу описывает подлежащее.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D0; Drei Satztypen</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Typ</th><th>Was drin ist</th><th>Beispiel</th></tr>
+                        <tr><td><b>einfacher Satz</b></td><td>только необходимые члены</td>
+                            <td>Der Journalist schreibt. · Er holt einen Kaffee.</td></tr>
+                        <tr><td><b>erweiterter Satz</b></td><td>+ Adverbiale und Attribute</td>
+                            <td>Der <span class="sg sg-t">fleißige</span> Journalist schreibt den <span class="sg sg-t">langen</span> Bericht <span class="sg sg-a">in größter Eile</span>.</td></tr>
+                        <tr><td><b>komplexer Satz</b></td><td>несколько предложений вместе</td>
+                            <td>Satzreihe (два главных) или Satzgefüge (главное + придаточное)</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== PROBEN ==================== -->
+        <div class="tab-content" id="tab-proben">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F52C;</span>
+                    <div>
+                        <h2>Die zwei Proben</h2>
+                        <p class="lesson-header-sub">Два практических приёма, чтобы разобрать любое длинное предложение</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>1 · Ersatzprobe — замени группу одним словом</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Слова, которые заменяются <strong>одним словом того же типа</strong>, — это один член предложения.
+                        Сказуемое не трогаем.
+                    </p>
+                    <div class="row"><span class="sg sg-s">Der Journalist</span> <span class="sg sg-p">schreibt</span>
+                        <span class="sg sg-o">den langen Bericht</span> <span class="sg sg-a">während der Konferenz</span>.</div>
+                    <div class="row" style="color:var(--color-accent)">&darr; &nbsp; &darr; &nbsp; &darr; &nbsp; &darr;</div>
+                    <div class="row"><span class="sg sg-s">Er</span> <span class="sg sg-p">schreibt</span>
+                        <span class="sg sg-o">ihn</span> <span class="sg sg-a">währenddessen</span>.</div>
+                    <p class="why">Сокращённое предложение содержит <b>ровно столько же</b> членов — только оно обозримее.
+                    Так проверяют, сколько членов на самом деле в предложении.</p>
+
+                    <div class="note-card" style="margin-top:0.8rem;">
+                        <h3>Пример посложнее</h3>
+                        <div class="row">Der wütend gewordene Stier durchstieß mit seinen spitzen Hörnern bereits nach fünf Minuten den verrosteten Maschendrahtzaun.</div>
+                        <div class="sl-wrap">
+                        <table class="sl">
+                            <tr><th>Subjekt</th><th>Prädikat</th><th>Modaladv.</th><th>Temporaladv.</th><th>Objekt</th></tr>
+                            <tr><td>Der wütend gewordene Stier</td><td>durchstieß</td><td>mit seinen spitzen Hörnern</td>
+                                <td>bereits nach fünf Minuten</td><td>den verrosteten Maschendrahtzaun</td></tr>
+                            <tr><td><b>Er</b></td><td>durchstieß</td><td><b>damit</b></td><td><b>dann</b></td><td><b>ihn</b></td></tr>
+                        </table>
+                        </div>
+                        <p class="why">Пять членов предложения. Атрибуты (<em>wütend gewordene</em>, <em>spitzen</em>, <em>verrosteten</em>)
+                        исчезли вместе со своими группами — значит они не самостоятельные члены.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>2 · Umstellprobe — передвинь группу</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Ставь разные группы перед спрягаемым глаголом. Что двигается <strong>вместе и не разваливается</strong> — один член.
+                        <strong>Сказуемое при этом остаётся на втором месте.</strong>
+                    </p>
+                    <div class="ex">
+                        <div><span class="sg sg-s">Der Journalist</span> <span class="sg sg-p">schreibt</span> <span class="sg sg-o">den langen Bericht</span> <span class="sg sg-a">in der Nacht</span>.</div>
+                        <div><span class="sg sg-a">In der Nacht</span> <span class="sg sg-p">schreibt</span> <span class="sg sg-s">der Journalist</span> <span class="sg sg-o">den langen Bericht</span>.</div>
+                        <div><span class="sg sg-o">Den langen Bericht</span> <span class="sg sg-p">schreibt</span> <span class="sg sg-s">der Journalist</span> <span class="sg sg-a">in der Nacht</span>.</div>
+                        <div><span class="sg sg-s">Der Journalist</span> <span class="sg sg-p">schreibt</span> <span class="sg sg-a">in der Nacht</span> <span class="sg sg-o">den langen Bericht</span>.</div>
+                    </div>
+                    <p class="why">А так — нельзя, потому что группа разорвана:</p>
+                    <div class="ex">
+                        <div class="no-l">Seinen langen schreibt der Journalist Bericht sofort.</div>
+                        <div class="no-l">Der schreibt Journalist den langen Bericht während der Konferenz.</div>
+                        <div class="no-l">Während schreibt der Journalist den langen Bericht der Konferenz.</div>
+                    </div>
+                    <p class="why">Артикли, предлоги и прилагательные-атрибуты <b>сами по себе не двигаются</b> — они всегда часть чего-то большего.</p>
+                </div>
+
+                <div class="note-card" style="background:rgba(121,184,255,0.07); border-color:rgba(121,184,255,0.3);">
+                    <h3 style="color:#79b8ff;">&#x1F4A1; Nebensatz = ein Satzglied</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Целое придаточное предложение может занимать место <strong>одного члена</strong>. Проверяется той же Ersatzprobe:
+                    </p>
+                    <div class="ex">
+                        <div><b>Dass weitere Stücke einstudiert werden sollen</b>, begrüßt er.</div>
+                        <div><span class="arr">&rarr;</span> <b>Das</b> begrüßt er. <span class="gray">— значит придаточное здесь = Akkusativobjekt</span></div>
+                    </div>
+                    <p class="why">Поэтому в Satzgefüge с придаточным впереди сказуемое всё равно стоит <b>на втором месте</b> —
+                    первое место занято целым придаточным.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ATTRIBUTE ==================== -->
+        <div class="tab-content" id="tab-attribute">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3F7;&#xFE0F;</span>
+                    <div>
+                        <h2>Attribute</h2>
+                        <p class="lesson-header-sub">Beifügungen — не члены предложения, а «начинка» внутри них</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Was ein Attribut ist</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        Attribut почти всегда относится к <strong>существительному</strong> и уточняет его.
+                        Отвечает на вопрос <strong>was für ein …?</strong><br>
+                        Ключевое: атрибут <strong>не член предложения</strong> — он всегда едет вместе со своим словом.
+                    </p>
+                    <div class="ex">
+                        <div>Das <span class="sg sg-t">hübsche</span> Mädchen liest ein <span class="sg sg-t">spannendes</span> Buch.</div>
+                    </div>
+                    <p class="why">Предложение можно раздувать атрибутами сколько угодно — число членов от этого не меняется:</p>
+                    <div class="ex">
+                        <div>Der Journalist schreibt seine Berichte mit einem Kuli. <span class="gray">(4 Satzglieder)</span></div>
+                        <div>Der <span class="sg sg-t">fleißige</span> Journalist schreibt seine <span class="sg sg-t">äußerst brisanten</span> Berichte
+                            mit einem <span class="sg sg-t">roten</span> Kuli. <span class="gray">(immer noch 4 Satzglieder)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Alle acht Arten</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Art</th><th>Stellung</th><th>Beispiel</th></tr>
+                        <tr><td><b>Adjektivattribut</b></td><td>vor dem Nomen, dekliniert</td>
+                            <td>Das ist ein <b>großer</b> Teich. · Mein <b>kleiner</b> Bruder hat den <b>öden</b> Film gesehen.</td></tr>
+                        <tr><td><b>Partizipattribut</b></td><td>vor dem Nomen, dekliniert</td>
+                            <td>die <b>wartende</b> Frau (Partizip I) · die <b>geöffnete</b> Tür (Partizip II) ·
+                                Die <b>geflohenen</b> Menschen lebten unter <b>alarmierenden</b> Zuständen.</td></tr>
+                        <tr><td><b>Genitivattribut</b></td><td>meist hinter dem Nomen</td>
+                            <td>der Herr <b>der Ringe</b> · das Auto <b>meines großen Bruders</b> · die Ufer <b>des Sees</b></td></tr>
+                        <tr><td><b>Präpositionalattribut</b></td><td>hinter dem Nomen</td>
+                            <td>Die Lampe <b>über unserem Bett</b> funktioniert nicht. · Ein Haus <b>mit Garten</b>.</td></tr>
+                        <tr><td><b>Adverbialattribut</b></td><td>meist hinter dem Nomen</td>
+                            <td>Sie gehen die erste Straße <b>links</b>. · Der Baum <b>hier</b> ist alt. ·
+                                <span class="gray">vorangestellt:</span> Er spielt <b>rechts</b> außen. · Das Dorf liegt <b>weit</b> unten.</td></tr>
+                        <tr><td><b>Infinitivattribut</b></td><td>hinter dem Nomen, mit <em>zu</em></td>
+                            <td>die Kunst <b>zu schweigen</b> · die Fähigkeit <b>zu lieben</b></td></tr>
+                        <tr><td><b>Pronomen / Zahlwort</b></td><td>meist davor</td>
+                            <td><b>Mein</b> Vater schimpft immer. · <b>Dieser</b> Mensch hat kein Herz. ·
+                                Er hat den <b>zweiten</b> Platz errungen. · <b>Dreißig</b> Schüler sind zu viel. ·
+                                <span class="gray">danach:</span> Die Startnummer <b>zwei</b> liegt vorn.</td></tr>
+                        <tr><td><b>Attributsatz</b> (Relativsatz)</td><td>hinter dem Nomen</td>
+                            <td>Der Teich, <b>den die Frösche lieben</b>, ist eine Attraktion. ·
+                                Er betrachtet den Affen, <b>der im Käfig herumturnt</b>.</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Gleichrangig oder nicht? — und damit: Komma oder nicht?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Когда прилагательных несколько, надо решить, <strong>равноправны</strong> ли они. Тест: подставь <em>und</em>.
+                    </p>
+                    <div class="ex">
+                        <div><span class="ok-l">gleichrangig</span> → Komma:<br>
+                            eine ungemütliche<b>,</b> enge Kammer <span class="gray">= ungemütlich <em>und</em> eng ✓</span><br>
+                            warmes<b>,</b> sonniges Wetter <span class="gray">= warm <em>und</em> sonnig ✓</span><br>
+                            die einfache<b>,</b> logische Grammatik</div>
+                        <div style="margin-top:0.5rem;"><span class="no-l" style="text-decoration:none; color:#f85149">nicht gleichrangig</span> → kein Komma:<br>
+                            ein bekannter deutscher Dichter <span class="gray">= не «bekannt und deutsch» — это «deutscher Dichter», который известен</span><br>
+                            die allgemeine politische Lage</div>
+                    </div>
+                    <p class="why">Логика: во втором случае прилагательное срослось с существительным в одну <b>Nominalgruppe</b>
+                    (<em>deutscher Dichter</em>), а первое описывает уже всю группу целиком.
+                    Подробнее про запятую — на странице <a href="deutsch-zeichensetzung.html" style="color:var(--color-accent)">Zeichensetzung</a>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C8; Erweiterung von Attributen</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Сам атрибут можно расширить — но без него расширение стоять не может:</p>
+                    <div class="ex">
+                        <div>eine <b>schöne</b> Geschichte <span class="arr">&rarr;</span> eine <b>sehr schöne</b> Geschichte
+                            &nbsp;<span class="no-l">eine sehr Geschichte</span></div>
+                        <div>ein <b>geplanter</b> Ausflug <span class="arr">&rarr;</span> ein <b>schlecht geplanter</b> Ausflug
+                            &nbsp;<span class="no-l">ein schlecht Ausflug</span></div>
+                        <div>Dieser <b>von allen immer wieder erwähnte</b> Aspekt bleibt wichtig.</div>
+                    </div>
+                    <p class="why">Иногда расширение <b>обязательно</b> (notwendige Erweiterung) — прилагательное или причастие его требует:<br>
+                    <em>der <b>des Lesens</b> mächtige Schüler</em> <span class="no-l">der mächtige Schüler</span> ·
+                    <em>die <b>auf den Tisch</b> gestellte Vase</em> <span class="no-l">die gestellte Vase</span></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Nachstellung — стилистический приём</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Прилагательные и причастия можно поставить <strong>после</strong> существительного — тогда они
+                        <strong>не склоняются</strong> и берутся в запятые. Встречается в литературе.
+                    </p>
+                    <div class="ex">
+                        <div>Ein <b>alter und reicher</b> Mann nahm sich eine junge Geliebte.</div>
+                        <div><span class="arr">&rarr;</span> Ein Mann<b>, alt und reich,</b> nahm sich eine junge Geliebte.</div>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Нужны <b>минимум два</b> прилагательных или уточнение — иначе так нельзя:<br>
+                    <span class="no-l">Die Geliebte, jung, war genau nach seinem Geschmack.</span><br>
+                    <span class="ok-l">✓</span> Die Geliebte, <b>21 Jahre alt</b>, war genau nach seinem Geschmack.<br>
+                    <span class="ok-l">✓</span> Die Geliebte, <b>von Kind an verwöhnt</b>, spekulierte auf seinen frühen Tod.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F464; Die Apposition</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Особый атрибут: <strong>второе название того же самого</strong>. Стоит после существительного, в запятых,
+                        и — уникальное свойство — <strong>может заменить</strong> своё опорное слово.
+                    </p>
+                    <div class="ex">
+                        <div><u>Herr Hammer</u>, <b>der Leiter der Fabrik</b>, geht in Rente.</div>
+                        <div><span class="arr">&rarr;</span> Herr Hammer geht in Rente. <span class="gray">(Apposition weg — Satz bleibt korrekt)</span></div>
+                        <div><span class="arr">&rarr;</span> <b>Der Leiter der Fabrik</b> geht in Rente. <span class="gray">(Apposition ersetzt das Bezugswort!)</span></div>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><strong>Падеж — как у опорного слова:</strong></p>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Bezug</th><th>Kasus</th><th>Beispiel</th></tr>
+                        <tr><td>zum Subjekt</td><td>Nominativ</td><td>Meine Wohnung, <b>ein Neubau</b>, gefällt mir sehr.</td></tr>
+                        <tr><td>zum Akkusativobjekt</td><td>Akkusativ</td><td>Ich liebe die Natur, <b>die größte Kostbarkeit der Welt</b>.</td></tr>
+                        <tr><td>zum Präpositionalobjekt</td><td>wie das Objekt</td><td>Ich freue mich auf den Mai, <b>den allerschönsten Monat</b>.</td></tr>
+                        <tr><td>ohne Artikel</td><td>immer Nominativ!</td><td>Die Stellungnahme Herrn Fleißigs, <b>Direktor der Tüchtig-Werke</b>, wird erwartet.</td></tr>
+                        <tr><td>mit Artikel</td><td>echter Kasus</td><td>Die Stellungnahme Herrn Fleißigs, <b>des Direktors der Tüchtig-Werke</b>, wird erwartet.</td></tr>
+                        <tr><td>Datumsangabe</td><td>Dativ <em>oder</em> Akkusativ</td>
+                            <td>Ich feiere am Sonntag, <b>dem 29. Februar</b>. / Mein Geburtstag ist am Sonntag, <b>den 29. Februar</b>.</td></tr>
+                    </table>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><strong>Vorangestellte Apposition</strong> — стоит впереди:</p>
+                    <div class="ex">
+                        <div><b>Gottfried</b> Benn <span class="gray">(Vorname)</span> · <b>Oma</b> Anna <span class="gray">(Verwandtschaft)</span> ·
+                            <b>Lehrer</b> Lämpel <span class="gray">(Beruf)</span> · <b>Doktor</b> Weber <span class="gray">(Titel)</span> ·
+                            <b>Frau</b> Höfler <span class="gray">(Anrede)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card" style="background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3);">
+                    <h3 style="color:#f85149;">&#x26A0;&#xFE0F; Drei klassische Verwechslungen</h3>
+
+                    <p style="font-size:0.95rem; margin-top:0.5rem;"><b>1. Attributsatz oder Apposition?</b></p>
+                    <div class="ex">
+                        <div><b>Attributsatz</b> — есть сказуемое и вводное слово:<br>
+                            Der Herrscher, <b>der ein fürchterlicher Tyrann <u>ist</u></b>, unterdrückt sein Volk.</div>
+                        <div><b>Apposition</b> — нет сказуемого, ничем не вводится:<br>
+                            Der Herrscher, <b>ein fürchterlicher Tyrann</b>, unterdrückt sein Volk.</div>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><b>2. Apposition oder Aufzählung?</b> — от запятой меняется смысл!</p>
+                    <div class="ex">
+                        <div>Lisa<b>,</b> meine Schwester<b>,</b> und ich gehen ins Kino. <span class="gray">→ Apposition: <b>2 Personen</b></span></div>
+                        <div>Lisa<b>,</b> meine Schwester und ich gehen ins Kino. <span class="gray">→ Aufzählung: <b>3 Personen</b></span></div>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><b>3. Genitivattribut oder Genitivobjekt?</b> — проверяется передвижением</p>
+                    <div class="ex">
+                        <div><b>Genitivattribut</b> — от опорного слова не оторвать:<br>
+                            Die Scheibe <b>des Autos</b> war beschmiert. &nbsp;<span class="no-l">Des Autos war die Scheibe beschmiert.</span></div>
+                        <div><b>Genitivobjekt</b> — самостоятельный член, двигается:<br>
+                            Er gedachte mit Reue <b>seiner vielen Straftaten</b>. &nbsp;
+                            <span class="ok-l">✓</span> <b>Seiner vielen Straftaten</b> gedachte er mit Reue.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F1E9;&#x1F1EA; Genitiv — nicht Dativ!</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        В южнонемецкой разговорной речи говорят <em>dem Toni seine Frau</em>. В письменной речи так нельзя:
+                    </p>
+                    <div class="ex">
+                        <div class="no-l">dem Toni seine Frau</div>
+                        <div><span class="ok-l">✓</span> <b>Tonis Frau</b> <span class="gray">(Genitivattribut, vorangestellt)</span></div>
+                        <div><span class="ok-l">✓</span> <b>die Frau von Toni</b> <span class="gray">(nachgestelltes Attribut mit von + Dativ)</span></div>
+                    </div>
+                    <p class="why">Впереди Genitivattribut ставится только при именах: <em><b>Schillers</b> Werke</em> · <em><b>Annes</b> Eltern</em>.
+                    В остальных случаях звучит архаично: <em>des Kaisers neue Kleider</em>.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== SATZBAU ==================== -->
+        <div class="tab-content" id="tab-bau">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3D7;&#xFE0F;</span>
+                    <div>
+                        <h2>Satzbaupläne</h2>
+                        <p class="lesson-header-sub">Глагол решает, сколько мест в предложении и где что стоит</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Valenz — «валентность» глагола</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        Каждый глагол заранее «знает», сколько при нём должно быть членов предложения.
+                    </p>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Wertigkeit</th><th>braucht</th><th>Beispiel</th></tr>
+                        <tr><td><b>einwertig</b> (intransitiv)</td><td>nur Subjekt</td>
+                            <td>Ich gähne. &nbsp;<span class="no-l">Ich gähne dir eine Müdigkeit.</span><br>
+                                <span class="gray">gehen, schlafen, schwimmen, sitzen, steigen</span></td></tr>
+                        <tr><td><b>zweiwertig</b></td><td>Subjekt + <b>ein</b> Objekt</td>
+                            <td>Diese Sache bedarf <b>einer Prüfung</b>. <span class="gray">(Genitiv)</span><br>
+                                Dieses Buch gehört <b>meinem Freund</b>. <span class="gray">(Dativ)</span><br>
+                                Sie benutzt <b>einen Computer</b>. <span class="gray">(Akkusativ)</span></td></tr>
+                        <tr><td><b>dreiwertig</b></td><td>Subjekt + <b>zwei</b> Objekte</td>
+                            <td>Lisa gibt <b>ihrem Freund</b> <b>einen Rat</b>. <span class="gray">(Dat + Akk)</span><br>
+                                Frau Beier bezichtigt <b>Herrn Hesse</b> <b>der Lüge</b>. <span class="gray">(Akk + Gen)</span></td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x1F534; Все <b>переходные (transitive)</b> глаголы — минимум двухвалентные, так как допускают Akkusativobjekt.</p>
+                    <p class="why">Одно и то же слово может менять валентность вместе со смыслом:<br>
+                    <em>Du <b>spinnst</b> wohl!</em> (= verrückt sein, einwertig) ↔ <em>Die Spinne <b>spinnt</b> ihr Netz.</em> (zweiwertig)<br>
+                    Так же: angehen · kochen · rollen · liegen</p>
+                    <p class="why">&#x1F4A1; Adverbiale можно добавлять <b>сколько угодно</b> — на валентность они не влияют:
+                    <em>Ich gähne <b>zum dritten Mal</b> <b>bei diesem langweiligen Film</b>.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; Die drei Stellungen des Prädikats</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Stellung</th><th>wo</th><th>welche Sätze</th><th>Beispiel</th></tr>
+                        <tr><td><b>Zweitstellung</b></td><td>2. Platz</td><td>Aussagesatz · Ergänzungsfrage · uneingeleiteter Objekt-/Subjektsatz</td>
+                            <td>Er <b>kommt</b> heute zu dir. · Wer <b>kommt</b> heute zu dir? · [Ich denke,] er <b>kommt</b> heute zu dir.</td></tr>
+                        <tr><td><b>Erststellung</b></td><td>1. Platz</td><td>Entscheidungsfrage · Aufforderung · uneingeleiteter Bedingungssatz</td>
+                            <td><b>Kommt</b> er heute zu dir? · <b>Komm</b> doch endlich! · <b>Habe</b> ich Zeit, komme ich heute.</td></tr>
+                        <tr><td><b>Letztstellung</b></td><td>am Ende</td><td>eingeleiteter Nebensatz</td>
+                            <td>Ich denke, dass er heute <b>kommt</b>.</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Считаются <b>члены предложения</b>, а не слова:
+                    <em>Der kleine Junge <b>|| geht ||</b> in die Schule.</em> — «geht» на втором месте, хотя перед ним три слова.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; Die Satzklammer</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Спрягаемая часть и остальные части сказуемого <strong>обнимают</strong> остальное предложение.
+                        Это и есть немецкая рамка.
+                    </p>
+                    <div class="ex">
+                        <div><b>trennbare Verben:</b> Ich <span class="klammer">weise dich höflich auf deinen Fehler hin</span>.</div>
+                        <div style="margin-top:0.8rem;"><b>Modalverben:</b> Der Chef <span class="klammer">kann ihre Probleme gut verstehen</span>.</div>
+                        <div style="margin-top:0.8rem;"><b>zusammengesetzte Zeiten:</b> Er <span class="klammer">wird wie immer zu viel Bier getrunken haben</span>.</div>
+                        <div style="margin-top:0.8rem;"><b>Passiv:</b> Das Kind <span class="klammer">wurde sofort ins Krankenhaus eingeliefert</span>.</div>
+                    </div>
+                    <p class="why">Сказуемое может состоять из <b>четырёх</b> частей — Passiv в Konjunktiv Plusquamperfekt с модальным глаголом:</p>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Subjekt</th><th>1. Teil</th><th></th><th>2. Teil</th><th>3. Teil</th><th>4. Teil</th></tr>
+                        <tr><td>Er</td><td><b>hätte</b><br><span class="gray">Hilfsverb</span></td><td>längst</td>
+                            <td><b>bestraft</b><br><span class="gray">Partizip</span></td><td><b>werden</b><br><span class="gray">Hilfsverb</span></td>
+                            <td><b>sollen</b><br><span class="gray">Modalverb</span></td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2702;&#xFE0F; Die Ausklammerung</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Если рамка становится слишком широкой, придаточные <strong>выносят за неё</strong> — так читать легче.
+                    </p>
+                    <div class="ex">
+                        <div><b>Weit:</b> Die Räuber <b>ließen</b>, nachdem sie von den Soldaten des Königs entdeckt worden waren, ihre Waffen <b>fallen</b>
+                            und <b>traten</b>, ohne sich noch einmal umzudrehen, den Rückzug <b>an</b>.</div>
+                        <div style="margin-top:0.6rem;"><b>Ausgeklammert (besser lesbar):</b> Die Räuber <b>ließen</b> ihre Waffen <b>fallen</b>,
+                            nachdem sie von den Soldaten des Königs entdeckt worden waren, und <b>traten</b> den Rückzug <b>an</b>,
+                            ohne sich noch einmal umzudrehen.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F522; Reihenfolge der Prädikatsteile im Nebensatz</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Обычно спрягаемая часть в конце:</p>
+                    <div class="ex">
+                        <div>Wir sind froh, dass der Einbrecher nichts Wertvolles entwenden <b>konnte</b>.</div>
+                        <div>…, weil der Zug nicht rechtzeitig losgefahren <b>ist</b>. · …, dass er darüber nachdenken <b>muss</b>.</div>
+                        <div>…, weil der Tisch noch nicht gedeckt worden <b>ist</b>. <span class="gray">(Passiv)</span></div>
+                    </div>
+                    <p class="why">&#x1F534; <b>Но:</b> если придаточное вводится союзом, стоит в сложном времени
+                    <b>и</b> содержит смысловой глагол + модальный — спрягаемая часть уходит <b>вперёд</b> обоих инфинитивов:</p>
+                    <div class="ex">
+                        <div>Elisabeth freut sich, dass sie die Termine <b>hat</b> halten können.</div>
+                        <div>Er hat sich wohl geschämt, weil er nicht <b>hat</b> mithelfen wollen.</div>
+                        <div>Ich bin nach Hause gegangen, obwohl ich noch <b>hätte</b> arbeiten müssen.</div>
+                        <div>Robert hat festgestellt, dass er so nicht mehr <b>wird</b> weiterarbeiten können.</div>
+                        <div>Der Chef sagt, dass die Vorhänge längst <b>hätten</b> gereinigt werden müssen. <span class="gray">(Passiv)</span></div>
+                    </div>
+                    <p class="why">Неспрягаемые модальные глаголы стоят в придаточном <b>в конце</b>:<br>
+                    <em>Es macht nachdenklich, dass das Land keinen Beitrag mehr wird leisten <b>können</b>.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; Wo steht was? — Stellungsregeln</h3>
+
+                    <p style="font-size:0.95rem; margin-top:0.5rem;"><b>Subjekt</b></p>
+                    <div class="ex">
+                        <div>При глаголе на 2 месте — подлежащее на <b>1-м</b> или сразу <b>после</b> глагола (3-е место):<br>
+                            <b>Er</b> schreibt ein Buch. · Ein umfangreiches Buch schreibt <b>er</b>. · Morgen schreibt <b>er</b> ein Buch.</div>
+                        <div>При глаголе на 1 месте — подлежащее сразу за ним: Schreibt <b>er</b> ein Buch?</div>
+                        <div>В придаточном — сразу за вводным словом: …, dass <b>er</b> ein Buch schreibt.</div>
+                    </div>
+                    <p class="why">Если подлежащее — <b>существительное</b> (не местоимение), его могут обогнать местоимения-дополнения:<br>
+                    <em>Morgen gibt <b>der Mann</b> es ihr.</em> · <em>Morgen gibt es <b>der Mann</b> ihr.</em> · <em>Morgen gibt es ihr <b>der Mann</b>.</em><br>
+                    С местоимением так нельзя: <span class="no-l">Morgen füttert es er ihr.</span></p>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><b>Objekt</b></p>
+                    <div class="ex">
+                        <div>Dativ перед Akkusativ: Der Hund bringt <b>seinem Herrchen</b> <b>einen Knochen</b>.</div>
+                        <div>Но местоимение в Akkusativ идёт <b>вперёд</b>: Der Hund bringt <b>ihn</b> seinem Herrchen.</div>
+                        <div><b>Персона</b> обычно стоит раньше: Er gibt <b>dem Jungen</b> ein Buch. · Der Ladenbesitzer beschuldigte <b>den Jungen</b> des Diebstahls.</div>
+                        <div>Präpositionalobjekt — как правило, <b>в конце</b>: Der Hund hatte Angst <b>vor dem Jungen</b>.</div>
+                        <div>Два Präpositionalobjekte — персона первой: Ich habe mich <b>mit meiner Schwester</b> um den Kuchen gestritten.</div>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><b>Adverbiale</b></p>
+                    <div class="ex">
+                        <div>Стоят довольно свободно: Trotz der widrigen Umstände gewann er den Lauf. ·
+                            Er gewann den Lauf trotz der widrigen Umstände.</div>
+                        <div><b>Правило порядка:</b> Zeit <span class="arr">vor</span> Ort:<br>
+                            Ich komme <b>morgen</b> <b>nach Hause</b>. · Der Empfang wird <b>am 20. April</b> <b>im alten Kutscherhaus</b> stattfinden.</div>
+                        <div><b>Notwendige</b> adverbiale Bestimmungen стоят в конце (или предпоследними, если конец занят частью сказуемого):<br>
+                            Das Gewitter zieht <b>nach Süden</b>. · Das Gewitter ist <b>nach Süden</b> gezogen.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== SATZARTEN ==================== -->
+        <div class="tab-content" id="tab-arten">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2753;</span>
+                    <div>
+                        <h2>Hauptsatzarten</h2>
+                        <p class="lesson-header-sub">Пять типов по функции + эллипсис</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4AC; Aussagesatz (Deklarativsatz)</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Самый частый. Глагол на <strong>втором</strong> месте, интонация <strong>падающая</strong>.</p>
+                    <div class="ex">
+                        <div>Das Wasser <b>hat</b> 19 Grad. · Paula <b>springt</b> vom 10-Meter-Brett. · Paula <b>ist</b> ausgebildete Rettungsschwimmerin.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; Fragesatz — fünf Typen</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Typ</th><th>Verbstellung</th><th>Intonation</th><th>Beispiel &rarr; Antwort</th></tr>
+                        <tr><td><b>Entscheidungsfrage</b></td><td>Verb an 1. Stelle</td><td>steigend &#x2197;</td>
+                            <td>Triffst du heute Paula? &rarr; Ja. / Nein.</td></tr>
+                        <tr><td><b>Ergänzungsfrage</b> (W-Frage)</td><td>Fragewort, Verb an 2. Stelle</td><td>fallend &#x2198;</td>
+                            <td>Wer hat den Probenraum abgeschlossen? &rarr; Der Hausmeister.</td></tr>
+                        <tr><td><b>Alternativfrage</b> (Wahlfrage)</td><td>Verb an 1. Stelle, Alternativen mit <em>oder</em></td><td>fallend &#x2198;</td>
+                            <td>Fährst du mit dem Bus oder mit dem Rad? &rarr; Mit dem Bus.</td></tr>
+                        <tr><td><b>Vergewisserungsfrage</b></td><td>wie ein Aussagesatz + Fragezeichen</td><td>steigend &#x2197;</td>
+                            <td>Er hat die E-Mail doch gelesen? &rarr; Ja. (Erwartung: Zustimmung)</td></tr>
+                        <tr><td><b>Nachfrage</b></td><td>wie Aussagesatz, aber mit W-Wort</td><td>W-Wort stark betont</td>
+                            <td>Wir waren in Rom. — Ihr seid <b>wo</b> gewesen?</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Все вопросительные слова начинаются с <b>w</b>: wer, was, welcher · wann, wie, wo, wohin, wovon …
+                    Иногда впереди стоит предлог: <em><b>Von wem</b> ist das Stück?</em></p>
+                    <p class="why">&#x1F4A1; <b>Doch</b> вместо <em>ja</em> — ответ на отрицательный вопрос:<br>
+                    <em>Gehst du heute nicht schwimmen? — <b>Doch.</b></em> (= Ich gehe schwimmen.)</p>
+                    <p class="why">&#x1F3AD; <b>Rhetorische Frage</b> — ответа не ждут. Обычно узнаётся по добавленному наречию:<br>
+                    <em>Ist das <b>nicht</b> eine tolle Idee?</em> (rhetorisch) ↔ <em>Ist das eine tolle Idee?</em> (echte Frage)<br>
+                    <em>Wer möchte <b>schon</b> in den Ferien Vokabeln lernen?</em> (rhetorisch)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270A; Aufforderungssatz</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Глагол на <strong>первом</strong> месте, интонация падающая.</p>
+                    <div class="ex">
+                        <div><b>Vergiss</b> deinen Schlüssel nicht! <span class="gray">(Befehl)</span></div>
+                        <div><b>Wartet</b> bitte auf mich! <span class="gray">(Bitte)</span></div>
+                        <div><b>Nimm</b> doch das Handy mit! <span class="gray">(Vorschlag)</span></div>
+                        <div><b>Geht</b> mir aus dem Weg! <span class="gray">(Forderung)</span></div>
+                    </div>
+                    <p class="why">Общие требования — без личной формы, просто инфинитив:<br>
+                    <em>Hunde bitte <b>anleinen</b>!</em> · <em><b>Aufstehen</b>!</em></p>
+                    <p class="why">Обращение к группе с собой (<em>wir</em>) или на <em>Sie</em> — <b>Konjunktiv Präsens</b>, глагол на 1 месте:<br>
+                    <em><b>Beginnen wir</b> mit der ersten Aufgabe!</em> · <em><b>Setzen Sie</b> sich doch bitte!</em> ·
+                    <em><b>Grüßen Sie</b> Ihre Frau von mir!</em><br>
+                    Что это Konjunktiv, видно только у <em>sein</em>: <em><b>Seien</b> Sie doch bitte etwas leiser!</em> ·
+                    <em><b>Seien</b> wir mal ehrlich!</em></p>
+                    <p class="why">Требование можно выразить и другими формами:<br>
+                    <em>Jetzt wird gefälligst geschlafen!</em> (Passiv) · <em>Du stehst sofort auf!</em> (Aussagesatz) ·
+                    <em>Stehst du jetzt endlich auf?</em> (Frage) · <em>Achtung! Einsteigen!</em> (Ellipse)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F31F; Wunschsatz (Desiderativsatz)</h3>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Typ</th><th>Form</th><th>Beispiel</th></tr>
+                        <tr><td><b>realisierbar</b></td><td>Konjunktiv Präteritum</td><td>Wenn er doch lernen <b>würde</b>! · <b>Ließe</b> doch der Regen endlich nach!</td></tr>
+                        <tr><td><b>irreal</b></td><td>Konjunktiv Plusquamperfekt</td><td>Wenn er doch gelernt <b>hätte</b>! · <b>Wärst</b> du bloß da gewesen!</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Два варианта построения:<br>
+                    <b>mit wenn</b> → глагол в конце: <em>Wenn doch der Regen endlich nach<b>ließe</b>!</em><br>
+                    <b>ohne wenn</b> → глагол на 1 месте: <em><b>Ließe</b> doch der Regen endlich nach!</em><br>
+                    Часто добавляют частицы <b>nur, doch, bloß</b>.</p>
+                    <p class="why">Устаревающие варианты с <em>mögen</em> + Infinitiv или Konjunktiv Präsens:<br>
+                    <em>Möge dich der Blitz treffen! · Nehme dieses Projekt bald ein Ende! · Gott behüte dich!</em><br>
+                    &#x26A0;&#xFE0F; С <em>wenn</em> такое построение невозможно.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2757; Ausrufesatz (Exklamativsatz)</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Выражает удивление или восхищение. Позиция глагола <strong>не закреплена</strong>. Часто добавляют частицы <b>ja, aber, doch</b>.
+                    </p>
+                    <div class="ex">
+                        <div>Ist das <b>aber</b> ein Spaß! · Das ist <b>ja</b> nett! · Das klappt <b>doch</b> prima!</div>
+                        <div>Sind das aufregende Ferien! / Das sind aufregende Ferien!</div>
+                        <div>Was wir nicht alles <b>unternehmen</b>! / Was <b>unternehmen</b> wir nicht alles!</div>
+                        <div>Wie <b>freue</b> ich mich auf morgen! / Wie ich mich auf morgen <b>freue</b>!</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2702;&#xFE0F; Satzellipse und Satzäquivalent</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        <strong>Ellipse</strong> — грамматически неполное предложение, но понятное из контекста.
+                    </p>
+                    <div class="sl-wrap">
+                    <table class="sl">
+                        <tr><th>Satzart</th><th>vollständig</th><th>Ellipse</th></tr>
+                        <tr><td>Aussagesatz</td><td>Ihr habt Glück gehabt.</td><td>Glück gehabt!</td></tr>
+                        <tr><td>Aussagesatz</td><td>Ich wünsche dir viel Erfolg.</td><td>Viel Erfolg!</td></tr>
+                        <tr><td>Ergänzungsfrage</td><td>Wie komme ich zur Bahnhofstraße?</td><td>Zur Bahnhofstraße?</td></tr>
+                        <tr><td>Entscheidungsfrage</td><td>Ist bei euch alles in Ordnung?</td><td>Alles in Ordnung?</td></tr>
+                        <tr><td>Aufforderungssatz</td><td>Geben Sie mir bitte zwei Eintrittskarten für Kinder und zwei für Erwachsene.</td>
+                            <td>Zwei für Kinder, zwei für Erwachsene.</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Придаточные тоже могут стать эллипсисом — тогда они вводятся союзом
+                    (sofern, wie, wenn, falls, wenn auch, obschon / obwohl):<br>
+                    <em>Ich schicke Ihnen<b>(,)</b> falls erforderlich<b>(,)</b> ein zweites Muster zu.</em> (= falls es erforderlich wird / ist)<br>
+                    <em><b>Wie angekündigt</b><b>(,)</b> erhalten Sie heute unseren neuesten Katalog.</em></p>
+                    <p class="why"><strong>Satzäquivalente</strong> — отдельные слова в роли целого предложения:
+                    междометия (pfui, ach, au, hurra, nanu) и слова <b>ja, nein, doch, danke, bitte</b>.<br>
+                    <em>Kommt er? → <b>Ja.</b> / <b>Ja</b>, er kommt.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== REIHE & GEFÜGE ==================== -->
+        <div class="tab-content" id="tab-gefuege">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>Satzreihe und Satzgefüge</h2>
+                        <p class="lesson-header-sub">Parataxe ↔ Hypotaxe — два способа соединять предложения</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Der Unterschied in einem Satz</h3>
+                    <div class="ex" style="font-size:1.04rem;">
+                        <div><b>Satzreihe</b> (Parataxe) — два <em>равноправных</em> главных:<br>
+                            <span class="gray">Es war schon spät. Wir entschieden uns für den Abbruch der Arbeiten.</span></div>
+                        <div style="margin-top:0.6rem;"><b>Satzgefüge</b> (Hypotaxe) — главное + <em>зависимое</em> придаточное:<br>
+                            <span class="gray"><b>Weil es schon spät war</b>, entschieden wir uns für den Abbruch der Arbeiten.</span></div>
+                    </div>
+                    <p class="why"><b>Hauptsatz</b> может стоять сам по себе, глагол на 2 месте.<br>
+                    <b>Nebensatz</b> сам стоять не может, глагол в конце.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F91D; Satzreihe</h3>
+                    <div class="ex">
+                        <div><b>mit Konjunktion:</b> Er schwimmt viel <b>und</b> joggt auch gern, <b>aber</b> Wanderungen findet er langweilig.</div>
+                        <div><b>ohne Konjunktion:</b> Er schwimmt viel, er joggt auch gern, Wanderungen findet er allerdings langweilig.</div>
+                        <div style="margin-top:0.5rem;"><b>Schaltsatz (Parenthese)</b> — один главный внутри другого:<br>
+                            Er wird, <b>das ist heute schon klar</b>, beim nächsten Sportfest ausgezeichnet werden.</div>
+                    </div>
+                    <p class="why">&#x1F4CD; <b>Komma-Regel für Satzreihen:</b><br>
+                    без союза → точка или <b>запятая обязательна</b>;<br>
+                    с <em>und, oder, sowie, beziehungsweise, entweder–oder, nicht–doch, weder–noch</em> → запятая <b>по желанию</b>;<br>
+                    с <em>aber, doch, jedoch, sondern</em> (противопоставление) → запятая <b>обязательна</b>.</p>
+                    <div class="ex">
+                        <div>Wir bauen das Zelt auf<b>[,]</b> und du kümmerst dich um die Verpflegung. <span class="gray">(fakultativ)</span></div>
+                        <div>Das Zelt war endlich aufgebaut<b>,</b> aber es wackelte. <span class="gray">(Pflicht)</span></div>
+                        <div><span class="ok-l">Aber:</span> Entweder essen wir Brötchen <b>oder</b> kochen einen Eintopf.
+                            <span class="gray">— второй части не хватает подлежащего → никогда не запятая</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CE; Satzgefüge — три позиции Nebensatz</h3>
+                    <div class="ex">
+                        <div><b>nachgestellt:</b> Er träumt von der Medaille<b>,</b> während er seine Bahnen zieht.</div>
+                        <div><b>vorangestellt:</b> <b>Während er seine Bahnen zieht,</b> träumt er von der Medaille.</div>
+                        <div><b>eingeschoben:</b> Er träumt<b>,</b> während er seine Bahnen zieht<b>,</b> von der Medaille.</div>
+                    </div>
+                    <p class="why">Придаточные присоединяются: подчинительными союзами (als, dass, nachdem, weil, wenn, ob),
+                    относительными местоимениями (der, die, das, welcher), вопросительными местоимениями (wer, was)
+                    или вопросительными наречиями (wie, wo, wohin, wovon).</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CA; Gleichrangig oder untergeordnet?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        <strong>Gleichrangige Nebensätze</strong> зависят от одного и того же главного.
+                        <strong>Тест:</strong> убери сначала одно, потом другое. Если оба раза предложение полное и осмысленное — они равноправны.
+                    </p>
+                    <div class="ex">
+                        <div>Er wird die Meisterschaft gewinnen, <span class="gray">wenn er sich weiterhin anstrengt,</span> wenn er jeden Tag trainiert. <span class="ok-l">✓</span></div>
+                        <div>Er wird die Meisterschaft gewinnen, wenn er sich weiterhin anstrengt, <span class="gray">wenn er jeden Tag trainiert.</span> <span class="ok-l">✓</span></div>
+                        <div style="margin-top:0.3rem;" class="gray">Оба варианта работают → предложения равноправны.</div>
+                    </div>
+
+                    <p style="font-size:0.95rem; margin-top:0.9rem;"><strong>Nebensätze nach Graden</strong> — придаточное может зависеть от другого придаточного:</p>
+                    <div class="ex" style="font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:0.9rem;">
+                        <div>Er trainiert täglich, &nbsp;<span class="gray">← Hauptsatz</span></div>
+                        <div style="padding-left:1.5rem;">weil er sich auf eine Meisterschaft vorbereitet, &nbsp;<span class="gray">← Nebensatz 1. Grades</span></div>
+                        <div style="padding-left:3rem;">die in wenigen Wochen stattfinden wird. &nbsp;<span class="gray">← Nebensatz 2. Grades</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5FA;&#xFE0F; Übersicht: was hängt woran?</h3>
+                    <div class="ex" style="font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:0.88rem; line-height:1.9;">
+                        <div>Klaus sieht auf die Uhr, | und er beeilt sich, | da stürzt der Computer ab.</div>
+                        <div style="color:#93c5fd;">Hauptsatz &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hauptsatz &nbsp;&nbsp;&nbsp;&nbsp; Hauptsatz &nbsp;&rarr; <b>Satzreihe</b></div>
+                        <div style="margin-top:0.9rem;">Der Text, | der brisante Informationen enthält, | soll morgen erscheinen.</div>
+                        <div style="color:#c4b5fd;">Hauptsatz &nbsp; eingeschobener Nebensatz &nbsp; Hauptsatz &nbsp;&rarr; <b>Satzgefüge</b></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Trainer: Was ist das markierte Satzglied?</h2>
+                        <p class="lesson-header-sub">Задай вопрос к выделенной части — ответ подскажет тип</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="tr-box">
+                        <div class="tr-sent" id="trSent">…</div>
+                        <div class="tr-sub" id="trSub">Wer? Wen? Wem? Wann? Wo? Warum?</div>
+                        <div class="tr-opts" id="trOpts"></div>
+                        <div class="tr-fb" id="trFb"></div>
+                        <div class="tr-actions">
+                            <button class="tr-btn" id="trNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="trOk">0</b></span>
+                            <span>Falsch: <b id="trBad">0</b></span>
+                            <span>Rest: <b id="trLeft">0</b></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ÜBUNGEN ==================== -->
+        <div class="tab-content" id="tab-uebungen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Übungen</h2>
+                        <p class="lesson-header-sub">Разбери сам, потом кликни</p>
+                    </div>
+                </div>
+
+                <div class="note-card"><h3>A · Wie viele Satzglieder?</h3><div id="drillA"></div></div>
+                <div class="note-card"><h3>B · Attribut oder Satzglied?</h3><div id="drillB"></div></div>
+                <div class="note-card"><h3>C · Apposition</h3><div id="drillC"></div></div>
+                <div class="note-card"><h3>D · Verbstellung</h3><div id="drillD"></div></div>
+                <div class="note-card"><h3>E · Satzart bestimmen</h3><div id="drillE"></div></div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+const $ = id => document.getElementById(id);
+
+/* ===================== TRAINER ===================== */
+const TYPES = ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt',
+               'Präpositionalobjekt', 'Adverbial', 'Prädikativ', 'Attribut'];
+const TRAIN = [
+    { s:'<u>Herr Martin</u> trägt heute Zeitungen aus.',              a:'Subjekt',              r:'Wer trägt aus? → Nominativ' },
+    { s:'Patrick deckt <u>den Tisch</u>.',                            a:'Akkusativobjekt',      r:'Wen oder was deckt er?' },
+    { s:'Patrick hilft <u>seinem Vater</u>.',                         a:'Dativobjekt',          r:'Wem hilft er?' },
+    { s:'Er war sich <u>seiner Schuld</u> bewusst.',                  a:'Genitivobjekt',        r:'Wessen war er sich bewusst?' },
+    { s:'Frau Beier bezichtigt Herrn Hesse <u>der Lüge</u>.',         a:'Genitivobjekt',        r:'Wessen bezichtigt sie ihn?' },
+    { s:'Sie legt den Zettel <u>auf den Tisch</u>.',                  a:'Präpositionalobjekt',  r:'legen verlangt „wohin“ → Präpositionalobjekt' },
+    { s:'Ich warte <u>auf den Bus</u>.',                              a:'Präpositionalobjekt',  r:'warten <em>auf</em> + Akk. — das Verb verlangt die Präposition' },
+    { s:'Der Hund hatte Angst <u>vor dem Jungen</u>.',                a:'Präpositionalobjekt',  r:'Angst haben <em>vor</em> + Dat.' },
+    { s:'Ich mache es <u>jetzt</u>.',                                 a:'Adverbial',            r:'Wann? → Temporaladverbial' },
+    { s:'Der Journalist schreibt <u>in der Nacht</u>.',               a:'Adverbial',            r:'Wann? → Temporaladverbial' },
+    { s:'Er schreibt den Bericht <u>mit einem roten Kuli</u>.',       a:'Adverbial',            r:'Wie? Womit? → Modaladverbial' },
+    { s:'<u>Trotz der widrigen Umstände</u> gewann er den Lauf.',     a:'Adverbial',            r:'Warum? Trotz wessen? → Kausaladverbial' },
+    { s:'Das Gewitter zieht <u>nach Süden</u>.',                      a:'Adverbial',            r:'Wohin? → Lokaladverbial (hier notwendig)' },
+    { s:'Ich wohne <u>in Stuttgart</u>.',                             a:'Adverbial',            r:'Wo? → ersetzbar durch <em>dort</em>' },
+    { s:'Dieser Käfer ist <u>winzig</u>.',                            a:'Prädikativ',           r:'nach <em>sein</em> — ohne dieses Wort ist der Satz unvollständig' },
+    { s:'Peter wird <u>Anwalt</u>.',                                  a:'Prädikativ',           r:'nach <em>werden</em> → prädikativer Nominativ' },
+    { s:'Mein Bruder heißt <u>Felix</u>.',                            a:'Prädikativ',           r:'nach <em>heißen</em> → prädikativer Nominativ' },
+    { s:'Überstunden bleiben <u>die Ausnahme</u>.',                   a:'Prädikativ',           r:'nach <em>bleiben</em> → prädikativer Nominativ' },
+    { s:'All seine Mühen waren <u>vergebens</u>.',                    a:'Prädikativ',           r:'Adverb als Prädikativ nach <em>sein</em>' },
+    { s:'Das <u>hübsche</u> Mädchen liest ein Buch.',                 a:'Attribut',             r:'gehört zu <em>Mädchen</em>, kann sich nicht allein bewegen' },
+    { s:'Alle bewundern den Garten <u>der Nachbarn</u>.',             a:'Attribut',             r:'Genitivattribut zu <em>Garten</em> — nicht verschiebbar' },
+    { s:'Die Lampe <u>über unserem Bett</u> funktioniert nicht.',     a:'Attribut',             r:'Präpositionalattribut zu <em>Lampe</em>' },
+    { s:'Der Teich, <u>den die Frösche lieben</u>, ist eine Attraktion.', a:'Attribut',          r:'Attributsatz (Relativsatz) zu <em>Teich</em>' },
+    { s:'Er hat den <u>zweiten</u> Platz errungen.',                  a:'Attribut',             r:'Zahladjektiv als Attribut zu <em>Platz</em>' },
+    { s:'Die Kunst <u>zu schweigen</u> ist selten.',                  a:'Attribut',             r:'Infinitivattribut zu <em>Kunst</em>' },
+    { s:'<u>Der wütend gewordene Stier</u> durchstieß den Zaun.',     a:'Subjekt',              r:'ganze Wortgruppe → ersetzbar durch <em>er</em>' },
+    { s:'Der Ladenbesitzer beschuldigte <u>den Jungen</u> des Diebstahls.', a:'Akkusativobjekt', r:'Wen beschuldigte er?' },
+    { s:'Lisa gibt ihrem Freund <u>einen Rat</u>.',                   a:'Akkusativobjekt',      r:'Was gibt sie? (geben ist dreiwertig)' },
+    { s:'Dieses Buch gehört <u>meinem Freund</u>.',                   a:'Dativobjekt',          r:'Wem gehört es?' },
+    { s:'Diese Sache bedarf <u>einer Prüfung</u>.',                   a:'Genitivobjekt',        r:'bedürfen verlangt den Genitiv' },
+    { s:'<u>Dass weitere Stücke einstudiert werden</u>, begrüßt er.', a:'Akkusativobjekt',      r:'Ersatzprobe: <em>Das</em> begrüßt er.' },
+    { s:'Er wohnt <u>wegen seiner Freundin</u> in München.',          a:'Adverbial',            r:'Warum? → Kausaladverbial' },
+    { s:'<u>Der fleißige Journalist</u> schreibt seine Berichte.',    a:'Subjekt',              r:'ganze Gruppe inkl. Attribut → ersetzbar durch <em>er</em>' },
+    { s:'Er schreibt seine <u>äußerst brisanten</u> Berichte.',       a:'Attribut',             r:'erweitertes Adjektivattribut zu <em>Berichte</em>' },
+    { s:'Meine Wohnung, <u>ein Neubau</u>, gefällt mir sehr.',        a:'Attribut',             r:'Apposition — eine Sonderform des Attributs' },
+    { s:'Ich liebe die Natur, <u>die größte Kostbarkeit der Welt</u>.', a:'Attribut',           r:'Apposition im Akkusativ (wie das Bezugswort)' },
+    { s:'Er gedachte mit Reue <u>seiner vielen Straftaten</u>.',      a:'Genitivobjekt',        r:'verschiebbar → eigenes Satzglied, kein Attribut' },
+    { s:'Die Scheibe <u>des Autos</u> war beschmiert.',               a:'Attribut',             r:'nicht verschiebbar → Genitivattribut' },
+    { s:'Sie gehen die erste Straße <u>links</u>.',                   a:'Attribut',             r:'Adverbialattribut zu <em>Straße</em>' },
+    { s:'Der Empfang wird <u>im alten Kutscherhaus</u> stattfinden.', a:'Adverbial',            r:'Wo? → Lokaladverbial (bei stattfinden notwendig)' }
+];
+let trPool = [], trCur = null, trDone = false, trOk = 0, trBad = 0;
+function trShuffle(a) {
+    const r = a.slice();
+    for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+    return r;
+}
+function trNext() {
+    if (!trPool.length) trPool = trShuffle(TRAIN);
+    trCur = trPool.pop();
+    trDone = false;
+    $('trSent').innerHTML = trCur.s;
+    $('trFb').innerHTML = '';
+    $('trLeft').textContent = trPool.length;
+    $('trOpts').innerHTML = TYPES.map(t => '<button class="tr-opt" data-t="' + t + '">' + t + '</button>').join('');
+    $('trOpts').querySelectorAll('.tr-opt').forEach(btn => btn.addEventListener('click', () => {
+        if (trDone) return;
+        trDone = true;
+        $('trOpts').querySelectorAll('.tr-opt').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.t === trCur.a) b.classList.add('good');
+        });
+        if (btn.dataset.t === trCur.a) {
+            trOk++; $('trOk').textContent = trOk;
+            $('trFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig</span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        } else {
+            btn.classList.add('bad');
+            trBad++; $('trBad').textContent = trBad;
+            $('trFb').innerHTML = '<span style="color:#f85149">&#x2717; richtig: <b>' + trCur.a + '</b></span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        }
+    }));
+}
+$('trNext').addEventListener('click', trNext);
+trNext();
+
+/* ===================== ÜBUNGEN ===================== */
+const DRILLS = {
+drillA: [
+    ['Der Journalist schreibt den langen Bericht während der Konferenz.',
+     '<b>4 Satzglieder</b> — Ersatzprobe: <em>Er schreibt ihn währenddessen.</em>'],
+    ['Der wütend gewordene Stier durchstieß mit seinen spitzen Hörnern bereits nach fünf Minuten den verrosteten Maschendrahtzaun.',
+     '<b>5 Satzglieder</b> — <em>Er durchstieß damit dann ihn.</em>'],
+    ['Der brave Hund bewacht während der ganzen Nacht das einsame Haus.',
+     '<b>4 Satzglieder</b> — Subjekt · Prädikat · Temporaladverbial · Akkusativobjekt'],
+    ['Mein kleiner, frecher Bruder hat sich den langweiligen Film im großen Kino angesehen.',
+     '<b>4 Satzglieder</b> — <em>Er hat ihn sich dort angesehen.</em> Alle Adjektive sind Attribute'],
+    ['Lisa gibt ihrem Freund einen guten Rat.',
+     '<b>4 Satzglieder</b> — dreiwertiges Verb: Subjekt + Dativobjekt + Akkusativobjekt'],
+    ['Ich gähne zum dritten Mal bei diesem langweiligen Film.',
+     '<b>4 Satzglieder</b> — <em>gähnen</em> ist einwertig; die zwei Adverbiale sind frei hinzugefügt'],
+    ['Die Falschaussage des Zeugen vor Gericht wurde untersucht.',
+     '<b>2 Satzglieder</b> — <em>Sie wurde untersucht.</em> Genitiv- und Präpositionalattribut gehören zum Subjekt']
+],
+drillB: [
+    ['Alle bewundern den Garten <b>der Nachbarn</b>.', '<b>Attribut</b> (Genitivattribut) — nicht verschiebbar'],
+    ['Er gedachte mit Reue <b>seiner vielen Straftaten</b>.', '<b>Genitivobjekt</b> — verschiebbar: <em>Seiner vielen Straftaten gedachte er mit Reue.</em>'],
+    ['Die Scheibe <b>des Autos</b> war beschmiert.', '<b>Attribut</b> — <span style="text-decoration:line-through">Des Autos war die Scheibe beschmiert.</span>'],
+    ['Ich wohne <b>in Stuttgart</b>.', '<b>Adverbial</b> — ersetzbar durch <em>dort</em>'],
+    ['Die Lampe <b>über unserem Bett</b> funktioniert nicht.', '<b>Attribut</b> — gehört zu <em>Lampe</em>, nicht zu <em>funktionieren</em>'],
+    ['Er spielt <b>rechts</b> außen.', '<b>Attribut</b> (Adverbialattribut, vorangestellt)'],
+    ['Die Kunst <b>zu schweigen</b> ist selten.', '<b>Attribut</b> (Infinitivattribut zu <em>Kunst</em>)'],
+    ['Ich habe nicht die Absicht, <b>dich zu verlassen</b>.', '<b>Attribut</b> zum Nomen <em>Absicht</em> — deshalb auch das Pflicht-Komma'],
+    ['Der Teich, <b>den die Frösche lieben</b>, ist eine Attraktion.', '<b>Attributsatz</b> (Relativsatz) zu <em>Teich</em>'],
+    ['<b>Dass weitere Stücke einstudiert werden sollen</b>, begrüßt er.', '<b>Akkusativobjekt</b> — Ersatzprobe: <em>Das begrüßt er.</em>'],
+    ['die Wanderung <b>im Gebirge</b> <b>zum Gipfel</b>', '<b>zwei gleichrangige</b> Präpositionalattribute — man wandert im Gebirge UND zum Gipfel'],
+    ['Wir haben Lust <b>auf ein Essen im Restaurant</b>.', '<b>untergeordnet</b> — <em>im Restaurant</em> ist Attribut zum Attribut <em>auf ein Essen</em>']
+],
+drillC: [
+    ['Herr Hammer, der Leiter der Fabrik, geht in Rente. — Was ist die Apposition?',
+     '<b>der Leiter der Fabrik</b> — sie kann das Bezugswort sogar ersetzen: <em>Der Leiter der Fabrik geht in Rente.</em>'],
+    ['Lisa, meine Schwester, und ich gehen ins Kino. — Wie viele Personen?',
+     '<b>2 Personen</b> — Apposition (Lisa = meine Schwester)'],
+    ['Lisa, meine Schwester und ich gehen ins Kino. — Wie viele Personen?',
+     '<b>3 Personen</b> — Aufzählung'],
+    ['Der Herrscher, der ein Tyrann ist, unterdrückt sein Volk. — Apposition oder Attributsatz?',
+     '<b>Attributsatz</b> — es gibt ein Prädikat (<em>ist</em>) und ein Einleitewort (<em>der</em>)'],
+    ['Der Herrscher, ein fürchterlicher Tyrann, unterdrückt sein Volk.',
+     '<b>Apposition</b> — kein Prädikat, nicht eingeleitet'],
+    ['Ich freue mich auf den Mai, ___ allerschönsten Monat. (Kasus?)',
+     '<b>den</b> allerschönsten Monat — Akkusativ, wie das Bezugswort'],
+    ['Die Stellungnahme Herrn Fleißigs, ___ der Tüchtig-Werke, wird erwartet. (ohne Artikel)',
+     '<b>Direktor</b> der Tüchtig-Werke — ohne Artikel steht die Apposition im <b>Nominativ</b>'],
+    ['Die Stellungnahme Herrn Fleißigs, ___ der Tüchtig-Werke, wird erwartet. (mit Artikel)',
+     '<b>des Direktors</b> der Tüchtig-Werke — mit Artikel echter Kasus (Genitiv)'],
+    ['Ich feiere am Sonntag, ___ 29. Februar.',
+     '<b>dem</b> 29. Februar (Dativ) oder <b>den</b> 29. Februar (Akkusativ) — beides erlaubt'],
+    ['Alexander von Humboldt, ein weit gereister Naturforscher, Mitbegründer der Geografie, wurde „der zweite Kolumbus“ genannt.',
+     'Bei mehreren Appositionen zu einem Bezugswort werden <b>alle durch Kommas</b> getrennt']
+],
+drillD: [
+    ['Wo steht das konjugierte Verb im Aussagesatz?', '<b>Zweitstellung</b> — gezählt werden Satzglieder, nicht Wörter'],
+    ['Wo steht es in der Entscheidungsfrage?', '<b>Erststellung</b>: <em>Kommt er heute?</em>'],
+    ['Wo steht es im eingeleiteten Nebensatz?', '<b>Letztstellung</b>: <em>…, dass er heute kommt.</em>'],
+    ['Er ist gestern mit dem Zug ___. (ankommen)', 'Er ist gestern mit dem Zug <b>angekommen</b>. — die zweite Klammerhälfte steht am Ende'],
+    ['…, weil der Zug nicht rechtzeitig ___. (losfahren, Perfekt)', '…, weil der Zug nicht rechtzeitig <b>losgefahren ist</b>.'],
+    ['Elisabeth freut sich, dass sie die Termine halten können ___. (haben)',
+     'dass sie die Termine <b>hat</b> halten können — konjugiertes Verb VOR die Infinitive!'],
+    ['Ich bin gegangen, obwohl ich noch arbeiten müssen ___. (hätte)',
+     'obwohl ich noch <b>hätte</b> arbeiten müssen'],
+    ['Der Chef sagt, dass die Vorhänge längst gereinigt werden müssen ___. (hätten)',
+     'dass die Vorhänge längst <b>hätten</b> gereinigt werden müssen — gilt auch im Passiv'],
+    ['Es macht nachdenklich, dass das Land keinen Beitrag mehr wird leisten ___.',
+     '… wird leisten <b>können</b> — nicht konjugierte Modalverben stehen am Satzende'],
+    ['Reihenfolge: Ich komme (nach Hause / morgen).', 'Ich komme <b>morgen nach Hause</b>. — Zeit vor Ort'],
+    ['Der Hund bringt (einen Knochen / seinem Herrchen).', 'Der Hund bringt <b>seinem Herrchen einen Knochen</b>. — Dativ vor Akkusativ'],
+    ['Der Hund bringt (ihn / seinem Herrchen).', 'Der Hund bringt <b>ihn seinem Herrchen</b>. — Pronomen im Akkusativ zuerst']
+],
+drillE: [
+    ['Triffst du heute Paula?', '<b>Entscheidungsfrage</b> — Verb an 1. Stelle, Antwort ja/nein, steigende Intonation'],
+    ['Wer hat den Raum abgeschlossen?', '<b>Ergänzungsfrage</b> (W-Frage) — Verb an 2. Stelle, fallende Intonation'],
+    ['Fährst du mit dem Bus oder mit dem Rad?', '<b>Alternativfrage</b> (Wahlfrage)'],
+    ['Er hat die E-Mail doch gelesen?', '<b>Vergewisserungsfrage</b> — Aufbau wie ein Aussagesatz, erwartet Zustimmung'],
+    ['Wir waren in Rom. — Ihr seid wo gewesen?', '<b>Nachfrage</b> — W-Wort mitten im Satz, stark betont'],
+    ['Ist das nicht eine tolle Idee?', '<b>Rhetorische Frage</b> — erkennbar am <em>nicht</em>; ohne es wäre es eine echte Entscheidungsfrage'],
+    ['Vergiss deinen Schlüssel nicht!', '<b>Aufforderungssatz</b> — Imperativ, Verb an 1. Stelle'],
+    ['Seien Sie doch bitte etwas leiser!', '<b>Aufforderungssatz</b> mit Konjunktiv Präsens (Sie-Form)'],
+    ['Hunde bitte anleinen!', '<b>Aufforderungssatz</b> — allgemeine Aufforderung mit blossem Infinitiv'],
+    ['Wenn er doch lernen würde!', '<b>Wunschsatz</b>, realisierbar — Konjunktiv Präteritum, mit <em>wenn</em> → Verb am Ende'],
+    ['Wärst du bloß da gewesen!', '<b>Wunschsatz</b>, irreal — Konjunktiv Plusquamperfekt, ohne <em>wenn</em> → Verb an 1. Stelle'],
+    ['Ist das aber ein Spaß!', '<b>Ausrufesatz</b> — Partikel <em>aber</em>, Ausrufezeichen'],
+    ['Viel Erfolg!', '<b>Satzellipse</b> — vollständig: <em>Ich wünsche dir viel Erfolg.</em>'],
+    ['Alles in Ordnung?', '<b>Satzellipse</b> einer Entscheidungsfrage'],
+    ['Kommt er? — Ja.', '<b>Satzäquivalent</b> — ein Wort in der Funktion eines ganzen Satzes'],
+    ['Es war schon spät. Wir brachen ab.', '<b>Satzreihe</b> (zwei Hauptsätze)'],
+    ['Weil es schon spät war, brachen wir ab.', '<b>Satzgefüge</b> (Hauptsatz + Nebensatz)'],
+    ['Er wird, das ist heute schon klar, ausgezeichnet werden.', '<b>Schaltsatz (Parenthese)</b> — ein Hauptsatz im anderen']
+]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = $(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        '<div class="dr-item"><div class="dr-q">' + q + '</div><div class="dr-a">' + a + '</div></div>').join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>

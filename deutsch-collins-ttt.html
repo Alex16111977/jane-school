@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хрестики-нулики | Collins Wortschatz | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        html { background: #0a0a14; }
+        .ttt-wrap { max-width: 640px; margin: 0 auto; }
+
+        .day-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.2rem; }
+        .day-tab {
+            padding: 0.45rem 0.85rem; border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .day-tab:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .day-tab.active { background: rgba(163,113,247,0.18); border-color: rgba(163,113,247,0.5); color:#c084fc; }
+
+        .ttt-score { display: flex; gap: 0.7rem; justify-content: center; margin: 0.4rem 0 1.1rem; }
+        .ttt-score-card {
+            flex: 1; max-width: 190px;
+            background: rgba(13,17,23,0.82);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 13px; padding: 0.7rem 0.9rem; text-align: center;
+        }
+        .ttt-score-card.ok { border-color: rgba(63,185,80,0.4); }
+        .ttt-score-card.bad { border-color: rgba(248,81,73,0.38); }
+        .ttt-score-mark { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+        .ttt-score-card.ok .ttt-score-mark { color: #6ee7a0; }
+        .ttt-score-card.bad .ttt-score-mark { color: #ff8a84; }
+        .ttt-score-name { font-size: 0.78rem; color: var(--color-text-muted); margin: 0.2rem 0 0.35rem; font-weight: 600; }
+        .ttt-score-num { font-size: 1.35rem; font-weight: 800; color: #fff; }
+
+        .ttt-status { text-align: center; font-size: 1.12rem; font-weight: 700; color: #fff; min-height: 1.6em; margin-bottom: 1rem; transition: color 0.2s; }
+        .ttt-status .accent { color: #c084fc; }
+
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 0 auto 0.4rem; max-width: 420px; }
+        .ttt-cell {
+            aspect-ratio: 1 / 1; border-radius: 16px;
+            background: rgba(255,255,255,0.96); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.2rem; font-weight: 900;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ttt-cell:not(.filled):not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(163,113,247,0.28); background: #fff; }
+        .ttt-cell:disabled, .ttt-cell.filled { cursor: default; }
+        .ttt-cell .mark { display: inline-block; animation: markPop 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+        @keyframes markPop { from { opacity:0; transform: scale(0.3) rotate(-12deg);} to {opacity:1; transform: scale(1) rotate(0);} }
+        .ttt-cell.o .mark { color: #16a34a; }
+        .ttt-cell.x .mark { color: #ef4444; }
+        .ttt-cell.win { background: #eafff0; box-shadow: 0 0 0 3px #3fb950, 0 8px 22px rgba(63,185,80,0.45); }
+
+        .ttt-q {
+            margin: 1.3rem auto 0; max-width: 480px;
+            background: rgba(13,17,23,0.85);
+            border: 1.5px solid rgba(163,113,247,0.3);
+            border-radius: 16px; padding: 1.2rem 1.2rem 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: none;
+            animation: qIn 0.3s ease both;
+        }
+        .ttt-q.show { display: block; }
+        @keyframes qIn { from { opacity:0; transform: translateY(12px);} to {opacity:1; transform: translateY(0);} }
+        .ttt-q-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(163,113,247,0.85); font-weight: 700; margin-bottom: 0.45rem; }
+        .ttt-q-word { font-size: 1.7rem; font-weight: 800; color: #fff; margin-bottom: 0.2rem; line-height: 1.2; }
+        .ttt-q-sub { font-size: 0.86rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-opts { display: flex; flex-direction: column; gap: 0.55rem; }
+        .ttt-opt {
+            padding: 0.8rem 1rem; border-radius: 11px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            color: #fff; font-size: 1.02rem; font-weight: 700; cursor: pointer; text-align: left;
+            transition: background 0.18s, border-color 0.18s, transform 0.12s;
+        }
+        .ttt-opt:hover:not(:disabled) { background: rgba(163,113,247,0.15); border-color: rgba(163,113,247,0.45); transform: translateX(3px); }
+        .ttt-opt:disabled { cursor: default; }
+        .ttt-opt.correct { background: rgba(63,185,80,0.2); border-color: #3fb950; color: #b6f5c6; }
+        .ttt-opt.wrong { background: rgba(248,81,73,0.16); border-color: #f85149; color: #ffc1bd; }
+        .ttt-feedback { text-align:center; font-size: 0.95rem; font-weight:700; margin-top: 0.9rem; min-height: 1.2em; }
+        .ttt-feedback.ok { color: #6ee7a0; }
+        .ttt-feedback.no { color: #ff8a84; }
+
+        .ttt-result {
+            margin: 1.3rem auto 0; max-width: 480px; text-align: center;
+            background: rgba(13,17,23,0.9); border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 16px; padding: 1.5rem 1.2rem; display: none; animation: qIn 0.35s ease both;
+        }
+        .ttt-result.show { display: block; }
+        .ttt-result-emoji { font-size: 2.6rem; }
+        .ttt-result-title { font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0.4rem 0 0.3rem; }
+        .ttt-result-sub { font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+        .ttt-result.win { border-color: rgba(63,185,80,0.5); }
+        .ttt-result.lose { border-color: rgba(248,81,73,0.4); }
+
+        .ttt-controls { display:flex; justify-content:center; align-items:center; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+        .ttt-btn {
+            display: inline-flex; align-items:center; gap: 0.5rem;
+            padding: 0.72rem 1.5rem; border-radius: 12px;
+            background: rgba(163,113,247,0.14); border: 1.5px solid rgba(163,113,247,0.4);
+            color: #c084fc; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
+        }
+        .ttt-btn:hover { background: rgba(163,113,247,0.26); color:#fff; transform: translateY(-2px); }
+        .ttt-btn.ghost { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.14); color: var(--color-text-muted); }
+        .ttt-btn.ghost:hover { background: rgba(255,255,255,0.1); color:#fff; }
+        .ttt-wins { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 600; }
+        .ttt-wins b { color: #6ee7a0; }
+
+        @media (max-width: 480px) {
+            .ttt-q-word { font-size: 1.45rem; }
+            .ttt-cell { font-size: 2.6rem; border-radius: 13px; }
+            .ttt-board { gap: 0.5rem; }
+            .ttt-score-mark { font-size: 1.3rem; }
+            .day-tab { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0e0c1a 0%,#111422 55%,#080c16 100%)"></div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-collins.html">Collins Grammar Extra</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Хрестики-нулики</span>
+        </nav>
+        <a href="deutsch-collins.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Назад до Collins Grammar</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Хрестики-нулики <span id="day-badge" style="background:linear-gradient(135deg,#a371f7,#c8a5ff);color:#0e0a1a;font-weight:900;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:50px;letter-spacing:0.08em;vertical-align:middle;margin-left:0.5rem;">① Genus & Fremdwörter</span></h1>
+            <p class="page-subtitle">Обери клітинку і переклади слово з прикладів Collins. Правильно &mdash; <b style="color:#6ee7a0;">&#9711;</b>, помилка &mdash; <b style="color:#ff8a84;">&#10005;</b>. Збери <b style="color:#6ee7a0;">3 &#9711; в ряд</b>!</p>
+        </div>
+
+        <div class="ttt-wrap">
+            <div class="day-tabs" id="day-tabs"></div>
+
+            <div class="ttt-score">
+                <div class="ttt-score-card ok">
+                    <div class="ttt-score-mark">&#9711;</div>
+                    <div class="ttt-score-name">Правильно</div>
+                    <div class="ttt-score-num" id="score-ok">0</div>
+                </div>
+                <div class="ttt-score-card bad">
+                    <div class="ttt-score-mark">&#10005;</div>
+                    <div class="ttt-score-name">Помилки</div>
+                    <div class="ttt-score-num" id="score-bad">0</div>
+                </div>
+            </div>
+
+            <div class="ttt-status" id="status">Обери клітинку</div>
+
+            <div class="ttt-board" id="board"></div>
+
+            <div class="ttt-q" id="question">
+                <div class="ttt-q-label">Як сказати німецькою?</div>
+                <div class="ttt-q-word" id="q-word"></div>
+                <div class="ttt-q-sub">Правильна відповідь поставить &#9711;, помилка &mdash; &#10005;</div>
+                <div class="ttt-opts" id="q-opts"></div>
+                <div class="ttt-feedback" id="q-feedback"></div>
+            </div>
+
+            <div class="ttt-result" id="result">
+                <div class="ttt-result-emoji" id="result-emoji"></div>
+                <div class="ttt-result-title" id="result-title"></div>
+                <div class="ttt-result-sub" id="result-sub"></div>
+                <button class="ttt-btn" onclick="newGame()">&#8635; Грати ще раз</button>
+            </div>
+
+            <div class="ttt-controls">
+                <button class="ttt-btn ghost" onclick="newGame()">&#8635; Нова гра</button>
+                <span class="ttt-wins">Перемоги: <b id="wins">0</b></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORDS_BY_DAY = {"k1":[{"de":"der Trabant","ua":"супутник (планети / штучний)","def":"Himmelskörper oder Gerät, das um einen anderen Körper kreist"},{"de":"der Ballast","ua":"баласт, зайвий тягар","def":"unnötige Last, die man mit sich herumträgt"},{"de":"der Kapitalismus","ua":"капіталізм","def":"Wirtschaftsordnung mit Privateigentum an Produktionsmitteln"},{"de":"der Tresor","ua":"сейф","def":"sehr sicherer Stahlschrank für Geld und Wertsachen"},{"de":"die Konkurrenz","ua":"конкуренція","def":"Wettbewerb zwischen mehreren Anbietern oder Personen"},{"de":"die Elektrizität","ua":"електрика","def":"Energieform, die durch bewegte Ladungen entsteht"},{"de":"das Reservat","ua":"заповідник, резервація","def":"geschütztes Gebiet für Tiere oder eine Volksgruppe"},{"de":"das Tablett","ua":"таця","def":"flache Platte zum Tragen von Geschirr"},{"de":"das Ultimatum","ua":"ультиматум","def":"letzte Forderung mit Frist und Drohung"},{"de":"der Reichtum","ua":"багатство","def":"sehr großer Besitz an Geld oder Gütern"},{"de":"das Abitur","ua":"атестат зрілості","def":"Abschlussprüfung am Ende des Gymnasiums"},{"de":"der Teppich","ua":"килим","def":"textiler Bodenbelag für ein Zimmer"}],"k2":[{"de":"der Band","ua":"том (книги)","def":"einzelnes Buch aus einer Reihe"},{"de":"das Band","ua":"стрічка; зв'язок","def":"schmaler Streifen Stoff; auch: enge Verbindung"},{"de":"der See","ua":"озеро","def":"größere Wasserfläche im Landesinneren"},{"de":"die See","ua":"море","def":"das Meer, besonders in der Sprache der Seeleute"},{"de":"der Leiter","ua":"керівник","def":"Person, die etwas führt oder verwaltet"},{"de":"die Leiter","ua":"драбина","def":"Gerät mit Sprossen zum Hinaufsteigen"},{"de":"der Funke","ua":"іскра","def":"kleines glühendes Teilchen, das wegspringt"},{"de":"der Gedanke","ua":"думка","def":"das, was jemand im Kopf denkt"},{"de":"der Buchstabe","ua":"літера","def":"einzelnes Zeichen des Alphabets"},{"de":"das Geschirr","ua":"посуд","def":"Teller, Tassen und Schüsseln zusammen"},{"de":"das Getreide","ua":"зерно, збіжжя","def":"Pflanzen wie Weizen und Roggen und ihre Körner"},{"de":"die Sehenswürdigkeit","ua":"визначна пам'ятка","def":"Ort, den Besucher unbedingt ansehen wollen"}],"k3":[{"de":"der Psychologe","ua":"психолог","def":"Fachmann für Erleben und Verhalten des Menschen"},{"de":"der Philosoph","ua":"філософ","def":"jemand, der über Sein und Erkenntnis nachdenkt"},{"de":"der Architekt","ua":"архітектор","def":"Fachmann, der Gebäude entwirft und plant"},{"de":"der Komponist","ua":"композитор","def":"jemand, der Musikstücke schreibt"},{"de":"der Astronaut","ua":"астронавт","def":"Mensch, der ins Weltall fliegt"},{"de":"der Chirurg","ua":"хірург","def":"Arzt, der Operationen durchführt"},{"de":"der Bauer","ua":"селянин, фермер","def":"jemand, der einen Hof bewirtschaftet"},{"de":"der Kollege","ua":"колега","def":"Person, mit der man zusammenarbeitet"},{"de":"der Mensch","ua":"людина","def":"das menschliche Wesen überhaupt"},{"de":"der Diamant","ua":"діамант","def":"härtester Edelstein, sehr wertvoll"},{"de":"der Elefant","ua":"слон","def":"größtes Landtier, mit Rüssel und Stoßzähnen"},{"de":"der Spatz","ua":"горобець","def":"kleiner grauer Vogel, häufig in Städten"}],"k4":[{"de":"der Wecker","ua":"будильник","def":"Uhr, die zur eingestellten Zeit klingelt"},{"de":"die Armbanduhr","ua":"наручний годинник","def":"Uhr, die man am Handgelenk trägt"},{"de":"der Kugelschreiber","ua":"кулькова ручка","def":"Stift, der über eine kleine Kugel Tinte abgibt"},{"de":"die Reisetasche","ua":"дорожня сумка","def":"große weiche Tasche für unterwegs"},{"de":"der Stapel","ua":"стос","def":"mehrere Dinge ordentlich übereinandergelegt"},{"de":"das Freibad","ua":"відкритий басейн","def":"Schwimmbad unter freiem Himmel"},{"de":"die Haltestelle","ua":"зупинка","def":"Ort, an dem Bus oder Bahn hält"},{"de":"der Fahrstuhl","ua":"ліфт","def":"Kabine, die Menschen zwischen Stockwerken bewegt"},{"de":"das Schloss","ua":"замок (споруда / на дверях)","def":"großes Herrenhaus; auch: Verschluss an einer Tür"},{"de":"die Mütze","ua":"шапка","def":"weiche Kopfbedeckung ohne Krempe"},{"de":"das Würstchen","ua":"сосиска","def":"kleine Wurst, meistens warm gegessen"},{"de":"die Auswahl","ua":"вибір, асортимент","def":"alles, woraus man wählen kann"}],"k5":[{"de":"holen","ua":"принести, забрати","def":"etwas oder jemanden von einem Ort herbringen"},{"de":"bügeln","ua":"прасувати","def":"Wäsche mit einem heißen Eisen glatt machen"},{"de":"abholen","ua":"забирати (когось)","def":"jemanden an einem Ort treffen und mitnehmen"},{"de":"wandern","ua":"ходити в походи","def":"längere Strecken zu Fuß in der Natur gehen"},{"de":"segeln","ua":"ходити під вітрилами","def":"mit einem Boot durch die Kraft des Windes fahren"},{"de":"stoßen","ua":"штовхати; вдарятися","def":"mit Kraft gegen etwas drücken oder treffen"},{"de":"atmen","ua":"дихати","def":"Luft in die Lunge ziehen und wieder abgeben"},{"de":"gießen","ua":"лити; поливати","def":"Flüssigkeit aus einem Gefäß fließen lassen"},{"de":"verzichten auf (+A)","ua":"відмовитися від","def":"etwas bewusst nicht nehmen und nicht tun"},{"de":"sich beeilen","ua":"поспішати","def":"etwas schneller machen, weil die Zeit knapp ist"},{"de":"sich melden","ua":"зголоситися; озватися","def":"sich freiwillig zeigen oder Kontakt aufnehmen"},{"de":"scheitern","ua":"зазнати невдачі","def":"keinen Erfolg haben, misslingen"}],"k6":[{"de":"sich sehnen nach (+D)","ua":"тужити за","def":"jemanden oder etwas schmerzlich vermissen"},{"de":"warten auf (+A)","ua":"чекати на","def":"bleiben, bis jemand oder etwas kommt"},{"de":"bitten um (+A)","ua":"просити про","def":"höflich sagen, dass man etwas haben möchte"},{"de":"sich bewerben um (+A)","ua":"подавати заявку на","def":"sich offiziell um eine Stelle bemühen"},{"de":"sich ärgern über (+A)","ua":"злитися через","def":"wegen einer Sache wütend oder unzufrieden sein"},{"de":"sich kümmern um (+A)","ua":"піклуватися про","def":"für jemanden oder etwas sorgen"},{"de":"teilnehmen an (+D)","ua":"брати участь у","def":"bei einer Veranstaltung dabei sein"},{"de":"leiden an (+D)","ua":"страждати на (хворобу)","def":"eine bestimmte Krankheit haben"},{"de":"sich verlassen auf (+A)","ua":"покладатися на","def":"sicher sein, dass jemand einen nicht enttäuscht"},{"de":"bestehen aus (+D)","ua":"складатися з","def":"aus bestimmten Teilen zusammengesetzt sein"},{"de":"bestehen auf (+D)","ua":"наполягати на","def":"eine Forderung nicht aufgeben"},{"de":"sich gewöhnen an (+A)","ua":"звикати до","def":"mit der Zeit etwas als normal empfinden"}],"k7":[{"de":"helfen (+D)","ua":"допомагати","def":"jemandem bei einer Sache beistehen"},{"de":"danken (+D)","ua":"дякувати","def":"jemandem seinen Dank aussprechen"},{"de":"schaden (+D)","ua":"шкодити","def":"jemandem oder etwas Schaden zufügen"},{"de":"gehören (+D)","ua":"належати","def":"Eigentum von jemandem sein"},{"de":"begegnen (+D)","ua":"зустріти (випадково)","def":"jemanden zufällig treffen"},{"de":"trauen (+D)","ua":"довіряти","def":"glauben, dass jemand ehrlich ist"},{"de":"fehlen (+D)","ua":"бракувати","def":"nicht da sein, obwohl es gebraucht wird"},{"de":"gefallen (+D)","ua":"подобатися","def":"jemandem angenehm erscheinen"},{"de":"schmecken (+D)","ua":"смакувати","def":"für jemanden gut im Geschmack sein"},{"de":"gelingen (+D)","ua":"вдаватися","def":"erfolgreich zu Ende gebracht werden"},{"de":"sich nähern (+D)","ua":"наближатися до","def":"immer näher an etwas herankommen"},{"de":"widersprechen (+D)","ua":"заперечувати","def":"das Gegenteil dessen sagen, was jemand behauptet"}],"k8":[{"de":"es geht um (+A)","ua":"йдеться про","def":"das Thema oder der Kern der Sache ist …"},{"de":"es handelt sich um (+A)","ua":"мова про","def":"genau genommen ist es …"},{"de":"es kommt darauf an","ua":"залежить від того","def":"die Antwort hängt von den Umständen ab"},{"de":"es lohnt sich","ua":"воно того варте","def":"der Aufwand bringt genug Nutzen"},{"de":"es hängt davon ab","ua":"це залежить","def":"die Sache ist von einer Bedingung abhängig"},{"de":"es macht nichts aus","ua":"це не заважає","def":"es stört niemanden"},{"de":"es ist mir egal","ua":"мені байдуже","def":"ich habe dazu keine Meinung und keinen Wunsch"},{"de":"es stimmt, dass …","ua":"це правда, що…","def":"die Aussage ist richtig"},{"de":"es ist schade, dass …","ua":"шкода, що…","def":"man bedauert, dass es so ist"},{"de":"es tut mir leid","ua":"мені шкода","def":"man drückt Bedauern oder Entschuldigung aus"},{"de":"es hat keinen Zweck","ua":"немає сенсу","def":"der Versuch bringt nichts"},{"de":"mir wird schlecht","ua":"мені стає зле","def":"man beginnt, Übelkeit zu fühlen"}],"k9":[{"de":"erstaunlicherweise","ua":"на диво","def":"man wundert sich, dass es so ist"},{"de":"glücklicherweise","ua":"на щастя","def":"zum Glück; es hätte schlimmer kommen können"},{"de":"komischerweise","ua":"як не дивно","def":"seltsam, aber es ist tatsächlich so"},{"de":"beispielsweise","ua":"наприклад","def":"als Beispiel genannt"},{"de":"beziehungsweise","ua":"або ж; точніше","def":"genauer gesagt; oder auch"},{"de":"zwangsweise","ua":"примусово","def":"ohne Wahl, unter Zwang"},{"de":"schrittweise","ua":"крок за кроком","def":"in einzelnen Etappen nacheinander"},{"de":"zeitweise","ua":"часом","def":"in manchen Zeitabschnitten"},{"de":"vorsichtshalber","ua":"про всяк випадок","def":"um sicherzugehen, dass nichts passiert"},{"de":"sicherheitshalber","ua":"задля безпеки","def":"damit auf jeden Fall nichts schiefgeht"},{"de":"hinsichtlich (+G)","ua":"щодо","def":"in Bezug auf eine bestimmte Sache"},{"de":"infolge (+G)","ua":"внаслідок","def":"als Folge von etwas"}],"k10":[{"de":"ähnlich (+D)","ua":"схожий на","def":"in vielem gleich, aber nicht identisch"},{"de":"dankbar (+D)","ua":"вдячний","def":"voller Dank für eine Hilfe"},{"de":"fremd (+D)","ua":"чужий","def":"unbekannt und nicht vertraut"},{"de":"peinlich (+D)","ua":"незручно, соромно","def":"so, dass man sich dabei schämt"},{"de":"unbekannt (+D)","ua":"невідомий","def":"von niemandem gekannt"},{"de":"begabt","ua":"обдарований","def":"mit besonderem Talent ausgestattet"},{"de":"verwöhnt","ua":"розпещений","def":"an zu viel Rücksicht und Luxus gewöhnt"},{"de":"geschickt","ua":"вправний; вдало зроблений","def":"mit Können und Übung gemacht"},{"de":"beeindruckend","ua":"вражаючий","def":"so, dass es großen Eindruck macht"},{"de":"niedlich","ua":"миленький","def":"klein und süß anzusehen"},{"de":"reif","ua":"стиглий","def":"voll entwickelt und zum Essen bereit"},{"de":"entsetzt","ua":"приголомшений жахом","def":"voller Schreck und Abscheu"}],"k11":[{"de":"Es ist Geschmackssache.","ua":"Це справа смаку.","def":"darüber kann man streiten, jeder mag etwas anderes"},{"de":"Tatsache ist, dass …","ua":"Факт у тому, що…","def":"unbestreitbar richtig ist, dass …"},{"de":"von Beruf","ua":"за фахом","def":"gibt an, welche Arbeit jemand gelernt hat"},{"de":"Nachrichten hören","ua":"слухати новини","def":"Meldungen im Radio oder Fernsehen verfolgen"},{"de":"recht haben","ua":"мати рацію","def":"mit seiner Meinung richtig liegen"},{"de":"unrecht haben","ua":"помилятися","def":"sich in seiner Meinung irren"},{"de":"Angst haben (vor +D)","ua":"боятися","def":"Furcht vor etwas empfinden"},{"de":"Hunger haben","ua":"бути голодним","def":"etwas essen wollen"},{"de":"Durst haben","ua":"хотіти пити","def":"etwas trinken wollen"},{"de":"Rauchen verboten!","ua":"Курити заборонено!","def":"hier darf niemand rauchen"},{"de":"Achtung!","ua":"Увага!","def":"Warnung: sei aufmerksam"},{"de":"Vorsicht!","ua":"Обережно!","def":"Warnung vor einer Gefahr"}],"k12":[{"de":"meinetwegen","ua":"через мене; та й нехай","def":"wegen meiner Person; auch: mir soll es recht sein"},{"de":"sämtlich","ua":"усі без винятку","def":"alle, die es gibt, vollständig"},{"de":"derjenige","ua":"той (самий), який","def":"genau der, über den gleich mehr gesagt wird"},{"de":"derselbe","ua":"той самий","def":"kein anderer, exakt der gleiche"},{"de":"einander","ua":"один одного","def":"gegenseitig, der eine den anderen"},{"de":"selbst / selber","ua":"сам","def":"ohne fremde Hilfe; betont die Person"},{"de":"beides","ua":"і те, і те","def":"die zwei verschiedenen Dinge zusammen"},{"de":"ganz","ua":"цілий, увесь","def":"vollständig, ohne fehlenden Teil"},{"de":"irgendjemand","ua":"хтось (байдуже хто)","def":"eine beliebige Person, egal welche"},{"de":"irgendwelche","ua":"якісь","def":"beliebige, nicht näher bestimmte"},{"de":"wenigstens","ua":"принаймні","def":"zumindest, als kleinstes Zugeständnis"},{"de":"höchstens","ua":"щонайбільше","def":"nicht mehr als; als Obergrenze"}]};
+        const DAYS = [["k1","① Genus & Fremdwörter"],["k2","② Doppelter Genus"],["k3","③ Menschen & Berufe"],["k4","④ Dinge des Alltags"],["k5","⑤ Verben: Alltag"],["k6","⑥ Verb + Präposition"],["k7","⑦ Dativverben"],["k8","⑧ Unpersönliches"],["k9","⑨ -weise & -halber"],["k10","⑩ Adjektive"],["k11","⑪ Feste Wendungen"],["k12","⑫ Grammatikwörter"]];
+        const LABELS = {"k1":"① Genus & Fremdwörter","k2":"② Doppelter Genus","k3":"③ Menschen & Berufe","k4":"④ Dinge des Alltags","k5":"⑤ Verben: Alltag","k6":"⑥ Verb + Präposition","k7":"⑦ Dativverben","k8":"⑧ Unpersönliches","k9":"⑨ -weise & -halber","k10":"⑩ Adjektive","k11":"⑪ Feste Wendungen","k12":"⑫ Grammatikwörter"};
+        const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        let board, lock, activeCell = null;
+        let correctCount = 0, mistakeCount = 0, wins = 0;
+        let currentDay = DAYS[0][0];
+        let pool = WORDS_BY_DAY[currentDay];
+        let queue = [];
+
+        function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+        function refillQueue(){ queue = shuffle(pool.slice()); }
+
+        function nextWord(){
+            if(queue.length === 0) refillQueue();
+            return queue.pop();
+        }
+
+        function buildDayTabs(){
+            const el = document.getElementById('day-tabs');
+            el.innerHTML = '';
+            DAYS.forEach(([d,lbl])=>{
+                const b = document.createElement('button');
+                b.className = 'day-tab' + (d===currentDay?' active':'');
+                b.textContent = lbl;
+                b.onclick = ()=>switchGameDay(d);
+                el.appendChild(b);
+            });
+        }
+
+        function switchGameDay(d){
+            currentDay = d;
+            pool = WORDS_BY_DAY[d];
+            document.getElementById('day-badge').textContent = LABELS[d];
+            [...document.querySelectorAll('.day-tab')].forEach((t,i)=>t.classList.toggle('active', DAYS[i][0]===d));
+            newGame();
+        }
+
+        function renderBoard(){
+            const el = document.getElementById('board');
+            el.innerHTML = '';
+            board.forEach((v,i)=>{
+                const b = document.createElement('button');
+                b.className = 'ttt-cell' + (v? ' filled '+v.toLowerCase() : '');
+                b.dataset.i = i;
+                if(v){ b.innerHTML = '<span class="mark">'+(v==='X'?'&#10005;':'&#9711;')+'</span>'; b.disabled = true; }
+                else { b.onclick = ()=>onPick(i); }
+                el.appendChild(b);
+            });
+        }
+
+        function setStatus(html){ document.getElementById('status').innerHTML = html; }
+        function updateScore(){
+            document.getElementById('score-ok').textContent = correctCount;
+            document.getElementById('score-bad').textContent = mistakeCount;
+        }
+
+        function onPick(i){
+            if(lock || board[i]) return;
+            activeCell = i; lock = true; askQuestion();
+        }
+
+        function askQuestion(){
+            const correct = nextWord();
+            const others = shuffle(pool.filter(w=>w.de!==correct.de));
+            const opts = shuffle([correct, others[0], others[1]]);
+            document.getElementById('q-word').textContent = correct.ua;
+            const fb = document.getElementById('q-feedback');
+            fb.textContent = ''; fb.className = 'ttt-feedback';
+            const box = document.getElementById('q-opts');
+            box.innerHTML = '';
+            opts.forEach(o=>{
+                const btn = document.createElement('button');
+                btn.className = 'ttt-opt';
+                btn.textContent = o.de;
+                btn.onclick = ()=>answer(btn, o.de===correct.de, correct);
+                box.appendChild(btn);
+            });
+            const q = document.getElementById('question');
+            q.classList.add('show');
+            q.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+
+        function answer(btn, isCorrect, correct){
+            [...document.querySelectorAll('.ttt-opt')].forEach(b=>{
+                b.disabled = true;
+                if(b.textContent===correct.de) b.classList.add('correct');
+            });
+            const fb = document.getElementById('q-feedback');
+            if(isCorrect){
+                fb.textContent = '✓ Правильно! ◯';
+                fb.className = 'ttt-feedback ok';
+                board[activeCell] = 'O';
+                correctCount++;
+            } else {
+                btn.classList.add('wrong');
+                fb.textContent = '✗ ' + correct.ua + ' = ' + correct.de + ' — ставимо ✕';
+                fb.className = 'ttt-feedback no';
+                board[activeCell] = 'X';
+                mistakeCount++;
+            }
+            updateScore();
+            setTimeout(()=>{
+                document.getElementById('question').classList.remove('show');
+                renderBoard();
+                if(checkEnd()) return;
+                setStatus('Обери наступну клітинку');
+                lock = false;
+            }, isCorrect ? 750 : 1500);
+        }
+
+        function checkEnd(){
+            for(const L of LINES){
+                if(L.every(i=>board[i]==='O')){ highlight(L); endGame('win'); return true; }
+            }
+            const full = board.every(v=>v);
+            const canStillWin = LINES.some(L=>L.every(i=>board[i]!=='X'));
+            if(full || !canStillWin){ endGame('lose'); return true; }
+            return false;
+        }
+
+        function highlight(line){ line.forEach(i=>{ const c=document.querySelector('.ttt-cell[data-i=\"'+i+'\"]'); if(c) c.classList.add('win'); }); }
+
+        function endGame(kind){
+            lock = true;
+            const r = document.getElementById('result');
+            const emoji = document.getElementById('result-emoji');
+            const title = document.getElementById('result-title');
+            const sub = document.getElementById('result-sub');
+            r.className = 'ttt-result show ' + (kind==='win'?'win':'lose');
+            if(kind==='win'){
+                emoji.textContent='🎉';
+                title.textContent='Три в ряд! Ти виграв!';
+                sub.textContent = 'Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                wins++; document.getElementById('wins').textContent = wins;
+                setStatus('<span class="accent">Перемога! 🎉 Три &#9711; в ряд</span>');
+            } else {
+                emoji.textContent='😕';
+                title.textContent='Лінія не зібралася';
+                sub.textContent = 'Помилки заблокували всі ряди. Правильних: ' + correctCount + ' · Помилок: ' + mistakeCount;
+                setStatus('Цього разу не вийшло — спробуй ще');
+            }
+        }
+
+        function newGame(){
+            board = ['','','','','','','','',''];
+            lock = false; activeCell = null;
+            correctCount = 0; mistakeCount = 0;
+            refillQueue();
+            updateScore();
+            document.getElementById('question').classList.remove('show');
+            document.getElementById('result').classList.remove('show');
+            setStatus('Обери клітинку');
+            renderBoard();
+        }
+
+        buildDayTabs();
+        document.getElementById('day-badge').textContent = LABELS[currentDay];
+        newGame();
+    </script>
+</body>
+</html>

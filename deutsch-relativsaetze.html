@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relativs&auml;tze &amp; Apposition | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    .rs-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.rs { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:520px; }
+    table.rs th { background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+                  text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.rs td { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top; }
+    table.rs tr.rs-grp td { background:rgba(244,114,182,0.10); color:#fff; font-weight:700; font-size:0.8rem;
+                            letter-spacing:0.05em; border-bottom:1px solid rgba(244,114,182,0.3); }
+    table.rs tbody tr:not(.rs-grp):hover { background:rgba(255,255,255,0.035); }
+    .rs-k { color:#fff; font-weight:700; white-space:nowrap; }
+    .rs-b { color:rgba(230,230,235,0.85); }
+    .rs-b u { text-decoration:none; border-bottom:2px solid rgba(134,239,172,0.55); color:#86efac; font-weight:600; }
+    .rs-b i { color:#f472b6; font-style:normal; font-weight:700; }
+    .rs-ru { color:rgba(230,230,235,0.55); font-size:0.85rem; }
+    .rs-note { color:rgba(230,230,235,0.5); font-size:0.8rem; }
+    .rs-new { color:#fbbf24; font-weight:800; }
+
+    /* Formen-Raster */
+    .rs-forms { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.6rem; margin-top:0.7rem; }
+    .rs-cell { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.7rem 0.85rem; }
+    .rs-cell h4 { margin:0 0 0.4rem; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:#9fb0c9; }
+    .rs-cell p { margin:0.15rem 0; font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.95rem; color:rgba(230,230,235,0.85); }
+    .rs-cell p b { color:#fbbf24; }
+
+    /* Trainer */
+    .tr-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tr-prompt { font-size:1.1rem; color:#fff; font-weight:600; text-align:center; margin:0.2rem 0 0.15rem; line-height:1.55; }
+    .tr-sub { text-align:center; color:rgba(230,230,235,0.6); font-size:0.88rem; margin-bottom:1rem; }
+    .tr-inp { width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); border-radius:8px;
+              padding:0.65rem 0.75rem; color:#fff; font-size:1.05rem; font-family:ui-monospace,"SF Mono",Menlo,monospace; text-align:center; }
+    .tr-inp:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px var(--color-accent-subtle); }
+    .tr-inp.ok { border-color:var(--color-green); background:rgba(63,185,80,0.1); }
+    .tr-inp.no { border-color:#f85149; background:rgba(248,81,73,0.1); }
+    .tr-actions { display:flex; gap:0.5rem; margin-top:0.8rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tr-fb { margin-top:0.8rem; font-size:0.95rem; min-height:1.4rem; text-align:center; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; line-height:1.55; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; line-height:1.55; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+
+    @media (max-width:640px) { .tr-prompt { font-size:0.98rem; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Relativs&auml;tze</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Relativs&auml;tze &amp; Apposition</h1>
+            <p class="page-subtitle">der / den / dem / dessen &middot; mit Pr&auml;position &middot; wo, was, wer &middot; и Apposition — короткий брат придаточного</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="system">Система</button>
+            <button class="tab" data-tab="kasus">4 Kasus</button>
+            <button class="tab" data-tab="praep">+ Pr&auml;position</button>
+            <button class="tab" data-tab="wowas">wo &middot; was &middot; wer</button>
+            <button class="tab" data-tab="apposition">&#x1F517; Apposition</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="drills">&#x270D;&#xFE0F; Drills</button>
+        </div>
+
+        <!-- ==================== SYSTEM ==================== -->
+        <div class="tab-content active" id="tab-system">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F511;</span>
+                    <div>
+                        <h2>Как это устроено</h2>
+                        <p class="lesson-header-sub">Придаточное, которое описывает не глагол, а <em>одно слово</em></p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F9E9; Relativsatz = Attribut в форме придаточного</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        Обычное придаточное зависит от сказуемого главного предложения. А <strong>Attributsatz</strong> зависит
+                        от одного слова &mdash; <strong>Bezugswort</strong>. Самый частый вид Attributsatz &mdash; это Relativsatz.
+                    </p>
+                    <table class="unit-table" style="margin-top:0.6rem;">
+                        <tr><th>Typ</th><th>Beispiel</th></tr>
+                        <tr><td>dass-Satz</td><td>Man lachte &uuml;ber Galileis <strong>Behauptung</strong>, <em>dass sich die Erde um die Sonne dreht</em>.</td></tr>
+                        <tr><td>ob-Satz</td><td>Die <strong>Frage</strong>, <em>ob M&auml;nner intelligenter sind</em>, ist sinnlos.</td></tr>
+                        <tr><td>Infinitivsatz</td><td>Otto hat den <strong>Entschluss</strong> gefasst, <em>Mathematik zu studieren</em>.</td></tr>
+                        <tr><td><strong>Relativsatz</strong></td><td>Ein <strong>Radfahrer</strong>, <em>der betrunken war</em>, ist ins Wasser gefallen.</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; Три правила, и тема закрыта</h3>
+                    <ol style="font-size:0.97rem; line-height:1.9; padding-left:1.2rem;">
+                        <li>Relativsatz стоит <strong>сразу за Bezugswort</strong> &mdash; насколько это возможно.</li>
+                        <li><strong>Род и число</strong> относительного местоимения берутся <strong>из Bezugswort</strong>.</li>
+                        <li><strong>Падеж</strong> берётся из <strong>роли внутри самого придаточного</strong> &mdash; не из главного!</li>
+                    </ol>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <thead><tr><th>Satz</th><th>Bezugswort</th><th>Rolle im Relativsatz</th><th>Form</th></tr></thead>
+                        <tbody>
+                            <tr><td class="rs-b">Der <b>Mann</b>, <u>dem</u> das Haus geh&ouml;rte, war schon alt.</td>
+                                <td class="rs-ru">m. Sg.</td><td class="rs-ru">Dativ-Erg&auml;nzung von &laquo;geh&ouml;ren&raquo;</td><td class="rs-k">dem</td></tr>
+                            <tr><td class="rs-b">Dort kommen unsere <b>Freunde</b>, auf <u>die</u> wir warten.</td>
+                                <td class="rs-ru">Pl.</td><td class="rs-ru">Akkusativ nach &laquo;auf&raquo;</td><td class="rs-k">die</td></tr>
+                            <tr><td class="rs-b">Wo ist der <b>Junge</b>, <u>der</u> mir ein Buch bringen wollte?</td>
+                                <td class="rs-ru">m. Sg.</td><td class="rs-ru">Subjekt</td><td class="rs-k">der</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CA; Формы Relativpronomen</h3>
+                    <p class="rs-note">Совпадают с определённым артиклем &mdash; кроме <span class="rs-new">четырёх выделенных</span>.</p>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <thead><tr><th></th><th>maskulin</th><th>neutrum</th><th>feminin</th><th>Plural</th></tr></thead>
+                        <tbody>
+                            <tr><td class="rs-k">Nominativ</td><td>der</td><td>das</td><td>die</td><td>die</td></tr>
+                            <tr><td class="rs-k">Akkusativ</td><td>den</td><td>das</td><td>die</td><td>die</td></tr>
+                            <tr><td class="rs-k">Dativ</td><td>dem</td><td>dem</td><td>der</td><td class="rs-new">denen</td></tr>
+                            <tr><td class="rs-k">Genitiv</td><td class="rs-new">dessen</td><td class="rs-new">dessen</td><td class="rs-new">deren</td><td class="rs-new">deren</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.94rem; margin-top:0.7rem;">
+                        Запомнить нужно ровно четыре формы: <strong>denen</strong> (Dativ Plural) и <strong>dessen / deren</strong> в родительном.
+                        Всё остальное &mdash; это артикль, который ты уже знаешь.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270F;&#xFE0F; Запятые и порядок слов</h3>
+                    <ul style="font-size:0.96rem; line-height:1.8; padding-left:1.1rem;">
+                        <li>Relativsatz <strong>всегда</strong> в запятых &mdash; с обеих сторон, если он внутри предложения.</li>
+                        <li>Глагол &mdash; <strong>в конце</strong> придаточного: <em>&hellip;, den ich dir gestern <b>geliehen habe</b>.</em></li>
+                        <li>Отделяемая приставка не отделяется: <em>&hellip;, der jeden Morgen um sechs <b>aufsteht</b>.</em></li>
+                        <li>Придаточное можно вставлять <strong>в середину</strong> главного:
+                            <em>Der Kugelschreiber, <b>den du mir geschenkt hast</b>, schreibt sehr gut.</em></li>
+                    </ul>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F1FA;&#x1F1E6; Где славянский сбивает</h3>
+                    <table class="unit-table">
+                        <tr><th>Falsch</th><th>Richtig</th><th>Почему</th></tr>
+                        <tr><td><s>Der Mann, der ich gestern getroffen habe&hellip;</s></td><td>Der Mann, <strong>den</strong> ich gestern getroffen habe&hellip;</td><td>внутри придаточного он дополнение &rarr; Akkusativ</td></tr>
+                        <tr><td><s>Das M&auml;dchen, die dort steht&hellip;</s></td><td>Das M&auml;dchen, <strong>das</strong> dort steht&hellip;</td><td>род берётся у Bezugswort, а не по смыслу</td></tr>
+                        <tr><td><s>&hellip;, die ich gesprochen habe mit.</s></td><td>&hellip;, <strong>mit denen</strong> ich gesprochen habe.</td><td>предлог идёт <em>перед</em> местоимением</td></tr>
+                        <tr><td><s>Der Mann was hier war&hellip;</s></td><td>Der Mann, <strong>der</strong> hier war&hellip;</td><td><em>was</em> только после alles/nichts/etwas и т.&nbsp;п.</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== 4 KASUS ==================== -->
+        <div class="tab-content" id="tab-kasus">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Четыре падежа по очереди</h2>
+                        <p class="lesson-header-sub">Спроси себя: кем это слово работает <em>внутри</em> придаточного?</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; 1. Nominativ &mdash; подлежащее придаточного</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Gib mir bitte den <b>Kugelschreiber</b>, <u>der</u> dort auf dem Tisch liegt!</td></tr>
+                            <tr><td class="rs-b">Das <b>Buch</b>, <u>das</u> dort liegt, gib mir bitte auch.</td></tr>
+                            <tr><td class="rs-b">&hellip; und auch noch die <b>Kassette</b>, <u>die</u> daneben liegt!</td></tr>
+                            <tr><td class="rs-b">Soll ich dir alle <b>Sachen</b> geben, <u>die</u> auf dem Tisch liegen?</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="rs-note" style="margin-top:0.5rem;">Проверка: после местоимения нет другого подлежащего &rarr; значит это Nominativ.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E3; 2. Akkusativ &mdash; прямое дополнение</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Der <b>Kugelschreiber</b>, <u>den</u> du mir geschenkt hast, schreibt sehr gut!</td></tr>
+                            <tr><td class="rs-b">Wo ist das <b>Buch</b>, <u>das</u> ich lesen soll?</td></tr>
+                            <tr><td class="rs-b">Von wem ist die <b>Kassette</b>, <u>die</u> wir eben geh&ouml;rt haben?</td></tr>
+                            <tr><td class="rs-b">Die <b>Sachen</b>, <u>die</u> du suchst, sind noch im Koffer.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="rs-note" style="margin-top:0.5rem;">Единственная видимая разница с Nominativ &mdash; мужской род: <em>der</em> &rarr; <strong>den</strong>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E1; 3. Dativ &mdash; глагол требует Dativ</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Wo ist der <b>Mann</b>, <u>dem</u> dieses Auto geh&ouml;rt? <span class="rs-ru">(geh&ouml;ren + D)</span></td></tr>
+                            <tr><td class="rs-b">Ida ist ein <b>Kind</b>, <u>dem</u> das Lernen schwerf&auml;llt. <span class="rs-ru">(schwerfallen + D)</span></td></tr>
+                            <tr><td class="rs-b">Die <b>Studentin</b>, <u>der</u> du den Koffer getragen hast, hat ein Paket abgegeben.</td></tr>
+                            <tr><td class="rs-b">Otto ist einer der <b>Menschen</b>, <u>denen</u> man gern zuh&ouml;rt. <span class="rs-ru">(zuh&ouml;ren + D)</span></td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.93rem; margin-top:0.6rem;">
+                        &#x1F4A1; Здесь пригодится список дативных глаголов: <em>geh&ouml;ren, helfen, danken, gratulieren, folgen, zuh&ouml;ren,
+                        begegnen, gefallen, schmecken, fehlen, passen, &auml;hnlich sein</em>. Подробнее &mdash;
+                        <a href="deutsch-verbvalenz.html" style="color:var(--color-accent)">Verbvalenz</a>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E0; 4. Genitiv &mdash; dessen / deren</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Sind Sie der <b>Mann</b>, <u>dessen</u> Auto vor meiner Garage steht?</td></tr>
+                            <tr><td class="rs-b">Wie hei&szlig;t das <b>Land</b>, <u>dessen</u> Hauptstadt Prag ist?</td></tr>
+                            <tr><td class="rs-b">Eine <b>Familie</b>, <u>deren</u> Wagen eine Panne hatte, sa&szlig; am Stra&szlig;enrand.</td></tr>
+                            <tr><td class="rs-b">Heute haben wir die <b>Leute</b> kennengelernt, <u>deren</u> Sohn mit unserem Sohn spielt.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.95rem; margin-top:0.7rem; line-height:1.65;">
+                        <strong>Два правила:</strong><br>
+                        &#x2460; <em>dessen/deren</em> стоит <strong>прямо перед существительным</strong>, которое принадлежит Bezugswort
+                        (<em>das Auto des Mannes &rarr; dessen Auto</em>).<br>
+                        &#x2461; Форма зависит <strong>только от Bezugswort</strong> (род и число) и <strong>не меняется</strong> по падежу:
+                        <em>dessen</em> &mdash; m/n, <em>deren</em> &mdash; f/Pl. Артикль после них не ставится.
+                    </p>
+                    <p class="rs-note" style="margin-top:0.5rem;">
+                        &#x26A0;&#xFE0F; После <em>dessen/deren</em> прилагательное получает <strong>сильное</strong> окончание:
+                        <em>&hellip;, deren <b>kleiner</b> Sohn krank ist</em> (не <s>deren kleine Sohn</s>).
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== + PRÄPOSITION ==================== -->
+        <div class="tab-content" id="tab-praep">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>Relativpronomen mit Präposition</h2>
+                        <p class="lesson-header-sub">Предлог всегда впереди — и он решает падеж</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3AF; Правило</h3>
+                    <p style="font-size:0.98rem; line-height:1.7;">
+                        Если глагол или ситуация внутри придаточного требует предлога, предлог встаёт
+                        <strong>перед</strong> относительным местоимением, и <strong>предлог задаёт падеж</strong>.
+                        В отличие от английского, «в конец» его отправить нельзя.
+                    </p>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Der <b>Student</b>, <i>neben</i> <u>dem</u> ich sitze, ist Pal&auml;stinenser. <span class="rs-ru">(neben + D, wo?)</span></td></tr>
+                            <tr><td class="rs-b">Das <b>Studentenheim</b>, <i>in</i> <u>dem</u> Ida wohnt, liegt am Stadtrand. <span class="rs-ru">(wo? &rarr; D)</span></td></tr>
+                            <tr><td class="rs-b">Die <b>Wohnung</b>, <i>in</i> <u>die</u> wir einziehen wollen, ist noch nicht fertig. <span class="rs-ru">(wohin? &rarr; A)</span></td></tr>
+                            <tr><td class="rs-b">Endlich kam der <b>Bus</b>, <i>auf</i> <u>den</u> ich gewartet hatte. <span class="rs-ru">(warten auf + A)</span></td></tr>
+                            <tr><td class="rs-b">Das sind <b>&Auml;rzte</b>, <i>zu</i> <u>denen</u> ich Vertrauen habe. <span class="rs-ru">(zu + D, Plural!)</span></td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="rs-note" style="margin-top:0.7rem;">
+                        Откуда берётся предлог? Из <strong>Präpositional-Ergänzung глагола</strong>: <em>warten <b>auf</b>, sich freuen <b>über</b>,
+                        sich verlassen <b>auf</b>, angewiesen sein <b>auf</b></em>. Полный список &mdash;
+                        <a href="deutsch-ergaenzungen.html" style="color:var(--color-accent)">Erg&auml;nzungen</a>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E0; Genitiv + Pr&auml;position &mdash; высший пилотаж</h3>
+                    <p style="font-size:0.96rem; line-height:1.65;">
+                        Три элемента подряд: <strong>предлог &rarr; dessen/deren &rarr; существительное</strong>.
+                        Хитрость в том, что предлог управляет <em>не</em> относительным местоимением, а существительным после него.
+                    </p>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Mein <b>Freund</b>, <i>in</i> <u>dessen</u> Zimmer ich wohne, macht ein Praktikum.</td></tr>
+                            <tr><td class="rs-b">Ich gebe dir ein <b>W&ouml;rterbuch</b>, <i>mit</i> <u>dessen</u> Hilfe du den Text &uuml;bersetzen kannst.</td></tr>
+                            <tr><td class="rs-b">Die <b>Lehrerin</b>, <i>an</i> <u>deren</u> Aussprache wir uns gew&ouml;hnt haben, verstehen wir gut.</td></tr>
+                            <tr><td class="rs-b">Die <b>Leute</b>, <i>f&uuml;r</i> <u>deren</u> Haus wir uns interessieren, kommen morgen zu uns.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <table class="unit-table" style="margin-top:0.7rem;">
+                        <tr><th>Element</th><th>Was bestimmt die Form?</th></tr>
+                        <tr><td>Pr&auml;position</td><td>глагол / смысл придаточного</td></tr>
+                        <tr><td><strong>dessen / deren</strong></td><td>род и число Bezugswort; падеж <em>не меняется</em></td></tr>
+                        <tr><td>Nomen danach</td><td><strong>предлог</strong>: <em>mit deren Problem<b>en</b></em> &mdash; mit + Dativ Plural</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Короче или длиннее?</h3>
+                    <table class="unit-table">
+                        <tr><th>Relativsatz</th><th>K&uuml;rzer</th></tr>
+                        <tr><td>Das Haus, <strong>in dem</strong> ich wohne&hellip;</td><td>Das Haus, <strong>wo</strong> ich wohne&hellip; <span class="rs-ru">(разговорно, только о месте)</span></td></tr>
+                        <tr><td>Die Stadt, <strong>in der</strong> Goethe geboren wurde&hellip;</td><td>Die Stadt, <strong>wo</strong> Goethe geboren wurde&hellip;</td></tr>
+                        <tr><td>Der Mann, <strong>der</strong> dort steht&hellip;</td><td>Der <strong>dort stehende</strong> Mann&hellip; <span class="rs-ru">(Partizip-Attribut, письменный стиль)</span></td></tr>
+                    </table>
+                    <p class="rs-note" style="margin-top:0.6rem;">
+                        Партиципиальные конструкции &mdash; <a href="deutsch-partizip.html" style="color:var(--color-accent)">Partizip</a>
+                        и <a href="deutsch-adj-partizip.html" style="color:var(--color-accent)">Adjektive aus Partizip</a>.
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== WO / WAS / WER ==================== -->
+        <div class="tab-content" id="tab-wowas">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F50E;</span>
+                    <div>
+                        <h2>Особые случаи: wo, was, wer</h2>
+                        <p class="lesson-header-sub">Когда der/die/das не годится</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; wo &mdash; о месте и времени</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <thead><tr><th>Fall</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="rs-k">Ortsangabe</td><td class="rs-b">Das ist die Stadt, <u>wo</u> ich geboren bin. <span class="rs-ru">(= in der)</span></td></tr>
+                            <tr><td class="rs-k">Geografischer Name<br><span class="rs-ru">— тут только wo!</span></td><td class="rs-b">Wir fahren nach K&ouml;ln, <u>wo</u> meine Tante wohnt. <span class="rs-ru">(нельзя &laquo;in dem&raquo;)</span></td></tr>
+                            <tr><td class="rs-k">Zeitangabe</td><td class="rs-b">Es gab Zeiten, <u>wo</u> man ohne Handy lebte. <span class="rs-ru">(besser: <b>in denen</b>)</span></td></tr>
+                            <tr><td class="rs-k">wohin / woher</td><td class="rs-b">Das Land, <u>wohin</u> er ausgewandert ist&hellip; &middot; die Stadt, <u>woher</u> sie kommt&hellip;</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="rs-note" style="margin-top:0.6rem;">
+                        После названий городов и стран <strong>обязательно wo</strong>. В остальных случаях <em>in dem / in der</em> звучит
+                        нейтральнее, а <em>wo</em> &mdash; разговорнее.
+                    </p>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4A0; was &mdash; после «неопределённых» слов</h3>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <thead><tr><th>Nach&hellip;</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="rs-k">alles, nichts, etwas, vieles, weniges, manches</td>
+                                <td class="rs-b">Das ist alles, <u>was</u> ich wei&szlig;. &middot; Es gibt nichts, <u>was</u> mich mehr &auml;rgert.</td></tr>
+                            <tr><td class="rs-k">das, dasselbe, dasjenige</td>
+                                <td class="rs-b">Das, <u>was</u> du sagst, stimmt nicht.</td></tr>
+                            <tr><td class="rs-k">Superlativ im Neutrum</td>
+                                <td class="rs-b">Das ist das Interessanteste, <u>was</u> du machen kannst.</td></tr>
+                            <tr><td class="rs-k">ganzer Hauptsatz<br><span class="rs-ru">= «что» обо всём сказанном</span></td>
+                                <td class="rs-b">Er hat die Pr&uuml;fung bestanden, <u>was</u> mich sehr gefreut hat.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.94rem; margin-top:0.7rem;">
+                        С предлогом <em>was</em> превращается в <strong>wo(r)-</strong>:
+                        <em>Es gibt nichts, <b>wor&uuml;ber</b> ich mich &auml;rgere.</em> &middot;
+                        <em>Er kam zu sp&auml;t, <b>wor&uuml;ber</b> sich alle &auml;rgerten.</em>
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F464; wer &mdash; без Bezugswort вообще</h3>
+                    <p style="font-size:0.96rem; line-height:1.65;">
+                        Когда «тот, кто» неизвестен и главному предложению не за что зацепиться, придаточное начинается
+                        с <strong>wer / wen / wem / wessen</strong> и стоит <strong>впереди</strong>:
+                    </p>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b"><u>Wer</u> zuletzt lacht, lacht am besten.</td><td class="rs-ru">кто смеётся последним&hellip;</td></tr>
+                            <tr><td class="rs-b"><u>Wer</u> in Deutschland arm ist, ist nicht so arm wie die Armen anderswo.</td><td class="rs-ru">тот, кто&hellip;</td></tr>
+                            <tr><td class="rs-b"><u>Wen</u> man nicht kennt, dem vertraut man nicht.</td><td class="rs-ru">Akk. &rarr; Dat. во второй части</td></tr>
+                            <tr><td class="rs-b"><u>Wem</u> das nicht passt, der kann gehen.</td><td class="rs-ru">кому не нравится&hellip;</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="rs-note" style="margin-top:0.6rem;">
+                        Во второй части часто появляется <em>der / dem / den</em> &mdash; и падеж там свой, по роли в главном предложении.
+                        Если оба падежа совпадают, второе местоимение можно опустить: <em>Wer nicht arbeitet, (der) soll auch nicht essen.</em>
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== APPOSITION ==================== -->
+        <div class="tab-content" id="tab-apposition">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>Die Apposition</h2>
+                        <p class="lesson-header-sub">Пояснение без глагола — самый короткий способ добавить информацию</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Что это</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        <strong>Apposition</strong> &mdash; это Rechtsattribut в <em>именной</em> форме: второе название того же самого,
+                        поставленное сразу за словом и <strong>в том же падеже</strong>.
+                    </p>
+                    <div class="rs-wrap">
+                    <table class="rs">
+                        <tbody>
+                            <tr><td class="rs-b">Unsere <b>Nachbarn</b>, <u>freundliche &auml;ltere Leute</u>, haben uns eingeladen. <span class="rs-ru">(Nom.)</span></td></tr>
+                            <tr><td class="rs-b">Kennst du <b>Herrn Demirel</b>, <u>den t&uuml;rkischen Konsul</u>? <span class="rs-ru">(Akk.)</span></td></tr>
+                            <tr><td class="rs-b">Ich bin gestern <b>Herrn Beuers</b>, <u>meinem Deutschlehrer</u>, begegnet. <span class="rs-ru">(Dat. &mdash; begegnen + D)</span></td></tr>
+                            <tr><td class="rs-b">Sie studiert in <b>G&ouml;ttingen</b>, <u>einer norddeutschen Universit&auml;tsstadt</u>. <span class="rs-ru">(Dat. &mdash; nach &laquo;in&raquo;)</span></td></tr>
+                            <tr><td class="rs-b">Rabat ist die Hauptstadt <b>Marokkos</b>, <u>eines nordafrikanischen Staates</u>. <span class="rs-ru">(Gen.)</span></td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Четыре правила</h3>
+                    <ol style="font-size:0.97rem; line-height:1.9; padding-left:1.2rem;">
+                        <li>Apposition &mdash; <strong>именная</strong> конструкция, глагола внутри нет.</li>
+                        <li>Стоит <strong>в том же падеже</strong>, что и Bezugswort.</li>
+                        <li><strong>Предлог не повторяется</strong>: <em>in G&ouml;ttingen, <s>in</s> einer Universit&auml;tsstadt</em> &mdash;
+                            но падеж от предлога сохраняется.</li>
+                        <li>Всегда <strong>между запятыми</strong> (в конце предложения &mdash; одна запятая перед).</li>
+                    </ol>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Одна мысль &mdash; три уровня</h3>
+                    <table class="unit-table">
+                        <tr><th>Форма</th><th>Beispiel</th><th>Stil</th></tr>
+                        <tr><td>zwei S&auml;tze</td><td>Das ist Peter. Er ist mein &auml;lterer Bruder.</td><td>A1</td></tr>
+                        <tr><td>Relativsatz</td><td>Das ist Peter, <strong>der mein &auml;lterer Bruder ist</strong>.</td><td>A2/B1</td></tr>
+                        <tr><td><strong>Apposition</strong></td><td>Das ist Peter, <strong>mein &auml;lterer Bruder</strong>.</td><td>B1+ &mdash; короче и естественнее</td></tr>
+                    </table>
+                    <p style="font-size:0.93rem; margin-top:0.7rem;">
+                        &#x1F4A1; Аппозиция &mdash; лучший способ убрать лишние придаточные из письменного текста.
+                        Особенно в <a href="deutsch-inhaltsangabe.html" style="color:var(--color-accent)">Inhaltsangabe</a> и
+                        <a href="deutsch-nominalstil.html" style="color:var(--color-accent)">Nominalstil</a>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x26A0;&#xFE0F; Мелочи, на которых спотыкаются</h3>
+                    <table class="unit-table">
+                        <tr><th>Fall</th><th>Beispiel</th></tr>
+                        <tr><td>Titel/Beruf перед именем &mdash; <strong>без</strong> запятой</td><td>Bundeskanzlerin Merkel &middot; Professor Weber</td></tr>
+                        <tr><td>&hellip; после имени &mdash; <strong>с</strong> запятыми</td><td>Angela Merkel, <em>die damalige Bundeskanzlerin</em>, sagte&hellip;</td></tr>
+                        <tr><td>als + Nomen &mdash; без запятой и без артикля</td><td>Er arbeitet <em>als Lehrer</em> in Berlin.</td></tr>
+                        <tr><td>Ma&szlig;angaben &mdash; без запятой</td><td>ein Glas Wasser &middot; zwei Kilo &Auml;pfel</td></tr>
+                        <tr><td>Datum / Ort в письме</td><td>M&uuml;nster, <em>den 2. August 2026</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270D;&#xFE0F; &Uuml;bung: bilden Sie Appositionen</h3>
+                    <p class="rs-note" style="margin-bottom:0.6rem;">Скажи вслух, потом кликни. Следи за падежом!</p>
+                    <div id="drApp"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Trainer: Relativpronomen</h2>
+                        <p class="lesson-header-sub">Впиши форму. Если нужен предлог — пиши вместе с ним</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="tr-box">
+                        <div class="tr-prompt" id="trPrompt">&hellip;</div>
+                        <div class="tr-sub" id="trSub"></div>
+                        <input class="tr-inp" id="trInput" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Relativpronomen">
+                        <div class="tr-actions">
+                            <button class="tr-btn" id="trCheck">Pr&uuml;fen</button>
+                            <button class="tr-btn ghost" id="trSkip">Antwort zeigen</button>
+                            <button class="tr-btn ghost" id="trNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="tr-fb" id="trFb"></div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="trOk">0</b></span>
+                            <span>Falsch: <b id="trBad">0</b></span>
+                            <span>Rest: <b id="trLeft">0</b></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== DRILLS ==================== -->
+        <div class="tab-content" id="tab-drills">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Drills</h2>
+                        <p class="lesson-header-sub">Сформулируй вслух, потом кликни</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A. Nominativ &amp; Akkusativ &mdash; erg&auml;nzen Sie</h3>
+                    <div id="drA"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B. Dativ &mdash; erg&auml;nzen Sie</h3>
+                    <div id="drB"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C. Mit Pr&auml;position</h3>
+                    <div id="drC"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>D. Genitiv: dessen / deren</h3>
+                    <div id="drD"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>E. Zwei S&auml;tze &rarr; ein Relativsatz</h3>
+                    <p class="rs-note" style="margin-bottom:0.6rem;">Предложение в скобках должно стать придаточным.</p>
+                    <div id="drE"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>F. Genitiv-Relativs&auml;tze bilden</h3>
+                    <div id="drF"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== TABS ===================== */
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+
+/* ===================== TRAINER ===================== */
+const TRAIN = [
+{q:'Wie hei&szlig;t die Studentin, ___ neben dir wohnt?',                 a:['die'],        hint:'f. Sg. &middot; Subjekt'},
+{q:'Woher kommt der Student, ___ so gut Deutsch spricht?',                a:['der'],        hint:'m. Sg. &middot; Subjekt'},
+{q:'Wem geh&ouml;rt das Fahrrad, ___ vor eurer Garage steht?',            a:['das'],        hint:'n. Sg. &middot; Subjekt'},
+{q:'Kennst du die jungen Leute, ___ dort auf der Bank sitzen?',           a:['die'],        hint:'Plural &middot; Subjekt'},
+{q:'Hier ist der Text, ___ wir &uuml;bersetzen sollen.',                  a:['den'],        hint:'m. Sg. &middot; Objekt'},
+{q:'Die Aufgabe, ___ der Lehrer gestellt hat, ist sehr schwer.',          a:['die'],        hint:'f. Sg. &middot; Objekt'},
+{q:'Nenn mir einen Roman, ___ du besonders gern gelesen hast!',           a:['den'],        hint:'m. Sg. &middot; Objekt'},
+{q:'Hier sind die Formulare, ___ wir ausf&uuml;llen m&uuml;ssen.',        a:['die'],        hint:'Pl. &middot; Objekt'},
+{q:'Wo ist die Frau, ___ diese Tasche geh&ouml;rt?',                      a:['der'],        hint:'geh&ouml;ren + Dativ, f. Sg.'},
+{q:'Kennst du das M&auml;dchen, ___ der Hund geh&ouml;rt?',               a:['dem'],        hint:'n. Sg. &middot; Dativ'},
+{q:'Es gibt viele Menschen, ___ man helfen m&uuml;sste.',                 a:['denen'],      hint:'helfen + D, Plural'},
+{q:'Mein Freund, ___ das deutsche Essen nicht schmeckt, kocht selbst.',   a:['dem'],        hint:'schmecken + D'},
+{q:'Die Insel, ___ das Schiff sich n&auml;hert, hei&szlig;t Sylt.',       a:['der'],        hint:'sich n&auml;hern + D, f. Sg.'},
+{q:'Wer war der Mann, ___ du so lange gesprochen hast? (mit)',            a:['mit dem'],    hint:'Pr&auml;position mitschreiben'},
+{q:'Das Geschenk, ___ ich mich am meisten gefreut habe, kam von dir.',    a:['über das','ueber das'], hint:'sich freuen &uuml;ber + A'},
+{q:'Morgen ist die Pr&uuml;fung, ___ ich seit 6 Monaten lerne.',          a:['für die','fuer die'],   hint:'lernen f&uuml;r + A'},
+{q:'Dort dr&uuml;ben ist die Schule, ___ ich mein Abitur gemacht habe.',  a:['in der'],     hint:'wo? &rarr; Dativ'},
+{q:'Wie hei&szlig;t die Familie, ___ du wohnst?',                         a:['bei der'],    hint:'wohnen bei + D'},
+{q:'Der Stuhl, ___ ich sitze, ist nicht bequem.',                         a:['auf dem'],    hint:'sitzen auf + D (wo?)'},
+{q:'Ich bringe dir einen Stuhl, ___ du dich setzen kannst.',              a:['auf den'],    hint:'sich setzen auf + A (wohin?)'},
+{q:'Die Freunde, ___ unsere Kinder spielen, wohnen gegen&uuml;ber.',      a:['mit denen'],  hint:'spielen mit + D, Plural'},
+{q:'Kennst du die Stadt, ___ Goethe geboren wurde?',                      a:['in der'],     hint:'Ort &rarr; in + D'},
+{q:'Leute, ___ man angewiesen ist, sollte man freundlich behandeln.',     a:['auf die'],    hint:'angewiesen sein auf + A'},
+{q:'Kennst du Herrn Meier, ___ Tochter promoviert hat?',                  a:['dessen'],     hint:'Genitiv, m. Sg.'},
+{q:'Alle Sch&uuml;ler, ___ Noten zu schlecht sind, wiederholen die Klasse.', a:['deren'],   hint:'Genitiv, Plural'},
+{q:'Man darf nicht mit einem Auto fahren, ___ Bremsen nicht funktionieren.', a:['dessen'],  hint:'Genitiv, n. Sg.'},
+{q:'Die Studentin, ___ Schrift man gut lesen kann, stammt aus Polen.',    a:['deren'],      hint:'Genitiv, f. Sg.'},
+{q:'Ich wohne bei einer Frau, ___ Tochter in Amerika ist.',               a:['deren'],      hint:'Genitiv, f. Sg.'},
+{q:'Ich habe einen Schulfreund getroffen, ___ Namen ich mich nicht erinnern konnte. (an)', a:['an dessen'], hint:'sich erinnern an + Genitiv-Pronomen'},
+{q:'Jeder braucht einen Menschen, ___ Hilfe er sich verlassen kann. (auf)', a:['auf dessen'], hint:'sich verlassen auf'},
+{q:'Meine Eltern, ___ Unterst&uuml;tzung ich angewiesen bin, helfen mir. (auf)', a:['auf deren'], hint:'angewiesen sein auf, Plural'},
+{q:'Das ist alles, ___ ich wei&szlig;.',                                  a:['was'],        hint:'nach &laquo;alles&raquo;'},
+{q:'Es gibt nichts, ___ mich mehr &auml;rgert.',                          a:['was'],        hint:'nach &laquo;nichts&raquo;'},
+{q:'Er hat die Pr&uuml;fung bestanden, ___ mich sehr gefreut hat.',       a:['was'],        hint:'bezieht sich auf den ganzen Satz'},
+{q:'Wir fahren nach K&ouml;ln, ___ meine Tante wohnt.',                   a:['wo'],         hint:'geografischer Name'}
+];
+
+let pool = [], cur = null, ok = 0, bad = 0, answered = false;
+const $ = id => document.getElementById(id);
+const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+}
+function nextQ() {
+    if (!pool.length) pool = shuffle(TRAIN);
+    cur = pool.pop();
+    answered = false;
+    $('trPrompt').innerHTML = cur.q.replace(/___/g, '<span style="color:var(--color-accent)">___</span>');
+    $('trSub').innerHTML = cur.hint || '';
+    const inp = $('trInput'); inp.value = ''; inp.className = 'tr-inp'; inp.focus();
+    $('trFb').textContent = '';
+    $('trLeft').textContent = pool.length;
+}
+function check() {
+    if (answered) { nextQ(); return; }
+    const inp = $('trInput'), val = norm(inp.value);
+    if (!val) return;
+    if (cur.a.some(a => norm(a) === val)) {
+        inp.classList.add('ok'); ok++; $('trOk').textContent = ok;
+        $('trFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig</span>';
+    } else {
+        inp.classList.add('no'); bad++; $('trBad').textContent = bad;
+        $('trFb').innerHTML = '<span style="color:#f85149">&#x2717; richtig: <b>' + cur.a[0] + '</b></span>';
+    }
+    answered = true;
+}
+$('trCheck').addEventListener('click', check);
+$('trNext').addEventListener('click', nextQ);
+$('trSkip').addEventListener('click', () => { $('trFb').innerHTML = '<span style="color:#fbbf24">&rarr; ' + cur.a[0] + '</span>'; answered = true; });
+$('trInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : check(); } });
+nextQ();
+
+/* ===================== DRILLS ===================== */
+const DRILLS = {
+    drA: [
+        ['Hast du den Film gesehen, ___ im &laquo;Cinema&raquo; l&auml;uft?', '<b>der</b>'],
+        ['Peter wohnt in einem Haus, ___ wundersch&ouml;n ist.', '<b>das</b>'],
+        ['Brasilianer, ___ nach Portugal kommen, haben keine Sprachprobleme.', '<b>die</b>'],
+        ['Ich kaufe nur Gem&uuml;se, ___ frisch ist.', '<b>das</b>'],
+        ['Kannst du mir das Buch ausleihen, ___ wir lesen sollen?', '<b>das</b>'],
+        ['Die Regeln, ___ wir lernen sollen, stehen auf Seite 32.', '<b>die</b>'],
+        ['Wo ist der Zeitungsartikel, ___ ich lesen soll?', '<b>den</b>'],
+        ['Zeig mir bitte die &Uuml;bung, ___ ihr machen sollt!', '<b>die</b>'],
+        ['Wer ist die Frau auf dem Foto, ___ du mir gezeigt hast?', '<b>das</b> &mdash; Bezugswort ist <em>das Foto</em>! <span style="color:rgba(230,230,235,0.5)">(bei &laquo;die Frau&raquo; w&auml;re es <em>die</em>)</span>'],
+        ['Der Text, ___ wir heute gelesen haben, war schwer.', '<b>den</b>']
+    ],
+    drB: [
+        ['Der Mann, ___ ich den Weg gezeigt habe, war ein Ausl&auml;nder.', '<b>dem</b>'],
+        ['Die beiden Polen, ___ ich meine Adresse gegeben habe, besuchen mich.', '<b>denen</b>'],
+        ['Wie hei&szlig;t die Frau, ___ du das Zimmer besorgt hast?', '<b>der</b>'],
+        ['Mehrere Zuschauer, ___ der Film nicht gefiel, haben das Kino verlassen.', '<b>denen</b>'],
+        ['Der Tourist, ___ wir das Hotel empfohlen haben, ist zufrieden.', '<b>dem</b>'],
+        ['Anna, ___ ich Geld geliehen habe, hat sich nicht mehr gemeldet.', '<b>der</b>'],
+        ['Ich verwechsle Peter oft mit seinem Bruder, ___ er sehr &auml;hnlich ist.', '<b>dem</b> <span style="color:rgba(230,230,235,0.5)">(&auml;hnlich + D)</span>'],
+        ['Alle Freunde, ___ es m&ouml;glich war, sind zur Hochzeit gekommen.', '<b>denen</b>'],
+        ['Er ist traurig wie ein Kind, ___ man sein Spielzeug weggenommen hat.', '<b>dem</b>'],
+        ['Unsere Freunde, ___ wir unseren Besuch angek&uuml;ndigt hatten, waren entt&auml;uscht.', '<b>denen</b>']
+    ],
+    drC: [
+        ['Ich m&ouml;chte dir meine Geschwister vorstellen, ___ ich dir oft erz&auml;hlt habe.', '<b>von denen</b>'],
+        ['Wir haben eine sch&ouml;ne Wohnung, ___ wir eine hohe Miete zahlen m&uuml;ssen.', '<b>f&uuml;r die</b>'],
+        ['Dort kommt ein Taxi, ___ Sie nach Hause fahren k&ouml;nnen.', '<b>mit dem</b>'],
+        ['&laquo;Emanzipation&raquo; ist ein Thema, ___ wir oft diskutiert haben.', '<b>&uuml;ber das</b>'],
+        ['Hast du eine Sonnencreme, ___ man sich vor Sonnenbrand sch&uuml;tzen kann?', '<b>mit der</b>'],
+        ['Das Studentenheim, ___ Ida wohnt, liegt am Stadtrand.', '<b>in dem</b> <span style="color:rgba(230,230,235,0.5)">(wo? &rarr; Dativ)</span>'],
+        ['Die Wohnung, ___ wir einziehen wollen, ist noch nicht fertig.', '<b>in die</b> <span style="color:rgba(230,230,235,0.5)">(wohin? &rarr; Akkusativ)</span>'],
+        ['Endlich kam der Bus, ___ ich eine halbe Stunde gewartet hatte.', '<b>auf den</b>'],
+        ['Das sind &Auml;rzte, ___ ich Vertrauen habe.', '<b>zu denen</b>'],
+        ['Der Student, ___ ich sitze, ist Pal&auml;stinenser.', '<b>neben dem</b>']
+    ],
+    drD: [
+        ['Im Sprachkurs gibt es Studenten, ___ Aussprache sehr undeutlich ist.', '<b>deren</b>'],
+        ['Ruf doch Herrn Schmitz an, ___ Telefonnummer ich dir gegeben habe.', '<b>dessen</b>'],
+        ['Wir fahren mit Familie Meier, ___ Auto gr&ouml;&szlig;er als unseres ist.', '<b>deren</b>'],
+        ['Ein Fahrrad, ___ Reifen platt sind, muss geschoben werden.', '<b>dessen</b>'],
+        ['Ich interessiere mich nur f&uuml;r Zimmer, ___ Miete ich bezahlen kann.', '<b>deren</b>'],
+        ['Der Student, ___ Name so lang ist, kommt aus Madagaskar.', '<b>dessen</b>'],
+        ['Meine Eltern, ___ Rente sehr niedrig ist, werden von mir unterst&uuml;tzt.', '<b>deren</b>'],
+        ['Die Studentin, ___ Adresse ich mich erkundigt habe, studiert nicht mehr hier. (nach)', '<b>nach deren</b>'],
+        ['Hoffentlich ist unseren Eltern, ___ Anruf wir seit Tagen warten, nichts passiert! (auf)', '<b>auf deren</b>'],
+        ['Unsere Freunde, ___ Katzen wir uns gek&uuml;mmert haben, kommen zur&uuml;ck. (um)', '<b>um deren</b>'],
+        ['Ich schreibe an Peter, ___ Geschenk ich mich sehr gefreut habe. (&uuml;ber)', '<b>&uuml;ber dessen</b>'],
+        ['Dort sitzt Herr Schmidt, ___ Frau ich eben telefoniert habe. (mit)', '<b>mit dessen</b>'],
+        ['Mein Zimmernachbar, ___ L&auml;rm ich mich beschwert habe, spricht nicht mehr mit mir. (&uuml;ber)', '<b>&uuml;ber dessen</b>'],
+        ['Jeden Abend besucht sie ihre Schwester, ___ Gesundheit sie sich Sorgen macht. (um)', '<b>um deren</b>']
+    ],
+    drE: [
+        ['Meine Freundin hat sich gefreut. (Ich habe ihr eine CD geschenkt.)', 'Meine Freundin, <b>der</b> ich eine CD geschenkt habe, hat sich gefreut.'],
+        ['Der Fahrer war betrunken. (Der Fahrer hat den Bus gefahren.)', 'Der Fahrer, <b>der</b> den Bus gefahren hat, war betrunken.'],
+        ['Der Kugelschreiber schreibt sehr gut. (Ich habe ihn gefunden.)', 'Der Kugelschreiber, <b>den</b> ich gefunden habe, schreibt sehr gut.'],
+        ['Unsere G&auml;ste kommen aus M&uuml;nchen. (Wir haben f&uuml;r sie ein Zimmer reserviert.)', 'Unsere G&auml;ste, <b>f&uuml;r die</b> wir ein Zimmer reserviert haben, kommen aus M&uuml;nchen.'],
+        ['Der Roman ist langweilig. (Du hast mich nach dem Roman gefragt.)', 'Der Roman, <b>nach dem</b> du mich gefragt hast, ist langweilig.'],
+        ['Hassan f&auml;hrt mit einem Fahrrad. (Sein Freund hat es ihm geliehen.)', 'Hassan f&auml;hrt mit einem Fahrrad, <b>das</b> ihm sein Freund geliehen hat.'],
+        ['Ich schreibe meiner Mutter einen Brief. (Sie macht Urlaub auf Sylt.)', 'Ich schreibe meiner Mutter, <b>die</b> Urlaub auf Sylt macht, einen Brief.'],
+        ['Die Leute waren sympathisch. (Ich habe mich mit ihnen im Zug unterhalten.)', 'Die Leute, <b>mit denen</b> ich mich im Zug unterhalten habe, waren sympathisch.'],
+        ['Kostas ist nach Griechenland zur&uuml;ckgekehrt. (Ihm gefiel das Leben hier nicht.)', 'Kostas, <b>dem</b> das Leben hier nicht gefiel, ist nach Griechenland zur&uuml;ckgekehrt.'],
+        ['Ist das deine Schwester? (Du hast so viel von ihr erz&auml;hlt.)', 'Ist das deine Schwester, <b>von der</b> du so viel erz&auml;hlt hast?'],
+        ['Unsere Nachbarn haben sich nicht bedankt. (Wir haben ihnen geholfen.)', 'Unsere Nachbarn, <b>denen</b> wir geholfen haben, haben sich nicht bedankt.'],
+        ['Die h&uuml;bsche Frau hei&szlig;t Katrin. (Ich bin in die Frau verliebt.)', 'Die h&uuml;bsche Frau, <b>in die</b> ich verliebt bin, hei&szlig;t Katrin.'],
+        ['Das M&auml;dchen hat sich gefreut. (Ich habe ihm einen Teddyb&auml;ren geschenkt.)', 'Das M&auml;dchen, <b>dem</b> ich einen Teddyb&auml;ren geschenkt habe, hat sich sehr gefreut.'],
+        ['Jetzt kommt endlich das Taxi. (Ich habe lange darauf gewartet.)', 'Jetzt kommt endlich das Taxi, <b>auf das</b> ich lange gewartet habe.']
+    ],
+    drF: [
+        ['Die Studenten m&uuml;ssen einen Sprachkurs besuchen. (Ihre Deutschkenntnisse reichen nicht aus.)', 'Die Studenten, <b>deren</b> Deutschkenntnisse nicht ausreichen, m&uuml;ssen einen Sprachkurs besuchen.'],
+        ['Mein Onkel unterst&uuml;tzt unsere Familie. (Ich bin mit seiner Hilfe hergekommen.)', 'Mein Onkel, <b>mit dessen</b> Hilfe ich hergekommen bin, unterst&uuml;tzt unsere Familie.'],
+        ['Wir wohnen bei Meiers. (In ihrem Haus gibt es gen&uuml;gend Platz.)', 'Wir wohnen bei Meiers, <b>in deren</b> Haus es gen&uuml;gend Platz gibt.'],
+        ['Wie hei&szlig;t der Student? (Ich kann seine Unterschrift nicht lesen.)', 'Wie hei&szlig;t der Student, <b>dessen</b> Unterschrift ich nicht lesen kann?'],
+        ['Der Reisende wurde festgenommen. (Die Polizei fand Drogen in seinem Koffer.)', 'Der Reisende, <b>in dessen</b> Koffer die Polizei Drogen fand, wurde festgenommen.'],
+        ['Der Film war interessant. (Der Regisseur des Films ist kaum bekannt.)', 'Der Film, <b>dessen</b> Regisseur kaum bekannt ist, war sehr interessant.'],
+        ['Der Mann war wieder hier. (Ich kenne seinen Namen nicht.)', 'Der Mann, <b>dessen</b> Namen ich nicht kenne, war wieder hier.'],
+        ['Die Bank war schmutzig. (Ich hatte mich auf die Bank gesetzt.)', 'Die Bank, <b>auf die</b> ich mich gesetzt hatte, war leider schmutzig.'],
+        ['Wer hat die Leute gesehen? (Dieses Auto geh&ouml;rt ihnen.)', 'Wer hat die Leute gesehen, <b>denen</b> dieses Auto geh&ouml;rt?'],
+        ['Kennst du diese Leute? (Wir sind ihnen gestern begegnet.)', 'Kennst du diese Leute, <b>denen</b> wir gestern begegnet sind?'],
+        ['Der Student hat sich ge&auml;rgert. (Man hat ihm das Fahrrad gestohlen.)', 'Der Student, <b>dem</b> man das Fahrrad gestohlen hat, hat sich sehr ge&auml;rgert.'],
+        ['Der Zug war p&uuml;nktlich. (Mein Freund kam mit dem Zug an.)', 'Der Zug, <b>mit dem</b> mein Freund ankam, war p&uuml;nktlich.']
+    ],
+    drApp: [
+        ['Hier ist Peter. <span style="color:rgba(230,230,235,0.5)">(Peter = mein &auml;lterer Bruder)</span>', 'Hier ist Peter, <b>mein &auml;lterer Bruder</b>. <span style="color:rgba(230,230,235,0.5)">(Nominativ)</span>'],
+        ['Hast du Peter gesehen?', 'Hast du Peter, <b>meinen &auml;lteren Bruder</b>, gesehen? <span style="color:rgba(230,230,235,0.5)">(Akkusativ)</span>'],
+        ['Hast du mit Peter gesprochen?', 'Hast du mit Peter, <b>meinem &auml;lteren Bruder</b>, gesprochen? <span style="color:rgba(230,230,235,0.5)">(Dativ &mdash; &laquo;mit&raquo; wird nicht wiederholt)</span>'],
+        ['Alle Freunde Peters sind schon bei uns gewesen.', 'Alle Freunde Peters, <b>meines &auml;lteren Bruders</b>, sind schon bei uns gewesen. <span style="color:rgba(230,230,235,0.5)">(Genitiv)</span>'],
+        ['Er lebt in Paris. <span style="color:rgba(230,230,235,0.5)">(Paris = die franz&ouml;sische Hauptstadt)</span>', 'Er lebt in Paris, <b>der franz&ouml;sischen Hauptstadt</b>.'],
+        ['Paris hat mir gut gefallen.', 'Paris, <b>die franz&ouml;sische Hauptstadt</b>, hat mir gut gefallen.'],
+        ['Meine Erinnerungen an Paris sind ganz lebendig.', 'Meine Erinnerungen an Paris, <b>die franz&ouml;sische Hauptstadt</b>, sind ganz lebendig. <span style="color:rgba(230,230,235,0.5)">(an + Akk.)</span>'],
+        ['Hast du noch nichts von den Azteken geh&ouml;rt? <span style="color:rgba(230,230,235,0.5)">(= die Ureinwohner Mexikos)</span>', 'Hast du noch nichts von den Azteken, <b>den Ureinwohnern Mexikos</b>, geh&ouml;rt?'],
+        ['Die Pyramiden der Azteken sind weltber&uuml;hmt.', 'Die Pyramiden der Azteken, <b>der Ureinwohner Mexikos</b>, sind weltber&uuml;hmt.'],
+        ['Wart ihr schon einmal in Australien? <span style="color:rgba(230,230,235,0.5)">(= der f&uuml;nfte Kontinent)</span>', 'Wart ihr schon einmal in Australien, <b>dem f&uuml;nften Kontinent</b>?'],
+        ['Wie hat dir Australien gefallen?', 'Wie hat dir Australien, <b>der f&uuml;nfte Kontinent</b>, gefallen?'],
+        ['Australien kenne ich &uuml;berhaupt nicht.', 'Australien, <b>den f&uuml;nften Kontinent</b>, kenne ich &uuml;berhaupt nicht.'],
+        ['Dieses Lammfleisch kommt aus Australien.', 'Dieses Lammfleisch kommt aus Australien, <b>dem f&uuml;nften Kontinent</b>.']
+    ]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        `<div class="dr-item"><div class="dr-q">${q}</div><div class="dr-a">${a}</div></div>`).join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>
