@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First German Reader — English words | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    .rd-tools { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0.2rem 0 1rem; }
+    .rd-search { flex:1 1 220px; min-width:180px; background:rgba(0,0,0,0.35);
+                 border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:0.55rem 0.8rem;
+                 color:#fff; font-size:0.95rem; font-family:inherit; }
+    .rd-search:focus { outline:none; border-color:#58a6ff; box-shadow:0 0 0 3px #58a6ff33; }
+    .rd-count { color:rgba(230,230,235,0.5); font-size:0.82rem; }
+    .rd-btn { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8);
+              border-radius:8px; padding:0.5rem 0.9rem; font-size:0.88rem; cursor:pointer; font-family:inherit; }
+    .rd-btn:hover { border-color:#58a6ff; color:#fff; }
+    .rd-btn.on { background:#58a6ff; border-color:#58a6ff; color:#0e0a1a; font-weight:700; }
+
+    .rd-chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-bottom:1rem; }
+    .rd-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); color:rgba(230,230,235,0.75);
+               border-radius:50px; padding:0.32rem 0.8rem; font-size:0.8rem; cursor:pointer; font-family:inherit;
+               white-space:nowrap; transition:all .15s; }
+    .rd-chip:hover { border-color:#58a6ff; color:#fff; }
+    .rd-chip.on { background:#58a6ff; border-color:#58a6ff; color:#0e0a1a; font-weight:700; }
+
+    .rd-deck { margin-bottom:1.3rem; }
+    .rd-deck > h3 { margin:0 0 0.5rem; font-size:1rem; color:#58a6ff; letter-spacing:0.02em; }
+    .rd-row { display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1.25fr) minmax(0,0.8fr);
+              gap:0.15rem 0.9rem; padding:0.45rem 0.75rem; font-size:0.9rem; line-height:1.45;
+              background:rgba(255,255,255,0.022); border-bottom:1px solid rgba(255,255,255,0.055); }
+    .rd-row:first-of-type { border-radius:9px 9px 0 0; }
+    .rd-row:last-of-type  { border-bottom:none; border-radius:0 0 9px 9px; }
+    .rd-row:hover { background:rgba(255,255,255,0.05); }
+    .rd-w { color:#fff; font-weight:600; }
+    .rd-m { color:rgba(230,230,235,0.7); }
+    .rd-u { color:#86efac; }
+    body.hide-tr .rd-m, body.hide-tr .rd-u { color:transparent; text-shadow:0 0 9px rgba(230,230,235,0.45); cursor:pointer; }
+    body.hide-tr .rd-row.show .rd-m, body.hide-tr .rd-row.show .rd-u { color:inherit; text-shadow:none; }
+    body.hide-tr .rd-row.show .rd-u { color:#86efac; }
+    @media (max-width:760px){ .rd-row { grid-template-columns:1fr; } .rd-m,.rd-u { font-size:0.86rem; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Reader words</span>
+        </nav>
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Reader <span style="color:#58a6ff">&mdash; English words</span></h1>
+            <p class="page-subtitle">Англійські слова з перекладів і глосарія хрестоматії, яких <b>ще немає</b> в розділі Englisch &mdash; 285 шт.</p>
+        </div>
+
+        <div class="rd-tools">
+            <input type="text" class="rd-search" id="q" placeholder="Пошук…">
+            <button class="rd-btn" id="toggle">&#x1F648; Сховати переклад</button>
+            <span class="rd-count" id="cnt"></span>
+        </div>
+
+        <div class="rd-chips" id="chips"></div>
+        <div id="list"></div>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026 &middot; nach «First German Reader», ed. Harry Steinhauer (Dover)</p>
+    </footer>
+
+<script>
+const DECKS = [["e1","① People & roles",[["ferryman","a person who takes people across a river by boat","перевізник"],["magistrate","a local official who acts as a judge in minor cases","мировий суддя"],["essayist","a writer of essays","есеїст"],["benefactor","someone who gives money or help to a person or cause","благодійник"],["pastor","a minister in charge of a Christian congregation","пастор"],["missionary","a person sent to spread a religion abroad","місіонер"],["preacher","someone who delivers religious sermons","проповідник"],["theologian","an expert in the study of religion","богослов"],["satirist","a writer who attacks folly through humour","сатирик"],["dramatist","a writer of plays","драматург"],["reformer","a person who works to change and improve a system","реформатор"],["forerunner","someone or something that comes before and prepares the way","предтеча"],["educator","a person whose profession is teaching","педагог"],["pedagogue","a teacher, especially a pedantic one","педагог (пед.)"],["laborer","a worker doing unskilled physical work","чорнороб"],["merchant","a person who trades in goods on a large scale","купець"],["comrade","a companion who shares your work or struggle","товариш"],["traitor","someone who betrays a country or a friend","зрадник"],["chieftain","the leader of a clan or tribe","вождь"],["grumbler","a person who complains constantly","буркотун"],["maiden","a young unmarried woman (literary)","дівиця"],["widow","a woman whose husband has died","вдова"],["attendant","a person who serves or accompanies someone","служник, супровідник"],["hearer","someone who listens; a member of an audience","слухач"],["publisher","a company or person that issues books","видавець"],["editor","a person who prepares texts for publication","редактор"],["translator","a person who renders text into another language","перекладач"],["organist","a musician who plays the organ","органіст"],["knight","a medieval mounted warrior of noble rank","лицар"],["slave","a person owned by another and forced to work","раб"],["gentleman","a well-mannered man of good social standing","джентльмен"],["joker","a person fond of playing tricks","жартівник"],["consul","a state's official representative in a foreign city","консул"],["patron","a person who supports an artist financially","меценат"]]],["e2","② Religion, death & rite",[["sacred","holy; connected with a god and treated with reverence","священний"],["pious","deeply and often demonstratively religious","побожний"],["piety","devotion to religious duties","побожність"],["devoutly","in a deeply religious manner","побожно"],["worship","reverence and ritual honour paid to a god","поклоніння"],["sermon","a religious talk given during a service","проповідь"],["preach","to deliver a religious address; to moralize","проповідувати"],["revere","to feel deep respect and awe for","шанувати"],["testament","a covenant with God; a will","заповіт"],["biblical","relating to the Bible","біблійний"],["dogma","a belief laid down as unquestionably true","догма"],["secular","not religious; worldly","світський"],["ecclesiastical","relating to the Christian church","церковний"],["orthodox","holding conventional or officially approved beliefs","ортодоксальний"],["redemption","the act of being saved from sin or debt","спокута, викуп"],["humility","a modest view of one's own importance","смиренність"],["bless","to ask for divine favour upon someone","благословляти"],["admonish","to warn or reprove firmly but gently","напучувати, дорікати"],["heavenly","of heaven; blissful","небесний"],["funeral","the ceremony of burying or cremating the dead","похорон"],["deceased","dead; the dead person","покійний"],["corpse","a dead body","труп"],["shroud","a cloth in which a corpse is wrapped","саван"],["tombstone","a stone marker on a grave","надгробок"],["cemetery","a burial ground","цвинтар"],["procession","a line of people moving forward ceremonially","процесія"],["tolling","the slow ringing of a bell, especially for a death","подзвін"],["lament","a passionate expression of grief","плач, голосіння"],["consolation","comfort given to someone who is suffering","розрада"],["throne","the ceremonial seat of a monarch","трон"],["sarcophagus","a stone coffin, often decorated","саркофаг"]]],["e3","③ Art, books & ideas",[["metaphysics","the branch of philosophy dealing with being and reality","метафізика"],["empiricism","the view that knowledge comes from experience","емпіризм"],["rationalism","the view that reason is the chief source of knowledge","раціоналізм"],["skepticism","a doubting attitude towards claims and beliefs","скептицизм"],["pessimism","the tendency to expect the worst","песимізм"],["existentialism","a philosophy centred on individual freedom and meaning","екзистенціалізм"],["classicism","adherence to the ideals of Greek and Roman art","класицизм"],["renaissance","a revival, especially the European rebirth of art and learning","відродження"],["antiquity","the ancient world; great age","античність, давнина"],["romanesque","the round-arched European style before Gothic","романський стиль"],["gothic","the pointed-arch medieval style; darkly romantic","готичний"],["manuscript","a handwritten or unpublished text","рукопис"],["inscription","words carved or written on a monument or in a book","напис"],["autobiography","an account of a life written by the person who lived it","автобіографія"],["treatise","a long formal written study of a subject","трактат"],["novella","a short novel","новела, повість"],["fable","a short moral story, often with animals","байка"],["anecdote","a short entertaining account of an incident","анекдот, історія"],["oratorio","a large religious musical work for voices and orchestra","ораторія"],["choral","written for or sung by a choir","хоровий"],["paperback","a book bound in flexible card","книжка в м'якій палітурці"],["edition","one of the versions in which a text is published","видання"],["monument","a structure built to commemorate a person or event","пам'ятник"],["censure","strong formal disapproval","осуд, догана"],["controversy","a prolonged public disagreement","суперечка, полеміка"],["connotation","an idea a word suggests beyond its plain meaning","конотація, відтінок"],["contraction","a shortened form of a word or phrase","скорочення"],["inflected","changed in form to show grammatical function","флективний, відмінюваний"],["untranslatable","impossible to render in another language","неперекладний"],["linguistically","from the point of view of language","мовно"],["kinship","the state of being related; close connection","спорідненість"],["representation","the act of depicting or standing for something","зображення, представлення"],["conceptual","relating to abstract ideas","поняттєвий"],["assertion","a confident and forceful statement","твердження"],["predilection","a marked liking or preference for something","схильність, уподобання"],["probability","the likelihood that something will happen","імовірність"],["precision","exactness and accuracy","точність"],["totality","the whole of something; completeness","цілісність"],["multiplicity","a large number and variety","множинність"],["vividness","the quality of being strikingly clear and lively","яскравість, наочність"],["compactness","the quality of being densely packed or concise","стислість"],["expressiveness","the quality of conveying feeling effectively","виразність"],["concreteness","the quality of being specific and tangible","конкретність"],["receptiveness","willingness to take in new ideas","сприйнятливість"],["distinctiveness","the quality of being clearly different","своєрідність"],["gradation","a gradual change through a series of stages","градація"],["purism","insistence on strict correctness, especially in language","пуризм"]]],["e4","④ Character & feeling",[["insolence","rude and disrespectful behaviour","зухвалість"],["amiable","friendly and pleasant in manner","привітний"],["esteem","respect and admiration for someone","повага, пошана"],["petty","concerned with trivial things; small-minded","дріб'язковий"],["boredom","the state of being weary through lack of interest","нудьга"],["vanity","excessive pride in one's appearance or worth","марнославство"],["bravery","courage in the face of danger","хоробрість"],["stubbornness","unwillingness to change one's mind","упертість"],["obsequiousness","excessive eagerness to please or obey","улесливість"],["ungrateful","not showing thanks for kindness received","невдячний"],["cranky","bad-tempered; eccentric","дратівливий, дивакуватий"],["heedless","paying no attention to danger or advice","необачний"],["slothful","lazy and disinclined to work","лінивий"],["rapturous","full of intense delight","захоплений, екстатичний"],["solemn","formal and serious in manner","урочистий, поважний"],["lofty","noble and elevated; haughtily superior","піднесений; зверхній"],["noble","of high moral character or high birth","шляхетний"],["distinguished","commanding respect through achievement","видатний"],["spirited","full of energy and determination","завзятий"],["naive","showing a lack of experience or judgement","наївний"],["shameless","showing no guilt about improper behaviour","безсоромний"],["incautious","acting without proper care","необережний"],["confidently","in a self-assured manner","упевнено"],["profoundly","very deeply; intensely","глибоко"],["resolute","firmly determined; unwavering","рішучий"],["dubious","doubtful; not to be relied on","сумнівний"],["tolerable","bearable; fairly good","стерпний"],["anguish","severe mental or physical pain","мука, страждання"],["fright","a sudden intense feeling of fear","переляк"],["disgrace","loss of reputation through dishonourable conduct","ганьба"],["ignorance","lack of knowledge or awareness","невігластво"],["cleverness","quickness of mind; ingenuity","кмітливість"],["incapable","not able to do something","неспроможний"],["subjective","based on personal feelings rather than facts","суб'єктивний"],["irrational","not governed by reason","ірраціональний"],["grieve","to feel deep sorrow, especially for someone's death","побиватися, тужити"],["despise","to look down on with contempt","зневажати"]]],["e5","⑤ Nature, land & things",[["turnip","a round white root vegetable","ріпа"],["grasshopper","a jumping insect that chirps in grass","коник"],["donkey","a small long-eared relative of the horse","віслюк"],["monkey","a small long-tailed primate","мавпа"],["aspen","a poplar whose leaves tremble in the wind","осика"],["lichen","a crusty growth of fungus and alga on rock or bark","лишайник"],["foliage","the leaves of a plant collectively","листя, листяний покрив"],["heath","open uncultivated land with low shrubs","пустище, верес"],["landscape","the visible features of an area of land","краєвид"],["brook","a small stream","струмок"],["mound","a raised mass of earth","пагорб, курган"],["twilight","the soft light after sunset or before sunrise","сутінки"],["starry","filled with or lit by stars","зоряний"],["cloudless","with no clouds in the sky","безхмарний"],["temperate","mild in climate; moderate in behaviour","помірний"],["oceanic","of or influenced by the ocean","океанічний"],["latitude","distance north or south of the equator","широта"],["longitude","distance east or west of the prime meridian","довгота"],["agrarian","relating to farming and cultivated land","аграрний"],["wooded","covered with trees","лісистий"],["luxuriant","growing thickly and abundantly","буйний, пишний"],["abundance","a very large quantity of something","достаток, багатство"],["anthracite","a hard coal that burns with little flame","антрацит"],["bituminous","of soft coal containing bitumen","бітумінозний"],["potash","a potassium compound used in fertilizer","поташ, калійна сіль"],["mineral","a naturally occurring inorganic substance","мінерал"],["marble","a hard polished stone used in sculpture","мармур"],["cradle","a baby's bed; the place where something began","колиска"],["weapon","an object used to inflict harm","зброя"],["trench","a long narrow ditch, especially in warfare","траншея"],["beacon","a fire or light used as a signal or guide","маяк, сигнальний вогонь"],["planetary","relating to planets","планетарний"]]],["e6","⑥ Verbs",[["procure","to obtain something with effort","роздобувати"],["designate","to give an official name or role to","призначати, позначати"],["signify","to be a sign of; to mean","означати"],["deflect","to turn something aside from its course","відхиляти"],["prolong","to make something last longer","подовжувати"],["enlarge","to make or become bigger","збільшувати"],["nourish","to feed and sustain; to foster","живити, плекати"],["vivify","to give life or vividness to","оживляти"],["intoxicate","to make drunk; to excite beyond self-control","п'янити"],["appease","to calm someone by giving in to demands","умилостивлювати"],["persecute","to treat someone cruelly over beliefs or origin","переслідувати"],["confiscate","to seize property with official authority","конфіскувати"],["recant","to publicly withdraw a former belief","зрікатися"],["forbade","past tense of forbid — refused to allow","заборонив"],["withstood","past tense of withstand — resisted successfully","витримав"],["possess","to have and own; to dominate someone's mind","володіти"],["clothe","to put clothes on; to cover","одягати"],["edify","to improve someone morally or intellectually","повчати, напучувати"],["requite","to repay a kindness or an injury","віддячувати, відплачувати"],["degenerate","to decline into a worse condition","вироджуватися"],["thrust","to push suddenly and forcefully","штовхати, встромляти"],["mourn","to feel and show sorrow for a death","оплакувати"],["dip","to put something briefly into a liquid","занурювати"],["drip","to fall in small drops","капати"],["whir","to make a low continuous buzzing sound","дзижчати"],["rustle","to make a soft dry sound like moving leaves","шелестіти"],["sway","to move slowly from side to side; to influence","гойдатися; впливати"],["drape","to hang cloth loosely over something","драпірувати"]]],["e7","⑦ Quality & judgement",[["crooked","bent out of shape; dishonest","кривий; нечесний"],["meager","small in quantity and poor in quality","мізерний"],["superb","of the very finest quality","чудовий"],["diminutive","extremely small","крихітний"],["incomparable","so good that nothing can be compared with it","незрівнянний"],["imperishable","that cannot decay or be destroyed","нетлінний"],["everlasting","lasting forever","вічний"],["transitory","lasting only a short time","минущий"],["transitoriness","the quality of passing quickly away","минущість"],["indestructible","impossible to destroy","незнищенний"],["insatiable","impossible to satisfy","ненаситний"],["incurable","impossible to cure","невиліковний"],["inexperienced","lacking practical knowledge","недосвідчений"],["unguarded","not protected; careless in speech","незахищений; необачний"],["unprejudiced","free from bias","неупереджений"],["defenseless","without protection against attack","беззахисний"],["hostile","unfriendly and opposed","ворожий"],["sovereign","possessing supreme power; independent","суверенний"],["municipal","relating to a town or city government","муніципальний"],["residential","designed for people to live in","житловий"],["influential","having great effect on people or events","впливовий"],["predominant","most important or noticeable","переважний"],["ostensibly","apparently, though perhaps not really","нібито, начебто"],["supposedly","according to what is believed, perhaps wrongly","нібито"],["formerly","in the past","колись, раніше"],["wholly","completely, entirely","цілком"],["solely","only; exclusively","виключно"],["aground","(of a ship) stuck on the bottom in shallow water","на мілині"],["observant","quick to notice things","спостережливий"],["accustomed","used to something through habit","звиклий"],["acquainted","having some knowledge of someone or something","обізнаний, знайомий"],["extravagant","spending or costing far too much; excessive","марнотратний; надмірний"],["superstitious","believing in luck, omens and magic","забобонний"],["aristocratic","belonging to or typical of the nobility","аристократичний"],["worldly","experienced in the ways of the world; material","світський, житейський"],["lowly","humble in rank or condition","убогий, скромний"],["nothingness","the state of not existing; emptiness","ніщо, небуття"],["solitude","the state of being alone","самотність, усамітнення"]]],["e8","⑧ History, state & change",[["unification","the process of being made into one","об'єднання"],["annexation","the seizure of territory by a state","анексія"],["liberation","the act of setting free","визволення"],["restitution","the return of property or payment for loss","реституція, відшкодування"],["indemnification","compensation for damage or loss","відшкодування"],["persecution","hostile treatment because of belief or origin","переслідування"],["siege","the surrounding of a place to force surrender","облога"],["barbarism","brutal ignorance; a crude usage in language","варварство"],["proverb","a short saying stating a general truth","прислів'я"],["insolvency","inability to pay one's debts","неплатоспроможність"],["debility","physical weakness","немічність"],["inferiority","the state of being lower in rank or quality","меншовартість"],["brevity","shortness of speech or duration","стислість"],["swiftness","great speed","швидкість"],["purity","freedom from contamination or mixture","чистота"],["fruition","the point at which a plan is realized","здійснення, плодоношення"],["inkling","a slight suspicion or hint","здогад, натяк"],["casualness","a relaxed lack of concern","невимушеність"],["morality","principles of right and wrong conduct","мораль"],["transcendence","existence beyond the ordinary physical world","трансцендентність"],["misfortune","bad luck; an unfortunate event","нещастя"],["dialect","a regional form of a language","діалект"],["eighteenth","ordinal number for 18","вісімнадцятий"],["nineteenth","ordinal number for 19","дев'ятнадцятий"],["postwar","occurring after a war","повоєнний"],["federal","relating to a union of partly self-governing states","федеральний"],["principality","a state ruled by a prince","князівство"],["duchy","the territory of a duke","герцогство"],["realm","a kingdom; a field of activity","королівство; царина"],["emperor","the male ruler of an empire","імператор"],["reformation","the act of reforming; the 16th-century church movement","реформація"],["civilization","an advanced stage of human social development","цивілізація"],["greatness","the quality of being outstanding","велич"],["imitation","a copy of something; the act of copying","наслідування, імітація"],["utility","usefulness; a public service","корисність; комунальна служба"],["leveling","the process of making equal or flat","вирівнювання"],["undertook","past tense of undertake — began or committed to","узявся, розпочав"],["uneventful","without anything interesting happening","без пригод, спокійний"]]]];
+const COLA = "Word", COLB = "Definition";
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const TOTAL = DECKS.reduce((a,d)=>a+d[2].length,0);
+let active = null;
+
+const list = document.getElementById('list');
+list.innerHTML = DECKS.map(([id,label,rows]) =>
+  '<div class="rd-deck" data-deck="'+id+'"><h3>'+esc(label)+'</h3>'+
+  rows.map(r => '<div class="rd-row"><span class="rd-w">'+esc(r[0])+'</span>'+
+                '<span class="rd-m">'+esc(r[1])+'</span>'+
+                '<span class="rd-u">'+esc(r[2])+'</span></div>').join('')+
+  '</div>').join('');
+
+document.getElementById('chips').innerHTML =
+  '<button class="rd-chip on" data-d="">Усі ('+TOTAL+')</button>' +
+  DECKS.map(([id,label,rows])=>'<button class="rd-chip" data-d="'+id+'">'+esc(label)+' ('+rows.length+')</button>').join('');
+
+const q = document.getElementById('q'), cnt = document.getElementById('cnt');
+function render(){
+  const s = q.value.trim().toLowerCase();
+  let shown = 0;
+  list.querySelectorAll('.rd-deck').forEach(deck=>{
+    const inDeck = !active || deck.dataset.deck === active;
+    let any = false;
+    deck.querySelectorAll('.rd-row').forEach(r=>{
+      const hit = inDeck && (!s || r.textContent.toLowerCase().includes(s));
+      r.style.display = hit ? '' : 'none';
+      if (hit) { any = true; shown++; }
+    });
+    deck.style.display = any ? '' : 'none';
+  });
+  cnt.textContent = (s || active) ? shown + ' із ' + TOTAL : TOTAL + ' слів';
+}
+q.addEventListener('input', render);
+document.getElementById('chips').addEventListener('click', e=>{
+  const b = e.target.closest('.rd-chip'); if(!b) return;
+  active = b.dataset.d || null;
+  document.querySelectorAll('.rd-chip').forEach(c=>c.classList.toggle('on', c===b));
+  render();
+});
+document.getElementById('toggle').addEventListener('click', e=>{
+  const on = document.body.classList.toggle('hide-tr');
+  e.target.classList.toggle('on', on);
+  e.target.innerHTML = on ? '\uD83D\uDC41\uFE0F Показати переклад' : '\uD83D\uDE48 Сховати переклад';
+  if(!on) list.querySelectorAll('.rd-row.show').forEach(r=>r.classList.remove('show'));
+});
+list.addEventListener('click', e=>{
+  if(!document.body.classList.contains('hide-tr')) return;
+  const row = e.target.closest('.rd-row'); if(row) row.classList.toggle('show');
+});
+render();
+</script>
+</body>
+</html>
