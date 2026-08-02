@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeichensetzung — Komma &amp; alle Satzzeichen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Regel-Karten ---- */
+    .rule-num { display:inline-flex; align-items:center; justify-content:center; width:1.6rem; height:1.6rem;
+                border-radius:50%; background:var(--color-accent); color:#1a0a12; font-weight:900; font-size:0.85rem;
+                margin-right:0.5rem; flex:0 0 auto; }
+    .ex { font-size:0.97rem; line-height:1.75; margin:0.5rem 0 0; }
+    .ex div { padding:0.12rem 0; }
+    .ex b   { color:#fff; }
+    .k     { color:#f472b6; font-weight:900; }        /* Komma pflicht */
+    .kopt  { color:#fbbf24; font-weight:900; }        /* Komma fakultativ */
+    .kno   { color:#f85149; font-weight:900; text-decoration:line-through; }
+    .ok-l  { color:#86efac; }
+    .no-l  { color:#f85149; }
+    .gray  { color:rgba(230,230,235,0.55); }
+    .why   { color:rgba(230,230,235,0.6); font-size:0.86rem; margin-top:0.4rem; font-style:italic; }
+
+    .badge { display:inline-block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em;
+             padding:0.15rem 0.5rem; border-radius:50px; font-weight:800; vertical-align:middle; margin-left:0.4rem; }
+    .b-muss { background:rgba(244,114,182,0.18); color:#f472b6; border:1px solid rgba(244,114,182,0.4); }
+    .b-kann { background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.4); }
+    .b-nie  { background:rgba(248,81,73,0.15);  color:#f85149; border:1px solid rgba(248,81,73,0.4); }
+
+    /* ---- Tabellen ---- */
+    .zs-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px;
+               border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.zs { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:460px; }
+    table.zs th { background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+                  text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.zs td { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top;
+                  color:rgba(230,230,235,0.82); }
+    table.zs td b { color:#fff; }
+    table.zs tbody tr:hover { background:rgba(255,255,255,0.035); }
+
+    /* ---- Komma-Trainer ---- */
+    .kt-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .kt-sent { font-size:1.18rem; line-height:2.4; color:#fff; text-align:center; margin:0.4rem 0 0.2rem;
+               font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+    .kt-w { white-space:nowrap; }
+    .slot { display:inline-block; width:1.05rem; margin:0 0.06rem; vertical-align:baseline;
+            border-bottom:2px dotted rgba(255,255,255,0.25); border-radius:3px 3px 0 0; cursor:pointer;
+            text-align:center; font-size:1.35rem; color:transparent; transition:all .12s; }
+    .slot:hover { background:rgba(244,114,182,0.16); border-bottom-color:var(--color-accent); }
+    .slot.on { color:var(--color-accent); background:rgba(244,114,182,0.14); border-bottom-color:var(--color-accent); }
+    .slot.good { color:#86efac !important; background:rgba(63,185,80,0.18); border-bottom-color:#86efac; }
+    .slot.bad  { color:#f85149 !important; background:rgba(248,81,73,0.18); border-bottom-color:#f85149; }
+    .slot.miss { color:#fbbf24 !important; background:rgba(251,191,36,0.2);  border-bottom-color:#fbbf24;
+                 animation:blink 1s ease-in-out 2; }
+    @keyframes blink { 50% { opacity:0.35; } }
+    .kt-hint { text-align:center; color:rgba(230,230,235,0.5); font-size:0.85rem; margin-bottom:0.8rem; }
+    .kt-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .kt-fb { margin-top:0.9rem; font-size:0.95rem; min-height:2.6rem; text-align:center; line-height:1.6; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    /* ---- Drills ---- */
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; line-height:1.5; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; line-height:1.55; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+
+    @media (max-width:640px) {
+        .kt-sent { font-size:1rem; line-height:2.5; }
+    }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Zeichensetzung</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Zeichensetzung</h1>
+            <p class="page-subtitle">Komma · wörtliche Rede · Apostroph · Bindestrich · Gedankenstrich — по PONS «Die große Grammatik»</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="komma">, Komma — 11 Regeln</button>
+            <button class="tab" data-tab="rede">„ Wörtliche Rede</button>
+            <button class="tab" data-tab="zeichen">! ? — ( ) Andere Zeichen</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Komma-Trainer</button>
+            <button class="tab" data-tab="uebungen">&#x270D;&#xFE0F; Übungen</button>
+        </div>
+
+        <!-- ==================== KOMMA ==================== -->
+        <div class="tab-content active" id="tab-komma">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CD;</span>
+                    <div>
+                        <h2>Das Komma</h2>
+                        <p class="lesson-header-sub">Всего 11 ситуаций. Больше в немецком запятая нигде не нужна</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Главный принцип</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        <em>«Setzen Sie ein Komma nur dann, wenn Sie es begründen können.»</em><br>
+                        Ставь запятую только тогда, когда можешь <strong>назвать правило</strong>.
+                        Не можешь назвать — <strong>не ставь</strong>. В немецком запятая — это грамматика,
+                        а не «пауза при чтении», как в английском.
+                    </p>
+                    <div class="zs-wrap">
+                    <table class="zs">
+                        <tr><th>Цвет на этой странице</th><th>Значение</th></tr>
+                        <tr><td><span class="k">,</span> розовая</td><td>запятая <b>обязательна</b></td></tr>
+                        <tr><td><span class="kopt">(,)</span> жёлтая</td><td>запятая <b>по желанию</b> — можно и так, и так</td></tr>
+                        <tr><td><span class="kno">,</span> перечёркнутая</td><td>запятая <b>запрещена</b></td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <!-- R1 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">1</span>Aufzählung — перечисление</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Перечислять можно всё: существительные, прилагательные, глаголы, целые группы.
+                        <strong>Тест:</strong> если между членами можно вставить <em>und</em> — они равноправны → запятая.
+                    </p>
+                    <div class="ex">
+                        <div>Weizen<span class="k">,</span> Roggen<span class="k">,</span> Gerste sind Getreidesorten. <span class="gray">(Nomen)</span></div>
+                        <div>Eine Orange sollte groß<span class="k">,</span> rund<span class="k">,</span> saftig sein. <span class="gray">(Adjektive)</span></div>
+                        <div>Wir wollen singen<span class="k">,</span> tanzen<span class="k">,</span> feiern. <span class="gray">(Verben)</span></div>
+                        <div>Sie schimpft über ihr Auto<span class="k">,</span> über die Leute<span class="k">,</span> über das Essen. <span class="gray">(Wortgruppen)</span></div>
+                    </div>
+                    <p class="why">⚠️ Перед <b>und</b>, <b>oder</b>, <b>sowie</b>, <b>bzw.</b> запятая <span class="no-l">отпадает</span>:</p>
+                    <div class="ex">
+                        <div>Weizen<span class="k">,</span> Roggen <span class="kno">,</span><b>und</b> Gerste sind Getreidesorten.</div>
+                        <div>Rentner<span class="k">,</span> Schüler <b>sowie</b> Studenten zahlen ermäßigten Eintritt.</div>
+                        <div>Du gehst am besten joggen<span class="k">,</span> walken <b>oder</b> wandern.</div>
+                    </div>
+                </div>
+
+                <!-- R2 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">2</span>Mehrere Adjektive vor dem Nomen</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Самое коварное правило. <strong>Тест с «und»:</strong> вставь <em>und</em> между прилагательными.
+                        Звучит осмысленно → они равноправны → <span class="ok-l">запятая</span>.
+                        Звучит бредово → <span class="no-l">без запятой</span>.
+                    </p>
+                    <div class="ex">
+                        <div><span class="ok-l">✓</span> ein kostenloses<span class="k">,</span> unverbindliches Angebot <span class="gray">= kostenlos <b>und</b> unverbindlich ✓</span></div>
+                        <div><span class="ok-l">✓</span> warmes<span class="k">,</span> sonniges Wetter <span class="gray">= warm <b>und</b> sonnig ✓</span></div>
+                        <div><span class="no-l">✗</span> ein großer britischer Frachter <span class="gray">= groß und britisch? ✗ — это «британский корабль», который большой</span></div>
+                        <div><span class="no-l">✗</span> die allgemeine politische Lage</div>
+                        <div><span class="no-l">✗</span> deine schönen neuen Schuhe</div>
+                        <div><span class="no-l">✗</span> sie hatte große blaue Augen</div>
+                    </div>
+                    <p class="why">Логика: если второе прилагательное <b>срослось</b> с существительным в одно понятие
+                    (<em>britischer Frachter</em>, <em>politische Lage</em>, <em>blaue Augen</em>) — первое описывает уже всю эту связку, и запятой нет.</p>
+                </div>
+
+                <!-- R3 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">3</span>Gegensatz — противопоставление</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Где противопоставление — там <strong>всегда</strong> запятая. Без исключений.</p>
+                    <div class="ex">
+                        <div>Du bist nicht frech<span class="k">,</span> <b>sondern</b> dumm.</div>
+                        <div>Er war groß und stark<span class="k">,</span> <b>aber</b> er war nicht klug.</div>
+                        <div>Sie kann nicht kochen<span class="k">,</span> <b>(je)doch</b> ganz toll Squash spielen.</div>
+                        <div>Wir wandern bei gutem Wetter<span class="k">,</span> <b>allerdings</b> nur im Schatten.</div>
+                        <div>Dies ist eine Schule<span class="k">,</span> kein Kindergarten. <span class="gray">(противопоставление без союза!)</span></div>
+                    </div>
+                    <p class="why">Парные союзы — тоже запятая перед второй частью:</p>
+                    <div class="ex">
+                        <div>Das Wetter war <b>einerseits</b> sonnig<span class="k">,</span> <b>andererseits</b> aber viel zu kalt.</div>
+                        <div>Es gab <b>nicht nur</b> Salat<span class="k">,</span> <b>sondern auch</b> warmes Essen.</div>
+                        <div>Seine Familie lebt <b>teils</b> in der Stadt<span class="k">,</span> <b>teils</b> auf dem Land.</div>
+                        <div><b>Halb</b> lachend<span class="k">,</span> <b>halb</b> weinend fiel sie ihm um den Hals.</div>
+                        <div><b>Ob</b> blond<span class="k">,</span> <b>ob</b> braun, ich liebe alle Frau'n …</div>
+                    </div>
+                    <p class="why">Список парных: einerseits … andererseits · teils … teils · ob … ob · nicht nur … sondern auch · bald … bald · halb … halb</p>
+                </div>
+
+                <!-- R4 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">4</span>Hauptsatz + Nebensatz — самое частое</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Главное и придаточное <strong>всегда</strong> отделяются запятой — неважно, что впереди.
+                    </p>
+                    <div class="ex">
+                        <div><b>Solange es regnet</b><span class="k">,</span> bleibt das Spiel unterbrochen. <span class="gray">(придаточное впереди)</span></div>
+                        <div>Ich glaube<span class="k">,</span> <b>dass es bald regnen wird</b>. <span class="gray">(придаточное сзади)</span></div>
+                    </div>
+                    <p class="why">Если придаточное <b>вклинилось внутрь</b> — запятые с <strong>обеих</strong> сторон. Самая частая ошибка: забыть вторую!</p>
+                    <div class="ex">
+                        <div>Ich ärgerte mich<span class="k">,</span> <b>nachdem ich die Prüfung verpatzt hatte</b><span class="k">,</span> noch lange über mich selbst.</div>
+                        <div>Ich glaube<span class="k">,</span> <b>dass ich die Richtige für Sie bin</b><span class="k">,</span> und würde mich über Ihre Antwort freuen.</div>
+                    </div>
+
+                    <div class="note-card" style="background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3); margin-top:0.8rem;">
+                        <h3 style="color:#f85149;">&#x26A0;&#xFE0F; Versteckte dass-Sätze</h3>
+                        <p style="font-size:0.94rem; line-height:1.6;">Придаточное <b>без союза</b> выглядит как главное — но остаётся придаточным.
+                        Проверка: вставь <em>dass</em>.</p>
+                        <div class="ex">
+                            <div>Ich glaube<span class="k">,</span> du kannst es schaffen<span class="k">,</span> und wünsche dir viel Glück.</div>
+                            <div class="gray">→ Ich glaube, <b>dass</b> du es schaffen kannst, und wünsche dir viel Glück.</div>
+                            <div style="margin-top:0.4rem;">Er versprach schon oft<span class="k">,</span> er käme pünktlich<span class="k">,</span> und dann kam er doch viel zu spät.</div>
+                            <div class="gray">→ Er versprach schon oft, <b>dass</b> er pünktlich käme, …</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- R5 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">5</span>Aufzählung ganzer Teilsätze</h3>
+                    <div class="ex">
+                        <div><b>Hauptsätze:</b> Der Himmel war blau<span class="k">,</span> die Sonne schien<span class="k">,</span> alles freute sich, da platzte die Bombe.</div>
+                        <div><b>Nebensätze:</b> Ich weiß nicht<span class="k">,</span> woher du kommst<span class="k">,</span> wer du bist<span class="k">,</span> was du willst.</div>
+                    </div>
+                    <p class="why">При <b>und / oder / sowie / bzw. / entweder … oder / weder … noch</b> запятая между главными
+                    предложениями <span class="kopt">не обязательна</span> — ставь, если хочешь чётче разделить:</p>
+                    <div class="ex">
+                        <div>Ich schnitt das Fleisch<span class="kopt">(,)</span> und Kim machte die Salatsoße.</div>
+                        <div>Sie ruft ihn an<span class="kopt">(,)</span> oder sie geht bei ihm vorbei.</div>
+                        <div>Weder haben wir miteinander gesprochen<span class="kopt">(,)</span> noch hatten wir sonst Kontakt.</div>
+                    </div>
+                    <p class="why">А перед последним придаточным <b>bzw. / und / oder / sowie</b> запятую <span class="no-l">убирают</span>:</p>
+                    <div class="ex">
+                        <div>Falls es morgen regnet <b>bzw.</b> wenn es noch nass ist<span class="k">,</span> bleiben wir zu Hause.</div>
+                        <div>Als Wolken aufkamen<span class="k">,</span> als es anfing zu regnen <b>und</b> als das Unwetter losbrach, packte uns die Angst.</div>
+                    </div>
+                </div>
+
+                <!-- R6 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">6</span>Anrede, Ausrufe, <em>bitte</em></h3>
+                    <p style="font-size:0.95rem; line-height:1.6;"><strong>Прямое обращение</strong> всегда отделяется — внутри предложения с двух сторон.</p>
+                    <div class="ex">
+                        <div>Das<span class="k">,</span> mein Freund<span class="k">,</span> wird dir nicht viel helfen.</div>
+                        <div>Ich bitte dich<span class="k">,</span> Susanne<span class="k">,</span> komm doch zurück!</div>
+                        <div>Könnten Sie mal kurz kommen<span class="k">,</span> Frau Meier?</div>
+                        <div>Hallo<span class="kopt">(,)</span> Susanne! <span class="gray">— после «Hallo» + голое имя запятая по желанию</span></div>
+                    </div>
+                    <p class="why">В письмах: <b>Sehr geehrter Herr Wohl<span class="k">,</span></b> … · <b>Hallo<span class="kopt">(,)</span> Peter,</b> … · <b>Guten Tag<span class="kopt">(,)</span> Frau Forst,</b> …<br>
+                    ⚠️ После формулы прощания <span class="no-l">запятой НЕТ</span>: <em>Mit freundlichen Grüßen</em> · <em>Beste Grüße aus Stuttgart</em> · <em>Herzlichst</em></p>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><strong>Ausrufe</strong> — запятая только если они <em>ударные</em>:</p>
+                    <div class="ex">
+                        <div><span class="ok-l">mit Komma:</span> Ach<span class="k">,</span> wie schade! · Nein<span class="k">,</span> das glaube ich nicht! · Aber ja<span class="k">,</span> wir kommen gerne! · Wir haben den Zug verpasst<span class="k">,</span> leider!</div>
+                        <div><span class="no-l">ohne Komma:</span> Ach geh doch! · Oh du lieber Himmel!</div>
+                    </div>
+                    <p class="why">Слово <b>bitte</b> обычно <span class="no-l">без запятой</span>: <em>Gib mir bitte mal das Salz.</em> · <em>Bitte hör auf damit.</em><br>
+                    С запятой — если хочешь подчеркнуть просьбу: <em>Iss jetzt<span class="k">,</span> bitte!</em> · <em>Bitte<span class="k">,</span> halt doch mal den Mund!</em></p>
+                </div>
+
+                <!-- R7 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">7</span>Infinitivgruppen mit <em>zu</em> — три случая</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Само по себе <em>zu + Infinitiv</em> запятой <strong>не требует</strong>. Она <strong>обязательна</strong> только в трёх случаях:
+                    </p>
+                    <div class="zs-wrap">
+                    <table class="zs">
+                        <tr><th>Условие</th><th>Beispiel</th></tr>
+                        <tr><td><b>1.</b> вводится <b>als, (an)statt, außer, ohne, um</b></td>
+                            <td>Er verlässt das Haus<span class="k">,</span> <b>ohne</b> davor zu frühstücken.<br>
+                                <b>Um</b> nicht zu fallen<span class="k">,</span> stützte er sich ab.<br>
+                                <b>Anstatt</b> sich an die Wahrheit zu halten<span class="k">,</span> log er weiter.</td></tr>
+                        <tr><td><b>2.</b> зависит от <b>существительного</b></td>
+                            <td>Der <b>Versuch</b><span class="k">,</span> mich zurückzuhalten<span class="k">,</span> ist zwecklos.<br>
+                                Ich habe nicht die <b>Absicht</b><span class="k">,</span> dich zu verlassen.</td></tr>
+                        <tr><td><b>3.</b> в главном есть <b>указатель</b> (Korrelat):<br><em>es, daran, davon, damit, darauf, das</em></td>
+                            <td><b>Es</b> ist verboten<span class="k">,</span> den Rasen zu betreten.<br>
+                                Denke <b>daran</b><span class="k">,</span> mich zu informieren.<br>
+                                Ich freue mich <b>darauf</b><span class="k">,</span> dich wieder zu sehen.<br>
+                                Doch noch teilnehmen zu dürfen<span class="k">,</span> <b>das</b> freut mich.</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Во всех остальных случаях запятая <span class="kopt">по желанию</span>:
+                    <em>Er plant<span class="kopt">(,)</span> morgen zu verreisen.</em> ·
+                    <em>Ich habe völlig vergessen<span class="kopt">(,)</span> meine Tabletten zu nehmen.</em><br>
+                    При <b>длинных</b> группах запятую лучше поставить — читателю легче.</p>
+
+                    <div class="note-card" style="background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3); margin-top:0.8rem;">
+                        <h3 style="color:#f85149;">&#x1F6AB; Никогда не ставь запятую при …</h3>
+                        <div class="ex">
+                            <div><b>haben / sein + zu:</b> Dieser Mensch hat hier nichts zu sagen. · Das Gebäude war schon von weitem zu sehen.</div>
+                            <div><b>brauchen / pflegen / scheinen + zu:</b> Meine Oma pflegte sich mittags hinzulegen. · Sie schien ihre Müdigkeit überwunden zu haben.</div>
+                            <div><b>es gibt … zu:</b> Bei unserer Tombola gibt es tolle Preise zu gewinnen.</div>
+                            <div><b>Spitzenstellung:</b> Die Wirtschaftshilfen beschloss das Parlament sofort zu gewähren.</div>
+                            <div><b>Verschränkung:</b> Diese Familientradition wollen wir zu verstehen versuchen.</div>
+                        </div>
+                    </div>
+
+                    <p class="why" style="margin-top:0.8rem;">&#x1F9E0; Запятая может <b>изменить смысл</b> — тогда её ставят обязательно:</p>
+                    <div class="ex">
+                        <div>Er behauptete nicht immer<span class="k">,</span> gearbeitet zu haben. <span class="gray">= утверждал не всегда</span></div>
+                        <div>Er behauptete<span class="k">,</span> nicht immer gearbeitet zu haben. <span class="gray">= утверждал, что работал не всегда</span></div>
+                    </div>
+                </div>
+
+                <!-- R8 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">8</span>Partizip- und Adjektivgruppen</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Обычно <span class="kopt">по желанию</span> — но есть одно место, где запятые <strong>обязательны</strong>.</p>
+                    <div class="ex">
+                        <div>Der Jäger setzte sich<span class="kopt">(,)</span> sichtlich erschöpft<span class="kopt">(,)</span> auf einen Stein.</div>
+                        <div>Wir treffen uns<span class="kopt">(,)</span> wie vereinbart<span class="kopt">(,)</span> nächsten Montag um neun Uhr.</div>
+                        <div style="margin-top:0.5rem;"><b>Pflicht</b> — если группа втиснута <b>между подлежащим и сказуемым</b>:</div>
+                        <div>Der Jäger<span class="k">,</span> sichtlich erschöpft<span class="k">,</span> setzte sich auf einen Stein.</div>
+                        <div style="margin-top:0.5rem;"><b>Pflicht</b> — если это пояснение <b>в конце</b> (Nachtrag):</div>
+                        <div>Der Jäger setzte sich auf einen Stein<span class="k">,</span> sichtlich erschöpft.</div>
+                    </div>
+                    <p class="why">Подсказка на слух: при чтении в местах запятых делаешь маленькие паузы.</p>
+                </div>
+
+                <!-- R9 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">9</span>Nachträge und Einschübe</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Эти слова почти всегда открывают вставку → перед ними запятая:</p>
+                    <p style="font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#fbbf24; font-size:0.93rem; line-height:1.9;">
+                        , vor allem … &nbsp;·&nbsp; , zum Beispiel / z. B. … &nbsp;·&nbsp; , außer … &nbsp;·&nbsp; , und zwar … &nbsp;·&nbsp;
+                        , also … &nbsp;·&nbsp; , nämlich … &nbsp;·&nbsp; , besonders … &nbsp;·&nbsp; , das heißt …
+                    </p>
+                    <div class="ex">
+                        <div>Sie liest gerne<span class="k">,</span> <b>vor allem</b> historische Romane.</div>
+                        <div>Sport hält gesund<span class="k">,</span> <b>zum Beispiel</b> regelmäßiges Schwimmen.</div>
+                        <div>Das Amt ist einmal pro Woche<span class="k">,</span> <b>und zwar</b> donnerstags<span class="k">,</span> auch am Nachmittag geöffnet.</div>
+                        <div style="margin-top:0.5rem;">Иногда решаешь сам <span class="kopt">(,)</span>:</div>
+                        <div>Das kostet Sie 325 Euro<span class="kopt">(,)</span> einschließlich der Transfergebühren.</div>
+                        <div>Die Hitze war<span class="kopt">(,)</span> besonders um die Mittagszeit<span class="kopt">(,)</span> unerträglich.</div>
+                    </div>
+                    <p class="why">⚠️ Если после <b>das heißt</b> идёт придаточное — нужна <b>ещё одна</b> запятая:<br>
+                    <em>Ich kam erst spät nach Hause<span class="k">,</span> das heißt<span class="k">,</span> nachdem meine Familie längst zu Bett gegangen war.</em></p>
+                </div>
+
+                <!-- R10 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">10</span>Apposition und Parenthese</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        <strong>Apposition</strong> — второе название того же самого. Запятые <strong>парные</strong>.
+                    </p>
+                    <div class="ex">
+                        <div>Ich kenne Rolf Schmitz<span class="k">,</span> deinen neuen Bekannten<span class="k">,</span> schon ewig.</div>
+                        <div>Wilhelm II.<span class="k">,</span> der letzte deutsche Kaiser<span class="k">,</span> starb im Exil.</div>
+                        <div style="margin-top:0.4rem;">В конце предложения — одна запятая и точка:</div>
+                        <div>Sie liebt ihn<span class="k">,</span> den besten aller Männer.</div>
+                        <div>Das ist Gabi Lander<span class="k">,</span> die neue Chefin.</div>
+                    </div>
+                    <p class="why">Если аппозиция — <b>имя после</b> нарицательного, запятые <span class="kopt">по желанию</span>:
+                    <em>Unsere neue Chefin<span class="kopt">(,)</span> Gabi Lander<span class="kopt">(,)</span> ist sehr nett.</em><br>
+                    ⚠️ У исторических имён запятой <span class="no-l">нет</span>: <em>Katharina die Große</em> · <em>Iwan der Schreckliche</em></p>
+
+                    <p style="font-size:0.95rem; margin-top:0.8rem;"><strong>Parenthese</strong> — целое предложение внутри другого:</p>
+                    <div class="ex">
+                        <div>Die Wolkentürme entluden sich<span class="k">,</span> es war wohl so gegen acht<span class="k">,</span> in einem Platzregen.</div>
+                        <div>Ihre fristlose Kündigung<span class="k">,</span> das will ich deutlich betonen<span class="k">,</span> ist unangemessen.</div>
+                        <div>Ich werde mir morgen<span class="k">,</span> glaub mir's oder nicht<span class="k">,</span> diesen Fernseher holen.</div>
+                    </div>
+                    <p class="why">Вместо запятых здесь можно взять <b>тире</b> или <b>скобки</b> — см. вкладку «Andere Zeichen».</p>
+                </div>
+
+                <!-- R11 -->
+                <div class="note-card">
+                    <h3><span class="rule-num">11</span>Datum und Ort</h3>
+                    <div class="ex">
+                        <div>Die Prüfung findet am Montag<span class="k">,</span> dem 10. Juni<span class="k">,</span> 8 Uhr<span class="kopt">(,)</span> statt.</div>
+                        <div>Sarah Müller<span class="k">,</span> wohnhaft in Hannover<span class="k">,</span> Heinrichplatz 64<span class="kopt">(,)</span> ist angeklagt …</div>
+                        <div>Zu seinem Nachfolger ist Herr Sven Taler<span class="k">,</span> Kochstraße 27<span class="k">,</span> Neustadt<span class="kopt">(,)</span> ernannt worden.</div>
+                        <div style="margin-top:0.4rem;"><span class="no-l">Ohne Komma:</span> Sie wohnt in Düren in der Thomasgasse 25 im 1. Stock.</div>
+                        <div><span class="no-l">Ohne Komma</span> (Gesetze): Gemäß § 24 Abs. 2 Satz 4 wurde die Frist eingehalten.</div>
+                    </div>
+                    <p class="why">Последняя запятая перед сказуемым — всегда <span class="kopt">по желанию</span>.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== WÖRTLICHE REDE ==================== -->
+        <div class="tab-content" id="tab-rede">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>Wörtliche Rede und Zitate</h2>
+                        <p class="lesson-header-sub">Немецкие кавычки: <span style="color:#fff">„unten oben“</span> — не английские "…"</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Три позиции Begleitsatz</h3>
+                    <div class="ex" style="font-size:1.02rem;">
+                        <div><b>1. Впереди</b> → двоеточие, потом кавычки:</div>
+                        <div style="padding-left:1rem;">Sie fragte<span style="color:#f472b6">:</span> „Was willst du hier?“</div>
+                        <div style="padding-left:1rem;">Der Lehrer fragte<span style="color:#f472b6">:</span> „Wer will sich dazu äußern?“</div>
+
+                        <div style="margin-top:0.7rem;"><b>2. Сзади</b> → внутри кавычек точка <span class="no-l">исчезает</span>, вместо неё запятая ПОСЛЕ кавычек:</div>
+                        <div style="padding-left:1rem;">„Ich gehe, und zwar für immer<span class="k">“,</span> sagte sie.</div>
+                        <div style="padding-left:1rem;">? и ! <b>остаются</b>: „Was willst du hier<span style="color:#f472b6">?“,</span> fragte er. · „Weg hier<span style="color:#f472b6">!“,</span> brüllte er.</div>
+
+                        <div style="margin-top:0.7rem;"><b>3. В середине</b> → берётся в запятые:</div>
+                        <div style="padding-left:1rem;">„Ich gehe<span class="k">“,</span> sagte sie<span class="k">,</span> „und zwar für immer.“</div>
+                        <div style="padding-left:1rem;">„Kannst du<span class="k">“,</span> fragte meine Mutter<span class="k">,</span> „mich bitte mitnehmen?“, und zog den Mantel an.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CC; Прямая речь внутри предложения</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Точка внутри кавычек пропадает, если предложение продолжается:</p>
+                    <div class="ex">
+                        <div>Er rief ihr noch zu: „Ich hole dich gleich ab<span class="k">“,</span> und verschwand um die Ecke.</div>
+                        <div>Susanne rief: „Hol schon mal das Auto!<span class="k">“,</span> und wandte sich wieder dem Spiegel zu.</div>
+                    </div>
+                    <p class="why">Если сам Begleitsatz — восклицание/вопрос, знаки сохраняются <b>оба</b>:</p>
+                    <div class="ex">
+                        <div>Sag ihm doch mal deutlich: „Halt den Mund!“<span style="color:#fbbf24">!</span></div>
+                        <div>Fragte sie wirklich: „Wo bin ich geboren?“<span style="color:#fbbf24">?</span></div>
+                        <div>Was meinst du mit: „Geh mir aus den Augen!“<span style="color:#fbbf24">?</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5A8;&#xFE0F; Der Doppelpunkt</h3>
+                    <div class="ex">
+                        <div><b>1.</b> перед прямой речью — см. выше</div>
+                        <div><b>2.</b> перед перечислением: Sie benötigen<span style="color:#f472b6">:</span> Papier, Füller, Lineal, Bleistift.</div>
+                        <div><b>3.</b> перед пояснением: So rührt man den Teig<span style="color:#f472b6">:</span> schnell und gleichmäßig.</div>
+                        <div><b>4.</b> перед выводом: Es krachte, Glas splitterte, das Licht ging aus<span style="color:#f472b6">:</span> Das Chaos war komplett.</div>
+                    </div>
+                    <p class="why">&#x1F534; После двоеточия — <b>заглавная</b>, если дальше идёт <b>полное предложение</b>:
+                    <em>Es ist immer dasselbe: <b>N</b>iemand möchte den Anfang machen.</em><br>
+                    Если только слово/список — <b>строчная</b>: <em>So rührt man den Teig: <b>s</b>chnell und gleichmäßig.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Zitate</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Цитата должна быть <strong>дословной</strong> — даже если из-за этого падеж «не сходится»:</p>
+                    <div class="ex">
+                        <div><span class="ok-l">✓</span> Viel Vergnügen mit „Das Quiz“ mit Jörg Pilawa <span class="gray">(nicht: „dem Quiz“)</span></div>
+                        <div><span class="ok-l">✓</span> Ich habe ein Kapitel aus „Die Akte“ von John Grisham gelesen.</div>
+                    </div>
+                    <p class="why">Кавычки нужны при:</p>
+                    <div class="ex">
+                        <div>· особых словах: Meine Frau nennt mich immer „Dickerchen“, was ich gar nicht mag.</div>
+                        <div>· названиях: Ich las im „Focus online“ den Artikel „Paris Hilton leckt ihre Wunden“.</div>
+                        <div>· иронии: Er tut immer so, als sei er der „liebe Onkel“. · Die Polizei, „dein Freund und Helfer“, legte mein Auto still.</div>
+                        <div>· поговорках (тогда <b>без</b> двоеточия): Sag ruhig wieder „Lügen haben kurze Beine“, aber du irrst dich.</div>
+                    </div>
+                    <p class="why">Знак препинания всего предложения ставится <b>после</b> закрывающей кавычки:
+                    <em>Das Buch hieß „Die Quelle“<b>.</b></em> · <em>Wer kennt den Roman „Die Akte“<b>?</b></em></p>
+                    <p class="why">&#x1F4CE; Кавычки <b>внутри</b> кавычек — одинарные:<br>
+                    <em>Frau von Lovenberg schreibt: „Wenn die Rede auf ihre Aktivitäten kam, sprach er von ‚deinem Durcheinander‘ und sie von ‚deinem Vergnügen‘.“</em></p>
+                    <p class="why">Пропуск в цитате → <b>Auslassungspunkte</b>, в научных текстах в квадратных скобках:
+                    <em>Anhand dieser Versuchsreihe [...] konnte der Nachweis erbracht werden.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ANDERE ZEICHEN ==================== -->
+        <div class="tab-content" id="tab-zeichen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2757;</span>
+                    <div>
+                        <h2>Alle anderen Zeichen</h2>
+                        <p class="lesson-header-sub">Punkt · Semikolon · Apostroph · Bindestrich · Gedankenstrich · Klammern · Schrägstrich</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F534; Der Punkt</h3>
+                    <div class="ex">
+                        <div>После утверждений и <b>вежливых</b> просьб: Setzen Sie sich bitte<b>.</b></div>
+                        <div>После порядковых числительных: die 3<b>.</b> Ausgabe · der 17<b>.</b> April · Karl V<b>.</b></div>
+                        <div>После сокращений: z<b>.</b> B<b>.</b> · u<b>.</b> a<b>.</b> &nbsp;— но <span class="no-l">без точки</span>: BGB, CDU, EKG, km, PS</div>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Заголовки и названия — <span class="no-l">без точки</span>: <em>Die Mittagsfrau</em> · <em>So bleiben Sie gesund</em> · <em>PKW landet im Kirchendach</em></p>
+                    <p class="why">Если предложение кончается порядковым числом или сокращением — <b>вторая точка не ставится</b>:<br>
+                    <em>Die Schule beginnt nicht am 3. August, sondern am 6.</em> · <em>Wir brauchen noch Butter, Milch, Eier, Käse usw.</em></p>
+                    <p class="why"><b>Auslassungspunkte (…)</b> — после них точка не нужна, но ? и ! ставятся <b>без пробела</b>:<br>
+                    <em>Er kam, sah, und …</em> · <em>Glaubst du etwa, dass er …?</em> · <em>Dieses Genörgel finde ich zum …!</em><br>
+                    Внутри слова — <b>без пробела</b>: <em>be…en</em> · <em>So eine Sch…!</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2757; Ausrufezeichen und Fragezeichen</h3>
+                    <div class="ex">
+                        <div><b>!</b> — при настойчивых требованиях и восклицаниях: Halt jetzt endlich den Mund! · Wie hell doch der Mond scheint! · Mensch! Ach! Nein!</div>
+                        <div><b>?</b> — прямые вопросы: Warum weinst du? · Soll ich dir helfen?</div>
+                        <div>Вежливая просьба в форме вопроса: Würdest du bitte die Musik leiser stellen?</div>
+                        <div>Утверждение с ? = удивление: Sie hat tatsächlich gewonnen? <span class="gray">(Das ist aber erstaunlich.)</span></div>
+                        <div>Хвостики: Das ist eine Ausrede, nicht (wahr)? · Du hast gelogen, stimmt's? · Das stimmt doch, oder?</div>
+                    </div>
+                    <p class="why">&#x1F6AB; <b>!!!</b> и <b>???</b> в почте выглядят плохо. Лучше переформулировать:
+                    <em>Abgabetermin war der 20. März<b>.</b></em> вместо <em>… März!!!</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F53B; Das Semikolon (Strichpunkt)</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Ставится, когда запятая — <strong>слишком слабо</strong>, а точка — <strong>слишком сильно</strong>.
+                    После точки с запятой пишем <b>с маленькой</b> (кроме существительных).</p>
+                    <div class="ex">
+                        <div>Man kann nicht alles wissen<span style="color:#f472b6">;</span> man muss nur wissen, wo man nachschlagen kann.</div>
+                        <div>Heute ist endlich schönes Wetter<span style="color:#f472b6">;</span> es wird ja auch allmählich Zeit.</div>
+                        <div style="margin-top:0.4rem;">Или чтобы разделить <b>группы внутри перечисления</b>:</div>
+                        <div>In seinem Gepäck befand sich: Gaskocher, Ersatzkartusche, Feuerzeug<span style="color:#f472b6">;</span> Getränke, Müsliriegel, Schokolade<span style="color:#f472b6">;</span> Karte, Kompass, Feldstecher.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2019; Der Apostroph</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Три группы: где <b>обязан</b>, где <b>можно</b>, где <b>категорически нельзя</b>.</p>
+                    <div class="zs-wrap">
+                    <table class="zs">
+                        <tr><th>Fall</th><th>Beispiele</th></tr>
+                        <tr><td><span class="badge b-muss">muss</span> сокращённые названия городов/улиц</td>
+                            <td>D<b>'</b>dorf, M<b>'</b>gladbach, Ku<b>'</b>damm</td></tr>
+                        <tr><td><span class="badge b-muss">muss</span> Genitiv имён на <b>-s, -ss, -ß, -z, -tz, -x, -ce</b></td>
+                            <td>Franz-Josef Strauß<b>'</b> Sohn, Jens Schmitz<b>'</b> Laden, Hans<b>'</b> Geburtstag, Aristoteles<b>'</b> Werke</td></tr>
+                        <tr><td><span class="badge b-kann">kann</span> пропуск <b>e</b> в глаголе</td>
+                            <td>Ich geh<b>'</b> noch schnell zum Bäcker. · Ich hab<b>'</b> viel erreicht. · Ich könnt<b>'</b> mich nicht sattsehen.</td></tr>
+                        <tr><td><span class="badge b-kann">kann</span> разговорная речь на письме</td>
+                            <td>So<b>'</b>n Quatsch! · Haben Sie <b>'</b>nen Moment Zeit? · Der Käpt<b>'</b>n war an Deck. · Nimm<b>'</b>s dir!</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> перед <b>-s множественного числа</b></td>
+                            <td><span class="no-l">✗</span> die E-Mail<b>'</b>s → <span class="ok-l">✓</span> die E-Mails, die Flirts, die Kameras, die VIPs, die Storys</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> Genitiv-s у обычных имён</td>
+                            <td><span class="no-l">✗</span> Andrea<b>'</b>s Bierstube → <span class="ok-l">✓</span> Andreas Bierstube, Franks Geburtstagsfeier, Onkel Toms Hütte</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> Imperativ 2. Person Sg.</td>
+                            <td>Geh! Bleib! Fahr! Halt an!</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> слияние предлога с артиклем</td>
+                            <td>am, vorm, untern, übers</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> короткие наречия</td>
+                            <td>Immer ran ans Büfett! · Ich geh mal rüber. · Komm doch rauf. · Sie kam runter.</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> пропуск <b>e</b> внутри прилагательного</td>
+                            <td>im finstren Wald, biedre Ansichten, ein ekliger Anblick, schludrige Arbeit; blöd, fad, öd, feig, trüb</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Апостроф в начале предложения при пропуске <em>es</em> — обязателен:
+                    <em><b>'s</b> ist schade um ihn.</em> · <em>Hat er<b>'s</b> verstanden?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2796; Der Bindestrich</h3>
+                    <div class="zs-wrap">
+                    <table class="zs">
+                        <tr><th>Fall</th><th>Beispiele</th></tr>
+                        <tr><td><span class="badge b-muss">muss</span> с субстантивированным инфинитивом</td>
+                            <td>das ewige <b>S</b>ich-nicht-entscheiden-<b>K</b>önnen · das <b>S</b>o-<b>T</b>un-als-ob · zum <b>A</b>us-der-<b>H</b>aut-<b>F</b>ahren</td></tr>
+                        <tr><td><span class="badge b-muss">muss</span> новое общее понятие</td>
+                            <td>das Immer-wieder-Neue · die Ad-hoc-Entscheidung · Hals-Nasen-Ohren-Arzt · ein Hunderttausend-Dollar-Geschäft</td></tr>
+                        <tr><td><span class="badge b-muss">muss</span> с сокращением, буквой или цифрой</td>
+                            <td>WDR-Sendung, Lkw-Reifen, Film-DVD, MS-krank, km-Leistung; x-förmig, Dehnungs-h; 4-Zylinder, 8-jährig, 10-prozentig, DIN-A4-Format</td></tr>
+                        <tr><td><span class="badge b-muss">muss</span> как Ergänzungszeichen</td>
+                            <td>Park-, Garten- und Balkonmöbel · sang- und klanglos · vor- und rückwärts · Abwasserleitungen und -kanäle</td></tr>
+                        <tr><td><span class="badge b-muss">muss</span> улицы с именами / названия</td>
+                            <td>Konrad-Adenauer-Platz, Peter-von-der-Gracht-Weg, Donau-Ems-Kanal, Paul-Klee-Gymnasium</td></tr>
+                        <tr><td><span class="badge b-kann">kann</span> против недопонимания</td>
+                            <td>Musiker-Leben / Musik-Erleben · Druck-Erzeugnis / Drucker-Zeugnis</td></tr>
+                        <tr><td><span class="badge b-kann">kann</span> при скоплении букв</td>
+                            <td>Tee-Ei (Teeei) · Zoo-Ordnung (Zooordnung) · hell-lila · Sauerstoff-Flasche</td></tr>
+                        <tr><td><span class="badge b-kann">kann</span> длинные слова читабельнее</td>
+                            <td>Donau-Wasserstandsbericht · Multifunktions-Küchenmaschine · Geländefahrzeug-Entwicklungsprogramm</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> обычные композиты</td>
+                            <td>das Motorradfahren, das Sichanstellen, das Schlangestehen, das Sprachenlernen, die Vierzimmerwohnung</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> при наличии Fugen-s</td>
+                            <td>Bewusstseinserweiterung, Schaffenskraft, Sicherheitsberatung</td></tr>
+                        <tr><td><span class="badge b-nie">nie</span> прилагательное усиливает прилагательное</td>
+                            <td>schwerreich, lauwarm, süßsauer</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x1F3A8; Цвета: <b>чёткие</b> цвета через дефис — <em>ein schwarz-weiß gestreifter Pullover</em>, <em>schwarz-rot-gelb lackiert</em>.
+                    <b>Смешанный</b> оттенок — слитно: <em>blaugrünes Meerwasser</em>, <em>der braunschwarze Ackerboden</em>.</p>
+                    <p class="why">&#x1F469;&#x200D;&#x1F3EB; Мужской + женский вариант: <em>Lehrer/-innen</em> · <em>Lehrer(innen)</em> · <em>Kolleg(inn)en</em>, <em>Ärzt(inn)en</em>.
+                    Но если формы разные — писать полностью: <em>die Ärzte und Ärztinnen</em> (<span class="no-l">✗</span> <em>die Ärzte/-innen</em>).</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2014; Der Gedankenstrich</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Жёстких правил нет. Одиночное тире почти всегда заменяемо запятой, двоеточием или точкой с запятой.
+                    После тире пишем <b>с маленькой</b> (кроме существительных).</p>
+                    <div class="ex">
+                        <div>Неожиданность: Dann, plötzlich <b>–</b> ein Knall!</div>
+                        <div>Команда: Laden <b>–</b> entsichern <b>–</b> Feuer!</div>
+                        <div>Противопоставление: Alle tanzen <b>–</b> nur du sitzt da.</div>
+                        <div>Смена темы: Ich habe jetzt keine Zeit. <b>–</b> Wie siehst du überhaupt aus?</div>
+                        <div style="margin-top:0.5rem;"><b>Двойное</b> тире = вставка: Der Chef blickte <b>–</b> er verzog dabei keine Miene <b>–</b> von einem zum anderen.</div>
+                    </div>
+                    <p class="why">Внутри вставки точку не ставят, но ! и ? — да:
+                    <em>Er übersah mich <b>– leider! –</b> auch nicht.</em> · <em>Ich folgte ihr <b>– warum auch nicht? –</b> bis vor die Haustür.</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>( ) Die Klammern</h3>
+                    <div class="ex">
+                        <div>Heute <b>(</b>man glaubt es kaum<b>)</b> ist endlich das Päckchen angekommen.</div>
+                        <div>In New London <b>(</b>Connecticut<b>)</b> gibt es auch ein College.</div>
+                        <div style="margin-top:0.4rem;">Целое предложение в скобках — с <b>маленькой</b> буквы и <b>без точки</b>:</div>
+                        <div>Der junge Mann <b>(</b>er war ihr bereits bekannt<b>)</b> winkte sie zu sich an den Tisch.</div>
+                        <div>Er änderte seine Meinung erneut <b>(</b>wer hätte das gedacht<b>?)</b>.</div>
+                    </div>
+                    <p class="why">Точка <b>после</b> скобки, если добавка относится к предложению:
+                    <em>Ich sage es dir jetzt noch ein letztes Mal (wiederholt habe ich es schon oft genug)<b>.</b></em><br>
+                    Точка <b>до</b> скобки, если это отдельная мысль — тогда внутри с большой:
+                    <em>Die Nordsee hat mir immer gut gefallen<b>.</b> (Wir haben dort zuletzt vor zwei Jahren Urlaub gemacht.)</em></p>
+                    <p class="why">Квадратные скобки — пояснение внутри круглых или своя ремарка в цитате:
+                    <em>Der Ort Paris (Kentucky [USA]) ist nur wenigen bekannt.</em> ·
+                    <em>Professor Mitschig schreibt: „Dieses Ereignis [gemeint ist seine Beförderung] brachte viel Unruhe.“</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>/ Der Schrägstrich</h3>
+                    <div class="ex">
+                        <div>Альтернатива (= und / oder / bzw.): Parkplatz für Besucherinnen<b>/</b>Besucher · 200 ml Wasser<b>/</b>Milch hinzufügen · Ein-<b>/</b>Ausgang · die Steuererklärung für 2009<b>/</b>10</div>
+                        <div>Номера: Telefonnummer 02462<b>/</b>620-123 · Aktenzeichen Az II<b>/</b>679<b>/</b>8 · Diktatzeichen Re<b>/</b>ga</div>
+                        <div>Отношения (pro / je) и дроби: 100 km<b>/</b>h · 50 l<b>/</b>m² · 550 Einwohner<b>/</b>km² · ein 3<b>/</b>4 Liter</div>
+                    </div>
+                    <p class="why">Пробелов вокруг косой черты обычно <b>не ставят</b>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2702;&#xFE0F; Die Worttrennung (перенос)</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Основное правило — по <strong>слогам при медленном произнесении</strong>: hei-ßen, Ei-er, Pfle-ger.</p>
+                    <div class="ex">
+                        <div>Композиты — по шву: Fern-seher, Schreib-tisch-lampe, spie-gel-glatt, ab-holen</div>
+                        <div>Одиночную гласную <span class="no-l">не отрывают</span>: <span class="no-l">a-ber, O-fen, I-gel, Tri-o</span></div>
+                        <div>Несколько согласных → последний уходит вниз: Brenn-nessel, es-sen, größ-te, Karp-fen, knus-prig, Mus-ter, sit-zen</div>
+                        <div><b>Неразделимы:</b> ch (la-chen), ck (We-cker), sch (La-sche), ph (Stro-phe), th (Ma-the-ma-tik), sh (Fa-shion), rh (Zir-rhose)</div>
+                        <div>Но: tsch можно как t-sch → Kut-sche, plant-schen, Prit-sche</div>
+                        <div>В иностранных словах два варианта: Chrys-antheme / Chry-santheme · Päd-agoge / Pä-dagoge · inter-essant / inte-ressant</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Komma-Trainer</h2>
+                        <p class="lesson-header-sub">Кликай на промежутки между словами, куда нужна запятая. Потом «Prüfen»</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="kt-box">
+                        <div class="kt-hint">Нажимай на точки между словами · если запятых не нужно вообще — сразу «Prüfen»</div>
+                        <div class="kt-sent" id="ktSent">…</div>
+                        <div class="kt-actions">
+                            <button class="tr-btn" id="ktCheck">Prüfen</button>
+                            <button class="tr-btn ghost" id="ktShow">Lösung zeigen</button>
+                            <button class="tr-btn ghost" id="ktNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="kt-fb" id="ktFb"></div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="ktOk">0</b></span>
+                            <span>Falsch: <b id="ktBad">0</b></span>
+                            <span>Rest: <b id="ktLeft">0</b></span>
+                        </div>
+                    </div>
+                    <p class="why" style="margin-top:0.7rem;">
+                        В тренажёре только <strong>обязательные</strong> запятые. Факультативные <span class="kopt">(,)</span> не засчитываются как ошибка — их тут просто нет.
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ÜBUNGEN ==================== -->
+        <div class="tab-content" id="tab-uebungen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Übungen</h2>
+                        <p class="lesson-header-sub">Сначала ответь сам, потом кликни — покажется решение с правилом</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A · Komma — ja oder nein?</h3>
+                    <div id="drillA"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B · Infinitivgruppen mit <em>zu</em></h3>
+                    <div id="drillB"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C · Wörtliche Rede — welche Zeichen?</h3>
+                    <div id="drillC"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>D · Apostroph — richtig oder falsch?</h3>
+                    <div id="drillD"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>E · Bindestrich — mit oder ohne?</h3>
+                    <div id="drillE"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+<script>
+/* ===================== TABS ===================== */
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+const $ = id => document.getElementById(id);
+
+/* ===================== KOMMA-TRAINER ===================== */
+/* c = индексы слов, ПОСЛЕ которых стоит обязательная запятая (0-based) */
+const KOMMA = [
+    { s:"Ich glaube dass es bald regnen wird",                       c:[1],     w:"Hauptsatz + Nebensatz mit <em>dass</em>" },
+    { s:"Solange es regnet bleibt das Spiel unterbrochen",           c:[2],     w:"vorangestellter Nebensatz" },
+    { s:"Weizen Roggen und Gerste sind Getreidesorten",              c:[0],     w:"Aufzählung — vor <em>und</em> kein Komma" },
+    { s:"Wir wollen singen tanzen feiern",                           c:[2,3],   w:"Aufzählung von Verben" },
+    { s:"Er war groß und stark aber er war nicht klug",              c:[4],     w:"Gegensatz mit <em>aber</em>" },
+    { s:"Du bist nicht frech sondern dumm",                          c:[3],     w:"Gegensatz mit <em>sondern</em>" },
+    { s:"Dies ist eine Schule kein Kindergarten",                    c:[3],     w:"Gegensatz auch ohne Konjunktion" },
+    { s:"Es gab nicht nur Salat sondern auch warmes Essen",          c:[4],     w:"Paar <em>nicht nur … sondern auch</em>" },
+    { s:"Wir wandern bei gutem Wetter allerdings nur im Schatten",   c:[4],     w:"Gegensatz mit <em>allerdings</em>" },
+    { s:"Ein kostenloses unverbindliches Angebot lag im Briefkasten",c:[1],     w:"gleichrangige Adjektive: kostenlos <em>und</em> unverbindlich" },
+    { s:"Im Hafen lag ein großer britischer Frachter",               c:[],      w:"nicht gleichrangig — „groß und britisch“ ergibt keinen Sinn" },
+    { s:"Sie hatte große blaue Augen",                               c:[],      w:"nicht gleichrangig → kein Komma" },
+    { s:"Die allgemeine politische Lage ist schwierig",              c:[],      w:"nicht gleichrangig → kein Komma" },
+    { s:"Das mein Freund wird dir nicht viel helfen",                c:[0,2],   w:"Anrede wird beidseitig eingeschlossen" },
+    { s:"Ich bitte dich Susanne komm doch zurück",                   c:[2,3],   w:"Anrede mitten im Satz" },
+    { s:"Ach wie schade",                                            c:[0],     w:"betonter Ausruf" },
+    { s:"Gib mir bitte mal das Salz",                                c:[],      w:"<em>bitte</em> steht normalerweise ohne Komma" },
+    { s:"Er verlässt das Haus ohne davor zu frühstücken",            c:[3],     w:"Infinitivgruppe mit <em>ohne … zu</em>" },
+    { s:"Um nicht zu fallen stützte er sich ab",                     c:[3],     w:"Infinitivgruppe mit <em>um … zu</em>" },
+    { s:"Anstatt sich an die Wahrheit zu halten log er weiter",      c:[6],     w:"Infinitivgruppe mit <em>anstatt … zu</em>" },
+    { s:"Es ist verboten den Rasen zu betreten",                     c:[2],     w:"Korrelat <em>es</em> kündigt die Infinitivgruppe an" },
+    { s:"Ich freue mich darauf dich wieder zu sehen",                c:[3],     w:"Korrelat <em>darauf</em>" },
+    { s:"Der Versuch mich zurückzuhalten ist zwecklos",              c:[1,3],   w:"Infinitivgruppe hängt vom Nomen <em>Versuch</em> ab → beidseitig" },
+    { s:"Ich habe nicht die Absicht dich zu verlassen",              c:[4],     w:"Infinitivgruppe hängt vom Nomen <em>Absicht</em> ab" },
+    { s:"Dieser Mensch hat hier nichts zu sagen",                    c:[],      w:"<em>haben + zu</em> → kein Komma" },
+    { s:"Das Firmengebäude war schon von weitem zu sehen",           c:[],      w:"<em>sein + zu</em> → kein Komma" },
+    { s:"Meine Oma pflegte sich mittags hinzulegen",                 c:[],      w:"<em>pflegen zu</em> → kein Komma" },
+    { s:"Bei unserer Tombola gibt es tolle Preise zu gewinnen",      c:[],      w:"<em>es gibt … zu</em> → kein Komma" },
+    { s:"Sie liest gerne vor allem historische Romane",              c:[2],     w:"Nachtrag mit <em>vor allem</em>" },
+    { s:"Sport hält gesund zum Beispiel regelmäßiges Schwimmen",     c:[2],     w:"Nachtrag mit <em>zum Beispiel</em>" },
+    { s:"Das Amt ist einmal pro Woche und zwar donnerstags auch am Nachmittag geöffnet", c:[5,8], w:"Einschub mit <em>und zwar</em> — beidseitig" },
+    { s:"Ich kenne Rolf Schmitz deinen neuen Bekannten schon ewig",  c:[3,6],   w:"Apposition wird beidseitig eingeschlossen" },
+    { s:"Sie liebt ihn den besten aller Männer",                     c:[2],     w:"Apposition am Satzende" },
+    { s:"Der Jäger sichtlich erschöpft setzte sich auf einen Stein", c:[1,3],   w:"Partizipgruppe zwischen Subjekt und Prädikat → Pflicht" },
+    { s:"Ich ärgerte mich nachdem ich die Prüfung verpatzt hatte noch lange über mich selbst", c:[2,8], w:"eingeschobener Nebensatz — Komma auch am Ende!" },
+    { s:"Ich glaube du kannst es schaffen und wünsche dir viel Glück", c:[1,5], w:"versteckter dass-Satz (= Ich glaube, <em>dass</em> …)" },
+    { s:"Der Himmel war blau die Sonne schien alles freute sich",    c:[3,6],   w:"Aufzählung gleichrangiger Hauptsätze" },
+    { s:"Ich weiß nicht woher du kommst wer du bist was du willst",  c:[2,5,8], w:"Aufzählung gleichrangiger Nebensätze" },
+    { s:"Falls es morgen regnet bzw. wenn es noch nass ist bleiben wir zu Hause", c:[9], w:"<em>bzw.</em> ersetzt das Komma zwischen den Nebensätzen" },
+    { s:"Ich glaube dass ich die Richtige bin und würde mich freuen", c:[1,6],  w:"eingeschobener Nebensatz — beide Kommas!" },
+    { s:"Seine Familie lebt teils in der Stadt teils auf dem Land",  c:[6],     w:"Paar <em>teils … teils</em>" },
+    { s:"Er versprach schon oft er käme pünktlich und dann kam er zu spät", c:[3,6], w:"versteckter dass-Satz" }
+];
+
+let ktPool = [], ktCur = null, ktDone = false, ktOk = 0, ktBad = 0;
+
+function ktShuffle(a) {
+    const r = a.slice();
+    for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+    return r;
+}
+function ktRender() {
+    const words = ktCur.s.split(' ');
+    let html = '';
+    words.forEach((w, i) => {
+        html += '<span class="kt-w">' + w + '</span>';
+        if (i < words.length - 1) html += '<span class="slot" data-i="' + i + '">,</span>';
+    });
+    html += '<span class="kt-w">.</span>';
+    $('ktSent').innerHTML = html;
+    $('ktSent').querySelectorAll('.slot').forEach(s => {
+        s.addEventListener('click', () => { if (!ktDone) s.classList.toggle('on'); });
+    });
+}
+function ktNext() {
+    if (!ktPool.length) ktPool = ktShuffle(KOMMA);
+    ktCur = ktPool.pop();
+    ktDone = false;
+    ktRender();
+    $('ktFb').innerHTML = '';
+    $('ktLeft').textContent = ktPool.length;
+}
+function ktCheck() {
+    if (ktDone) { ktNext(); return; }
+    const slots = $('ktSent').querySelectorAll('.slot');
+    const want = new Set(ktCur.c);
+    let allRight = true;
+    slots.forEach(s => {
+        const i = +s.dataset.i, set = s.classList.contains('on');
+        s.classList.remove('on');
+        if (set && want.has(i)) s.classList.add('good');
+        else if (set && !want.has(i)) { s.classList.add('bad'); allRight = false; }
+        else if (!set && want.has(i)) { s.classList.add('miss'); allRight = false; }
+    });
+    ktDone = true;
+    if (allRight) {
+        ktOk++; $('ktOk').textContent = ktOk;
+        $('ktFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig!</span><br><span style="color:rgba(230,230,235,0.65);font-size:0.88rem">' + ktCur.w + '</span>';
+    } else {
+        ktBad++; $('ktBad').textContent = ktBad;
+        const n = ktCur.c.length;
+        $('ktFb').innerHTML = '<span style="color:#f85149">&#x2717; ' +
+            (n === 0 ? 'hier braucht es <b>kein</b> Komma' : 'nötig: <b>' + n + '</b> Komma' + (n > 1 ? 's' : '')) +
+            '</span><br><span style="color:rgba(230,230,235,0.65);font-size:0.88rem">' + ktCur.w + '</span>';
+    }
+}
+function ktShow() {
+    if (ktDone) return;
+    const slots = $('ktSent').querySelectorAll('.slot');
+    const want = new Set(ktCur.c);
+    slots.forEach(s => { s.classList.remove('on'); if (want.has(+s.dataset.i)) s.classList.add('good'); });
+    ktDone = true;
+    $('ktFb').innerHTML = '<span style="color:#fbbf24">&rarr; ' +
+        (ktCur.c.length === 0 ? 'kein Komma' : ktCur.c.length + '&times; Komma') +
+        '</span><br><span style="color:rgba(230,230,235,0.65);font-size:0.88rem">' + ktCur.w + '</span>';
+}
+$('ktCheck').addEventListener('click', ktCheck);
+$('ktNext').addEventListener('click', ktNext);
+$('ktShow').addEventListener('click', ktShow);
+ktNext();
+
+/* ===================== ÜBUNGEN ===================== */
+const DRILLS = {
+drillA: [
+    ['Ich habe Brot Käse und Wein gekauft.', 'Ich habe Brot<b>,</b> Käse und Wein gekauft. — Aufzählung; vor <em>und</em> kein Komma'],
+    ['Sie ist nett aber sehr laut.', 'Sie ist nett<b>,</b> aber sehr laut. — Gegensatz mit <em>aber</em>'],
+    ['Der alte hölzerne Tisch stand in der Ecke.', 'Kein Komma — <em>hölzerner Tisch</em> ist ein festes Bild, „alt und hölzern“ passt nicht'],
+    ['Ein langer anstrengender Tag geht zu Ende.', 'Ein langer<b>,</b> anstrengender Tag — lang <em>und</em> anstrengend ✓ gleichrangig'],
+    ['Weil es regnete blieben wir zu Hause.', 'Weil es regnete<b>,</b> blieben wir zu Hause. — vorangestellter Nebensatz'],
+    ['Er sagte dass er morgen kommt und legte auf.', 'Er sagte<b>,</b> dass er morgen kommt<b>,</b> und legte auf. — eingeschobener Nebensatz, zwei Kommas!'],
+    ['Guten Tag Frau Müller wie geht es Ihnen?', 'Guten Tag<b>,</b> Frau Müller<b>,</b> wie geht es Ihnen? — Anrede beidseitig'],
+    ['Mit freundlichen Grüßen Anna Schmidt', 'Kein Komma nach der Grußformel! <em>Mit freundlichen Grüßen</em> ⏎ <em>Anna Schmidt</em>'],
+    ['Wir treffen uns am Montag dem 3. Mai um acht Uhr.', 'am Montag<b>,</b> dem 3. Mai<b>,</b> um acht Uhr — Datumsangabe in Kommas'],
+    ['Sie kam nach Hause packte die Taschen aus und kochte Kaffee.', 'Sie kam nach Hause<b>,</b> packte die Taschen aus und kochte Kaffee. — Aufzählung, vor <em>und</em> kein Komma'],
+    ['Das Buch das du mir geliehen hast war spannend.', 'Das Buch<b>,</b> das du mir geliehen hast<b>,</b> war spannend. — eingeschobener Relativsatz beidseitig'],
+    ['Er ist müde denn er hat schlecht geschlafen.', 'Er ist müde<b>,</b> denn er hat schlecht geschlafen. — <em>denn</em> verbindet zwei Hauptsätze → Komma'],
+    ['Ich weiß nicht ob er kommt oder ob er absagt.', 'Ich weiß nicht<b>,</b> ob er kommt oder ob er absagt. — vor dem zweiten <em>ob</em> ersetzt <em>oder</em> das Komma'],
+    ['Meine Schwester eine bekannte Ärztin lebt in Wien.', 'Meine Schwester<b>,</b> eine bekannte Ärztin<b>,</b> lebt in Wien. — Apposition beidseitig'],
+    ['Peter der Große reformierte Russland.', 'Kein Komma — mehrteiliger historischer Eigenname'],
+    ['Er sang laut und falsch.', 'Kein Komma — nur zwei Glieder mit <em>und</em>']
+],
+drillB: [
+    ['Ich habe vergessen dir zu schreiben.', 'Ich habe vergessen<b>(,)</b> dir zu schreiben. — <span style="color:#fbbf24">fakultativ</span>, kein Auslöser vorhanden'],
+    ['Er ging weg ohne sich zu verabschieden.', 'Er ging weg<b>,</b> ohne sich zu verabschieden. — <em>ohne … zu</em> → Pflicht'],
+    ['Ich habe keine Lust heute auszugehen.', 'Ich habe keine Lust<b>,</b> heute auszugehen. — hängt vom Nomen <em>Lust</em> ab → Pflicht'],
+    ['Es macht Spaß mit dir zu arbeiten.', 'Es macht Spaß<b>,</b> mit dir zu arbeiten. — Korrelat <em>es</em> → Pflicht'],
+    ['Du brauchst nicht zu kommen.', 'Kein Komma — <em>brauchen zu</em>'],
+    ['Diese Aufgabe ist leicht zu lösen.', 'Kein Komma — <em>sein + zu</em>'],
+    ['Er scheint sehr müde zu sein.', 'Kein Komma — <em>scheinen zu</em>'],
+    ['Ich denke daran den Vertrag zu kündigen.', 'Ich denke daran<b>,</b> den Vertrag zu kündigen. — Korrelat <em>daran</em>'],
+    ['Statt zu lernen spielte er den ganzen Tag.', 'Statt zu lernen<b>,</b> spielte er den ganzen Tag. — <em>statt … zu</em>'],
+    ['Um pünktlich zu sein stand er früh auf.', 'Um pünktlich zu sein<b>,</b> stand er früh auf. — <em>um … zu</em>'],
+    ['Er hat mir nichts zu sagen.', 'Kein Komma — <em>haben + zu</em>'],
+    ['Sie hofft die Prüfung zu bestehen.', 'Sie hofft<b>(,)</b> die Prüfung zu bestehen. — <span style="color:#fbbf24">fakultativ</span>']
+],
+drillC: [
+    ['Er sagte ___ Ich komme gleich ___', 'Er sagte<b>:</b> „Ich komme gleich<b>.“</b> — Begleitsatz vorne → Doppelpunkt'],
+    ['___ Ich komme gleich ___ sagte er.', '<b>„</b>Ich komme gleich<b>“,</b> sagte er. — Punkt fällt weg, Komma nach den Anführungszeichen'],
+    ['___ Wo warst du ___ fragte sie.', '<b>„</b>Wo warst du<b>?“,</b> fragte sie. — Fragezeichen bleibt, dann Komma'],
+    ['___ Ich gehe ___ sagte sie ___ und zwar sofort ___', '<b>„</b>Ich gehe<b>“,</b> sagte sie<b>,</b> „und zwar sofort<b>.“</b> — Begleitsatz in Kommas'],
+    ['Er rief ihr zu ___ Bis morgen ___ und ging.', 'Er rief ihr zu<b>:</b> „Bis morgen<b>“,</b> und ging. — Punkt entfällt im Satzinneren'],
+    ['Sie benötigen ___ Papier, Füller, Lineal.', 'Sie benötigen<b>:</b> Papier, Füller, Lineal. — Doppelpunkt vor Aufzählung'],
+    ['Es ist immer dasselbe ___ niemand möchte anfangen.', 'Es ist immer dasselbe<b>: N</b>iemand möchte anfangen. — vollständiger Satz → GROSS'],
+    ['So rührt man den Teig ___ schnell und gleichmäßig.', 'So rührt man den Teig<b>: s</b>chnell und gleichmäßig. — kein ganzer Satz → klein'],
+    ['Ich las im Focus den Artikel Paris Hilton leckt ihre Wunden.', 'Ich las im <b>„</b>Focus<b>“</b> den Artikel <b>„</b>Paris Hilton leckt ihre Wunden<b>“.</b> — Punkt nach dem Anführungszeichen'],
+    ['Wer kennt den Roman Die Akte ___', 'Wer kennt den Roman <b>„</b>Die Akte<b>“?</b> — Fragezeichen gehört zum Rahmensatz → hinter die Anführungszeichen']
+],
+drillD: [
+    ["Andrea's Bierstube", '<span style="color:#f85149">✗ falsch</span> → <b>Andreas Bierstube</b>. Genitiv-s bekommt nie einen Apostroph'],
+    ["Hans' Geburtstag", '<span style="color:#86efac">✓ richtig</span> — Name endet auf -s, Genitiv nur durch Apostroph erkennbar'],
+    ["die Foto's", '<span style="color:#f85149">✗ falsch</span> → <b>die Fotos</b>. Vor der Pluralendung -s ist der Apostroph ausnahmslos falsch'],
+    ["die E-Mails", '<span style="color:#86efac">✓ richtig</span> — Plural ohne Apostroph'],
+    ["Ich geh' noch schnell einkaufen.", '<span style="color:#86efac">✓ richtig</span> — ausgelassenes -e, Apostroph empfohlen'],
+    ["Geh' nach Hause!", '<span style="color:#f85149">✗ falsch</span> → <b>Geh nach Hause!</b> Imperativ 2. Person Singular nie mit Apostroph'],
+    ["Komm doch mal rüber.", '<span style="color:#86efac">✓ richtig</span> — Kurzform von <em>herüber</em>, kein Apostroph'],
+    ["Wir fahren mit'm Rad.", '<span style="color:#86efac">✓ richtig</span> — gesprochene Sprache, Apostroph erlaubt'],
+    ["Wir gehen in's Kino.", '<span style="color:#f85149">✗ falsch</span> → <b>ins Kino</b>. Verschmelzung Präposition + Artikel nie mit Apostroph'],
+    ["Aristoteles' Werke", '<span style="color:#86efac">✓ richtig</span> — Name auf -es, Genitiv-Apostroph'],
+    ["die Werke des Aristoteles", '<span style="color:#86efac">✓ richtig</span> — mit Begleiter entfällt der Apostroph'],
+    ["'s ist schade um ihn.", '<span style="color:#86efac">✓ richtig</span> — am Satzanfang ausgelassenes <em>es</em> braucht den Apostroph']
+],
+drillE: [
+    ['das Sichnichtentscheidenkönnen', '<b>das Sich-nicht-entscheiden-Können</b> — nominalisierter Infinitiv → Bindestriche Pflicht'],
+    ['die Adhocentscheidung', '<b>die Ad-hoc-Entscheidung</b> — mehrteiliger neuer Begriff'],
+    ['der Halsnasenohrenarzt', '<b>der Hals-Nasen-Ohren-Arzt</b> (auch: HNO-Arzt)'],
+    ['die Lkwreifen', '<b>die Lkw-Reifen</b> — mit Abkürzung immer Bindestrich'],
+    ['ein 8jähriges Kind', '<b>ein 8-jähriges Kind</b> — Ziffer + Wort'],
+    ['Park, Garten und Balkonmöbel', '<b>Park-, Garten- und Balkonmöbel</b> — Ergänzungsstrich'],
+    ['der Konrad Adenauer Platz', '<b>der Konrad-Adenauer-Platz</b> — Straßenname mit Personennamen'],
+    ['das Motorrad-fahren', '<b>das Motorradfahren</b> — einfache Zusammensetzung, kein Bindestrich'],
+    ['die Bewusstseins-erweiterung', '<b>die Bewusstseinserweiterung</b> — Fugen-s → kein Bindestrich'],
+    ['schwer-reich', '<b>schwerreich</b> — Adjektiv verstärkt Adjektiv → zusammen'],
+    ['ein schwarzweiß gestreifter Pullover', '<b>ein schwarz-weiß gestreifter Pullover</b> — klar unterscheidbare Farben'],
+    ['blau-grünes Meerwasser', '<b>blaugrünes Meerwasser</b> — Mischfarbe → zusammen'],
+    ['die Zooordnung', '<b>die Zoo-Ordnung</b> — Bindestrich erlaubt (Vokalhäufung)'],
+    ['das DIN A4 Format', '<b>das DIN-A4-Format</b>']
+]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = $(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        '<div class="dr-item"><div class="dr-q">' + q + '</div><div class="dr-a">' + a + '</div></div>').join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>

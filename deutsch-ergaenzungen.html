@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erg&auml;nzungen &mdash; was das Verb verlangt | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Listen-Tabellen ---- */
+    .eg-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.eg { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:520px; }
+    table.eg th { position:sticky; top:0; z-index:2; background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase;
+                  letter-spacing:0.07em; text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.eg td { padding:0.42rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top; }
+    table.eg tr.grp td { background:rgba(244,114,182,0.10); color:#fff; font-weight:700; font-size:0.82rem; letter-spacing:0.05em;
+                         border-bottom:1px solid rgba(244,114,182,0.3); }
+    table.eg tbody tr:not(.grp):hover { background:rgba(255,255,255,0.035); }
+    .eg-v   { color:#fff; font-weight:600; white-space:nowrap; }
+    .eg-p   { font-family:ui-monospace,"SF Mono",Menlo,monospace; color:#fbbf24; white-space:nowrap; }
+    .eg-ex  { color:rgba(230,230,235,0.78); }
+    .eg-ex u { text-decoration:none; border-bottom:2px solid rgba(134,239,172,0.55); color:#86efac; }
+    .eg-ru  { color:rgba(230,230,235,0.55); font-size:0.85rem; }
+    .eg-note{ color:rgba(230,230,235,0.5); font-size:0.8rem; }
+
+    /* ---- Suche + Chips ---- */
+    .eg-tools { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0.2rem 0 0.5rem; }
+    .eg-search { flex:1 1 220px; min-width:180px; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.14);
+                 border-radius:8px; padding:0.55rem 0.8rem; color:#fff; font-size:0.95rem; font-family:inherit; }
+    .eg-search:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px var(--color-accent-subtle); }
+    .eg-count { color:rgba(230,230,235,0.5); font-size:0.82rem; }
+
+    /* ---- Paar-Karten wo/wohin ---- */
+    .wp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:0.7rem; margin-top:0.7rem; }
+    .wp-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.75rem 0.9rem; }
+    .wp-card h4 { margin:0 0 0.45rem; font-size:1rem; color:#fff; font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+    .wp-row { display:flex; gap:0.5rem; font-size:0.87rem; line-height:1.45; margin-bottom:0.3rem; }
+    .wp-tag { flex:0 0 3.6rem; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em; padding-top:0.15rem; }
+    .wp-tag.wo   { color:#79b8ff; }
+    .wp-tag.whin { color:#f472b6; }
+    .wp-txt { color:rgba(230,230,235,0.8); }
+    .wp-txt b { color:#fff; }
+    .wp-txt em { color:#86efac; font-style:normal; }
+
+    /* ---- Trainer ---- */
+    .tr-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tr-prompt { font-size:1.15rem; color:#fff; font-weight:600; text-align:center; margin:0.2rem 0 0.15rem; line-height:1.5; }
+    .tr-sub { text-align:center; color:rgba(230,230,235,0.6); font-size:0.88rem; margin-bottom:1rem; }
+    .tr-inp { width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); border-radius:8px;
+              padding:0.65rem 0.75rem; color:#fff; font-size:1.05rem; font-family:ui-monospace,"SF Mono",Menlo,monospace; text-align:center; }
+    .tr-inp:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px var(--color-accent-subtle); }
+    .tr-inp.ok { border-color:var(--color-green); background:rgba(63,185,80,0.1); }
+    .tr-inp.no { border-color:#f85149; background:rgba(248,81,73,0.1); }
+    .tr-actions { display:flex; gap:0.5rem; margin-top:0.8rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tr-fb { margin-top:0.8rem; font-size:0.95rem; min-height:1.4rem; text-align:center; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    /* ---- Drills (Klick = Antwort) ---- */
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+    .dr-hint { color:rgba(230,230,235,0.45); font-size:0.8rem; margin-top:0.15rem; }
+
+    @media (max-width:640px) {
+        .tr-prompt { font-size:1rem; }
+    }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Erg&auml;nzungen</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Erg&auml;nzungen &mdash; was das Verb verlangt</h1>
+            <p class="page-subtitle">Satzglieder &middot; wo/wohin &middot; Verben mit Pr&auml;position &middot; Adjektive mit Erg&auml;nzung &mdash; вся система по Clamer&nbsp;/&nbsp;Heilmann</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="system">Система</button>
+            <button class="tab" data-tab="wohin">&#x1F4CD; wo / wohin</button>
+            <button class="tab" data-tab="verben">&#x1F517; Verb + Pr&auml;p.</button>
+            <button class="tab" data-tab="adjektive">&#x1F3F7;&#xFE0F; Adjektiv + Erg.</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="uebungen">&#x270D;&#xFE0F; &Uuml;bungen</button>
+        </div>
+
+        <!-- ==================== SYSTEM ==================== -->
+        <div class="tab-content active" id="tab-system">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Три вида членов предложения</h2>
+                        <p class="lesson-header-sub">Prädikat &rarr; Ergänzungen &rarr; Angaben. Всё остальное — детали</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Главная мысль</h3>
+                    <p style="font-size:0.98rem; line-height:1.6;">
+                        Немецкий глагол — не просто «действие». Глагол <strong>заранее знает, сколько спутников</strong> ему нужно
+                        и в каком падеже. Эти обязательные спутники называются <strong>Ergänzungen</strong>.
+                        Всё, что можно добавить в любое предложение (когда, где, почему, как), — это <strong>Angaben</strong>.
+                    </p>
+                    <table class="unit-table" style="margin-top:0.7rem;">
+                        <tr><th>Satzglied</th><th>Кто решает?</th><th>Можно убрать?</th></tr>
+                        <tr><td><strong>Pr&auml;dikat</strong></td><td>&mdash; (это ядро)</td><td>никогда</td></tr>
+                        <tr><td><strong>Erg&auml;nzung</strong></td><td>глагол</td><td>иногда, но предложение &laquo;повисает&raquo;</td></tr>
+                        <tr><td><strong>Angabe</strong></td><td>ты сам</td><td>всегда</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D0; Разбор одного предложения</h3>
+                    <p style="font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:1.05rem; color:#fff; margin-bottom:0.5rem;">
+                        Das M&auml;dchen &nbsp;gab&nbsp; seinem Freund &nbsp;einen Kuss &nbsp;<span style="color:rgba(230,230,235,0.5)">auf die Wange</span>.
+                    </p>
+                    <table class="unit-table">
+                        <tr><th>Teil</th><th>Rolle</th><th>Frage</th></tr>
+                        <tr><td>gab</td><td>Pr&auml;dikat</td><td>&mdash;</td></tr>
+                        <tr><td>Das M&auml;dchen</td><td>Nominativ-Erg&auml;nzung (= Subjekt)</td><td>Wer? / Was?</td></tr>
+                        <tr><td>seinem Freund</td><td>Dativ-Erg&auml;nzung</td><td>Wem?</td></tr>
+                        <tr><td>einen Kuss</td><td>Akkusativ-Erg&auml;nzung</td><td>Wen? / Was?</td></tr>
+                        <tr><td>auf die Wange</td><td><em>Angabe</em> (свободно!)</td><td>Wo?</td></tr>
+                    </table>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.65); margin-top:0.6rem;">
+                        <strong>geben</strong> требует три Ergänzungen: <em>кто</em> — <em>кому</em> — <em>что</em>.
+                        А «auf die Wange» глагол не требовал — это твоё добавление.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Тест на различение: Weglassprobe</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Убери часть предложения. Если предложение стало <strong>грамматически неправильным</strong> — это была Ergänzung.
+                    Если просто стало короче и всё ещё правильно — это была Angabe.</p>
+                    <table class="unit-table" style="margin-top:0.6rem;">
+                        <tr><th>Satz</th><th>Weglassprobe</th><th>Ergebnis</th></tr>
+                        <tr><td>Wir wohnen <strong>in M&uuml;nster</strong>.</td><td>&#x2717; Wir wohnen.</td><td>Erg&auml;nzung (Situativ)</td></tr>
+                        <tr><td>Wir arbeiten <strong>in M&uuml;nster</strong>.</td><td>&#x2713; Wir arbeiten.</td><td>Angabe (Lokal)</td></tr>
+                        <tr><td>Ich warte <strong>auf dich</strong>.</td><td>&#x2717; Ich warte&hellip;</td><td>Erg&auml;nzung (Pr&auml;positional)</td></tr>
+                        <tr><td>Ich schlafe <strong>jeden Tag</strong> 8 Stunden.</td><td>&#x2713; Ich schlafe 8 Stunden.</td><td>Angabe (Temporal)</td></tr>
+                    </table>
+                    <p class="eg-note" style="margin-top:0.6rem;">
+                        Хитрость: <em>Schreibst du (einen Brief)?</em> — Akkusativ-Ergänzung иногда можно убрать без ошибки.
+                        Но её «место» в голове глагола остаётся: слушатель всё равно понимает, что ты что-то пишешь.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F522; Девять типов Ergänzungen</h3>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Typ</th><th>Frage</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">Nominativ</td><td class="eg-p">Wer? Was?</td><td class="eg-ex"><u>Der Student</u> schl&auml;ft.</td></tr>
+                            <tr><td class="eg-v">Akkusativ</td><td class="eg-p">Wen? Was?</td><td class="eg-ex">Ich lese <u>ein Buch</u>.</td></tr>
+                            <tr><td class="eg-v">Dativ</td><td class="eg-p">Wem?</td><td class="eg-ex">Das hilft <u>mir</u>.</td></tr>
+                            <tr><td class="eg-v">Genitiv <span class="eg-note">(редко)</span></td><td class="eg-p">Wessen?</td><td class="eg-ex">Wir gedenken <u>der Opfer</u>.</td></tr>
+                            <tr><td class="eg-v">Pr&auml;positional</td><td class="eg-p">Worauf? Auf wen?</td><td class="eg-ex">Ich warte <u>auf den Bus</u>.</td></tr>
+                            <tr><td class="eg-v">Situativ</td><td class="eg-p">Wo?</td><td class="eg-ex">Er wohnt <u>bei seinen Eltern</u>.</td></tr>
+                            <tr><td class="eg-v">Direktiv</td><td class="eg-p">Wohin? Woher?</td><td class="eg-ex">Wir gehen <u>in die Mensa</u>.</td></tr>
+                            <tr><td class="eg-v">Einordnungs-E.</td><td class="eg-p">Was ist er?</td><td class="eg-ex">Er ist <u>Ingenieur</u>. / Sie wird <u>&Auml;rztin</u>.</td></tr>
+                            <tr><td class="eg-v">Qualitativ</td><td class="eg-p">Wie?</td><td class="eg-ex">Das Essen schmeckt <u>gut</u>. / Er ist <u>krank</u>.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p class="eg-note" style="margin-top:0.6rem;">Первые шесть — рабочие лошадки. Genitiv-Ergänzung встречается почти только в письменном стиле.</p>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4A1; Зачем это нужно практически</h3>
+                    <ul style="font-size:0.95rem; line-height:1.7; padding-left:1.1rem;">
+                        <li><strong>Порядок слов.</strong> Ergänzungen стоят ближе к глаголу, Angaben — свободнее. Правило Mittelfeld: <em>Angabe перед Ergänzung</em> (кроме местоимений).</li>
+                        <li><strong>Passiv.</strong> Пассив образуют только глаголы с Akkusativ-Ergänzung. Нет Akkusativ — будет безличный пассив: <em>Es wird getanzt.</em></li>
+                        <li><strong>Учить слова.</strong> Записывай глагол не как «warten = ждать», а как <em>warten <strong>auf</strong> + A.</em> — вместе с его Ergänzung.</li>
+                        <li><strong>Nebensätze.</strong> Придаточное — это просто Ergänzung в виде предложения: <em>Ich hoffe <strong>auf gutes Wetter</strong></em> &rarr; <em>Ich hoffe, <strong>dass es morgen nicht regnet</strong>.</em></li>
+                    </ul>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; Ergänzung как целое придаточное</h3>
+                    <table class="unit-table">
+                        <tr><th>Erg&auml;nzung</th><th>&hellip; als Satz</th></tr>
+                        <tr><td>Akkusativ: <em>Ich wei&szlig; <strong>die Antwort</strong>.</em></td><td><em>Ich wei&szlig;, <strong>dass er kommt</strong>.</em></td></tr>
+                        <tr><td>Nominativ: <em><strong>Sein Erfolg</strong> freut mich.</em></td><td><em>Es freut mich, <strong>dass er Erfolg hat</strong>.</em></td></tr>
+                        <tr><td>Pr&auml;positional: <em>Ich warte <strong>auf den Brief</strong>.</em></td><td><em>Ich warte <strong>darauf, dass er schreibt</strong>.</em></td></tr>
+                        <tr><td>Infinitivsatz</td><td><em>Ich hoffe, ihn bald <strong>zu sehen</strong>.</em></td></tr>
+                        <tr><td>Indirekte Frage</td><td><em>Ich wei&szlig; nicht, <strong>ob / wann er kommt</strong>.</em></td></tr>
+                    </table>
+                    <p class="eg-note" style="margin-top:0.6rem;">
+                        Ключ к Präpositional-Ergänzung в придаточном: сначала <strong>da(r)+ Präposition</strong> в главном (darauf, daf&uuml;r, damit, davon&hellip;),
+                        потом <em>dass</em>. Подробно — <a href="deutsch-pronominaladverbien.html" style="color:var(--color-accent)">Pronominaladverbien</a>.
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== WO / WOHIN ==================== -->
+        <div class="tab-content" id="tab-wohin">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CD;</span>
+                    <div>
+                        <h2>Situativ- vs. Direktiv-Ergänzung</h2>
+                        <p class="lesson-header-sub">Wo? = Dativ &middot; Wohin? = Akkusativ. Место, где ошибаются чаще всего</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3AF; Одно правило на всю тему</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        Девять «двойных» предлогов — <strong>an, auf, hinter, in, neben, &uuml;ber, unter, vor, zwischen</strong> — сами по себе падеж не выбирают.
+                        Его выбирает <strong>глагол</strong>:
+                    </p>
+                    <table class="unit-table" style="margin-top:0.6rem;">
+                        <tr><th></th><th>Wo? (Situativ)</th><th>Wohin? (Direktiv)</th></tr>
+                        <tr><td>Kasus</td><td><strong>Dativ</strong></td><td><strong>Akkusativ</strong></td></tr>
+                        <tr><td>Verb</td><td>состояние: liegen, stehen, sitzen&hellip;</td><td>движение к цели: legen, stellen, setzen&hellip;</td></tr>
+                        <tr><td>Beispiel</td><td>Das Buch liegt auf <strong>dem</strong> Tisch.</td><td>Ich lege das Buch auf <strong>den</strong> Tisch.</td></tr>
+                    </table>
+                    <p class="eg-note" style="margin-top:0.6rem;">
+                        Проверка: если у глагола есть Akkusativ-Ergänzung («что я двигаю») — почти всегда Direktiv, значит Akkusativ и после предлога.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F501; Шесть пар, которые нужно знать наизусть</h3>
+                    <p class="eg-note">Слева — сильный глагол (сам стоит/лежит), справа — слабый (я это делаю с объектом).</p>
+                    <div class="wp-grid">
+                        <div class="wp-card">
+                            <h4>liegen &harr; legen</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Das Buch <b>liegt</b> auf <em>dem</em> Tisch. <span class="eg-note">(lag &middot; hat gelegen)</span></span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>lege</b> das Buch auf <em>den</em> Tisch. <span class="eg-note">(legte &middot; hat gelegt)</span></span></div>
+                        </div>
+                        <div class="wp-card">
+                            <h4>stehen &harr; stellen</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Das Auto <b>steht</b> in <em>der</em> Garage. <span class="eg-note">(stand &middot; hat gestanden)</span></span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>stelle</b> das Auto in <em>die</em> Garage. <span class="eg-note">(stellte &middot; hat gestellt)</span></span></div>
+                        </div>
+                        <div class="wp-card">
+                            <h4>sitzen &harr; setzen</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Das Kind <b>sitzt</b> auf <em>dem</em> Stuhl. <span class="eg-note">(sa&szlig; &middot; hat gesessen)</span></span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>setze</b> das Kind auf <em>den</em> Stuhl. <span class="eg-note">(setzte &middot; hat gesetzt)</span></span></div>
+                        </div>
+                        <div class="wp-card">
+                            <h4>h&auml;ngen &harr; h&auml;ngen</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Das Bild <b>h&auml;ngt</b> an <em>der</em> Wand. <span class="eg-note">(hing &middot; hat gehangen)</span></span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>h&auml;nge</b> das Bild an <em>die</em> Wand. <span class="eg-note">(h&auml;ngte &middot; hat geh&auml;ngt)</span></span></div>
+                        </div>
+                        <div class="wp-card">
+                            <h4>stecken &harr; stecken</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Der Schl&uuml;ssel <b>steckt</b> in <em>dem</em> Schloss.</span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>stecke</b> den Schl&uuml;ssel in <em>das</em> Schloss. <span class="eg-note">(оба слабые: steckte)</span></span></div>
+                        </div>
+                        <div class="wp-card">
+                            <h4>kleben &harr; kleben</h4>
+                            <div class="wp-row"><span class="wp-tag wo">wo</span><span class="wp-txt">Die Briefmarke <b>klebt</b> auf <em>dem</em> Brief.</span></div>
+                            <div class="wp-row"><span class="wp-tag whin">wohin</span><span class="wp-txt">Ich <b>klebe</b> die Marke auf <em>den</em> Brief.</span></div>
+                        </div>
+                    </div>
+                    <p class="eg-note" style="margin-top:0.7rem;">
+                        <strong>hängen</strong> — единственная пара, где инфинитив одинаковый, но формы разные:
+                        <em>hing / gehangen</em> (висел) против <em>hängte / gehängt</em> (повесил). В Perfekt слышно сразу.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; Verben mit Situativ-Erg&auml;nzung (nur WO)</h3>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Verb</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">sein</td><td class="eg-ex">Ich bin <u>im Garten</u>.</td></tr>
+                            <tr><td class="eg-v">sich befinden</td><td class="eg-ex">Unsere Wohnung befindet sich <u>im 3. Stock</u>.</td></tr>
+                            <tr><td class="eg-v">wohnen</td><td class="eg-ex">Er wohnt <u>bei seinen Eltern</u>.</td></tr>
+                            <tr><td class="eg-v">bleiben</td><td class="eg-ex">Heute bleibe ich <u>zu Hause</u>.</td></tr>
+                            <tr><td class="eg-v">stattfinden</td><td class="eg-ex">Der Vortrag findet <u>im H&ouml;rsaal A</u> statt.</td></tr>
+                            <tr><td class="eg-v">befestigt sein</td><td class="eg-ex">Die Lampe ist <u>an der Decke</u> befestigt.</td></tr>
+                            <tr><td class="eg-v">liegen &middot; stehen &middot; sitzen &middot; h&auml;ngen &middot; stecken &middot; kleben</td><td class="eg-ex">см. пары выше</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E3; Verben mit Akkusativ + Direktiv (что + куда)</h3>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Verb</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">bringen</td><td class="eg-ex">Sie bringt das Kind <u>in den Kindergarten</u>.</td></tr>
+                            <tr><td class="eg-v">gie&szlig;en</td><td class="eg-ex">Gie&szlig;en Sie noch etwas Tee <u>in die Tasse</u>!</td></tr>
+                            <tr><td class="eg-v">laden</td><td class="eg-ex">Er l&auml;dt das Gep&auml;ck <u>ins Auto</u>.</td></tr>
+                            <tr><td class="eg-v">leiten</td><td class="eg-ex">Die Fabrik leitet die Abw&auml;sser <u>in den Fluss</u>.</td></tr>
+                            <tr><td class="eg-v">packen</td><td class="eg-ex">Sie packt ihre Kleider <u>in den Koffer</u>.</td></tr>
+                            <tr><td class="eg-v">schicken</td><td class="eg-ex">Ich schicke das Kind <u>zur Schule</u>.</td></tr>
+                            <tr><td class="eg-v">schieben</td><td class="eg-ex">Wir schieben den Schrank <u>an die Wand</u>.</td></tr>
+                            <tr><td class="eg-v">tragen</td><td class="eg-ex">Wir tragen den Tisch <u>auf die Terrasse</u>.</td></tr>
+                            <tr><td class="eg-v">transportieren</td><td class="eg-ex">Ich transportiere die M&ouml;bel <u>in die neue Wohnung</u>.</td></tr>
+                            <tr><td class="eg-v">werfen</td><td class="eg-ex">Ich werfe den Ball <u>in die Luft</u>.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E2; Verben mit Direktiv-Erg&auml;nzung (nur WOHIN)</h3>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Verb</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">gehen</td><td class="eg-ex">Ich gehe <u>zum Augenarzt</u>.</td></tr>
+                            <tr><td class="eg-v">eilen</td><td class="eg-ex">Sie eilt <u>ins B&uuml;ro</u>.</td></tr>
+                            <tr><td class="eg-v">fahren</td><td class="eg-ex">Wir fahren <u>an die See</u>.</td></tr>
+                            <tr><td class="eg-v">fliegen</td><td class="eg-ex">Er fliegt <u>nach Portugal</u>.</td></tr>
+                            <tr><td class="eg-v">gelangen</td><td class="eg-ex"><u>Auf kleine Inseln</u> gelangt man nur mit dem Schiff.</td></tr>
+                            <tr><td class="eg-v">kommen</td><td class="eg-ex">Heute kommen unsere Nachbarn <u>zu uns</u>.</td></tr>
+                            <tr><td class="eg-v">laufen</td><td class="eg-ex">Ich laufe schnell <u>zum B&auml;cker</u>.</td></tr>
+                            <tr><td class="eg-v">rennen</td><td class="eg-ex">Das Kind rennt <u>nach Hause</u>.</td></tr>
+                            <tr><td class="eg-v">springen</td><td class="eg-ex">Er springt <u>&uuml;ber eine Mauer</u>.</td></tr>
+                            <tr><td class="eg-v">steigen</td><td class="eg-ex">Wir steigen <u>auf einen hohen Berg</u>.</td></tr>
+                            <tr><td class="eg-v">ziehen</td><td class="eg-ex">Sie zieht im Dezember <u>nach K&ouml;ln</u>.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F5FA;&#xFE0F; Какой предлог для WOHIN?</h3>
+                    <p class="eg-note">Самая частая ошибка не в падеже, а в выборе предлога. Шпаргалка:</p>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Wohin?</th><th>Wann?</th><th>&hellip; und Wo?</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-p">in + A</td><td class="eg-ex">закрытое пространство, страны с артиклем: <u>in die Schule, ins Kino, in die T&uuml;rkei, in die USA</u></td><td class="eg-ru">in der Schule, im Kino, in der T&uuml;rkei</td></tr>
+                            <tr><td class="eg-p">zu + D</td><td class="eg-ex">к людям и учреждениям как цель: <u>zum Arzt, zur Post, zu meinem Freund, zur Arbeit</u></td><td class="eg-ru">beim Arzt, bei der Post, bei meinem Freund</td></tr>
+                            <tr><td class="eg-p">nach + D</td><td class="eg-ex">города, страны без артикля, стороны света: <u>nach K&ouml;ln, nach Portugal, nach links, nach Hause</u></td><td class="eg-ru">in K&ouml;ln, in Portugal, <b>zu Hause</b></td></tr>
+                            <tr><td class="eg-p">an + A</td><td class="eg-ex">к «краю», к воде, вплотную: <u>an die See, ans Fenster, an die Wand, an die Uni</u></td><td class="eg-ru">an der See, am Fenster, an der Wand</td></tr>
+                            <tr><td class="eg-p">auf + A</td><td class="eg-ex">на поверхность; часть учреждений: <u>auf den Berg, auf die Stra&szlig;e, auf die Bank, auf die Post</u></td><td class="eg-ru">auf dem Berg, auf der Stra&szlig;e, auf der Bank</td></tr>
+                            <tr><td class="eg-p">&uuml;ber / durch + A</td><td class="eg-ex">через, сквозь: <u>&uuml;ber die Br&uuml;cke, durch den Wald</u></td><td class="eg-ru">auf der Br&uuml;cke, im Wald</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.92rem; margin-top:0.7rem; color:rgba(230,230,235,0.75);">
+                        Запомнить пару-исключение: <strong>nach Hause</strong> (домой) &mdash; <strong>zu Hause</strong> (дома). Больше нигде <em>nach</em> с человеком не используется.
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== VERBEN + PRÄPOSITION ==================== -->
+        <div class="tab-content" id="tab-verben">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>Verben mit Präpositional-Ergänzung</h2>
+                        <p class="lesson-header-sub">Список по предлогам — так их проще держать в голове, чем по алфавиту</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <p style="font-size:0.95rem; line-height:1.6; margin-bottom:0.3rem;">
+                        Здесь предлог <strong>не имеет своего значения</strong> — он часть глагола, как приставка.
+                        <em>warten auf</em> не значит «ждать на». Учить только парами, вместе с падежом.
+                        Индекс <span class="eg-p">D</span>/<span class="eg-p">A</span> = падеж после предлога.
+                    </p>
+                    <div class="eg-tools">
+                        <input class="eg-search" id="verbSearch" type="text" placeholder="Поиск: warten, auf, ждать&hellip;">
+                        <span class="eg-count" id="verbCount"></span>
+                    </div>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Pr&auml;p.</th><th>Verb</th><th>Beispiel</th></tr></thead>
+                        <tbody id="verbBody"></tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x26A0;&#xFE0F; Глаголы с двумя предлогами</h3>
+                    <table class="unit-table">
+                        <tr><th>Verb</th><th>Variante 1</th><th>Variante 2</th></tr>
+                        <tr><td>sich freuen</td><td><strong>auf</strong> + A &mdash; о будущем<br><em>Ich freue mich auf die Ferien.</em></td><td><strong>&uuml;ber</strong> + A &mdash; о том, что уже есть<br><em>Ich freue mich &uuml;ber das Geschenk.</em></td></tr>
+                        <tr><td>leiden</td><td><strong>an</strong> + D &mdash; болезнь<br><em>Sie leidet an Krebs.</em></td><td><strong>unter</strong> + D &mdash; обстоятельства<br><em>Er leidet unter dem Wetter.</em></td></tr>
+                        <tr><td>k&auml;mpfen</td><td><strong>f&uuml;r</strong> + A &mdash; за<br><em>f&uuml;r die Gleichberechtigung</em></td><td><strong>gegen</strong> + A &mdash; против<br><em>gegen die Armut</em></td></tr>
+                        <tr><td>sich wenden</td><td><strong>an</strong> + A &mdash; обратиться к<br><em>Ich wende mich an das Sozialamt.</em></td><td><strong>gegen</strong> + A &mdash; выступить против<br><em>Ich wende mich gegen die Vorw&uuml;rfe.</em></td></tr>
+                        <tr><td>sich bedanken<br>sich entschuldigen</td><td><strong>bei</strong> + D &mdash; у кого<br><em>Ich bedanke mich bei Ihnen.</em></td><td><strong>f&uuml;r</strong> + A &mdash; за что<br><em>&hellip; f&uuml;r die Hilfe.</em></td></tr>
+                        <tr><td>sich beschweren</td><td><strong>bei</strong> + D &mdash; кому жалуешься<br><em>bei der Chefin</em></td><td><strong>&uuml;ber</strong> + A &mdash; на что<br><em>&uuml;ber den L&auml;rm</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Как спросить и как заменить</h3>
+                    <table class="unit-table">
+                        <tr><th></th><th>Sache (вещь)</th><th>Person (человек)</th></tr>
+                        <tr><td>Frage</td><td><strong>Wo</strong>rauf wartest du?</td><td><strong>Auf wen</strong> wartest du?</td></tr>
+                        <tr><td>Antwort</td><td>Ich warte <strong>darauf</strong>.</td><td>Ich warte <strong>auf ihn</strong>.</td></tr>
+                        <tr><td>+ Nebensatz</td><td>Ich warte <strong>darauf, dass</strong> er kommt.</td><td>&mdash;</td></tr>
+                    </table>
+                    <p class="eg-note" style="margin-top:0.6rem;">
+                        Если предлог начинается с гласной, вставляется <strong>-r-</strong>: <em>da<b>r</b>auf, da<b>r</b>&uuml;ber, wo<b>r</b>an</em>.
+                        Полностью тема — на странице <a href="deutsch-pronominaladverbien.html" style="color:var(--color-accent)">Pronominaladverbien</a>.
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ADJEKTIVE ==================== -->
+        <div class="tab-content" id="tab-adjektive">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3F7;&#xFE0F;</span>
+                    <div>
+                        <h2>Adjektive mit Ergänzungen</h2>
+                        <p class="lesson-header-sub">У прилагательных тоже есть валентность — и её почти никто не учит</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Идея</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        <em>stolz</em> — это не просто «гордый». Это <strong>stolz auf + Akkusativ</strong>.
+                        Прилагательное в предикате (после <em>sein / werden / bleiben</em>) ведёт себя как глагол:
+                        оно тоже требует определённую Ergänzung. Три группы: Akkusativ, Dativ, Präposition.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E0; 1. Adjektiv + Akkusativ</h3>
+                    <p class="eg-note">Мера, возраст, размер — падеж без предлога.</p>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Adjektiv</th><th>Beispiel</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">alt</td><td class="eg-ex">Das Baby ist erst <u>einen Monat</u> alt.</td></tr>
+                            <tr><td class="eg-v">breit &middot; gro&szlig; &middot; hoch &middot; lang</td><td class="eg-ex">Die T&uuml;r ist <u>einen Meter</u> breit.</td></tr>
+                            <tr><td class="eg-v">schwer</td><td class="eg-ex">Der Sack Kartoffeln ist etwa <u>einen Zentner</u> schwer.</td></tr>
+                            <tr><td class="eg-v">gewohnt</td><td class="eg-ex">Ich bin <u>diesen L&auml;rm</u> nicht gewohnt.</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <p style="font-size:0.92rem; margin-top:0.7rem; color:rgba(230,230,235,0.78);">
+                        &#x26A0;&#xFE0F; Ловушка: <strong>gewohnt + Akkusativ</strong> (привык к чему-то как к норме) против
+                        <strong>gew&ouml;hnt an + Akkusativ</strong> (привык, adaptировался):<br>
+                        <em>Ich bin diesen L&auml;rm nicht gewohnt.</em> &middot; <em>Ich habe mich an den L&auml;rm gew&ouml;hnt.</em>
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E1; 2. Adjektiv + Dativ</h3>
+                    <p class="eg-note">Дательный обычно = «для меня, по отношению ко мне». Почти всегда без предлога.</p>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Adjektiv</th><th>Beispiel</th><th>Bedeutung</th></tr></thead>
+                        <tbody>
+                            <tr><td class="eg-v">&auml;hnlich</td><td class="eg-ex">Er ist <u>seinem Bruder</u> sehr &auml;hnlich.</td><td class="eg-ru">похож на</td></tr>
+                            <tr><td class="eg-v">behilflich</td><td class="eg-ex">Ein freundlicher Mann war <u>mir</u> behilflich.</td><td class="eg-ru">помог</td></tr>
+                            <tr><td class="eg-v">bekannt</td><td class="eg-ex">Sein Name ist <u>mir</u> nicht bekannt.</td><td class="eg-ru">известен кому <span class="eg-note">(&rarr; bekannt mit = знаком с)</span></td></tr>
+                            <tr><td class="eg-v">dankbar</td><td class="eg-ex">Ich bin <u>meinem Freund</u> dankbar.</td><td class="eg-ru">благодарен</td></tr>
+                            <tr><td class="eg-v">egal &middot; gleich(g&uuml;ltig)</td><td class="eg-ex"><u>Ihm</u> ist alles egal.</td><td class="eg-ru">безразлично</td></tr>
+                            <tr><td class="eg-v">m&ouml;glich</td><td class="eg-ex">Es ist <u>mir</u> nicht m&ouml;glich, mehr zu bezahlen.</td><td class="eg-ru">возможно для</td></tr>
+                            <tr><td class="eg-v">recht</td><td class="eg-ex">Der Termin ist <u>mir</u> recht.</td><td class="eg-ru">подходит</td></tr>
+                            <tr><td class="eg-v">sympathisch</td><td class="eg-ex">Unsere Nachbarin ist <u>mir</u> sehr sympathisch.</td><td class="eg-ru">симпатична</td></tr>
+                            <tr><td class="eg-v">&uuml;berlegen &ne; unterlegen</td><td class="eg-ex">Der Weltmeister war <u>seinem Gegner</u> weit &uuml;berlegen.</td><td class="eg-ru">превосходит / уступает</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; 3. Adjektiv + Pr&auml;position</h3>
+                    <div class="eg-tools">
+                        <input class="eg-search" id="adjSearch" type="text" placeholder="Поиск: stolz, auf, von&hellip;">
+                        <span class="eg-count" id="adjCount"></span>
+                    </div>
+                    <div class="eg-wrap">
+                    <table class="eg">
+                        <thead><tr><th>Adjektiv + Pr&auml;p.</th><th>Beispiel</th></tr></thead>
+                        <tbody id="adjBody"></tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E0; Мини-группы, чтобы учить пачками</h3>
+                    <table class="unit-table">
+                        <tr><th>Гнездо</th><th>Adjektive</th></tr>
+                        <tr><td><strong>&uuml;ber</strong> + A &mdash; эмоция о свершившемся</td><td>froh, gl&uuml;cklich, erfreut, erstaunt, entsetzt, traurig</td></tr>
+                        <tr><td><strong>auf</strong> + A &mdash; направленность вперёд</td><td>stolz, gespannt, neidisch, angewiesen</td></tr>
+                        <tr><td><strong>f&uuml;r</strong> + A &mdash; «для кого/чего»</td><td>n&uuml;tzlich, sch&auml;dlich, interessant, geeignet, charakteristisch, bezeichnend</td></tr>
+                        <tr><td><strong>mit</strong> + D &mdash; связь / завершённость</td><td>zufrieden, fertig, einverstanden, verwandt, vergleichbar, bekannt</td></tr>
+                        <tr><td><strong>von</strong> + D &mdash; источник / зависимость</td><td>abh&auml;ngig, &uuml;berzeugt, frei, m&uuml;de</td></tr>
+                        <tr><td><strong>zu</strong> + D &mdash; готовность</td><td>bereit, entschlossen, berechtigt, f&auml;hig, freundlich</td></tr>
+                        <tr><td><strong>an</strong> + D &mdash; наличие/вина</td><td>reich, arm, schuld, interessiert</td></tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Trainer: какой предлог?</h2>
+                        <p class="lesson-header-sub">Впиши предлог. Падеж уже подсказан в скобках — но сначала подумай сам</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="tr-box">
+                        <div class="tr-prompt" id="trPrompt">&hellip;</div>
+                        <div class="tr-sub" id="trSub"></div>
+                        <input class="tr-inp" id="trInput" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Pr&auml;position">
+                        <div class="tr-actions">
+                            <button class="tr-btn" id="trCheck">Pr&uuml;fen</button>
+                            <button class="tr-btn ghost" id="trSkip">Antwort zeigen</button>
+                            <button class="tr-btn ghost" id="trNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="tr-fb" id="trFb"></div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="trOk">0</b></span>
+                            <span>Falsch: <b id="trBad">0</b></span>
+                            <span>Rest: <b id="trLeft">0</b></span>
+                        </div>
+                    </div>
+                    <p class="eg-note" style="margin-top:0.7rem;">
+                        Слитные формы засчитываются: <em>am / im / zum / zur / ans / ins</em> вместо <em>an dem / in dem</em>&hellip;
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ÜBUNGEN ==================== -->
+        <div class="tab-content" id="tab-uebungen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Übungen</h2>
+                        <p class="lesson-header-sub">Сначала скажи вслух, потом кликни — покажется ответ</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A. Situativ oder Direktiv? &mdash; Endung + Pr&auml;teritum + Perfekt</h3>
+                    <p class="eg-note" style="margin-bottom:0.6rem;">Определи: <em>wo</em> (Dativ) или <em>wohin</em> (Akkusativ) — и поставь предложение в прошедшее.</p>
+                    <div id="drillA"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B. Welche Pr&auml;position? &mdash; Verben</h3>
+                    <div id="drillB"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C. Welche Pr&auml;position? &mdash; Adjektive</h3>
+                    <div id="drillC"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>D. Erg&auml;nzung oder Angabe?</h3>
+                    <p class="eg-note" style="margin-bottom:0.6rem;">Убери выделенную часть. Предложение ещё правильное?</p>
+                    <div id="drillD"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== TABS ===================== */
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+
+/* ===================== VERBEN + PRÄPOSITION ===================== */
+/* p = Präposition (mit Kasus) · v = Verb · ex = Beispiel */
+const VERBEN = [
+{p:'an + D', v:'erkennen A',        ex:'Man kann sie <u>an ihrer Stimme</u> erkennen.'},
+{p:'an + D', v:'es fehlt (D)',      ex:'Es fehlt uns <u>an Geld</u>.'},
+{p:'an + D', v:'leiden',            ex:'Er leidet <u>an einer schweren Krankheit</u>. <span class="eg-note">(&rarr; unter)</span>'},
+{p:'an + D', v:'es liegt',          ex:'Es lag <u>am Wetter</u>, dass wir nicht kommen konnten.'},
+{p:'an + D', v:'sterben',           ex:'Die alte Frau starb <u>an Krebs</u>.'},
+{p:'an + D', v:'teilnehmen',        ex:'Wir nehmen <u>am Sprachkurs</u> teil.'},
+{p:'an + D', v:'zweifeln',          ex:'Ich zweifle <u>an seiner Ehrlichkeit</u>.'},
+{p:'an + A', v:'denken',            ex:'Ich denke oft <u>an meine Kindheit</u>.'},
+{p:'an + A', v:'sich erinnern',     ex:'Ich erinnere mich gern <u>an die Ferien</u>.'},
+{p:'an + A', v:'sich gew&ouml;hnen',ex:'Wir m&uuml;ssen uns <u>an das schlechte Wetter</u> gew&ouml;hnen.'},
+{p:'an + A', v:'glauben',           ex:'Glauben Sie <u>an den Fortschritt</u>?'},
+{p:'an + A', v:'sich wenden',       ex:'Ich wende mich <u>an das Sozialamt</u>. <span class="eg-note">(&rarr; gegen)</span>'},
+{p:'auf + A',v:'achten',            ex:'Der Busfahrer hat nicht <u>auf den Gegenverkehr</u> geachtet.'},
+{p:'auf + A',v:'antworten',         ex:'Ich habe sofort <u>auf seinen Brief</u> geantwortet.'},
+{p:'auf + A',v:'sich freuen',       ex:'Wir freuen uns schon <u>auf die n&auml;chsten Ferien</u>. <span class="eg-note">(&rarr; &uuml;ber)</span>'},
+{p:'auf + A',v:'hoffen',            ex:'Wir hoffen <u>auf schnelle Hilfe</u>.'},
+{p:'auf + A',v:'es kommt an',       ex:'Es kommt jetzt <u>auf eine schnelle Hilfe</u> an.'},
+{p:'auf + A',v:'sich konzentrieren',ex:'Wir konzentrieren uns <u>auf ein einziges Problem</u>.'},
+{p:'auf + A',v:'sich spezialisieren',ex:'Die Firma hat sich <u>auf Ersatzteile</u> spezialisiert.'},
+{p:'auf + A',v:'sto&szlig;en',      ex:'Bei der Lekt&uuml;re bin ich <u>auf ein Problem</u> gesto&szlig;en.'},
+{p:'auf + A',v:'sich verlassen',    ex:'Wir k&ouml;nnen uns immer <u>auf unseren Freund</u> verlassen.'},
+{p:'auf + A',v:'verzichten',        ex:'Der Arzt hat <u>auf das Honorar</u> verzichtet.'},
+{p:'auf + A',v:'sich vorbereiten',  ex:'Wir bereiten uns <u>auf die Pr&uuml;fung</u> vor.'},
+{p:'auf + A',v:'warten',            ex:'Wir warten <u>auf gutes Wetter</u>.'},
+{p:'aus',    v:'bestehen',          ex:'Unsere Wohnung besteht <u>aus 4 R&auml;umen</u>.'},
+{p:'bei',    v:'sich bedanken (f&uuml;r)', ex:'Ich m&ouml;chte mich <u>bei Ihnen</u> f&uuml;r die Hilfe bedanken.'},
+{p:'bei',    v:'sich beschweren (&uuml;ber)', ex:'Er beschwert sich <u>bei der Chefin</u> &uuml;ber die Kollegen.'},
+{p:'bei',    v:'sich entschuldigen (f&uuml;r)', ex:'Er entschuldigt sich <u>bei den Nachbarn</u> f&uuml;r den Krach.'},
+{p:'f&uuml;r + A', v:'sich bedanken (bei)', ex:'Ich bedanke mich <u>f&uuml;r das Geschenk</u>.'},
+{p:'f&uuml;r + A', v:'danken (D)',  ex:'Ich danke ihm <u>f&uuml;r seine Hilfe</u>.'},
+{p:'f&uuml;r + A', v:'eintreten',   ex:'Ich trete <u>f&uuml;r die Verk&uuml;rzung der Schulzeit</u> ein.'},
+{p:'f&uuml;r + A', v:'sich entscheiden', ex:'Ich habe mich <u>f&uuml;r Tee</u> entschieden.'},
+{p:'f&uuml;r + A', v:'halten A',    ex:'Ich habe ihn lange <u>f&uuml;r einen Griechen</u> gehalten.'},
+{p:'f&uuml;r + A', v:'sich interessieren', ex:'Interessierst du dich <u>f&uuml;r Politik</u>?'},
+{p:'f&uuml;r + A', v:'k&auml;mpfen', ex:'Sie k&auml;mpfen <u>f&uuml;r die Gleichberechtigung</u>. <span class="eg-note">(&rarr; gegen)</span>'},
+{p:'f&uuml;r + A', v:'sorgen',      ex:'Die Eltern sorgen gut <u>f&uuml;r ihre Kinder</u>.'},
+{p:'gegen + A', v:'k&auml;mpfen',   ex:'Wir m&uuml;ssen <u>gegen die Armut</u> k&auml;mpfen.'},
+{p:'gegen + A', v:'protestieren',   ex:'Die Sch&uuml;ler protestieren <u>gegen die Fahrpreiserh&ouml;hung</u>.'},
+{p:'gegen + A', v:'versto&szlig;en',ex:'Sie hat <u>gegen das Gesetz</u> versto&szlig;en.'},
+{p:'gegen + A', v:'sich wenden',    ex:'Ich wende mich <u>gegen die falschen Vorw&uuml;rfe</u>.'},
+{p:'in + D', v:'sich irren',        ex:'Er hat sich <u>im Datum</u> geirrt.'},
+{p:'mit',    v:'anfangen',          ex:'Wir fangen <u>mit der ersten Seite</u> an.'},
+{p:'mit',    v:'aufh&ouml;ren',     ex:'Wir h&ouml;ren <u>mit der Diskussion</u> auf.'},
+{p:'mit',    v:'sich befassen',     ex:'Wir haben uns lange <u>mit diesem Thema</u> befasst.'},
+{p:'mit',    v:'beginnen',          ex:'Wir beginnen <u>mit einer Wiederholung</u>.'},
+{p:'mit',    v:'sich besch&auml;ftigen', ex:'Wir besch&auml;ftigen uns <u>mit moderner Musik</u>.'},
+{p:'mit',    v:'handeln',           ex:'Mein Freund handelt <u>mit Gebrauchtwagen</u>.'},
+{p:'mit',    v:'vergleichen A',     ex:'Er vergleicht M&uuml;nster <u>mit seiner Heimatstadt</u>.'},
+{p:'mit',    v:'verwechseln A',     ex:'Ich habe sie <u>mit ihrer Schwester</u> verwechselt.'},
+{p:'mit',    v:'zusammensto&szlig;en', ex:'Das Auto stie&szlig; <u>mit dem Zug</u> zusammen.'},
+{p:'nach',   v:'sich erkundigen',   ex:'Wir erkundigen uns <u>nach der Abfahrt des Zuges</u>.'},
+{p:'nach',   v:'fragen A',          ex:'Der Tourist fragte einen Polizisten <u>nach dem Weg</u>.'},
+{p:'&uuml;ber + A', v:'sich &auml;rgern', ex:'Ich &auml;rgere mich <u>&uuml;ber meine Fehler</u>.'},
+{p:'&uuml;ber + A', v:'sich aufregen', ex:'Ich rege mich <u>&uuml;ber meinen Nachbarn</u> auf.'},
+{p:'&uuml;ber + A', v:'berichten',  ex:'Die Zeugin berichtet <u>&uuml;ber den Unfall</u>.'},
+{p:'&uuml;ber + A', v:'sich beschweren (bei)', ex:'Der Nachbar beschwert sich <u>&uuml;ber den L&auml;rm</u>.'},
+{p:'&uuml;ber + A', v:'diskutieren (mit)', ex:'Die Studenten diskutieren gerne <u>&uuml;ber Politik</u>.'},
+{p:'&uuml;ber + A', v:'sich freuen', ex:'Ich freue mich <u>&uuml;ber das Geschenk</u>. <span class="eg-note">(&rarr; auf)</span>'},
+{p:'&uuml;ber + A', v:'sich informieren', ex:'Wir informieren uns <u>&uuml;ber den Kurs des Dollars</u>.'},
+{p:'&uuml;ber + A', v:'klagen',     ex:'Der Kranke klagt <u>&uuml;ber Schmerzen im R&uuml;cken</u>.'},
+{p:'&uuml;ber + A', v:'lachen',     ex:'<u>&Uuml;ber diesen Witz</u> kann ich nicht lachen.'},
+{p:'&uuml;ber + A', v:'nachdenken', ex:'Ich muss <u>&uuml;ber das Problem</u> nachdenken.'},
+{p:'&uuml;ber + A', v:'sprechen (mit)', ex:'Wir haben <u>&uuml;ber seine Studienpl&auml;ne</u> gesprochen.'},
+{p:'&uuml;ber + A', v:'sich unterhalten', ex:'Wor&uuml;ber habt ihr euch unterhalten?'},
+{p:'&uuml;ber + A', v:'sich wundern', ex:'Ich wundere mich <u>&uuml;ber die hohen Preise</u>.'},
+{p:'um + A', v:'sich bem&uuml;hen', ex:'Ich bem&uuml;he mich seit langem <u>um ein Zimmer</u>.'},
+{p:'um + A', v:'sich bewerben',     ex:'Sie bewirbt sich <u>um einen besseren Arbeitsplatz</u>.'},
+{p:'um + A', v:'bitten (A)',        ex:'Er hat mich <u>um Geld</u> gebeten.'},
+{p:'um + A', v:'es geht',           ex:'In diesem Text geht es <u>um die Arbeitslosigkeit</u>.'},
+{p:'um + A', v:'es handelt sich',   ex:'Bei dem Verletzten handelt es sich <u>um einen alten Mann</u>.'},
+{p:'um + A', v:'sich sorgen',       ex:'Er sorgt sich <u>um die Gesundheit seines Kindes</u>.'},
+{p:'um + A', v:'trauern',           ex:'Wir trauern <u>um den toten Freund</u>.'},
+{p:'unter + D', v:'leiden',         ex:'Er leidet sehr <u>unter dem schlechten Wetter</u>. <span class="eg-note">(&rarr; an)</span>'},
+{p:'von',    v:'abh&auml;ngen',     ex:'Meine Laune h&auml;ngt <u>vom Wetter</u> ab.'},
+{p:'von',    v:'sich trennen',      ex:'Sie hat sich <u>von ihrem Mann</u> getrennt.'},
+{p:'von',    v:'sich unterscheiden',ex:'Er unterscheidet sich gar nicht <u>von seinem Zwillingsbruder</u>.'},
+{p:'von',    v:'sich verabschieden',ex:'Ich m&ouml;chte mich <u>von Ihnen</u> verabschieden.'},
+{p:'vor + D',v:'fliehen',           ex:'Der Autodieb ist <u>vor der Polizei</u> geflohen.'},
+{p:'vor + D',v:'sich f&uuml;rchten',ex:'Die Kinder f&uuml;rchten sich <u>vor dem Gewitter</u>.'},
+{p:'vor + D',v:'sch&uuml;tzen A',   ex:'Die Eltern sch&uuml;tzen ihre Kinder <u>vor Gefahren</u>.'},
+{p:'vor + D',v:'warnen A',          ex:'Ich warne dich <u>vor diesem Experiment</u>.'},
+{p:'zu',     v:'sich entschlie&szlig;en', ex:'Wir haben uns <u>zur Abreise</u> entschlossen.'},
+{p:'zu',     v:'geh&ouml;ren',      ex:'Es geh&ouml;rt <u>zu meinen Aufgaben</u>, Protokoll zu f&uuml;hren.'},
+{p:'zu',     v:'gratulieren (D)',   ex:'Ich gratuliere dir <u>zum Geburtstag</u>.'},
+{p:'zu',     v:'&uuml;berreden A',  ex:'Ich m&ouml;chte euch <u>zum Mitkommen</u> &uuml;berreden.'}
+];
+
+/* ===================== ADJEKTIVE + PRÄPOSITION ===================== */
+const ADJEKTIVE = [
+{a:'abh&auml;ngig von',        ex:'Die Kinder sind <u>von ihren Eltern</u> abh&auml;ngig.'},
+{a:'angewiesen auf + A',       ex:'Ich bin <u>auf seine Hilfe</u> angewiesen.'},
+{a:'arm an + D',               ex:'Das Land ist <u>an Wasser</u> arm.'},
+{a:'bekannt mit',              ex:'Ich bin <u>mit ihm</u> seit langem bekannt. <span class="eg-note">(&rarr; + D = известен кому)</span>'},
+{a:'beliebt bei',              ex:'Sie ist <u>bei ihren Kollegen</u> sehr beliebt.'},
+{a:'berechtigt zu',            ex:'Herr Marx war <u>zur Einl&ouml;sung des Schecks</u> nicht berechtigt.'},
+{a:'bereit zu',                ex:'Wir sind <u>zur Abreise</u> bereit.'},
+{a:'besorgt um + A',           ex:'Die Mutter ist <u>um ihr krankes Kind</u> besorgt.'},
+{a:'bezeichnend f&uuml;r',     ex:'Diese Antwort ist <u>f&uuml;r sie</u> bezeichnend.'},
+{a:'charakteristisch f&uuml;r', ex:'Hitze und Feuchtigkeit sind <u>f&uuml;r die Tropen</u> charakteristisch.'},
+{a:'einverstanden mit',        ex:'Ich bin <u>mit diesem Vorschlag</u> einverstanden.'},
+{a:'entschlossen zu',          ex:'Wir sind <u>zur Abreise</u> entschlossen.'},
+{a:'entsetzt &uuml;ber + A',   ex:'Ich bin <u>&uuml;ber sein Benehmen</u> entsetzt.'},
+{a:'erfreut &uuml;ber + A',    ex:'Sie ist <u>&uuml;ber das sch&ouml;ne Geschenk</u> erfreut.'},
+{a:'erstaunt &uuml;ber + A',   ex:'Die Studentin war <u>&uuml;ber die guten Noten</u> erstaunt.'},
+{a:'f&auml;hig zu',            ex:'Der Mann ist <u>zu jeder Tat</u> f&auml;hig.'},
+{a:'fertig mit',               ex:'Ich bin <u>mit der Arbeit</u> fertig.'},
+{a:'frei von',                 ex:'Der Kranke ist heute <u>von Schmerzen</u> frei.'},
+{a:'freundlich zu',            ex:'Sie ist <u>zu allen Leuten</u> freundlich.'},
+{a:'froh &uuml;ber + A',       ex:'Wir sind <u>&uuml;ber deinen Erfolg</u> froh.'},
+{a:'geeignet f&uuml;r / zu',   ex:'Dieses Buch ist <u>f&uuml;r Anf&auml;nger</u> (zum Lernen) gut geeignet.'},
+{a:'gespannt auf + A',         ex:'Ich bin <u>auf das Ende des Romans</u> gespannt.'},
+{a:'gew&ouml;hnt an + A',      ex:'Ich bin <u>an das fr&uuml;he Aufstehen</u> gew&ouml;hnt.'},
+{a:'gl&uuml;cklich &uuml;ber + A', ex:'Er ist <u>&uuml;ber das Geschenk</u> gl&uuml;cklich.'},
+{a:'interessant f&uuml;r',     ex:'Der Vortrag war <u>f&uuml;r uns</u> interessant.'},
+{a:'interessiert an + D',      ex:'Wir sind <u>an einer Reise nach Spanien</u> interessiert.'},
+{a:'m&uuml;de von',            ex:'Ich bin <u>von der Arbeit</u> m&uuml;de.'},
+{a:'neidisch auf + A',         ex:'Sie ist <u>auf ihre j&uuml;ngere Schwester</u> neidisch.'},
+{a:'n&uuml;tzlich f&uuml;r',   ex:'Fremdsprachenkenntnisse sind <u>f&uuml;r alle</u> n&uuml;tzlich.'},
+{a:'reich an + D',             ex:'Dieses Land ist <u>an Bodensch&auml;tzen</u> reich.'},
+{a:'sch&auml;dlich f&uuml;r',  ex:'Rauchen ist <u>f&uuml;r die Gesundheit</u> sch&auml;dlich.'},
+{a:'schuld an + D',            ex:'Wer war <u>an dem Verkehrsunfall</u> schuld?'},
+{a:'stolz auf + A',            ex:'Die Eltern sind <u>auf ihre Tochter</u> stolz.'},
+{a:'traurig &uuml;ber + A',    ex:'Wir sind <u>&uuml;ber die schlechte Nachricht</u> traurig.'},
+{a:'&uuml;berzeugt von',       ex:'Sie ist <u>von der Qualit&auml;t des Produktes</u> &uuml;berzeugt.'},
+{a:'vergleichbar mit',         ex:'Deine Arbeit ist <u>mit seiner Arbeit</u> nicht vergleichbar.'},
+{a:'verwandt mit',             ex:'Er ist <u>mit dem Pr&auml;sidenten</u> verwandt.'},
+{a:'zufrieden mit',            ex:'Wir sind <u>mit unserer Arbeit</u> zufrieden.'}
+];
+
+/* ---- Rendern + Suche ---- */
+function renderList(data, bodyId, countId, rowFn, matchFn) {
+    const body = document.getElementById(bodyId), cnt = document.getElementById(countId);
+    return function (q) {
+        const t = (q || '').trim().toLowerCase();
+        const rows = data.filter(d => !t || matchFn(d, t));
+        body.innerHTML = rows.map(rowFn).join('');
+        cnt.textContent = rows.length + ' / ' + data.length;
+    };
+}
+const strip = s => s.replace(/&[a-z]+;/g, m => ({'&uuml;':'ü','&auml;':'ä','&ouml;':'ö','&szlig;':'ss','&Uuml;':'ü'}[m] || ''))
+                    .replace(/<[^>]*>/g, '').toLowerCase();
+
+const drawVerben = renderList(VERBEN, 'verbBody', 'verbCount',
+    d => `<tr><td class="eg-p">${d.p}</td><td class="eg-v">${d.v}</td><td class="eg-ex">${d.ex}</td></tr>`,
+    (d, t) => strip(d.p + ' ' + d.v + ' ' + d.ex).includes(t));
+const drawAdj = renderList(ADJEKTIVE, 'adjBody', 'adjCount',
+    d => `<tr><td class="eg-v">${d.a}</td><td class="eg-ex">${d.ex}</td></tr>`,
+    (d, t) => strip(d.a + ' ' + d.ex).includes(t));
+
+drawVerben(''); drawAdj('');
+document.getElementById('verbSearch').addEventListener('input', e => drawVerben(e.target.value));
+document.getElementById('adjSearch').addEventListener('input', e => drawAdj(e.target.value));
+
+/* ===================== TRAINER ===================== */
+/* q = Satz mit ___ · a = akzeptierte Antworten · hint */
+const TRAIN = [
+{q:'Wir warten ___ den Bus.',                      a:['auf'],           hint:'warten &hellip; + Akkusativ'},
+{q:'Ich denke oft ___ meine Kindheit.',            a:['an'],            hint:'denken &hellip; + Akkusativ'},
+{q:'Er leidet ___ einer schweren Krankheit.',      a:['an'],            hint:'болезнь &rarr; + Dativ'},
+{q:'Sie leidet sehr ___ dem L&auml;rm.',           a:['unter'],         hint:'обстоятельства &rarr; + Dativ'},
+{q:'Die Wohnung besteht ___ vier R&auml;umen.',    a:['aus'],           hint:'состоит из'},
+{q:'Ich interessiere mich ___ Politik.',           a:['für','fuer'],    hint:'+ Akkusativ'},
+{q:'Wir m&uuml;ssen ___ die Armut k&auml;mpfen.',  a:['gegen'],         hint:'против'},
+{q:'Die Gewerkschaft k&auml;mpft ___ h&ouml;here L&ouml;hne.', a:['für','fuer'], hint:'за'},
+{q:'Ich &auml;rgere mich ___ meine Fehler.',       a:['über','ueber'],  hint:'+ Akkusativ'},
+{q:'Ich freue mich schon ___ die Ferien.',         a:['auf'],           hint:'радость о будущем'},
+{q:'Ich freue mich ___ das Geschenk.',             a:['über','ueber'],  hint:'радость о полученном'},
+{q:'Sie bewirbt sich ___ eine Stelle.',            a:['um'],            hint:'+ Akkusativ'},
+{q:'Meine Laune h&auml;ngt ___ Wetter ab.',        a:['vom','von dem'], hint:'von + Dativ, слитно'},
+{q:'Die Kinder f&uuml;rchten sich ___ dem Gewitter.', a:['vor'],        hint:'+ Dativ'},
+{q:'Ich gratuliere dir ___ Geburtstag.',           a:['zum','zu dem'],  hint:'zu + Dativ, слитно'},
+{q:'Wir nehmen ___ Sprachkurs teil.',              a:['am','an dem'],   hint:'an + Dativ, слитно'},
+{q:'Er hat sich ___ Datum geirrt.',                a:['im','in dem'],   hint:'in + Dativ, слитно'},
+{q:'Bitte antworten Sie ___ meine Frage!',         a:['auf'],           hint:'+ Akkusativ'},
+{q:'Ich bedanke mich ___ dir ___ die Hilfe. (1. L&uuml;cke)', a:['bei'], hint:'у кого'},
+{q:'Ich bedanke mich bei dir ___ die Hilfe. (2. L&uuml;cke)', a:['für','fuer'], hint:'за что'},
+{q:'Die Eltern sind ___ ihre Tochter stolz.',      a:['auf'],           hint:'Adjektiv + Akkusativ'},
+{q:'Wir sind ___ unserer Arbeit zufrieden.',       a:['mit'],           hint:'Adjektiv + Dativ'},
+{q:'Dieses Land ist ___ Bodensch&auml;tzen reich.',a:['an'],            hint:'Adjektiv + Dativ'},
+{q:'Wer ist ___ dem Unfall schuld?',               a:['an'],            hint:'Adjektiv + Dativ'},
+{q:'Ihr Freund ist ___ Drogen abh&auml;ngig.',     a:['von'],           hint:'Adjektiv + Dativ'},
+{q:'Ich bin ___ das fr&uuml;he Aufstehen gew&ouml;hnt.', a:['an'],      hint:'gew&ouml;hnt &hellip; + Akkusativ'},
+{q:'Wir sind ___ die gute Nachricht froh.',        a:['über','ueber'],  hint:'froh &hellip; + Akkusativ'},
+{q:'Rauchen ist ___ die Gesundheit sch&auml;dlich.', a:['für','fuer'],  hint:'Adjektiv + Akkusativ'},
+{q:'Er ist ___ jeder Tat f&auml;hig.',             a:['zu'],            hint:'Adjektiv + Dativ'},
+{q:'Sie ist ___ ihren Kollegen sehr beliebt.',     a:['bei'],           hint:'Adjektiv + Dativ'}
+];
+
+let pool = [], cur = null, ok = 0, bad = 0, answered = false;
+const $ = id => document.getElementById(id);
+
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+}
+function nextQ() {
+    if (!pool.length) pool = shuffle(TRAIN);
+    cur = pool.pop();
+    answered = false;
+    $('trPrompt').innerHTML = cur.q.replace('___', '<span style="color:var(--color-accent)">___</span>');
+    $('trSub').textContent = cur.hint || '';
+    const inp = $('trInput'); inp.value = ''; inp.className = 'tr-inp'; inp.focus();
+    $('trFb').textContent = '';
+    $('trLeft').textContent = pool.length;
+}
+function check() {
+    if (answered) { nextQ(); return; }
+    const inp = $('trInput');
+    const val = inp.value.trim().toLowerCase().replace(/\s+/g, ' ');
+    if (!val) return;
+    if (cur.a.some(a => a.toLowerCase() === val)) {
+        inp.classList.add('ok'); ok++; $('trOk').textContent = ok;
+        $('trFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig</span>';
+    } else {
+        inp.classList.add('no'); bad++; $('trBad').textContent = bad;
+        $('trFb').innerHTML = '<span style="color:#f85149">&#x2717; richtig: <b>' + cur.a[0] + '</b></span>';
+    }
+    answered = true;
+}
+$('trCheck').addEventListener('click', check);
+$('trNext').addEventListener('click', nextQ);
+$('trSkip').addEventListener('click', () => {
+    $('trFb').innerHTML = '<span style="color:#fbbf24">&rarr; ' + cur.a[0] + '</span>';
+    answered = true;
+});
+$('trInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : check(); } });
+nextQ();
+
+/* ===================== ÜBUNGEN ===================== */
+const DRILLS = {
+    drillA: [
+        ['Die B&uuml;cher liegen auf d___ Tisch.', 'auf <b>dem</b> Tisch &middot; lagen &middot; haben gelegen'],
+        ['Das Auto steht auf d___ Stra&szlig;e.', 'auf <b>der</b> Stra&szlig;e &middot; stand &middot; hat gestanden'],
+        ['Die Kinder sitzen auf ein___ Bank.', 'auf <b>einer</b> Bank &middot; sa&szlig;en &middot; haben gesessen'],
+        ['Das Handtuch h&auml;ngt neben d___ Waschbecken.', 'neben <b>dem</b> Waschbecken &middot; hing &middot; hat gehangen'],
+        ['Das Geld steckt in d___ Portemonnaie.', 'in <b>dem</b> (im) Portemonnaie &middot; steckte &middot; hat gesteckt'],
+        ['Ich lege den Kugelschreiber neben d___ Buch.', 'neben <b>das</b> Buch &middot; legte &middot; habe gelegt'],
+        ['Wir stellen das Radio auf d___ Tisch.', 'auf <b>den</b> Tisch &middot; stellten &middot; haben gestellt'],
+        ['Sie setzt sich in ihr___ Auto.', 'in <b>ihr</b> Auto (Akk.) &middot; setzte sich &middot; hat sich gesetzt'],
+        ['Er h&auml;ngt seinen Mantel an d___ Haken.', 'an <b>den</b> Haken &middot; h&auml;ngte &middot; hat geh&auml;ngt'],
+        ['Sie steckt den Schl&uuml;ssel in ihr___ Tasche.', 'in <b>ihre</b> Tasche &middot; steckte &middot; hat gesteckt'],
+        ['Ich gehe ___ Arzt. / Ich fliege ___ T&uuml;rkei. / Ich fahre ___ See.', '<b>zum</b> Arzt &middot; <b>in die</b> T&uuml;rkei &middot; <b>an die</b> See'],
+        ['Wenn das Haus brennt, muss man ___ Stra&szlig;e rennen.', 'auf die Stra&szlig;e (wohin? &rarr; Akk.)']
+    ],
+    drillB: [
+        ['Wir m&uuml;ssen uns ___ die Reise nach Prag vorbereiten.', 'auf'],
+        ['Ich habe mich ___ das billigste Zimmer entschieden.', 'f&uuml;r'],
+        ['Seit wann leidest du ___ Bronchitis?', 'an (болезнь)'],
+        ['Ich beschwere mich ___ Kellner ___ das kalte Essen.', 'beim Kellner &middot; &uuml;ber das Essen'],
+        ['Ich habe mich ___ sein leises Sprechen gew&ouml;hnt.', 'an'],
+        ['Erinnerst du dich noch ___ unsere alte Lehrerin?', 'an'],
+        ['Die B&uuml;rger protestieren ___ die Schlie&szlig;ung des Museums.', 'gegen'],
+        ['Wei&szlig;t du, ___ welcher Krankheit er gestorben ist?', 'an'],
+        ['Ich zweifle oft ___ seinem Verstand.', 'an'],
+        ['Der Politiker wollte nicht ___ Diskussion teilnehmen.', 'an der Diskussion'],
+        ['Der Roman besteht ___ vier Teilen.', 'aus'],
+        ['Ich muss ___ meine j&uuml;ngeren Geschwister sorgen.', 'f&uuml;r'],
+        ['F&uuml;r den Bau der Fabrik fehlt es ___ Fachleuten.', 'an'],
+        ['Kann ich mich ___ Ihre Hilfe verlassen?', 'auf'],
+        ['Bitte wenden Sie sich ___ die Auskunft!', 'an'],
+        ['Du erkennst Peter sofort ___ seinem lauten Lachen.', 'an'],
+        ['Ich habe sie ___ ihrer Kusine verwechselt.', 'mit'],
+        ['Er unterscheidet sich ___ seinem Bruder durch seinen Flei&szlig;.', 'von']
+    ],
+    drillC: [
+        ['Die Professorin war ___ der Arbeit nicht zufrieden.', 'mit'],
+        ['Herr Meier ist ___ seinen Bruder neidisch.', 'auf'],
+        ['Der Name des K&uuml;nstlers war ___ Journalisten bekannt.', 'den Journalisten (Dativ, ohne Pr&auml;position)'],
+        ['Ali ist ___ seinen Freunden sehr beliebt.', 'bei'],
+        ['Mittags bin ich m&uuml;de ___ Lernen.', 'vom Lernen'],
+        ['Ich bin seit Jahren ___ das fr&uuml;he Aufstehen gew&ouml;hnt.', 'an'],
+        ['Ich bin ___ solchen L&auml;rm nicht gewohnt!', 'einen solchen L&auml;rm &mdash; Akkusativ, <b>ohne</b> Pr&auml;position!'],
+        ['Wir sind ___ den Ausgang der Wahlen gespannt.', 'auf'],
+        ['Ihr Freund ist ___ Drogen abh&auml;ngig.', 'von'],
+        ['Alte Menschen sind reich ___ Erfahrungen.', 'an'],
+        ['Viele Menschen sind besorgt ___ ihren Arbeitsplatz.', 'um'],
+        ['Herr Meier ist ___ Nachbarn ___ die Hilfe dankbar.', 'seinem Nachbarn (Dativ) &middot; f&uuml;r die Hilfe'],
+        ['Der Firmenchef ist ___ der Qualit&auml;t seiner Produkte &uuml;berzeugt.', 'von'],
+        ['Ob du Kartoffeln oder Reis kochst, ist ___ egal.', 'mir (Dativ)'],
+        ['Wer ist schuld ___ der Armut vieler L&auml;nder?', 'an'],
+        ['Ich bin ___ deinen Pl&auml;nen nicht einverstanden.', 'mit'],
+        ['Die Mannschaft war ___ allen anderen &uuml;berlegen.', 'allen anderen (Dativ, ohne Pr&auml;position)'],
+        ['Dieses Brot ist frei ___ Konservierungsmitteln.', 'von'],
+        ['Ist dieses Messer gut ___ Brotschneiden geeignet?', 'zum Brotschneiden (auch: f&uuml;r + Akk.)'],
+        ['Das M&auml;dchen war ___ alten Dame behilflich.', 'der alten Dame (Dativ)']
+    ],
+    drillD: [
+        ['Wir <b>wohnen</b> in M&uuml;nster.', 'Erg&auml;nzung (Situativ) &mdash; &laquo;Wir wohnen.&raquo; звучит неполно'],
+        ['Wir <b>arbeiten</b> in M&uuml;nster.', 'Angabe &mdash; &laquo;Wir arbeiten.&raquo; полностью правильно'],
+        ['Ich warte <b>auf den Bus</b>.', 'Erg&auml;nzung (Pr&auml;positional) &mdash; warten требует auf + A'],
+        ['Ich lese <b>am Abend</b> ein Buch.', 'Angabe (Temporal)'],
+        ['Sie legt das Buch <b>auf den Tisch</b>.', 'Erg&auml;nzung (Direktiv) &mdash; legen без &laquo;куда&raquo; не работает'],
+        ['Sie liest das Buch <b>auf dem Sofa</b>.', 'Angabe (Lokal)'],
+        ['Der Vortrag findet <b>im H&ouml;rsaal A</b> statt.', 'Erg&auml;nzung (Situativ) &mdash; stattfinden требует место'],
+        ['Er hat mir <b>gestern</b> ein Buch geschenkt.', 'Angabe (Temporal); &laquo;mir&raquo; и &laquo;ein Buch&raquo; &mdash; Erg&auml;nzungen'],
+        ['Das Kind rennt <b>nach Hause</b>.', 'Erg&auml;nzung (Direktiv)'],
+        ['<b>Wegen des Regens</b> bleiben wir zu Hause.', 'Angabe (Kausal); &laquo;zu Hause&raquo; &mdash; Erg&auml;nzung bei bleiben']
+    ]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        `<div class="dr-item"><div class="dr-q">${q}</div><div class="dr-a">${a}</div></div>`).join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>

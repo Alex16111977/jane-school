@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getrennt oder zusammen? | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    .ex { font-size:0.97rem; line-height:1.75; margin:0.5rem 0 0; }
+    .ex div { padding:0.12rem 0; }
+    .ex b { color:#fff; }
+    .why { color:rgba(230,230,235,0.6); font-size:0.86rem; margin-top:0.4rem; font-style:italic; }
+    .gray { color:rgba(230,230,235,0.55); }
+    .ok-l { color:#86efac; }
+    .no-l { color:#f85149; }
+    .acc  { color:var(--color-accent); }
+
+    /* Betonungsmarke */
+    .st { color:#fbbf24; font-weight:900; }
+    .stress { border-bottom:2px solid #fbbf24; }
+
+    .badge { display:inline-block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em;
+             padding:0.15rem 0.5rem; border-radius:50px; font-weight:800; white-space:nowrap; }
+    .b-zus { background:rgba(63,185,80,0.16);   color:#86efac; border:1px solid rgba(63,185,80,0.4); }
+    .b-get { background:rgba(121,184,255,0.14); color:#79b8ff; border:1px solid rgba(121,184,255,0.4); }
+    .b-bei { background:rgba(251,191,36,0.15);  color:#fbbf24; border:1px solid rgba(251,191,36,0.4); }
+
+    /* Tabellen */
+    .gz-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px;
+               border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.gz { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:480px; }
+    table.gz th { background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+                  text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.gz td { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top;
+                  color:rgba(230,230,235,0.82); }
+    table.gz td b { color:#fff; }
+    table.gz tbody tr:hover { background:rgba(255,255,255,0.035); }
+    table.gz tr.grp td { background:rgba(244,114,182,0.10); color:#fff; font-weight:700; font-size:0.82rem;
+                         letter-spacing:0.05em; border-bottom:1px solid rgba(244,114,182,0.3); }
+
+    /* Suche */
+    .gz-tools { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0.2rem 0 0.5rem; }
+    .gz-search { flex:1 1 220px; min-width:180px; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.14);
+                 border-radius:8px; padding:0.55rem 0.8rem; color:#fff; font-size:0.95rem; font-family:inherit; }
+    .gz-search:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px var(--color-accent-subtle); }
+    .gz-count { color:rgba(230,230,235,0.5); font-size:0.82rem; }
+
+    /* Trainer */
+    .tr-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tr-sent { font-size:1.1rem; color:rgba(230,230,235,0.85); text-align:center; margin:0.3rem 0 0.5rem; line-height:1.6; }
+    .tr-word { font-size:1.5rem; color:#fff; text-align:center; font-weight:700; margin-bottom:0.2rem;
+               font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+    .tr-sub { text-align:center; color:rgba(230,230,235,0.5); font-size:0.85rem; margin-bottom:1rem; }
+    .tr-opts { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .tr-opt { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); border-radius:9px;
+              padding:0.7rem 1.2rem; color:#fff; font-size:0.98rem; font-weight:600; cursor:pointer;
+              font-family:inherit; transition:all .15s; }
+    .tr-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(244,114,182,0.1); }
+    .tr-opt.good { background:rgba(63,185,80,0.2); border-color:#86efac; color:#86efac; }
+    .tr-opt.bad  { background:rgba(248,81,73,0.18); border-color:#f85149; color:#f85149; }
+    .tr-opt:disabled { cursor:default; }
+    .tr-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tr-fb { margin-top:0.9rem; font-size:0.95rem; min-height:2.8rem; text-align:center; line-height:1.6; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    /* Drills */
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; line-height:1.5; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; line-height:1.55; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+
+    @media (max-width:640px) { .tr-word { font-size:1.2rem; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Getrennt oder zusammen</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Getrennt oder zusammen?</h1>
+            <p class="page-subtitle">Rad fahren, aber Autofahren · weh tun, aber wehtun · schwer beladen, aber schwerbeladen — по PONS «Die große Grammatik»</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="system">&#x1F511; System</button>
+            <button class="tab" data-tab="verben">Verben</button>
+            <button class="tab" data-tab="adj">Adjektive &amp; Partizipien</button>
+            <button class="tab" data-tab="nomen">Nomen &amp; Zahlen</button>
+            <button class="tab" data-tab="liste">&#x1F50D; Liste</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="uebungen">&#x270D;&#xFE0F; Übungen</button>
+        </div>
+
+        <!-- ==================== SYSTEM ==================== -->
+        <div class="tab-content active" id="tab-system">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F511;</span>
+                    <div>
+                        <h2>Один вопрос решает всё</h2>
+                        <p class="lesson-header-sub">Это <em>группа слов</em> или <em>одно новое слово</em>?</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F9E9; Wortgruppe vs. Zusammensetzung</h3>
+                    <div class="ex" style="font-size:1.05rem;">
+                        <div><span class="badge b-get">getrennt</span> &nbsp;<b>Wortgruppe</b> — каждое слово сохраняет свой смысл</div>
+                        <div style="padding-left:1rem;">Wir werden bald <b>daheim ankommen</b>. <span class="gray">(придём домой)</span></div>
+                        <div style="margin-top:0.6rem;"><span class="badge b-zus">zusammen</span> &nbsp;<b>Zusammensetzung</b> — вместе получилось <em>одно</em> новое понятие</div>
+                        <div style="padding-left:1rem;">Wir werden bald <b>heimkommen</b>. <span class="gray">(вернёмся домой — одно действие)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3B5; Главный инструмент: Betonungsregel</h3>
+                    <p style="font-size:0.98rem; line-height:1.7;">
+                        Произнеси вслух. Слушай, <strong>где ударение</strong>.
+                    </p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Ударение</th><th>Schreibung</th><th>Beispiel</th></tr>
+                        <tr><td><b>первое слово</b> сильнее глагола</td>
+                            <td><span class="badge b-zus">zusammen</span></td>
+                            <td>anein<span class="st">'</span>andergeraten → Die beiden sind <b>aneinandergeraten</b>.<br>
+                                da<span class="st">'</span>vonkommen → Wir sind noch einmal <b>davongekommen</b>.<br>
+                                da<span class="st">'</span>heimbleiben → Wer krank ist, sollte <b>daheimbleiben</b>.</td></tr>
+                        <tr><td>оба <b>одинаково</b> или глагол сильнее</td>
+                            <td><span class="badge b-get">getrennt</span></td>
+                            <td>aneinander <span class="st">'</span>denken → Wir werden täglich <b>aneinander denken</b>.<br>
+                                davon <span class="st">'</span>kommen → Das kann <b>davon kommen</b>, dass es friert.<br>
+                                daheim <span class="st">'</span>arbeiten → Man kann <b>daheim arbeiten</b>.</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">То же самое различие: <b>Er will immer da<span class="stress">bei</span>sitzen.</b> (быть рядом) —
+                    <b>Du kannst da<span class="stress">bei</span> (währenddessen) <span class="stress">sit</span>zen.</b> (при этом сидеть)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Второй инструмент: wörtlich oder übertragen?</h3>
+                    <p style="font-size:0.98rem; line-height:1.7;">
+                        Если из двух слов получился <strong>переносный смысл</strong> — пиши <span class="badge b-zus">zusammen</span>.
+                        Если каждое слово значит ровно то, что значит — <span class="badge b-get">getrennt</span>.
+                    </p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Wörtlich <span class="badge b-get">getrennt</span></th><th>Übertragen <span class="badge b-zus">zusammen</span></th></tr>
+                        <tr><td><b>fest stehen</b> — стоять на твёрдой земле</td><td><b>feststehen</b> — быть решённым, точным</td></tr>
+                        <tr><td><b>frei sprechen</b> — говорить без конспекта</td><td><b>freisprechen</b> — оправдать (суд)</td></tr>
+                        <tr><td><b>gerade biegen</b> — выпрямить (трубу)</td><td><b>geradebiegen</b> — исправить ошибку</td></tr>
+                        <tr><td><b>klar sehen</b> — чётко видеть</td><td><b>klarsehen</b> — понять, разобраться</td></tr>
+                        <tr><td><b>krank machen</b> — сделать больным (курение)</td><td><b>krankmachen</b> — притворяться больным</td></tr>
+                        <tr><td><b>näher kommen</b> — подойти ближе</td><td><b>sich näherkommen</b> — сблизиться (отношения)</td></tr>
+                        <tr><td><b>richtig schreiben</b> — писать без ошибок</td><td><b>richtigstellen</b> — исправить, скорректировать</td></tr>
+                        <tr><td><b>sitzen bleiben</b> — остаться сидеть (в поезде)</td><td><b>sitzenbleiben</b> — остаться на второй год</td></tr>
+                        <tr><td><b>hängen lassen</b> — оставить висеть (пальто)</td><td><b>hängenlassen</b> — бросить в беде</td></tr>
+                        <tr><td><b>liegen lassen</b> — оставить лежать (на столе)</td><td><b>liegenlassen</b> — не обращать внимания</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Другие «переносные» глаголы, которые всегда слитно:
+                    heiligsprechen · kundtun · krankschreiben · nahegehen · schiefgehen · schwerfallen · wahrhaben · weismachen</p>
+                </div>
+
+                <div class="note-card" style="background:rgba(251,191,36,0.07); border-color:rgba(251,191,36,0.3);">
+                    <h3 style="color:#fbbf24;">&#x1F91D; Третий случай: <span class="badge b-bei">beides</span></h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Когда нельзя однозначно решить, переносный смысл или нет — <strong>разрешены оба варианта</strong>.
+                        Не мучайся, пиши как хочешь.
+                    </p>
+                    <div class="ex">
+                        <div>ähnlichsehen / ähnlich sehen · liebhaben / lieb haben · wehtun / weh tun</div>
+                        <div>sich schönmachen / schön machen · zufriedenstellen / zufrieden stellen</div>
+                        <div>kennenlernen / kennen lernen <span class="gray">(единственное исключение из правила Verb+Verb)</span></div>
+                    </div>
+                    <p class="why">Также если прилагательное описывает <b>результат</b> действия:
+                    <em>klein schneiden / kleinschneiden</em> · <em>warm machen / warmmachen</em> · <em>blank putzen / blankputzen</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Шпаргалка на одну минуту</h3>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Тип связи</th><th>Правило</th><th>Beispiel</th></tr>
+                        <tr><td>Verb + Verb</td><td><span class="badge b-get">getrennt</span></td><td>laufen lernen, spazieren gehen, sitzen bleiben</td></tr>
+                        <tr><td>Nomen + Verb</td><td><span class="badge b-get">getrennt</span></td><td>Auto fahren, Rad fahren, Zeitung lesen</td></tr>
+                        <tr><td>Adjektiv + Verb</td><td><span class="badge b-get">getrennt</span>, если смысл прямой</td><td>allein erziehen, deutlich machen</td></tr>
+                        <tr><td>Adverb + Verb</td><td>по <b>ударению</b></td><td>daheimbleiben / daheim arbeiten</td></tr>
+                        <tr><td>irgendwas + <b>sein</b></td><td><span class="badge b-get">getrennt</span> — всегда</td><td>da sein, groß sein, vorbei sein, zufrieden sein</td></tr>
+                        <tr><td><b>Nominalisierung</b> (с артиклем)</td><td><span class="badge b-zus">zusammen</span> + с большой</td><td>das Radfahren, beim Autofahren, das Laufenlernen</td></tr>
+                        <tr><td>Nomen + Nomen / Adjektiv + Nomen</td><td><span class="badge b-zus">zusammen</span> — всегда</td><td>Fensterglas, Haustür, Freibad, Blaumeise</td></tr>
+                        <tr><td>Fugenelement (-s-, -en-, -e-)</td><td><span class="badge b-zus">zusammen</span> — всегда</td><td>gebrauchsfertig, ahnungslos, sonnenbeschienen</td></tr>
+                        <tr><td>первая часть в <b>Komparativ</b> или расширена</td><td><span class="badge b-get">getrennt</span></td><td>leichter verständlich, zu schwer beladen, recht leicht verständlich</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== VERBEN ==================== -->
+        <div class="tab-content" id="tab-verben">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x26A1;</span>
+                    <div>
+                        <h2>Verben</h2>
+                        <p class="lesson-header-sub">Четыре комбинации: Adverb · Adjektiv · Verb · Nomen — каждая со своим правилом</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>1 · Adverb + Verb → по ударению</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Часть наречий уже <strong>потеряли самостоятельность</strong> и стали приставками.
+                        В инфинитиве и причастии — слитно, в спрягаемых формах — раздельно (как у любых Trennbare).
+                    </p>
+                    <div class="ex">
+                        <div><b>fürliebnehmen:</b> fürliebnehmen, fürliebnehmend, fürliebgenommen — <em>aber:</em> ich nehme <b>fürlieb</b></div>
+                        <div><b>anheimstellen:</b> anheimstellen, anheimgestellt — <em>aber:</em> ich stelle <b>anheim</b></div>
+                    </div>
+                    <p class="why">Такие же: eingehen · entzweigehen · heimzahlen · hintanstellen · innehaben · überhandnehmen ·
+                    umhinkönnen · vorliebnehmen · zugutehalten · zurechtlegen · zunichtemachen · zuteilwerden · zustattenkommen</p>
+
+                    <p style="font-size:0.95rem; margin-top:0.9rem;">Остальные наречия могут быть <strong>и приставкой, и самостоятельным словом</strong> — решает ударение:</p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th><span class="badge b-zus">zusammen</span> — наречие ударнее</th><th><span class="badge b-get">getrennt</span> — самостоятельное наречие</th></tr>
+                        <tr><td>Er will immer <b>dabeisitzen</b>.</td><td>Du kannst <b>dabei</b> (währenddessen) <b>sitzen</b>.</td></tr>
+                        <tr><td>Du kannst den Stuhl <b>davorstellen</b>.</td><td>Du kannst den Brief <b>davor</b> (vorher) <b>schreiben</b>.</td></tr>
+                        <tr><td>Es muss irgendwie <b>weitergehen</b>.</td><td>Wir müssen <b>weiter</b> (weiterhin) <b>warten</b>.</td></tr>
+                        <tr><td>Ich muss meine Sachen <b>zusammensuchen</b>.</td><td>Wir können den Schlüssel <b>zusammen</b> (gemeinsam) <b>suchen</b>.</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>2 · Adjektiv + Verb → чаще <span class="badge b-get">getrennt</span></h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Если оба слова сохраняют исходный смысл — раздельно:</p>
+                    <div class="ex">
+                        <div>Ich musste meinen Sohn <b>allein erziehen</b>. · Wie kann ich dir das <b>deutlich machen</b>?</div>
+                        <div class="gray">eng verbinden · ernst nehmen · falsch schreiben · neu eröffnen · schwer stürzen · stark fallen · weit gehen</div>
+                    </div>
+                    <p class="why">&#x1F534; <b>Всегда</b> раздельно, если прилагательное само составное или с суффиксом:
+                    <em>aus|wendig lernen</em> · <em>bewusst|los schlagen</em> · <em>dunkel|blau anmalen</em> · <em>un|genau arbeiten</em></p>
+                    <p class="why">&#x1F7E2; Слитно — если родился <b>новый переносный</b> смысл: heiligsprechen · kundtun · krankschreiben ·
+                    nahegehen · schiefgehen · schwerfallen · wahrhaben · weismachen</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>3 · Verb + Verb → <span class="badge b-get">getrennt</span></h3>
+                    <div class="ex">
+                        <div>laufen lernen · schreiben üben · spazieren gehen · sitzen bleiben · kennen lernen</div>
+                    </div>
+                    <p class="why">Исключение — <b>kennenlernen</b> можно писать слитно всегда:
+                    <em>Ich war einsam, bevor ich sie <b>kennenlernte / kennen lernte</b>.</em></p>
+                    <p style="font-size:0.95rem; margin-top:0.8rem;">Слитно — если второй глагол <b>bleiben</b> или <b>lassen</b> и смысл переносный:</p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Wörtlich <span class="badge b-get">getrennt</span></th><th>Übertragen <span class="badge b-zus">zusammen</span></th></tr>
+                        <tr><td><b>sitzen bleiben</b> (im Zug)</td><td><b>sitzenbleiben</b> (nicht versetzt werden)</td></tr>
+                        <tr><td><b>hängen lassen</b> (den Mantel am Haken)</td><td><b>hängenlassen</b> (nicht helfen)</td></tr>
+                        <tr><td><b>liegen lassen</b> (auf dem Tisch)</td><td><b>liegenlassen</b> (nicht beachten)</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>4 · Nomen + Verb → <span class="badge b-get">getrennt</span></h3>
+                    <div class="ex">
+                        <div>Auto fahren · Rad fahren · Kegel schieben · Hof halten · Folge leisten · Gefahr laufen · Radio hören · Tee trinken · Zeitung lesen</div>
+                    </div>
+                    <p class="why">Но некоторые срослись в <b>trennbare Verben</b> — тогда именная часть пишется с маленькой:</p>
+                    <div class="ex">
+                        <div><b>eislaufen</b> → ich laufe eis → ich bin eisgelaufen</div>
+                        <div><b>teilnehmen</b> → ich nehme teil → ich habe teilgenommen</div>
+                        <div class="gray">Ebenso: irreführen · kopfstehen · nottun · leidtun · preisgeben · standhalten · stattfinden · stattgeben · wundernehmen</div>
+                    </div>
+                    <p class="why">А эти — <b>неразделимые</b>, произошли от сложных существительных:
+                    <em>bergsteigen → ich bergsteige → ich bin berggestiegen</em> · <em>schlussfolgern → ich schlussfolgere → ich habe geschlussfolgert</em><br>
+                    Так же: handhaben · lobpreisen · maßregeln · nachtwandeln · notlanden · schlafwandeln · wallfahren · wetteifern</p>
+                </div>
+
+                <div class="note-card" style="background:rgba(251,191,36,0.07); border-color:rgba(251,191,36,0.3);">
+                    <h3 style="color:#fbbf24;">&#x1F91D; Здесь можно и так, и так</h3>
+                    <div class="ex">
+                        <div>Acht geben / achtgeben &nbsp;·&nbsp; Maß halten / maßhalten &nbsp;·&nbsp; Halt machen / haltmachen</div>
+                        <div>Dank sagen / danksagen &nbsp;·&nbsp; Gewähr leisten / gewährleisten &nbsp;·&nbsp; Staub saugen / staubsaugen</div>
+                        <div>Brust schwimmen / brustschwimmen <span class="gray">(und andere Schwimmstile)</span></div>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Внимание: если <b>не</b> используешь как сложный глагол, именная часть пишется с <b>большой</b>:<br>
+                    <em>Ich sauge <b>S</b>taub in der ganzen Wohnung.</em> &nbsp;↔&nbsp; <em>Ich <b>s</b>taubsauge die ganze Wohnung.</em><br>
+                    <em>Wir leisten <b>G</b>ewähr auf alle Teile.</em> &nbsp;↔&nbsp; <em>Wir <b>g</b>ewährleisten einen tadellosen Service.</em></p>
+                </div>
+
+                <div class="note-card" style="background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3);">
+                    <h3 style="color:#f85149;">&#x1F6AB; Всё с <em>sein</em> — только раздельно</h3>
+                    <div class="ex" style="font-size:1.02rem;">
+                        <div>da sein · groß sein · hier sein · vorbei sein · weg sein · zufrieden sein · zusammen sein</div>
+                    </div>
+                    <p class="why">Без исключений. Ни один глагол с <em>sein</em> не пишется слитно.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DD; Nominalisierung → всегда слитно и с большой буквы</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Как только перед сочетанием появляется <strong>артикль или предлог с артиклем</strong> — всё склеивается в одно слово с большой буквы.
+                    </p>
+                    <div class="ex">
+                        <div>Rad fahren → Wir lieben <b>das Radfahren</b> am Sonntag.</div>
+                        <div>Auto fahren → <b>Beim Autofahren</b> soll man nicht telefonieren.</div>
+                        <div>Radio hören → In unserem Keller ist <b>(das) Radiohören</b> nicht möglich.</div>
+                        <div>laufen lernen → In der Reha wurde <b>das Laufenlernen</b> trainiert.</div>
+                        <div>schreiben üben → Der Lehrer immer mit seinem <b>Schreibenüben</b>!</div>
+                        <div>spazieren gehen → <b>Mit dem Spazierengehen</b> ist es nicht getan.</div>
+                        <div>kennen lernen → Ein <b>Kennenlernen</b> war nicht mehr möglich.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ADJEKTIVE ==================== -->
+        <div class="tab-content" id="tab-adj">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3A8;</span>
+                    <div>
+                        <h2>Adjektive und Partizipien</h2>
+                        <p class="lesson-header-sub">schwer beladen ↔ schwerbeladen — здесь ошибаются чаще всего</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5DC;&#xFE0F; Сокращённое выражение → <span class="badge b-zus">zusammen</span></h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Если два слова — это <strong>сжатая целая фраза</strong>, пиши слитно:
+                    </p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Zusammen</th><th>= volle Bedeutung</th></tr>
+                        <tr><td><b>herzerfrischend</b></td><td>das Herz erfrischend</td></tr>
+                        <tr><td><b>farbenblind</b></td><td>blind gegenüber Farben</td></tr>
+                        <tr><td><b>freudestrahlend</b></td><td>vor Freude strahlend</td></tr>
+                        <tr><td><b>sturmerprobt</b></td><td>im Sturm erprobt</td></tr>
+                        <tr><td><b>gottverlassen</b></td><td>von Gott verlassen</td></tr>
+                        <tr><td><b>fingerbreit</b></td><td>so breit wie ein Finger</td></tr>
+                        <tr><td><b>eisfrei</b></td><td>frei von Eis</td></tr>
+                        <tr><td><b>denkfaul</b></td><td>zu faul zum Denken</td></tr>
+                        <tr><td><b>hitzebeständig</b></td><td>beständig gegen Hitze</td></tr>
+                        <tr><td><b>angsterfüllt</b></td><td>von Angst erfüllt</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CF; Partizip + Adjektiv → <span class="badge b-get">getrennt</span></h3>
+                    <div class="ex">
+                        <div>brechend voll · brüllend heiß · leuchtend blau · strahlend hell · verschwindend gering</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Adjektiv + Partizip → <span class="badge b-bei">beides</span>, но с оговорками</h3>
+                    <div class="ex">
+                        <div>weitreichende / weit reichende Veränderungen</div>
+                        <div>getrenntlebende / getrennt lebende Ehepaare</div>
+                        <div>grüngestreifte / grün gestreifte Trikots</div>
+                        <div>schwerwiegende / schwer wiegende Probleme</div>
+                    </div>
+                    <p class="why">&#x1F534; Как только конструкция <b>расширяется</b> — правило включается:</p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Что меняется</th><th>Schreibung</th><th>Beispiel</th></tr>
+                        <tr><td>степень сравнения / расширение у <b>первой</b> части</td>
+                            <td><span class="badge b-get">getrennt</span></td>
+                            <td><b>weiter</b> reichende · <b>sehr weit</b> reichende · <b>zu weit</b> reichende Veränderungen<br>
+                                <b>schwerer</b> wiegende · <b>äußerst schwer</b> wiegende · die <b>am schwersten</b> wiegenden Probleme</td></tr>
+                        <tr><td>степень сравнения у <b>второй</b> части (Partizip)</td>
+                            <td><span class="badge b-zus">zusammen</span></td>
+                            <td>weitreichend<b>ere</b> Verbindungen · schwerwiegend<b>ere</b> Probleme</td></tr>
+                        <tr><td>смысл <b>переносный</b></td>
+                            <td><span class="badge b-zus">zusammen</span></td>
+                            <td>eine <b>alleinstehende</b> Frau · ein <b>frischgebackenes</b> Ehepaar · eine <b>zufriedenstellende</b> Antwort</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3B5; Тест на ударение — самый надёжный</h3>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Первая часть ударнее → <span class="badge b-zus">zusammen</span></th><th>Оба одинаково / вторая ударнее → <span class="badge b-get">getrennt</span></th></tr>
+                        <tr><td>ein <b>vielgelesenes</b> Buch</td><td>eine <b>stark befahrene</b> Autobahn</td></tr>
+                        <tr><td>Der Junge ist <b>frühreif</b>.</td><td>Die Äpfel sind dieses Jahr <b>früh reif</b>.</td></tr>
+                        <tr><td><b>Leichtverständliche</b> Regeln sind immer gut.</td><td>Es ist <b>leicht verständlich</b>, dass er so gehandelt hat.</td></tr>
+                        <tr><td>Ein <b>schwerbeladener</b> LKW bog um die Ecke.</td><td>Der LKW ist <b>schwer beladen</b>.</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x1F534; Всегда <b>раздельно</b>, если первая часть стоит в <b>Komparativ</b> или расширена ещё одним словом:</p>
+                    <div class="ex">
+                        <div>Diese Erklärung ist schon <b>leichter verständlich</b>.</div>
+                        <div>Dieser Patient ist <b>schwerer krank</b> als der andere.</div>
+                        <div>Der LKW war <b>zu schwer beladen</b>.</div>
+                        <div>Er ist <b>schwer zuckerkrank</b>.</div>
+                        <div>Die Regeln sind <b>recht leicht verständlich</b>.</div>
+                        <div class="gray" style="margin-top:0.3rem;">Aber: Er ist <b>schwerstkrank</b> — слитно, потому что «schwerst» отдельным словом не бывает.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; Всегда слитно</h3>
+                    <div class="ex">
+                        <div><b>Fugenelement</b> (-s-, -en-, -e-): gebrauch<b>s</b>fertig · ahnung<b>s</b>los · handel<b>s</b>üblich · sonn<b>en</b>beschienen · werb<b>e</b>wirksam</div>
+                        <div><b>Два равноправных свойства:</b> dummdreist · nasskalt · süßsauer · taubstumm</div>
+                        <div><b>Первая часть усиливает/ослабляет:</b> altbekannt · bitterböse · brandneu · extrabreit · frühreif · hellblau ·
+                            hochbetagt · lauwarm · rosarot · stocksauer · strohdumm · superschlau · todkrank · uralt</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Partizip von getrennten Verben</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Если Nomen+Verb или Adjektiv+Verb пишется раздельно, то и причастие можно писать раздельно.
+                        Но слитно тоже разрешено:
+                    </p>
+                    <div class="ex">
+                        <div>Vertrauen erwecken → <b>Vertrauen erweckend / vertrauenerweckend</b></div>
+                        <div>Rat suchen → <b>Rat suchend / ratsuchend</b></div>
+                        <div>allein erziehen → <b>allein erziehend / alleinerziehend</b></div>
+                        <div>brach liegen → <b>brach liegend / brachliegend</b></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== NOMEN ==================== -->
+        <div class="tab-content" id="tab-nomen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9F1;</span>
+                    <div>
+                        <h2>Nomen, Präpositionen, Zahlen</h2>
+                        <p class="lesson-header-sub">Здесь правила проще всего</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; Zusammengesetzte Nomen → всегда <span class="badge b-zus">zusammen</span></h3>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Muster</th><th>Beispiele</th></tr>
+                        <tr><td>Nomen + Nomen</td><td>das Fensterglas · die Haustür</td></tr>
+                        <tr><td>Eigenname + Nomen</td><td>der Schillerplatz</td></tr>
+                        <tr><td>Adjektiv + Nomen</td><td>das Freibad · die Blaumeise</td></tr>
+                        <tr><td>Verbstamm + Nomen</td><td>das Fahrzeug · der Rollmops</td></tr>
+                        <tr><td>Pronomen + Nomen</td><td>das Wirgefühl · der Icherzähler</td></tr>
+                        <tr><td>Adverb + Nomen</td><td>die Hinfahrt · der Außendienst</td></tr>
+                        <tr><td>Zahlwort + Nomen</td><td>das Neunauge · der Vielfahrer</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Английские заимствования тоже слитно, если ударение на первой части:
+                    <em>Software · Mountainbike · Warehouse · Homebanking · Stuntman · Swimmingpool</em><br>
+                    Но: <em>Electronic Cash</em> · <em>High Fidelity</em> — раздельно.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CD; Präposition + Nomen</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Некоторые срослись окончательно — <span class="badge b-zus">zusammen</span>:</p>
+                    <div class="ex">
+                        <div>anhand · anstatt · beizeiten · bisweilen · infolge · inmitten · zufolge · zuliebe · zurzeit · zuzeiten</div>
+                    </div>
+                    <p class="why">А эти можно писать <span class="badge b-bei">и так, и так</span>:</p>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>Variante A</th><th>Variante B</th></tr>
+                        <tr><td>anstelle</td><td>an Stelle</td></tr>
+                        <tr><td>aufgrund</td><td>auf Grund</td></tr>
+                        <tr><td>aufseiten</td><td>auf Seiten</td></tr>
+                        <tr><td>mithilfe</td><td>mit Hilfe</td></tr>
+                        <tr><td>nachhause</td><td>nach Hause</td></tr>
+                        <tr><td>infrage stellen</td><td>in Frage stellen</td></tr>
+                        <tr><td>zugunsten</td><td>zu Gunsten</td></tr>
+                        <tr><td>zuungunsten</td><td>zu Ungunsten</td></tr>
+                        <tr><td>zulasten</td><td>zu Lasten</td></tr>
+                        <tr><td>zugrunde gehen</td><td>zu Grunde gehen</td></tr>
+                        <tr><td>zuwege bringen</td><td>zu Wege bringen</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F522; Zahlwörter</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Всё <strong>меньше миллиона</strong> — слитно, одним словом:
+                    </p>
+                    <div class="ex">
+                        <div><b>eintausendvierhundert</b> · <b>dreihundertzweiunddreißig</b></div>
+                        <div style="margin-top:0.4rem;">Но <b>Million, Milliarde, Billion</b> — отдельные существительные:</div>
+                        <div><b>vier Millionen</b> fünfhundertdreiundachtzigtausendsechshundert</div>
+                        <div style="margin-top:0.4rem;">Aber: der <b>zweimillionste</b> Besucher <span class="gray">(здесь это уже Zahladjektiv)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C5; Mal / mal, Paar / paar, Acht / acht</h3>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <tr><th>groß</th><th>klein</th></tr>
+                        <tr><td>das erste / zweite / letzte <b>Mal</b>, ein anderes <b>Mal</b>, tausende <b>Male</b></td>
+                            <td>ein<b>mal</b>, zwei<b>mal</b>, 1-bis 2-<b>mal</b>, x-<b>mal</b>, dies<b>mal</b>, kein<b>mal</b>, viel<b>mal(s)</b>, alle<b>mal</b>, ein paar<b>mal</b></td></tr>
+                        <tr><td>ein <b>Paar</b> Schuhe (два вместе), ein schönes <b>Paar</b>, <b>Paare</b> bilden</td>
+                            <td>ein <b>paar</b> (einige) Äpfel, ein <b>paar</b> hundert Menschen</td></tr>
+                        <tr><td>die <b>Acht</b>, hab <b>Acht</b>, in <b>Acht</b> und Bann, außer <b>Acht</b> lassen, der <b>Achtjährige</b></td>
+                            <td><b>acht</b> Kinder, Kapitel <b>acht</b>, <b>acht</b>jährig / 8-jährig, <b>acht</b>geben</td></tr>
+                        <tr><td>sein <b>Eigen</b>(tum), sein <b>Eigen</b> nennen</td>
+                            <td>das ist ihm <b>eigen</b>, sich zu <b>eigen</b> machen, mein <b>eigener</b> Sohn</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x1F4A1; С предлогом + склоняемым прилагательным можно писать и большими, и маленькими:
+                    <em>von nahem / Nahem</em> · <em>von neuem / Neuem</em> · <em>seit langem / Langem</em> · <em>bei weitem / Weitem</em> ·
+                    <em>ohne weiteres / Weiteres</em> · <em>binnen kurzem / Kurzem</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== LISTE ==================== -->
+        <div class="tab-content" id="tab-liste">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F50D;</span>
+                    <div>
+                        <h2>Wortverbindungen, die häufig falsch geschrieben werden</h2>
+                        <p class="lesson-header-sub">Справочник для быстрой проверки — просто найди слово</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="gz-tools">
+                        <input class="gz-search" id="lsSearch" type="text" placeholder="Suchen: zufuß, nichts, weiteren …" autocomplete="off">
+                        <span class="gz-count" id="lsCount"></span>
+                    </div>
+                    <div class="gz-wrap">
+                    <table class="gz">
+                        <thead><tr><th style="width:45%">Richtige Schreibung</th><th>Hinweis</th></tr></thead>
+                        <tbody id="lsBody"></tbody>
+                    </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Trainer</h2>
+                        <p class="lesson-header-sub">Произнеси вслух, послушай ударение — потом выбирай</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="tr-box">
+                        <div class="tr-word" id="trWord">…</div>
+                        <div class="tr-sent" id="trSent"></div>
+                        <div class="tr-sub" id="trSub"></div>
+                        <div class="tr-opts">
+                            <button class="tr-opt" data-a="getrennt">getrennt</button>
+                            <button class="tr-opt" data-a="zusammen">zusammen</button>
+                            <button class="tr-opt" data-a="beides">beides geht</button>
+                        </div>
+                        <div class="tr-fb" id="trFb"></div>
+                        <div class="tr-actions">
+                            <button class="tr-btn" id="trNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="trOk">0</b></span>
+                            <span>Falsch: <b id="trBad">0</b></span>
+                            <span>Rest: <b id="trLeft">0</b></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ÜBUNGEN ==================== -->
+        <div class="tab-content" id="tab-uebungen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Übungen</h2>
+                        <p class="lesson-header-sub">Скажи вслух свой вариант, потом кликни</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A · Wörtlich oder übertragen?</h3>
+                    <div id="drillA"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B · Verben im Satz</h3>
+                    <div id="drillB"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C · Nominalisierung</h3>
+                    <div id="drillC"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>D · Adjektive und Partizipien</h3>
+                    <div id="drillD"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+<script>
+/* ===================== TABS ===================== */
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+const $ = id => document.getElementById(id);
+
+/* ===================== LISTE ===================== */
+const LISTE = [
+    ['aufs Beste / aufs beste', 'beide Schreibweisen erlaubt'],
+    ['dementsprechend', 'zusammen'],
+    ['demzufolge', 'zusammen'],
+    ['des ungeachtet / dessen ungeachtet', 'getrennt'],
+    ['des Weiteren', 'getrennt, Weiteres groß'],
+    ['desgleichen', 'zusammen'],
+    ['dieses Mal', 'getrennt — aber: diesmal'],
+    ['diesmal', 'zusammen'],
+    ['ebenso gut, ebenso oft', 'getrennt'],
+    ['ebensovielmal / ebenso viel Mal', 'beides'],
+    ['gar kein, gar nicht, gar nichts, gar sehr', 'immer getrennt'],
+    ['genau so oft wie nötig', 'getrennt'],
+    ['genauso gut, genauso oft', 'zusammen'],
+    ['genausovielmal / genauso viel Mal', 'beides'],
+    ['infolgedessen', 'zusammen'],
+    ['irgend so ein', 'getrennt'],
+    ['irgendetwas', 'zusammen'],
+    ['irgendjemand', 'zusammen'],
+    ['jederzeit', 'zusammen — aber: zu jeder Zeit'],
+    ['nicht Berufstätige / Nichtberufstätige', 'beides'],
+    ['nicht Leitende / Nichtleitende', 'beides'],
+    ['nicht Selbstständige / Nichtselbstständige', 'beides'],
+    ['nichtsdestotrotz', 'zusammen'],
+    ['nichtsdestoweniger', 'zusammen'],
+    ['noch mal, noch einmal', 'getrennt — aber: nochmals'],
+    ['nochmals', 'zusammen'],
+    ['so oft wie früher', 'getrennt'],
+    ['sooft ich danach frage …', 'zusammen, wenn Konjunktion'],
+    ['so viel Arbeit, so viele Gedanken', 'getrennt'],
+    ['soviel ich weiß …', 'zusammen, wenn Konjunktion'],
+    ['so weit, dass …', 'getrennt'],
+    ['soweit ich informiert bin …', 'zusammen, wenn Konjunktion'],
+    ['stattdessen', 'zusammen (Adverb)'],
+    ['von Hand', 'getrennt'],
+    ['währenddessen', 'zusammen'],
+    ['zu Anfang', 'getrennt'],
+    ['zu Ende', 'getrennt'],
+    ['zu Fuß', 'getrennt'],
+    ['zu Hilfe', 'getrennt'],
+    ['zu jeder Zeit', 'getrennt — aber: jederzeit'],
+    ['zu Lande', 'getrennt'],
+    ['zu Recht bestraft werden', 'getrennt'],
+    ['zu Schaden kommen', 'getrennt'],
+    ['zu viel, zu viele', 'getrennt'],
+    ['zuallererst', 'zusammen'],
+    ['zurechtkommen', 'zusammen'],
+    ['zurzeit (= momentan)', 'zusammen — aber: zur Zeit Goethes'],
+    ['zur Zeit Goethes', 'getrennt'],
+    ['Zuviel, das', 'zusammen als Nomen'],
+    ['zuzeiten (= bisweilen)', 'zusammen'],
+    ['anhand, anstatt, beizeiten, bisweilen', 'Präposition + Nomen → zusammen'],
+    ['infolge, inmitten, zufolge, zuliebe', 'Präposition + Nomen → zusammen'],
+    ['anstelle / an Stelle', 'beides'],
+    ['aufgrund / auf Grund', 'beides'],
+    ['mithilfe / mit Hilfe', 'beides'],
+    ['nachhause / nach Hause', 'beides'],
+    ['infrage / in Frage stellen', 'beides'],
+    ['zugunsten / zu Gunsten', 'beides'],
+    ['zugrunde / zu Grunde gehen', 'beides'],
+    ['zuwege / zu Wege bringen', 'beides'],
+    ['Acht geben / achtgeben', 'beides'],
+    ['Maß halten / maßhalten', 'beides'],
+    ['Halt machen / haltmachen', 'beides'],
+    ['Dank sagen / danksagen', 'beides'],
+    ['Gewähr leisten / gewährleisten', 'beides'],
+    ['Staub saugen / staubsaugen', 'beides'],
+    ['kennenlernen / kennen lernen', 'beides — Ausnahme bei Verb + Verb'],
+    ['wehtun / weh tun', 'beides'],
+    ['liebhaben / lieb haben', 'beides'],
+    ['ähnlichsehen / ähnlich sehen', 'beides'],
+    ['zufriedenstellen / zufrieden stellen', 'beides'],
+    ['Auto fahren, Rad fahren, Zeitung lesen', 'Nomen + Verb → getrennt'],
+    ['das Autofahren, das Radfahren', 'Nominalisierung → zusammen + groß'],
+    ['laufen lernen, spazieren gehen', 'Verb + Verb → getrennt'],
+    ['da sein, groß sein, vorbei sein', 'alles mit sein → getrennt'],
+    ['eislaufen, teilnehmen, stattfinden', 'trennbares Verb → ich laufe eis'],
+    ['bergsteigen, schlussfolgern, handhaben', 'untrennbar → ich bergsteige'],
+    ['sitzenbleiben (nicht versetzt)', 'übertragen → zusammen'],
+    ['sitzen bleiben (im Zug)', 'wörtlich → getrennt'],
+    ['feststehen (sicher sein)', 'übertragen → zusammen'],
+    ['fest stehen (auf Boden)', 'wörtlich → getrennt'],
+    ['freisprechen (von Schuld)', 'übertragen → zusammen'],
+    ['frei sprechen (ohne Konzept)', 'wörtlich → getrennt'],
+    ['richtigstellen (korrigieren)', 'übertragen → zusammen'],
+    ['richtig schreiben (korrekt)', 'wörtlich → getrennt'],
+    ['krankschreiben, schwerfallen, weismachen', 'übertragen → zusammen'],
+    ['schwerstkrank', 'zusammen — „schwerst“ gibt es nicht allein'],
+    ['schwer krank, schwerer krank', 'getrennt'],
+    ['dummdreist, nasskalt, süßsauer, taubstumm', 'zwei gleiche Eigenschaften → zusammen'],
+    ['altbekannt, brandneu, stocksauer, uralt', 'Verstärkung → zusammen'],
+    ['gebrauchsfertig, ahnungslos, handelsüblich', 'Fugenelement → zusammen'],
+    ['brechend voll, brüllend heiß, leuchtend blau', 'Partizip + Adjektiv → getrennt'],
+    ['eintausendvierhundert, dreihundertzweiunddreißig', 'unter einer Million → zusammen'],
+    ['vier Millionen, drei Milliarden', 'Million/Milliarde → getrennt']
+];
+function lsRender(q) {
+    const f = q.trim().toLowerCase().replace(/\s+/g, '');
+    const rows = LISTE.filter(r => !f || (r[0] + ' ' + r[1]).toLowerCase().replace(/\s+/g, '').includes(f));
+    $('lsBody').innerHTML = rows.map(r => '<tr><td><b>' + r[0] + '</b></td><td>' + r[1] + '</td></tr>').join('')
+        || '<tr><td colspan="2" style="color:rgba(230,230,235,0.5)">nichts gefunden</td></tr>';
+    $('lsCount').textContent = rows.length + ' / ' + LISTE.length;
+}
+$('lsSearch').addEventListener('input', e => lsRender(e.target.value));
+lsRender('');
+
+/* ===================== TRAINER ===================== */
+const TRAIN = [
+    { w:'daheim + bleiben',   s:'Wer krank ist, sollte ___.',                 a:'zusammen', r:'<b>daheimbleiben</b> — Adverb ist stärker betont' },
+    { w:'daheim + arbeiten',  s:'Bei Homeoffice kann man ___.',               a:'getrennt', r:'<b>daheim arbeiten</b> — beide gleich betont' },
+    { w:'davon + kommen',     s:'Wir sind noch einmal ___.',                  a:'zusammen', r:'<b>davongekommen</b> — Adverb betont' },
+    { w:'aneinander + denken',s:'Wir werden täglich ___.',                    a:'getrennt', r:'<b>aneinander denken</b> — beide gleich betont' },
+    { w:'allein + erziehen',  s:'Ich musste meinen Sohn ___.',                a:'getrennt', r:'<b>allein erziehen</b> — Adjektiv + Verb, wörtlich' },
+    { w:'deutlich + machen',  s:'Wie kann ich dir das ___?',                  a:'getrennt', r:'<b>deutlich machen</b> — wörtliche Bedeutung' },
+    { w:'krank + schreiben',  s:'Der Arzt musste ihn ___.',                   a:'zusammen', r:'<b>krankschreiben</b> — neue übertragene Bedeutung' },
+    { w:'weis + machen',      s:'Sie will mir nichts ___.',                   a:'zusammen', r:'<b>weismachen</b> — übertragen' },
+    { w:'schwer + fallen',    s:'Der Abschied ist mir sehr ___.',             a:'zusammen', r:'<b>schwergefallen</b> — übertragen' },
+    { w:'gerade + biegen',    s:'Er will den Fehler ___ (= berichtigen).',    a:'zusammen', r:'<b>geradebiegen</b> — übertragene Bedeutung' },
+    { w:'gerade + biegen',    s:'Der Schlosser muss das Rohr ___.',           a:'getrennt', r:'<b>gerade biegen</b> — wörtlich' },
+    { w:'sitzen + bleiben',   s:'Er ist in der 8. Klasse ___.',               a:'zusammen', r:'<b>sitzengeblieben</b> — nicht versetzt worden' },
+    { w:'sitzen + bleiben',   s:'Sie ist im Zug einfach ___.',                a:'getrennt', r:'<b>sitzen geblieben</b> — wörtlich' },
+    { w:'liegen + lassen',    s:'Er hat meinen Brief einfach ___ (ignoriert).',a:'zusammen', r:'<b>liegenlassen</b> — nicht beachten' },
+    { w:'laufen + lernen',    s:'Das Kind muss erst ___.',                    a:'getrennt', r:'Verb + Verb → immer getrennt' },
+    { w:'spazieren + gehen',  s:'Wir wollen im Park ___.',                    a:'getrennt', r:'Verb + Verb → getrennt' },
+    { w:'kennen + lernen',    s:'Ich habe sie letztes Jahr ___.',             a:'beides',   r:'<b>kennengelernt / kennen gelernt</b> — die eine Ausnahme' },
+    { w:'Rad + fahren',       s:'Am Sonntag wollen wir ___.',                 a:'getrennt', r:'Nomen + Verb → getrennt' },
+    { w:'Zeitung + lesen',    s:'Beim Frühstück will ich ___.',               a:'getrennt', r:'Nomen + Verb → getrennt' },
+    { w:'das Rad + fahren',   s:'Wir lieben ___ am Sonntag.',                 a:'zusammen', r:'<b>das Radfahren</b> — Nominalisierung → zusammen + groß' },
+    { w:'beim Auto + fahren', s:'___ soll man nicht telefonieren.',           a:'zusammen', r:'<b>Beim Autofahren</b> — Nominalisierung' },
+    { w:'das laufen + lernen',s:'In der Reha wurde ___ trainiert.',           a:'zusammen', r:'<b>das Laufenlernen</b> — Nominalisierung' },
+    { w:'teil + nehmen',      s:'Ich habe am Kurs ___.',                      a:'zusammen', r:'<b>teilgenommen</b> — trennbares Verb, Partizip zusammen' },
+    { w:'eis + laufen',       s:'Wir sind gestern ___.',                      a:'zusammen', r:'<b>eisgelaufen</b> — aber: ich laufe eis' },
+    { w:'Staub + saugen',     s:'Ich ___ die ganze Wohnung.',                 a:'beides',   r:'<b>sauge Staub</b> (groß!) oder <b>staubsauge</b>' },
+    { w:'zufrieden + sein',   s:'Ich will endlich ___.',                      a:'getrennt', r:'Alles mit <em>sein</em> → immer getrennt' },
+    { w:'vorbei + sein',      s:'Der Ärger ist endlich ___.',                 a:'getrennt', r:'Alles mit <em>sein</em> → getrennt' },
+    { w:'weh + tun',          s:'Mein Rücken kann ganz schön ___.',           a:'beides',   r:'<b>wehtun / weh tun</b> — beide erlaubt' },
+    { w:'lieb + haben',       s:'Ich werde dich immer ___.',                  a:'beides',   r:'<b>liebhaben / lieb haben</b>' },
+    { w:'schwer + beladen',   s:'Der LKW ist ___.',                           a:'getrennt', r:'beide Teile gleich betont → getrennt' },
+    { w:'schwer + beladen',   s:'Ein ___er LKW bog um die Ecke.',             a:'zusammen', r:'<b>schwerbeladener</b> — erster Teil betont' },
+    { w:'früh + reif',        s:'Die Äpfel sind dieses Jahr ___.',            a:'getrennt', r:'beide gleich betont → getrennt' },
+    { w:'früh + reif',        s:'Der Junge ist ___.',                         a:'zusammen', r:'<b>frühreif</b> — erster Teil betont' },
+    { w:'leicht + verständlich', s:'Diese Erklärung ist schon leicht<b>er</b> ___.', a:'getrennt', r:'Komparativ beim ersten Teil → immer getrennt' },
+    { w:'schwer + krank',     s:'Er ist ganz ___ (Superlativ: schwerst).',    a:'zusammen', r:'<b>schwerstkrank</b> — „schwerst“ gibt es nicht allein' },
+    { w:'zu schwer + beladen',s:'Der LKW war ___.',                           a:'getrennt', r:'erweitert durch <em>zu</em> → getrennt' },
+    { w:'brüllend + heiß',    s:'Im Zelt war es ___.',                        a:'getrennt', r:'Partizip + Adjektiv → getrennt' },
+    { w:'freude + strahlend', s:'Sie kam ___ ins Zimmer.',                    a:'zusammen', r:'<b>freudestrahlend</b> = vor Freude strahlend' },
+    { w:'hitze + beständig',  s:'Diese Form ist ___.',                        a:'zusammen', r:'<b>hitzebeständig</b> = beständig gegen Hitze' },
+    { w:'nass + kalt',        s:'Das Wetter war ___.',                        a:'zusammen', r:'zwei gleichwertige Eigenschaften → zusammen' },
+    { w:'stock + sauer',      s:'Der Chef war ___.',                          a:'zusammen', r:'Verstärkung → zusammen' },
+    { w:'gebrauchs + fertig', s:'Das Gerät ist sofort ___.',                  a:'zusammen', r:'Fugen-s → immer zusammen' },
+    { w:'weit + reichend',    s:'Das hatte ___e Folgen.',                     a:'beides',   r:'<b>weitreichende / weit reichende</b>' },
+    { w:'allein + stehend',   s:'Sie ist eine ___e Frau.',                    a:'zusammen', r:'<b>alleinstehende</b> — übertragener Sinn' },
+    { w:'vier + Millionen',   s:'Die Stadt hat ___ Einwohner.',               a:'getrennt', r:'Million/Milliarde/Billion sind Nomen → getrennt' },
+    { w:'ein tausend + vierhundert', s:'Der Betrag lautet ___ Euro.',         a:'zusammen', r:'unter einer Million → alles zusammen' },
+    { w:'zu + Fuß',           s:'Ich gehe ___ zur Arbeit.',                   a:'getrennt', r:'<b>zu Fuß</b> — immer getrennt' },
+    { w:'zur + Zeit',         s:'___ bin ich im Urlaub (= momentan).',        a:'zusammen', r:'<b>zurzeit</b> — aber: zur Zeit Goethes' },
+    { w:'auf + Grund',        s:'___ des Regens fiel das Spiel aus.',         a:'beides',   r:'<b>aufgrund / auf Grund</b>' },
+    { w:'gar + nicht',        s:'Das gefällt mir ___.',                       a:'getrennt', r:'<b>gar nicht</b> — immer getrennt' }
+];
+let trPool = [], trCur = null, trDone = false, trOk = 0, trBad = 0;
+function trShuffle(a) {
+    const r = a.slice();
+    for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+    return r;
+}
+function trNext() {
+    if (!trPool.length) trPool = trShuffle(TRAIN);
+    trCur = trPool.pop();
+    trDone = false;
+    $('trWord').textContent = trCur.w;
+    $('trSent').innerHTML = trCur.s;
+    $('trSub').textContent = 'Wie schreibt man das hier?';
+    $('trFb').innerHTML = '';
+    $('trLeft').textContent = trPool.length;
+    document.querySelectorAll('.tr-opt').forEach(b => { b.className = 'tr-opt'; b.disabled = false; });
+}
+document.querySelectorAll('.tr-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (trDone) return;
+        trDone = true;
+        document.querySelectorAll('.tr-opt').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.a === trCur.a) b.classList.add('good');
+        });
+        if (btn.dataset.a === trCur.a) {
+            trOk++; $('trOk').textContent = trOk;
+            $('trFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig</span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        } else {
+            btn.classList.add('bad');
+            trBad++; $('trBad').textContent = trBad;
+            $('trFb').innerHTML = '<span style="color:#f85149">&#x2717; richtig: <b>' + trCur.a + '</b></span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        }
+    });
+});
+$('trNext').addEventListener('click', trNext);
+trNext();
+
+/* ===================== ÜBUNGEN ===================== */
+const DRILLS = {
+drillA: [
+    ['Der Termin steht fest / feststeht — er ist sicher.', '<b>Der Termin steht fest.</b> (feststehen, übertragen) — im Satz trennbar: steht … fest'],
+    ['Er kann auf dem Eis nicht fest stehen.', '<b>fest stehen</b> — wörtlich: sicher auf dem Boden stehen'],
+    ['Das Gericht hat ihn ___ (von Schuld).', '<b>freigesprochen</b> — übertragen'],
+    ['Der Redner konnte ganz ___ (ohne Konzept).', '<b>frei sprechen</b> — wörtlich'],
+    ['Jetzt sehe ich endlich ___ (= ich begreife).', '<b>klar</b> → klarsehen, übertragen → zusammen'],
+    ['Er hat sich ___ gemeldet, obwohl er gesund ist.', '<b>krankgemeldet</b> / krankmachen — übertragen: vorgeben, krank zu sein'],
+    ['Rauchen kann dich ___.', '<b>krank machen</b> — wörtlich'],
+    ['Die beiden sind sich in letzter Zeit ___.', '<b>nähergekommen</b> — übertragen: engere Beziehung'],
+    ['Komm bitte etwas ___, ich höre dich nicht.', '<b>näher</b> — wörtlich, getrennt'],
+    ['Der Sprecher musste die Meldung ___.', '<b>richtigstellen</b> — übertragen: korrigieren'],
+    ['Du musst diese Wörter ___ lernen.', '<b>richtig schreiben</b> — wörtlich']
+],
+drillB: [
+    ['Wir werden bald ___ ankommen. (daheim)', '<b>daheim ankommen</b> — Wortgruppe, getrennt'],
+    ['Wir werden bald ___. (heim + kommen)', '<b>heimkommen</b> — Zusammensetzung'],
+    ['Die beiden sind heftig ___. (aneinander + geraten)', '<b>aneinandergeraten</b> — Adverb stärker betont'],
+    ['Er will beim Gespräch immer ___. (dabei + sitzen)', '<b>dabeisitzen</b>'],
+    ['Du kannst ___ (währenddessen) sitzen.', '<b>dabei sitzen</b> — dabei ist selbstständiges Adverb'],
+    ['Ich muss meine Sachen ___. (zusammen + suchen)', '<b>zusammensuchen</b>'],
+    ['Wir können den Schlüssel ___ (gemeinsam) suchen.', '<b>zusammen suchen</b> — getrennt'],
+    ['Der Vortrag wird morgen ___. (statt + finden)', '<b>stattfinden</b> — trennbares Verb: er findet statt'],
+    ['Ich ___ am Wettbewerb. (teil + nehmen, Präsens)', '<b>Ich nehme teil.</b> — trennbar, im Präsens getrennt'],
+    ['Ich habe daraus ___. (schluss + folgern)', '<b>geschlussfolgert</b> — untrennbar!'],
+    ['Ich bin gestern ___. (berg + steigen)', '<b>berggestiegen</b> — untrennbar: ich bergsteige'],
+    ['Endlich ist der Stress ___. (vorbei + sein)', '<b>vorbei</b> — alles mit sein bleibt getrennt']
+],
+drillC: [
+    ['Rad fahren → Wir lieben ___ am Sonntag.', '<b>das Radfahren</b> — zusammen und groß'],
+    ['Auto fahren → ___ soll man nicht telefonieren.', '<b>Beim Autofahren</b>'],
+    ['Radio hören → In unserem Keller ist ___ nicht möglich.', '<b>(das) Radiohören</b>'],
+    ['laufen lernen → In der Reha wurde ___ trainiert.', '<b>das Laufenlernen</b>'],
+    ['spazieren gehen → ___ ist es nicht getan.', '<b>Mit dem Spazierengehen</b>'],
+    ['kennen lernen → Ein ___ war nicht mehr möglich.', '<b>Kennenlernen</b>'],
+    ['schreiben üben → Der Lehrer immer mit seinem ___!', '<b>Schreibenüben</b>']
+],
+drillD: [
+    ['ein Buch, das viel gelesen wird → ein ___ Buch', '<b>vielgelesenes</b> Buch — erster Teil betont'],
+    ['eine Autobahn, die stark befahren ist → eine ___ Autobahn', 'eine <b>stark befahrene</b> Autobahn — beide gleich betont'],
+    ['Der LKW ist ___. (schwer + beladen)', '<b>schwer beladen</b> — getrennt'],
+    ['Ein ___ LKW bog um die Ecke.', 'Ein <b>schwerbeladener</b> LKW — zusammen'],
+    ['Diese Erklärung ist schon ___ verständlich. (leicht, Komparativ)', '<b>leichter verständlich</b> — Komparativ → getrennt'],
+    ['Die Regeln sind ___ verständlich. (recht + leicht)', '<b>recht leicht verständlich</b> — erweitert → getrennt'],
+    ['Er ist ___. (schwerst + krank)', '<b>schwerstkrank</b> — zusammen, „schwerst“ steht nie allein'],
+    ['Sie kam ___ ins Zimmer. (vor Freude strahlend)', '<b>freudestrahlend</b>'],
+    ['ein Material, das gegen Hitze beständig ist', '<b>hitzebeständig</b>'],
+    ['Im Zelt war es ___. (brüllend + heiß)', '<b>brüllend heiß</b> — Partizip + Adjektiv → getrennt'],
+    ['Das Wetter war ___. (nass + kalt)', '<b>nasskalt</b> — zwei gleichwertige Eigenschaften'],
+    ['Sie ist eine ___ Frau. (allein + stehend)', 'eine <b>alleinstehende</b> Frau — übertragen → zusammen'],
+    ['ein Ehepaar, das getrennt lebt', '<b>getrennt lebendes / getrenntlebendes</b> Ehepaar — beides'],
+    ['Vertrauen erwecken → eine ___ Geste', 'eine <b>Vertrauen erweckende / vertrauenerweckende</b> Geste — beides']
+]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = $(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        '<div class="dr-item"><div class="dr-q">' + q + '</div><div class="dr-a">' + a + '</div></div>').join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>

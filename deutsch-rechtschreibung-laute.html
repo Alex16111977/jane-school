@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechtschreibung: Vokale und Konsonanten | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    .ex { font-size:0.97rem; line-height:1.75; margin:0.5rem 0 0; }
+    .ex div { padding:0.12rem 0; }
+    .ex b { color:#fff; }
+    .why { color:rgba(230,230,235,0.6); font-size:0.86rem; margin-top:0.4rem; font-style:italic; }
+    .gray { color:rgba(230,230,235,0.55); }
+    .ok-l { color:#86efac; }
+    .no-l { color:#f85149; }
+    .hi { color:#fbbf24; font-weight:800; }
+    .arr { color:var(--color-accent); font-weight:700; }
+
+    .rl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px;
+               border:1px solid rgba(255,255,255,0.08); margin-top:0.6rem; }
+    table.rl { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:440px; }
+    table.rl th { background:#151a24; color:#9fb0c9; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+                  text-align:left; padding:0.55rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.12); }
+    table.rl td { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.055); vertical-align:top;
+                  color:rgba(230,230,235,0.82); }
+    table.rl td b { color:#fff; }
+    table.rl tbody tr:hover { background:rgba(255,255,255,0.035); }
+
+    .rl-tools { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0.2rem 0 0.5rem; }
+    .rl-search { flex:1 1 220px; min-width:180px; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.14);
+                 border-radius:8px; padding:0.55rem 0.8rem; color:#fff; font-size:0.95rem; font-family:inherit; }
+    .rl-search:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px var(--color-accent-subtle); }
+    .rl-count { color:rgba(230,230,235,0.5); font-size:0.82rem; }
+
+    /* Merksatz-Box */
+    .merk { background:linear-gradient(135deg,rgba(244,114,182,0.12),rgba(167,139,250,0.1));
+            border:1px solid rgba(244,114,182,0.35); border-radius:12px; padding:1rem 1.2rem; margin-top:0.7rem;
+            text-align:center; font-size:1.08rem; line-height:1.7; color:#fff; font-style:italic; }
+
+    /* Trainer */
+    .tr-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tr-sent { font-size:1.2rem; color:#fff; text-align:center; margin:0.3rem 0; line-height:1.7;
+               font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+    .tr-sub { text-align:center; color:rgba(230,230,235,0.5); font-size:0.85rem; margin-bottom:1rem; }
+    .tr-opts { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .tr-opt { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.16); border-radius:9px;
+              padding:0.7rem 1.3rem; color:#fff; font-size:1.05rem; font-weight:700; cursor:pointer;
+              font-family:ui-monospace,"SF Mono",Menlo,monospace; transition:all .15s; }
+    .tr-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(244,114,182,0.1); }
+    .tr-opt.good { background:rgba(63,185,80,0.2); border-color:#86efac; color:#86efac; }
+    .tr-opt.bad  { background:rgba(248,81,73,0.18); border-color:#f85149; color:#f85149; }
+    .tr-opt:disabled { cursor:default; }
+    .tr-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tr-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.6rem 1.2rem;
+              font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tr-btn:hover { background:var(--color-accent-hover); }
+    .tr-fb { margin-top:0.9rem; font-size:0.95rem; min-height:2.8rem; text-align:center; line-height:1.6; }
+    .tr-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-stats b { color:#fff; }
+
+    .dr-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .dr-item:hover { border-color:var(--color-accent); }
+    .dr-q { color:rgba(230,230,235,0.9); font-size:0.95rem; line-height:1.5; }
+    .dr-a { display:none; margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.95rem; font-weight:600; line-height:1.55; }
+    .dr-item.open .dr-a { display:block; }
+    .dr-item.open { background:rgba(63,185,80,0.07); border-color:rgba(63,185,80,0.35); }
+
+    @media (max-width:640px) { .tr-sent { font-size:1rem; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <a href="mathe.html">Mathematik</a>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <a href="vokabeln.html">Vokabeln</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Vokale und Konsonanten</span>
+        </nav>
+        <a href="deutsch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu Deutsch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Rechtschreibung: Vokale und Konsonanten</h1>
+            <p class="page-subtitle">Wie hört man, ob ss oder ß, ä oder e, b oder p? — Ableiten, verlängern, Stammprinzip · по PONS «Die große Grammatik»</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="stamm">&#x1F511; Stammprinzip</button>
+            <button class="tab" data-tab="laenge">kurz / lang</button>
+            <button class="tab" data-tab="vokale">ä·e · ai·ei · äu·eu</button>
+            <button class="tab" data-tab="s">s · ss · ß</button>
+            <button class="tab" data-tab="kons">Konsonanten</button>
+            <button class="tab" data-tab="homo">&#x1F50D; Homophone</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Trainer</button>
+            <button class="tab" data-tab="uebungen">&#x270D;&#xFE0F; Übungen</button>
+        </div>
+
+        <!-- ==================== STAMMPRINZIP ==================== -->
+        <div class="tab-content active" id="tab-stamm">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F511;</span>
+                    <div>
+                        <h2>Das Stammprinzip</h2>
+                        <p class="lesson-header-sub">Одно правило, из которого следует почти вся немецкая орфография</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F9E9; Суть</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        Все слова одного <strong>корня (Wortstamm)</strong> пишутся <strong>одинаково</strong> — даже когда
+                        произношение меняется и ударение уходит на другой слог.<br>
+                        Значит: <em>не помнишь, как писать — найди родственное слово, где слышно</em>.
+                    </p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Stamm</th><th>Abgeleitet</th><th>Warum so?</th></tr>
+                        <tr><td><b>Befehl</b></td><td>(er) befiehlt, befohlen</td><td>Dehnungs-<b>h</b> bleibt</td></tr>
+                        <tr><td><b>finden</b></td><td>(er) fand, Fund, Befund</td><td>Schärfung durch zwei Konsonanten</td></tr>
+                        <tr><td><b>Name</b></td><td>nämlich, namentlich, Zuname</td><td>kein Dehnungszeichen im Stamm → auch nicht abgeleitet</td></tr>
+                        <tr><td><b>nehmen</b></td><td>Zunahme, Vereinnahmung, Vernehmung</td><td>Dehnungs-<b>h</b></td></tr>
+                        <tr><td><b>sagen</b></td><td>Sage, unsäglich</td><td>kein Dehnungszeichen</td></tr>
+                        <tr><td><b>Stand</b></td><td>ständig, Ständchen</td><td>Schärfung durch zwei Konsonanten</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">При образовании часто появляется <b>Umlaut</b>: a→ä, o→ö, u→ü. Написание корня от этого не меняется.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6E0;&#xFE0F; Три приёма проверки — запомни их</h3>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Приём</th><th>Когда</th><th>Beispiel</th></tr>
+                        <tr><td><b>Ableiten</b> — найти корень</td><td>ä или e? äu или eu?</td>
+                            <td>K<b>rä</b>nkung <span class="arr">&larr;</span> krank · s<b>äu</b>bern <span class="arr">&larr;</span> sauber</td></tr>
+                        <tr><td><b>Verlängern</b> — удлинить слово</td><td>b/p, d/t, g/k в конце</td>
+                            <td>Die<b>b</b> <span class="arr">&rarr;</span> Die<b>b</b>e · Ra<b>d</b> <span class="arr">&rarr;</span> Rä<b>d</b>er · Bal<b>g</b> <span class="arr">&rarr;</span> Bäl<b>g</b>e</td></tr>
+                        <tr><td><b>Ersetzen</b> — подставить другое слово</td><td>das oder dass?</td>
+                            <td><b>das</b> Auto <span class="arr">&rarr;</span> <em>dieses</em> Auto ✓ &nbsp;·&nbsp; <b>dass</b> es regnet <span class="arr">&rarr;</span> <em>dieses</em> es regnet ✗</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card" style="background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3);">
+                    <h3 style="color:#f85149;">&#x26A0;&#xFE0F; Где Stammprinzip не работает</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        В нескольких словах двойной согласный корня исчез, потому что к нему добавились редкие суффиксы <b>-d, -st, -t</b>:
+                    </p>
+                    <div class="ex">
+                        <div>bre<b>nn</b>en <span class="arr">&rarr;</span> der Bra<b>nd</b></div>
+                        <div>schwe<b>ll</b>en <span class="arr">&rarr;</span> die Geschwu<b>lst</b></div>
+                        <div>gö<b>nn</b>en <span class="arr">&rarr;</span> die Gu<b>nst</b></div>
+                        <div>kö<b>nn</b>en <span class="arr">&rarr;</span> die Ku<b>nst</b></div>
+                        <div>scha<b>ff</b>en <span class="arr">&rarr;</span> Gesch<b>ä</b>ft, besch<b>ä</b>ftigen</div>
+                        <div>ko<b>mm</b>en <span class="arr">&rarr;</span> die Anku<b>nft</b>, die Zuku<b>nft</b>, die Herku<b>nft</b></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== KURZ / LANG ==================== -->
+        <div class="tab-content" id="tab-laenge">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CF;</span>
+                    <div>
+                        <h2>Kurz oder lang?</h2>
+                        <p class="lesson-header-sub">Schärfung (короткий) ↔ Dehnung (долгий) — как это видно в написании</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F53B; Schärfung — короткий гласный</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Правило: после <strong>короткого ударного</strong> гласного идут <strong>два согласных</strong>.
+                    </p>
+                    <div class="ex">
+                        <div><b>Zwei verschiedene:</b> Band, Karte, Schuld, gelten, Amt, Wink, wirklich</div>
+                        <div><b>Zwei gleiche:</b> Blatt, Stimme, Sonne, starren, wissen, willig</div>
+                    </div>
+                    <p class="why">По Stammprinzip удвоение сохраняется во всех родственных словах — даже если ударение ушло:<br>
+                    <em>anbändeln, abgekartet, unschuldig, Beamter, winken, Wirklichkeit, entblättern, Stimmung, sonnig, Starrheit, wissentlich, Unwillen</em></p>
+
+                    <p style="font-size:0.95rem; margin-top:0.9rem;">&#x26A0;&#xFE0F; <strong>Короткие служебные слова</strong> — исключение, пишутся с одним согласным:</p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Wortart</th><th>Beispiele</th></tr>
+                        <tr><td>Präpositionen</td><td>ab, bis, in, mit, um, vom</td></tr>
+                        <tr><td>Pronomen</td><td>das, des, es, man, was</td></tr>
+                        <tr><td>Fremdwörter</td><td>fit, Jet, Klub, Pop, top</td></tr>
+                        <tr><td>Verbformen</td><td>(ich) bin, gib!, (er) hat</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x274C; z und k werden nie verdoppelt</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Вместо <em>zz</em> и <em>kk</em> в немецких словах пишут <strong>tz</strong> и <strong>ck</strong>:
+                    </p>
+                    <div class="ex">
+                        <div><b>tz:</b> Spitze, Katze, wetzen, motzig</div>
+                        <div><b>ck:</b> Hecke, Socken, rackern, dreckig</div>
+                    </div>
+                    <div class="merk">
+                        Nach <b>l</b>, <b>n</b>, <b>r</b> — das merke ja —<br>steht nie <b>tz</b> und nie <b>ck</b>!
+                    </div>
+                    <p class="why">Walze, ranzig, schwarz · Nelke, krank, stärken</p>
+                    <p class="why">В заимствованиях бывает иначе:
+                    <b>zz:</b> Skizze, Pizza, Razzia, Jazz, Intermezzo ·
+                    <b>kk:</b> Sakko, Stakkato, Mokka, Trekking, Akkumulator ·
+                    <b>k:</b> Fabrik, Kautschuk, Tabak, Artikel</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F53C; Dehnung — долгий гласный</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Долготу показывают три знака:</p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Zeichen</th><th>Beispiele</th></tr>
+                        <tr><td><b>Dehnungs-h</b></td><td>bohren, Fuhre, ihnen, Lehne, nah, Stahl, Zeh</td></tr>
+                        <tr><td><b>Dehnungs-e nach i</b></td><td>Biene, Biest, dienen, Niere, Schiene</td></tr>
+                        <tr><td><b>Vokalverdopplung</b></td><td>Beet, Fee, haarig, leeren, Moor, Staat, Zoo</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Очень многие долгие гласные <b>не имеют</b> никакого знака — их написание надо просто запомнить:<br>
+                    <em>Bibel, Biber, Igel, leben, Mal, oder, pur, Rasen, rufen, schwer, Tor, Träne, Tür, wagen, Weg</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F1ED; Dehnungs-h — только перед l, m, n, r</h3>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>vor</th><th>Beispiele</th></tr>
+                        <tr><td>vor <b>l</b></td><td>hohl, Mahlzeit, Mehl, wühlen</td></tr>
+                        <tr><td>vor <b>m</b></td><td>angenehm, lahm, Ruhm</td></tr>
+                        <tr><td>vor <b>n</b></td><td>Bahn, Bühne, Sehne, wohnen</td></tr>
+                        <tr><td>vor <b>r</b></td><td>Fähre, führen, kehren, Rohr</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">После долгого <b>i</b> Dehnungs-h есть только в местоимениях
+                    <em>ihn, ihm, ihr, ihnen, ihren, ihre, ihrer</em> — и ещё в существительном <em>der Ihle</em> (сельдь).</p>
+
+                    <p style="font-size:0.95rem; margin-top:0.9rem;">&#x1F4A1; Отличай <strong>Dehnungs-h</strong> от <strong>silbentrennendes h</strong>
+                    (ge-hen, blü-hen, Mü-he, Ru-he) — второе слышно при чётком произношении.</p>
+
+                    <div class="note-card" style="background:rgba(251,191,36,0.07); border-color:rgba(251,191,36,0.3); margin-top:0.8rem;">
+                        <h3 style="color:#fbbf24;">&#x2705; Правило для глаголов: смотри на инфинитив</h3>
+                        <div class="ex">
+                            <div><b>В инфинитиве есть h</b> → h остаётся во ВСЕХ формах:<br>
+                                blühen <span class="arr">&rarr;</span> es blüht · fliehen <span class="arr">&rarr;</span> er floh · gehen <span class="arr">&rarr;</span> du gehst ·
+                                nähen <span class="arr">&rarr;</span> du nähtest · stehen <span class="arr">&rarr;</span> sie steht · sehen <span class="arr">&rarr;</span> er sieht ·
+                                befehlen <span class="arr">&rarr;</span> du befiehlst, du befahlst · fühlen <span class="arr">&rarr;</span> sie fühlte</div>
+                            <div style="margin-top:0.5rem;"><b>В инфинитиве нет h</b> → h не появляется НИКОГДА:<br>
+                                säen <span class="arr">&rarr;</span> sie sät, sie säte, sie hat gesät · schreien <span class="arr">&rarr;</span> er schreit, er schrie ·
+                                speien <span class="arr">&rarr;</span> es speit, es spie · spüren <span class="arr">&rarr;</span> du spürst</div>
+                            <div style="margin-top:0.5rem;" class="no-l"><b>Nur zwei Ausnahmen:</b>
+                                gehen <span class="arr">&rarr;</span> ich <b>ging</b>, ge<b>gang</b>en &nbsp;·&nbsp; ziehen <span class="arr">&rarr;</span> ich <b>zog</b>, ge<b>zog</b>en</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F1EE; Dehnungs-e und Vokalverdopplung</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        <b>ie</b> бывает только после <strong>i</strong>, зато перед любым согласным:<br>
+                        <em>Bier, bieten, dienen, diese, gierig, gießen, Liebe, Lied, er lief, Riemen, viel</em>
+                    </p>
+                    <p class="why">От многих существительных так образуются глаголы на <b>-ieren</b>:
+                    Export <span class="arr">&rarr;</span> exportieren · Marsch <span class="arr">&rarr;</span> marschieren · Probe <span class="arr">&rarr;</span> probieren</p>
+                    <p class="why">Ряд существительных иностранного происхождения кончается на <b>-ine</b>:
+                    Maschine, Gardine, Apfelsine, Kantine, Rosine, Margarine</p>
+
+                    <p style="font-size:0.95rem; margin-top:0.9rem;">Удваиваться могут <strong>только a, e, o</strong>. Никогда — i, u и умляуты ä, ö, ü.</p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Doppelvokal</th><th>Wörter</th></tr>
+                        <tr><td><b>aa</b></td><td>Aal, Haar, Paar, Saal <span class="gray">(Plural: Säle!)</span>, Saat, Waage, Staat</td></tr>
+                        <tr><td><b>ee</b></td><td>Beere, Beet, Gelee, Idee, Kaffee, leer, See, Seele, Tee, Meer</td></tr>
+                        <tr><td><b>oo</b></td><td>Boot <span class="gray">(aber: Bötchen!)</span>, Moor, Moos, Zoo</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== VOKALE ==================== -->
+        <div class="tab-content" id="tab-vokale">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F504;</span>
+                    <div>
+                        <h2>Gleich klingende Vokale</h2>
+                        <p class="lesson-header-sub">ä oder e · ai oder ei · äu oder eu — решает <em>Ableiten</em></p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>ä oder e?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Пиши <strong>ä</strong>, если слово можно вывести из слова с <strong>a</strong>. Иначе — <strong>e</strong>.
+                    </p>
+                    <div class="ex">
+                        <div>K<b>rä</b>nkung <span class="arr">&larr;</span> kr<b>a</b>nk &nbsp;·&nbsp; bes<b>ä</b>nftigen <span class="arr">&larr;</span> s<b>a</b>nft &nbsp;·&nbsp;
+                            St<b>ä</b>ngel <span class="arr">&larr;</span> St<b>a</b>nge</div>
+                        <div>B<b>ä</b>ndel <span class="arr">&larr;</span> B<b>a</b>nd &nbsp;·&nbsp; W<b>ä</b>lder <span class="arr">&larr;</span> W<b>a</b>ld &nbsp;·&nbsp;
+                            beh<b>ä</b>nde <span class="arr">&larr;</span> H<b>a</b>nd</div>
+                    </div>
+                    <p class="why">Обратного перехода (a→e или e→a) при словообразовании не бывает.
+                    Единственное исключение: <em><b>a</b>lt</em>, но <em><b>E</b>ltern</em>.</p>
+                    <p class="why">Слово <em>aufwendig</em> можно писать и <em>aufw<b>ä</b>ndig</em> — оно выводится и от <em>aufwenden</em>, и от <em>Aufwand</em>.</p>
+                    <p class="why">&#x26A0;&#xFE0F; Не все слова с ä выводятся. Тогда написание надо запомнить — особенно потому, что рядом есть похожее слово с e:</p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>mit ä</th><th>mit e</th></tr>
+                        <tr><td>die <b>Ä</b>hre <span class="gray">(колос)</span></td><td>die <b>E</b>hre <span class="gray">(честь)</span></td></tr>
+                        <tr><td>die B<b>ä</b>ren <span class="gray">(медведи)</span></td><td>die B<b>ee</b>ren <span class="gray">(ягоды)</span></td></tr>
+                        <tr><td>die L<b>ä</b>rche <span class="gray">(лиственница)</span></td><td>die L<b>e</b>rche <span class="gray">(жаворонок)</span></td></tr>
+                        <tr><td>die S<b>ä</b>gen <span class="gray">(пилы)</span></td><td>der S<b>e</b>gen <span class="gray">(благословение)</span></td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>ai oder ei?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Правила нет — но слов с <strong>ai</strong> всего горстка. Выучи их, всё остальное пиши через <strong>ei</strong>.
+                    </p>
+                    <div class="ex" style="font-size:1.02rem;">
+                        <div><b>ai:</b> Aitel · Hai · Hain · Kai · Kaiser · (Brot-)Laib · (Fisch-)Laich · Laie ·
+                            Mai · Mais · Rain · (Gitarren-)Saite · Waid (Jagd) · Waise(nkind)</div>
+                    </div>
+                    <p class="why">Всё остальное — <b>ei</b>: beide, breit, Eimer, Feier, Heide, leiden, Leiter, meiden, meinen,
+                    reich, Seite, Teich, weise, weit …</p>
+                    <p class="why">&#x1F4A1; Обрати внимание на пары: <em>(Brot-)L<b>ai</b>b</em> ↔ <em>L<b>ei</b>b (тело)</em> ·
+                    <em>W<b>ai</b>se (сирота)</em> ↔ <em>w<b>ei</b>se (мудрый)</em> · <em>S<b>ai</b>te (струна)</em> ↔ <em>S<b>ei</b>te (страница)</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>äu oder eu?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Пиши <strong>äu</strong>, если можно вывести из слова с <strong>au</strong>. Иначе — <strong>eu</strong>.
+                    </p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>äu</th><th>&larr; von</th><th>äu</th><th>&larr; von</th></tr>
+                        <tr><td>sich äußern</td><td>außen</td><td>Bäume</td><td>Baum</td></tr>
+                        <tr><td>Fäulnis</td><td>faul</td><td>Gebäude</td><td>bauen</td></tr>
+                        <tr><td>Gräuel</td><td>grau</td><td>Häute</td><td>Haut</td></tr>
+                        <tr><td>säubern</td><td>sauber</td><td>schäumen</td><td>Schaum</td></tr>
+                        <tr><td>behände</td><td>Hand</td><td>Geräusch</td><td>rauschen</td></tr>
+                        <tr><td>läuten</td><td>Laut</td><td>täuschen</td><td>Tausch</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Не выводятся (запомнить): <em>sich str<b>äu</b>ben · Kn<b>äu</b>el · R<b>äu</b>de · sich r<b>äu</b>spern · S<b>äu</b>le</em></p>
+                    <p class="why">Всё остальное — <b>eu</b>: Beule, Beute, Eule, Euter, Freude, heulen, heute, Leute,
+                    Meute, Reue, Scheune, Scheusal, Seuche, Steuer, teuer, Teufel, Zeuge …</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== S-LAUTE ==================== -->
+        <div class="tab-content" id="tab-s">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F41A;</span>
+                    <div>
+                        <h2>s · ss · ß</h2>
+                        <p class="lesson-header-sub">Самая частая ошибка немцев — и решается одним вопросом о длине гласного</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Решающая схема</h3>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Laut</th><th>Schreibung</th><th>Beispiele</th></tr>
+                        <tr><td><b>звонкий</b> s (мягкий)</td><td>всегда одиночное <b>s</b></td>
+                            <td>только в начале слова или слога: sauber, Susanne, lesen, Amsel, Linse</td></tr>
+                        <tr><td rowspan="3"><b>глухой</b> s (резкий)</td><td>одиночное <b>s</b></td>
+                            <td>в конце слова: Mais, bis, heraus, als, Mus, Gas, etwas, famos<br>
+                                сразу после согласного: Erbse, plumpsen, (des) Vaters<br>
+                                перед p и t: Rispe, Knospe, knusprig, Ast, lustig, Kunst, leisten</td></tr>
+                        <tr><td><b>ss</b></td><td>после <b>короткого</b> гласного: Wasser, Fluss, (er) isst, russisch, verhasst, Klasse, flüssig</td></tr>
+                        <tr><td><b>ß</b></td><td>после <b>долгого</b> гласного: Floß, genießen, Ruß, Spaß, (er) stieß, stoßen, Straße, verdrießen<br>
+                                после долгих умляутов: Füße, mäßig, Schöße<br>
+                                после дифтонгов: außen, Preußen, reißen, Sträuße</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x1F1E8;&#x1F1ED; В Швейцарии и Лихтенштейне <b>ß</b> не используется — там пишут <em>Gruss</em>, <em>Spass</em>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CC; Одиночное s в суффиксах</h3>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Fremdwörter auf -ismus</th><th>Deutsche Nomen auf -nis</th></tr>
+                        <tr><td>Fanatismus (Fanatismen)<br>Realismus (Realismen)<br>Rheumatismus (Rheumatismen)</td>
+                            <td>Zeugnis (Zeugni<b>ss</b>e)<br>Geheimnis (Geheimni<b>ss</b>e)<br>Finsternis (Finsterni<b>ss</b>e)</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Слова на <b>-nis</b> удваивают s <b>во множественном числе</b>. Слова на <b>-ismus</b> — нет.</p>
+                    <p class="why">Ещё слова с одиночным s несмотря на краткое произношение:<br>
+                    Atlas (Atlasse / Atlanten) · Bus (Busse) · Fundus · Globus (Globen / Globusse) · Kaktus (Kakteen) ·
+                    Krokus (Krokusse) · Kürbis (Kürbisse) · Status · Zirkus (Zirkusse)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Verbformen: s, ss oder ß?</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        По Stammprinzip — <strong>смотри на инфинитив</strong>.
+                    </p>
+                    <div class="ex">
+                        <div><b>Инфинитив со звонким s</b> → во всех формах и производных <b>одиночное s</b>:</div>
+                        <div style="padding-left:0.8rem;">blasen <span class="arr">&rarr;</span> er bläst, er blies, die Blasmusik</div>
+                        <div style="padding-left:0.8rem;">lesen <span class="arr">&rarr;</span> er liest, er las, lies!, das Leseverhalten</div>
+                        <div style="padding-left:0.8rem;">niesen <span class="arr">&rarr;</span> er niest, er nieste, der Niesanfall</div>
+                        <div style="padding-left:0.8rem;">reisen <span class="arr">&rarr;</span> er reist, er reiste, gereist, der Reisekatalog</div>
+                        <div style="margin-top:0.6rem;"><b>Инфинитив с ss или ß</b> → чередование по длине гласного:</div>
+                        <div style="padding-left:0.8rem;">fressen <span class="arr">&rarr;</span> er fri<b>ss</b>t <span class="arr">&rarr;</span> er fra<b>ß</b> <span class="arr">&rarr;</span> gefre<b>ss</b>en <span class="arr">&rarr;</span> Fra<b>ß</b>, gefrä<b>ß</b>ig</div>
+                        <div style="padding-left:0.8rem;">fassen <span class="arr">&rarr;</span> er fa<b>ss</b>t <span class="arr">&rarr;</span> gefa<b>ss</b>t <span class="arr">&rarr;</span> Fa<b>ss</b>ung</div>
+                        <div style="padding-left:0.8rem;">genießen <span class="arr">&rarr;</span> er genie<b>ß</b>t <span class="arr">&rarr;</span> er geno<b>ss</b> <span class="arr">&rarr;</span> geno<b>ss</b>en <span class="arr">&rarr;</span> Genu<b>ss</b></div>
+                        <div style="padding-left:0.8rem;">heißen <span class="arr">&rarr;</span> er hei<b>ß</b>t <span class="arr">&rarr;</span> er hie<b>ß</b> <span class="arr">&rarr;</span> gehei<b>ß</b>en <span class="arr">&rarr;</span> Verhei<b>ß</b>ung</div>
+                        <div style="padding-left:0.8rem;">lassen <span class="arr">&rarr;</span> er lä<b>ss</b>t <span class="arr">&rarr;</span> er lie<b>ß</b> <span class="arr">&rarr;</span> gela<b>ss</b>en <span class="arr">&rarr;</span> Überla<b>ss</b>ung</div>
+                        <div style="padding-left:0.8rem;">reißen <span class="arr">&rarr;</span> er rei<b>ß</b>t <span class="arr">&rarr;</span> er ri<b>ss</b> <span class="arr">&rarr;</span> geri<b>ss</b>en <span class="arr">&rarr;</span> Rei<b>ß</b>wolf</div>
+                        <div style="margin-top:0.4rem;" class="no-l">У этих глаголов одиночного s не бывает никогда!</div>
+                    </div>
+                </div>
+
+                <div class="note-card" style="background:rgba(251,191,36,0.07); border-color:rgba(251,191,36,0.3);">
+                    <h3 style="color:#fbbf24;">&#x2705; das oder dass? — тест на замену</h3>
+                    <p style="font-size:0.98rem; line-height:1.7;">
+                        Подставь <strong>dieses / jenes / welches</strong>. Получилось — пиши <b>das</b>. Не получилось — <b>dass</b>.
+                    </p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>das</th><th>Wortart</th><th>ersetzbar durch</th></tr>
+                        <tr><td><b>das</b> Auto</td><td>bestimmter Artikel</td><td><em>dieses / jenes</em> Auto</td></tr>
+                        <tr><td><b>das</b> dort parkt</td><td>Relativpronomen</td><td><em>welches</em> dort parkt</td></tr>
+                        <tr><td><b>das</b> gehört mir</td><td>Demonstrativpronomen</td><td><em>dieses</em> gehört mir</td></tr>
+                    </table>
+                    </div>
+                    <div class="ex">
+                        <div><span class="ok-l">✓</span> <b>Das</b> Auto, <b>das</b> dort parkt, ist meins. <b>Das</b> gehört mir.
+                            <span class="gray">— все три заменяются</span></div>
+                        <div style="margin-top:0.4rem;"><span class="no-l">✗</span> Ich weiß, <b>dass</b> es schon spät ist.
+                            <span class="gray">— «Ich weiß, dieses es schon spät ist» — бессмыслица → Konjunktion → dass</span></div>
+                        <div><span class="no-l">✗</span> <b>Dass</b> das so richtig ist, leuchtet mir ein.
+                            <span class="gray">— первое не заменяется (dass), второе заменяется (das)</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== KONSONANTEN ==================== -->
+        <div class="tab-content" id="tab-kons">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F524;</span>
+                    <div>
+                        <h2>Konsonanten</h2>
+                        <p class="lesson-header-sub">b/p · d/t · g/k · v/f/ph · x-Laute · -ig/-lich</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Auslautverhärtung — и как с ней бороться</h3>
+                    <p style="font-size:1rem; line-height:1.7;">
+                        В конце слова <strong>b, d, g</strong> звучат как <strong>p, t, k</strong>. Услышать невозможно —
+                        значит <strong>удлини слово</strong>, и согласный станет слышен.
+                    </p>
+                    <div class="ex">
+                        <div>Dieb — звучит как «Diep». Но: <b>Diebe</b>, <b>des Diebes</b>, <b>Diebin</b> <span class="arr">&rarr;</span> слышно <b>b</b> <span class="arr">&rarr;</span> пишем <b>b</b>.</div>
+                    </div>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>b oder p</th><th>d oder t</th><th>g oder k</th></tr>
+                        <tr><td>Hieb <span class="arr">&rarr;</span> Hiebe<br>Kalb <span class="arr">&rarr;</span> Kälber, kalben<br>Raub <span class="arr">&rarr;</span> rauben<br>
+                                Camp <span class="arr">&rarr;</span> Camping<br>Tipp <span class="arr">&rarr;</span> tippen<br>Skalp <span class="arr">&rarr;</span> skalpieren<br>Typ <span class="arr">&rarr;</span> typisch</td>
+                            <td>Geld <span class="arr">&rarr;</span> Gelder<br>Rad <span class="arr">&rarr;</span> Räder<br>Tod <span class="arr">&rarr;</span> des Todes<br>
+                                Entgelt <span class="arr">&rarr;</span> entgelten<br>Rat <span class="arr">&rarr;</span> Räte, raten<br>tot <span class="arr">&rarr;</span> töten</td>
+                            <td>Balg <span class="arr">&rarr;</span> Bälge<br>Teig <span class="arr">&rarr;</span> teigig<br>Ausschank <span class="arr">&rarr;</span> ausschenken<br>
+                                Werk <span class="arr">&rarr;</span> werken<br>Volk <span class="arr">&rarr;</span> Völker<br>König <span class="arr">&rarr;</span> Könige</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Не всё удлиняется — эти запомнить:<br>
+                    <b>mit b:</b> Erbse, Krebs, Obst, Herbst, Abt<br>
+                    <b>mit p:</b> Gips, Haupt, knipsen, Klaps, Knirps, Schlips, Straps</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Тематические группы: end-/ent- · tod-/tot- · stadt-/statt-</h3>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Baustein</th><th>Bedeutung</th><th>Beispiele</th></tr>
+                        <tr><td><b>end-</b></td><td>от <em>Ende</em>, всегда <b>betont</b></td><td>endlich, endlos, endgültig, unendlich, Endzeit, Endspiel</td></tr>
+                        <tr><td><b>ent-</b></td><td>отделение, всегда <b>unbetont</b></td><td>entfernen, entführen, entlang, entgleisen, Entzug, Entsetzen, Entschluss</td></tr>
+                        <tr><td><b>tod-</b></td><td>усиление («смертельно»)</td><td>todernst, Todfeind, todkrank, todschick, todmüde, todsicher, todtraurig, Todsünde, tödlich</td></tr>
+                        <tr><td><b>tot-</b></td><td>буквально «мёртвый»</td><td>totfahren, sich totärgern, Totgeburt, Totgesagte, Totschlag, tottreten</td></tr>
+                        <tr><td><b>stadt-</b></td><td>от <em>die Stadt</em></td><td>die Vorstadt, die Stadtverwaltung, städtisch, stadteinwärts, Verstädterung</td></tr>
+                        <tr><td><b>statt-</b></td><td>от <em>die Statt</em> (Stätte, Platz)</td><td>abstatten, bestatten, stattdessen, stattlich, an Eides statt, stattfinden, Statthalter, Werkstatt</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>v · f · ph</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">В речи <b>v, f, ph</b> звучат одинаково — на письме различаются.</p>
+                    <div class="ex">
+                        <div><b>Приставки ver- и vor- — всегда через v:</b> Verkauf, verschwinden, unverhofft, Vortrag, vorsprechen, unvorsichtig</div>
+                        <div><b>Корни fern, fertig, Ferien — всегда через f:</b> Fernsehen, entfernen, Fernweh · fertig machen, Fertiggericht, anfertigen ·
+                            Sommerferien, Ferienbeginn, ferienbedingt</div>
+                        <div class="gray">Ещё с fer-: Ferse, Ferkel, Ferner · Fremdwörter: fertil, Ferment, Feralien</div>
+                    </div>
+                    <p class="why"><b>ph</b> — только в заимствованиях, чаще греческих: Alphabet, Asphalt, Philosoph, Phosphor, Strophe<br>
+                    В корнях <em>fot/phot, fon/phon, graf/graph</em> можно выбирать:
+                    <em>Fotograf / Photograph</em> · <em>Grafik / Graphik</em> · <em>Saxofon / Saxophon</em>.
+                    Но <em>Telefon</em> — обычно только через f.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>Gesprochen wie x: chs · cks · gs · ks · x</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">Звук [ks] пишется пятью способами. Помогает <strong>Ableiten</strong>:</p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Schreibung</th><th>Beispiel</th><th>abgeleitet von</th></tr>
+                        <tr><td rowspan="2"><b>cks</b></td><td>glucksen · Klecks · knicksen · (aus)tricksen</td><td>Glucke · kleckern · knicken · Trick</td></tr>
+                        <tr><td>Häcksel · Knacks · Mucks</td><td>hacken · knacken · mucken</td></tr>
+                        <tr><td><b>gs</b></td><td>flugs · anfangs · unterwegs · rings</td><td>Flug · Anfang · Weg · Ring</td></tr>
+                        <tr><td><b>ks</b></td><td>Koks</td><td>verkoken</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">Не выводятся, запомнить: <b>ks:</b> Ekstase, Faksimile, Keks, Murks, schlaksig</p>
+                    <p class="why"><b>chs:</b> Achse, Buchse, Büchse, Dachs, Deichsel, drechseln, Echse, Fuchs, Flachs, Luchs, Ochse,
+                    Sachse, sechs, Wachs, wachsen, wechseln, Wuchs<br>
+                    <b>x:</b> ausbüxen, Axt, Exemplar (и все на Ex-/ex-), Fax, feixen, fixen, Hexe, Jux, kraxeln, Lexikon,
+                    mixen, Nixe, Praxis, Sex, Taxi, Text, verflixt<br>
+                    Оба варианта: <em>die Hachse / Haxe</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>-ig oder -lich? — heimlich und heimelig</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        Окончания <b>-ig</b> и <b>-lich</b> часто звучат одинаково. Решение: <strong>удлини прилагательное</strong> —
+                        добавь окончание, и станет слышно.
+                    </p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>Grundform</th><th>verlängert &rarr; hörbar</th></tr>
+                        <tr><td>freud<b>ig</b></td><td>eine freud<b>ig</b>e Nachricht</td></tr>
+                        <tr><td>rost<b>ig</b></td><td>ein rost<b>ig</b>er Nagel</td></tr>
+                        <tr><td>staub<b>ig</b></td><td>ein staub<b>ig</b>er Weg</td></tr>
+                        <tr><td>fröh<b>lich</b></td><td>eine fröh<b>lich</b>e Runde</td></tr>
+                        <tr><td>mög<b>lich</b></td><td>mög<b>lich</b>e Gefahren</td></tr>
+                        <tr><td>vergeb<b>lich</b></td><td>vergeb<b>lich</b>e Mühe</td></tr>
+                    </table>
+                    </div>
+                    <p class="why">&#x26A0;&#xFE0F; Особенно осторожно с прилагательными на <b>-lig</b>:<br>
+                    <em>grus(e)lig <span class="arr">&rarr;</span> eine grus(e)lige Geschichte</em> · <em>heimelig <span class="arr">&rarr;</span> eine heimelige Wohnung</em> ·
+                    <em>kniff(e)lig <span class="arr">&rarr;</span> eine kniff(e)lige Aufgabe</em> · <em>ek(e)lig <span class="arr">&rarr;</span> eine ek(e)lige Vorstellung</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Häufung gleicher Buchstaben</h3>
+                    <p style="font-size:0.95rem; line-height:1.6;">
+                        При сложении слов могут набежать три одинаковые буквы. Писать так можно — но лучше поставить дефис.
+                    </p>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <tr><th>zusammen</th><th>lesbarer mit Bindestrich</th></tr>
+                        <tr><td>Teeei (Tee + Ei)</td><td>Tee-Ei</td></tr>
+                        <tr><td>Zooorchester</td><td>Zoo-Orchester</td></tr>
+                        <tr><td>Seeelefant</td><td>See-Elefant</td></tr>
+                        <tr><td>Kaffeeernte</td><td>Kaffee-Ernte</td></tr>
+                        <tr><td>Stofffülle</td><td>Stoff-Fülle</td></tr>
+                        <tr><td>Schritttempo</td><td>Schritt-Tempo</td></tr>
+                        <tr><td>Rollladen</td><td>Roll-Laden</td></tr>
+                        <tr><td>Stillleben</td><td>Still-Leben</td></tr>
+                        <tr><td>Sauerstoffflasche</td><td>Sauerstoff-Flasche</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== HOMOPHONE ==================== -->
+        <div class="tab-content" id="tab-homo">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F50D;</span>
+                    <div>
+                        <h2>Homophone</h2>
+                        <p class="lesson-header-sub">Звучат одинаково, пишутся по-разному, значат разное. Только запоминать</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="rl-tools">
+                        <input class="rl-search" id="hoSearch" type="text" placeholder="Suchen: Lid, Meer, wieder …" autocomplete="off">
+                        <span class="rl-count" id="hoCount"></span>
+                    </div>
+                    <div class="rl-wrap">
+                    <table class="rl">
+                        <thead><tr><th style="width:50%">Wort 1</th><th>Wort 2</th></tr></thead>
+                        <tbody id="hoBody"></tbody>
+                    </table>
+                    </div>
+                    <p class="why" style="margin-top:0.7rem;">
+                        Все производные и составные слова наследуют написание базового слова (Stammprinzip).
+                    </p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Trainer</h2>
+                        <p class="lesson-header-sub">Прежде чем выбирать — попробуй вывести или удлинить слово</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="tr-box">
+                        <div class="tr-sent" id="trSent">…</div>
+                        <div class="tr-sub" id="trSub">Welche Schreibung ist richtig?</div>
+                        <div class="tr-opts" id="trOpts"></div>
+                        <div class="tr-fb" id="trFb"></div>
+                        <div class="tr-actions">
+                            <button class="tr-btn" id="trNext">Weiter &rarr;</button>
+                        </div>
+                        <div class="tr-stats">
+                            <span>Richtig: <b id="trOk">0</b></span>
+                            <span>Falsch: <b id="trBad">0</b></span>
+                            <span>Rest: <b id="trLeft">0</b></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ÜBUNGEN ==================== -->
+        <div class="tab-content" id="tab-uebungen">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Übungen</h2>
+                        <p class="lesson-header-sub">Назови проверочное слово, потом кликни</p>
+                    </div>
+                </div>
+
+                <div class="note-card"><h3>A · Ableiten: ä oder e, äu oder eu</h3><div id="drillA"></div></div>
+                <div class="note-card"><h3>B · Verlängern: b/p, d/t, g/k</h3><div id="drillB"></div></div>
+                <div class="note-card"><h3>C · s, ss oder ß</h3><div id="drillC"></div></div>
+                <div class="note-card"><h3>D · das oder dass</h3><div id="drillD"></div></div>
+                <div class="note-card"><h3>E · Homophone im Satz</h3><div id="drillE"></div></div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+const $ = id => document.getElementById(id);
+
+/* ===================== HOMOPHONE ===================== */
+const HOMO = [
+    ['der Aal <span class="gray">(schlangenförmiger Fisch)</span>', 'die Ahle <span class="gray">(nadelähnliches Werkzeug)</span>'],
+    ['beten, das Gebet <span class="gray">(Gespräch mit Gott)</span>', 'das Beet <span class="gray">(Anpflanzung)</span>'],
+    ['Fiber <span class="gray">(Faserstoff)</span>', 'Fieber <span class="gray">(erhöhte Körperwärme)</span>'],
+    ['hehr <span class="gray">(erhaben, heilig)</span>', 'das Heer <span class="gray">(Streitmacht)</span>'],
+    ['holen <span class="gray">(herbringen)</span>', 'hohl <span class="gray">(nicht massiv)</span>'],
+    ['die Leere <span class="gray">(Inhaltslosigkeit)</span>', 'die Lehre <span class="gray">(Unterricht, Ausbildung)</span>'],
+    ['das Lid <span class="gray">(Augendeckel)</span>', 'das Lied <span class="gray">(Gesangsstück)</span>'],
+    ['mehr <span class="gray">(in Zahl oder Menge steigend)</span>', 'das Meer <span class="gray">(Ozean)</span>'],
+    ['die Mine <span class="gray">(Sprengkörper, Inneres eines Stifts)</span>', 'die Miene <span class="gray">(Gesichtsausdruck)</span>'],
+    ['das Mal <span class="gray">(Erkennungszeichen, Ereignis)</span>', 'das Mahl <span class="gray">(Speise)</span>'],
+    ['das Moor <span class="gray">(sumpfiges Gelände)</span>', 'der Mohr <span class="gray">(veraltet)</span>'],
+    ['Rigel <span class="gray">(Name eines Sterns)</span>', 'der Riegel <span class="gray">(Schließvorrichtung)</span>'],
+    ['selig <span class="gray">(glücklich)</span>, Seligkeit', 'die Seele <span class="gray">(das Unsterbliche)</span>, beseelt'],
+    ['das Sigel <span class="gray">(Abkürzungszeichen)</span>', 'das Siegel <span class="gray">(Stempelabdruck)</span>'],
+    ['die Stele <span class="gray">(Grabsäule)</span>', 'stehlen <span class="gray">(entwenden, rauben)</span>'],
+    ['der Stil <span class="gray">(künstlerische Ausrichtung)</span>', 'der Stiel <span class="gray">(Haltestab)</span>'],
+    ['die Uhr', 'der Ur <span class="gray">(ausgestorbenes Wildrind)</span>'],
+    ['der Wagen, etwas wagen', 'die Waage <span class="gray">(zur Gewichtsmessung)</span>'],
+    ['der Wal <span class="gray">(Meeressäugetier)</span>', 'die Wahl <span class="gray">(mehrere Möglichkeiten)</span>'],
+    ['wider <span class="gray">(gegen)</span>, widerspiegeln', 'wieder <span class="gray">(erneut)</span>, wiederholen'],
+    ['die Ähre <span class="gray">(Getreidefruchtstand)</span>', 'die Ehre'],
+    ['die Bären', 'die Beeren'],
+    ['die Lärche <span class="gray">(Nadelbaum)</span>', 'die Lerche <span class="gray">(Vogel)</span>'],
+    ['die Sägen', 'der Segen'],
+    ['der (Brot-)Laib', 'der Leib <span class="gray">(Körper)</span>'],
+    ['die Waise <span class="gray">(Waisenkind)</span>', 'weise <span class="gray">(klug)</span>'],
+    ['die (Gitarren-)Saite', 'die Seite <span class="gray">(Buchseite)</span>'],
+    ['der (Fisch-)Laich', 'der Laie <span class="gray">(Nichtfachmann)</span>'],
+    ['das Lärm', 'lernen'],
+    ['die Stadt <span class="gray">(Ort)</span>', 'statt / die Statt <span class="gray">(Stätte, Platz)</span>'],
+    ['der Tod, tödlich, todkrank', 'tot, töten, totfahren'],
+    ['das Rad <span class="gray">(Räder)</span>', 'der Rat <span class="gray">(Räte, raten)</span>'],
+    ['das Ende, endlich, endgültig', 'ent- <span class="gray">(entfernen, entlang)</span>'],
+    ['das <span class="gray">(Artikel / Pronomen — ersetzbar durch dieses)</span>', 'dass <span class="gray">(Konjunktion — nicht ersetzbar)</span>'],
+    ['seit <span class="gray">(Zeit)</span>', 'seid <span class="gray">(ihr seid)</span>'],
+    ['viel <span class="gray">(Menge)</span>', 'fiel <span class="gray">(von fallen)</span>'],
+    ['Ferien, fertig, fern', 'ver- / vor- <span class="gray">(Verkauf, Vortrag)</span>']
+];
+function hoRender(q) {
+    const f = q.trim().toLowerCase();
+    const strip = s => s.replace(/<[^>]*>/g, '').toLowerCase();
+    const rows = HOMO.filter(r => !f || strip(r[0] + ' ' + r[1]).includes(f));
+    $('hoBody').innerHTML = rows.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('')
+        || '<tr><td colspan="2" style="color:rgba(230,230,235,0.5)">nichts gefunden</td></tr>';
+    $('hoCount').textContent = rows.length + ' / ' + HOMO.length;
+}
+$('hoSearch').addEventListener('input', e => hoRender(e.target.value));
+hoRender('');
+
+/* ===================== TRAINER ===================== */
+const TRAIN = [
+    { s:'Die K___nkung saß tief.',            o:['rä','re'],   a:0, r:'K<b>rä</b>nkung &larr; k<b>ra</b>nk' },
+    { s:'Der St___ngel ist gebrochen.',       o:['ä','e'],     a:0, r:'St<b>ä</b>ngel &larr; St<b>a</b>nge' },
+    { s:'Er will mich bes___nftigen.',        o:['ä','e'],     a:0, r:'bes<b>ä</b>nftigen &larr; s<b>a</b>nft' },
+    { s:'Die L___rche singt am Morgen.',      o:['e','ä'],     a:0, r:'die L<b>e</b>rche = Vogel; die L<b>ä</b>rche = Nadelbaum' },
+    { s:'Wir müssen die Wohnung s___bern.',   o:['äu','eu'],   a:0, r:'s<b>äu</b>bern &larr; s<b>au</b>ber' },
+    { s:'Das Geb___de ist neu.',              o:['äu','eu'],   a:0, r:'Geb<b>äu</b>de &larr; b<b>au</b>en' },
+    { s:'Ein seltsames Ger___sch war zu hören.', o:['äu','eu'], a:0, r:'Ger<b>äu</b>sch &larr; r<b>au</b>schen' },
+    { s:'Wir haben große Fr___de.',           o:['eu','äu'],   a:0, r:'Fr<b>eu</b>de — nicht von einem au-Wort ableitbar' },
+    { s:'Er ist ein guter Z___ge.',           o:['eu','äu'],   a:0, r:'Z<b>eu</b>ge — nicht ableitbar' },
+    { s:'Sie hat sich gestr___bt.',           o:['äu','eu'],   a:0, r:'sich str<b>äu</b>ben — Ausnahme, muss man merken' },
+    { s:'Im M___ blühen die Bäume.',          o:['ai','ei'],   a:0, r:'M<b>ai</b> — eines der wenigen ai-Wörter' },
+    { s:'Er kaufte einen Brotl___b.',         o:['ai','ei'],   a:0, r:'L<b>ai</b>b Brot; der L<b>ei</b>b = Körper' },
+    { s:'Die Gitarrens___te ist gerissen.',   o:['ai','ei'],   a:0, r:'S<b>ai</b>te an der Gitarre; S<b>ei</b>te im Buch' },
+    { s:'Das war sehr w___se von dir.',       o:['ei','ai'],   a:0, r:'w<b>ei</b>se = klug; W<b>ai</b>se = Kind ohne Eltern' },
+    { s:'Der Die___ wurde gefasst.',          o:['b','p'],     a:0, r:'verlängern: die Die<b>b</b>e, des Die<b>b</b>es' },
+    { s:'Das Kal___ ist noch klein.',         o:['b','p'],     a:0, r:'verlängern: Käl<b>b</b>er, kal<b>b</b>en' },
+    { s:'Gib mir einen Tip___!',              o:['p','b'],     a:0, r:'verlängern: ti<b>pp</b>en' },
+    { s:'Das Ra___ hat einen Platten.',       o:['d','t'],     a:0, r:'verlängern: Rä<b>d</b>er' },
+    { s:'Ich brauche deinen Ra___.',          o:['t','d'],     a:0, r:'verlängern: Rä<b>t</b>e, ra<b>t</b>en' },
+    { s:'Der Vogel ist ___ot.',               o:['t','d'],     a:0, r:'<b>t</b>ot &rarr; <b>t</b>öten (gestorben); <b>T</b>od = das Nomen' },
+    { s:'Er ist ___odkrank.',                 o:['t','d'],     a:1, r:'<b>tod</b>krank — Verstärkung, von <em>Tod</em>' },
+    { s:'Der Bal___ des Tieres.',             o:['g','k'],     a:0, r:'verlängern: Bäl<b>g</b>e' },
+    { s:'Das Vol___ jubelte.',                o:['k','g'],     a:0, r:'verlängern: Völ<b>k</b>er' },
+    { s:'Wir gehen zum Ver___auf.',           o:['k','g'],     a:0, r:'Ver<b>k</b>auf — Vorsilbe <em>ver-</em> mit v' },
+    { s:'Er hat es ___ndgültig entschieden.', o:['e','ä'],     a:0, r:'<b>end</b>gültig &larr; das Ende, betont' },
+    { s:'Der Zug ist ___tgleist.',            o:['en','end'],  a:0, r:'<b>ent</b>gleisen — unbetonte Vorsilbe ent-' },
+    { s:'Wir wohnen in der Vor___adt.',       o:['st','stt'],  a:0, r:'Vor<b>st</b>adt &larr; die S<b>t</b>adt' },
+    { s:'Wa___er ist lebenswichtig.',         o:['ss','ß'],    a:0, r:'kurzer Vokal → <b>ss</b>' },
+    { s:'Die Stra___e ist gesperrt.',         o:['ß','ss'],    a:0, r:'langer Vokal → <b>ß</b>' },
+    { s:'Er hat viel Spa___ gehabt.',         o:['ß','ss'],    a:0, r:'langer Vokal → <b>ß</b>' },
+    { s:'Der Flu___ ist über die Ufer getreten.', o:['ss','ß'], a:0, r:'kurzer Vokal → <b>ss</b>' },
+    { s:'Wir sitzen drau___en.',              o:['ß','ss'],    a:0, r:'nach Diphthong au → <b>ß</b>' },
+    { s:'Sie hat mich gegrü___t.',            o:['ß','ss'],    a:0, r:'grüßen — langer Umlaut ü → <b>ß</b>' },
+    { s:'Er i___t gerade zu Mittag.',         o:['ss','ß'],    a:0, r:'er i<b>ss</b>t &larr; e<b>ss</b>en, kurzer Vokal' },
+    { s:'Er a___ schon alles auf.',           o:['ß','ss'],    a:0, r:'er a<b>ß</b> — langer Vokal im Präteritum' },
+    { s:'Er hat den Ball geri___en.',         o:['ss','ß'],    a:0, r:'geri<b>ss</b>en — kurzer Vokal (aber: er rei<b>ß</b>t)' },
+    { s:'Wir haben den Abend geno___en.',     o:['ss','ß'],    a:0, r:'geno<b>ss</b>en — kurz (aber: genie<b>ß</b>en)' },
+    { s:'Er hat gerei___t und viel gesehen.', o:['s','ss'],    a:0, r:'rei<b>s</b>en — stimmhaftes s im Infinitiv' },
+    { s:'Die Zeugni___e wurden verteilt.',    o:['ss','s'],    a:0, r:'Zeugni<b>ss</b>e — Nomen auf -nis verdoppeln im Plural' },
+    { s:'Die Realismu___ verschiedener Epochen.', o:['s','ss'], a:0, r:'Realismen / Realismu<b>s</b> — -ismus verdoppelt nie' },
+    { s:'Ich glaube, ___ es regnet.',         o:['dass','das'], a:0, r:'nicht durch <em>dieses</em> ersetzbar → Konjunktion <b>dass</b>' },
+    { s:'___ Auto dort ist meins.',           o:['Das','Dass'], a:0, r:'= <em>dieses</em> Auto → Artikel <b>das</b>' },
+    { s:'Das Buch, ___ du mir gabst, war gut.', o:['das','dass'], a:0, r:'= <em>welches</em> → Relativpronomen <b>das</b>' },
+    { s:'___ freut mich sehr.',               o:['Das','Dass'], a:0, r:'= <em>dieses</em> freut mich → Demonstrativpronomen' },
+    { s:'Ich hoffe, ___ du kommst.',          o:['dass','das'], a:0, r:'Konjunktion → <b>dass</b>' },
+    { s:'Ich habe das L___d geschlossen.',    o:['id','ied'],  a:0, r:'das L<b>id</b> = Augendeckel; das L<b>ied</b> = Gesangsstück' },
+    { s:'Wir sangen ein schönes L___d.',      o:['ied','id'],  a:0, r:'das L<b>ied</b> = Gesangsstück' },
+    { s:'Das M___r ist heute ruhig.',         o:['ee','eh'],   a:0, r:'das M<b>ee</b>r = Ozean; m<b>eh</b>r = Menge' },
+    { s:'Er verzog keine M___ne.',            o:['ie','i'],    a:0, r:'die M<b>ie</b>ne = Gesichtsausdruck; die M<b>i</b>ne = Sprengkörper' },
+    { s:'Sie kommt ___der zurück.',           o:['wie','wi'],  a:0, r:'<b>wie</b>der = erneut; <b>wi</b>der = gegen' },
+    { s:'Das ist gegen meine Überzeugung, also ___spreche ich.', o:['wider','wieder'], a:0, r:'<b>wider</b>sprechen = dagegen sein' },
+    { s:'Ein rost___ Nagel steckte in der Wand.', o:['iger','licher'], a:0, r:'verlängern: rost<b>ig</b>er' },
+    { s:'Eine fröh___ Runde saß zusammen.',   o:['liche','ige'], a:0, r:'verlängern: fröh<b>lich</b>e' },
+    { s:'Das ist eine kniff___ Aufgabe.',     o:['(e)lige','liche'], a:0, r:'kniff(e)l<b>ig</b>e — verlängern hilft' },
+    { s:'Wir gingen se___s Kilometer.',       o:['ch','ck'],   a:0, r:'se<b>chs</b> — Merkwort mit chs' },
+    { s:'Er machte einen Kle___.',            o:['cks','chs'], a:0, r:'Kle<b>cks</b> &larr; kle<b>ck</b>ern' },
+    { s:'Er ging unterwe___.',                o:['gs','chs'],  a:0, r:'unterwe<b>gs</b> &larr; We<b>g</b>' },
+    { s:'Der Fu___ lief über das Feld.',      o:['chs','cks'], a:0, r:'Fu<b>chs</b> — Merkwort' },
+    { s:'Er hat eine He___e im Garten.',      o:['ck','k'],    a:0, r:'He<b>ck</b>e — nach kurzem Vokal nie kk' },
+    { s:'Die Kat___e schläft.',               o:['z','tz'],    a:1, r:'Ka<b>tz</b>e — nach kurzem Vokal nie zz' },
+    { s:'Die Wal___e dreht sich.',            o:['z','tz'],    a:0, r:'Wal<b>z</b>e — nach l nie tz!' },
+    { s:'Die Nel___e duftet.',                o:['k','ck'],    a:0, r:'Nel<b>k</b>e — nach l nie ck!' },
+    { s:'Sie fährt einen schwar___en Wagen.', o:['z','tz'],    a:0, r:'schwar<b>z</b> — nach r nie tz!' },
+    { s:'Er ist kran___.',                    o:['k','ck'],    a:0, r:'kran<b>k</b> — nach n nie ck!' },
+    { s:'Wir gehen ___en.',                   o:['sä','se'],   a:0, r:'s<b>ä</b>en — sie sät, sie hat gesät (kein h!)' },
+    { s:'Die Blume blü___t.',                 o:['h','—'],     a:0, r:'blü<b>h</b>en hat h im Infinitiv → h bleibt überall' },
+    { s:'Sie hat viel gesä___t.',             o:['—','h'],     a:0, r:'säen hat kein h → gesät ohne h' }
+];
+let trPool = [], trCur = null, trDone = false, trOk = 0, trBad = 0;
+function trShuffle(a) {
+    const r = a.slice();
+    for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+    return r;
+}
+function trNext() {
+    if (!trPool.length) trPool = trShuffle(TRAIN);
+    trCur = trPool.pop();
+    trDone = false;
+    $('trSent').innerHTML = trCur.s.replace('___', '<span style="color:var(--color-accent)">___</span>');
+    $('trFb').innerHTML = '';
+    $('trLeft').textContent = trPool.length;
+    const order = trShuffle(trCur.o.map((t, i) => ({ t, i })));
+    $('trOpts').innerHTML = order.map(x =>
+        '<button class="tr-opt" data-i="' + x.i + '">' + x.t + '</button>').join('');
+    $('trOpts').querySelectorAll('.tr-opt').forEach(btn => btn.addEventListener('click', () => {
+        if (trDone) return;
+        trDone = true;
+        const i = +btn.dataset.i;
+        $('trOpts').querySelectorAll('.tr-opt').forEach(b => {
+            b.disabled = true;
+            if (+b.dataset.i === trCur.a) b.classList.add('good');
+        });
+        if (i === trCur.a) {
+            trOk++; $('trOk').textContent = trOk;
+            $('trFb').innerHTML = '<span style="color:#86efac">&#x2713; richtig</span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        } else {
+            btn.classList.add('bad');
+            trBad++; $('trBad').textContent = trBad;
+            $('trFb').innerHTML = '<span style="color:#f85149">&#x2717; richtig: <b>' + trCur.o[trCur.a] + '</b></span><br><span style="color:rgba(230,230,235,0.7);font-size:0.9rem">' + trCur.r + '</span>';
+        }
+    }));
+}
+$('trNext').addEventListener('click', trNext);
+trNext();
+
+/* ===================== ÜBUNGEN ===================== */
+const DRILLS = {
+drillA: [
+    ['K__nkung (ä oder e?)', '<b>Krä</b>nkung &larr; k<b>ra</b>nk'],
+    ['St__ngel', '<b>Stä</b>ngel &larr; St<b>a</b>nge'],
+    ['B__ndel', '<b>Bä</b>ndel &larr; B<b>a</b>nd'],
+    ['beh__nde', 'beh<b>ä</b>nde &larr; H<b>a</b>nd'],
+    ['W__lder', 'W<b>ä</b>lder &larr; W<b>a</b>ld'],
+    ['__ltern', '<b>E</b>ltern — die einzige Ausnahme (von <em>alt</em>, aber mit e!)'],
+    ['s__bern (äu oder eu?)', 's<b>äu</b>bern &larr; s<b>au</b>ber'],
+    ['F__lnis', 'F<b>äu</b>lnis &larr; f<b>au</b>l'],
+    ['H__te (von Haut)', 'H<b>äu</b>te &larr; H<b>au</b>t'],
+    ['t__schen', 't<b>äu</b>schen &larr; T<b>au</b>sch'],
+    ['Sch__ne', 'Sch<b>eu</b>ne — nicht ableitbar → eu'],
+    ['Kn__el', 'Kn<b>äu</b>el — Ausnahme, muss man merken'],
+    ['aufw__ndig / aufw__ndig', 'aufw<b>e</b>ndig <em>oder</em> aufw<b>ä</b>ndig — beides erlaubt (von aufwenden / Aufwand)']
+],
+drillB: [
+    ['Die__ (b oder p?)', '<b>Dieb</b> &rarr; die Die<b>b</b>e, des Die<b>b</b>es'],
+    ['Kal__', '<b>Kalb</b> &rarr; Käl<b>b</b>er, kal<b>b</b>en'],
+    ['Rau__', '<b>Raub</b> &rarr; rau<b>b</b>en'],
+    ['Ty__', '<b>Typ</b> &rarr; ty<b>p</b>isch'],
+    ['Skal__', '<b>Skalp</b> &rarr; skal<b>p</b>ieren'],
+    ['Gel__ (d oder t?)', '<b>Geld</b> &rarr; Gel<b>d</b>er'],
+    ['Ra__ (Fahrzeugteil)', '<b>Rad</b> &rarr; Rä<b>d</b>er'],
+    ['Ra__ (Empfehlung)', '<b>Rat</b> &rarr; Rä<b>t</b>e, ra<b>t</b>en'],
+    ['To__ (das Nomen)', '<b>Tod</b> &rarr; des To<b>d</b>es'],
+    ['to__ (nicht lebendig)', '<b>tot</b> &rarr; tö<b>t</b>en'],
+    ['Bal__ (g oder k?)', '<b>Balg</b> &rarr; Bäl<b>g</b>e'],
+    ['Vol__', '<b>Volk</b> &rarr; Völ<b>k</b>er'],
+    ['Ausschan__', '<b>Ausschank</b> &rarr; aussc<b>h</b>enken'],
+    ['Merkwörter mit b, die sich nicht verlängern lassen', 'Erbse, Krebs, Obst, Herbst, Abt'],
+    ['Merkwörter mit p', 'Gips, Haupt, knipsen, Klaps, Knirps, Schlips, Straps']
+],
+drillC: [
+    ['Wa__er', 'Wa<b>ss</b>er — kurzer Vokal'],
+    ['Stra__e', 'Stra<b>ß</b>e — langer Vokal'],
+    ['Flu__', 'Flu<b>ss</b> — kurzer Vokal'],
+    ['Flo__ (Wasserfahrzeug)', 'Flo<b>ß</b> — langer Vokal'],
+    ['drau__en', 'drau<b>ß</b>en — nach Diphthong'],
+    ['Fü__e', 'Fü<b>ß</b>e — langer Umlaut'],
+    ['er i__t (essen)', 'er i<b>ss</b>t — kurz'],
+    ['er a__ (Präteritum)', 'er a<b>ß</b> — lang'],
+    ['er lä__t (lassen)', 'er lä<b>ss</b>t — kurz'],
+    ['er lie__ (Präteritum)', 'er lie<b>ß</b> — lang'],
+    ['geno__en (genießen)', 'geno<b>ss</b>en — kurz'],
+    ['er genie__t', 'er genie<b>ß</b>t — lang'],
+    ['gerei__t (reisen)', 'gerei<b>s</b>t — stimmhaftes s im Infinitiv → immer einfaches s'],
+    ['Zeugni__ / Plural', 'Zeugni<b>s</b> &rarr; Zeugni<b>ss</b>e — -nis verdoppelt im Plural'],
+    ['Realismu__ / Plural', 'Realismu<b>s</b> &rarr; Realismen — -ismus verdoppelt nie'],
+    ['Kürbi__ / Plural', 'Kürbi<b>s</b> &rarr; Kürbi<b>ss</b>e']
+],
+drillD: [
+    ['Ich weiß, __ es schon spät ist.', '<b>dass</b> — nicht ersetzbar'],
+    ['__ Auto, __ dort parkt, ist meins.', '<b>Das</b> Auto, <b>das</b> dort parkt — beide ersetzbar (dieses / welches)'],
+    ['__ so richtig ist, leuchtet mir ein.', '<b>Dass</b> — Konjunktion am Satzanfang'],
+    ['__ gehört mir.', '<b>Das</b> gehört mir — = <em>dieses</em>'],
+    ['Ich hoffe, __ du kommst.', '<b>dass</b>'],
+    ['Er sagte, __ er das Buch, __ er las, gut fand.', '… <b>dass</b> er das Buch, <b>das</b> er las, gut fand.'],
+    ['__ ist ein Problem, __ wir lösen müssen.', '<b>Das</b> ist ein Problem, <b>das</b> wir lösen müssen. — beide ersetzbar!'],
+    ['Es ist schade, __ __ Wetter so schlecht ist.', 'Es ist schade, <b>dass das</b> Wetter so schlecht ist.']
+],
+drillE: [
+    ['Ich habe das L__ geschlossen. / Wir sangen ein L__.', 'das <b>Lid</b> (Augendeckel) · das <b>Lied</b> (Gesang)'],
+    ['Das M__ ist ruhig. / Ich brauche m__.', 'das <b>Meer</b> · <b>mehr</b>'],
+    ['Er verzog keine M__ne. / Die M__ne explodierte.', 'die <b>Miene</b> (Gesicht) · die <b>Mine</b> (Sprengkörper)'],
+    ['Der St__ des Löffels. / Der Barockst__.', 'der <b>Stiel</b> (Haltestab) · der <b>Stil</b> (Kunstrichtung)'],
+    ['Er kommt w__der. / Er handelte w__der besseres Wissen.', '<b>wieder</b> (erneut) · <b>wider</b> (gegen)'],
+    ['Sie ist sehr w__se. / Das W__senkind.', '<b>weise</b> (klug) · das <b>Waisen</b>kind'],
+    ['Die S__te der Gitarre. / Die S__te im Buch.', 'die <b>Saite</b> · die <b>Seite</b>'],
+    ['Der Wal im Meer. / Die W__l zwischen zwei Optionen.', 'der <b>Wal</b> · die <b>Wahl</b>'],
+    ['Der W__gen fährt. / Die W__ge zeigt 70 kg.', 'der <b>Wagen</b> · die <b>Waage</b>'],
+    ['Die L__re im Raum. / Die L__re des Meisters.', 'die <b>Leere</b> · die <b>Lehre</b>'],
+    ['Die L__rche ist ein Baum. / Die L__rche ist ein Vogel.', 'die <b>Lärche</b> (Baum) · die <b>Lerche</b> (Vogel)'],
+    ['Die B__ren im Wald. / Die B__ren am Strauch.', 'die <b>Bären</b> · die <b>Beeren</b>'],
+    ['S__t gestern regnet es. / Ihr s__d spät dran.', '<b>seit</b> (Zeit) · <b>seid</b> (von sein)'],
+    ['Er hat v__l gegessen. / Er f__l vom Rad.', '<b>viel</b> · <b>fiel</b> (von fallen)']
+]
+};
+Object.keys(DRILLS).forEach(id => {
+    const box = $(id);
+    if (!box) return;
+    box.innerHTML = DRILLS[id].map(([q, a]) =>
+        '<div class="dr-item"><div class="dr-q">' + q + '</div><div class="dr-a">' + a + '</div></div>').join('');
+    box.querySelectorAll('.dr-item').forEach(it =>
+        it.addEventListener('click', () => it.classList.toggle('open')));
+});
+</script>
+</body>
+</html>
