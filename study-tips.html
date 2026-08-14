@@ -1,393 +1,332 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Study · NeoStudy</title>
-    <link rel="stylesheet" href="css/style.css?v=10">
-    <style>
-        .page-bg { position:fixed; inset:0; z-index:0; pointer-events:none; }
-        .page-bg img { width:100%; height:100%; object-fit:cover; object-position:center 40%;
-            filter:brightness(0.13) saturate(1.5); }
-        .page-bg::after { content:''; position:absolute; inset:0;
-            background: radial-gradient(ellipse 65% 50% at 70% 10%, rgba(192,132,252,0.15) 0%, transparent 65%),
-                        radial-gradient(ellipse 50% 45% at 20% 85%, rgba(244,114,182,0.1) 0%, transparent 65%); }
-        body { position:relative; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Study · NeoStudy</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;500;700;800&display=swap');
 
-        /* ── layout ── */
-        .st-hero { position:relative; z-index:2; text-align:center; padding:7rem 1rem 2.5rem; }
-        .st-eyebrow { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.22em;
-            text-transform:uppercase; color:rgba(192,132,252,0.65); margin-bottom:0.9rem; }
-        .st-hero h1 { font-size:clamp(2.2rem,5vw,3.4rem); font-weight:900; letter-spacing:-0.03em;
-            margin:0 0 0.7rem;
-            background:linear-gradient(135deg,#fff 15%,#c084fc 55%,#f472b6 100%);
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .st-hero p { font-size:1rem; color:rgba(225,205,245,0.5); font-style:italic; margin:0; }
+    :root {
+        --color-bg: #faf6f0;
+        --color-surface: #fffdf9;
+        --color-text: #2f2a24;
+        --color-divider: rgba(60, 48, 36, 0.14);
+        --color-accent: #bf5b3d;
+        --color-accent-100: #f8e9e2;
+        --color-accent-200: #f0d3c5;
+        --color-accent-700: #9c4a30;
+        --color-accent-800: #7d3a25;
+        --color-accent-2: #6f9160;
+        --color-accent-2-100: #eaf1e2;
+        --color-accent-2-200: #d5e3c6;
+        --color-accent-2-700: #56744a;
+        --color-accent-2-800: #455e3b;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-6: 28px;
+        --space-8: 48px;
+        --radius-sm: 8px;
+        --radius-lg: 18px;
+        --shadow-md: 0 10px 28px rgba(90, 66, 44, 0.14);
+        --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+    }
 
-        .st-wrap { position:relative; z-index:2; max-width:900px; margin:0 auto; padding:0 1.2rem 5rem; }
+    * { box-sizing: border-box; }
 
-        /* ── section heading ── */
-        .st-h { font-size:1.05rem; font-weight:800; color:#fff; font-family:'Nunito',sans-serif;
-            margin:2.5rem 0 1rem; padding-bottom:0.5rem;
-            border-bottom:1px solid rgba(192,132,252,0.2);
-            display:flex; align-items:center; gap:0.6rem; }
+    body {
+        margin: 0;
+        font-family: 'Nunito', -apple-system, 'Segoe UI', sans-serif;
+        color: var(--color-text);
+        font-size: 15px;
+        line-height: 1.55;
+        background:
+            radial-gradient(480px 380px at 90% -5%, var(--color-accent-2-100), transparent 70%),
+            radial-gradient(420px 360px at -5% 15%, var(--color-accent-100), transparent 65%),
+            var(--color-bg);
+    }
 
-        /* ── Timeline ── */
-        .timeline { display:flex; flex-direction:column; gap:0; position:relative; }
-        .timeline::before { content:''; position:absolute; left:28px; top:0; bottom:0;
-            width:2px; background:linear-gradient(to bottom,#c084fc,#f472b6,transparent); }
-        .tl-item { display:flex; gap:1.2rem; align-items:flex-start; padding:0 0 1.4rem; position:relative; }
-        .tl-dot { width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:0.25rem;
-            border:2px solid; position:relative; z-index:1; background:#0c0912; }
-        .tl-dot.purple { border-color:#c084fc; box-shadow:0 0 10px rgba(192,132,252,0.4); }
-        .tl-dot.pink   { border-color:#f472b6; box-shadow:0 0 10px rgba(244,114,182,0.4); }
-        .tl-dot.green  { border-color:#86efac; box-shadow:0 0 10px rgba(134,239,172,0.4); }
-        .tl-dot.yellow { border-color:#fbbf24; box-shadow:0 0 10px rgba(251,191,36,0.35); }
-        .tl-dot.red    { border-color:#f87171; box-shadow:0 0 10px rgba(248,113,113,0.35); }
-        .tl-content { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-            border-radius:13px; padding:0.9rem 1.1rem; flex:1; }
-        .tl-when { font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
-            margin-bottom:0.3rem; }
-        .tl-title { font-size:0.97rem; font-weight:800; color:#fff; margin-bottom:0.4rem; }
-        .tl-text { font-size:0.86rem; color:rgba(230,210,245,0.72); line-height:1.6; }
-        .tl-tags { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.5rem; }
-        .tl-tag { font-size:0.7rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:999px; }
+    h1, h2, h3 { font-family: var(--font-heading); font-weight: 800; margin: 0; }
+    h2 { font-size: 1.7rem; }
+    h3 { font-size: 1.08rem; margin-bottom: var(--space-2); }
 
-        /* ── Method cards ── */
-        .methods-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
-        .method-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-            border-radius:14px; padding:1.15rem 1.2rem;
-            transition:border-color 0.25s, box-shadow 0.25s; }
-        .method-card:hover { border-color:rgba(192,132,252,0.3); box-shadow:0 6px 24px rgba(192,132,252,0.08); }
-        .method-icon { font-size:1.6rem; display:block; margin-bottom:0.6rem; }
-        .method-name { font-size:0.95rem; font-weight:800; color:#fff; margin-bottom:0.2rem; }
-        .method-badge { display:inline-block; font-size:0.66rem; font-weight:700; padding:0.1rem 0.45rem;
-            border-radius:999px; margin-bottom:0.5rem; }
-        .badge-gold { background:rgba(251,191,36,0.15); color:#fbbf24; }
-        .badge-purple { background:rgba(192,132,252,0.15); color:#c084fc; }
-        .badge-pink { background:rgba(244,114,182,0.15); color:#f472b6; }
-        .badge-green { background:rgba(134,239,172,0.15); color:#86efac; }
-        .method-text { font-size:0.84rem; color:rgba(228,210,245,0.72); line-height:1.55; }
-        .method-how { margin-top:0.6rem; font-size:0.8rem; color:rgba(192,132,252,0.7);
-            font-style:italic; padding-top:0.6rem; border-top:1px solid rgba(255,255,255,0.06); }
+    a { color: var(--color-accent-700); }
+    a:hover { color: var(--color-accent); }
 
-        /* ── Do / Don't ── */
-        .do-dont { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        @media(max-width:580px) { .do-dont { grid-template-columns:1fr; } }
-        .do-box, .dont-box { border-radius:14px; padding:1.1rem 1.2rem; }
-        .do-box { background:rgba(134,239,172,0.05); border:1px solid rgba(134,239,172,0.2); }
-        .dont-box { background:rgba(248,113,113,0.05); border:1px solid rgba(248,113,113,0.2); }
-        .do-box h3 { color:#86efac; font-size:0.88rem; font-weight:800; margin-bottom:0.7rem; font-family:'Nunito',sans-serif; }
-        .dont-box h3 { color:#f87171; font-size:0.88rem; font-weight:800; margin-bottom:0.7rem; font-family:'Nunito',sans-serif; }
-        .dd-item { display:flex; gap:0.6rem; align-items:flex-start; padding:0.3rem 0;
-            font-size:0.85rem; color:rgba(230,210,245,0.78); line-height:1.45; }
-        .dd-icon { flex-shrink:0; font-size:0.9rem; margin-top:0.05rem; }
+    /* ── nav ── */
+    .nav { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+    .nav-brand { font-family: var(--font-heading); font-weight: 800; font-size: 1.3rem; margin-right: auto; }
+    .nav a { text-decoration: none; font-weight: 700; font-size: 0.92rem; }
+    .nav-dd { position: relative; }
+    .nav-dd-btn { cursor: pointer; user-select: none; font-weight: 700; font-size: 0.92rem;
+        color: var(--color-accent-700); white-space: nowrap; }
+    .nav-dd:hover .nav-dd-btn, .nav-dd:focus-within .nav-dd-btn { color: var(--color-accent); }
+    .nav-dd-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+        display: none; flex-direction: column; min-width: 160px;
+        background: var(--color-surface); border: 1px solid var(--color-divider);
+        border-radius: 12px; padding: 6px; box-shadow: var(--shadow-md); z-index: 50; }
+    .nav-dd:hover .nav-dd-menu, .nav-dd:focus-within .nav-dd-menu { display: flex; }
+    .nav-dd-menu a { padding: 8px 12px; border-radius: 8px; white-space: nowrap; }
+    .nav-dd-menu a:hover { background: var(--color-accent-100); }
 
-        /* ── Subject tips ── */
-        .subj-tips { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
-        .st-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-            border-radius:14px; padding:1.1rem 1.2rem; }
-        .st-card-head { display:flex; align-items:center; gap:0.7rem; margin-bottom:0.8rem; }
-        .st-card-icon { font-size:1.4rem; }
-        .st-card-title { font-size:0.95rem; font-weight:800; color:#fff; }
-        .st-tip { display:flex; gap:0.55rem; align-items:flex-start; padding:0.3rem 0;
-            border-bottom:1px solid rgba(255,255,255,0.05); }
-        .st-tip:last-child { border-bottom:none; }
-        .st-tip-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:0.45rem; }
-        .st-tip-text { font-size:0.84rem; color:rgba(228,210,245,0.75); line-height:1.45; }
+    /* ── tags ── */
+    .tag { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.04em;
+        padding: 4px 12px; border-radius: 999px; }
+    .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
+    .tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
+    .tag-outline { background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent-700); }
 
-        /* ── Brain tips ── */
-        .brain-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:0.8rem; }
-        .brain-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-            border-radius:13px; padding:0.9rem 1rem; text-align:center; }
-        .brain-icon { font-size:1.8rem; display:block; margin-bottom:0.45rem; }
-        .brain-title { font-size:0.85rem; font-weight:800; color:#fff; margin-bottom:0.25rem; }
-        .brain-text { font-size:0.78rem; color:rgba(228,210,245,0.6); line-height:1.45; }
+    /* ── cards ── */
+    .card { background: var(--color-surface); border-radius: var(--radius-lg);
+        padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+    .elev-sm { box-shadow: 0 2px 10px rgba(90, 66, 44, 0.08); }
+    .card-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.05rem; }
+    .card-body { font-size: 14px; margin: 0; color: color-mix(in srgb, var(--color-text) 80%, transparent); }
+    .st-card { transition: box-shadow 0.25s; }
+    .st-card:hover { box-shadow: var(--shadow-md); }
 
-        /* ── Quick chips ── */
-        .chips { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.4rem; }
-        .chip { background:rgba(192,132,252,0.1); border:1px solid rgba(192,132,252,0.2);
-            border-radius:999px; padding:0.25rem 0.75rem;
-            font-size:0.78rem; color:rgba(210,180,250,0.8); }
-    </style>
+    .st-dd-item { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-2) 0; }
+    .st-dd-icon { display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border-radius: 999px; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+        .grid-2 { grid-template-columns: 1fr !important; }
+    }
+</style>
 </head>
-<body class="dark-theme">
+<body>
 
-    <div class="page-bg">
-        <img src="img/gallery/photo16.webp" alt="">
-    </div>
+<div style="max-width:980px;margin:0 auto;padding:0 0 var(--space-8);position:relative;overflow:hidden;">
 
-    <nav class="navbar navbar-transparent" style="position:relative;z-index:10;">
-        <a href="index.html" class="logo">NeoStudy</a>
-        <div class="nav-links">
-            <a href="index.html">Startseite</a>
+  <nav class="nav" style="max-width:980px;margin:0 auto;padding:var(--space-4);">
+    <span class="nav-brand">NeoStudy</span>
+    <a href="index.html">Startseite</a>
+    <div class="nav-dd">
+        <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+        <div class="nav-dd-menu">
             <a href="mathe.html">Mathematik</a>
-            <a href="englisch.html">Englisch</a>
-            <a href="deutsch.html">Deutsch</a>
+            <a href="biologie.html">Biologie</a>
+        </div>
+    </div>
+    <a href="englisch.html">Englisch</a>
+    <a href="deutsch.html">Deutsch</a>
+    <div class="nav-dd">
+        <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+        <div class="nav-dd-menu">
             <a href="vokabeln.html">Vokabeln</a>
             <a href="englisch-vokabeln.html">Vocabulary</a>
-            <a href="gallery.html">Gallery</a>
-            <a href="kanikuly.html">Bloom</a>
-            <a href="notizen.html">Notizen</a>
-            <a href="study-tips.html" class="active">How to Study</a>
         </div>
-    </nav>
-
-    <div class="st-hero">
-        <span class="st-eyebrow">✦ study smarter, not harder ✦</span>
-        <h1>How to Study 📖</h1>
-        <p>не учись больше &mdash; учись правильно</p>
     </div>
+    <a href="gallery.html">Gallery</a>
+    <a href="study-tips.html" aria-current="page" style="color:var(--color-accent);font-weight:700;">How to Study</a>
+  </nav>
 
-    <div class="st-wrap">
-
-        <!-- ══ TIMELINE ══ -->
-        <div class="st-h">📅 За сколько дней начинать</div>
-        <p style="font-size:0.84rem;color:rgba(228,205,245,0.45);margin:-0.4rem 0 1.2rem;">Это самое важное — большинство провалов из-за того что начали слишком поздно</p>
-
-        <div class="timeline">
-            <div class="tl-item">
-                <div class="tl-dot purple"></div>
-                <div class="tl-content">
-                    <div class="tl-when" style="color:#c084fc;">за 7+ дней</div>
-                    <div class="tl-title">Обзор и план</div>
-                    <div class="tl-text">Посмотри что вообще будет на тесте. Раздели на темы. Сделай список — что знаешь хорошо, что слабо. Начни с самого сложного.</div>
-                    <div class="tl-tags">
-                        <span class="tl-tag" style="background:rgba(192,132,252,0.12);color:#c084fc;">Составь план</span>
-                        <span class="tl-tag" style="background:rgba(192,132,252,0.12);color:#c084fc;">30 мин/день</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tl-item">
-                <div class="tl-dot pink"></div>
-                <div class="tl-content">
-                    <div class="tl-when" style="color:#f472b6;">за 3–5 дней</div>
-                    <div class="tl-title">Активное повторение</div>
-                    <div class="tl-text">Не перечитывай — воспроизводи! Закрой тетрадь и попробуй написать всё что помнишь. Делай карточки, объясняй темы вслух. По 45 мин с паузами.</div>
-                    <div class="tl-tags">
-                        <span class="tl-tag" style="background:rgba(244,114,182,0.12);color:#f472b6;">Active recall</span>
-                        <span class="tl-tag" style="background:rgba(244,114,182,0.12);color:#f472b6;">45 мин + 10 мин пауза</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tl-item">
-                <div class="tl-dot yellow"></div>
-                <div class="tl-content">
-                    <div class="tl-when" style="color:#fbbf24;">за 1–2 дня</div>
-                    <div class="tl-title">Повторение слабых мест</div>
-                    <div class="tl-text">Только то что всё ещё не знаешь. Прогони карточки. Порешай примеры. Ничего нового не учи — только закрепляй. Ложись спать вовремя — это важнее учёбы ночью.</div>
-                    <div class="tl-tags">
-                        <span class="tl-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;">Только слабые темы</span>
-                        <span class="tl-tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;">Стоп в 21:00</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content">
-                    <div class="tl-when" style="color:#86efac;">день перед тестом</div>
-                    <div class="tl-title">Лёгкое повторение + отдых</div>
-                    <div class="tl-text">Пролистай конспект один раз. Посмотри формулы/правила. После 20:00 — не учишься. Поешь нормально, ложись раньше, не сиди в телефоне до 2 ночи.</div>
-                    <div class="tl-tags">
-                        <span class="tl-tag" style="background:rgba(134,239,172,0.12);color:#86efac;">20 мин макс</span>
-                        <span class="tl-tag" style="background:rgba(134,239,172,0.12);color:#86efac;">Сон 8+ часов</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tl-item">
-                <div class="tl-dot red"></div>
-                <div class="tl-content">
-                    <div class="tl-when" style="color:#f87171;">день теста</div>
-                    <div class="tl-title">Утро решает</div>
-                    <div class="tl-text">Позавтракай — мозг без еды не работает. Пробегись по ключевым формулам/словам (5–10 мин). Выходи заранее чтобы не нервничать. Во время теста — сначала лёгкие задания.</div>
-                    <div class="tl-tags">
-                        <span class="tl-tag" style="background:rgba(248,113,113,0.12);color:#f87171;">Завтрак обязателен</span>
-                        <span class="tl-tag" style="background:rgba(248,113,113,0.12);color:#f87171;">Воду с собой</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ METHODS ══ -->
-        <div class="st-h">🧠 Техники которые реально работают</div>
-
-        <div class="methods-grid">
-            <div class="method-card">
-                <span class="method-icon">🃏</span>
-                <div class="method-name">Active Recall</div>
-                <span class="method-badge badge-gold">⭐ #1 техника</span>
-                <div class="method-text">Закрой книгу и попробуй воспроизвести всё что знаешь. Именно попытка вспомнить — а не перечитывание — заставляет мозг запоминать.</div>
-                <div class="method-how">→ Сделай карточки. Прочитай тему → закрой → перескажи вслух</div>
-            </div>
-            <div class="method-card">
-                <span class="method-icon">🔁</span>
-                <div class="method-name">Spaced Repetition</div>
-                <span class="method-badge badge-purple">Научно доказано</span>
-                <div class="method-text">Повторяй материал через промежутки: через 1 день, 3 дня, неделю, месяц. Мозг забывает — и именно в момент забывания повторение работает лучше всего.</div>
-                <div class="method-how">→ Anki (приложение) делает это автоматически</div>
-            </div>
-            <div class="method-card">
-                <span class="method-icon">🍅</span>
-                <div class="method-name">Pomodoro</div>
-                <span class="method-badge badge-pink">Против прокрастинации</span>
-                <div class="method-text">25 мин полной концентрации → 5 мин пауза. После 4 блоков — 20 мин большая пауза. Телефон убираешь физически в другую комнату.</div>
-                <div class="method-how">→ Используй любой таймер. Попробуй Forest app</div>
-            </div>
-            <div class="method-card">
-                <span class="method-icon">🗣️</span>
-                <div class="method-name">Feynman Technique</div>
-                <span class="method-badge badge-green">Для понимания</span>
-                <div class="method-text">Объясни тему так, будто рассказываешь это 10-летнему ребёнку. Если не можешь объяснить просто — значит сам не понял. Возвращайся и разбирайся.</div>
-                <div class="method-how">→ Говори вслух. Или записывай объяснение</div>
-            </div>
-            <div class="method-card">
-                <span class="method-icon">🗺️</span>
-                <div class="method-name">Mind Map</div>
-                <span class="method-badge badge-purple">Для связей</span>
-                <div class="method-text">В центре — главная тема, от неё ветки с подтемами. Помогает увидеть как всё связано и быстро повторить большую тему за 5 минут.</div>
-                <div class="method-how">→ Нарисуй от руки. Или используй Miro/Canva</div>
-            </div>
-            <div class="method-card">
-                <span class="method-icon">✍️</span>
-                <div class="method-name">Писать от руки</div>
-                <span class="method-badge badge-gold">Недооценённое</span>
-                <div class="method-text">Писать от руки запоминается в 1,5 раза лучше чем печатать. Мозг обрабатывает информацию глубже когда пишет медленно и выбирает что записать.</div>
-                <div class="method-how">→ Конспект от руки. Потом перепиши кратко своими словами</div>
-            </div>
-        </div>
-
-        <!-- ══ DO / DON'T ══ -->
-        <div class="st-h">✅ Что делать и что нет</div>
-        <div class="do-dont">
-            <div class="do-box">
-                <h3>✅ Делай</h3>
-                <div class="dd-item"><span class="dd-icon">🎯</span>Начинай с самого сложного пока голова свежая</div>
-                <div class="dd-item"><span class="dd-icon">📵</span>Убирай телефон физически перед учёбой</div>
-                <div class="dd-item"><span class="dd-icon">💤</span>Спи 8 часов — память consolidates во сне</div>
-                <div class="dd-item"><span class="dd-icon">💧</span>Пей воду во время учёбы</div>
-                <div class="dd-item"><span class="dd-icon">🗣️</span>Объясняй темы вслух — это лучшая проверка</div>
-                <div class="dd-item"><span class="dd-icon">📝</span>Делай конспекты своими словами</div>
-                <div class="dd-item"><span class="dd-icon">⏸️</span>Делай паузы каждые 25–45 минут</div>
-                <div class="dd-item"><span class="dd-icon">🌿</span>Учись при естественном свете когда можно</div>
-            </div>
-            <div class="dont-box">
-                <h3>❌ Не делай</h3>
-                <div class="dd-item"><span class="dd-icon">📖</span>Не перечитывай одно и то же — это иллюзия учёбы</div>
-                <div class="dd-item"><span class="dd-icon">🌙</span>Не учи ночью перед тестом — только хуже</div>
-                <div class="dd-item"><span class="dd-icon">📱</span>Не учись с телефоном рядом — даже выключенным</div>
-                <div class="dd-item"><span class="dd-icon">🎵</span>Не слушай музыку с текстом — мешает обработке</div>
-                <div class="dd-item"><span class="dd-icon">⚡</span>Не учи всё в последний день — не поможет</div>
-                <div class="dd-item"><span class="dd-icon">🛋️</span>Не учись лёжа в кровати — засыпаешь и не запоминаешь</div>
-                <div class="dd-item"><span class="dd-icon">📋</span>Не копируй конспект дословно — пиши своими словами</div>
-                <div class="dd-item"><span class="dd-icon">☕</span>Не пей много кофе — тревожность мешает запоминать</div>
-            </div>
-        </div>
-
-        <!-- ══ BY SUBJECT ══ -->
-        <div class="st-h">📚 По предметам — как учить именно это</div>
-        <div class="subj-tips">
-            <div class="st-card">
-                <div class="st-card-head">
-                    <span class="st-card-icon">🧮</span>
-                    <span class="st-card-title">Mathematik</span>
-                </div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#fbbf24;"></div><div class="st-tip-text"><strong>Решай примеры</strong> — не читай теорию, просто решай. Маша учится только через практику</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#fbbf24;"></div><div class="st-tip-text">Записывай формулы на карточки — и воспроизводи их без подсказки</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#fbbf24;"></div><div class="st-tip-text">Разбирай ошибки — не просто посмотри правильный ответ, а пойми почему ошиблась</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#fbbf24;"></div><div class="st-tip-text">Не заучивай правила — решай достаточно примеров и правила запомнятся сами</div></div>
-                <div style="margin-top:0.7rem;">
-                    <div class="chips">
-                        <span class="chip">Примеры > теория</span>
-                        <span class="chip">Разбирай ошибки</span>
-                    </div>
-                </div>
-            </div>
-            <div class="st-card">
-                <div class="st-card-head">
-                    <span class="st-card-icon">🇩🇪</span>
-                    <span class="st-card-title">Deutsch</span>
-                </div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#86efac;"></div><div class="st-tip-text"><strong>Грамматику</strong> учи через примеры предложений — не сухие правила</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#86efac;"></div><div class="st-tip-text">Слова учи в контексте — не изолированно. "der Hund beißt" а не просто "beißen"</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#86efac;"></div><div class="st-tip-text">Для диктанта — пиши слова 5–7 раз от руки, потом проверяй</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#86efac;"></div><div class="st-tip-text">Читай вслух — помогает и произношению и запоминанию</div></div>
-                <div style="margin-top:0.7rem;">
-                    <div class="chips">
-                        <span class="chip">Контекст важен</span>
-                        <span class="chip">Писать от руки</span>
-                    </div>
-                </div>
-            </div>
-            <div class="st-card">
-                <div class="st-card-head">
-                    <span class="st-card-icon">🇬🇧</span>
-                    <span class="st-card-title">Englisch</span>
-                </div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#93c5fd;"></div><div class="st-tip-text"><strong>Слова учи группами</strong> по теме (еда, природа, работа) — так проще запомнить</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#93c5fd;"></div><div class="st-tip-text">Для текста — сначала прочитай вопросы, потом ищи ответы. Не читай весь текст сразу</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#93c5fd;"></div><div class="st-tip-text">Времена учи по примерам и timeline — рисуй линию времени</div></div>
-                <div class="st-tip"><div class="st-tip-dot" style="background:#93c5fd;"></div><div class="st-tip-text">Смотри что-то на английском каждый день — даже 10 минут TikTok</div></div>
-                <div style="margin-top:0.7rem;">
-                    <div class="chips">
-                        <span class="chip">Тематические группы</span>
-                        <span class="chip">Immersion</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ BRAIN CARE ══ -->
-        <div class="st-h">💜 Что помогает мозгу запоминать</div>
-        <div class="brain-grid">
-            <div class="brain-card">
-                <span class="brain-icon">😴</span>
-                <div class="brain-title">Сон 8 часов</div>
-                <div class="brain-text">Во сне мозг переносит знания из краткосрочной памяти в долгосрочную. Без сна учёба = выброшенное время</div>
-            </div>
-            <div class="brain-card">
-                <span class="brain-icon">🚶‍♀️</span>
-                <div class="brain-title">Прогулка</div>
-                <div class="brain-text">20 мин ходьбы улучшают концентрацию на 2 часа. Лучший перерыв — не TikTok, а выйти на воздух</div>
-            </div>
-            <div class="brain-card">
-                <span class="brain-icon">💧</span>
-                <div class="brain-title">Вода</div>
-                <div class="brain-text">Обезвоживание на 2% снижает концентрацию на 20%. Стакан воды рядом — обязателен</div>
-            </div>
-            <div class="brain-card">
-                <span class="brain-icon">🍌</span>
-                <div class="brain-title">Нормальная еда</div>
-                <div class="brain-text">Мозг работает на глюкозе. Завтрак перед тестом — не опционально. Орехи, фрукты — отличный перекус</div>
-            </div>
-            <div class="brain-card">
-                <span class="brain-icon">📵</span>
-                <div class="brain-title">Без телефона</div>
-                <div class="brain-text">Уведомление прерывает концентрацию на 23 минуты. Не на беззвучный — именно убрать физически</div>
-            </div>
-            <div class="brain-card">
-                <span class="brain-icon">🎵</span>
-                <div class="brain-title">Правильная музыка</div>
-                <div class="brain-text">Инструменталы, lo-fi, природные звуки — ок. Музыка с текстом — мешает. Тишина — тоже хорошо</div>
-            </div>
-        </div>
-
-        <!-- ══ LINK TO LANGUAGE PAGE ══ -->
-        <div class="st-h" style="border-color:rgba(99,179,237,0.2);">🌍 Хочешь выучить язык?</div>
-        <a href="how-to-learn-language.html" style="text-decoration:none;display:block;">
-            <div style="background:rgba(99,179,237,0.07);border:1px solid rgba(99,179,237,0.25);border-radius:14px;padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1.2rem;transition:border-color 0.2s,box-shadow 0.2s;" onmouseover="this.style.borderColor='rgba(99,179,237,0.5)';this.style.boxShadow='0 6px 24px rgba(99,179,237,0.1)'" onmouseout="this.style.borderColor='rgba(99,179,237,0.25)';this.style.boxShadow='none'">
-                <span style="font-size:2rem;">🌍</span>
-                <div>
-                    <div style="font-size:0.97rem;font-weight:800;color:#fff;margin-bottom:0.2rem;">Как выучить язык</div>
-                    <div style="font-size:0.84rem;color:rgba(160,210,250,0.7);">Погружение, shadowing, грамматика без зубрёжки и реалистичный план по времени</div>
-                </div>
-                <span style="margin-left:auto;color:rgba(99,179,237,0.5);font-size:1.2rem;">→</span>
-            </div>
-        </a>
-
-        <div style="text-align:center;margin-top:3rem;color:rgba(192,132,252,0.35);font-size:0.8rem;letter-spacing:0.08em;">
-            ✦ progress over perfection · один тест за раз ✦
-        </div>
-
+  <!-- ══ HERO ══ -->
+  <header style="position:relative;padding:var(--space-8) var(--space-4) var(--space-6);overflow:hidden;">
+    <div style="position:absolute;top:-10px;right:-70px;width:160px;height:160px;border-radius:50%;background:var(--color-accent-2-100);z-index:0;"></div>
+    <div style="position:relative;z-index:1;max-width:640px;">
+      <span class="tag tag-accent">✦ study smarter, not harder</span>
+      <h1 style="margin-top:var(--space-3);font-size:clamp(2.4rem,5vw,3.6rem);color:var(--color-text);">Как учиться</h1>
+      <p style="font-style:italic;font-size:17px;color:color-mix(in srgb, var(--color-text) 60%, transparent);margin:0;">не учись больше — учись правильно</p>
     </div>
+  </header>
+
+  <div style="padding:0 var(--space-4);position:relative;z-index:1;">
+
+    <!-- ══ DO / DON'T ══ -->
+    <section style="margin-bottom:var(--space-8);">
+      <span class="tag tag-accent-2">Основы</span>
+      <h2 style="margin-top:var(--space-2);">Что делать и что нет</h2>
+      <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-top:var(--space-4);">
+
+        <div class="card elev-sm st-card" style="background:var(--color-accent-2-100);">
+          <h3 style="color:var(--color-accent-2-800);">Делай</h3>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Начинай с самого сложного, пока голова свежая</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></span><span>Убирай телефон физически перед учёбой</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span>Спи 8 часов — память консолидируется во сне</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span><span>Пей воду во время учёбы</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></span><span>Объясняй темы вслух — это лучшая проверка</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg></span><span>Делай конспекты своими словами</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></span><span>Делай паузы каждые 25–45 минут</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-2-200);color:var(--color-accent-2-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span><span>Учись при естественном свете, когда можно</span></div>
+        </div>
+
+        <div class="card elev-sm st-card" style="background:var(--color-accent-100);">
+          <h3 style="color:var(--color-accent-800);">Не делай</h3>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>Не перечитывай одно и то же — это иллюзия учёбы</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span>Не учи ночью перед тестом — только хуже</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></span><span>Не учись с телефоном рядом — даже выключенным</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Не слушай музыку с текстом — мешает обработке</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span><span>Не учи всё в последний день — не поможет</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></span><span>Не учись лёжа в кровати — засыпаешь и не запоминаешь</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg></span><span>Не копируй конспект дословно — пиши своими словами</span></div>
+          <div class="st-dd-item"><span class="st-dd-icon" style="background:var(--color-accent-200);color:var(--color-accent-800);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M16 8h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1"/></svg></span><span>Не пей много кофе — тревожность мешает запоминать</span></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══ BRAIN CARE ══ -->
+    <section style="margin-bottom:var(--space-8);">
+      <span class="tag tag-accent">Физиология</span>
+      <h2 style="margin-top:var(--space-2);">Что помогает мозгу запоминать</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--space-3);margin-top:var(--space-4);">
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:40px;height:40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg></span>
+          <div class="card-title">Прогулка</div>
+          <p class="card-body">20 минут ходьбы улучшают концентрацию на 2 часа. Лучший перерыв — не TikTok, а выйти на воздух.</p>
+        </div>
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:40px;height:40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></span>
+          <div class="card-title">Нормальная еда</div>
+          <p class="card-body">Мозг работает на глюкозе — на голодный желудок концентрация падает. Лёгкий белковый перекус держит энергию дольше, чем сладкое.</p>
+        </div>
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:40px;height:40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+          <div class="card-title">Правильная музыка</div>
+          <p class="card-body">Инструменталы, lo-fi, природные звуки — ок. Музыка с текстом мешает. Тишина — тоже хорошо.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ JAPANESE WAY ══ -->
+    <section style="margin-bottom:var(--space-8);">
+      <span class="tag tag-accent-2">Философия</span>
+      <h2 style="margin-top:var(--space-2);">Японский путь обучения — 8 привычек вместо выгорания</h2>
+
+      <div class="card" style="background:var(--color-accent-2-100);border-left:4px solid var(--color-accent-2);border-radius:var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-sm);margin-top:var(--space-4);">
+        <p style="font-style:italic;font-size:16px;margin:0;color:var(--color-accent-2-800);">«Шесть часов за одним столом — и ни слова в голове. Дело не в тебе. Дело в системе, которой тебя научили учиться.»</p>
+      </div>
+
+      <p style="margin-top:var(--space-4);color:color-mix(in srgb, var(--color-text) 75%, transparent);max-width:70ch;">Главный миф: чем больше часов и чем сильнее устала вечером — тем продуктивнее день. Это неправда. В Японии обучение встроено в культуру как путь («-до»: кендо — путь меча, садо — путь чая, шодо — путь письма). Вот 8 принципов, которыми пользуются лучшие студентки Японии, чтобы запоминать больше за меньшее время и не выгорать перед экзаменами.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);margin-top:var(--space-4);">
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c0-4.4-2-6.4-2-10a4 4 0 0 1 8 0c0 3.6-2 5.6-2 10"/><path d="M9.5 9c-1.4-.8-2.5-2.4-2.5-4.5C7 2 8 2 9 2c2 0 3.6 1.2 4 3"/></svg></span>
+          <div class="card-title">Кайдзен — правило 1%</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Постоянство &gt; марафон</span>
+          <p class="card-body">Без повторения мозг теряет 70% выученного за сутки (кривая Эббингауза). 30 минут осмысленного повторения каждый день дают больше, чем восьмичасовой марафон накануне: долгосрочная память формируется во сне, а не за одну ночь на кофе и панике.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: возьми тему недельной давности и 10 минут активно вспоминай её без конспекта. Проверяй себя только после попытки.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/></svg></span>
+          <div class="card-title">Икигай — ради чего</div>
+          <span class="tag tag-accent" style="width:fit-content;">Твоя опора</span>
+          <p class="card-body">Учиться «потому что надо» — значит сдаться при первом же поводе. Икигай — честный ответ на вопрос «зачем мне это на самом деле». Когда в 23:00 хочется всё бросить, у тебя есть за что ухватиться.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: напиши одно личное предложение «зачем я это учу» — не «чтобы сдать». Перечитывай его именно в момент, когда хочется бросить.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
+          <div class="card-title">Хара Хачи Бу — правило 80%</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Стоп до предела</span>
+          <p class="card-body">На Окинаве едят до 80% сытости — и живут дольше всех в мире. С учёбой так же: после 45–60 минут концентрации запоминание резко падает. Заниматься «через силу ещё часик» — это лить воду в уже полный стакан.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: блоки по 45–50 минут, после таймера — полноценная пауза без чувства вины. Останавливайся, пока ещё есть запас.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg></span>
+          <div class="card-title">Синрин-йоку — пауза без экрана</div>
+          <span class="tag tag-accent" style="width:fit-content;">Настоящий отдых</span>
+          <p class="card-body">Скроллинг на перерыве — не отдых, а ещё более интенсивная стимуляция: возвращаешься к учебнику ещё более уставшей. Паузы без экрана включают «сеть пассивного режима» мозга — ту самую, что рождает внезапные озарения в душе или на прогулке.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: 10 минут без экранов между блоками — посмотри в окно, пройдись, потянись, медленно выпей воды. Что угодно, кроме телефона.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg></span>
+          <div class="card-title">Ваби-саби — некрасивый конспект</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Против перфекционизма</span>
+          <p class="card-body">40 минут на пастельные маркеры и оформление — фальшивая продуктивность. Кривая интеллект-карта за 3 минуты, которая реально отражает связи в голове, полезнее идеального summary, переписанного слово в слово. Зачёркивания и правки — это не сбой, так выглядит настоящая учёба.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: разреши одной странице остаться некрасивой, но правдивой. Точность важнее эстетики.</p>
+        </div>
+
+        <div class="card elev-sm st-card" style="border:1px solid var(--color-accent);">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
+          <div class="card-title">Гаман — без ментальной драмы</div>
+          <span class="tag tag-outline" style="width:fit-content;">★ Самая важная</span>
+          <p class="card-body">Самая большая потеря времени — не незнание, а драма до начала: «сегодня не то настроение», «начну позже». У лучших студенток не больше силы воли — у них меньше внутренних переговоров перед стартом. Это не про игнор усталости: правило 80% никто не отменял.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание — правило 2 минут: пообещай себе ровно 2 минуты по таймеру, не час и не весь раздел. Драма исчезает, как только начинается реальное действие.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <div class="card-title">Омоияри — объясняй другим</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Помощь = учёба</span>
+          <p class="card-body">Объяснение вслух мгновенно показывает пробелы — места, которые «казались понятными», а были заучены поверхностно. Помогая однокласснице, ты сама пересматриваешь материал и находишь свои слепые зоны. Прятать конспекты от «конкуренток» — вредить себе.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: объясни одну сложную тему вслух — реальному или воображаемому собеседнику. Где запнулась — там твой настоящий пробел.</p>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span>
+          <div class="card-title">Кинцуги — золотая трещина</div>
+          <span class="tag tag-accent" style="width:fit-content;">Про неудачи</span>
+          <p class="card-body">В Японии разбитую керамику чинят золотом — вещь становится ценнее, а трещину не прячут. Проваленный тест — не клеймо, а данные. В топ-1% попадают не те, кто никогда не проваливался, а те, кто превращает каждую неудачу в информацию для следующей попытки.</p>
+          <p style="font-size:12px;font-style:italic;color:color-mix(in srgb, var(--color-text) 60%, transparent);border-top:1px solid var(--color-divider);padding-top:var(--space-2);margin:0;">→ Задание: перед тем как убрать плохую работу в стол, 5 минут честно разбери, какая привычка сломалась: всё оставила на последний момент? Занималась без пауз до истощения? Украшала конспект вместо повторения? Или тема просто новая и сложная — и это ничего не говорит о твоём уме.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══ TEST PLAN ══ -->
+    <section style="margin-bottom:var(--space-8);">
+      <span class="tag tag-accent">План</span>
+      <h2 style="margin-top:var(--space-2);">План подготовки к тесту — по шагам</h2>
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-4);">
+
+        <div class="card elev-sm st-card" style="flex-direction:row;align-items:flex-start;gap:var(--space-4);">
+          <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);flex-shrink:0;">1</span>
+          <div>
+            <div class="card-title">За 7 дней — разбей материал</div>
+            <p class="card-body" style="margin:0;">Раздели темы на дни. Начни с самой сложной, пока времени ещё много.</p>
+          </div>
+        </div>
+
+        <div class="card elev-sm st-card" style="flex-direction:row;align-items:flex-start;gap:var(--space-4);">
+          <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);flex-shrink:0;">2</span>
+          <div>
+            <div class="card-title">За 6–4 дня — активное повторение</div>
+            <p class="card-body" style="margin:0;">Блоки по 45 минут, без телефона. Объясняй темы вслух, не просто перечитывай.</p>
+          </div>
+        </div>
+
+        <div class="card elev-sm st-card" style="flex-direction:row;align-items:flex-start;gap:var(--space-4);">
+          <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);flex-shrink:0;">3</span>
+          <div>
+            <div class="card-title">За 3–2 дня — практика</div>
+            <p class="card-body" style="margin:0;">Решай прошлые тесты и примеры заданий. Отмечай слабые места для повторения.</p>
+          </div>
+        </div>
+
+        <div class="card elev-sm st-card" style="flex-direction:row;align-items:flex-start;gap:var(--space-4);">
+          <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);flex-shrink:0;">4</span>
+          <div>
+            <div class="card-title">Накануне — лёгкий повтор и сон</div>
+            <p class="card-body" style="margin:0;">Просмотри только конспект, без новых тем. Ложись спать вовремя — сон важнее ещё одного часа зубрёжки.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══ LINK TO LANGUAGE PAGE ══ -->
+    <a href="how-to-learn-language.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="card elev-sm st-card" style="flex-direction:row;align-items:center;gap:var(--space-4);background:var(--color-surface);">
+        <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:48px;height:48px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <div style="flex:1;">
+          <div class="card-title">Хочешь выучить язык?</div>
+          <p class="card-body" style="margin:0;">Погружение, shadowing, грамматика без зубрёжки и реалистичный план по времени</p>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <p style="text-align:center;margin-top:var(--space-8);color:color-mix(in srgb, var(--color-text) 45%, transparent);font-size:13px;letter-spacing:0.04em;">✦ progress over perfection · один тест за раз ✦</p>
+
+  </div>
+</div>
+
 </body>
 </html>
