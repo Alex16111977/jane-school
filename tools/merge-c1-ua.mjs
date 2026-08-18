@@ -22,7 +22,7 @@ const decodeEnt = s => String(s==null?'':s).replace(/&#x[0-9a-fA-F]+;/g,'').repl
 const clean = s => decodeEnt(s).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
 
 function extractExtras(html){ const m='window.C1_EXTRAS=';const i=html.indexOf(m);const s=i+m.length;const e=html.indexOf('</script>',s);let lit=html.slice(s,e).trim();if(lit.endsWith(';'))lit=lit.slice(0,-1);return JSON.parse(lit); }
-function parseDayCards(html,day){ const open=html.indexOf('data-day="'+day+'">');if(open<0)return[];const next=html.indexOf('data-day="'+(day+1)+'">',open+1);const block=html.slice(open,next<0?html.length:next);const re=/<div class="fcard-num">#(\d+)<\/div>/g;const nums=[];let m;while((m=re.exec(block))!==null)nums.push(parseInt(m[1],10));return nums; }
+function parseDayCards(html,day){ const at=d=>{const m=new RegExp('<div class="day-content[^"]*" data-day="'+d+'">').exec(html);return m?m.index:-1;};const open=at(day);if(open<0)return[];const next=at(day+1);const block=html.slice(open,next<0?html.length:next);const re=/<div class="fcard-num">#(\d+)<\/div>/g;const nums=[];let m;while((m=re.exec(block))!==null)nums.push(parseInt(m[1],10));return nums; }
 
 const html = fs.readFileSync(HTML,'utf8');
 const extras = extractExtras(html);
