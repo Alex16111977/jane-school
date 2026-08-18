@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling rules and short forms | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag { display:inline-block; font-size:0.65rem; font-weight:800; padding:0.12rem 0.5rem; border-radius:6px; margin-right:0.35rem; vertical-align:middle; letter-spacing:0.03em; }
+        .t-pl  { background: rgba(68,147,248,0.16);  color:#79b8ff; }
+        .t-un  { background: rgba(63,185,80,0.16);   color:#56d364; }
+        .t-sg  { background: rgba(245,158,11,0.16);  color:#fbbf24; }
+        .t-bad { background: rgba(248,81,73,0.16);   color:#ff8080; }
+        .t-ok  { background: rgba(163,113,247,0.16); color:#c8a5ff; }
+
+        .two-cols { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+        @media (max-width:620px){ .two-cols{ grid-template-columns:1fr; } }
+        .cbox { border-radius:12px; padding:0.9rem 1rem; }
+        .cbox-pl { background: rgba(68,147,248,0.08); border:1px solid rgba(68,147,248,0.22); }
+        .cbox-un { background: rgba(63,185,80,0.08);  border:1px solid rgba(63,185,80,0.22); }
+        .cbox-bad{ background: rgba(248,81,73,0.08);  border:1px solid rgba(248,81,73,0.22); }
+        .cbox-t  { font-size:0.95rem; font-weight:800; margin-bottom:0.45rem; }
+        .cbox-pl .cbox-t { color:#79b8ff; }
+        .cbox-un .cbox-t { color:#56d364; }
+        .cbox-bad .cbox-t{ color:#ff8080; }
+        .cbox ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.3rem; }
+        .cbox li { font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.45; }
+
+        .pair-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+        @media (max-width:620px){ .pair-grid{ grid-template-columns:1fr; } }
+        .pair-cell { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.83rem; line-height:1.5; }
+        .pair-cell .lbl { display:block; font-size:0.66rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.3rem; opacity:0.85; }
+        .pair-cell.pos .lbl { color:#56d364; }
+        .pair-cell.neg .lbl { color:#ff8080; }
+        .pair-cell.mid .lbl { color:#fbbf24; }
+        .pair-cell .ru { display:block; color:rgba(255,255,255,0.45); font-size:0.76rem; margin-top:0.15rem; }
+
+        .pattern-row { display:flex; gap:0.8rem; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.84rem; }
+        .pattern-row:last-child { border-bottom:none; }
+        .pattern-name { flex-shrink:0; width:200px; font-weight:700; color:#79b8ff; font-size:0.78rem; }
+        .pattern-ex { flex:1; color:rgba(255,255,255,0.78); }
+        .pattern-ex b { color:#fff; }
+        @media (max-width:620px){ .pattern-row{ flex-direction:column; gap:0.15rem; } .pattern-name{ width:auto; } }
+
+        .mini-note { font-size:0.78rem; color:rgba(255,255,255,0.5); line-height:1.55; margin-top:0.5rem; }
+        .word-chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
+        .wchip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; color:rgba(255,255,255,0.8); }
+        .wchip b { color:#79b8ff; }
+
+        .form-box { background:rgba(163,113,247,0.07); border:1px solid rgba(163,113,247,0.25); border-radius:12px; padding:0.7rem 0.95rem; margin:0.6rem 0; font-size:0.9rem; color:#e6ddff; text-align:center; font-weight:700; letter-spacing:0.01em; }
+        .form-box b { color:#c8a5ff; }
+
+        .vlist { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; }
+        .vrow { display:flex; gap:0.7rem; align-items:baseline; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:0.45rem 0.7rem; font-size:0.82rem; line-height:1.45; }
+        .vrow .vw { flex-shrink:0; width:190px; font-weight:800; color:#79b8ff; }
+        .vrow .vx { flex:1; color:rgba(255,255,255,0.8); }
+        .vrow .vx i { color:rgba(255,255,255,0.45); font-style:normal; }
+        @media (max-width:620px){ .vrow{ flex-direction:column; gap:0.15rem; } .vrow .vw{ width:auto; } }
+
+        .drill { margin-top:0.5rem; }
+        .drill-item { padding:0.5rem 0; border-bottom:1px dashed rgba(255,255,255,0.09); font-size:0.86rem; line-height:1.6; }
+        .drill-item:last-child { border-bottom:none; }
+        .sol { color:#56d364; font-weight:700; cursor:pointer; border-bottom:1px dotted rgba(86,211,100,0.5); }
+        .sol.hidden-sol { color:transparent; background:rgba(255,255,255,0.09); border-radius:4px; padding:0 0.4rem; border-bottom:none; }
+        .drill-hint { color:rgba(255,255,255,0.42); font-size:0.78rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Spelling</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Правила написания</h1>
+            <p class="page-subtitle">Куда исчезает -e, когда удваивается согласная, что делать с -y &middot; и все короткие формы I'm / he's / 'd</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="ses">-s / -es</button>
+            <button class="tab" data-tab="ing">-ing и -ed</button>
+            <button class="tab" data-tab="erly">-er / -est / -ly</button>
+            <button class="tab" data-tab="short">Короткие формы</button>
+            <button class="tab" data-tab="drill">Тренировка</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+
+        <!-- ============ TAB 1 ============ -->
+        <div class="tab-content active" id="tab-ses">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F524;</span>
+                    <div>
+                        <h2>Окончание -s / -es</h2>
+                        <p class="lesson-header-sub">Множественное число и he/she/it &mdash; правила одни и те же</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Базовое правило:</strong> просто <strong>-s</strong>. Но после шипящих и свистящих нужен «лишний слог» &rarr; <strong>-es</strong>.</p>
+                    <table class="unit-table" style="margin-top:0.5rem;">
+                        <tr><th>Конец слова</th><th>Окончание</th><th>Примеры</th></tr>
+                        <tr><td>-s, -ss, -sh, -ch, -x</td><td><strong>-es</strong></td><td>bus/bus<strong>es</strong> &middot; miss/miss<strong>es</strong> &middot; wash/wash<strong>es</strong> &middot; match/match<strong>es</strong> &middot; box/box<strong>es</strong></td></tr>
+                        <tr><td>-o (у части слов)</td><td><strong>-es</strong></td><td>potato/potato<strong>es</strong> &middot; tomato/tomato<strong>es</strong> &middot; do/do<strong>es</strong> &middot; go/go<strong>es</strong></td></tr>
+                        <tr><td>согласная + -y</td><td><strong>y &rarr; ies</strong></td><td>baby/bab<strong>ies</strong> &middot; story/stor<strong>ies</strong> &middot; country/countr<strong>ies</strong> &middot; try/tr<strong>ies</strong> &middot; study/stud<strong>ies</strong></td></tr>
+                        <tr><td>гласная + -y</td><td>просто <strong>-s</strong></td><td>play/play<strong>s</strong> &middot; monkey/monkey<strong>s</strong> &middot; enjoy/enjoy<strong>s</strong> &middot; buy/buy<strong>s</strong></td></tr>
+                        <tr><td>всё остальное</td><td><strong>-s</strong></td><td>book<strong>s</strong> &middot; idea<strong>s</strong> &middot; work<strong>s</strong> &middot; live<strong>s</strong></td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F511; Главный вопрос: <strong>что стоит перед y</strong> &mdash; согласная (city &rarr; cities) или гласная (day &rarr; days)? Гласные: a e i o u.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x26A0;&#xFE0F; Особые случаи множественного числа</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">-f / -fe &rarr; -ves</span><span class="vx">knife/kni<b>ves</b> &middot; life/li<b>ves</b> &middot; wife/wi<b>ves</b> &middot; shelf/shel<b>ves</b> &middot; leaf/lea<b>ves</b> &middot; half/hal<b>ves</b></span></div>
+                        <div class="vrow"><span class="vw">но не всегда</span><span class="vx">roof/roof<b>s</b> &middot; chief/chief<b>s</b> &middot; belief/belief<b>s</b></span></div>
+                        <div class="vrow"><span class="vw">без -s вообще</span><span class="vx">man/m<b>e</b>n &middot; woman/wom<b>e</b>n &middot; child/child<b>ren</b> &middot; foot/f<b>ee</b>t &middot; tooth/t<b>ee</b>th &middot; mouse/m<b>i</b>ce</span></div>
+                        <div class="vrow"><span class="vw">форма не меняется</span><span class="vx">sheep &middot; fish &middot; series &middot; species &middot; aircraft</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2 ============ -->
+        <div class="tab-content" id="tab-ing">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270F;&#xFE0F;</span>
+                    <div>
+                        <h2>-ing и -ed</h2>
+                        <p class="lesson-header-sub">Три правила: выброси -e, удвой согласную, поменяй -y</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>1&#xFE0F;&#x20E3; Глагол кончается на -e &rarr; убираем e перед -ing</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">-e &rarr; -ing</span><span class="vx">hope &rarr; hop<b>ing</b> &middot; smile &rarr; smil<b>ing</b> &middot; dance &rarr; danc<b>ing</b> &middot; write &rarr; writ<b>ing</b> &middot; make &rarr; mak<b>ing</b></span></div>
+                        <div class="vrow"><span class="vw">-e &rarr; -ed</span><span class="vx">hope &rarr; hope<b>d</b> &middot; smile &rarr; smile<b>d</b> &middot; dance &rarr; dance<b>d</b> <i>(добавляем только -d)</i></span></div>
+                        <div class="vrow"><span class="vw">исключения</span><span class="vx">be &rarr; <b>being</b> &middot; see &rarr; <b>seeing</b> &middot; agree &rarr; <b>agreeing</b> <i>(-ee не трогаем)</i></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>2&#xFE0F;&#x20E3; -ie &rarr; -ying</h3>
+                    <div class="word-chips">
+                        <span class="wchip">die &rarr; <b>dying</b></span>
+                        <span class="wchip">lie &rarr; <b>lying</b></span>
+                        <span class="wchip">tie &rarr; <b>tying</b></span>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #a371f7; background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">3&#xFE0F;&#x20E3; Удвоение согласной &mdash; главное правило</h3>
+                    <div class="form-box">гласная + <b>одна</b> согласная на конце &rarr; согласную <b>удваиваем</b></div>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">односложные</span><span class="vx">stop &rarr; sto<b>pp</b>ing / sto<b>pp</b>ed &middot; plan &rarr; pla<b>nn</b>ing &middot; rub &rarr; ru<b>bb</b>ing &middot; swim &rarr; swi<b>mm</b>ing</span></div>
+                        <div class="vrow"><span class="vw">прилагательные</span><span class="vx">big &rarr; bi<b>gg</b>er / bi<b>gg</b>est &middot; wet &rarr; we<b>tt</b>er &middot; thin &rarr; thi<b>nn</b>er &middot; hot &rarr; ho<b>tt</b>er</span></div>
+                    </div>
+                    <p style="font-size:0.86rem;color:rgba(255,255,255,0.78);margin-top:0.7rem;"><strong>Если слогов больше одного</strong> &mdash; удваиваем, только когда <strong>ударение падает на последний слог</strong>:</p>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">&#x2705; ударение в конце &rarr; удваиваем</span>pre<b>FER</b> &rarr; preferring, preferred<br>per<b>MIT</b> &rarr; permitting<br>re<b>GRET</b> &rarr; regretting<br>be<b>GIN</b> &rarr; beginning</div>
+                        <div class="pair-cell mid"><span class="lbl">&#x2716; ударение не в конце &rarr; не удваиваем</span><b>VIS</b>it &rarr; visiting, visited<br>de<b>VEL</b>op &rarr; developing<br><b>HAP</b>pen &rarr; happened<br>re<b>MEM</b>ber &rarr; remembering</div>
+                    </div>
+                    <p class="mini-note">&#x1F1EC;&#x1F1E7; Британская особенность: глаголы на <strong>-l</strong> удваивают её <em>всегда</em> &mdash; travel &rarr; tra<b>vell</b>ing, cancel &rarr; can<b>cell</b>ed. В американском варианте одна l: traveling, canceled.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6AB; Когда НЕ удваиваем</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">две согласные на конце</span><span class="vx">start &rarr; star<b>t</b>ing &middot; help &rarr; help<b>ing</b> &middot; long &rarr; long<b>er</b></span></div>
+                        <div class="vrow"><span class="vw">две гласные перед согласной</span><span class="vx">boil &rarr; boil<b>ing</b> &middot; need &rarr; need<b>ed</b> &middot; explain &rarr; explain<b>ed</b> &middot; cheap &rarr; cheap<b>er</b> &middot; loud &rarr; loud<b>er</b></span></div>
+                        <div class="vrow"><span class="vw">на конце y или w</span><span class="vx">stay &rarr; stay<b>ing</b>, stay<b>ed</b> &middot; grow &rarr; grow<b>ing</b> &middot; new &rarr; new<b>er</b></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; -y в прошедшем времени</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">согласная + y &rarr; ied</span><span class="vx">hurry &rarr; hurr<b>ied</b> &middot; study &rarr; stud<b>ied</b> &middot; apply &rarr; appl<b>ied</b> &middot; try &rarr; tr<b>ied</b></span></div>
+                        <div class="vrow"><span class="vw">гласная + y &rarr; просто -ed</span><span class="vx">play &rarr; play<b>ed</b> &middot; enjoy &rarr; enjoy<b>ed</b> &middot; stay &rarr; stay<b>ed</b></span></div>
+                        <div class="vrow"><span class="vw">перед -ing y НЕ меняется</span><span class="vx">hurry<b>ing</b> &middot; study<b>ing</b> &middot; apply<b>ing</b> &middot; try<b>ing</b></span></div>
+                        <div class="vrow"><span class="vw">неправильные</span><span class="vx">pay &rarr; <b>paid</b> &middot; lay &rarr; <b>laid</b> &middot; say &rarr; <b>said</b></span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3 ============ -->
+        <div class="tab-content" id="tab-erly">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CA;</span>
+                    <div>
+                        <h2>-er / -est и -ly</h2>
+                        <p class="lesson-header-sub">Сравнительная степень и наречия</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C8; -er / -est</h3>
+                    <table class="unit-table">
+                        <tr><th>Тип слова</th><th>Что происходит</th><th>Примеры</th></tr>
+                        <tr><td>обычное</td><td>+ -er / -est</td><td>cheap &rarr; cheap<strong>er</strong> / cheap<strong>est</strong> &middot; quick &rarr; quick<strong>er</strong></td></tr>
+                        <tr><td>кончается на -e</td><td>+ -r / -st</td><td>wide &rarr; wide<strong>r</strong> / wide<strong>st</strong> &middot; late &rarr; late<strong>r</strong> &middot; large &rarr; large<strong>r</strong></td></tr>
+                        <tr><td>согласная + y</td><td>y &rarr; i</td><td>easy &rarr; eas<strong>ier</strong> / eas<strong>iest</strong> &middot; heavy &rarr; heav<strong>ier</strong> &middot; lucky &rarr; luck<strong>ier</strong></td></tr>
+                        <tr><td>гласная + одна согласная</td><td>удвоение</td><td>big &rarr; bi<strong>gg</strong>er &middot; hot &rarr; ho<strong>tt</strong>est &middot; thin &rarr; thi<strong>nn</strong>er</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3C3; Наречие на -ly</h3>
+                    <table class="unit-table">
+                        <tr><th>Прилагательное</th><th>Правило</th><th>Наречие</th></tr>
+                        <tr><td>quick, bright, cheap</td><td>+ -ly</td><td>quick<strong>ly</strong>, bright<strong>ly</strong>, cheap<strong>ly</strong></td></tr>
+                        <tr><td>easy, heavy, temporary</td><td>y &rarr; i + ly</td><td>eas<strong>ily</strong>, heav<strong>ily</strong>, temporar<strong>ily</strong></td></tr>
+                        <tr><td>polite, extreme, absolute</td><td>-e остаётся</td><td>polite<strong>ly</strong>, extreme<strong>ly</strong>, absolute<strong>ly</strong></td></tr>
+                        <tr><td>simple, terrible, reasonable</td><td>-le &rarr; -ly</td><td>sim<strong>ply</strong>, terri<strong>bly</strong>, reasona<strong>bly</strong></td></tr>
+                        <tr><td>true, whole</td><td>e выпадает</td><td><strong>truly</strong>, <strong>wholly</strong> <em>(исключения)</em></td></tr>
+                        <tr><td>basic, tragic (-ic)</td><td>+ -ally</td><td>basic<strong>ally</strong>, tragic<strong>ally</strong> <em>(искл. public &rarr; publicly)</em></td></tr>
+                    </table>
+                    <p class="mini-note">&#x1F4A1; Помни: <strong>good &rarr; well</strong>, а <strong>fast, hard, late, early</strong> вообще не берут -ly. Про пары <em>hard/hardly</em>, <em>late/lately</em> &mdash; на странице <a href="englisch-adjectives.html" style="color:#79b8ff;">Adjectives &amp; Adverbs</a>.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 4 ============ -->
+        <div class="tab-content" id="tab-short">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5DC;&#xFE0F;</span>
+                    <div>
+                        <h2>Короткие формы</h2>
+                        <p class="lesson-header-sub">I'm &middot; he's &middot; they've &middot; I'd &mdash; и где их ставить нельзя</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Полный список</h3>
+                    <table class="unit-table">
+                        <tr><th>Форма</th><th>Что заменяет</th><th>Примеры</th></tr>
+                        <tr><td><strong>'m</strong></td><td>am</td><td>I'm</td></tr>
+                        <tr><td><strong>'s</strong></td><td>is <em>или</em> has</td><td>he's, she's, it's</td></tr>
+                        <tr><td><strong>'re</strong></td><td>are</td><td>you're, we're, they're</td></tr>
+                        <tr><td><strong>'ve</strong></td><td>have</td><td>I've, you've, we've, they've</td></tr>
+                        <tr><td><strong>'ll</strong></td><td>will</td><td>I'll, he'll, she'll, you'll, we'll, they'll</td></tr>
+                        <tr><td><strong>'d</strong></td><td>would <em>или</em> had</td><td>I'd, he'd, she'd, you'd, we'd, they'd</td></tr>
+                    </table>
+                    <div class="pair-grid" style="margin-top:0.6rem;">
+                        <div class="pair-cell pos"><span class="lbl">'s = is</span>She<b>'s</b> ill. <span class="ru">= She is ill</span></div>
+                        <div class="pair-cell mid"><span class="lbl">'s = has</span>She<b>'s</b> gone away. <span class="ru">= She has gone</span></div>
+                        <div class="pair-cell pos"><span class="lbl">'d = would</span>I<b>'d</b> see a doctor if I were you. <span class="ru">= I would see</span></div>
+                        <div class="pair-cell mid"><span class="lbl">'d = had</span>I<b>'d</b> never seen her before. <span class="ru">= I had never seen</span></div>
+                    </div>
+                    <p class="mini-note">Как отличить: после <strong>'s = has</strong> и <strong>'d = had</strong> идёт третья форма глагола (gone, seen). После <strong>'d = would</strong> &mdash; инфинитив (see, go). И отдельно: <strong>let's</strong> = let us.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F517; После вопросительных слов и существительных</h3>
+                    <div class="word-chips">
+                        <span class="wchip">who<b>'s</b></span><span class="wchip">what<b>'s</b></span><span class="wchip">where<b>'s</b></span>
+                        <span class="wchip">how<b>'s</b></span><span class="wchip">that<b>'s</b></span><span class="wchip">there<b>'s</b></span>
+                        <span class="wchip">here<b>'s</b></span><span class="wchip">who<b>'ll</b></span><span class="wchip">there<b>'ll</b></span><span class="wchip">who<b>'d</b></span>
+                    </div>
+                    <div class="vlist" style="margin-top:0.5rem;">
+                        <div class="vrow"><span class="vw">who's = who is</span><span class="vx"><b>Who's</b> that woman over there?</span></div>
+                        <div class="vrow"><span class="vw">what's = what has</span><span class="vx"><b>What's</b> happened?</span></div>
+                        <div class="vrow"><span class="vw">there'll = there will</span><span class="vx">Do you think <b>there'll</b> be many people at the party?</span></div>
+                        <div class="vrow"><span class="vw">после имени</span><span class="vx"><b>Katherine's</b> going out tonight. &middot; My best <b>friend's</b> just got married.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f85149; background:rgba(248,81,73,0.06);">
+                    <h3 style="color:#ff8080;">&#x26A0;&#xFE0F; В конце предложения короткую форму НЕЛЬЗЯ</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">&#x2705;</span>&laquo;Are you tired?&raquo; &mdash; &laquo;Yes, I <b>am</b>.&raquo;</div>
+                        <div class="pair-cell neg"><span class="lbl">&#x274C;</span><s>Yes, I'm.</s></div>
+                        <div class="pair-cell pos"><span class="lbl">&#x2705;</span>Do you know where she <b>is</b>?</div>
+                        <div class="pair-cell neg"><span class="lbl">&#x274C;</span><s>Do you know where she's?</s></div>
+                        <div class="pair-cell pos"><span class="lbl">&#x2705;</span>&laquo;Who's got the keys?&raquo; &mdash; &laquo;I <b>have</b>.&raquo;</div>
+                        <div class="pair-cell neg"><span class="lbl">&#x274C;</span><s>I've.</s></div>
+                    </div>
+                    <p class="mini-note">Причина простая: в конце фразы глагол ударный, а короткая форма безударная.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6AB; Отрицательные короткие формы</h3>
+                    <div class="two-cols">
+                        <div class="cbox cbox-pl">
+                            <div class="cbox-t">be / do / have</div>
+                            <ul>
+                                <li>isn't &middot; aren't &middot; wasn't &middot; weren't</li>
+                                <li>don't &middot; doesn't &middot; didn't</li>
+                                <li>haven't &middot; hasn't &middot; hadn't</li>
+                            </ul>
+                        </div>
+                        <div class="cbox cbox-un">
+                            <div class="cbox-t">модальные</div>
+                            <ul>
+                                <li>can't (= cannot) &middot; couldn't</li>
+                                <li>won't (= will not) &middot; wouldn't</li>
+                                <li>shan't (= shall not) &middot; shouldn't</li>
+                                <li>mustn't &middot; needn't &middot; daren't</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="mini-note">Два варианта отрицания у is/are: <em>he <b>isn't</b></em> = <em>he<b>'s not</b></em>, <em>they <b>aren't</b></em> = <em>they<b>'re not</b></em>. Смысл одинаковый, второй чуть эмоциональнее.<br>
+                    &#x270D;&#xFE0F; В формальном письме (эссе, официальное письмо) короткие формы <strong>не</strong> используют &mdash; пишут <em>do not, will not, it is</em>.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5 ============ -->
+        <div class="tab-content" id="tab-drill">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Тренировка</h2>
+                        <p class="lesson-header-sub">Кликни по серому, чтобы открыть ответ</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A. Напиши форму -ing</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. stop &rarr; <span class="sol">stopping</span> &nbsp;&middot;&nbsp; 2. write &rarr; <span class="sol">writing</span> &nbsp;&middot;&nbsp; 3. lie &rarr; <span class="sol">lying</span></div>
+                        <div class="drill-item">4. begin &rarr; <span class="sol">beginning</span> &nbsp;&middot;&nbsp; 5. visit &rarr; <span class="sol">visiting</span> &nbsp;&middot;&nbsp; 6. travel &rarr; <span class="sol">travelling (BrE) / traveling (AmE)</span></div>
+                        <div class="drill-item">7. see &rarr; <span class="sol">seeing</span> &nbsp;&middot;&nbsp; 8. study &rarr; <span class="sol">studying</span> &nbsp;&middot;&nbsp; 9. swim &rarr; <span class="sol">swimming</span></div>
+                        <div class="drill-item">10. happen &rarr; <span class="sol">happening</span> &nbsp;&middot;&nbsp; 11. prefer &rarr; <span class="sol">preferring</span> &nbsp;&middot;&nbsp; 12. explain &rarr; <span class="sol">explaining</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B. Напиши форму прошедшего времени (-ed)</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. plan &rarr; <span class="sol">planned</span> &nbsp;&middot;&nbsp; 2. study &rarr; <span class="sol">studied</span> &nbsp;&middot;&nbsp; 3. play &rarr; <span class="sol">played</span></div>
+                        <div class="drill-item">4. dance &rarr; <span class="sol">danced</span> &nbsp;&middot;&nbsp; 5. permit &rarr; <span class="sol">permitted</span> &nbsp;&middot;&nbsp; 6. develop &rarr; <span class="sol">developed</span></div>
+                        <div class="drill-item">7. carry &rarr; <span class="sol">carried</span> &nbsp;&middot;&nbsp; 8. enjoy &rarr; <span class="sol">enjoyed</span> &nbsp;&middot;&nbsp; 9. cancel &rarr; <span class="sol">cancelled (BrE)</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C. Сравнительная степень и наречие</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. big &rarr; <span class="sol">bigger / biggest</span> &nbsp;&middot;&nbsp; 2. easy &rarr; <span class="sol">easier / easiest</span></div>
+                        <div class="drill-item">3. large &rarr; <span class="sol">larger / largest</span> &nbsp;&middot;&nbsp; 4. quiet &rarr; <span class="sol">quieter / quietest</span></div>
+                        <div class="drill-item">5. heavy (наречие) &rarr; <span class="sol">heavily</span> &nbsp;&middot;&nbsp; 6. simple &rarr; <span class="sol">simply</span></div>
+                        <div class="drill-item">7. extreme &rarr; <span class="sol">extremely</span> &nbsp;&middot;&nbsp; 8. true &rarr; <span class="sol">truly</span> &nbsp;&middot;&nbsp; 9. basic &rarr; <span class="sol">basically</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>D. Что означает 's / 'd?</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. She's living in Berlin. &rarr; <span class="sol">she IS living</span></div>
+                        <div class="drill-item">2. She's lived there for years. &rarr; <span class="sol">she HAS lived</span></div>
+                        <div class="drill-item">3. I'd like a coffee. &rarr; <span class="sol">I WOULD like</span></div>
+                        <div class="drill-item">4. I'd already left when he called. &rarr; <span class="sol">I HAD already left</span></div>
+                        <div class="drill-item">5. He'd have helped you. &rarr; <span class="sol">he WOULD have helped</span></div>
+                        <div class="drill-item">6. What's happened? &rarr; <span class="sol">what HAS happened</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 6 ============ -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Quiz</h2>
+                        <p class="lesson-header-sub">12 вопросов</p>
+                    </div>
+                </div>
+                <div class="quiz-container">
+
+                    <div class="quiz-question" data-answer="planning" data-why="гласная + одна согласная → удвоение">
+                        <p><strong>1.</strong> We are _____ a trip to Spain.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'planing')">planing</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'planning')">planning</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'planeing')">planeing</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="writing" data-why="перед -ing конечная -e выпадает">
+                        <p><strong>2.</strong> She's _____ a new book.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'writeing')">writeing</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'writing')">writing</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'writting')">writting</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="visited" data-why="ударение не на последнем слоге → без удвоения">
+                        <p><strong>3.</strong> We _____ my grandparents last week.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'visitted')">visitted</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'visited')">visited</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'visitd')">visitd</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="studied" data-why="согласная + y → ied">
+                        <p><strong>4.</strong> He _____ medicine for six years.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'studyed')">studyed</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'studied')">studied</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'studdied')">studdied</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="played" data-why="гласная + y → просто -ed">
+                        <p><strong>5.</strong> They _____ football all afternoon.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'plaied')">plaied</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'played')">played</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'playd')">playd</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="lying" data-why="-ie → -ying">
+                        <p><strong>6.</strong> The cat is _____ on the sofa.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'lieing')">lieing</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'lying')">lying</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'liing')">liing</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="boxes" data-why="после -x нужно -es">
+                        <p><strong>7.</strong> There are three _____ in the hall.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'boxs')">boxs</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'boxes')">boxes</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'boxies')">boxies</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="easily" data-why="согласная + y → i + ly">
+                        <p><strong>8.</strong> He passed the test _____.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'easyly')">easyly</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'easily')">easily</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'easely')">easely</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="simply" data-why="-le → -ly">
+                        <p><strong>9.</strong> It's _____ not true.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'simplely')">simplely</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'simply')">simply</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'simpley')">simpley</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="has" data-why="дальше третья форма → 's = has">
+                        <p><strong>10.</strong> «He's gone home.» &nbsp; 's здесь =</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'is')">is</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'has')">has</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'was')">was</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="had" data-why="дальше третья форма → 'd = had">
+                        <p><strong>11.</strong> «I'd finished before you arrived.» &nbsp; 'd здесь =</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'would')">would</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'had')">had</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'did')">did</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="iam" data-why="в конце фразы короткая форма невозможна">
+                        <p><strong>12.</strong> «Are you ready?» &mdash; «Yes, _____.»</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'im')">I'm</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'iam')">I am</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'imready')">I'm.</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="q-score"></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        document.querySelectorAll('.sol').forEach(s => {
+            s.classList.add('hidden-sol');
+            s.addEventListener('click', () => s.classList.toggle('hidden-sol'));
+        });
+
+        const Q_TOTAL = document.querySelectorAll('.quiz-question').length;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! \u2705';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite \u274C \u2014 ' + (q.dataset.why || '');
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('q-score');
+            if (qDone === Q_TOTAL && scoreEl) {
+                const pct = qScore / Q_TOTAL;
+                if (pct === 1) scoreEl.innerHTML = '\uD83C\uDF1F ' + qScore + '/' + Q_TOTAL + ' \u2014 Perfect!';
+                else if (pct >= 0.8) scoreEl.innerHTML = '\u2705 ' + qScore + '/' + Q_TOTAL + ' \u2014 Great!';
+                else if (pct >= 0.6) scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 Good, \u043f\u043e\u0432\u0442\u043e\u0440\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 \u043f\u0440\u043e\u0439\u0434\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438 \u0435\u0449\u0451 \u0440\u0430\u0437 \uD83D\uDCAA';
+                scoreEl.style.color = pct >= 0.8 ? 'var(--color-green)' : pct >= 0.6 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verb / Adjective / Noun + Preposition | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag { display:inline-block; font-size:0.65rem; font-weight:800; padding:0.12rem 0.5rem; border-radius:6px; margin-right:0.35rem; vertical-align:middle; letter-spacing:0.03em; }
+        .t-pl  { background: rgba(68,147,248,0.16);  color:#79b8ff; }
+        .t-un  { background: rgba(63,185,80,0.16);   color:#56d364; }
+        .t-sg  { background: rgba(245,158,11,0.16);  color:#fbbf24; }
+        .t-bad { background: rgba(248,81,73,0.16);   color:#ff8080; }
+        .t-ok  { background: rgba(163,113,247,0.16); color:#c8a5ff; }
+
+        .two-cols { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+        @media (max-width:620px){ .two-cols{ grid-template-columns:1fr; } }
+        .cbox { border-radius:12px; padding:0.9rem 1rem; }
+        .cbox-pl { background: rgba(68,147,248,0.08); border:1px solid rgba(68,147,248,0.22); }
+        .cbox-un { background: rgba(63,185,80,0.08);  border:1px solid rgba(63,185,80,0.22); }
+        .cbox-bad{ background: rgba(248,81,73,0.08);  border:1px solid rgba(248,81,73,0.22); }
+        .cbox-t  { font-size:0.95rem; font-weight:800; margin-bottom:0.45rem; }
+        .cbox-pl .cbox-t { color:#79b8ff; }
+        .cbox-un .cbox-t { color:#56d364; }
+        .cbox-bad .cbox-t{ color:#ff8080; }
+        .cbox ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.3rem; }
+        .cbox li { font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.45; }
+
+        .pair-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+        @media (max-width:620px){ .pair-grid{ grid-template-columns:1fr; } }
+        .pair-cell { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.83rem; line-height:1.5; }
+        .pair-cell .lbl { display:block; font-size:0.66rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.3rem; opacity:0.85; }
+        .pair-cell.pos .lbl { color:#56d364; }
+        .pair-cell.neg .lbl { color:#ff8080; }
+        .pair-cell.mid .lbl { color:#fbbf24; }
+        .pair-cell .ru { display:block; color:rgba(255,255,255,0.45); font-size:0.76rem; margin-top:0.15rem; }
+
+        .pattern-row { display:flex; gap:0.8rem; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.84rem; }
+        .pattern-row:last-child { border-bottom:none; }
+        .pattern-name { flex-shrink:0; width:200px; font-weight:700; color:#79b8ff; font-size:0.78rem; }
+        .pattern-ex { flex:1; color:rgba(255,255,255,0.78); }
+        .pattern-ex b { color:#fff; }
+        @media (max-width:620px){ .pattern-row{ flex-direction:column; gap:0.15rem; } .pattern-name{ width:auto; } }
+
+        .mini-note { font-size:0.78rem; color:rgba(255,255,255,0.5); line-height:1.55; margin-top:0.5rem; }
+        .word-chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
+        .wchip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; color:rgba(255,255,255,0.8); }
+        .wchip b { color:#79b8ff; }
+
+        .form-box { background:rgba(163,113,247,0.07); border:1px solid rgba(163,113,247,0.25); border-radius:12px; padding:0.7rem 0.95rem; margin:0.6rem 0; font-size:0.9rem; color:#e6ddff; text-align:center; font-weight:700; letter-spacing:0.01em; }
+        .form-box b { color:#c8a5ff; }
+
+        .vlist { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; }
+        .vrow { display:flex; gap:0.7rem; align-items:baseline; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:0.45rem 0.7rem; font-size:0.82rem; line-height:1.45; }
+        .vrow .vw { flex-shrink:0; width:190px; font-weight:800; color:#79b8ff; }
+        .vrow .vx { flex:1; color:rgba(255,255,255,0.8); }
+        .vrow .vx i { color:rgba(255,255,255,0.45); font-style:normal; }
+        @media (max-width:620px){ .vrow{ flex-direction:column; gap:0.15rem; } .vrow .vw{ width:auto; } }
+
+        .drill { margin-top:0.5rem; }
+        .drill-item { padding:0.5rem 0; border-bottom:1px dashed rgba(255,255,255,0.09); font-size:0.86rem; line-height:1.6; }
+        .drill-item:last-child { border-bottom:none; }
+        .sol { color:#56d364; font-weight:700; cursor:pointer; border-bottom:1px dotted rgba(86,211,100,0.5); }
+        .sol.hidden-sol { color:transparent; background:rgba(255,255,255,0.09); border-radius:4px; padding:0 0.4rem; border-bottom:none; }
+        .drill-hint { color:rgba(255,255,255,0.42); font-size:0.78rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Verb + Preposition</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Какой предлог после слова</h1>
+            <p class="page-subtitle">listen TO &middot; depend ON &middot; good AT &middot; reason FOR &mdash; полный справочник сочетаний с предлогами + случаи, где предлога нет</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="verbs1">to / at</button>
+            <button class="tab" data-tab="verbs2">about / for</button>
+            <button class="tab" data-tab="verbs3">of / from / on / in</button>
+            <button class="tab" data-tab="adj">Прилагательное + предлог</button>
+            <button class="tab" data-tab="noun">Существительное + предлог</button>
+            <button class="tab" data-tab="drill">Тренировка</button>
+            <button class="tab" data-tab="quiz">Quiz</button>
+        </div>
+
+
+        <!-- ============ TAB 1 ============ -->
+        <div class="tab-content active" id="tab-verbs1">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x27A1;&#xFE0F;</span>
+                    <div>
+                        <h2>Глагол + to / at</h2>
+                        <p class="lesson-header-sub">И главный список: где предлога быть НЕ должно</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; verb + TO</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">talk / speak to sb</span><span class="vx">Who were you <b>talking to</b>? <i>talk with тоже возможно</i></span></div>
+                        <div class="vrow"><span class="vw">listen to sth</span><span class="vx">I like to <b>listen to the radio</b>. <i>не <s>listen the radio</s></i></span></div>
+                        <div class="vrow"><span class="vw">apologise to sb (for)</span><span class="vx">They <b>apologised to me for</b> their mistake.</span></div>
+                        <div class="vrow"><span class="vw">explain sth to sb</span><span class="vx">Can you <b>explain this word to me</b>? <i>не <s>explain me this word</s></i></span></div>
+                        <div class="vrow"><span class="vw">explain / describe to sb what&hellip;</span><span class="vx">I <b>explained to them why</b> I was worried. &middot; Let me <b>describe to you what</b> I saw.</span></div>
+                        <div class="vrow"><span class="vw">write to sb</span><span class="vx">I'll <b>write to you</b> when I get there.</span></div>
+                        <div class="vrow"><span class="vw">reply to sth</span><span class="vx">He never <b>replied to my email</b>.</span></div>
+                        <div class="vrow"><span class="vw">belong to sb</span><span class="vx">This bag <b>belongs to Sarah</b>.</span></div>
+                        <div class="vrow"><span class="vw">happen to sb/sth</span><span class="vx">What <b>happened to</b> that gold watch you had?</span></div>
+                        <div class="vrow"><span class="vw">invite sb to</span><span class="vx">They only <b>invited</b> a few people <b>to their wedding</b>.</span></div>
+                        <div class="vrow"><span class="vw">prefer A to B</span><span class="vx">I <b>prefer tea to coffee</b>.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #f85149; background:rgba(248,81,73,0.06);">
+                    <h3 style="color:#ff8080;">&#x1F6AB; Здесь предлога НЕТ (а в русском/немецком есть)</h3>
+                    <div class="two-cols">
+                        <div class="cbox cbox-bad">
+                            <div class="cbox-t">&#x274C; так говорят по ошибке</div>
+                            <ul>
+                                <li><s>I called to the airline.</s></li>
+                                <li><s>You didn't answer to my email.</s></li>
+                                <li><s>Can I ask to you?</s></li>
+                                <li><s>He thanked to me.</s></li>
+                                <li><s>We discussed about the plan.</s></li>
+                                <li><s>They entered into the room.</s></li>
+                                <li><s>She married with an American.</s></li>
+                            </ul>
+                        </div>
+                        <div class="cbox cbox-un">
+                            <div class="cbox-t">&#x2705; правильно</div>
+                            <ul>
+                                <li>I <b>called the airline</b>. <i>(phone / call / email / text sb)</i></li>
+                                <li>You didn't <b>answer my email</b>.</li>
+                                <li>Can I <b>ask you</b>?</li>
+                                <li>He <b>thanked me</b> (for helping).</li>
+                                <li>We <b>discussed the plan</b>.</li>
+                                <li>They <b>entered the room</b>.</li>
+                                <li>She <b>married an American</b> / is <b>married to</b> an American.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="mini-note">Запомни цепочку: <strong>phone / call / email / text / answer / ask / thank / discuss / enter / marry / reach / approach / lack</strong> &mdash; <em>без предлога</em>. Но: <strong>write to</strong>, <strong>reply to</strong>, <strong>listen to</strong> &mdash; <em>с предлогом</em>.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F441;&#xFE0F; verb + AT</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">look / stare / glance at</span><span class="vx">Why are you <b>looking at me</b> like that?</span></div>
+                        <div class="vrow"><span class="vw">have a look at</span><span class="vx">Can you <b>have a look at</b> my essay?</span></div>
+                        <div class="vrow"><span class="vw">laugh at</span><span class="vx">Everybody will <b>laugh at me</b> with this haircut.</span></div>
+                        <div class="vrow"><span class="vw">smile at</span><span class="vx">She <b>smiled at</b> me and walked on.</span></div>
+                        <div class="vrow"><span class="vw">point / aim at</span><span class="vx">Don't <b>point that knife at me</b>.</span></div>
+                        <div class="vrow"><span class="vw">shoot / fire at</span><span class="vx">He was <b>shooting at birds</b>, but didn't hit any.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #a371f7; background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">&#x2B50; at или to &mdash; и смысл меняется</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell neg"><span class="lbl">shout AT &mdash; агрессия</span>He got angry and started <b>shouting at me</b>.<span class="ru">орал на меня</span></div>
+                        <div class="pair-cell pos"><span class="lbl">shout TO &mdash; чтобы услышали</span>He <b>shouted to me</b> from the other side of the street.<span class="ru">крикнул мне издалека</span></div>
+                        <div class="pair-cell neg"><span class="lbl">throw AT &mdash; чтобы попасть</span>Somebody <b>threw an egg at</b> the politician.</div>
+                        <div class="pair-cell pos"><span class="lbl">throw TO &mdash; чтобы поймали</span>Lisa <b>threw the keys to me</b> from the window.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2 ============ -->
+        <div class="tab-content" id="tab-verbs2">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>Глагол + about / for</h2>
+                        <p class="lesson-header-sub">И пары, где предлог полностью меняет смысл</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4AD; verb + ABOUT</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">talk / read / know about</span><span class="vx">We <b>talked about</b> a lot of things.</span></div>
+                        <div class="vrow"><span class="vw">have a discussion about</span><span class="vx">We <b>had a discussion about</b> what to do. <i>но: we <b>discussed</b> what to do</i></span></div>
+                        <div class="vrow"><span class="vw">do something about</span><span class="vx">If it worries you, <b>do something about it</b>.</span></div>
+                        <div class="vrow"><span class="vw">worry about</span><span class="vx">Don't <b>worry about</b> me.</span></div>
+                        <div class="vrow"><span class="vw">care about</span><span class="vx">He's selfish. He doesn't <b>care about</b> other people. <i>= ему не важны</i></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50D; Три пары: hear / think / dream / complain / remind</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell mid"><span class="lbl">hear ABOUT = узнать о событии</span>Did you <b>hear about</b> the fire at the hotel?</div>
+                        <div class="pair-cell pos"><span class="lbl">hear OF = знать о существовании</span>Who's Tom Hart? I've never <b>heard of</b> him.</div>
+                        <div class="pair-cell neg"><span class="lbl">hear FROM = получить весточку</span>Have you <b>heard from</b> Jane recently?</div>
+                        <div class="pair-cell mid"><span class="lbl">think ABOUT = обдумывать</span>I've <b>thought about</b> what you said.</div>
+                        <div class="pair-cell pos"><span class="lbl">think OF = придумать / оценить</span>It was my idea &mdash; I <b>thought of</b> it first. &middot; What did you <b>think of</b> the film?</div>
+                        <div class="pair-cell mid"><span class="lbl">dream ABOUT = видеть во сне</span>I <b>dreamt about</b> you last night.</div>
+                        <div class="pair-cell pos"><span class="lbl">dream OF = мечтать / «ни за что»</span>Do you <b>dream of</b> being rich? &middot; I wouldn't <b>dream of</b> it!</div>
+                        <div class="pair-cell mid"><span class="lbl">complain ABOUT = жаловаться на</span>We <b>complained about</b> the food.</div>
+                        <div class="pair-cell pos"><span class="lbl">complain OF = жаловаться на боль</span>He was <b>complaining of</b> a pain in his stomach.</div>
+                        <div class="pair-cell mid"><span class="lbl">remind sb ABOUT = напомнить не забыть</span>Thanks for <b>reminding me about</b> the meeting.</div>
+                        <div class="pair-cell pos"><span class="lbl">remind sb OF = напоминать (похож)</span>This house <b>reminds me of</b> my childhood.</div>
+                    </div>
+                    <p class="mini-note">&#x1F4A1; <strong>think of / about doing</strong> &mdash; о планах: <em>My sister is <b>thinking of going</b> to Canada.</em> (оба варианта ок)</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; verb + FOR</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">ask (sb) for</span><span class="vx">I emailed the company <b>asking for</b> more information. <i>но: ask sb <b>the way / the time</b></i></span></div>
+                        <div class="vrow"><span class="vw">apply (to&hellip;) for</span><span class="vx">Why don't you <b>apply for</b> the job?</span></div>
+                        <div class="vrow"><span class="vw">wait for</span><span class="vx">I'm <b>waiting for</b> the rain to stop.</span></div>
+                        <div class="vrow"><span class="vw">search &hellip; for</span><span class="vx">I've <b>searched the house for</b> my keys.</span></div>
+                        <div class="vrow"><span class="vw">leave (a place) for</span><span class="vx">She <b>left home for work</b> at seven. <i>не <s>left to work</s></i></span></div>
+                        <div class="vrow"><span class="vw">pay for</span><span class="vx">We didn't have enough to <b>pay for the meal</b>. <i>но: <b>pay the bill / the rent / a fine</b></i></span></div>
+                        <div class="vrow"><span class="vw">thank / forgive sb for</span><span class="vx">I'll never <b>forgive them for</b> what they did.</span></div>
+                        <div class="vrow"><span class="vw">apologise (to sb) for</span><span class="vx">I <b>apologised for</b> my mistake.</span></div>
+                        <div class="vrow"><span class="vw">blame sb for</span><span class="vx">Everybody <b>blamed me for</b> the accident. = I was <b>to blame for</b> it.</span></div>
+                        <div class="vrow"><span class="vw">blame sth on sb</span><span class="vx">Don't <b>blame it on me</b>! <i>внимание: проблему сваливают ON кого-то</i></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F440; look for / look after / care for / take care of</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell mid"><span class="lbl">look FOR = искать</span>I've lost my keys. Help me <b>look for</b> them.</div>
+                        <div class="pair-cell pos"><span class="lbl">look AFTER = присматривать</span>He needs somebody to <b>look after</b> him.</div>
+                        <div class="pair-cell mid"><span class="lbl">take care OF = взять на себя</span>I'll <b>take care of</b> the travel arrangements.</div>
+                        <div class="pair-cell pos"><span class="lbl">care FOR = ухаживать / не любить (в отриц.)</span>She <b>cares for</b> her father. &middot; I don't <b>care for</b> hot weather.</div>
+                    </div>
+                    <p class="mini-note">И отдельно: <strong>I don't care what/where/how&hellip;</strong> &mdash; без предлога: <em>I don't <b>care what</b> you do.</em></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3 ============ -->
+        <div class="tab-content" id="tab-verbs3">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Глагол + of / from / on / in / into / with</h2>
+                        <p class="lesson-header-sub">Оставшиеся семьи &mdash; и их надо просто узнавать</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; verb + OF</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">accuse sb of</span><span class="vx">Tina <b>accused me of</b> being selfish.</span></div>
+                        <div class="vrow"><span class="vw">suspect sb of</span><span class="vx">Some students were <b>suspected of</b> cheating.</span></div>
+                        <div class="vrow"><span class="vw">approve / disapprove of</span><span class="vx">His parents don't <b>approve of</b> what he does.</span></div>
+                        <div class="vrow"><span class="vw">consist of</span><span class="vx">The meal <b>consisted of</b> seven courses.</span></div>
+                        <div class="vrow"><span class="vw">die of / from</span><span class="vx">&laquo;What did he <b>die of</b>?&raquo; &mdash; &laquo;A heart attack.&raquo;</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E2; verb + FROM</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">suffer from</span><span class="vx">More people are <b>suffering from</b> heart disease.</span></div>
+                        <div class="vrow"><span class="vw">protect sb/sth from</span><span class="vx">Sun cream <b>protects the skin from</b> the sun.</span></div>
+                        <div class="vrow"><span class="vw">prevent sb from</span><span class="vx">The rain <b>prevented us from</b> going out.</span></div>
+                        <div class="vrow"><span class="vw">borrow sth from sb</span><span class="vx">I <b>borrowed</b> the money <b>from</b> my brother. <i>но: <b>lend</b> sb sth</i></span></div>
+                        <div class="vrow"><span class="vw">translate from &hellip; into</span><span class="vx">Her books have been <b>translated from</b> Polish <b>into</b> many languages.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E0; verb + ON</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">depend on</span><span class="vx">It <b>depends on</b> the traffic. <i>но: It depends <b>how</b> much it is &mdash; on можно опустить перед how/what/where</i></span></div>
+                        <div class="vrow"><span class="vw">rely on</span><span class="vx">You can <b>rely on</b> Anna &mdash; she keeps her promises.</span></div>
+                        <div class="vrow"><span class="vw">live on</span><span class="vx">His salary isn't enough to <b>live on</b>.</span></div>
+                        <div class="vrow"><span class="vw">congratulate sb on</span><span class="vx">I <b>congratulated her on</b> her exam results.</span></div>
+                        <div class="vrow"><span class="vw">compliment sb on</span><span class="vx">I <b>complimented Mark on</b> his cooking.</span></div>
+                        <div class="vrow"><span class="vw">concentrate on</span><span class="vx">I tried to <b>concentrate on</b> my work.</span></div>
+                        <div class="vrow"><span class="vw">insist on</span><span class="vx">They <b>insisted on</b> paying for the meal.</span></div>
+                        <div class="vrow"><span class="vw">spend money on</span><span class="vx">How much do you <b>spend on</b> food each week? <i>но: spend time <b>doing</b></i></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E3; verb + IN / INTO</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">believe in</span><span class="vx">Do you <b>believe in</b> ghosts? &middot; I <b>believe in</b> saying what I think.</span></div>
+                        <div class="vrow"><span class="vw">но: believe sth/sb</span><span class="vx">That can't be true &mdash; I don't <b>believe it</b>. <i>не <s>believe in it</s></i></span></div>
+                        <div class="vrow"><span class="vw">specialise in</span><span class="vx">She <b>specialises in</b> company law.</span></div>
+                        <div class="vrow"><span class="vw">succeed in</span><span class="vx">I hope you <b>succeed in</b> finding the job you want.</span></div>
+                        <div class="vrow"><span class="vw">break into</span><span class="vx">Our house was <b>broken into</b> last week.</span></div>
+                        <div class="vrow"><span class="vw">crash / drive / run into</span><span class="vx">He lost control and <b>crashed into</b> a wall.</span></div>
+                        <div class="vrow"><span class="vw">divide / cut / split into</span><span class="vx">The book is <b>divided into</b> three parts.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F7E1; verb + WITH</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">collide with</span><span class="vx">A bus <b>collided with</b> a car.</span></div>
+                        <div class="vrow"><span class="vw">fill sth with</span><span class="vx"><b>Fill</b> the pan <b>with</b> water. <i>но прилагательное: full <b>of</b> water</i></span></div>
+                        <div class="vrow"><span class="vw">provide / supply sb with</span><span class="vx">The school <b>provides students with</b> books.</span></div>
+                        <div class="vrow"><span class="vw">agree with sb</span><span class="vx">I <b>agree with you</b> about that. <i>но: agree <b>to</b> a plan, agree <b>on</b> a date</i></span></div>
+                        <div class="vrow"><span class="vw">deal with</span><span class="vx">Who's going to <b>deal with</b> this complaint?</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 4 ============ -->
+        <div class="tab-content" id="tab-adj">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F524;</span>
+                    <div>
+                        <h2>Прилагательное + предлог</h2>
+                        <p class="lesson-header-sub">good AT &middot; married TO &middot; afraid OF &middot; keen ON</p>
+                    </div>
+                </div>
+
+                <div class="note-card" style="border-left:3px solid #a371f7; background:rgba(163,113,247,0.06);">
+                    <h3 style="color:#c8a5ff;">&#x2B50; nice OF you &mdash; и nice TO me</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell pos"><span class="lbl">OF somebody TO do &mdash; оценка поступка</span>It was very <b>nice of you to</b> help me.<span class="ru">nice / kind / good / generous / polite / stupid / silly of sb</span></div>
+                        <div class="pair-cell mid"><span class="lbl">TO somebody &mdash; отношение к человеку</span>They have always been very <b>nice to me</b>.<span class="ru">не <s>nice with me</s></span></div>
+                    </div>
+                    <p class="mini-note">Ещё: <em>It was <b>stupid of me to</b> go out without a coat.</em> &middot; <em>Why were you so <b>unfriendly to</b> Lucy?</em></p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F621; Чувства: about / with</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">angry / annoyed about sth</span><span class="vx">There's no point getting <b>angry about</b> things that don't matter.</span></div>
+                        <div class="vrow"><span class="vw">angry / annoyed with sb for</span><span class="vx">Are you <b>annoyed with me for</b> being late?</span></div>
+                        <div class="vrow"><span class="vw">upset about</span><span class="vx">Lisa is <b>upset about</b> not being invited.</span></div>
+                        <div class="vrow"><span class="vw">excited / worried / nervous about</span><span class="vx">Are you <b>nervous about</b> the exam?</span></div>
+                        <div class="vrow"><span class="vw">pleased / happy / delighted with</span><span class="vx">They were <b>delighted with</b> the present.</span></div>
+                        <div class="vrow"><span class="vw">disappointed / satisfied with</span><span class="vx">Were you <b>happy with</b> your exam results?</span></div>
+                        <div class="vrow"><span class="vw">surprised / shocked at / by</span><span class="vx">Everybody was <b>surprised at</b> (or <b>by</b>) the news.</span></div>
+                        <div class="vrow"><span class="vw">impressed with / by</span><span class="vx">I'm very <b>impressed with</b> her English.</span></div>
+                        <div class="vrow"><span class="vw">fed up / bored with</span><span class="vx">I'm <b>fed up with</b> this job.</span></div>
+                        <div class="vrow"><span class="vw">tired of</span><span class="vx">Let's go &mdash; I'm <b>tired of</b> waiting.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F614; sorry &mdash; четыре схемы</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">sorry about (ситуация)</span><span class="vx">I'm <b>sorry about</b> the mess. &middot; <b>Sorry about</b> the delay.</span></div>
+                        <div class="vrow"><span class="vw">sorry for/about (мой поступок)</span><span class="vx">I'm <b>sorry for shouting</b> at you.</span></div>
+                        <div class="vrow"><span class="vw">sorry + предложение</span><span class="vx">I'm <b>sorry I shouted</b> at you.</span></div>
+                        <div class="vrow"><span class="vw">feel sorry for sb</span><span class="vx">I <b>feel sorry for</b> Mark &mdash; he's had a lot of bad luck.</span></div>
+                        <div class="vrow"><span class="vw">sorry to hear</span><span class="vx">I'm <b>sorry to hear</b> about your job.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F535; adjective + OF</h3>
+                    <div class="word-chips">
+                        <span class="wchip">afraid / scared / frightened / terrified <b>of</b></span>
+                        <span class="wchip">fond <b>of</b></span><span class="wchip">proud <b>of</b></span><span class="wchip">ashamed <b>of</b></span>
+                        <span class="wchip">jealous / envious <b>of</b></span><span class="wchip">suspicious <b>of</b></span><span class="wchip">critical <b>of</b></span>
+                        <span class="wchip">tolerant <b>of</b></span><span class="wchip">aware / conscious <b>of</b></span><span class="wchip">capable / incapable <b>of</b></span>
+                        <span class="wchip">full <b>of</b></span><span class="wchip">short <b>of</b></span><span class="wchip">typical <b>of</b></span><span class="wchip">sure / certain <b>of / about</b></span>
+                    </div>
+                    <div class="vlist" style="margin-top:0.5rem;">
+                        <div class="vrow"><span class="vw">terrified of</span><span class="vx">&laquo;Are you <b>afraid of</b> spiders?&raquo; &mdash; &laquo;Yes, I'm <b>terrified of</b> them.&raquo;</span></div>
+                        <div class="vrow"><span class="vw">aware of</span><span class="vx">I wasn't <b>aware of</b> that.</span></div>
+                        <div class="vrow"><span class="vw">capable of</span><span class="vx">You are <b>capable of</b> doing the job well.</span></div>
+                        <div class="vrow"><span class="vw">full of / short of</span><span class="vx">She's always <b>full of</b> energy. &middot; I'm a bit <b>short of</b> money.</span></div>
+                        <div class="vrow"><span class="vw">typical of</span><span class="vx">It's <b>typical of</b> him to keep everybody waiting.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F308; Остальные предлоги</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">good / bad / brilliant AT</span><span class="vx">I'm not very <b>good at</b> repairing things. <i>не <s>good in</s></i></span></div>
+                        <div class="vrow"><span class="vw">married / engaged TO</span><span class="vx">Louise is <b>married to</b> an American. <i>но: married <b>with</b> three children = у неё трое детей</i></span></div>
+                        <div class="vrow"><span class="vw">similar TO</span><span class="vx">Your handwriting is <b>similar to</b> mine.</span></div>
+                        <div class="vrow"><span class="vw">different FROM / TO</span><span class="vx">The film was <b>different from</b> what I'd expected. <i>(AmE: different than)</i></span></div>
+                        <div class="vrow"><span class="vw">interested IN</span><span class="vx">Are you <b>interested in</b> art?</span></div>
+                        <div class="vrow"><span class="vw">keen ON</span><span class="vx">Chris wasn't <b>keen on</b> going out.</span></div>
+                        <div class="vrow"><span class="vw">dependent ON / independent OF</span><span class="vx">I don't want to be <b>dependent on</b> anybody.</span></div>
+                        <div class="vrow"><span class="vw">crowded WITH</span><span class="vx">The streets were <b>crowded with</b> tourists. <i>но: <b>full of</b> tourists</i></span></div>
+                        <div class="vrow"><span class="vw">famous FOR</span><span class="vx">Florence is <b>famous for</b> its art treasures.</span></div>
+                        <div class="vrow"><span class="vw">responsible FOR</span><span class="vx">Who was <b>responsible for</b> all that noise?</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5 ============ -->
+        <div class="tab-content" id="tab-noun">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4E6;</span>
+                    <div>
+                        <h2>Существительное + предлог</h2>
+                        <p class="lesson-header-sub">reason FOR &middot; cause OF &middot; increase IN &middot; solution TO</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; По предлогам</h3>
+                    <table class="unit-table">
+                        <tr><th>Предлог</th><th>Существительные</th><th>Пример</th></tr>
+                        <tr><td><strong>FOR</strong></td><td>a reason, a need, a demand, an excuse</td><td>Nobody knew the <strong>reason for</strong> the delay. <em>(не reason of)</em></td></tr>
+                        <tr><td><strong>OF</strong></td><td>the cause, a picture/photo/map/plan, an advantage</td><td>The <strong>cause of</strong> the explosion is unknown. &middot; a <strong>photo of</strong> her family</td></tr>
+                        <tr><td><strong>IN</strong></td><td>an increase, a decrease, a rise, a fall</td><td>There's been an <strong>increase in</strong> road accidents.</td></tr>
+                        <tr><td><strong>TO</strong></td><td>damage, an invitation, a solution, a key, an answer, a reply, a reaction, an attitude</td><td>I hope we find a <strong>solution to</strong> the problem. <em>(не solution of)</em></td></tr>
+                        <tr><td><strong>WITH</strong></td><td>a relationship, a connection, contact</td><td>Do you have a good <strong>relationship with</strong> your parents?</td></tr>
+                        <tr><td><strong>BETWEEN</strong></td><td>a difference, a connection, a relationship (двух вещей)</td><td>There are <strong>differences between</strong> British and American English.</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x26A0;&#xFE0F; Самые частые ошибки</h3>
+                    <div class="two-cols">
+                        <div class="cbox cbox-bad">
+                            <div class="cbox-t">&#x274C;</div>
+                            <ul>
+                                <li><s>the reason of the delay</s></li>
+                                <li><s>a solution of the problem</s></li>
+                                <li><s>an answer of the question</s></li>
+                                <li><s>an increase of accidents</s></li>
+                                <li><s>the damage of the car</s></li>
+                            </ul>
+                        </div>
+                        <div class="cbox cbox-un">
+                            <div class="cbox-t">&#x2705;</div>
+                            <ul>
+                                <li>the <b>reason for</b> the delay</li>
+                                <li>a <b>solution to</b> the problem</li>
+                                <li>an <b>answer to</b> the question</li>
+                                <li>an <b>increase in</b> accidents</li>
+                                <li>the <b>damage to</b> the car</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="mini-note">&#x1F4A1; Тонкость: <em>the <b>advantage of</b> living alone</em> (преимущество чего-то), но <em>there are advantages <b>in</b> / <b>to</b> living alone</em> (у этого есть плюсы).<br>
+                    &#x1F4A1; <strong>attitude to</strong> = <strong>attitude towards</strong> &mdash; оба варианта верны.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 6 ============ -->
+        <div class="tab-content" id="tab-drill">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Тренировка</h2>
+                        <p class="lesson-header-sub">Кликни по серому, чтобы открыть ответ</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A. Вставь предлог (или поставь &laquo;&mdash;&raquo;, если он не нужен)</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. I'll phone _____ you tomorrow. &rarr; <span class="sol">&mdash; (phone you)</span></div>
+                        <div class="drill-item">2. Please listen _____ me. &rarr; <span class="sol">to</span></div>
+                        <div class="drill-item">3. Can you explain this rule _____ me? &rarr; <span class="sol">to</span></div>
+                        <div class="drill-item">4. We discussed _____ the problem for an hour. &rarr; <span class="sol">&mdash;</span></div>
+                        <div class="drill-item">5. She apologised _____ me _____ being late. &rarr; <span class="sol">to &hellip; for</span></div>
+                        <div class="drill-item">6. He's married _____ a doctor. &rarr; <span class="sol">to</span></div>
+                        <div class="drill-item">7. I'm not very good _____ maths. &rarr; <span class="sol">at</span></div>
+                        <div class="drill-item">8. It depends _____ the weather. &rarr; <span class="sol">on</span></div>
+                        <div class="drill-item">9. They accused him _____ lying. &rarr; <span class="sol">of</span></div>
+                        <div class="drill-item">10. Who's responsible _____ this mess? &rarr; <span class="sol">for</span></div>
+                        <div class="drill-item">11. The bag was full _____ books. &rarr; <span class="sol">of</span></div>
+                        <div class="drill-item">12. The room was crowded _____ people. &rarr; <span class="sol">with</span></div>
+                        <div class="drill-item">13. I didn't answer _____ his letter. &rarr; <span class="sol">&mdash; (answer his letter)</span></div>
+                        <div class="drill-item">14. She replied _____ my message an hour later. &rarr; <span class="sol">to</span></div>
+                        <div class="drill-item">15. What's the reason _____ the delay? &rarr; <span class="sol">for</span></div>
+                        <div class="drill-item">16. There's been a rise _____ prices. &rarr; <span class="sol">in</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B. Выбери правильную пару</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. Have you _____ (heard about / heard of / heard from) Jane? She called me yesterday. &rarr; <span class="sol">heard from</span></div>
+                        <div class="drill-item">2. Never _____ him &mdash; who is he? &rarr; <span class="sol">heard of</span></div>
+                        <div class="drill-item">3. This song _____ me _____ my childhood. &rarr; <span class="sol">reminds &hellip; of</span></div>
+                        <div class="drill-item">4. Can you _____ me _____ the meeting tomorrow? &rarr; <span class="sol">remind &hellip; about</span></div>
+                        <div class="drill-item">5. He shouted _____ me because he was furious. &rarr; <span class="sol">at</span></div>
+                        <div class="drill-item">6. She shouted _____ me from across the street. &rarr; <span class="sol">to</span></div>
+                        <div class="drill-item">7. I'm _____ my old laptop &mdash; time for a new one. <em>(надоел)</em> &rarr; <span class="sol">fed up with / tired of</span></div>
+                        <div class="drill-item">8. Don't _____ it _____ me &mdash; it wasn't my fault. &rarr; <span class="sol">blame &hellip; on</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 7 ============ -->
+        <div class="tab-content" id="tab-quiz">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Quiz</h2>
+                        <p class="lesson-header-sub">14 вопросов</p>
+                    </div>
+                </div>
+                <div class="quiz-container">
+
+                    <div class="quiz-question" data-answer="to" data-why="listen всегда с to">
+                        <p><strong>1.</strong> I love listening _____ podcasts on the way to work.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'to')">to</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'none')">&mdash;</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'at')">at</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="none" data-why="discuss something — без предлога">
+                        <p><strong>2.</strong> We need to discuss _____ the budget.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'about')">about</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'none')">&mdash;</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'on')">on</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="explaintome" data-why="explain something TO somebody">
+                        <p><strong>3.</strong> Could you _____ ?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'explainmeit')">explain me it</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'explaintome')">explain it to me</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'explainforme')">explain it for me</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="at" data-why="good AT something">
+                        <p><strong>4.</strong> She's really good _____ languages.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'in')">in</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'at')">at</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'for')">for</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="of" data-why="afraid OF">
+                        <p><strong>5.</strong> He's afraid _____ flying.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'from')">from</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'about')">about</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="withmefor" data-why="angry WITH somebody FOR doing">
+                        <p><strong>6.</strong> Are you angry _____ forgetting your birthday?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'onmefor')">on me for</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'withmefor')">with me for</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'atmeof')">at me of</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="for" data-why="pay FOR the meal, но pay the bill">
+                        <p><strong>7.</strong> Let me pay _____ the coffee.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'for')">for</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'none')">&mdash;</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="lookafter" data-why="look after = присматривать">
+                        <p><strong>8.</strong> Can you _____ my cat while I'm away?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'lookfor')">look for</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'lookafter')">look after</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'lookat')">look at</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="of" data-why="remind sb OF = быть похожим">
+                        <p><strong>9.</strong> That smell reminds me _____ my grandmother's kitchen.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'about')">about</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'to')">to</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="on" data-why="depend / rely ON">
+                        <p><strong>10.</strong> You can rely _____ him &mdash; he never lets anyone down.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'on')">on</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'to')">to</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="to" data-why="solution TO a problem">
+                        <p><strong>11.</strong> We still haven't found a solution _____ the problem.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'to')">to</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'for')">for</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="in" data-why="increase / rise / fall IN">
+                        <p><strong>12.</strong> There has been a sharp increase _____ house prices.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'in')">in</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'to')">to</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="thoughtof" data-why="think OF = придумать / оценить">
+                        <p><strong>13.</strong> What did you _____ the film?</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'thinkabout')">think about</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'thoughtof')">think of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'thinkon')">think on</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <div class="quiz-question" data-answer="with" data-why="fill sth WITH, но full OF">
+                        <p><strong>14.</strong> He filled the glass _____ water.</p>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQ(this,'of')">of</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'with')">with</button>
+                            <button class="quiz-btn" onclick="checkQ(this,'by')">by</button>
+                        </div>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+                    <p class="quiz-score" id="q-score"></p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        document.querySelectorAll('.sol').forEach(s => {
+            s.classList.add('hidden-sol');
+            s.addEventListener('click', () => s.classList.toggle('hidden-sol'));
+        });
+
+        const Q_TOTAL = document.querySelectorAll('.quiz-question').length;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! \u2705';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite \u274C \u2014 ' + (q.dataset.why || '');
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('q-score');
+            if (qDone === Q_TOTAL && scoreEl) {
+                const pct = qScore / Q_TOTAL;
+                if (pct === 1) scoreEl.innerHTML = '\uD83C\uDF1F ' + qScore + '/' + Q_TOTAL + ' \u2014 Perfect!';
+                else if (pct >= 0.8) scoreEl.innerHTML = '\u2705 ' + qScore + '/' + Q_TOTAL + ' \u2014 Great!';
+                else if (pct >= 0.6) scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 Good, \u043f\u043e\u0432\u0442\u043e\u0440\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 \u043f\u0440\u043e\u0439\u0434\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438 \u0435\u0449\u0451 \u0440\u0430\u0437 \uD83D\uDCAA';
+                scoreEl.style.color = pct >= 0.8 ? 'var(--color-green)' : pct >= 0.6 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>
