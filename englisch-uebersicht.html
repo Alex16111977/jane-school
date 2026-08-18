@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&Uuml;berblick &amp; Diagnose | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag { display:inline-block; font-size:0.65rem; font-weight:800; padding:0.12rem 0.5rem; border-radius:6px; margin-right:0.35rem; vertical-align:middle; letter-spacing:0.03em; }
+        .t-pl  { background: rgba(68,147,248,0.16);  color:#79b8ff; }
+        .t-un  { background: rgba(63,185,80,0.16);   color:#56d364; }
+        .t-sg  { background: rgba(245,158,11,0.16);  color:#fbbf24; }
+        .t-bad { background: rgba(248,81,73,0.16);   color:#ff8080; }
+        .t-ok  { background: rgba(163,113,247,0.16); color:#c8a5ff; }
+
+        .two-cols { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+        @media (max-width:620px){ .two-cols{ grid-template-columns:1fr; } }
+        .cbox { border-radius:12px; padding:0.9rem 1rem; }
+        .cbox-pl { background: rgba(68,147,248,0.08); border:1px solid rgba(68,147,248,0.22); }
+        .cbox-un { background: rgba(63,185,80,0.08);  border:1px solid rgba(63,185,80,0.22); }
+        .cbox-bad{ background: rgba(248,81,73,0.08);  border:1px solid rgba(248,81,73,0.22); }
+        .cbox-t  { font-size:0.95rem; font-weight:800; margin-bottom:0.45rem; }
+        .cbox-pl .cbox-t { color:#79b8ff; }
+        .cbox-un .cbox-t { color:#56d364; }
+        .cbox-bad .cbox-t{ color:#ff8080; }
+        .cbox ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.3rem; }
+        .cbox li { font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.45; }
+
+        .pair-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+        @media (max-width:620px){ .pair-grid{ grid-template-columns:1fr; } }
+        .pair-cell { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.83rem; line-height:1.5; }
+        .pair-cell .lbl { display:block; font-size:0.66rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.3rem; opacity:0.85; }
+        .pair-cell.pos .lbl { color:#56d364; }
+        .pair-cell.neg .lbl { color:#ff8080; }
+        .pair-cell.mid .lbl { color:#fbbf24; }
+        .pair-cell .ru { display:block; color:rgba(255,255,255,0.45); font-size:0.76rem; margin-top:0.15rem; }
+
+        .pattern-row { display:flex; gap:0.8rem; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.84rem; }
+        .pattern-row:last-child { border-bottom:none; }
+        .pattern-name { flex-shrink:0; width:200px; font-weight:700; color:#79b8ff; font-size:0.78rem; }
+        .pattern-ex { flex:1; color:rgba(255,255,255,0.78); }
+        .pattern-ex b { color:#fff; }
+        @media (max-width:620px){ .pattern-row{ flex-direction:column; gap:0.15rem; } .pattern-name{ width:auto; } }
+
+        .mini-note { font-size:0.78rem; color:rgba(255,255,255,0.5); line-height:1.55; margin-top:0.5rem; }
+        .word-chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
+        .wchip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; color:rgba(255,255,255,0.8); }
+        .wchip b { color:#79b8ff; }
+
+        .form-box { background:rgba(163,113,247,0.07); border:1px solid rgba(163,113,247,0.25); border-radius:12px; padding:0.7rem 0.95rem; margin:0.6rem 0; font-size:0.9rem; color:#e6ddff; text-align:center; font-weight:700; letter-spacing:0.01em; }
+        .form-box b { color:#c8a5ff; }
+
+        .vlist { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; }
+        .vrow { display:flex; gap:0.7rem; align-items:baseline; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:0.45rem 0.7rem; font-size:0.82rem; line-height:1.45; }
+        .vrow .vw { flex-shrink:0; width:190px; font-weight:800; color:#79b8ff; }
+        .vrow .vx { flex:1; color:rgba(255,255,255,0.8); }
+        .vrow .vx i { color:rgba(255,255,255,0.45); font-style:normal; }
+        @media (max-width:620px){ .vrow{ flex-direction:column; gap:0.15rem; } .vrow .vw{ width:auto; } }
+
+        .drill { margin-top:0.5rem; }
+        .drill-item { padding:0.5rem 0; border-bottom:1px dashed rgba(255,255,255,0.09); font-size:0.86rem; line-height:1.6; }
+        .drill-item:last-child { border-bottom:none; }
+        .sol { color:#56d364; font-weight:700; cursor:pointer; border-bottom:1px dotted rgba(86,211,100,0.5); }
+        .sol.hidden-sol { color:transparent; background:rgba(255,255,255,0.09); border-radius:4px; padding:0 0.4rem; border-bottom:none; }
+        .drill-hint { color:rgba(255,255,255,0.42); font-size:0.78rem; }
+        .v5-wrap { overflow-x:auto; }
+        .unit-table td b { color:#fff; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">&Uuml;berblick &amp; Diagnose</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>&Uuml;berblick &amp; Diagnose</h1>
+            <p class="page-subtitle">Все времена в одной таблице &middot; 7 форм будущего &middot; модальные по функциям &middot; тест на 40 вопросов, который сам скажет, что повторить</p>
+        </div>
+
+        <div class="note-box">
+            <b>Зачем эта страница.</b> На сайте есть отдельные страницы почти по каждому времени и модальному глаголу &mdash;
+            но не было <b>сводной картины</b> и не было способа быстро понять, <i>что именно</i> у тебя проседает.
+            Здесь три обзорные таблицы (времена, будущее, модальные) и <b>диагностика на 40 вопросов</b>:
+            после каждой ошибки она даёт ссылку на нужную страницу сайта, а в конце собирает список тем для повторения.
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="tenses">Все времена</button>
+            <button class="tab" data-tab="future">Будущее: 7 форм</button>
+            <button class="tab" data-tab="modals">Модальные</button>
+            <button class="tab" data-tab="diag">&#x1F9ED; Диагностика</button>
+            <button class="tab" data-tab="drill">Тренировка</button>
+        </div>
+
+        <!-- ============ TAB 1: TENSES ============ -->
+        <div class="tab-content active" id="tab-tenses">
+        <div class="zp-notes">
+            <section class="note-section">
+                <h2>Матрица: simple &times; continuous, present &times; past</h2>
+                <div class="note-card highlight-card">
+                    <p>Вся система английских времён держится на двух вопросах: <b>факт или процесс?</b> (simple / continuous) и
+                    <b>когда точка отсчёта?</b> (сейчас / в прошлом / до какого-то момента).</p>
+                    <div class="v5-wrap"><table class="unit-table">
+                        <tr><th></th><th>Simple &mdash; факт, сколько раз</th><th>Continuous &mdash; процесс, как долго</th></tr>
+                        <tr>
+                            <td><b>Present</b></td>
+                            <td><b>I do</b><br>Anna <b>plays</b> tennis twice a week.<br>The shop <b>doesn't open</b> on Sundays.<br>Water <b>boils</b> at 100&deg;.</td>
+                            <td><b>I am doing</b><br>Anna <b>is playing</b> tennis right now.<br>Don't call me, I<b>'m working</b>.<br>Prices <b>are rising</b> again.</td>
+                        </tr>
+                        <tr>
+                            <td><b>Present perfect</b></td>
+                            <td><b>I have done</b><br>She <b>has played</b> there many times.<br>I<b>'ve lost</b> my keys &mdash; result now.<br>We<b>'ve known</b> each other for years.</td>
+                            <td><b>I have been doing</b><br>She's tired &mdash; she<b>'s been playing</b> tennis.<br>How long <b>have you been learning</b> German?<br>It<b>'s been raining</b> all day.</td>
+                        </tr>
+                        <tr>
+                            <td><b>Past</b></td>
+                            <td><b>I did</b><br>She <b>played</b> tennis yesterday.<br>I <b>lost</b> my keys on Monday.<br>The train <b>left</b> at six.</td>
+                            <td><b>I was doing</b><br>At six she <b>was playing</b> tennis.<br>I <b>was cooking</b> when he called.<br>It <b>was raining</b> when we left.</td>
+                        </tr>
+                        <tr>
+                            <td><b>Past perfect</b></td>
+                            <td><b>I had done</b><br>The match <b>had finished</b> before we arrived.<br>I realised I <b>had left</b> the keys inside.<br>It was the first time I <b>had flown</b>.</td>
+                            <td><b>I had been doing</b><br>She was tired &mdash; she <b>had been playing</b> for hours.<br>The ground was wet: it <b>had been raining</b>.<br>How long <b>had you been waiting</b>?</td>
+                        </tr>
+                    </table></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>Что выбрать: три быстрых теста</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">1. Сколько раз?</span><span class="vx">Есть число или «сколько раз» &rarr; <b>simple</b>: I've read it <b>twice</b>. She <b>wrote</b> three emails.</span></div>
+                        <div class="vrow"><span class="vw">2. Как долго?</span><span class="vx">Есть «сколько времени / с каких пор» &rarr; <b>continuous</b>: I<b>'ve been waiting</b> since two.</span></div>
+                        <div class="vrow"><span class="vw">3. Время закончилось?</span><span class="vx">Указан конченный отрезок (yesterday, in 2019, last week) &rarr; <b>past simple</b>, перфект невозможен.</span></div>
+                        <div class="vrow"><span class="vw">Осторожно</span><span class="vx">know, like, want, need, believe, belong, own &mdash; <b>без continuous</b>: &#x274C; I'm knowing &rarr; &#x2705; I know.</span></div>
+                        <div class="vrow"><span class="vw">Исключение</span><span class="vx">be и have меняют смысл: He <b>is being</b> rude <i>(ведёт себя)</i>. I<b>'m having</b> lunch <i>(ем)</i>.</span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>Сигнальные слова</h3>
+                    <div class="v5-wrap"><table class="unit-table">
+                        <tr><th>Время</th><th>Слова-маркеры</th></tr>
+                        <tr><td><b>Present simple</b></td><td>always, usually, often, every day, on Mondays, twice a week, never</td></tr>
+                        <tr><td><b>Present continuous</b></td><td>now, at the moment, today, this week, currently, these days</td></tr>
+                        <tr><td><b>Present perfect</b></td><td>just, already, yet, ever, never, so far, recently, this week, since, for</td></tr>
+                        <tr><td><b>Present perfect cont.</b></td><td>how long, since, for, all day, all morning</td></tr>
+                        <tr><td><b>Past simple</b></td><td>yesterday, last night, in 2019, two years ago, when I was a child</td></tr>
+                        <tr><td><b>Past continuous</b></td><td>at eight o'clock, while, when (фон для другого действия)</td></tr>
+                        <tr><td><b>Past perfect</b></td><td>before, after, by the time, already (в прошлом), it was the first time</td></tr>
+                    </table></div>
+                    <p class="mini-note">Маркеры помогают, но не решают: <i>this week</i> живёт и с перфектом (I've read two books this week), и с continuous (I'm working from home this week).</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>Самые частые ошибки в системе времён</h3>
+                    <div class="two-cols">
+                        <div class="cbox cbox-bad">
+                            <div class="cbox-t">&#x274C; Так не говорят</div>
+                            <ul>
+                                <li>I live here <b>since</b> 2019.</li>
+                                <li>I <b>have seen</b> him yesterday.</li>
+                                <li>When <b>have you arrived</b>?</li>
+                                <li>I <b>am knowing</b> the answer.</li>
+                                <li>She <b>is working</b> here since May.</li>
+                            </ul>
+                        </div>
+                        <div class="cbox cbox-un">
+                            <div class="cbox-t">&#x2705; Правильно</div>
+                            <ul>
+                                <li>I<b>'ve lived</b> here since 2019.</li>
+                                <li>I <b>saw</b> him yesterday.</li>
+                                <li>When <b>did you arrive</b>?</li>
+                                <li>I <b>know</b> the answer.</li>
+                                <li>She<b>'s been working</b> here since May.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 2: FUTURE ============ -->
+        <div class="tab-content" id="tab-future">
+        <div class="zp-notes">
+            <section class="note-section">
+                <h2>Семь способов сказать о будущем &mdash; и когда какой</h2>
+                <div class="note-card highlight-card">
+                    <div class="v5-wrap"><table class="unit-table">
+                        <tr><th>Форма</th><th>Когда</th><th>Пример</th></tr>
+                        <tr><td><b>I'm leaving</b><br><i>present continuous</i></td><td>договорённость, уже есть план и время</td><td>I<b>'m leaving</b> on Friday &mdash; the ticket's booked.</td></tr>
+                        <tr><td><b>My train leaves</b><br><i>present simple</i></td><td>расписание, программа</td><td>The train <b>leaves</b> at 9.30. What time <b>does</b> the film <b>start</b>?</td></tr>
+                        <tr><td><b>I'm going to leave</b><br><i>be going to</i></td><td>намерение (решил заранее) + очевидный прогноз</td><td>I<b>'m going to look</b> for a new job. Look at the sky &mdash; it<b>'s going to rain</b>.</td></tr>
+                        <tr><td><b>I'll leave</b><br><i>will</i></td><td>решение прямо сейчас, обещание, предложение помощи, мнение о будущем</td><td>&mdash; The phone's ringing. &mdash; I<b>'ll get</b> it. &middot; I think she<b>'ll like</b> it.</td></tr>
+                        <tr><td><b>I'll be leaving</b><br><i>future continuous</i></td><td>процесс в определённый момент будущего; вежливый вопрос о планах</td><td>This time tomorrow I<b>'ll be flying</b> to Rome. &middot; <b>Will you be using</b> the car tonight?</td></tr>
+                        <tr><td><b>I'll have left</b><br><i>future perfect</i></td><td>будет завершено к моменту</td><td>By June I<b>'ll have finished</b> the course.</td></tr>
+                        <tr><td><b>before I leave</b><br><i>present после when/if/before</i></td><td>после when, if, before, after, until, as soon as &mdash; настоящее</td><td>I'll call you <b>when I get</b> home. <i>&#x274C; when I will get</i></td></tr>
+                    </table></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>will или going to &mdash; главное различие</h3>
+                    <div class="pair-grid">
+                        <div class="pair-cell mid"><span class="lbl">going to &mdash; решил ДО разговора</span>I<b>'m going to sell</b> my car. <i>(решил вчера)</i></div>
+                        <div class="pair-cell pos"><span class="lbl">will &mdash; решаю В момент речи</span>&mdash; The car's making a noise. &mdash; OK, I<b>'ll sell</b> it.</div>
+                        <div class="pair-cell mid"><span class="lbl">going to &mdash; вижу признаки</span>She<b>'s going to have</b> a baby.</div>
+                        <div class="pair-cell pos"><span class="lbl">will &mdash; думаю, предполагаю</span>I think it<b>'ll be</b> a difficult year.</div>
+                    </div>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">предложение</span><span class="vx"><b>I'll carry</b> that for you. <i>&mdash; спонтанная помощь, только will</i></span></div>
+                        <div class="vrow"><span class="vw">обещание</span><span class="vx">I <b>won't tell</b> anyone, I promise.</span></div>
+                        <div class="vrow"><span class="vw">отказ</span><span class="vx">The car <b>won't start</b>. <i>&mdash; won't = отказывается</i></span></div>
+                        <div class="vrow"><span class="vw">was going to</span><span class="vx">I <b>was going to call</b> you, but I forgot. <i>&mdash; собирался и не сделал</i></span></div>
+                        <div class="vrow"><span class="vw">be about to</span><span class="vx">Hurry &mdash; the film<b> is about to start</b>. <i>&mdash; вот-вот</i></span></div>
+                        <div class="vrow"><span class="vw">shall</span><span class="vx"><b>Shall I</b> open the window? <b>Shall we</b> go? <i>&mdash; только предложения и в вопросе с I/we</i></span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 3: MODALS ============ -->
+        <div class="tab-content" id="tab-modals">
+        <div class="zp-notes">
+            <section class="note-section">
+                <h2>Модальные: одна таблица на все функции</h2>
+                <div class="note-card highlight-card">
+                    <div class="v5-wrap"><table class="unit-table">
+                        <tr><th>Функция</th><th>Настоящее / будущее</th><th>Прошлое</th></tr>
+                        <tr><td><b>Способность</b></td><td>can swim &middot; is able to</td><td>could swim <i>(вообще)</i> &middot; was able to <i>(в конкретный раз)</i></td></tr>
+                        <tr><td><b>Разрешение</b></td><td>can / may / could I&hellip;?</td><td>was allowed to</td></tr>
+                        <tr><td><b>Необходимость</b></td><td>must &middot; have to &middot; have got to</td><td>had to <i>(must в прошлом не бывает)</i></td></tr>
+                        <tr><td><b>Отсутствие необходимости</b></td><td>needn't &middot; don't have to</td><td>didn't have to &middot; didn't need to &middot; needn't have done</td></tr>
+                        <tr><td><b>Запрет</b></td><td>mustn't &middot; can't</td><td>wasn't allowed to</td></tr>
+                        <tr><td><b>Совет</b></td><td>should &middot; ought to &middot; had better</td><td>should have done <i>(а не сделал)</i></td></tr>
+                        <tr><td><b>Уверенность 95%</b></td><td>must be</td><td>must have been</td></tr>
+                        <tr><td><b>Вероятность 50%</b></td><td>may / might / could be</td><td>may / might / could have been</td></tr>
+                        <tr><td><b>Уверенность «нет»</b></td><td>can't be</td><td>can't / couldn't have been</td></tr>
+                    </table></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>Ключевые различия, на которых сыпятся</h3>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">mustn't ≠ don't have to</span><span class="vx">You <b>mustn't</b> park here <i>(нельзя)</i> / You <b>don't have to</b> park here <i>(можно не)</i>.</span></div>
+                        <div class="vrow"><span class="vw">must ≠ have to</span><span class="vx"><b>Must</b> &mdash; я сам считаю нужным; <b>have to</b> &mdash; правило извне. I <b>must</b> stop smoking. / I <b>have to</b> wear a uniform.</span></div>
+                        <div class="vrow"><span class="vw">could ≠ was able to</span><span class="vx">I <b>could</b> swim at five <i>(умение)</i> / The water was cold but I <b>was able to</b> swim across <i>(один раз получилось)</i>.</span></div>
+                        <div class="vrow"><span class="vw">should have</span><span class="vx">You <b>should have told</b> me. <i>&mdash; надо было, но не сделал</i></span></div>
+                        <div class="vrow"><span class="vw">can't have</span><span class="vx">She <b>can't have forgotten</b> &mdash; she wrote it down. <i>&mdash; отрицание догадки, не mustn't</i></span></div>
+                        <div class="vrow"><span class="vw">would</span><span class="vx">I <b>would</b> take the job, but the pay is terrible. <i>&mdash; воображаемая ситуация</i></span></div>
+                        <div class="vrow"><span class="vw">would (прошлое)</span><span class="vx">Every summer we <b>would go</b> to the lake. <i>= used to, о повторявшемся</i></span></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>Формы: что после модального</h3>
+                    <div class="form-box">modal + <b>infinitive без to</b> &nbsp;&middot;&nbsp; modal + <b>have + V3</b> (прошлое) &nbsp;&middot;&nbsp; modal + <b>be + -ing</b> (сейчас/процесс)</div>
+                    <div class="vlist">
+                        <div class="vrow"><span class="vw">+ inf</span><span class="vx">She <b>might come</b> later. <i>&#x274C; might to come</i></span></div>
+                        <div class="vrow"><span class="vw">+ have V3</span><span class="vx">She <b>might have come</b> while we were out.</span></div>
+                        <div class="vrow"><span class="vw">+ be -ing</span><span class="vx">He <b>must be joking</b>. &middot; They <b>may be waiting</b> outside.</span></div>
+                        <div class="vrow"><span class="vw">нет -s</span><span class="vx">&#x274C; He cans / musts &rarr; &#x2705; He <b>can</b>, he <b>must</b>.</span></div>
+                        <div class="vrow"><span class="vw">два модальных нельзя</span><span class="vx">&#x274C; will can &rarr; &#x2705; <b>will be able to</b>; &#x274C; must can &rarr; &#x2705; <b>have to be able to</b>.</span></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+        <!-- ============ TAB 4: DIAGNOSTIC ============ -->
+        <div class="tab-content" id="tab-diag">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9ED;</span>
+                    <div>
+                        <h2>Диагностика: 40 вопросов &rarr; список твоих слабых тем</h2>
+                        <p class="lesson-header-sub">Отвечай подряд. В конце страница сама скажет, какие разделы сайта тебе стоит повторить &mdash; со ссылками</p>
+                    </div>
+                </div>
+                <div class="note-card">
+                    <div id="diag-box"></div>
+                    <div id="diag-result" style="margin-top:1rem"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ============ TAB 5: DRILL ============ -->
+        <div class="tab-content" id="tab-drill">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x270D;&#xFE0F;</span>
+                    <div>
+                        <h2>Тренировка</h2>
+                        <p class="lesson-header-sub">Ответ спрятан &mdash; кликни по серому прямоугольнику</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>A. Времена: поставь глагол в нужную форму</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. I <span class="sol">have known</span> (know) her since 2018.</div>
+                        <div class="drill-item">2. Look at the sky &mdash; it <span class="sol">is going to rain</span> (rain).</div>
+                        <div class="drill-item">3. When I got home, the film <span class="sol">had already started</span> (already / start).</div>
+                        <div class="drill-item">4. She's exhausted &mdash; she <span class="sol">has been working</span> (work) since six.</div>
+                        <div class="drill-item">5. What <span class="sol">were you doing</span> (you / do) at nine last night?</div>
+                        <div class="drill-item">6. The train <span class="sol">leaves</span> (leave) at 7.40 tomorrow.</div>
+                        <div class="drill-item">7. By next summer I <span class="sol">will have lived</span> (live) here for ten years.</div>
+                        <div class="drill-item">8. I <span class="sol">saw</span> (see) that film last week &mdash; it's good.</div>
+                        <div class="drill-item">9. This time tomorrow we <span class="sol">will be sitting</span> (sit) on the beach.</div>
+                        <div class="drill-item">10. Don't phone at eight &mdash; I <span class="sol">will be having</span> (have) dinner.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>B. Будущее: will / going to / present continuous</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. &mdash; The bags look heavy. &mdash; <span class="sol">I'll help</span> you.</div>
+                        <div class="drill-item">2. We <span class="sol">'re meeting</span> Anna at seven &mdash; it's arranged.</div>
+                        <div class="drill-item">3. I've decided: I <span class="sol">'m going to learn</span> Spanish this year.</div>
+                        <div class="drill-item">4. I think prices <span class="sol">will rise</span> again in autumn.</div>
+                        <div class="drill-item">5. Call me as soon as you <span class="sol">arrive</span> (arrive). <i>(не «will arrive»)</i></div>
+                        <div class="drill-item">6. I <span class="sol">was going to</span> phone you, but my battery died.</div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>C. Модальные</h3>
+                    <div class="drill">
+                        <div class="drill-item">1. You <span class="sol">mustn't</span> use your phone here. <i>(запрещено)</i></div>
+                        <div class="drill-item">2. You <span class="sol">don't have to</span> come if you're busy. <i>(не обязательно)</i></div>
+                        <div class="drill-item">3. The water was freezing, but she <span class="sol">was able to</span> swim to the boat.</div>
+                        <div class="drill-item">4. You <span class="sol">should have told</span> me earlier &mdash; I'd have helped.</div>
+                        <div class="drill-item">5. He <span class="sol">can't have seen</span> us &mdash; he was facing the other way.</div>
+                        <div class="drill-item">6. Next year I <span class="sol">will be able to</span> drive. <i>(не «will can»)</i></div>
+                        <div class="drill-item">7. It's late &mdash; we <span class="sol">had better</span> leave now.</div>
+                        <div class="drill-item">8. You <span class="sol">needn't have paid</span> &mdash; the tickets were free. <i>(заплатил зря)</i></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        document.querySelectorAll('.sol').forEach(s => {
+            s.classList.add('hidden-sol');
+            s.addEventListener('click', () => s.classList.toggle('hidden-sol'));
+        });
+
+        const Q_TOTAL = document.querySelectorAll('.quiz-question').length;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! \u2705';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite \u274C \u2014 ' + (q.dataset.why || '');
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('q-score');
+            if (qDone === Q_TOTAL && scoreEl) {
+                const pct = qScore / Q_TOTAL;
+                if (pct === 1) scoreEl.innerHTML = '\uD83C\uDF1F ' + qScore + '/' + Q_TOTAL + ' \u2014 Perfect!';
+                else if (pct >= 0.8) scoreEl.innerHTML = '\u2705 ' + qScore + '/' + Q_TOTAL + ' \u2014 Great!';
+                else if (pct >= 0.6) scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 Good, \u043f\u043e\u0432\u0442\u043e\u0440\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 \u043f\u0440\u043e\u0439\u0434\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438 \u0435\u0449\u0451 \u0440\u0430\u0437 \uD83D\uDCAA';
+                scoreEl.style.color = pct >= 0.8 ? 'var(--color-green)' : pct >= 0.6 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+
+    // ===== Диагностика: 40 вопросов с маршрутом на страницы сайта =====
+    var DIAG = [
+      ["I ____ here since 2019.",["live","have lived","am living"],1,"Present Perfect: since/for","englisch-present-perfect.html"],
+      ["We ____ dinner when the lights went out.",["had","were having","have had"],1,"Past Continuous","englisch-past-continuous.html"],
+      ["I ____ him yesterday at the station.",["have seen","saw","had seen"],1,"Past Simple vs Perfect","englisch-past-simple.html"],
+      ["She's tired. She ____ all morning.",["has cleaned","has been cleaning","cleans"],1,"Present Perfect Continuous","englisch-present-perfect-continuous.html"],
+      ["How many emails ____ today?",["have you written","have you been writing","did you write"],0,"Perfect: simple vs continuous","englisch-present-perfect.html"],
+      ["When we arrived, the film ____.",["already started","has already started","had already started"],2,"Past Perfect","englisch-past-perfect.html"],
+      ["It's the first time I ____ sushi.",["try","have tried","tried"],1,"It's the first time + Perfect","englisch-feinheiten.html"],
+      ["Water ____ at 100 degrees.",["is boiling","boils","has boiled"],1,"Present Simple: факты","englisch-present-simple.html"],
+      ["I ____ the answer.",["am knowing","know","have been knowing"],1,"State verbs без continuous","englisch-present-continuous.html"],
+      ["He ____ his keys again — it happens every week!",["always loses","is always losing","has always lost"],1,"always + continuous = упрёк","englisch-feinheiten.html"],
+      ["My train ____ at 8.15 tomorrow.",["will leave","leaves","is leaving"],1,"Расписание = Present Simple","englisch-future.html"],
+      ["— The phone's ringing! — OK, I ____ it.",["will get","am getting","am going to get"],0,"will: решение в момент речи","englisch-future-will-going-to.html"],
+      ["Look at those clouds — it ____.",["will rain","is going to rain","rains"],1,"going to: видимый признак","englisch-future-going-to.html"],
+      ["I ____ Anna at six, we arranged it yesterday.",["will meet","meet","am meeting"],2,"Present Continuous = договорённость","englisch-future.html"],
+      ["By 2030 they ____ the new line.",["will finish","will have finished","finish"],1,"Future Perfect","englisch-future-perfect.html"],
+      ["This time tomorrow I ____ over the Atlantic.",["will fly","will be flying","fly"],1,"Future Continuous","englisch-future-continuous.html"],
+      ["I'll call you when I ____ home.",["will get","get","will have got"],1,"После when — настоящее","englisch-future.html"],
+      ["You ____ smoke here — it's a hospital.",["mustn't","don't have to","needn't"],0,"mustn't = запрет","englisch-modals.html"],
+      ["You ____ come tomorrow if you're busy.",["mustn't","don't have to","can't"],1,"don't have to = не обязательно","englisch-modals.html"],
+      ["The sea was rough, but he ____ swim back.",["could","was able to","can"],1,"could vs was able to","englisch-modals.html"],
+      ["She ____ me — she was on a plane all day.",["mustn't have called","can't have called","shouldn't have called"],1,"can't have = уверен, что нет","englisch-feinheiten.html"],
+      ["You ____ him the truth. Now it's too late.",["should tell","should have told","must have told"],1,"should have done","englisch-modals.html"],
+      ["We ____ cook — the food was included.",["needn't have","didn't need to","mustn't have"],0,"needn't have done = сделал зря","englisch-feinheiten.html"],
+      ["Next month I ____ drive on my own.",["will can","will be able to","can will"],1,"will be able to","englisch-modals.html"],
+      ["It's late. We ____ go home.",["had better","would better","should better"],0,"had better","englisch-modals.html"],
+      ["Mathematics ____ my favourite subject.",["are","is","were"],1,"-ics = единственное число","englisch-feinheiten.html"],
+      ["The police ____ looking for the driver.",["is","are","has"],1,"police = множественное","englisch-feinheiten.html"],
+      ["Fifty euros ____ too much for that.",["are","is","were"],1,"Сумма = единственное","englisch-feinheiten.html"],
+      ["____ tiger is losing its habitat.",["A","The","—"],1,"the + вид животных","englisch-articles.html"],
+      ["She plays ____ violin beautifully.",["a","the","—"],1,"инструменты с the","englisch-articles.html"],
+      ["____ rich are getting richer.",["The","A","—"],0,"the + прилагательное = группа","englisch-feinheiten.html"],
+      ["____ of the windows was broken.",["Everyone","Every one","Everybody"],1,"every one of","englisch-quantifiers.html"],
+      ["Is your headache ____ better?",["very","any","so"],1,"any + comparative","englisch-feinheiten.html"],
+      ["____ we book, the cheaper it is.",["Sooner","The sooner","As soon"],1,"the … the …","englisch-feinheiten.html"],
+      ["Your phone is the same ____ mine.",["like","as","than"],1,"the same as","englisch-feinheiten.html"],
+      ["There was ____ traffic this morning.",["hardly any","hard any","hardly no"],0,"hardly any","englisch-feinheiten.html"],
+      ["He asked me ____.",["where did I work","where I worked","where worked I"],1,"Порядок слов в пересказе","englisch-feinheiten.html"],
+      ["Do you know ____?",["where is the station","where the station is","where the station"],1,"Вежливый вопрос","englisch-questions.html"],
+      ["I can't decide ____ to accept.",["if","whether","that"],1,"whether перед to","englisch-feinheiten.html"],
+      ["She suggested ____ earlier.",["me to leave","that I leave","me leaving"],1,"suggest + that","englisch-feinheiten.html"]
+    ];
+    (function () {
+      var box = document.getElementById('diag-box');
+      var res = document.getElementById('diag-result');
+      if (!box) return;
+      var wrong = [], done = 0, score = 0;
+      box.innerHTML = DIAG.map(function (q, i) {
+        return '<div class="quiz-question" id="dq' + i + '">' +
+          '<p><strong>' + (i + 1) + '.</strong> ' + q[0] + '</p>' +
+          '<div class="quiz-options">' +
+          q[1].map(function (o, j) { return '<button class="quiz-btn" data-i="' + i + '" data-j="' + j + '">' + o + '</button>'; }).join('') +
+          '</div><p class="quiz-feedback"></p></div>';
+      }).join('');
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('.quiz-btn') : null;
+        if (!b) return;
+        var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        var q = document.getElementById('dq' + i);
+        if (q.classList.contains('answered')) return;
+        q.classList.add('answered');
+        q.querySelectorAll('.quiz-btn').forEach(function (x) { x.disabled = true; });
+        var fb = q.querySelector('.quiz-feedback');
+        done++;
+        if (j === DIAG[i][2]) {
+          b.classList.add('correct'); score++;
+          fb.textContent = 'Correct ✅ — ' + DIAG[i][3];
+          fb.style.color = 'var(--color-green)';
+        } else {
+          b.classList.add('wrong');
+          q.querySelectorAll('.quiz-btn')[DIAG[i][2]].classList.add('correct');
+          fb.innerHTML = '❌ — ' + DIAG[i][3] + ' &middot; <a href="' + DIAG[i][4] + '" style="color:var(--color-accent)">повторить тему</a>';
+          fb.style.color = 'var(--color-red)';
+          wrong.push([DIAG[i][3], DIAG[i][4]]);
+        }
+        if (done === DIAG.length) {
+          var seen = {}, list = '';
+          wrong.forEach(function (w) { if (!seen[w[1] + w[0]]) { seen[w[1] + w[0]] = 1; list += '<li><a href="' + w[1] + '" style="color:var(--color-accent)">' + w[0] + '</a></li>'; } });
+          res.innerHTML = '<div class="note-card highlight-card"><h3>' + score + ' / ' + DIAG.length + '</h3>' +
+            (wrong.length ? '<p>Твои слабые места — открой и пройди:</p><ul style="line-height:1.9">' + list + '</ul>'
+                          : '<p>Ошибок нет — система времён и модальных у тебя собрана. 🌟</p>') +
+            '</div>';
+          res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    })();
+
+    </script>
+</body>
+</html>

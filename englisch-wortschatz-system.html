@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wortschatz-System &mdash; 555 Bausteine | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <link rel="stylesheet" href="css/lesson-audio.css?v=3">
+    <style>
+        /* === THEMATISCHER WORTSCHATZ — violet accent === */
+        .v5-note {
+            background: rgba(45,212,191,0.09);
+            border: 1px solid rgba(45,212,191,0.28);
+            border-left: 4px solid #2dd4bf;
+            border-radius: 0 12px 12px 0;
+            padding: 0.9rem 1.1rem;
+            margin: 1.1rem 0;
+            color: rgba(226,232,240,0.88);
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+        .v5-note b { color: #5eead4; }
+        .v5-bar {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 1rem 0 0.9rem;
+        }
+        .v5-search {
+            flex: 1 1 240px;
+            min-width: 190px;
+            background: rgba(15,15,30,0.75);
+            border: 1.5px solid rgba(45,212,191,0.3);
+            border-radius: 12px;
+            padding: 0.6rem 0.95rem;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+        }
+        .v5-search:focus { border-color: #2dd4bf; box-shadow: 0 0 0 3px rgba(45,212,191,0.15); }
+        .v5-btn {
+            background: rgba(45,212,191,0.14);
+            border: 1.5px solid rgba(45,212,191,0.35);
+            color: #99f6e4;
+            border-radius: 12px;
+            padding: 0.55rem 0.95rem;
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .v5-btn:hover { background: rgba(45,212,191,0.26); color: #fff; }
+        .v5-btn.on { background: #2dd4bf; border-color: #2dd4bf; color: #04211d; }
+        .v5-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.1rem; }
+        .v5-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(226,232,240,0.8);
+            border-radius: 20px;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.79rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .v5-chip:hover { border-color: rgba(45,212,191,0.5); color: #fff; }
+        .v5-chip.on { background: rgba(45,212,191,0.9); border-color: #2dd4bf; color: #04211d; font-weight: 800; }
+        .v5-chip small { opacity: 0.65; font-weight: 700; margin-left: 0.25rem; }
+        .v5-cnt { font-size: 0.82rem; color: rgba(200,220,255,0.55); margin-bottom: 0.7rem; }
+        .v5-deck-h {
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: #5eead4;
+            margin: 1.6rem 0 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(45,212,191,0.22);
+            letter-spacing: 0.01em;
+        }
+        .v5-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 0.85rem; }
+        .v5-card {
+            background: rgba(45,212,191,0.055);
+            border: 1px solid rgba(45,212,191,0.19);
+            border-radius: 14px;
+            padding: 0.85rem 1rem 0.9rem;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .v5-card:hover { border-color: rgba(45,212,191,0.42); background: rgba(45,212,191,0.085); }
+        .v5-w { font-size: 1.09rem; font-weight: 800; color: #99f6e4; letter-spacing: 0.005em; }
+        .v5-pos {
+            font-size: 0.64rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-radius: 20px;
+            padding: 0.13rem 0.5rem;
+            margin-left: 0.45rem;
+            vertical-align: 0.12rem;
+            background: rgba(148,163,184,0.16);
+            color: #cbd5e1;
+            border: 1px solid rgba(148,163,184,0.25);
+        }
+        .v5-pos.adj { background: rgba(56,189,248,0.14); color: #7dd3fc; border-color: rgba(56,189,248,0.28); }
+        .v5-pos.v   { background: rgba(52,211,153,0.14); color: #6ee7b7; border-color: rgba(52,211,153,0.28); }
+        .v5-pos.n   { background: rgba(251,146,60,0.14); color: #fdba74; border-color: rgba(251,146,60,0.28); }
+        .v5-ipa { font-size: 0.79rem; color: rgba(94,234,212,0.72); margin: 0.2rem 0 0.42rem; }
+        .v5-def { font-size: 0.87rem; color: rgba(226,232,240,0.82); line-height: 1.5; }
+        .v5-ua {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fcd34d;
+            margin-top: 0.32rem;
+            line-height: 1.45;
+        }
+        body.v5-hide-ua .v5-ua { filter: blur(5px); cursor: pointer; }
+        body.v5-hide-ua .v5-card:hover .v5-ua { filter: none; }
+        .v5-ex {
+            font-size: 0.83rem;
+            color: rgba(203,213,225,0.62);
+            font-style: italic;
+            margin-top: 0.4rem;
+            line-height: 1.5;
+            border-top: 1px dashed rgba(45,212,191,0.16);
+            padding-top: 0.4rem;
+        }
+        .v5-ex b { color: #2dd4bf; font-style: normal; font-weight: 700; }
+        .v5-tip {
+            font-size: 0.8rem;
+            color: #fda4af;
+            background: rgba(244,63,94,0.08);
+            border-left: 3px solid rgba(244,63,94,0.5);
+            border-radius: 0 8px 8px 0;
+            padding: 0.35rem 0.6rem;
+            margin-top: 0.45rem;
+            line-height: 1.5;
+        }
+        .v5-tip b { color: #fecdd3; }
+        .v5-say {
+            background: rgba(45,212,191,0.14);
+            border: 1px solid rgba(45,212,191,0.32);
+            color: #99f6e4;
+            border-radius: 8px;
+            width: 1.75rem;
+            height: 1.55rem;
+            font-size: 0.82rem;
+            line-height: 1;
+            cursor: pointer;
+            margin-left: 0.45rem;
+            vertical-align: 0.1rem;
+            padding: 0;
+            transition: background 0.15s, transform 0.15s;
+        }
+        .v5-say:hover { background: rgba(45,212,191,0.3); transform: translateY(-1px); }
+        .v5-say.playing { background: #2dd4bf; color: #04211d; border-color: #2dd4bf; }
+        .v5-deck-h .v5-say { margin-left: 0.6rem; }
+        .v5-hearsm {
+            background: rgba(45,212,191,0.12);
+            border: 1px solid rgba(45,212,191,0.3);
+            color: #99f6e4;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.16rem 0.6rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin-left: 0.5rem;
+            vertical-align: 0.08rem;
+        }
+        .v5-hearsm:hover { background: rgba(45,212,191,0.26); color: #fff; }
+        /* --- Übungen --- */
+        .v5-ex-box {
+            background: rgba(15,15,30,0.55);
+            border: 1.5px solid rgba(45,212,191,0.25);
+            border-radius: 16px;
+            padding: 1.2rem 1.3rem;
+            margin-bottom: 1.2rem;
+        }
+        .v5-q { font-size: 1.02rem; color: #e2e8f0; line-height: 1.6; margin-bottom: 0.9rem; }
+        .v5-q b { color: #99f6e4; }
+        .v5-q .gap { color: #2dd4bf; font-weight: 800; letter-spacing: 0.08em; }
+        .v5-opts { display: grid; gap: 0.5rem; }
+        .v5-opt {
+            text-align: left;
+            background: rgba(255,255,255,0.045);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 11px;
+            padding: 0.6rem 0.9rem;
+            color: #e2e8f0;
+            font-size: 0.92rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .v5-opt:hover:not(:disabled) { border-color: rgba(45,212,191,0.55); background: rgba(45,212,191,0.1); }
+        .v5-opt.ok { background: rgba(52,211,153,0.16); border-color: #34d399; color: #a7f3d0; }
+        .v5-opt.no { background: rgba(248,113,113,0.14); border-color: #f87171; color: #fecaca; }
+        .v5-fb { margin-top: 0.75rem; font-size: 0.9rem; line-height: 1.55; min-height: 1.2rem; }
+        .v5-prog { font-size: 0.85rem; color: rgba(200,220,255,0.6); margin-bottom: 0.6rem; font-weight: 700; }
+        /* --- Matching --- */
+        .v5-match { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .v5-mcol { display: grid; gap: 0.5rem; align-content: start; }
+        .v5-mi {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.13);
+            border-radius: 11px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: left;
+            transition: all 0.15s;
+        }
+        .v5-mi:hover:not(.done) { border-color: rgba(45,212,191,0.6); }
+        .v5-mi.sel { border-color: #2dd4bf; background: rgba(45,212,191,0.2); }
+        .v5-mi.done { opacity: 0.32; border-color: rgba(52,211,153,0.5); background: rgba(52,211,153,0.1); cursor: default; }
+        .v5-mi.shake { animation: v5shake 0.3s; }
+        @keyframes v5shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        /* --- Wortbildung / Lifehacks --- */
+        .v5-sec {
+            background: rgba(255,255,255,0.028);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 1.15rem 1.35rem;
+            margin-bottom: 1.15rem;
+        }
+        .v5-sec h3 {
+            color: #5eead4;
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin: 0 0 0.7rem;
+            letter-spacing: 0.01em;
+        }
+        .v5-sec p { color: rgba(226,232,240,0.82); font-size: 0.92rem; line-height: 1.7; margin: 0 0 0.7rem; }
+        .v5-sec p b, .v5-sec li b { color: #99f6e4; }
+        .v5-sec ul { margin: 0 0 0.7rem; padding-left: 1.15rem; }
+        .v5-sec li { color: rgba(226,232,240,0.82); font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.35rem; }
+        .v5-tab-w { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 0.7rem; }
+        .v5-tab-w th {
+            text-align: left;
+            color: #2dd4bf;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid rgba(45,212,191,0.25);
+        }
+        .v5-tab-w td {
+            padding: 0.42rem 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: rgba(226,232,240,0.82);
+            line-height: 1.5;
+            vertical-align: top;
+        }
+        .v5-tab-w td.k { color: #99f6e4; font-weight: 700; white-space: nowrap; }
+        .v5-tab-w tr:hover td { background: rgba(45,212,191,0.05); }
+        .v5-wrap { overflow-x: auto; }
+        .v5-key {
+            display: inline-block;
+            background: rgba(45,212,191,0.16);
+            border: 1px solid rgba(45,212,191,0.3);
+            border-radius: 7px;
+            padding: 0.06rem 0.42rem;
+            color: #99f6e4;
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+        .v5-good { color: #6ee7b7; font-weight: 700; }
+        .v5-bad { color: #fca5a5; font-weight: 700; }
+        @media (max-width: 640px) {
+            .v5-grid { grid-template-columns: 1fr; }
+            .v5-match { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/moon.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer &#9662;</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln &#9662;</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+            <a href="gallery.html">Gallery</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Wortschatz-System</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Wortschatz-System &mdash; 555 Bausteine</h1>
+            <p class="page-subtitle">21 Blöcke &middot; B2&ndash;C1 &middot; Wortbildung, Verbausdrücke, Aussprache, Register &mdash; mit Übungen, Regeltabellen und Audio</p>
+        </div>
+
+        <div class="v5-note">
+            <b>Що це:</b> 555 будівельних блоків англійської — суфікси, префікси, складені слова, сталі пари, вирази з do/make/get/put,
+            вимовні пастки, регістр, мова заголовків і табличок, US&harr;UK. Кожен блок перевірено по всіх англійських сторінках сайту — <b>майже все тут нове</b>.
+            Близько 40 слів (conflict, permit, key, hit, axe&hellip;) на сайті трапляються, але <b>в іншому значенні чи функції</b>:
+            тут вони як пари «іменник↔дієслово» з різним наголосом і як газетна лексика — тому лишилися. Означення, переклади й приклади — мої власні, під український контекст.
+            У кожної картки є <b>&#x1F50A; офлайн-озвучка</b>, у кожного блоку — суцільний трек.
+        </div>
+
+        <div class="tabs" style="margin-bottom:1.5rem">
+            <button class="tab active" data-tab="t-w">&#x1F4D6; Wörter</button>
+            <button class="tab" data-tab="t-u">&#x270D;&#xFE0F; Übungen</button>
+            <button class="tab" data-tab="t-m">&#x1F9E9; Matching</button>
+            <button class="tab" data-tab="t-b">&#x1F4D0; Systeme</button>
+            <button class="tab" data-tab="t-l">&#x1F4A1; Lifehacks</button>
+        </div>
+
+        <!-- ============ WÖRTER ============ -->
+        <div class="tab-content active" id="t-w">
+            <div class="v5-bar">
+                <input class="v5-search" id="v5q" type="search" placeholder="Suchen: englisch, deutsch/ukrainisch, Definition …" autocomplete="off">
+                <button class="v5-btn" id="v5hide">&#x1F648; Übersetzung verstecken</button>
+                <button class="v5-btn" id="v5rand">&#x1F3B2; 12 zufällige</button>
+                <button class="v5-btn" id="v5hear">&#x1F3A7; Block anhören</button>
+            </div>
+            <div class="v5-chips" id="v5chips"></div>
+            <div class="v5-cnt" id="v5cnt"></div>
+            <div id="v5list"></div>
+        </div>
+
+        <!-- ============ ÜBUNGEN ============ -->
+        <div class="tab-content" id="t-u">
+            <div class="v5-note">
+                Вправи будуються <b>з тих самих 555 блоків</b> і щоразу генеруються заново &mdash; повторюй скільки завгодно.
+                Обери тип вправи й блок слів; після 10 питань покажу результат.
+            </div>
+            <div class="v5-bar">
+                <button class="v5-btn on" data-mode="ua">1&#xFE0F;&#x20E3; Wort &rarr; Bedeutung</button>
+                <button class="v5-btn" data-mode="gap">2&#xFE0F;&#x20E3; Lückentext</button>
+                <button class="v5-btn" data-mode="def">3&#xFE0F;&#x20E3; Definition &rarr; Wort</button>
+                <button class="v5-btn" data-mode="rev">4&#xFE0F;&#x20E3; Bedeutung &rarr; Wort</button>
+            </div>
+            <div class="v5-bar">
+                <select class="v5-search" id="v5deck" style="flex:0 1 320px"></select>
+                <button class="v5-btn" id="v5start">&#x25B6; Neue Runde</button>
+            </div>
+            <div class="v5-ex-box" id="v5quiz"></div>
+        </div>
+
+        <!-- ============ MATCHING ============ -->
+        <div class="tab-content" id="t-m">
+            <div class="v5-note">
+                Клацни слово ліворуч і його значення праворуч. Вісім пар за раунд &mdash; так мозок закріплює
+                <b>звʼязок форма&nbsp;&harr;&nbsp;значення</b>, а не просто впізнавання.
+            </div>
+            <div class="v5-bar">
+                <select class="v5-search" id="v5mdeck" style="flex:0 1 320px"></select>
+                <button class="v5-btn" id="v5mnew">&#x1F504; Neue Runde</button>
+                <span class="v5-prog" id="v5mscore" style="margin:0"></span>
+            </div>
+            <div class="v5-match" id="v5matchbox"></div>
+        </div>
+
+        <!-- ============ WORTBILDUNG ============ -->
+        <!-- ============ SYSTEME ============ -->
+        <div class="tab-content" id="t-b">
+            <div class="v5-note">
+                Тут не слова, а <b>правила, за якими вони збираються</b>. Якщо знаєш модель, нове слово не треба вчити —
+                його можна зібрати або розібрати на місці. Усі приклади — з карток цієї сторінки.
+            </div>
+
+            <div class="v5-sec">
+                <h3>1. Наголос стрибає: іменник ↔ дієслово</h3>
+                <p>Одне написання, два наголоси й дві частини мови. Іменник — наголос на <b>першому</b> складі,
+                дієслово — на <b>другому</b>. Це найшвидший спосіб звучати природно.</p>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Слово</th><th>Іменник (<b>PER</b>mit)</th><th>Дієслово (per<b>MIT</b>)</th></tr>
+                    <tr><td class="k">permit</td><td>/ˈpɜːmɪt/ дозвіл</td><td>/pəˈmɪt/ дозволяти</td></tr>
+                    <tr><td class="k">conflict</td><td>/ˈkɒnflɪkt/ конфлікт</td><td>/kənˈflɪkt/ суперечити</td></tr>
+                    <tr><td class="k">contest</td><td>/ˈkɒntest/ конкурс</td><td>/kənˈtest/ оскаржувати</td></tr>
+                    <tr><td class="k">conduct</td><td>/ˈkɒndʌkt/ поведінка</td><td>/kənˈdʌkt/ проводити</td></tr>
+                    <tr><td class="k">increase</td><td>/ˈɪŋkriːs/ зростання</td><td>/ɪnˈkriːs/ зростати</td></tr>
+                    <tr><td class="k">decrease</td><td>/ˈdiːkriːs/ зниження</td><td>/dɪˈkriːs/ зменшуватися</td></tr>
+                    <tr><td class="k">export / import</td><td>/ˈekspɔːt/ експорт</td><td>/ɪkˈspɔːt/ експортувати</td></tr>
+                    <tr><td class="k">transfer</td><td>/ˈtrænsfɜː/ переказ</td><td>/trænsˈfɜː/ переводити</td></tr>
+                    <tr><td class="k">progress</td><td>/ˈprəʊɡres/ прогрес</td><td>/prəˈɡres/ просуватися</td></tr>
+                    <tr><td class="k">insult</td><td>/ˈɪnsʌlt/ образа</td><td>/ɪnˈsʌlt/ ображати</td></tr>
+                    <tr><td class="k">suspect</td><td>/ˈsʌspekt/ підозрюваний</td><td>/səˈspekt/ підозрювати</td></tr>
+                    <tr><td class="k">record</td><td>/ˈrekɔːd/ запис, рекорд</td><td>/rɪˈkɔːd/ записувати</td></tr>
+                </table></div>
+                <p><b>Тренуй парами вголос:</b> «We need a <i>PERmit</i> — they won't per<i>MIT</i> it.» Одна фраза — обидва наголоси.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>2. Німі літери — де вони ховаються</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Не читається</th><th>Де</th><th>Слова</th></tr>
+                    <tr><td class="k">b</td><td>після m, перед t</td><td>tom<b>b</b>, wom<b>b</b>, com<b>b</b>, clim<b>b</b>, lam<b>b</b>, de<b>b</b>tor, dou<b>b</b>t</td></tr>
+                    <tr><td class="k">k</td><td>перед n</td><td><b>k</b>nob, <b>k</b>nee, <b>k</b>nife, <b>k</b>now, <b>k</b>nock</td></tr>
+                    <tr><td class="k">l</td><td>перед k, m, f</td><td>cha<b>l</b>k, ta<b>l</b>k, wa<b>l</b>k, ca<b>l</b>m, ha<b>l</b>f</td></tr>
+                    <tr><td class="k">t</td><td>у -sten, -stle</td><td>fas<b>t</b>en, lis<b>t</b>en, cas<b>t</b>le, whis<b>t</b>le</td></tr>
+                    <tr><td class="k">h</td><td>на початку кількох слів</td><td><b>h</b>eir, <b>h</b>our, <b>h</b>onest, <b>h</b>onourable</td></tr>
+                    <tr><td class="k">p</td><td>перед n, s, t (грецькі)</td><td><b>p</b>neumatic, <b>p</b>sychiatry, <b>p</b>seudonym, <b>p</b>sychic</td></tr>
+                    <tr><td class="k">w</td><td>перед r</td><td><b>w</b>rite, <b>w</b>rong, <b>w</b>rap, <b>w</b>reck</td></tr>
+                </table></div>
+                <p>І навпаки: кінцеве <b>-e</b> у грецьких словах читається як /i/ — apostroph<b>e</b>, catastroph<b>e</b>, recip<b>e</b>, hyperbol<b>e</b>.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>3. Складені слова: як їх писати й де наголос</h3>
+                <ul>
+                    <li><b>Іменник + іменник</b> — найчастіша модель: <i>alarm clock, income tax, tea bag, traffic lights</i>. Наголос — на <b>першому</b> слові: <i>ALARM clock</i>.</li>
+                    <li><b>Дієслово + прийменник → іменник</b> (пишеться разом або через дефіс, наголос на першій частині): <i>break out → a BREAKOUT, take over → a TAKEOVER, cut back → a CUTBACK, set up → a SET-UP</i>.</li>
+                    <li><b>Складені прикметники</b> перед іменником пишуться через дефіс: <i>a well-known writer, a two-hour meeting</i> — але після дієслова дефіс зникає: <i>the writer is well known</i>.</li>
+                    <li>Числівник у складеному прикметнику <b>не має -s</b>: <i>a five-minute walk</i> (не «five-minutes»).</li>
+                    <li>Продуктивні хвости: <b>-free</b> (sugar-free, duty-free, stress-free), <b>-proof</b> (bullet-proof, waterproof, foolproof), <b>-friendly</b> (user-friendly), <b>-conscious</b> (health-conscious).</li>
+                </ul>
+            </div>
+
+            <div class="v5-sec">
+                <h3>4. Binomials — пари, порядок у яких не міняють</h3>
+                <p>Це готові блоки: скажеш «white and black» — і носій почує помилку. Тримаються трьома клеями:</p>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Клей</th><th>Приклади</th></tr>
+                    <tr><td class="k">алітерація (той самий звук)</td><td><b>p</b>art and <b>p</b>arcel, <b>p</b>rim and <b>p</b>roper, <b>p</b>ick and <b>ch</b>oose, <b>r</b>ack and <b>r</b>uin, <b>r</b>ant and <b>r</b>ave, <b>w</b>ine and <b>d</b>ine</td></tr>
+                    <tr><td class="k">рима / ритм</td><td>high and dry, wear and tear, by leaps and bounds, to and fro</td></tr>
+                    <tr><td class="k">логіка або звичка</td><td>first and foremost, sooner or later, give and take, all or nothing, sink or swim, peace and quiet</td></tr>
+                </table></div>
+                <p><b>Правило вживання:</b> binomial не розривають і не змінюють число — <i>«part and parcel of the job»</i>, ніколи «parcels».</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>5. Незлічуване → злічуване: як «нарізати» масу</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Модель</th><th>Приклади</th></tr>
+                    <tr><td class="k">a piece / bit of</td><td>a piece of advice, a piece of news, a bit of luck</td></tr>
+                    <tr><td class="k">специфічна «порція»</td><td>a <b>clap</b> of thunder, a <b>flash</b> of lightning, a <b>puff</b> of smoke, a <b>gust</b> of wind, a <b>drop</b> of rain</td></tr>
+                    <tr><td class="k">група в природі</td><td>a <b>clump</b> of trees, a <b>shoal</b> of fish, a <b>swarm</b> of bees, a <b>heap</b> of clothes, a <b>flock</b> of birds</td></tr>
+                    <tr><td class="k">тара</td><td>a <b>carton</b> of milk, a <b>jug</b> of water, a <b>tub</b> of ice cream, a <b>barrel</b> of oil, a <b>crate</b> of apples</td></tr>
+                </table></div>
+                <p><b>Тільки множина</b> (і дієслово в множині): trousers, jeans, leggings, dungarees, overalls, braces, goggles, handcuffs, tongs, scissors, lodgings, proceeds, acoustics, the authorities.
+                Щоб порахувати — <i>a pair of</i>: <b>a pair of</b> goggles, <b>two pairs of</b> swimming trunks.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>6. do чи make?</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th><b>do</b> — робота, обов'язок, невизначене</th><th><b>make</b> — створювати, виробляти результат</th></tr>
+                    <tr><td>do the washing-up, do the gardening, do business, do a favour, do your best, do without, do harm</td><td>make an attempt, make a decision, make a mistake, make progress, make an excuse, make a noise, make love</td></tr>
+                </table></div>
+                <p><b>Фразові дієслова:</b> ті, що з об'єктом-іменником, зазвичай розділяються — <i>bring the price down</i> / <i>bring down the price</i>;
+                але з займенником <b>тільки</b> посередині: <i>bring it down</i> (не «bring down it»).
+                А ось <b>look up to sb</b>, <b>get round to sth</b>, <b>come between</b> — нерозривні: <i>look up to her</i>.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>7. Регістр: одне значення — три рівні</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Формально</th><th>Нейтрально</th><th>Розмовно</th></tr>
+                    <tr><td class="k">residence, abode</td><td>home</td><td>place</td></tr>
+                    <tr><td class="k">offspring</td><td>children</td><td>kids</td></tr>
+                    <tr><td class="k">utilise</td><td>use</td><td>—</td></tr>
+                    <tr><td class="k">purchase</td><td>buy</td><td>get</td></tr>
+                    <tr><td class="k">commence</td><td>begin, start</td><td>kick off</td></tr>
+                    <tr><td class="k">require</td><td>need</td><td>want</td></tr>
+                    <tr><td class="k">assist</td><td>help</td><td>give sb a hand</td></tr>
+                    <tr><td class="k">physician</td><td>doctor</td><td>quack (зневажл.)</td></tr>
+                    <tr><td class="k">remuneration</td><td>pay</td><td>dosh, readies</td></tr>
+                    <tr><td class="k">police officer</td><td>policeman</td><td>cop, the old bill</td></tr>
+                    <tr><td class="k">television</td><td>TV</td><td>telly</td></tr>
+                    <tr><td class="k">refreshments</td><td>food</td><td>grub</td></tr>
+                </table></div>
+                <p><b>Правило:</b> у листі до установи бери ліву колонку, у розмові з друзями — праву. Змішувати колонки в одному реченні —
+                найпомітніша помилка іноземця: <i>«We commenced the party with some grub»</i> звучить смішно.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>8. Заголовки газет — своя граматика</h3>
+                <ul>
+                    <li>Артиклі й допоміжні дієслова <b>викидають</b>: <i>MAYOR OPENS HOSPITAL</i> (= The mayor has opened a hospital).</li>
+                    <li>Present Simple = минуле: <i>BLAZE DESTROYS MARKET</i> (= destroyed).</li>
+                    <li><b>to + інфінітив</b> = майбутнє: <i>PRESIDENT TO VISIT FLOOD AREAS</i> (= will visit).</li>
+                    <li>Пасив без <i>be</i>: <i>FOUR INJURED IN BLAST</i> (= four people were injured).</li>
+                    <li>Слова коротшають і драматизуються — саме їх варто вивчити:</li>
+                </ul>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Заголовок</th><th>Звичайне слово</th><th>Заголовок</th><th>Звичайне слово</th></tr>
+                    <tr><td class="k">aid</td><td>help</td><td class="k">key</td><td>essential</td></tr>
+                    <tr><td class="k">axe</td><td>cut, remove</td><td class="k">link</td><td>connection</td></tr>
+                    <tr><td class="k">back</td><td>support</td><td class="k">move</td><td>step, action</td></tr>
+                    <tr><td class="k">bar</td><td>forbid</td><td class="k">ordeal</td><td>painful experience</td></tr>
+                    <tr><td class="k">bid</td><td>attempt</td><td class="k">oust</td><td>remove from power</td></tr>
+                    <tr><td class="k">blast</td><td>explosion</td><td class="k">plea</td><td>request</td></tr>
+                    <tr><td class="k">blaze</td><td>fire</td><td class="k">pledge / vow</td><td>promise</td></tr>
+                    <tr><td class="k">boost</td><td>encouragement</td><td class="k">ploy</td><td>trick</td></tr>
+                    <tr><td class="k">clash</td><td>dispute</td><td class="k">poll</td><td>election, survey</td></tr>
+                    <tr><td class="k">curb</td><td>limit</td><td class="k">probe</td><td>investigation</td></tr>
+                    <tr><td class="k">drive</td><td>campaign</td><td class="k">quit</td><td>resign</td></tr>
+                    <tr><td class="k">gems</td><td>jewels</td><td class="k">riddle</td><td>mystery</td></tr>
+                    <tr><td class="k">go-ahead</td><td>approval</td><td class="k">strife</td><td>conflict</td></tr>
+                    <tr><td class="k">hit</td><td>affect badly</td><td class="k">talks</td><td>discussions</td></tr>
+                    <tr><td class="k">head / boss</td><td>director</td><td class="k">wed</td><td>marry</td></tr>
+                </table></div>
+            </div>
+
+            <div class="v5-sec">
+                <h3>9. Мова табличок і оголошень</h3>
+                <p>На вивісках англійська стає гранично формальною — тому ці слова майже не трапляються більше ніде:</p>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Напис</th><th>Що це означає людською</th></tr>
+                    <tr><td class="k">Trespassers will be prosecuted</td><td>Не заходь — це приватна земля, подамо до суду</td></tr>
+                    <tr><td class="k">Authorised personnel only</td><td>Тільки для персоналу</td></tr>
+                    <tr><td class="k">Permit holders only</td><td>Тільки з дозволом (паркування)</td></tr>
+                    <tr><td class="k">Please refrain from smoking</td><td>Просимо не палити</td></tr>
+                    <tr><td class="k">Cyclists dismount</td><td>Велосипедистам зійти з велосипеда</td></tr>
+                    <tr><td class="k">Alight here for the castle</td><td>Виходьте тут, щоб дійти до замку</td></tr>
+                    <tr><td class="k">Reduce speed now</td><td>Знизьте швидкість</td></tr>
+                    <tr><td class="k">Display ticket clearly</td><td>Покладіть квиток на видному місці</td></tr>
+                    <tr><td class="k">Unaccompanied children not admitted</td><td>Дітей без дорослих не пускають</td></tr>
+                    <tr><td class="k">Penalty for littering £1,000</td><td>Штраф за сміття — 1000 фунтів</td></tr>
+                </table></div>
+                <p>Помічай дієслова: <b>refrain from</b>, <b>dismount</b>, <b>alight</b>, <b>display</b>, <b>prosecute</b> — усі формальні, усі без «please» у наказі.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>10. США ↔ Британія: не тільки слова</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Рівень</th><th>Британія</th><th>США</th></tr>
+                    <tr><td class="k">правопис -our/-or</td><td>colour, honour, labour</td><td>color, honor, labor</td></tr>
+                    <tr><td class="k">-re/-er</td><td>centre, theatre, litre</td><td>center, theater, liter</td></tr>
+                    <tr><td class="k">-ise/-ize</td><td>organise (і organize)</td><td>organize тільки</td></tr>
+                    <tr><td class="k">подвоєння l</td><td>travelled, cancelled</td><td>traveled, canceled</td></tr>
+                    <tr><td class="k">дієприкметник get</td><td>got</td><td>gotten</td></tr>
+                    <tr><td class="k">Present Perfect</td><td>I've just eaten</td><td>I just ate</td></tr>
+                    <tr><td class="k">прийменник часу</td><td>at the weekend</td><td>on the weekend</td></tr>
+                    <tr><td class="k">дата</td><td>5 March 2026 (5/3)</td><td>March 5, 2026 (3/5)</td></tr>
+                </table></div>
+                <p><b>Головне:</b> обирай одну систему й тримайся її в межах тексту. Мішанина помітна навіть тим, хто не знає правил.</p>
+            </div>
+        </div>
+
+        <!-- ============ LIFEHACKS ============ -->
+        <div class="tab-content" id="t-l">
+            <div class="v5-note">
+                Ця сторінка вчиться інакше, ніж список окремих слів: тут майже все — <b>блоки</b> (складені слова, пари, вирази,
+                порівняння). Блок треба запам'ятовувати цілим, і саме тому він дається легше, ніж здається.
+            </div>
+
+            <div class="v5-sec">
+                <h3>1. Не вчи слова — вчи блоки</h3>
+                <p>Мозок зберігає <i>traffic lights</i>, <i>part and parcel</i>, <i>as cool as a cucumber</i> так само, як одне слово: цілим шматком.
+                Спроба розібрати блок по словах тільки шкодить — <i>«part» + «parcel»</i> нічого не пояснює.</p>
+                <ul>
+                    <li>Повторюй блок уголос <b>без пауз усередині</b>: «asCOOLasaCUCUMBER» — так він і звучить у мові.</li>
+                    <li>Записуй одразу з дієсловом-сусідом: не <i>a risk</i>, а <b>take a risk</b>; не <i>fire</i>, а <b>set fire to sth</b>.</li>
+                    <li>Для складених іменників став наголос на першому слові — це і є половина «вимови блоку».</li>
+                </ul>
+            </div>
+
+            <div class="v5-sec">
+                <h3>2. План на 6 тижнів</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Тиждень</th><th>Блоки</th><th>Навіщо саме так</th></tr>
+                    <tr><td class="k">1</td><td>Suffixe, Präfixe, Wurzeln</td><td>Дає ключ до решти: далі половину слів упізнаєш без словника</td></tr>
+                    <tr><td class="k">2</td><td>Compound Adjectives, Compound Nouns</td><td>Найчастотніше в текстах і в описах людей</td></tr>
+                    <tr><td class="k">3</td><td>do/make/bring/take, get/set/put/come/go</td><td>Це те, що дає розмовну швидкість</td></tr>
+                    <tr><td class="k">4</td><td>Aussprache-Fallen, Homophone, Lautmalerei</td><td>Слухове тренування; тут аудіо важливіше за читання</td></tr>
+                    <tr><td class="k">5</td><td>Binomials, Similes, Sprichwörter</td><td>Пасивне впізнавання: розуміти всі, вживати кілька</td></tr>
+                    <tr><td class="k">6</td><td>Register, Headlines, Schilder, US↔UK</td><td>Читання новин і документів без спотикань</td></tr>
+                </table></div>
+                <p>По 12–15 блоків на день + повтор попереднього дня = увесь список за шість тижнів, без героїзму.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>3. Активний чи пасивний запас — вирішуй одразу</h3>
+                <p>Половину цієї сторінки треба лише <b>розуміти</b>, а не вживати. Ось чесний поділ:</p>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th><span class="v5-good">Активно (кажи сам)</span></th><th><span class="v5-bad">Пасивно (тільки розумій)</span></th></tr>
+                    <tr><td>compound nouns: traffic lights, income tax</td><td>Sprichwörter — сказане не в тему звучить дивно</td></tr>
+                    <tr><td>do/make/take-вирази: take a risk, do without</td><td>Similes з * (as drunk as a lord, as mad as a hatter)</td></tr>
+                    <tr><td>get rid of, set aside, bring out</td><td>Слова із заголовків: oust, probe, ploy — тільки в газеті</td></tr>
+                    <tr><td>нейтральний регістр: use, need, buy, help</td><td>сленг: dosh, sarnie, squaddie, the old bill</td></tr>
+                    <tr><td>приставки й суфікси для власних слів</td><td>abode, offspring, utilise — у своєму мовленні не треба</td></tr>
+                </table></div>
+                <p><b>Правило:</b> якщо не впевнений на 100%, у якій ситуації слово доречне — тримай його в пасиві. Помилка регістру помітніша за помилку граматики.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>4. Вимова: три вправи по дві хвилини</h3>
+                <ul>
+                    <li><b>Пари наголосів.</b> Візьми з вкладки «Systeme» таблицю іменник↔дієслово й читай парами: <i>a PERmit — to perMIT</i>. Десять пар — і слух налаштовується сам.</li>
+                    <li><b>Німі літери.</b> Прочитай уголос ряд: <i>tomb, womb, comb, climb, debtor, knob, chalk, fasten, heir</i>. Якщо десь вирвалася зайва літера — повтори весь ряд.</li>
+                    <li><b>Звуконаслідування.</b> Слова на кшталт <i>growl, moan, wheeze, whizz, clang</i> самі підказують звук — читай їх із інтонацією, вони так і запам'ятовуються.</li>
+                </ul>
+                <p>Натисни 🔊 на картці — там жива вимова слова, перекладу й прикладу. Для складених слів слухай, <b>де падає наголос</b>: це і є основна помилка.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>5. Читай новини через заголовки</h3>
+                <p>Заголовок — це стисла граматика й найдраматичніші слова. Вивчивши 25 слів із блоку <b>Headline English</b>,
+                ти почнеш розуміти британські газети з першого рядка:</p>
+                <ul>
+                    <li><i>PM VOWS TO AXE 200 JOBS</i> → The Prime Minister has promised to cut 200 jobs.</li>
+                    <li><i>PROBE INTO BLAZE AT CITY MARKET</i> → There is an investigation into the fire at the market.</li>
+                    <li><i>MPs BACK CURB ON RENTS</i> → Members of Parliament support a limit on rents.</li>
+                </ul>
+                <p>Вправа на 5 хвилин: відкрий сайт BBC, перепиши три заголовки «людською» англійською. Це найкращий тест на цей блок.</p>
+            </div>
+
+            <div class="v5-sec">
+                <h3>6. Пастки, на яких ловляться всі</h3>
+                <div class="v5-wrap"><table class="v5-tab-w">
+                    <tr><th>Пастка</th><th>У чому річ</th></tr>
+                    <tr><td class="k">rubber</td><td>У Британії — гумка-стирачка, у США — презерватив. Проси <b>eraser</b>.</td></tr>
+                    <tr><td class="k">vest</td><td>BrE — майка під сорочку, AmE — жилет від костюма. Протилежні речі.</td></tr>
+                    <tr><td class="k">wash up</td><td>BrE — мити посуд, AmE — помити руки. «Go and wash up» = дві різні вечері.</td></tr>
+                    <tr><td class="k">pants</td><td>BrE — труси, AmE — штани. Комплімент може вийти дивним.</td></tr>
+                    <tr><td class="k">faze ≠ phase</td><td>faze — збентежити; phase — фаза, етап. Звучать однаково.</td></tr>
+                    <tr><td class="k">lead</td><td>/led/ — свинець, /liːd/ — вести. Пишеться однаково.</td></tr>
+                    <tr><td class="k">quid</td><td>Множини нема: <i>twenty quid</i>, не «quids».</td></tr>
+                    <tr><td class="k">the authorities</td><td>Завжди множина: <i>the authorities <b>have</b> decided</i>.</td></tr>
+                    <tr><td class="k">utilise</td><td>Не «розумніше» за use — просто канцелярит. У 9 з 10 випадків пиши <b>use</b>.</td></tr>
+                    <tr><td class="k">as sick as a parrot</td><td>Не про хворобу, а про розчарування. А <i>as sick as a dog</i> — таки про нудоту.</td></tr>
+                </table></div>
+            </div>
+
+            <div class="v5-sec">
+                <h3>7. Як користуватися цією сторінкою</h3>
+                <ul>
+                    <li><b>Wörter</b> — обирай один блок чипсом угорі; пошук працює і англійською, і українською, і по всіх блоках одразу.</li>
+                    <li><b>🙈 Übersetzung verstecken</b> — переклад розмивається, наведи на картку для перевірки. Найкращий щоденний тест.</li>
+                    <li><b>Übungen</b> — чотири режими: значення, пропуск у реченні, означення → слово і найважчий «переклад → слово».</li>
+                    <li><b>Matching</b> — коли блоки вже знайомі, але плутаються між собою.</li>
+                    <li><b>🔊 / 🎧</b> — озвучка окремої картки і суцільний трек на блок: слухай у дорозі, сторінка не блокується.</li>
+                    <li><b>Systeme</b> — таблиці-правила; повертайся до них щотижня, а не читай один раз підряд.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div><!-- /page-content -->
+
+    <!-- ===== Audio-Dock (schmale Leiste unten, blockiert die Seite nicht) ===== -->
+    <div class="lsa-dock" id="lsa-dock">
+        <div class="lsa-panel" id="lsa-panel">
+            <div class="lsa-now" id="lsa-now"></div>
+            <div class="lsa-settings">
+                <div class="lsa-group">
+                    <button class="lsa-c" data-set="speed" data-val="0.75">0.75&times;</button>
+                    <button class="lsa-c" data-set="speed" data-val="0.9">0.9&times;</button>
+                    <button class="lsa-c" data-set="speed" data-val="1">1&times;</button>
+                    <button class="lsa-c" data-set="speed" data-val="1.25">1.25&times;</button>
+                </div>
+                <div class="lsa-group">
+                    <span style="align-self:center;color:#7a8494;font-size:.78rem;padding:0 .3rem;">&#x1F501;</span>
+                    <button class="lsa-c" data-set="repeat" data-val="1">1&times;</button>
+                    <button class="lsa-c" data-set="repeat" data-val="3">3&times;</button>
+                    <button class="lsa-c" data-set="repeat" data-val="0">&#8734;</button>
+                </div>
+            </div>
+            <div class="lsa-hint">&#9654; Bildschirm sperren, Handy in die Tasche &mdash; läuft weiter. Steuerung vom Sperrbildschirm oder über Kopfhörer.</div>
+        </div>
+        <div class="lsa-bar">
+            <button class="lsa-bar-btn" id="lsa-prev" aria-label="Zurück">&#9198;</button>
+            <button class="lsa-bar-btn lsa-bar-main" id="lsa-play" aria-label="Play/Pause">&#9654;</button>
+            <button class="lsa-bar-btn" id="lsa-next" aria-label="Weiter">&#9197;</button>
+            <button class="lsa-bar-info" id="lsa-bar-info" type="button" aria-label="Details ein-/ausblenden">
+                <div class="lsa-bar-text" id="lsa-bar-text"></div>
+                <div class="lsa-bar-progress" id="lsa-bar-progress"></div>
+            </button>
+            <button class="lsa-bar-close" onclick="closeLessonAudio()" aria-label="Schließen">&times;</button>
+        </div>
+    </div>
+
+    <script src="audio/sy-audio-cues.js"></script>
+    <script src="js/lesson-audio-player.js"></script>
+
+    <script>
+    var DECKS = [];
+    function D(id, t, rows) { DECKS.push({ id: id, t: t, rows: rows }); }
+
+D("b1","&#x1F527; Suffixe &mdash; Wortenden mit Bedeutung",[
+["addressee","n","/ˌædreˈsiː/","the person a letter or message is sent to","адресат, одержувач","The addressee had moved, so the letter came back.","<b>-ee</b> = той, НА кого спрямована дія: payee, employee, interviewee."],
+["payee","n","/peɪˈiː/","the person who money is paid to","одержувач платежу","Write the payee's name on the cheque."],
+["sender","n","/ˈsendə/","the person who sends something","відправник","The sender forgot to add a return address.","<b>-er</b> = той, ХТО робить: sender ↔ addressee."],
+["supervisor","n","/ˈsuːpəvaɪzə/","a person who is in charge of somebody's work","керівник, наглядач, науковий керівник","My supervisor reads every chapter twice."],
+["donor","n","/ˈdəʊnə/","a person who gives blood, an organ or money","донор; жертводавець","Blood donors get a cup of tea and a biscuit."],
+["typist","n","/ˈtaɪpɪst/","a person whose job is typing","друкарка, машиніст(ка)","In 1980 every office had three typists.","<b>-ist</b> = людина за фахом чи переконанням: cellist, physicist, Marxist."],
+["cellist","n","/ˈtʃelɪst/","a person who plays the cello","віолончеліст","The cellist tuned up while the hall filled."],
+["violinist","n","/ˌvaɪəˈlɪnɪst/","a person who plays the violin","скрипаль","Her daughter is a violinist in the city orchestra."],
+["physicist","n","/ˈfɪzɪsɪst/","a scientist who studies physics","фізик","Ask a physicist why the sky is blue and take notes.","Не плутай: <b>physicist</b> (фізик) vs <b>physician</b> (терапевт)."],
+["physiotherapist","n","/ˌfɪziəʊˈθerəpɪst/","a person trained to treat injury with exercise and massage","фізіотерапевт, реабілітолог","My physiotherapist gave me four exercises and one warning."],
+["terrorist","n","/ˈterərɪst/","a person who uses violence for political aims","терорист","The word terrorist is used differently by each side."],
+["Marxist","n","/ˈmɑːksɪst/","a follower of Marx's political and economic ideas","марксист","He reads Marxist theory and votes for nobody."],
+["Buddhism","n","/ˈbʊdɪzəm/","the religion based on the teachings of the Buddha","буддизм","Buddhism is often described as a philosophy, not a religion.","<b>-ism</b> = вчення / система поглядів."],
+["brotherhood","n","/ˈbrʌðəhʊd/","the feeling of friendship and support between people","братерство","The strike created a brotherhood that lasted years.","<b>-hood</b> = стан або період: childhood, motherhood, adulthood."],
+["motherhood","n","/ˈmʌðəhʊd/","the state of being a mother","материнство","Motherhood changed her sleep, not her ambition."],
+["goodness","n","/ˈɡʊdnəs/","the quality of being good and kind","доброта","There is a lot of quiet goodness in that family.","<b>-ness</b> робить іменник із прикметника: readiness, laziness, scarcity ≠ (це -ity)."],
+["readiness","n","/ˈredinəs/","the state of being prepared and willing","готовність","Their readiness to help surprised the new neighbours."],
+["scarcity","n","/ˈskeəsəti/","a situation in which there is not enough of something","дефіцит, нестача","A scarcity of nurses, not of beds, closed the ward."],
+["complication","n","/ˌkɒmplɪˈkeɪʃn/","something that makes a situation more difficult; a medical problem","ускладнення","There was one complication: nobody had the key."],
+["alteration","n","/ˌɔːltəˈreɪʃn/","a change, especially a small one","зміна, переробка (одягу, планів)","The suit needs one small alteration in the sleeve."],
+["excitement","n","/ɪkˈsaɪtmənt/","a feeling of being very happy and enthusiastic","хвилювання, збудження, ажіотаж","The excitement lasted until the second delay."],
+["beautify","v","/ˈbjuːtɪfaɪ/","to make something more beautiful","прикрашати, робити гарнішим","They beautified the yard with three plants and a bench.","<b>-ify</b> = робити яким: purify, terrify, simplify."],
+["purify","v","/ˈpjʊərɪfaɪ/","to make something clean and free from harmful substances","очищати","These tablets purify water in twenty minutes."],
+["terrify","v","/ˈterɪfaɪ/","to frighten somebody very much","жахати, наганяти жах","Open water terrifies me; swimming pools do not."],
+["modernise","v","/ˈmɒdənaɪz/","to make something more modern","модернізувати","They modernised the kitchen and kept the old stove.","<b>-ise/-ize</b> = перетворювати на: industrialise, computerise, commercialise."],
+["computerise","v","/kəmˈpjuːtəraɪz/","to start using computers to do a job","комп'ютеризувати","The library computerised its catalogue in 1998."],
+["industrialise","v","/ɪnˈdʌstriəlaɪz/","to develop industry in a country or region","індустріалізувати","The region industrialised fast and cleaned up slowly."],
+["commercialise","v","/kəˈmɜːʃəlaɪz/","to make something into a business opportunity","комерціалізувати","Every festival gets commercialised sooner or later."],
+["edible","adj","/ˈedəbl/","safe or good to eat","їстівний","Only half the mushrooms in this book are edible.","<b>-able/-ible</b> = такий, що можна: readable, washable, drinkable."],
+["drinkable","adj","/ˈdrɪŋkəbl/","good enough to drink","питний, придатний для пиття","The tap water here is drinkable but tastes of chlorine."],
+["readable","adj","/ˈriːdəbl/","enjoyable and easy to read","легкий для читання, читабельний","A readable report is worth two brilliant ones."],
+["washable","adj","/ˈwɒʃəbl/","that can be washed without damage","той, що можна прати","Choose washable paint if you have small children."],
+["forgivable","adj","/fəˈɡɪvəbl/","not too bad to be forgiven","простимий, пробачний","One late reply is forgivable; five is a habit."],
+["forgetful","adj","/fəˈɡetfl/","often forgetting things","забудькуватий","I have become forgetful about names and sharp about faces.","<b>-ful</b> = повний чогось; <b>-less</b> = без."],
+["outrageous","adj","/aʊtˈreɪdʒəs/","shocking and unacceptable; very unusual","обурливий; кричущий","The prices at the airport are outrageous."],
+["reddish","adj","/ˈredɪʃ/","slightly red","червонуватий","Her hair is reddish in summer and brown in winter.","<b>-ish</b> = «трохи»: greenish, tallish, about sixish."],
+["grater","n","/ˈɡreɪtə/","a kitchen tool for cutting food into small pieces","тертка","Use the fine side of the grater for the cheese.","<b>-er</b> також для приладів: stapler, projector, cooker."],
+["stapler","n","/ˈsteɪplə/","a device for fastening papers together","степлер","The stapler is always in the last drawer you open."],
+["projector","n","/prəˈdʒektə/","a device that shows images on a screen","проєктор","The projector works; the laptop does not."],
+["coat hanger","n","/ˈkəʊt hæŋə/","a device for hanging clothes in a wardrobe","вішак (плічка)","Hotels give you six coat hangers and no wardrobe."]
+]);
+D("b2","&#x2795; Pr&auml;fixe &mdash; Vorsilben, die alles drehen",[
+["antibiotic","n","/ˌæntibaɪˈɒtɪk/","a medicine that destroys bacteria","антибіотик","Antibiotics do nothing for a common cold.","<b>anti-</b> = проти: antiseptic, antisocial, anti-war."],
+["antiseptic","n","/ˌæntiˈseptɪk/","a substance that prevents infection","антисептик","Put some antiseptic on that cut."],
+["antisocial","adj","/ˌæntiˈsəʊʃl/","harmful or annoying to other people; not sociable","антисоціальний; нетовариський","Playing music at 3 a.m. is antisocial behaviour."],
+["anti-war","adj","/ˌæntiˈwɔː/","opposing war","антивоєнний","The anti-war protest filled three streets."],
+["autograph","n","/ˈɔːtəɡrɑːf/","a famous person's signature","автограф","He asked for an autograph and got a selfie.","<b>auto-</b> = сам: autobiography, auto-pilot, automatic."],
+["auto-pilot","n","/ˈɔːtəʊpaɪlət/","a device that flies a plane automatically","автопілот","I did the whole morning on auto-pilot."],
+["biannual","adj","/baɪˈænjuəl/","happening twice a year","двічі на рік","The biannual review happens in March and September.","<b>bi-</b> = двічі / два: bilateral, bilingual, biannual."],
+["bilateral","adj","/ˌbaɪˈlætərəl/","involving two groups or countries","двосторонній","They signed a bilateral agreement on transport."],
+["disapprove","v","/ˌdɪsəˈpruːv/","to think that something is bad or wrong","не схвалювати","My parents disapprove of the whole idea, loudly.","<b>dis-</b> = заперечення / зворотна дія: disprove, disqualify, dissimilar."],
+["disbelieve","v","/ˌdɪsbɪˈliːv/","to not believe somebody or something","не вірити","I have no reason to disbelieve her."],
+["disprove","v","/ˌdɪsˈpruːv/","to show that something is not true","спростовувати","One photo disproved the whole story."],
+["disqualify","v","/dɪsˈkwɒlɪfaɪ/","to officially stop somebody taking part","дискваліфікувати","Two runners were disqualified for a false start."],
+["discontented","adj","/ˌdɪskənˈtentɪd/","not happy with your situation","невдоволений","A discontented team works slowly and says nothing."],
+["dissimilar","adj","/dɪˈsɪmɪlə/","not the same as something else","несхожий, відмінний","The two systems are not dissimilar — that is the problem."],
+["exhale","v","/eksˈheɪl/","to breathe out","видихати","Inhale for four seconds, exhale for six.","<b>ex-</b> = назовні / колишній: export, ex-wife, ex-smoker."],
+["excommunicate","v","/ˌekskəˈmjuːnɪkeɪt/","to officially exclude somebody from a church","відлучати від церкви","He was excommunicated and became a folk hero."],
+["ex-smoker","n","/ˌeksˈsməʊkə/","a person who used to smoke","колишній курець","No one is stricter than an ex-smoker."],
+["ex-wife","n","/ˌeksˈwaɪf/","a woman who was previously married to somebody","колишня дружина","He still plays football with his ex-wife's brother."],
+["illegible","adj","/ɪˈledʒəbl/","impossible to read because of bad handwriting","нерозбірливий (почерк)","The signature was illegible, so the parcel came back.","<b>il-/im-/ir-</b> = «не» перед l, m/p, r: illiterate, immoral, irregular."],
+["illiterate","adj","/ɪˈlɪtərət/","unable to read or write","неписьменний","Being illiterate in one language is not being stupid."],
+["immoral","adj","/ɪˈmɒrəl/","not following accepted standards of behaviour","аморальний","Charging that much for water is simply immoral."],
+["improbable","adj","/ɪmˈprɒbəbl/","not likely to be true or to happen","малоймовірний","An improbable story, told very convincingly."],
+["microbiology","n","/ˌmaɪkrəʊbaɪˈɒlədʒi/","the study of very small living things","мікробіологія","She switched from medicine to microbiology.","<b>micro-</b> = дуже малий; <b>macro-</b> = великий."],
+["microscopic","adj","/ˌmaɪkrəˈskɒpɪk/","extremely small; only visible with a microscope","мікроскопічний","The difference between the two offers is microscopic."],
+["mistranslate","v","/ˌmɪstrænzˈleɪt/","to translate something wrongly","неправильно перекласти","One mistranslated word turned a joke into an insult.","<b>mis-</b> = помилково: misunderstand, misread, mislead."],
+["monogamous","adj","/məˈnɒɡəməs/","having only one partner at a time","моногамний","Swans are famously monogamous and famously aggressive.","<b>mono-</b> = один: monologue, monotonous."],
+["multimedia","adj","/ˌmʌltiˈmiːdiə/","using several media (sound, video, text) at once","мультимедійний","The museum's multimedia room is the only quiet place.","<b>multi-</b> = багато: multinational, multipurpose."],
+["multinational","adj","/ˌmʌltiˈnæʃnəl/","operating in several countries","багатонаціональний, транснаціональний","Three multinational companies control the market."],
+["multipurpose","adj","/ˌmʌltiˈpɜːpəs/","that can be used for several different things","багатофункціональний","A multipurpose hall means a bad hall for everything."],
+["overdo","v","/ˌəʊvəˈduː/","to do something too much","перестаратися, переборщити","Season it, but do not overdo the salt.","<b>over-</b> = надто; <b>under-</b> = недостатньо."],
+["undercooked","adj","/ˌʌndəˈkʊkt/","not cooked enough","недоварений, недосмажений","The chicken was undercooked and went straight back."],
+["underused","adj","/ˌʌndəˈjuːzd/","not used as much as it could be","недовикористаний","The library is superb and completely underused."],
+["underworked","adj","/ˌʌndəˈwɜːkt/","having too little work to do","недовантажений роботою","Overpaid and underworked is a rare combination."],
+["postgraduate","adj","/ˌpəʊstˈɡrædʒuət/","connected with study after a first degree","післядипломний, магістерський/аспірантський","She is doing postgraduate work in linguistics.","<b>post-</b> = після; <b>pre-</b> = до."],
+["post-war","adj","/ˌpəʊstˈwɔː/","happening after a war","повоєнний","Post-war housing was fast, cheap and still standing."],
+["post-impressionist","adj","/ˌpəʊstɪmˈpreʃənɪst/","belonging to the art movement after impressionism","постімпресіоністський","The post-impressionist room is upstairs on the left."],
+["preconceived","adj","/ˌpriːkənˈsiːvd/","(of an idea) formed before you have real knowledge","упереджений, наперед сформований","Come without preconceived ideas about the place."],
+["pre-judge","v","/ˌpriːˈdʒʌdʒ/","to form an opinion before knowing the facts","судити наперед","Do not pre-judge the report before the numbers arrive."],
+["pre-war","adj","/ˌpriːˈwɔː/","existing before a war","довоєнний","The pre-war building survived; the new one did not."],
+["pseudo-intellectual","adj","/ˌsjuːdəʊɪntəˈlektʃuəl/","pretending to be more intelligent or cultured than you are","псевдоінтелектуальний","A pseudo-intellectual review of a very simple film.","<b>pseudo-</b> = псевдо-, несправжній: pseudonym."],
+["renew","v","/rɪˈnjuː/","to make something valid for a longer period; to start again","поновлювати (документ, підписку)","I need to renew my passport before June.","<b>re-</b> = знову / назад: rewrite, rebuild, return."],
+["semi-circular","adj","/ˌsemiˈsɜːkjələ/","shaped like half a circle","напівкруглий","The seats form a semi-circular row around the stage.","<b>semi-</b> = напів-: semi-detached, semi-final."],
+["semi-detached","adj","/ˌsemidɪˈtætʃt/","(of a house) joined to another house on one side","будинок на дві родини (спарений)","They bought a semi-detached house with a long garden."],
+["subdivision","n","/ˈsʌbdɪvɪʒn/","a part of something that is already a part","підрозділ, підподіл","Each chapter has three subdivisions and one point.","<b>sub-</b> = під: submarine, subway, substandard."],
+["undo","v","/ʌnˈduː/","to open or untie something; to cancel an action","розстібати, розв'язувати; скасовувати","Ctrl+Z will undo the last twenty minutes of panic.","<b>un-</b> + дієслово = зворотна дія: undress, unfold, unload, untie, unwrap, unzip."],
+["undress","v","/ʌnˈdres/","to take your clothes off","роздягатися","The child undressed in nine seconds flat."],
+["unfold","v","/ʌnˈfəʊld/","to open something folded; (of events) to develop","розгортати; розвиватися","The story unfolded over three long evenings."],
+["unload","v","/ʌnˈləʊd/","to remove things from a vehicle","розвантажувати","They unloaded the van in the rain, twice."],
+["untie","v","/ʌnˈtaɪ/","to undo a knot or something tied","розв'язувати","I could not untie the knot, so I cut it."],
+["unveil","v","/ʌnˈveɪl/","to show something new to the public for the first time","представляти (уперше), відкривати завісу","The company unveils the new model in October."],
+["unwrap","v","/ʌnˈræp/","to remove the paper or covering from something","розгортати (упаковку)","She unwrapped the present slowly, to annoy us."],
+["unzip","v","/ʌnˈzɪp/","to open something fastened with a zip; to extract a file","розстібати блискавку; розпаковувати архів","Unzip the folder before you open the file."],
+["import","v","/ɪmˈpɔːt/","to bring goods into a country from abroad","імпортувати","We import almost all of it and complain about the price.","Наголос: дієслово im<b>PORT</b>, іменник <b>IM</b>port."]
+]);
+D("b3","&#x1F3DB;&#xFE0F; Wortwurzeln &mdash; ein Kern, sechs W&ouml;rter",[
+["export","n","/ˈekspɔːt/","goods sent to another country for sale","експорт","Exports fell for the third quarter in a row.","Корінь <b>port</b> = нести (portare): transport, deport, import, portable."],
+["transport","v","/trænˈspɔːt/","to carry goods or people from one place to another","перевозити, транспортувати","The fish is transported in ice within four hours.","Наголос: дієслово trans<b>PORT</b>, іменник <b>TRANS</b>port."],
+["deport","v","/dɪˈpɔːt/","to force a foreigner to leave a country","депортувати, висилати","He was deported after twelve years of paying taxes."],
+["deportation","n","/ˌdiːpɔːˈteɪʃn/","the act of forcing somebody to leave a country","депортація, вислання","The deportation order was cancelled at the last hour."],
+["deportee","n","/ˌdiːpɔːˈtiː/","a person who is being deported","депортований","The deportees were given ten minutes to pack."],
+["compose","v","/kəmˈpəʊz/","to write music; to put parts together to form a whole","складати, компонувати; писати музику","She composed the whole piece on a borrowed piano.","Корінь <b>pos/pose</b> = класти, ставити: expose, impose, depose, propose."],
+["composer","n","/kəmˈpəʊzə/","a person who writes music","композитор","The composer conducted the first performance himself."],
+["composition","n","/ˌkɒmpəˈzɪʃn/","a piece of music or writing; the way parts are arranged","твір, композиція; склад","The composition of the committee explains its decisions."],
+["depose","v","/dɪˈpəʊz/","to remove a ruler from power","скидати (з престолу, з посади)","The king was deposed in a single afternoon."],
+["impress","v","/ɪmˈpres/","to make somebody feel admiration","вражати, справляти враження","What impressed me was how calmly she answered.","Корінь <b>press</b> = тиснути: depress, oppress, suppress, express."],
+["depress","v","/dɪˈpres/","to make somebody feel sad; to reduce the value of something","пригнічувати; знижувати (ціни)","The news depressed everyone in the room."],
+["oppress","v","/əˈpres/","to treat a group of people in a cruel and unfair way","гнобити, пригнічувати","Laws that oppress one group weaken all the others."],
+["oppressor","n","/əˈpresə/","a person or group that treats others cruelly","гнобитель","Every side in that war called the other the oppressor."],
+["convert","v","/kənˈvɜːt/","to change something into a different form","перетворювати; переобладнувати","They converted the attic into a tiny office.","Корінь <b>vert/vers</b> = повертати: divert, reverse, introvert, versatile."],
+["divert","v","/daɪˈvɜːt/","to make something change direction; to distract","відводити, перенаправляти; відволікати","Traffic is diverted through the old town until May."],
+["conduct","v","/kənˈdʌkt/","to organise and do something; to lead an orchestra","проводити (дослідження); диригувати","They conducted the survey in four languages.","Корінь <b>duc/duct</b> = вести: produce, reduce, introduce, education."],
+["advertiser","n","/ˈædvətaɪzə/","a person or company that pays for advertising","рекламодавець","Advertisers left the platform within a week.","Корінь <b>vert</b> тут інший — від <i>advertere</i> «повертати увагу до»."]
+]);
+D("b4","&#x1F9E0; Abstrakte Nomen",[
+["adulthood","n","/ˈædʌlthʊd/","the state of being an adult","дорослість","Adulthood is mostly admin, nobody warns you."],
+["manhood","n","/ˈmænhʊd/","the state of being a man; qualities seen as male","зрілість (чоловіча); мужність","The novel questions what manhood is supposed to mean."],
+["womanhood","n","/ˈwʊmənhʊd/","the state of being a woman","жіноча зрілість, жіночність","Her essays are about work, not about womanhood."],
+["companionship","n","/kəmˈpænjənʃɪp/","the pleasant feeling of having company","товариство, дружнє спілкування","She misses the companionship of the old office.","<b>-ship</b> = стан, стосунок: friendship, ownership, membership."],
+["ownership","n","/ˈəʊnəʃɪp/","the fact of owning something","власність, право власності","Ownership of the building changed three times."],
+["friendliness","n","/ˈfrendlinəs/","kind and pleasant behaviour","привітність, доброзичливість","The friendliness of strangers is what I remember."],
+["laziness","n","/ˈleɪzinəs/","the quality of not wanting to work","лінощі","Some of what looks like laziness is exhaustion."],
+["generosity","n","/ˌdʒenəˈrɒsəti/","the quality of giving freely","щедрість","Her generosity is quiet and slightly stubborn."],
+["hostility","n","/hɒˈstɪləti/","unfriendly or aggressive feelings","ворожість","There was open hostility between the two departments."],
+["popularity","n","/ˌpɒpjuˈlærəti/","the state of being liked by many people","популярність","Popularity is not the same as respect."],
+["sensitivity","n","/ˌsensəˈtɪvəti/","the ability to understand others' feelings; being easily hurt","чутливість; делікатність","He handled the complaint with real sensitivity."],
+["amazement","n","/əˈmeɪzmənt/","a feeling of great surprise","здивування, подив","To my amazement, the machine worked first time.","Сталий вираз: <b>to my amazement</b>."],
+["breadth","n","/bredθ/","the distance from side to side; the range of something","ширина; широта (знань)","The breadth of her reading shows in every answer.","Пара: <b>broad → breadth</b>, як <b>long → length</b>, <b>strong → strength</b>."],
+["faith","n","/feɪθ/","strong belief or trust","віра, довіра","I have faith in the plan and doubts about the deadline."],
+["martyrdom","n","/ˈmɑːtədəm/","the death or suffering of a martyr","мучеництво","The film turns an ordinary death into martyrdom.","<b>-dom</b> = стан або сфера: freedom, boredom, stardom, kingdom."],
+["stardom","n","/ˈstɑːdəm/","the state of being a famous performer","зіркова слава","Two hits and then stardom, then silence."]
+]);
+D("b5","&#x1F517; Compound Adjectives",[
+["absent-minded","adj","/ˌæbsəntˈmaɪndɪd/","often forgetting things because you are thinking of something else","розсіяний","My absent-minded colleague has three pairs of glasses."],
+["big-headed","adj","/ˌbɪɡˈhedɪd/","thinking you are more important than you are","зазнайкуватий, самозакоханий","One good review and he got big-headed."],
+["broadminded","adj","/ˌbrɔːdˈmaɪndɪd/","willing to accept opinions different from your own","з широкими поглядами, толерантний","Her parents are surprisingly broadminded about it.","Протилежне: <b>narrow-minded</b>."],
+["self-centred","adj","/ˌselfˈsentəd/","interested only in yourself","егоцентричний","A self-centred host is worse than a bad cook."],
+["stuck-up","adj","/ˌstʌkˈʌp/","unfriendly because you think you are better than others","пихатий, гонористий (розм.)","They seem stuck-up but they are just shy."],
+["two-faced","adj","/ˌtuːˈfeɪst/","not honest — saying different things to different people","дволикий, лицемірний","Nobody trusts a two-faced negotiator twice."],
+["warm-hearted","adj","/ˌwɔːmˈhɑːtɪd/","kind and friendly","сердечний, добросердий","A warm-hearted email fixed a week of tension."],
+["curly-haired","adj","/ˌkɜːliˈheəd/","having curly hair","кучерявий","The curly-haired boy in the photo is my father."],
+["long-haired","adj","/ˌlɒŋˈheəd/","having long hair","довговолосий","A long-haired cat and a white sofa: a bad plan."],
+["red-haired","adj","/ˌredˈheəd/","having red hair","рудий, рудоволосий","Both red-haired sisters burn in ten minutes of sun."],
+["wavy-haired","adj","/ˌweɪviˈheəd/","having wavy hair","хвилястоволосий","She is the wavy-haired one on the left."],
+["long-legged","adj","/ˌlɒŋˈleɡɪd/","having long legs","довгоногий","Long-legged people should not sit in row 14."],
+["thin-lipped","adj","/ˌθɪnˈlɪpt/","having thin lips; looking disapproving","тонкогубий; невдоволений на вигляд","He gave a thin-lipped smile and said nothing."],
+["suntanned","adj","/ˈsʌntænd/","having darker skin from being in the sun","засмаглий","Everyone came back suntanned except me."],
+["air-conditioned","adj","/ˌeəkənˈdɪʃnd/","having a system that keeps the air cool","з кондиціонером","Only the air-conditioned carriage was full."],
+["all-out","adj","/ˌɔːlˈaʊt/","complete and using all possible effort","тотальний, повний (наступ, зусилля)","They made an all-out effort in the last week."],
+["bullet-proof","adj","/ˈbʊlɪtpruːf/","able to stop bullets; impossible to criticise","куленепробивний; безкомпромісно надійний","Her argument is bullet-proof and very short.","Модель <b>-proof</b>: waterproof, soundproof, foolproof."],
+["business-class","adj","/ˈbɪznəs klɑːs/","connected with the more expensive travel class","бізнес-класу","A business-class ticket and a two-hour delay."],
+["cut-price","adj","/ˌkʌtˈpraɪs/","sold at a lower price than usual","за зниженою ціною","Cut-price flights, full-price surprises."],
+["duty-free","adj","/ˌdjuːtiˈfriː/","without tax on imported goods","безмитний","The duty-free shop is the slowest part of the airport.","Модель <b>-free</b>: sugar-free, interest-free, stress-free."],
+["interest-free","adj","/ˌɪntrəstˈfriː/","with no interest to pay","безвідсотковий","An interest-free loan from a friend has a different cost."],
+["sugar-free","adj","/ˌʃʊɡəˈfriː/","containing no sugar","без цукру","Sugar-free does not mean calorie-free."],
+["far-fetched","adj","/ˌfɑːˈfetʃt/","very unlikely to be true","надуманий, притягнутий за вуха","The plot is far-fetched and I watched all eight episodes."],
+["first-born","adj","/ˈfɜːstbɔːn/","being the oldest child","первісток, старша дитина","The first-born gets the rules, the second gets the fun."],
+["first-class","adj","/ˌfɜːstˈklɑːs/","of the best quality; of the most expensive travel class","першокласний; першого класу","First-class service in a second-hand building."],
+["first-hand","adj","/ˌfɜːstˈhænd/","learned directly, not from others","з перших рук, безпосередній","I want a first-hand account, not a summary."],
+["handmade","adj","/ˌhændˈmeɪd/","made by hand, not by machine","ручної роботи","Handmade means slower, dearer and slightly uneven."],
+["last-minute","adj","/ˌlɑːstˈmɪnɪt/","done at the latest possible time","в останню хвилину","A last-minute change ruined the seating plan."],
+["long-standing","adj","/ˌlɒŋˈstændɪŋ/","having existed for a long time","давній, багаторічний","They have a long-standing agreement about holidays."],
+["never-ending","adj","/ˌnevərˈendɪŋ/","seeming to last for ever","нескінченний","The never-ending meeting had four agenda points."],
+["open-necked","adj","/ˌəʊpənˈnekt/","(of a shirt) worn without a tie","з розстібнутим коміром","An open-necked shirt is the new formal."],
+["open-toed","adj","/ˌəʊpənˈtəʊd/","(of shoes) leaving the toes uncovered","з відкритим носком (взуття)","No open-toed shoes in the laboratory."],
+["run-down","adj","/ˌrʌnˈdaʊn/","in bad condition; tired and unwell","занедбаний; виснажений","A run-down building in a very expensive street."],
+["sky-blue","adj","/ˌskaɪˈbluː/","of a light blue colour","небесно-блакитний","The sky-blue door is the only nice thing about the house."],
+["so-called","adj","/ˌsəʊˈkɔːld/","used to show you think a name is wrong","так званий (з іронією)","This so-called reform changed one form."],
+["tight-fitting","adj","/ˌtaɪtˈfɪtɪŋ/","fitting closely to the body","облягаючий","A tight-fitting jacket and a very long meeting."],
+["time-consuming","adj","/ˈtaɪm kənˌsjuːmɪŋ/","taking a lot of time","затратний за часом, марудний","Checking each entry by hand is time-consuming."],
+["top-secret","adj","/ˌtɒpˈsiːkrət/","extremely secret","цілком таємний","The top-secret plan was on a shared drive."],
+["world-famous","adj","/ˌwɜːldˈfeɪməs/","known everywhere in the world","всесвітньо відомий","A world-famous cellist in a half-empty hall."]
+]);
+D("b6","&#x1F9F1; Compound Nouns",[
+["air traffic control","n","/ˈeə træfɪk kənˌtrəʊl/","the system that guides planes safely","авіадиспетчерська служба","Air traffic control kept us circling for forty minutes."],
+["alarm clock","n","/əˈlɑːm klɒk/","a clock that wakes you up","будильник","My alarm clock is a phone I keep across the room."],
+["bank account","n","/ˈbæŋk əkaʊnt/","an arrangement with a bank to keep your money","банківський рахунок","Opening a bank account here needs two addresses."],
+["birth control","n","/ˈbɜːθ kənˌtrəʊl/","methods of preventing pregnancy","контроль народжуваності, контрацепція","Birth control is still a political topic in many countries."],
+["burglar alarm","n","/ˈbɜːɡlər əlɑːm/","a device that makes a noise if somebody breaks in","охоронна сигналізація","The burglar alarm goes off whenever the cat jumps."],
+["contact lens","n","/ˈkɒntækt lenz/","a small plastic lens worn on the eye","контактна лінза","I lost a contact lens on the train and found it at home."],
+["cotton wool","n","/ˌkɒtn ˈwʊl/","soft material used for cleaning skin or wounds","вата","Put some cotton wool on it and stop looking at it.","AmE: <b>cotton balls / absorbent cotton</b>."],
+["data processing","n","/ˈdeɪtə prəʊsesɪŋ/","the work of handling information with computers","обробка даних","Half the job title is data processing, half is patience."],
+["death penalty","n","/ˈdeθ penəlti/","punishment by death","смертна кара","The death penalty was abolished here in 1969."],
+["earring","n","/ˈɪərɪŋ/","a piece of jewellery worn on the ear","сережка","One earring is a style; two lost ones are a habit."],
+["generation gap","n","/ˌdʒenəˈreɪʃn ɡæp/","the difference in attitudes between old and young people","розрив поколінь","The generation gap is now measured in apps."],
+["grass roots","n","/ˌɡrɑːs ˈruːts/","ordinary people, not the leaders of an organisation","низи, рядові члени, «трава»","The campaign was built at grass roots level."],
+["hay fever","n","/ˈheɪ fiːvə/","an allergy to pollen","сінна лихоманка, поліноз","Every May my hay fever turns me into a fountain."],
+["income tax","n","/ˈɪnkʌm tæks/","tax paid on the money you earn","прибутковий податок","Income tax here is simple to calculate and painful to pay."],
+["labour force","n","/ˈleɪbə fɔːs/","all the people who work in a company or country","робоча сила, трудові ресурси","A third of the labour force is over fifty."],
+["light bulb","n","/ˈlaɪt bʌlb/","the glass part of a lamp that gives light","лампочка","We changed the light bulb and the room changed."],
+["luxury goods","n","/ˈlʌkʃəri ɡʊdz/","expensive items that are not necessary","предмети розкоші","Luxury goods sell best in a bad economy — ask them why."],
+["mail order","n","/ˈmeɪl ɔːdə/","a system of buying goods by post or online","замовлення поштою","My grandmother bought everything by mail order."],
+["mineral water","n","/ˈmɪnərəl wɔːtə/","water from a spring, sold in bottles","мінеральна вода","Still or sparkling mineral water, madam?"],
+["pedestrian crossing","n","/pəˈdestriən krɒsɪŋ/","a place where people can cross the road","пішохідний перехід","Cars actually stop at the pedestrian crossing here.","AmE: <b>crosswalk</b>; смугастий у Британії — <b>zebra crossing</b>."],
+["pocket money","n","/ˈpɒkɪt mʌni/","money parents give a child each week","кишенькові гроші","Pocket money teaches arithmetic faster than school does.","AmE: <b>allowance</b>."],
+["race relations","n","/ˈreɪs rɪleɪʃnz/","relations between people of different races in a country","міжрасові стосунки","The report on race relations was quietly shelved."],
+["roadworks","n","/ˈrəʊdwɜːks/","repairs being done to a road","дорожні роботи","Roadworks in August, every August, on that bridge."],
+["science fiction","n","/ˌsaɪəns ˈfɪkʃn/","stories about the future, space and technology","наукова фантастика","Good science fiction is about now, not about spaceships.","Скорочено: <b>sci-fi</b>."],
+["sound barrier","n","/ˈsaʊnd bæriə/","the point at which an aircraft reaches the speed of sound","звуковий бар'єр","Breaking the sound barrier makes one very loud bang."],
+["sunglasses","n","/ˈsʌnɡlɑːsɪz/","dark glasses that protect your eyes from the sun","сонцезахисні окуляри","I own six pairs of sunglasses and can find none."],
+["tea bag","n","/ˈtiː bæɡ/","a small paper bag with tea leaves inside","чайний пакетик","One tea bag, two cups: my grandmother's economics."],
+["trademark","n","/ˈtreɪdmɑːk/","a name or symbol legally owned by a company; a typical feature","торгова марка; фірмова риса","The red laces are his trademark."],
+["traffic lights","n","/ˈtræfɪk laɪts/","the coloured lights that control traffic","світлофор","The traffic lights at that junction are decorative."],
+["voice mail","n","/ˈvɔɪs meɪl/","a system that records phone messages","голосова пошта","Nobody under thirty listens to voice mail."],
+["windscreen","n","/ˈwɪndskriːn/","the glass at the front of a car","лобове скло","A stone cracked the windscreen on the motorway.","AmE: <b>windshield</b>."],
+["windscreen wiper","n","/ˈwɪndskriːn waɪpə/","the arm that clears rain from the windscreen","двірник (склоочисник)","One windscreen wiper works, the other conducts music."],
+["youth hostel","n","/ˈjuːθ hɒstl/","cheap accommodation, especially for young travellers","молодіжний хостел","We stayed in a youth hostel with a sea view and no towels."],
+["bailout","n","/ˈbeɪlaʊt/","financial help given to a company or country in trouble","фінансова допомога, «порятунок»","The bank got a bailout; the customers got fees.","Модель <b>дієслово + прийменник → іменник</b>: bail out → a bailout."],
+["breakout","n","/ˈbreɪkaʊt/","an escape from prison; a sudden start of something","втеча (з в'язниці); спалах","A breakout at the old prison became a film."],
+["break-up","n","/ˈbreɪkʌp/","the end of a relationship or organisation","розрив, розпад","After the break-up he kept the flat and the cat."],
+["bypass","n","/ˈbaɪpɑːs/","a road that goes round a town; a heart operation","об'їзна дорога; шунтування","The bypass saved the town and killed its cafés."],
+["crackdown","n","/ˈkrækdaʊn/","severe action to stop something","жорсткі заходи, «закручування гайок»","A crackdown on parking, announced twice a year."],
+["cutback","n","/ˈkʌtbæk/","a reduction in something, especially spending","скорочення (витрат)","Cutbacks hit the library before the car park."],
+["lay-by","n","/ˈleɪbaɪ/","a place beside a road where a car can stop","кишеня для зупинки біля дороги","We ate our sandwiches in a lay-by, like proper tourists."],
+["outlet","n","/ˈaʊtlet/","a shop selling one brand cheaply; a way to express feelings","аутлет; віддушина","Running is his outlet after ten-hour shifts."],
+["outlook","n","/ˈaʊtlʊk/","the likely future; your attitude to life","перспективи; світогляд","The economic outlook is grim and the sun is shining."],
+["outset","n","/ˈaʊtset/","the beginning of something","початок","I said at the outset that the date was impossible.","Сталий вираз: <b>from/at the outset</b>."],
+["printout","n","/ˈprɪntaʊt/","a printed copy of computer data","роздруківка","Bring a printout — the projector will fail."],
+["set-up","n","/ˈsetʌp/","the way something is organised; a trick to make somebody look guilty","організація справи; підстава","The whole meeting was a set-up and we walked in."],
+["shake-up","n","/ˈʃeɪkʌp/","a big change in an organisation","струс, реорганізація","The shake-up moved four people and solved nothing."],
+["takeover","n","/ˈteɪkəʊvə/","when one company gains control of another","поглинання (компанії)","The takeover was announced on a Friday evening."],
+["turnover","n","/ˈtɜːnəʊvə/","the total business done in a period; the rate staff leave","оборот (компанії); плинність кадрів","High staff turnover costs more than higher wages."],
+["walkout","n","/ˈwɔːkaʊt/","a sudden strike; leaving a meeting as a protest","страйк; демонстративний вихід","A one-hour walkout got them a two-year deal."]
+]);
+D("b7","&#x1F91D; Binomials &mdash; feste Wortpaare",[
+["all or nothing","phrase","","complete commitment or none at all","все або нічого","With him it is all or nothing, never a compromise.","Binomials — пари, порядок слів у яких <b>не міняють</b>."],
+["back to front","phrase","","with the back part at the front","задом наперед","You are wearing your T-shirt back to front."],
+["black and white","phrase","","in a simple way, as if only two options exist","чорно-біле (спрощене) бачення","He sees every argument in black and white."],
+["first and foremost","phrase","","most importantly","насамперед, передусім","First and foremost, thank you for staying late."],
+["give and take","phrase","","mutual compromise","взаємні поступки, компроміс","Any shared flat needs give and take and a cleaning rota."],
+["give or take","phrase","","approximately, plus or minus","плюс-мінус, приблизно","It takes an hour, give or take ten minutes."],
+["here and there","phrase","","in various places","подекуди, там і сям","There are mistakes here and there, but the idea works."],
+["high and dry","phrase","","in a difficult situation, without help","напризволяще, у скруті","The agency closed and left thirty clients high and dry."],
+["by leaps and bounds","phrase","","very quickly and successfully","семимильними кроками","Her German has improved by leaps and bounds."],
+["out and about","phrase","","going out and being active, especially after illness","на ногах, у русі (після хвороби)","She is out and about again after the operation."],
+["part and parcel","phrase","","an essential part of something","невід'ємна частина","Rejection is part and parcel of freelance work."],
+["peace and quiet","phrase","","calm and silence","тиша й спокій","I moved here for peace and quiet and got roadworks."],
+["pick and choose","phrase","","to choose only what you like most","вибирати найкраще, перебирати","With three offers you can pick and choose."],
+["prim and proper","phrase","","very formal and easily shocked","манірний, надто правильний","Her prim and proper aunt swears at football matches."],
+["go to rack and ruin","phrase","","to fall into a very bad condition","занепадати, розвалюватися","The old cinema went to rack and ruin in ten years."],
+["rant and rave","phrase","","to complain loudly and angrily","галасливо обурюватися, лаятися","He ranted and raved about the bins for an hour."],
+["rest and recreation","phrase","","time for relaxing away from work","відпочинок і розваги","Two weeks of rest and recreation, then straight back."],
+["sink or swim","phrase","","to fail or succeed entirely by your own effort","або виплив, або втонув","No training, no manual: sink or swim."],
+["slowly but surely","phrase","","gradually but definitely","повільно, але впевнено","Slowly but surely the list is getting shorter."],
+["sooner or later","phrase","","at some time in the future, certainly","рано чи пізно","Sooner or later somebody will ask for the numbers."],
+["to and fro","phrase","","backwards and forwards","туди-сюди","She walked to and fro across the kitchen, thinking."],
+["wine and dine","phrase","","to entertain somebody with good food and drink","пригощати, розважати (клієнта)","They wined and dined the client and lost the contract."]
+]);
+D("b8","&#x1F524; Abk&uuml;rzungen &amp; Akronyme",[
+["AKA","abbr","/ˌeɪkeɪˈeɪ/","also known as","він же, також відомий як","Robert Zimmerman, AKA Bob Dylan."],
+["AWOL","abbr","/ˈeɪwɒl/","absent without leave — missing without permission","самовільна відсутність, «зник»","Our project manager has been AWOL since Tuesday."],
+["carbs","n","/kɑːbz/","carbohydrates","вуглеводи (розм.)","He cut carbs for a week and talked about it for a year."],
+["cellphone","n","/ˈselfəʊn/","a mobile phone (American English)","мобільний телефон (амер.)","In the US it is a cellphone, in Britain a mobile."],
+["DNA","abbr","/ˌdiːenˈeɪ/","the chemical that carries genetic information","ДНК","DNA evidence reopened a case from 1994."],
+["FAQ","abbr","/ˌefeɪˈkjuː/","frequently asked questions","часті питання","Read the FAQ before writing, please."],
+["GM","abbr","/ˌdʒiːˈem/","genetically modified","генетично модифікований","GM crops are banned in some countries here."],
+["IOU","abbr","/ˌaɪəʊˈjuː/","I owe you — a written promise to pay","боргова розписка","He left an IOU in the biscuit tin."],
+["laser","n","/ˈleɪzə/","a device producing a narrow beam of light","лазер","Laser surgery took eleven minutes.","Це акронім: <i>light amplification by stimulated emission of radiation</i>."],
+["MI6","abbr","/ˌemaɪˈsɪks/","the British foreign intelligence service","МІ-6 (британська зовнішня розвідка)","MI6 exists mostly in films and slightly in Vauxhall."],
+["NATO","abbr","/ˈneɪtəʊ/","North Atlantic Treaty Organization","НАТО","NATO membership was the only headline that week."],
+["PTO","abbr","/ˌpiːtiːˈəʊ/","please turn over (at the bottom of a page)","див. на звороті","The form said PTO and I missed half the questions."],
+["RIP","abbr","/ˌɑːrɪˈpiː/","rest in peace","спочивай з миром","RIP under a photo is the modern obituary."],
+["satnav","n","/ˈsætnæv/","a satellite navigation system in a car","навігатор (GPS)","The satnav sent us into a field, confidently."],
+["sci-fi","n","/ˈsaɪfaɪ/","science fiction","наукова фантастика","A sci-fi film with no science and very little fiction."],
+["scuba","n","/ˈskuːbə/","equipment for breathing under water","акваланг","He learnt scuba diving at forty-five.","Акронім: <i>self-contained underwater breathing apparatus</i>."],
+["sonar","n","/ˈsəʊnɑː/","equipment that finds objects under water using sound","сонар, гідролокатор","The sonar found the wreck in ninety metres."],
+["the CIA","abbr","/ˌsiːaɪˈeɪ/","the US Central Intelligence Agency","ЦРУ","Every second thriller has the CIA in it."],
+["the FBI","abbr","/ˌefbiːˈaɪ/","the US Federal Bureau of Investigation","ФБР","The FBI handles crimes that cross state lines."]
+]);
+D("b9","&#x1F5E3; Aussprache-Fallen",[
+["conflict","n","/ˈkɒnflɪkt/ &middot; v /kənˈflɪkt/","a serious disagreement; (v) to be incompatible","конфлікт; (дієсл.) суперечити","The dates conflict, so one meeting has to move.","Іменник — наголос на <b>першому</b> складі, дієслово — на другому. Так само: conduct, contest, permit, progress, transfer."],
+["contest","n","/ˈkɒntest/ &middot; v /kənˈtest/","a competition; (v) to formally challenge something","конкурс; (дієсл.) оскаржувати","They contested the result and lost twice."],
+["conduct","n","/ˈkɒndʌkt/","a person's behaviour","поведінка","His conduct during the crisis is why he got the job."],
+["permit","n","/ˈpɜːmɪt/ &middot; v /pəˈmɪt/","an official document; (v) to allow","дозвіл; (дієсл.) дозволяти","You need a permit to park here after six."],
+["progress","v","/prəˈɡres/","to develop or move forward","просуватися, розвиватися","Work progressed slowly until the money arrived."],
+["transfer","n","/ˈtrænsfɜː/","the act of moving somebody or something to another place","переказ; переведення; пересадка","The transfer took three working days."],
+["increase","n","/ˈɪŋkriːs/ &middot; v /ɪnˈkriːs/","a rise in number or amount; (v) to become bigger","зростання; (дієсл.) зростати","A five per cent increase sounds better than it feels."],
+["decrease","n","/ˈdiːkriːs/ &middot; v /dɪˈkriːs/","a fall in number or amount; (v) to become smaller","зниження; (дієсл.) зменшуватися","There was a sharp decrease in complaints after the fix."],
+["insult","v","/ɪnˈsʌlt/","to say something rude and offensive","ображати","Do not insult the people whose help you need.","Іменник <b>insult</b> /ˈɪnsʌlt/ — образа."],
+["suspect","v","/səˈspekt/","to believe that something is probably true","підозрювати","I suspect the file was never sent.","Іменник <b>suspect</b> /ˈsʌspekt/ — підозрюваний."],
+["desert","n","/ˈdezət/","a large area of sand with very little rain","пустеля","The desert is cold at night — nobody tells you that.","Три схожі слова: <b>desert</b> /ˈdezət/ пустеля, <b>desert</b> /dɪˈzɜːt/ покидати, <b>dessert</b> /dɪˈzɜːt/ десерт."],
+["chalk","n","/tʃɔːk/","a soft white stone used for writing on boards","крейда","Chalk on a blackboard: the sound and the smell.","<b>l</b> не читається: chalk, talk, walk, half, calm."],
+["debtor","n","/ˈdetə/","a person who owes money","боржник","The letter arrives addressed to the debtor, not the person.","<b>b</b> німа: debt, doubt, subtle, debtor."],
+["fasten","v","/ˈfɑːsn/","to close or attach something firmly","застібати, пристібати","Fasten your seatbelt while the sign is on.","<b>t</b> німа: fasten, listen, castle, whistle, often (часто)."],
+["heir","n","/eə/","a person who will inherit money or a title","спадкоємець","The heir to the business is nineteen and uninterested.","<b>h</b> німа: heir, hour, honest, honour."],
+["heiress","n","/ˈeəres/","a woman who will inherit money or property","спадкоємиця","The heiress sold the estate and opened a bakery."],
+["honourable","adj","/ˈɒnərəbl/","deserving respect; morally right","почесний; шляхетний","Resigning was the honourable thing and it cost him everything."],
+["knob","n","/nɒb/","a round handle or control button","ручка (дверна), регулятор","The knob came off in my hand.","<b>k</b> німа перед n: knob, knee, knife, know, knock."],
+["tomb","n","/tuːm/","a grave, especially a large one","гробниця, могила","The tomb is empty and the queue is enormous.","<b>b</b> німа в кінці: tomb, womb, comb, climb, lamb."],
+["womb","n","/wuːm/","the organ in which a baby develops","матка, утроба","Everything about that scan happened inside a womb."],
+["pneumatic","adj","/njuːˈmætɪk/","operated by air pressure","пневматичний","A pneumatic drill at seven in the morning.","<b>p</b> німа перед n/s/t: pneumatic, psychology, pseudonym, ptarmigan."],
+["pseudonym","n","/ˈsjuːdənɪm/","a false name used by a writer","псевдонім","She published three novels under a pseudonym."],
+["psychiatry","n","/saɪˈkaɪətri/","the branch of medicine dealing with mental illness","психіатрія","He studied psychiatry after ten years in surgery."],
+["psychic","adj","/ˈsaɪkɪk/","having powers that cannot be explained; mental","екстрасенсорний; психічний","I am not psychic — write the date in the email."],
+["apostrophe","n","/əˈpɒstrəfi/","the punctuation mark ' ","апостроф","One apostrophe in the wrong place ruins a shop sign.","Кінцеве <b>-e</b> читається /i/: apostrophe, catastrophe, recipe, hyperbole."],
+["catastrophe","n","/kəˈtæstrəfi/","a terrible event; a disaster","катастрофа","The rain turned the festival into a catastrophe."],
+["arithmetic","n","/əˈrɪθmətɪk/","the basic mathematics of numbers","арифметика","My arithmetic is fine; my attention is not.","Іменник — a<b>RITH</b>metic, прикметник <b>arithmetical</b> — ˌarith<b>MET</b>ical."],
+["photographer","n","/fəˈtɒɡrəfə/","a person who takes photographs","фотограф","The photographer waited two hours for that cloud.","Наголос гуляє: <b>PHO</b>tograph → pho<b>TOG</b>rapher → photo<b>GRAPH</b>ic."],
+["telephony","n","/təˈlefəni/","the system of sending sound over long distances","телефонія, телефонний зв'язок","Internet telephony killed the phone card."],
+["cupid","n","/ˈkjuːpɪd/","the Roman god of love, shown as a boy with a bow","купідон","A cupid on every February window."],
+["fiend","n","/fiːnd/","a very cruel person; an enthusiast for something","злодій, лиходій; фанат чогось","He is a crossword fiend and a terrible loser.","<b>ie</b> = /iː/: fiend, field, priest — але <b>friend</b> = /frend/."],
+["co-opt","v","/kəʊˈɒpt/","to make somebody a member of a group without an election","кооптувати, залучати (до складу)","They co-opted two parents onto the committee."],
+["chopping board","n","/ˈtʃɒpɪŋ bɔːd/","a board for cutting food on","дошка для нарізання","One chopping board for fish, one for everything else.","У складених іменниках наголос на <b>першому</b> слові: CHOPPING board."],
+["photo frame","n","/ˈfəʊtəʊ freɪm/","a frame that holds a photograph","фоторамка","An empty photo frame is a strange gift."]
+]);
+D("b10","&#x1F50A; Lautmalerei &mdash; Onomatopoeia",[
+["bash","v","/bæʃ/","to hit something hard and noisily","гримнути, гепнути","He bashed the door with his shoulder and it opened."],
+["clang","v","/klæŋ/","to make a loud ringing metal sound","дзвеніти, брязкати (метал)","The gate clanged shut behind us."],
+["clip-clop","n","/ˈklɪpklɒp/","the sound of a horse's hooves","цокіт копит","The clip-clop of the horse woke the whole street."],
+["growl","v","/ɡraʊl/","(of a dog) to make a low angry sound; to speak angrily","гарчати; буркотіти","The dog growled and the postman reconsidered."],
+["grumble","v","/ˈɡrʌmbl/","to complain quietly; (of a stomach) to rumble","бурчати, нарікати","They grumble about the weather all year, happily."],
+["grumpy","adj","/ˈɡrʌmpi/","bad-tempered, especially in the morning","буркотливий, сварливий","He is grumpy until the second coffee."],
+["mash","v","/mæʃ/","to crush food into a soft mass","розминати, товкти","Boil the potatoes, then mash them with butter."],
+["meow","v","/miˈaʊ/","(of a cat) to make its typical sound","нявкати","The cat meows at the fridge, not at me.","BrE також пишуть <b>miaow</b>."],
+["moan","v","/məʊn/","to make a long low sound of pain; to complain","стогнати; ниття, скаржитися","Stop moaning and open the window."],
+["moo","v","/muː/","(of a cow) to make its typical sound","мукати","The cows moo at exactly five every evening."],
+["roar","v","/rɔː/","(of a lion, crowd or engine) to make a very loud deep sound","ревти, гарчати","The crowd roared for a goal that was offside."],
+["spit out","v","/ˌspɪt ˈaʊt/","to force something out of your mouth","випльовувати","He spat out the coffee and apologised to the plant."],
+["spray","v","/spreɪ/","to send small drops of liquid through the air","розпилювати, бризкати","Spray the leaves, not the floor."],
+["spurt","v","/spɜːt/","(of liquid) to come out in a sudden strong stream","бити струменем","Water spurted from the pipe across the kitchen."],
+["tweet","v","/twiːt/","(of a small bird) to make a short high sound","цвірінькати","Two birds tweet outside that window at 4 a.m."],
+["wheeze","v","/wiːz/","to breathe noisily with difficulty","хрипіти, сопіти","He wheezed up the stairs and blamed the bag."],
+["whizz","v","/wɪz/","to move very fast with a hissing sound","просвистіти, промчати","A cyclist whizzed past the queue of cars."],
+["gash","n","/ɡæʃ/","a long deep cut","глибокий поріз, рана","A gash on his hand from the broken glass."]
+]);
+D("b11","&#x1F465; Homophone &amp; Homographe",[
+["heir / air","phrase","/eə/","the person who inherits ≠ what we breathe","спадкоємець ≠ повітря","The heir opened a window for some air.","Однаково звучать — різні слова. Класика: <b>heir/air</b>, <b>pray/prey</b>, <b>sail/sale</b>."],
+["pray / prey","phrase","/preɪ/","to speak to God ≠ an animal that is hunted","молитися ≠ здобич","They pray for rain; the hawk looks for prey."],
+["sail / sale","phrase","/seɪl/","to travel by boat ≠ selling at low prices","пливти під вітрилом ≠ розпродаж","We sail on Friday, right after the sale ends."],
+["sew / so / sow","phrase","/səʊ/","to join cloth ≠ therefore ≠ to plant seeds","шити ≠ отже ≠ сіяти","She can sew, so she sows buttons back on in seconds."],
+["toe / tow","phrase","/təʊ/","a part of your foot ≠ to pull a vehicle","палець ноги ≠ буксирувати","He broke a toe kicking the car they had to tow."],
+["pane / pain","phrase","/peɪn/","a sheet of glass ≠ a feeling of hurt","шибка ≠ біль","A cracked pane and a pain in my back: Monday."],
+["pale / pail","phrase","/peɪl/","light in colour ≠ a bucket","блідий ≠ відро","He went pale and dropped the pail."],
+["peal / peel","phrase","/piːl/","the loud ringing of bells ≠ to remove skin from fruit","передзвін ≠ чистити (шкірку)","A peal of bells while I peel potatoes."],
+["plaice / place","phrase","/pleɪs/","a flat sea fish ≠ a location","камбала ≠ місце","We ate plaice at a place with no menu."],
+["roe / row","phrase","/rəʊ/","fish eggs ≠ a line of seats","ікра ≠ ряд","Fish roe on toast, in the back row of the cinema."],
+["tee / tea","phrase","/tiː/","the peg a golf ball sits on ≠ the drink","підставка для м'яча в гольфі ≠ чай","He put the ball on the tee and asked for tea."],
+["whine / wine","phrase","/waɪn/","to complain in an annoying way ≠ the drink","ниття ≠ вино","Stop whining about the wine."],
+["hoarse / horse","phrase","/hɔːs/","having a rough voice ≠ the animal","хрипкий ≠ кінь","She was hoarse after shouting at the horse race."],
+["lead","n","/led/ &middot; v /liːd/","the heavy metal ≠ to guide (spelled the same!)","свинець ≠ вести","Old pipes are made of lead /led/; she will lead /liːd/ the team.","Це <b>гомограф</b>: пишеться однаково, читається по-різному."],
+["wound","n","/wuːnd/ &middot; v /waʊnd/","an injury ≠ past of wind (to turn)","рана ≠ намотав (від wind)","He wound /waʊnd/ a bandage round the wound /wuːnd/."],
+["bathing","n","/ˈbeɪðɪŋ/ &middot; /ˈbɑːðɪŋ/","swimming ≠ washing a baby","купання (у морі) ≠ купання (дитини)","Bathing /ˈbeɪðɪŋ/ in the sea, bathing /ˈbɑːðɪŋ/ the baby."],
+["site / sight","phrase","/saɪt/","a place where something happens ≠ the ability to see","майданчик, місце ≠ зір, видовище","The building site is not a pretty sight."],
+["pare","v","/peə/","to cut away the outer layer; to reduce","обрізати, зчищати; урізати","They pared the budget to the bone.","Звучить як <b>pair</b> і <b>pear</b>."],
+["laze","v","/leɪz/","to relax and do nothing","ледарювати, вилежуватися","We lazed by the river for a whole afternoon.","Звучить як <b>lays</b>."],
+["faze","v","/feɪz/","to disturb or worry somebody","збивати з пантелику, бентежити","Nothing fazes her, not even a fire alarm mid-lecture.","Звучить як <b>phase</b> — але значення різні."],
+["purr","v","/pɜː/","(of a cat) to make a soft low sound of pleasure","муркотіти","The cat purrs when the laptop is warm."],
+["lead singer","n","/ˌliːd ˈsɪŋə/","the main singer in a band","соліст (гурту)","The lead singer forgot the second verse."]
+]);
+D("b12","&#x1F9FA; Nomen-Formen &mdash; nur Plural, Mengen, Beh&auml;lter",[
+["acoustics","n","/əˈkuːstɪks/","the qualities of a room that affect how sound is heard","акустика (приміщення)","The acoustics in that hall are famous.","Слово тільки в множині — і дієслово теж у множині: <i>the acoustics <b>are</b> good</i>."],
+["authorities","n","/ɔːˈθɒrətiz/","the people or organisations with official power","влада, органи влади","The authorities were informed and did nothing.","У значенні «влада» майже завжди множина: <b>the authorities</b>."],
+["braces","n","/ˈbreɪsɪz/","straps that hold trousers up; wires that straighten teeth","підтяжки; брекети","He wore red braces and a very serious face.","AmE: підтяжки — <b>suspenders</b>."],
+["classics","n","/ˈklæsɪks/","the study of ancient Greek and Latin language and literature","класична філологія","She read Classics at university and works in IT."],
+["dungarees","n","/ˌdʌŋɡəˈriːz/","loose trousers with a bib and straps","комбінезон (робочий)","Painters' dungarees with four pockets of nothing."],
+["goggles","n","/ˈɡɒɡlz/","special glasses that protect your eyes","захисні окуляри","Swimming goggles leave marks for an hour."],
+["handcuffs","n","/ˈhændkʌfs/","metal rings joined by a chain, put on a prisoner's wrists","наручники","The handcuffs were on before he finished the sentence."],
+["knickers","n","/ˈnɪkəz/","women's underwear (British English)","жіночі трусики (брит.)","Don't get your knickers in a twist — the file is safe.","Ідіома: <b>get your knickers in a twist</b> = панікувати через дрібницю."],
+["leggings","n","/ˈleɡɪŋz/","tight stretchy trousers","легінси","Leggings are not trousers, says every dress code."],
+["lodgings","n","/ˈlɒdʒɪŋz/","a room rented in somebody's house","найняте житло, кімната","He found cheap lodgings near the station."],
+["overalls","n","/ˈəʊvərɔːlz/","a piece of clothing worn over other clothes to protect them","робочий комбінезон","Overalls, gloves and two hours of dust."],
+["proceeds","n","/ˈprəʊsiːdz/","the money received from an event or sale","виручка, надходження","All proceeds go to the local hospice."],
+["swimming trunks","n","/ˈswɪmɪŋ trʌŋks/","shorts worn by men for swimming","плавки","He packed three pairs of swimming trunks and no towel."],
+["tongs","n","/tɒŋz/","a tool with two arms for picking things up","щипці","Use the tongs, not your fingers, for the salad."],
+["underpants","n","/ˈʌndəpænts/","men's underwear","чоловічі труси","A suitcase of shirts and no underpants."],
+["requirement","n","/rɪˈkwaɪəmənt/","something that is needed or officially demanded","вимога","A second language is a requirement, not a bonus.","Абстрактне <i>work</i> незлічуване, а <b>a requirement</b> — злічуване."],
+["clap of thunder","n","/ˌklæp əv ˈθʌndə/","a single loud crash of thunder","удар грому","One clap of thunder and the whole street lost power.","Так «нарізають» незлічуване: <b>a clap of</b> thunder, <b>a flash of</b> lightning."],
+["puff of smoke","n","/ˌpʌf əv ˈsməʊk/","a small amount of smoke released at once","клуб диму","The engine died with a puff of smoke."],
+["rumble","n","/ˈrʌmbl/","a long deep rolling sound","гуркіт, гул","A rumble of traffic behind the hotel all night."],
+["flux","n","/flʌks/","continuous change","мінливість, плинність","The whole department is in flux again.","Сталий вираз: <b>in a state of flux</b>."],
+["disrepair","n","/ˌdɪsrɪˈpeə/","bad condition because of a lack of repairs","занепад, аварійний стан","The bridge fell into disrepair over twenty years.","Сталий вираз: <b>fall into disrepair</b>."],
+["change out of","phrase","","the coins you get back from a note","решта (з купюри)","Have you got change out of twenty?"],
+["clump","n","/klʌmp/","a small tight group of trees or plants","купка, гурт (дерев, трави)","A clump of trees marks the old boundary.","Групи в природі: <b>a clump of</b> trees, <b>a shoal of</b> fish, <b>a swarm of</b> bees."],
+["heap","n","/hiːp/","an untidy pile of things","купа","A heap of clothes on the chair, as usual.","Розм.: <b>heaps of time</b> = купа часу."],
+["shoal","n","/ʃəʊl/","a large group of fish swimming together","косяк (риби)","A shoal of small fish turned all at once."],
+["swarm","n","/swɔːm/","a large group of insects flying together","рій","A swarm of bees settled on the school gate."],
+["barrel","n","/ˈbærəl/","a large round container for liquids","бочка","Whisky sleeps in a barrel for twelve years."],
+["carton","n","/ˈkɑːtn/","a cardboard or plastic container for food and drink","пакет, коробка (молока, соку)","Two cartons of milk and one of orange juice."],
+["crate","n","/kreɪt/","a large wooden or plastic box for transporting goods","ящик, контейнер","A crate of apples appeared on the doorstep."],
+["jug","n","/dʒʌɡ/","a container with a handle for pouring liquids","глечик","A jug of water on every table, unasked.","AmE частіше <b>pitcher</b>."],
+["tub","n","/tʌb/","a wide round container; a small plastic pot of food","бадя, кадка; баночка (морозива)","We finished a whole tub of ice cream, obviously."]
+]);
+D("b13","&#x1F504; Ausdr&uuml;cke mit do / make / bring / take",[
+["do business","phrase","","to trade or work with a person or company","вести справи, мати справу","We have done business with them for ten years."],
+["do without","phrase","","to manage although you do not have something","обходитися без","We will have to do without a second car."],
+["make off","phrase","","to leave quickly, especially after doing something wrong","накивати п'ятами, утекти","They made off with the till and a plant."],
+["make out","phrase","","to manage to see, hear or understand something","розібрати, розгледіти; збагнути","I could just make out a signature at the bottom."],
+["make love","phrase","","to have sex","кохатися","The film cuts away before they make love, thankfully."],
+["allowance","n","/əˈlaʊəns/","money given regularly for a purpose","надбавка, грошова допомога; кишенькові","A travel allowance covers half the ticket.","Сталий вираз: <b>make allowances for sb</b> = робити знижку на обставини."],
+["attempt","n","/əˈtempt/","an act of trying to do something","спроба","A second attempt worked because we changed one line.","<b>make an attempt to do sth</b> — робити спробу."],
+["excuse","n","/ɪkˈskjuːs/","a reason given to explain a fault","виправдання, відмовка","That is an explanation, not an excuse.","Іменник /ɪkˈskjuːs/ з /s/, дієслово <b>excuse</b> /ɪkˈskjuːz/ з /z/."],
+["exercise","n","/ˈeksəsaɪz/","physical activity; a task to practise a skill","вправа; фізичні вправи","Twenty minutes of exercise beats one perfect plan.","<b>do exercise</b> (фізичні), але <b>do an exercise</b> (завдання)."],
+["gardening","n","/ˈɡɑːdnɪŋ/","the work of looking after a garden","садівництво, робота в саду","Gardening is the only sport I am good at.","<b>do the gardening / do the shopping / do the washing-up</b>."],
+["bring down","phrase","","to reduce; to make a government lose power","знижувати; повалити (уряд)","The strike brought down the government in a week."],
+["bring into force","phrase","","to make a law start to operate","вводити в дію (закон)","The new rules were brought into force in January."],
+["bring into the open","phrase","","to make something public and no longer secret","виносити на люди, оприлюднювати","One email brought the whole dispute into the open."],
+["bring off","phrase","","to succeed in doing something difficult","провернути, здійснити (складне)","Nobody thought they would bring it off, and they did."],
+["bring on","phrase","","to cause something bad to happen","спричиняти, накликати","Stress brought on the migraine, not the coffee."],
+["bring out","phrase","","to produce and sell a new product","випускати (товар, книжку)","They bring out a new version every September."],
+["bring out the best in sb","phrase","","to make somebody show their best qualities","розкривати в комусь найкраще","A calm team leader brings out the best in everyone."],
+["bring round","phrase","","to make somebody conscious again; to persuade","приводити до тями; переконати","Two hours of argument brought her round."],
+["bring to a head","phrase","","to make a situation reach a point where action is needed","доводити до критичної точки","The missed deadline brought things to a head."],
+["bring to light","phrase","","to make new information known","виявляти, проливати світло","The audit brought several old debts to light."],
+["take a risk","phrase","","to do something that might have a bad result","ризикувати","We took a risk on a new supplier and it paid off."],
+["take back","phrase","","to admit that something you said was wrong; to return goods","брати слова назад; повертати товар","I take back what I said about the second draft."],
+["take control","phrase","","to start directing a situation","брати під контроль","Somebody has to take control of the schedule."]
+]);
+D("b14","&#x2699;&#xFE0F; Ausdr&uuml;cke mit get / set / put / come / go",[
+["get across","phrase","","to succeed in making people understand an idea","донести (думку)","The slides were pretty; the idea did not get across."],
+["get behind with","phrase","","to fail to do or pay something on time","відставати з (роботою, платежами)","I got behind with the reading in week two."],
+["get off to a good start","phrase","","to begin well","добре стартувати","The project got off to a good start and then met reality."],
+["get rid of","phrase","","to remove or throw away something unwanted","позбутися","We got rid of three cupboards and gained a room."],
+["get round","phrase","","to find a way to avoid a problem or rule","обійти (правило, проблему)","There is no way to get round the visa requirement."],
+["get round to","phrase","","to finally do something after a delay","дійти руки до чогось","I finally got round to fixing the tap."],
+["get up to","phrase","","to do something, often something bad","витворяти, чимось займатися","What did the children get up to while we were out?"],
+["get-together","n","/ˈɡet təɡeðə/","an informal meeting of friends","посиденьки, зустріч","A small get-together turned into forty people."],
+["put across","phrase","","to explain an idea so that people understand it","викласти, донести (думку)","She puts complicated ideas across in two sentences."],
+["put two and two together","phrase","","to guess the truth from what you know","скласти два і два, здогадатися","Nobody told me — I put two and two together."],
+["put your foot down","phrase","","to state firmly that something must (not) happen","твердо наполягти, поставити крапку","Her mother put her foot down about the tattoo."],
+["put-up job","n","/ˌpʊtʌp ˈdʒɒb/","something arranged dishonestly in advance","підстава, наперед підлаштована справа","The whole competition was a put-up job."],
+["set a record","phrase","","to achieve the best result ever","встановити рекорд","She set a record that stood for nineteen years."],
+["set aside","phrase","","to save something for a special purpose","відкладати (гроші, час)","Set aside twenty minutes a day and it works."],
+["set fire to sth","phrase","","to make something start burning","підпалити","Someone set fire to the bins behind the shop."],
+["set free","phrase","","to release a person or animal","звільняти, випускати на волю","The birds were checked and set free."],
+["come between","phrase","","to damage the relationship between people","стати між, посварити","Money came between the two brothers."],
+["come down","phrase","","to fall; to become lower","падати, знижуватися","Prices came down as soon as the second shop opened."],
+["come into","phrase","","to receive money from somebody who has died","успадкувати (гроші)","He came into a small fortune and bought a boat."],
+["come off","phrase","","to be successful; to become detached","вдатися; відірватися","The plan came off, which surprised everybody."],
+["come round","phrase","","to visit somebody; to become conscious again","зайти в гості; отямитися","Come round on Sunday and bring the photos."],
+["go pear-shaped","phrase","","to go badly wrong","піти шкереберть","Everything went pear-shaped twenty minutes before the start."],
+["break the news","phrase","","to tell somebody about something bad","повідомити (погану новину)","Somebody had to break the news to the team."],
+["break off","phrase","","to stop speaking; to end a relationship","обірвати (розмову); розірвати (стосунки)","She broke off mid-sentence and left."],
+["look up to sb","phrase","","to admire and respect somebody","поважати, брати за приклад","Younger colleagues look up to her, and she notices."],
+["turn over a new leaf","phrase","","to change your behaviour for the better","почати нове життя, виправитися","Every January he turns over a new leaf until February."],
+["run out of","phrase","","to have no more of something left","вичерпати запас чогось","We ran out of chairs, then out of patience."]
+]);
+D("b15","&#x1F3A9; Formell vs. informell",[
+["residence","n","/ˈrezɪdəns/","the place where somebody lives (formal)","місце проживання, резиденція","Please state your place of residence.","Формальне. У розмові — <b>home</b>, <b>where you live</b>."],
+["abode","n","/əˈbəʊd/","the place where somebody lives (very formal / legal)","житло, помешкання (юр.)","He was charged as being of no fixed abode.","Живе у штампі <b>of no fixed abode</b> = без певного місця проживання."],
+["offspring","n","/ˈɒfsprɪŋ/","a person's children; the young of an animal","нащадки, потомство","Their offspring are all taller than both parents.","Формальне або жартівливе. У розмові — <b>kids</b>, <b>children</b>."],
+["utilise","v","/ˈjuːtɪlaɪz/","to use something (formal)","використовувати, утилізувати (ресурс)","The space could be better utilised as a workshop.","У 90% випадків краще просте <b>use</b> — це головне правило регістру."],
+["capacity","n","/kəˈpæsəti/","the ability to do something; the amount something can hold","здатність; місткість","She has a great capacity for hard work.","Формальний відповідник <b>ability</b>."],
+["go amiss","phrase","","to go wrong; to be unwelcome (formal)","піти не так; бути недоречним","A little extra help would not go amiss.","Сталий вираз: <b>sth would not go amiss</b> = не завадило б."],
+["cheerio","exclam","/ˌtʃɪəriˈəʊ/","goodbye (informal, British)","бувай, до зустрічі (розм., брит.)","Cheerio, see you on Thursday!"],
+["advert","n","/ˈædvɜːt/","an advertisement (informal, British)","реклама, оголошення (розм.)","There is an advert for it on every bus.","Розм. скорочення: advertisement → advert → <b>ad</b>."],
+["mag","n","/mæɡ/","a magazine","журнал (розм.)","A gardening mag on every table in that waiting room."],
+["telly","n","/ˈteli/","television (informal, British)","телевізор, телек (розм.)","Nothing on the telly, as always."],
+["celeb","n","/səˈleb/","a celebrity","знаменитість (розм.)","A minor celeb opened the shopping centre."],
+["cop","n","/kɒp/","a police officer (informal)","коп, поліцейський (розм.)","Two cops stood outside eating chips."],
+["the old bill","n","/ði ˌəʊld ˈbɪl/","the police (British slang)","поліція (брит. сленг)","Someone called the old bill about the noise."],
+["quack","n","/kwæk/","a person who pretends to be a doctor","шарлатан від медицини","That clinic is run by a quack with a good website."],
+["shrink","n","/ʃrɪŋk/","a psychiatrist or psychotherapist (informal)","психоаналітик, «мозгоправ» (розм.)","He tells his shrink things he never tells us."],
+["vet","n","/vet/","a veterinary surgeon; (v) to check somebody carefully","ветеринар; (дієсл.) ретельно перевіряти","The vet says the cat is simply fat."],
+["squaddie","n","/ˈskwɒdi/","an ordinary soldier (British slang)","солдат-строковик (брит. сленг)","Two squaddies on the train, both asleep."],
+["geek","n","/ɡiːk/","a person very interested in computers or a niche subject","гік, задрот (розм., часто схвально)","Ask the office geek — she fixed it in a minute."],
+["anorak","n","/ˈænəræk/","a boring person with an obsessive hobby; a waterproof jacket","занудний фанат хобі; куртка-анорак","Train spotters are the classic British anorak."],
+["grub","n","/ɡrʌb/","food (informal)","їжа, харчі, «хавка» (розм.)","Cheap grub and a warm room: student heaven."],
+["sarnie","n","/ˈsɑːni/","a sandwich (British slang)","бутерброд (брит. сленг)","A bacon sarnie and a strong tea."],
+["spud","n","/spʌd/","a potato (informal)","картоплина (розм.)","Peel a few spuds while I do the rest."],
+["dosh","n","/dɒʃ/","money (British slang)","гроші, бабки (брит. сленг)","No dosh until Friday, sorry."],
+["quid","n","/kwɪd/","one pound sterling (British slang)","фунт (брит. сленг)","It cost me twenty quid and an argument.","Множина не змінюється: <b>twenty quid</b>, не «quids»."],
+["readies","n","/ˈrediz/","cash (British slang)","готівка (брит. сленг)","He pays in readies and asks no questions."],
+["loo","n","/luː/","a toilet (informal, British)","туалет (розм., брит.)","Where's the loo? — Second door on the left."]
+]);
+D("b16","&#x1F3AD; Similes &mdash; feste Vergleiche",[
+["as blind as a bat","simile","","unable to see well at all","сліпий як кріт","Without my glasses I am as blind as a bat.","Позначені * у книжці можуть образити — вживай обережно."],
+["as thin as a rake","simile","","extremely thin","худий як тріска","He eats constantly and stays as thin as a rake."],
+["as strong as an ox","simile","","very strong","сильний як бик","Her grandfather is eighty and as strong as an ox."],
+["as quiet as a mouse","simile","","making almost no noise","тихий як миша","The children were as quiet as mice for four minutes."],
+["as heavy as lead","simile","/led/","extremely heavy","важкий як свинець","The suitcase was as heavy as lead.","Протилежне: <b>as light as a feather</b>."],
+["as light as a feather","simile","","extremely light","легкий як пір'їнка","The baby's shoe was as light as a feather."],
+["as drunk as a lord","simile","","very drunk","п'яний як чіп","He came home as drunk as a lord and sang."],
+["as sober as a judge","simile","","completely sober; very serious","тверезий як скельце; серйозний","I was as sober as a judge and still lost the argument."],
+["as black as night","simile","","completely dark","чорний як ніч","The corridor was as black as night."],
+["as white as snow","simile","","beautifully white","білий як сніг","Her skin was as white as snow, said the tale."],
+["as white as a sheet","simile","","very pale from fear or shock","блідий як полотно","He came out of the room as white as a sheet."],
+["as good as gold","simile","","(of a child) very well behaved","золота дитина, слухняний","The kids were as good as gold all afternoon."],
+["as cool as a cucumber","simile","","very calm in a difficult situation","незворушний, спокійний як удав","She gave the speech as cool as a cucumber."],
+["as busy as a bee","simile","","very busy and active","працьовитий як бджола","Since he retired he has been as busy as a bee."],
+["as hard as iron","simile","","extremely hard","твердий як залізо","The ground was as hard as iron in January."],
+["as dry as a bone","simile","","completely dry","сухий як порох","The soil is as dry as a bone — water everything."],
+["as mad as a hatter","simile","","completely crazy (humorous)","геть божевільний","Our neighbour is as mad as a hatter and very kind."],
+["as bold as brass","simile","","confident in a rude, shameless way","нахабний до безсоромності","She walked in as bold as brass and sat down."],
+["as deaf as a post","simile","","unable to hear at all","глухий як пень","Speak up — he is as deaf as a post."],
+["as easy as pie","simile","","very easy","простіше простого","Installing it was as easy as pie."],
+["as quick as a flash","simile","","extremely fast","швидко як блискавка","As quick as a flash, she had the answer."],
+["as sick as a dog","simile","","very ill, especially vomiting","дуже хворий, вивертає","I was as sick as a dog after that fish."],
+["as sick as a parrot","simile","","very disappointed","страшенно розчарований","We lost in the last minute — sick as a parrot."],
+["as red as a beetroot","simile","","very red in the face from embarrassment","червоний як буряк","He went as red as a beetroot when she asked."],
+["as dead as a doornail","simile","","completely dead or finished","мертвий, і крапка","The battery is as dead as a doornail."],
+["work like a dream","simile","","to work perfectly and smoothly","працювати як годинник","The new booking system works like a dream."],
+["have eyes like a hawk","simile","","to notice everything, even small details","мати гострий зір, все помічати","Our teacher had eyes like a hawk."],
+["eat like a horse","simile","","to eat very large amounts","їсти як не в себе","He eats like a horse and never gains a kilo."],
+["drink like a fish","simile","","to drink too much alcohol","пити як бочка","They drink like fish and call it networking."],
+["sleep like a log","simile","","to sleep very deeply","спати як убитий","Two hours of hiking and I slept like a log."],
+["have a memory like a sieve","simile","","to forget things constantly","мати діряву пам'ять","I have a memory like a sieve — write it down for me."],
+["like a bear with a sore head","simile","","in a very bad mood","злий як чорт","Before coffee he is like a bear with a sore head."],
+["like a bull in a china shop","simile","","very clumsy and insensitive","як слон у посудній лавці","He entered the negotiation like a bull in a china shop."],
+["like a red rag to a bull","simile","","certain to make somebody very angry","як червона ганчірка для бика","Mentioning the parking is like a red rag to a bull."]
+]);
+D("b17","&#x1F4DC; Sprichw&ouml;rter",[
+["Never judge a book by its cover.","proverb","","Don't judge people or things by appearance.","Не суди книжку за обкладинкою.","The office looks awful — never judge a book by its cover."],
+["Never look a gift-horse in the mouth.","proverb","","Don't find fault with good fortune you are given.","Дарованому коневі в зуби не заглядають.","It's free and it works — don't look a gift-horse in the mouth."],
+["We'll cross that bridge when we come to it.","proverb","","We'll deal with that problem when it actually happens.","Будемо думати, коли дійде до того.","And if they say no? — We'll cross that bridge when we come to it."],
+["Take care of the pennies and the pounds will take care of themselves.","proverb","","Look after small sums and the large ones follow.","Копійка гривню береже.","She saves on everything: take care of the pennies."],
+["When the cat's away, the mice will play.","proverb","","People behave freely when the person in charge is absent.","Кіт з дому — миші в танець.","The boss is on holiday — when the cat's away…"],
+["You can lead a horse to water but you can't make it drink.","proverb","","You can offer help but not force someone to accept it.","Можна привести коня до води, та не змусиш пити.","I sent her the course twice. You can lead a horse to water…"],
+["One swallow doesn't make a summer.","proverb","","One good sign doesn't mean everything will be fine.","Одна ластівка весни не робить.","Sales were up in May, but one swallow doesn't make a summer."],
+["There's no smoke without fire.","proverb","","Rumours usually have some truth in them.","Немає диму без вогню.","Three people said the same thing — no smoke without fire."],
+["People who live in glass houses shouldn't throw stones.","proverb","","Don't criticise faults you have yourself.","Не бачить сучок у своєму оці.","He complains about late replies — glass houses, stones."],
+["Too many cooks spoil the broth.","proverb","","Too many people interfering ruins the work.","Де багато господинь, там хата неметена.","Five editors on one page: too many cooks spoil the broth."],
+["Many hands make light work.","proverb","","A job is easier when many people help.","Гуртом і батька легше бити.","Everyone carried one box — many hands make light work."],
+["Don't count your chickens before they hatch.","proverb","","Don't rely on something that hasn't happened yet.","Курчат по осені рахують.","The contract isn't signed — don't count your chickens.","Це прислів'я вже є на сайті в іншому списку; лишаю для повноти пари."]
+]);
+D("b18","&#x1F6A7; Schilder &amp; Hinweise",[
+["Trespassers will be prosecuted.","phrase","","People who enter this private land will be taken to court.","Прохід заборонено — порушників буде притягнуто до відповідальності.","A rusty sign said: Trespassers will be prosecuted."],
+["trespasser","n","/ˈtrespəsə/","a person who enters private land without permission","порушник меж приватної власності","The farmer treats every walker as a trespasser."],
+["prosecute","v","/ˈprɒsɪkjuːt/","to officially charge somebody with a crime in court","притягати до суду, переслідувати в судовому порядку","Shoplifters will be prosecuted, says every till."],
+["Penalty for littering: £1,000","phrase","","You can be fined for dropping rubbish.","Штраф за смiття — 1000 фунтів.","Penalty for littering signs are ignored by everyone."],
+["Cyclists dismount","phrase","","Cyclists must get off and walk here.","Велосипедистам спішитися.","At the bridge the sign says: Cyclists dismount."],
+["dismount","v","/dɪsˈmaʊnt/","to get off a bicycle or horse","спішуватися, злазити (з велосипеда, коня)","She dismounted and pushed the bike up the hill."],
+["Permit holders only","phrase","","Only people with an official permit may park or enter.","Тільки за наявності дозволу.","Permit holders only — and the permits sold out in 2009."],
+["Authorised personnel only","phrase","","Only staff with permission may enter.","Стороннім вхід заборонено (тільки для персоналу).","A grey door marked Authorised personnel only."],
+["personnel","n","/ˌpɜːsəˈnel/","the people who work for an organisation","персонал, кадри","Personnel changes were announced by email."],
+["unauthorised","adj","/ʌnˈɔːθəraɪzd/","without official permission","несанкціонований","Unauthorised access is logged and reported."],
+["Unaccompanied children","phrase","","children who are not with an adult","діти без супроводу дорослих","Unaccompanied children may not use the pool."],
+["unaccompanied","adj","/ˌʌnəˈkʌmpənid/","not with anybody else","без супроводу","Unaccompanied luggage will be removed."],
+["prohibited","adj","/prəˈhɪbɪtɪd/","not allowed by law or rules","заборонений","Smoking is prohibited throughout the building.","На вивісках формально: <b>prohibited</b>, у розмові — <b>not allowed</b>."],
+["Please refrain from using mobile phones","phrase","","Please do not use phones here.","Просимо утриматися від користування телефонами.","Theatres still print: Please refrain from using mobile phones."],
+["health warning","n","/ˈhelθ wɔːnɪŋ/","an official notice that something is bad for you","попередження про шкоду для здоров'я","The packet is half health warning, half product."],
+["Alight here for…","phrase","","Get off here for…","Вихід тут до…","Alight here for the museum and the castle.","<b>alight</b> /əˈlaɪt/ = сходити з транспорту (тільки в оголошеннях)."],
+["Reduce speed now","phrase","","Start going more slowly.","Знизьте швидкість.","Reduce speed now — and then a camera."],
+["Display ticket clearly","phrase","","Put your ticket where it can easily be seen.","Розмістіть квиток на видному місці.","Display ticket clearly on the windscreen."],
+["auditorium","n","/ˌɔːdɪˈtɔːriəm/","the part of a theatre where the audience sits","глядацька зала","No food or drink in the auditorium."]
+]);
+D("b19","&#x1F4F0; Headline English",[
+["aid","n","/eɪd/","help (in headlines)","допомога","FLOOD AID PLEDGED BY NEIGHBOURS.","У заголовках слова короткі й драматичні: <b>aid</b> замість <i>help</i>."],
+["back","v","/bæk/","to support (in headlines)","підтримати","MPs BACK NEW HOUSING PLAN."],
+["bar","v","/bɑː/","to forbid or exclude","заборонити, не пустити","CLUB BARS FANS FROM AWAY GAME."],
+["bid","n","/bɪd/","an attempt; an offer to buy","спроба; заявка, пропозиція","RESCUE BID FAILS IN HEAVY SNOW."],
+["blaze","n","/bleɪz/","a large fire","пожежа","BLAZE DESTROYS CITY MARKET."],
+["blast","n","/blɑːst/","an explosion","вибух","GAS BLAST INJURES FOUR."],
+["boost","n","/buːst/","something that encourages or increases","поштовх, стимул","EXPORT BOOST FOR SMALL FIRMS."],
+["clash","n","/klæʃ/","a dispute or fight","сутичка, зіткнення","CLASH OVER SCHOOL FUNDING."],
+["curb","n","/kɜːb/","a limit or restriction","обмеження","NEW CURBS ON SHORT-TERM RENTS."],
+["gems","n","/dʒemz/","jewels","коштовності","STOLEN GEMS FOUND IN GARDEN."],
+["go-ahead","n","/ˈɡəʊəhed/","official approval to start something","дозвіл, «зелене світло»","BRIDGE GETS GO-AHEAD AFTER 12 YEARS."],
+["hit","v","/hɪt/","to affect badly","ударити, боляче зачепити","STRIKE HITS MORNING SERVICES."],
+["key","adj","/kiː/","essential, most important","ключовий","KEY WITNESS FAILS TO APPEAR."],
+["ordeal","n","/ɔːˈdiːl/","a very painful or difficult experience","важке випробування","HOSTAGE TELLS OF 30-HOUR ORDEAL."],
+["oust","v","/aʊst/","to remove somebody from a position of power","усунути, витіснити","PARTY OUSTS LEADER AFTER VOTE."],
+["plea","n","/pliː/","an urgent request","заклик, благання","PLEA FOR BLOOD DONORS AFTER CRASH."],
+["pledge","n","/pledʒ/","a serious promise","обіцянка, зобов'язання","PM PLEDGES 5,000 NEW NURSES."],
+["ploy","n","/plɔɪ/","a clever trick to gain an advantage","хитрий хід, виверт","CRITICS CALL TAX CUT AN ELECTION PLOY."],
+["poll","n","/pəʊl/","an election or a survey of opinion","вибори; опитування","POLL SHOWS VOTERS SPLIT."],
+["probe","n","/prəʊb/","an investigation","розслідування","POLICE PROBE INTO MISSING FUNDS."],
+["riddle","n","/ˈrɪdl/","a mystery","загадка","RIDDLE OF THE EMPTY TRAIN."],
+["strife","n","/straɪf/","serious conflict or trouble","розбрат, чвари","YEARS OF STRIFE END IN ONE HANDSHAKE."],
+["vow","v","/vaʊ/","to promise solemnly","заприсягтися, пообіцяти","MINISTER VOWS TO CUT WAITING LISTS."],
+["quit","v","/kwɪt/","to leave a job; to resign","піти з посади","HEAD OF AGENCY QUITS AFTER REPORT."],
+["talking point","n","/ˈtɔːkɪŋ pɔɪnt/","a subject that people discuss a lot","предмет обговорення","THE REAL TALKING POINT IS THE PRICE."],
+["axe","v","/æks/","to cut or remove, especially jobs","скоротити, зрізати","FIRM AXES 200 JOBS AT TWO PLANTS."]
+]);
+D("b20","&#x1F1FA;&#x1F1F8; US &harr; British",[
+["hood &harr; bonnet","phrase","","US hood = UK bonnet — the front cover of a car engine","капот","He opened the hood; in Britain it is the bonnet."],
+["trunk &harr; boot","phrase","","US trunk = UK boot — the luggage space of a car","багажник","Put the bags in the trunk — or the boot, if you are British."],
+["candy &harr; sweets","phrase","","US candy = UK sweets","цукерки","A bag of candy in Chicago is a bag of sweets in Leeds."],
+["eraser &harr; rubber","phrase","","US eraser = UK rubber","гумка (стирачка)","Ask for a rubber in the US and watch the face.","Класична пастка: у США <b>rubber</b> означає презерватив."],
+["flashlight &harr; torch","phrase","","US flashlight = UK torch","ліхтарик","Take a flashlight — the path has no lights."],
+["freeway &harr; motorway","phrase","","US freeway = UK motorway","автомагістраль","Three hours on the freeway with no radio.","Ще: <b>interstate</b> — міжштатна автомагістраль у США."],
+["interstate","n","/ˈɪntəsteɪt/","a major road connecting US states","міжштатна автомагістраль","We joined the interstate and drove until dark."],
+["drapes &harr; curtains","phrase","","US drapes = UK curtains","штори","Heavy drapes in every American hotel room."],
+["pantyhose &harr; tights","phrase","","US pantyhose = UK tights","колготки","One pair of pantyhose, two hours, one ladder."],
+["parking lot &harr; car park","phrase","","US parking lot = UK car park","автостоянка","The parking lot was bigger than the shop."],
+["rest room &harr; toilet","phrase","","US rest room = UK toilet / loo","туалет (громадський)","Ask for the rest room, not the toilet, in the US."],
+["round trip &harr; return ticket","phrase","","US round trip = UK return (ticket)","квиток туди й назад","A round trip costs less than two singles."],
+["Scotch tape &harr; Sellotape","phrase","","US Scotch tape = UK Sellotape — sticky tape","скотч","Both names are brands that became the word."],
+["vest &harr; waistcoat","phrase","","US vest = UK waistcoat (part of a suit)","жилет","In the US a vest goes over a shirt, in the UK under it.","Пастка: британський <b>vest</b> = американський <b>undershirt</b> (майка)."],
+["undershirt &harr; vest","phrase","","US undershirt = UK vest — worn under a shirt","майка (натільна)","He wore an undershirt under a very thin shirt."],
+["waistcoat","n","/ˈweɪskəʊt/","a sleeveless jacket worn under a suit jacket (UK)","жилет (від костюма)","A three-piece suit needs a waistcoat."],
+["check &harr; bill","phrase","","US check = UK bill (in a restaurant)","рахунок (у ресторані)","Could we have the check, please? — the bill, in London.","А британський <b>cheque</b> = американський <b>check</b> (банківський чек)."],
+["zebra crossing &harr; crosswalk","phrase","","UK zebra crossing = US crosswalk","пішохідний перехід","Cars stop at a zebra crossing; that is the law."],
+["wash up","phrase","","UK: to wash the dishes; US: to wash your hands and face","мити посуд (брит.) / умитися (амер.)","\"Go and wash up\" means two different things.","Класичне непорозуміння за столом."],
+["jewelry &harr; jewellery","phrase","","US jewelry = UK jewellery","прикраси","Same word, one letter less in the US."],
+["-ize &harr; -ise","phrase","","US spelling prefers -ize; UK accepts both","орфографія -ize / -ise","organize / organise, realize / realise.","Оксфордський стиль теж пише <b>-ize</b>, тож це не «американська помилка»."],
+["tropical storm","n","/ˌtrɒpɪkl ˈstɔːm/","a violent storm with heavy rain and strong winds","тропічний шторм","A tropical storm closed every airport in the region."]
+]);
+D("b21","&#x1F5E8;&#xFE0F; Multi-Word Expressions",[
+["bark up the wrong tree","phrase","","to have the wrong idea about how to get something","іти хибним слідом, помилятися","If you think I hid the file, you're barking up the wrong tree."],
+["daft as a brush","phrase","","very silly (informal, British)","дурненький, з дивацтвом","He's daft as a brush and the kindest man here."],
+["a pain in the neck","phrase","","a very annoying person or thing","заноза, головний біль (про когось/щось)","The new form is a pain in the neck."],
+["poke your nose into sth","phrase","","to interfere in something private","пхати носа не в свої справи","Don't poke your nose into their finances."],
+["take the biscuit","phrase","","to be the most surprising or annoying thing","це вже вершина (нахабства)","Charging for the water really takes the biscuit.","AmE: <b>take the cake</b>."],
+["get hold of the wrong end of the stick","phrase","","to misunderstand something completely","зрозуміти все навпаки","She got the wrong end of the stick and cancelled everything."]
+]);
+// ===== Grunddaten =====
+var ALL = [];
+DECKS.forEach(function (d) {
+    d.rows.forEach(function (r) {
+        ALL.push({ w: r[0], pos: r[1], ipa: r[2], def: r[3], ua: r[4], ex: r[5], tip: r[6] || '', deck: d.id, dt: d.t, idx: ALL.length });
+        ALL[ALL.length - 1].ri = d.rows.indexOf(r);
+    });
+});
+
+function esc(s) { return String(s).replace(/&(?!#?\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function uaShort(s) { return String(s).split(/\s+[—–-]\s+/)[0]; }
+
+// Wortformen im Beispielsatz finden (teems, absconded, purloining ...)
+var IRREG = {
+    bring: ['brought'], make: ['made'], come: ['came'], take: ['took', 'taken'], get: ['got', 'gotten'],
+    go: ['went', 'gone', 'goes'], do: ['did', 'done', 'does'], break: ['broke', 'broken'], run: ['ran'],
+    eat: ['ate', 'eaten'], drink: ['drank', 'drunk'], sleep: ['slept'], wear: ['wore', 'worn'],
+    tell: ['told'], have: ['had', 'has'], put: ['puts'], set: ['sets'], cut: ['cuts'], keep: ['kept'],
+    stand: ['stood'], hold: ['held'], spit: ['spat'], lead: ['led'], feel: ['felt'], think: ['thought']
+};
+function wordForms(w) {
+    var b = w.toLowerCase();
+    var f = [b, b + 's', b + 'es', b + 'ed', b + 'd', b + 'ing', b + 'ly'];
+    if (IRREG[b]) f = f.concat(IRREG[b]);
+    if (/e$/.test(b)) { var s = b.slice(0, -1); f.push(s + 'ing', s + 'ed', s + 'es'); }
+    if (/y$/.test(b)) { var y = b.slice(0, -1); f.push(y + 'ied', y + 'ies', y + 'ying'); }
+    if (/[^aeiou][aeiou][^aeiouwxy]$/.test(b)) { var dbl = b + b.slice(-1); f.push(dbl + 'ed', dbl + 'ing'); }
+    return f.sort(function (a, c) { return c.length - a.length; });
+}
+function reEsc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function findForm(w, text) {
+    var forms = wordForms(w);
+    for (var i = 0; i < forms.length; i++) {
+        var re = new RegExp('\\b' + reEsc(forms[i]) + '\\b', 'i');
+        var m = text.match(re);
+        if (m) return m[0];
+    }
+    return null;
+}
+// mehrteilige Ausdrücke: erlaubt gebeugtes erstes Verb + 0-2 Wörter dazwischen
+//   "bring down" findet auch "brought the price down"
+function findPhrase(w, text) {
+    var hit = findForm(w, text);
+    if (hit) return hit;
+    var parts = w.toLowerCase().replace(/\b(sth|sb|s\.o\.?)\b/g, ' ').replace(/[^a-z' ]/g, ' ').trim().split(/\s+/);
+    if (parts.length < 2) return null;
+    var forms = wordForms(parts[0]).map(reEsc).join('|');
+    var tail = parts.slice(1).map(reEsc).join('\\s+(?:\\w+\\s+){0,2}');
+    try {
+        var re = new RegExp('\\b(?:' + forms + ')\\b\\s+(?:\\w+\\s+){0,2}' + tail + '\\b', 'i');
+        var m = text.match(re);
+        return m ? m[0] : null;
+    } catch (e) { return null; }
+}
+function markWord(w, text) {
+    var hit = findPhrase(w, text);
+    if (!hit) return esc(text);
+    return esc(text).replace(new RegExp('\\b' + reEsc(hit) + '\\b'), '<b>' + hit + '</b>');
+}
+function gapSentence(w, text) {
+    var hit = findPhrase(w, text);
+    if (!hit) return null;
+    return esc(text).replace(new RegExp('\\b' + reEsc(hit) + '\\b'), '<span class="gap">_______</span>');
+}
+
+// ===== Tabs =====
+function showTab(target) {
+    document.querySelectorAll('.tab[data-tab]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === target); });
+    document.querySelectorAll('.tab-content').forEach(function (c) {
+        var on = c.id === target;
+        c.classList.toggle('active', on);
+        c.style.display = on ? 'block' : 'none';
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('.tab[data-tab]').forEach(function (b) {
+    b.addEventListener('click', function () { showTab(this.getAttribute('data-tab')); });
+});
+
+// ===== Wörter-Liste =====
+var activeDeck = 'all', randomSet = null;
+var chipBox = document.getElementById('v5chips');
+var listBox = document.getElementById('v5list');
+var cntBox = document.getElementById('v5cnt');
+var qInput = document.getElementById('v5q');
+
+chipBox.innerHTML = '<button class="v5-chip on" data-d="all">Alle <small>' + ALL.length + '</small></button>' +
+    DECKS.map(function (d) { return '<button class="v5-chip" data-d="' + d.id + '">' + d.t + ' <small>' + d.rows.length + '</small></button>'; }).join('');
+
+chipBox.addEventListener('click', function (e) {
+    var b = e.target.closest('.v5-chip'); if (!b) return;
+    activeDeck = b.getAttribute('data-d');
+    randomSet = null;
+    chipBox.querySelectorAll('.v5-chip').forEach(function (c) { c.classList.toggle('on', c === b); });
+    render();
+});
+
+function cardHTML(r, i) {
+    var posCls = r.pos === 'adj' ? 'adj' : (r.pos === 'v' ? 'v' : (r.pos === 'n' ? 'n' : ''));
+    return '<div class="v5-card">' +
+        '<div><span class="v5-w">' + esc(r.w) + '</span><span class="v5-pos ' + posCls + '">' + esc(r.pos) + '</span>' + sayBtn(r) + '</div>' +
+        '<div class="v5-ipa">' + esc(r.ipa) + '</div>' +
+        '<div class="v5-def">' + esc(r.def) + '</div>' +
+        '<div class="v5-ua">' + r.ua + '</div>' +
+        '<div class="v5-ex">' + markWord(r.w, r.ex) + '</div>' +
+        (r.tip ? '<div class="v5-tip">' + r.tip + '</div>' : '') +
+        '</div>';
+}
+
+function render() {
+    var s = qInput.value.trim().toLowerCase();
+    // Suche geht immer über alle Blöcke, Chips filtern nur ohne Suche
+    var rows = randomSet ? randomSet : (s ? ALL : ALL.filter(function (r) { return activeDeck === 'all' || r.deck === activeDeck; }));
+    if (s) {
+        rows = rows.filter(function (r) {
+            return (r.w + ' ' + r.ua + ' ' + r.def + ' ' + r.ex).toLowerCase().indexOf(s) > -1;
+        });
+    }
+    cntBox.textContent = rows.length + ' von ' + ALL.length + ' Wörtern' + (randomSet ? ' (Zufallsauswahl)' : (s ? ' · Suche über alle Blöcke' : ''));
+    if (!rows.length) { listBox.innerHTML = '<div class="v5-note">Nichts gefunden. Andere Schreibweise probieren?</div>'; return; }
+    var html = '', groups = {};
+    rows.forEach(function (r) { (groups[r.deck] = groups[r.deck] || []).push(r); });
+    DECKS.forEach(function (d) {
+        var g = groups[d.id]; if (!g) return;
+        if (activeDeck === 'all' || randomSet || s) html += '<div class="v5-deck-h">' + d.t + ' &middot; ' + g.length + deckHearBtn(d.id) + '</div>';
+        html += '<div class="v5-grid">' + g.map(cardHTML).join('') + '</div>';
+    });
+    listBox.innerHTML = html;
+}
+qInput.addEventListener('input', function () { randomSet = null; render(); });
+document.getElementById('v5hide').addEventListener('click', function () {
+    var on = document.body.classList.toggle('v5-hide-ua');
+    this.classList.toggle('on', on);
+    this.innerHTML = on ? '&#x1F441;&#xFE0F; Übersetzung zeigen' : '&#x1F648; Übersetzung verstecken';
+});
+document.getElementById('v5rand').addEventListener('click', function () {
+    randomSet = shuffle(ALL).slice(0, 12);
+    qInput.value = '';
+    render();
+});
+
+// ===== Deck-Auswahl für Übungen / Matching =====
+var deckOpts = '<option value="all">Alle Bl&ouml;cke (' + ALL.length + ' W&ouml;rter)</option>' +
+    DECKS.map(function (d) {
+        var t = d.t.replace(/&#x[0-9A-Fa-f]+;/g, '').trim();
+        return '<option value="' + d.id + '">' + t + ' (' + d.rows.length + ')</option>';
+    }).join('');
+document.getElementById('v5deck').innerHTML = deckOpts;
+document.getElementById('v5mdeck').innerHTML = deckOpts;
+
+function poolOf(deckId) {
+    return deckId === 'all' ? ALL : ALL.filter(function (r) { return r.deck === deckId; });
+}
+
+// ===== Übungen =====
+var qMode = 'ua', qList = [], qIdx = 0, qScore = 0;
+document.querySelectorAll('[data-mode]').forEach(function (b) {
+    b.addEventListener('click', function () {
+        document.querySelectorAll('[data-mode]').forEach(function (x) { x.classList.remove('on'); });
+        this.classList.add('on');
+        qMode = this.getAttribute('data-mode');
+        startQuiz();
+    });
+});
+document.getElementById('v5start').addEventListener('click', startQuiz);
+document.getElementById('v5deck').addEventListener('change', startQuiz);
+
+function startQuiz() {
+    var pool = poolOf(document.getElementById('v5deck').value);
+    if (qMode === 'gap') pool = pool.filter(function (r) { return gapSentence(r.w, r.ex); });
+    if (pool.length < 4) { document.getElementById('v5quiz').innerHTML = '<div class="v5-note">Zu wenige W&ouml;rter in diesem Block f&uuml;r diesen Modus.</div>'; return; }
+    qList = shuffle(pool).slice(0, 10);
+    qIdx = 0; qScore = 0;
+    showQ();
+}
+
+function showQ() {
+    var box = document.getElementById('v5quiz');
+    if (qIdx >= qList.length) {
+        var pct = Math.round(qScore / qList.length * 100);
+        var msg = pct >= 90 ? 'Ausgezeichnet &mdash; diese Gruppe sitzt.' : (pct >= 60 ? 'Solide. Die Fehler nochmal in den Karten nachlesen.' : 'Noch zu fr&uuml;h f&uuml;r den Test &mdash; erst die Karten lesen, dann wiederholen.');
+        box.innerHTML = '<div class="v5-prog">Fertig</div><div class="v5-q"><b>' + qScore + ' / ' + qList.length + '</b> richtig (' + pct + '%)<br><span style="font-size:0.9rem;color:rgba(200,220,255,0.6)">' + msg + '</span></div>' +
+            '<button class="v5-btn on" onclick="startQuiz()">&#x1F504; Noch eine Runde</button>';
+        return;
+    }
+    var r = qList[qIdx];
+    var pool = poolOf(document.getElementById('v5deck').value);
+    var same = pool.filter(function (x) { return x.w !== r.w && x.pos === r.pos; });
+    if (same.length < 3) same = ALL.filter(function (x) { return x.w !== r.w && x.pos === r.pos; });
+    if (same.length < 3) same = ALL.filter(function (x) { return x.w !== r.w; });
+    var wrong = shuffle(same).slice(0, 3);
+    var opts = shuffle([r].concat(wrong));
+    var stem = '', label = '';
+    if (qMode === 'ua') {
+        label = 'Was bedeutet das Wort?';
+        stem = '<b>' + esc(r.w) + '</b> <span style="color:rgba(94,234,212,0.7);font-size:0.85rem">' + esc(r.ipa) + '</span>';
+    } else if (qMode === 'gap') {
+        label = 'Welches Wort passt in die L&uuml;cke?';
+        stem = gapSentence(r.w, r.ex);
+    } else if (qMode === 'def') {
+        label = 'Welches Wort passt zu dieser Definition?';
+        stem = esc(r.def);
+    } else {
+        label = 'Welches englische Wort ist das?';
+        stem = esc(uaShort(r.ua).replace(/<[^>]+>/g, ''));
+    }
+    var optHTML = opts.map(function (o) {
+        var text = (qMode === 'ua') ? uaShort(o.ua) : esc(o.w);
+        return '<button class="v5-opt" data-w="' + esc(o.w) + '">' + text + '</button>';
+    }).join('');
+    box.innerHTML = '<div class="v5-prog">Frage ' + (qIdx + 1) + ' / ' + qList.length + ' &middot; Punkte: ' + qScore + '</div>' +
+        '<div class="v5-q"><span style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:#2dd4bf;display:block;margin-bottom:0.4rem">' + label + '</span>' + stem + '</div>' +
+        '<div class="v5-opts">' + optHTML + '</div><div class="v5-fb"></div>';
+    box.querySelectorAll('.v5-opt').forEach(function (b) {
+        b.addEventListener('click', function () { answer(this, r); });
+    });
+}
+
+function answer(btn, r) {
+    var box = document.getElementById('v5quiz');
+    if (box.dataset.done === '1') return;
+    box.dataset.done = '1';
+    var ok = btn.getAttribute('data-w') === r.w;
+    box.querySelectorAll('.v5-opt').forEach(function (b) {
+        b.disabled = true;
+        if (b.getAttribute('data-w') === r.w) b.classList.add('ok');
+    });
+    if (!ok) btn.classList.add('no'); else qScore++;
+    var fb = box.querySelector('.v5-fb');
+    fb.innerHTML = (ok ? '<span style="color:#6ee7b7;font-weight:700">&#10003; Richtig.</span> ' : '<span style="color:#fca5a5;font-weight:700">&#10007; Leider nein.</span> ') +
+        '<b style="color:#99f6e4">' + esc(r.w) + '</b> ' + sayBtn(r) + ' ' + esc(r.ipa) + ' &mdash; ' + r.ua +
+        '<br><span style="color:rgba(203,213,225,0.62);font-style:italic">' + markWord(r.w, r.ex) + '</span>' +
+        '<div style="margin-top:0.7rem"><button class="v5-btn on" id="v5next">Weiter &rarr;</button></div>';
+    document.getElementById('v5next').addEventListener('click', function () {
+        box.dataset.done = '0'; qIdx++; showQ();
+    });
+}
+
+// ===== Matching =====
+var mSel = null, mDone = 0, mTotal = 0;
+document.getElementById('v5mnew').addEventListener('click', newMatch);
+document.getElementById('v5mdeck').addEventListener('change', newMatch);
+
+function newMatch() {
+    var pool = poolOf(document.getElementById('v5mdeck').value);
+    var n = Math.min(8, pool.length);
+    var picks = shuffle(pool).slice(0, n);
+    mSel = null; mDone = 0; mTotal = n;
+    var left = picks.map(function (r) { return '<button class="v5-mi" data-side="l" data-w="' + esc(r.w) + '">' + esc(r.w) + '</button>'; });
+    var right = shuffle(picks).map(function (r) { return '<button class="v5-mi" data-side="r" data-w="' + esc(r.w) + '">' + uaShort(r.ua) + '</button>'; });
+    document.getElementById('v5matchbox').innerHTML =
+        '<div class="v5-mcol">' + left.join('') + '</div><div class="v5-mcol">' + right.join('') + '</div>';
+    document.getElementById('v5mscore').textContent = '0 / ' + n;
+}
+
+document.getElementById('v5matchbox').addEventListener('click', function (e) {
+    var b = e.target.closest('.v5-mi'); if (!b || b.classList.contains('done')) return;
+    if (!mSel) {
+        this.querySelectorAll('.v5-mi').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel'); mSel = b; return;
+    }
+    if (mSel === b) { b.classList.remove('sel'); mSel = null; return; }
+    if (mSel.getAttribute('data-side') === b.getAttribute('data-side')) {
+        mSel.classList.remove('sel'); b.classList.add('sel'); mSel = b; return;
+    }
+    if (mSel.getAttribute('data-w') === b.getAttribute('data-w')) {
+        mSel.classList.add('done'); b.classList.add('done');
+        mSel.classList.remove('sel'); mSel = null; mDone++;
+        document.getElementById('v5mscore').textContent = mDone + ' / ' + mTotal;
+        if (mDone === mTotal) document.getElementById('v5mscore').textContent = '&#10003; ' + mDone + ' / ' + mTotal + ' — fertig!';
+    } else {
+        b.classList.add('shake'); var s = mSel;
+        setTimeout(function () { b.classList.remove('shake'); s.classList.remove('sel'); }, 320);
+        mSel = null;
+    }
+});
+
+// ===== Audio: Offline-Tracks pro Block (edge-tts, siehe tools/gen-wt-audio.mjs) =====
+function syData(deck) { return (window.SY_AUDIO || {})[deck]; }
+function syAny() { return Object.keys(window.SY_AUDIO || {}).length > 0; }
+function plain(x) { return String(x).replace(/<[^>]+>/g, ''); }
+
+function sayBtn(r) {
+    if (!syData(r.deck)) return '';
+    return '<button class="v5-say" data-say="' + r.deck + '" data-i="' + r.ri + '" title="Anhören: Wort, Übersetzung, Beispiel" aria-label="Anhören">&#128266;</button>';
+}
+function deckHearBtn(id) {
+    if (!syData(id)) return '';
+    return ' <button class="v5-hearsm" data-hear="' + id + '">&#127911; Block anhören</button>';
+}
+
+// --- ein einzelnes Kärtchen aus dem Blocktrack abspielen ---
+var syEl = null, syBtn = null, syStop = null;
+function syPlayCard(deck, i, btn) {
+    var data = syData(deck); if (!data || !data.c) return;
+    var cue = data.c.find(function (p) { return p[0] === i; }); if (!cue) return;
+    var start = cue[1], end = cue[4];
+    if (!syEl) { syEl = new Audio(); syEl.preload = 'none'; }
+    if (syStop) { syEl.removeEventListener('timeupdate', syStop); syStop = null; }
+    if (syBtn) syBtn.classList.remove('playing');
+    if (syBtn === btn && !syEl.paused) { syEl.pause(); syBtn = null; return; }   // 2. Klick = Stopp
+    syBtn = btn || null;
+    var src = 'audio/sy__' + deck + '.m4a';
+    var go = function () {
+        try { syEl.currentTime = start; } catch (e) {}
+        var p = syEl.play(); if (p && p.catch) p.catch(function () {});
+        if (btn) btn.classList.add('playing');
+    };
+    if (syEl.getAttribute('data-src') !== src) {
+        syEl.setAttribute('data-src', src); syEl.src = src;
+        syEl.addEventListener('loadedmetadata', go, { once: true });
+        syEl.load();   // preload="none" lädt sonst nie -> loadedmetadata käme nie
+    } else go();
+    syStop = function () {
+        if (syEl.currentTime >= end - 0.02) { syEl.pause(); if (btn) btn.classList.remove('playing'); }
+    };
+    syEl.addEventListener('timeupdate', syStop);
+}
+
+// --- ganzen Block in die Dock-Leiste unten (nicht blockierend) ---
+function syOpenBlock(id) {
+    var data = syData(id); if (!data || !data.c) return;
+    var deck = null;
+    DECKS.forEach(function (d) { if (d.id === id) deck = d; });
+    if (!deck) return;
+    if (syEl) { try { syEl.pause(); } catch (e) {} if (syBtn) syBtn.classList.remove('playing'); syBtn = null; }
+    window.LESSON_AUDIO = {
+        src: 'audio/sy__' + id + '.m4a',
+        d: data.d,
+        c: data.c.map(function (pcue) {
+            var r = deck.rows[pcue[0]] || ['', '', '', '', '', ''];
+            return {
+                kind: 'unit',
+                units: [plain(r[0]) + '  ·  ' + plain(uaShort(r[4])), esc(plain(r[5]))],
+                t: pcue[1]
+            };
+        })
+    };
+    if (typeof openLessonAudio === 'function') openLessonAudio();
+}
+
+document.addEventListener('click', function (e) {
+    var say = e.target.closest ? e.target.closest('[data-say]') : null;
+    if (say) { syPlayCard(say.getAttribute('data-say'), parseInt(say.getAttribute('data-i'), 10), say); return; }
+    var hear = e.target.closest ? e.target.closest('[data-hear]') : null;
+    if (hear) { syOpenBlock(hear.getAttribute('data-hear')); }
+});
+
+var hearBtn = document.getElementById('v5hear');
+if (!syAny()) { hearBtn.style.display = 'none'; }
+hearBtn.addEventListener('click', function () {
+    if (activeDeck === 'all') {
+        cntBox.innerHTML = '<span style="color:#5eead4">&#x1F3A7; W&auml;hle zuerst einen Block (Chip oben) &mdash; oder nimm den &#127911;-Knopf in einer Block&uuml;berschrift.</span>';
+        setTimeout(render, 3500);
+        return;
+    }
+    syOpenBlock(activeDeck);
+});
+
+// ===== Start =====
+render();
+startQuiz();
+newMatch();
+
+    </script>
+</body>
+</html>
