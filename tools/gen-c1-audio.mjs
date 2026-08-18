@@ -91,9 +91,12 @@ catch (e) { console.log('note: tools/c1-ua-extras.json missing — Ukrainian ext
 
 // ---------- parse one day's cards (document order) ----------
 function parseDayCards(html, day) {
-  const open = html.indexOf('data-day="' + day + '">');
+  // NB: anchor on the day-content div, NOT on data-day="N" alone — the
+  // Grosstext (<section class="gt-sec" data-day="N">) also carries data-day.
+  const at = d => { const m = new RegExp('<div class="day-content[^"]*" data-day="' + d + '">').exec(html); return m ? m.index : -1; };
+  const open = at(day);
   if (open < 0) return [];
-  const next = html.indexOf('data-day="' + (day + 1) + '">', open + 1);
+  const next = at(day + 1);
   const block = html.slice(open, next < 0 ? html.length : next);
   const re = /<div class="fcard-num">#(\d+)<\/div><div class="fcard-word">([\s\S]*?)<\/div><div class="fcard-hint">[\s\S]*?<div class="fcard-ua">([\s\S]*?)<\/div>[\s\S]*?<div class="fcard-example">([\s\S]*?)<\/div>/g;
   const cards = []; let m;
