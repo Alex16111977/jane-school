@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key word transformations: перефразируй предложение | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .q-tag { display:inline-block; font-size:0.65rem; font-weight:800; padding:0.12rem 0.5rem; border-radius:6px; margin-right:0.35rem; vertical-align:middle; letter-spacing:0.03em; }
+        .t-pl  { background: rgba(68,147,248,0.16);  color:#79b8ff; }
+        .t-un  { background: rgba(63,185,80,0.16);   color:#56d364; }
+        .t-sg  { background: rgba(245,158,11,0.16);  color:#fbbf24; }
+        .t-bad { background: rgba(248,81,73,0.16);   color:#ff8080; }
+        .t-ok  { background: rgba(163,113,247,0.16); color:#c8a5ff; }
+
+        .two-cols { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+        @media (max-width:620px){ .two-cols{ grid-template-columns:1fr; } }
+        .cbox { border-radius:12px; padding:0.9rem 1rem; }
+        .cbox-pl { background: rgba(68,147,248,0.08); border:1px solid rgba(68,147,248,0.22); }
+        .cbox-un { background: rgba(63,185,80,0.08);  border:1px solid rgba(63,185,80,0.22); }
+        .cbox-bad{ background: rgba(248,81,73,0.08);  border:1px solid rgba(248,81,73,0.22); }
+        .cbox-t  { font-size:0.95rem; font-weight:800; margin-bottom:0.45rem; }
+        .cbox-pl .cbox-t { color:#79b8ff; }
+        .cbox-un .cbox-t { color:#56d364; }
+        .cbox-bad .cbox-t{ color:#ff8080; }
+        .cbox ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.3rem; }
+        .cbox li { font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.45; }
+
+        .pair-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+        @media (max-width:620px){ .pair-grid{ grid-template-columns:1fr; } }
+        .pair-cell { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.83rem; line-height:1.5; }
+        .pair-cell .lbl { display:block; font-size:0.66rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.3rem; opacity:0.85; }
+        .pair-cell.pos .lbl { color:#56d364; }
+        .pair-cell.neg .lbl { color:#ff8080; }
+        .pair-cell.mid .lbl { color:#fbbf24; }
+        .pair-cell .ru { display:block; color:rgba(255,255,255,0.45); font-size:0.76rem; margin-top:0.15rem; }
+
+        .pattern-row { display:flex; gap:0.8rem; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.84rem; }
+        .pattern-row:last-child { border-bottom:none; }
+        .pattern-name { flex-shrink:0; width:200px; font-weight:700; color:#79b8ff; font-size:0.78rem; }
+        .pattern-ex { flex:1; color:rgba(255,255,255,0.78); }
+        .pattern-ex b { color:#fff; }
+        @media (max-width:620px){ .pattern-row{ flex-direction:column; gap:0.15rem; } .pattern-name{ width:auto; } }
+
+        .mini-note { font-size:0.78rem; color:rgba(255,255,255,0.5); line-height:1.55; margin-top:0.5rem; }
+        .word-chips { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
+        .wchip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; color:rgba(255,255,255,0.8); }
+        .wchip b { color:#79b8ff; }
+
+        .form-box { background:rgba(163,113,247,0.07); border:1px solid rgba(163,113,247,0.25); border-radius:12px; padding:0.7rem 0.95rem; margin:0.6rem 0; font-size:0.9rem; color:#e6ddff; text-align:center; font-weight:700; letter-spacing:0.01em; }
+        .form-box b { color:#c8a5ff; }
+
+        .vlist { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; }
+        .vrow { display:flex; gap:0.7rem; align-items:baseline; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:0.45rem 0.7rem; font-size:0.82rem; line-height:1.45; }
+        .vrow .vw { flex-shrink:0; width:190px; font-weight:800; color:#79b8ff; }
+        .vrow .vx { flex:1; color:rgba(255,255,255,0.8); }
+        .vrow .vx i { color:rgba(255,255,255,0.45); font-style:normal; }
+        @media (max-width:620px){ .vrow{ flex-direction:column; gap:0.15rem; } .vrow .vw{ width:auto; } }
+
+        .drill { margin-top:0.5rem; }
+        .drill-item { padding:0.5rem 0; border-bottom:1px dashed rgba(255,255,255,0.09); font-size:0.86rem; line-height:1.6; }
+        .drill-item:last-child { border-bottom:none; }
+        .sol { color:#56d364; font-weight:700; cursor:pointer; border-bottom:1px dotted rgba(86,211,100,0.5); }
+        .sol.hidden-sol { color:transparent; background:rgba(255,255,255,0.09); border-radius:4px; padding:0 0.4rem; border-bottom:none; }
+        .drill-hint { color:rgba(255,255,255,0.42); font-size:0.78rem; }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.82)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Transformationen</span>
+        </nav>
+
+        <a href="englisch.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu Englisch</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>Перефразируй предложение</h1>
+            <p class="page-subtitle">60 заданий экзаменационного формата: перепиши так, чтобы смысл не изменился, использовав данное слово (2&ndash;5 слов)</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="passive">&#x1F504; Пассив</button>
+            <button class="tab" data-tab="reported">&#x1F4AC; Косвенная</button>
+            <button class="tab" data-tab="cond">&#x1F52E; Условные</button>
+            <button class="tab" data-tab="modals">&#x1F570;&#xFE0F; Модальные</button>
+            <button class="tab" data-tab="struct">&#x1F9E9; Структуры</button>
+            <button class="tab" data-tab="mixed">&#x1F3AF; Смешанное</button>
+        </div>
+
+<style>
+        .gp { width:210px; padding:0.2rem 0.45rem; border-radius:6px; border:1px solid rgba(255,255,255,0.22);
+              background:rgba(255,255,255,0.07); color:#fff; font-size:0.88rem; font-family:inherit; outline:none; }
+        .gp:focus { border-color:rgba(68,147,248,0.7); box-shadow:0 0 0 2px rgba(68,147,248,0.15); }
+        .gp.ok  { border-color:rgba(63,185,80,0.8); background:rgba(63,185,80,0.14); color:#7ee787; }
+        .gp.bad { border-color:rgba(248,81,73,0.8); background:rgba(248,81,73,0.12); color:#ff9b95; }
+        .trlist { display:flex; flex-direction:column; gap:0.55rem; margin-top:0.6rem; }
+        .tr { display:flex; gap:0.7rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+              border-radius:10px; padding:0.65rem 0.85rem; }
+        .tr-n { flex-shrink:0; width:1.6rem; height:1.6rem; border-radius:50%; background:rgba(68,147,248,0.18);
+                color:#79b8ff; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+        .tr-body { flex:1; }
+        .tr-src { margin:0 0 0.35rem; font-size:0.88rem; color:rgba(255,255,255,0.85); }
+        .tr-key { margin:0 0 0.35rem; display:inline-block; font-size:0.74rem; font-weight:800; letter-spacing:0.06em;
+                  text-transform:uppercase; color:#fbbf24; background:rgba(245,158,11,0.12);
+                  border:1px solid rgba(245,158,11,0.3); border-radius:6px; padding:0.1rem 0.5rem; }
+        .tr-tgt { margin:0; font-size:0.88rem; color:rgba(255,255,255,0.95); line-height:2; }
+        .cue { color:rgba(255,255,255,0.45); font-size:0.8rem; font-style:italic; }
+        .tbar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-top:0.8rem; }
+        .tbtn { padding:0.45rem 1rem; border-radius:9px; font-size:0.83rem; font-weight:700; cursor:pointer;
+                border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#fff; }
+        .tbtn.check { border-color:rgba(63,185,80,0.5); color:#7ee787; }
+        .tbtn.show  { border-color:rgba(245,158,11,0.5); color:#fbbf24; }
+        .tscore { font-size:0.85rem; font-weight:700; color:rgba(255,255,255,0.6); }
+</style>
+
+        <div class="tab-content active" id="tab-passive">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F504;</span>
+                    <div><h2>Пассив</h2><p class="lesson-header-sub">Кто сделал — неважно; have / get something done</p></div>
+                </div>
+                <div class="note-card highlight-card">
+                    <p><strong class="accent">Как это устроено:</strong> сверху исходное предложение, под ним <span class="tr-key" style="display:inline-block">ключевое слово</span>, снизу второе предложение с пропуском. Впиши <strong>2&ndash;5 слов</strong> так, чтобы смысл не изменился, и обязательно используй ключевое слово <strong>без изменений</strong>.</p>
+                    <p class="mini-note">Это самый частый формат на экзаменах (FCE/CAE, ЗНО, Abitur). Он проверяет не «знаю правило», а «умею переформулировать».</p>
+                </div>
+
+                <div class="note-card" data-ex>
+                    <h3>Пассив и have something done <span class="cue">&mdash; passive · get · have</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Somebody stole my bike last night.</p>
+                            <p class="tr-key">been</p>
+                            <p class="tr-tgt">My bike <input class="gp wide" data-a="has been stolen"> last night.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">They are repairing the road at the moment.</p>
+                            <p class="tr-key">being</p>
+                            <p class="tr-tgt">The road <input class="gp wide" data-a="is being repaired"> at the moment.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">People say he is a millionaire.</p>
+                            <p class="tr-key">said</p>
+                            <p class="tr-tgt">He <input class="gp wide" data-a="is said to be"> a millionaire.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Someone should have told me earlier.</p>
+                            <p class="tr-key">been</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="should have been told"> earlier.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">A mechanic serviced our car yesterday.</p>
+                            <p class="tr-key">had</p>
+                            <p class="tr-tgt">We <input class="gp wide" data-a="had our car serviced"> yesterday.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Thieves broke into their flat while they were away.</p>
+                            <p class="tr-key">had</p>
+                            <p class="tr-tgt">They <input class="gp wide" data-a="had their flat broken into"> while they were away.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Nobody has cleaned this room for weeks.</p>
+                            <p class="tr-key">cleaned</p>
+                            <p class="tr-tgt">This room <input class="gp wide" data-a="hasn&#x27;t been cleaned|has not been cleaned"> for weeks.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">They will announce the results on Friday.</p>
+                            <p class="tr-key">be</p>
+                            <p class="tr-tgt">The results <input class="gp wide" data-a="will be announced"> on Friday.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I don't like it when people interrupt me.</p>
+                            <p class="tr-key">being</p>
+                            <p class="tr-tgt">I don't like <input class="gp wide" data-a="being interrupted"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Somebody must have taken my umbrella.</p>
+                            <p class="tr-key">been</p>
+                            <p class="tr-tgt">My umbrella <input class="gp wide" data-a="must have been taken"> by somebody.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tab-reported">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div><h2>Косвенная речь</h2><p class="lesson-header-sub">said / told / asked / advised / suggested</p></div>
+                </div>
+                
+
+                <div class="note-card" data-ex>
+                    <h3>Косвенная речь <span class="cue">&mdash; said · told · asked · whether</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«I'm moving to Berlin,» he said.</p>
+                            <p class="tr-key">was</p>
+                            <p class="tr-tgt">He said he <input class="gp wide" data-a="was moving"> to Berlin.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«I saw her yesterday,» Anna told me.</p>
+                            <p class="tr-key">had</p>
+                            <p class="tr-tgt">Anna told me she <input class="gp wide" data-a="had seen her"> the day before.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«Don't touch the switch,» he warned me.</p>
+                            <p class="tr-key">not</p>
+                            <p class="tr-tgt">He warned me <input class="gp wide" data-a="not to touch"> the switch.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«Will you help me?» she asked.</p>
+                            <p class="tr-key">if</p>
+                            <p class="tr-tgt">She asked me <input class="gp wide" data-a="if I would help|whether I would help"> her.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«Where do you live?» the officer asked.</p>
+                            <p class="tr-key">lived</p>
+                            <p class="tr-tgt">The officer asked me where <input class="gp wide" data-a="I lived"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«I'll call you tomorrow,» he promised.</p>
+                            <p class="tr-key">would</p>
+                            <p class="tr-tgt">He promised he <input class="gp wide" data-a="would call me"> the next day.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«You should see a doctor,» she said to me.</p>
+                            <p class="tr-key">advised</p>
+                            <p class="tr-tgt">She <input class="gp wide" data-a="advised me to see"> a doctor.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«I'm sorry I was late,» he said.</p>
+                            <p class="tr-key">apologised</p>
+                            <p class="tr-tgt">He <input class="gp wide" data-a="apologised for being"> late.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«Let's take a taxi,» said Kim.</p>
+                            <p class="tr-key">suggested</p>
+                            <p class="tr-tgt">Kim <input class="gp wide" data-a="suggested taking"> a taxi.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">«I didn't break it,» he said.</p>
+                            <p class="tr-key">denied</p>
+                            <p class="tr-tgt">He <input class="gp wide" data-a="denied breaking"> it.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tab-cond">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F52E;</span>
+                    <div><h2>Условные и wish</h2><p class="lesson-header-sub">if / unless / in case / wish / otherwise</p></div>
+                </div>
+                
+
+                <div class="note-card" data-ex>
+                    <h3>Условные и wish <span class="cue">&mdash; if · unless · wish · otherwise</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I don't have a car, so I can't drive you.</p>
+                            <p class="tr-key">had</p>
+                            <p class="tr-tgt">If I <input class="gp wide" data-a="had a car"> I could drive you.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">She didn't study, so she failed the exam.</p>
+                            <p class="tr-key">had</p>
+                            <p class="tr-tgt">If she <input class="gp wide" data-a="had studied"> she would have passed.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I'm sorry I don't speak Spanish.</p>
+                            <p class="tr-key">wish</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="wish I spoke"> Spanish.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It's a pity I said that yesterday.</p>
+                            <p class="tr-key">hadn&#x27;t</p>
+                            <p class="tr-tgt">I wish I <input class="gp wide" data-a="hadn&#x27;t said"> that yesterday.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">The dog barks all night and it drives me mad.</p>
+                            <p class="tr-key">would</p>
+                            <p class="tr-tgt">I wish the dog <input class="gp wide" data-a="would stop barking"> at night.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">You can only enter if you have a ticket.</p>
+                            <p class="tr-key">unless</p>
+                            <p class="tr-tgt">You can't enter <input class="gp wide" data-a="unless you have"> a ticket.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Take an umbrella because it might rain.</p>
+                            <p class="tr-key">case</p>
+                            <p class="tr-tgt">Take an umbrella <input class="gp wide" data-a="in case it rains"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I set an alarm, so I didn't oversleep.</p>
+                            <p class="tr-key">otherwise</p>
+                            <p class="tr-tgt">I set an alarm; <input class="gp wide" data-a="otherwise I would have overslept"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I'd prefer you not to tell anyone.</p>
+                            <p class="tr-key">rather</p>
+                            <p class="tr-tgt">I'd <input class="gp wide" data-a="rather you didn&#x27;t tell"> anyone.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It's time for us to go home.</p>
+                            <p class="tr-key">went</p>
+                            <p class="tr-tgt">It's time <input class="gp wide" data-a="we went"> home.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tab-modals">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F570;&#xFE0F;</span>
+                    <div><h2>Модальные</h2><p class="lesson-header-sub">must have / can't have / needn't have / had better</p></div>
+                </div>
+                
+
+                <div class="note-card" data-ex>
+                    <h3>Модальные <span class="cue">&mdash; must · can't · needn't · should · able</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I'm sure he forgot about the meeting.</p>
+                            <p class="tr-key">have</p>
+                            <p class="tr-tgt">He <input class="gp wide" data-a="must have forgotten"> about the meeting.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I'm sure she didn't see us.</p>
+                            <p class="tr-key">can&#x27;t</p>
+                            <p class="tr-tgt">She <input class="gp wide" data-a="can&#x27;t have seen"> us.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It wasn't necessary for you to wait, but you did.</p>
+                            <p class="tr-key">needn&#x27;t</p>
+                            <p class="tr-tgt">You <input class="gp wide" data-a="needn&#x27;t have waited"> for me.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It wasn't necessary to book, so we didn't.</p>
+                            <p class="tr-key">need</p>
+                            <p class="tr-tgt">We didn't <input class="gp wide" data-a="need to book"> a table.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It was a mistake to lend him the money.</p>
+                            <p class="tr-key">shouldn&#x27;t</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="shouldn&#x27;t have lent"> him the money.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Perhaps she missed the train.</p>
+                            <p class="tr-key">might</p>
+                            <p class="tr-tgt">She <input class="gp wide" data-a="might have missed"> the train.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I managed to finish the report on time.</p>
+                            <p class="tr-key">able</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="was able to finish"> the report on time.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It's forbidden to park here.</p>
+                            <p class="tr-key">mustn&#x27;t</p>
+                            <p class="tr-tgt">You <input class="gp wide" data-a="mustn&#x27;t park"> here.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">You are obliged to wear a helmet.</p>
+                            <p class="tr-key">have</p>
+                            <p class="tr-tgt">You <input class="gp wide" data-a="have to wear"> a helmet.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It would be a good idea to leave now.</p>
+                            <p class="tr-key">better</p>
+                            <p class="tr-tgt">We <input class="gp wide" data-a="had better leave|&#x27;d better leave"> now.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tab-struct">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div><h2>Структуры</h2><p class="lesson-header-sub">so / such / too / enough / -ing / to</p></div>
+                </div>
+                
+
+                <div class="note-card" data-ex>
+                    <h3>Структуры и обороты <span class="cue">&mdash; so · such · enough · too · -ing / to</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">The film was very boring, so I left.</p>
+                            <p class="tr-key">such</p>
+                            <p class="tr-tgt">It was <input class="gp wide" data-a="such a boring film"> that I left.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">The coffee was very hot and I couldn't drink it.</p>
+                            <p class="tr-key">too</p>
+                            <p class="tr-tgt">The coffee was <input class="gp wide" data-a="too hot to drink"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">He isn't old enough to vote.</p>
+                            <p class="tr-key">young</p>
+                            <p class="tr-tgt">He <input class="gp wide" data-a="is too young to"> vote.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">We didn't have enough chairs for everybody.</p>
+                            <p class="tr-key">were</p>
+                            <p class="tr-tgt">There <input class="gp wide" data-a="weren&#x27;t enough chairs"> for everybody.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">She's good at explaining difficult things.</p>
+                            <p class="tr-key">explain</p>
+                            <p class="tr-tgt">She <input class="gp wide" data-a="is good at explaining|can explain"> difficult things well.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I regret telling him the truth.</p>
+                            <p class="tr-key">wish</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="wish I hadn&#x27;t told"> him the truth.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">He apologised because he had arrived late.</p>
+                            <p class="tr-key">for</p>
+                            <p class="tr-tgt">He apologised <input class="gp wide" data-a="for arriving"> late.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">It's not worth arguing with him.</p>
+                            <p class="tr-key">point</p>
+                            <p class="tr-tgt">There's <input class="gp wide" data-a="no point in arguing"> with him.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I had no problem finding the address.</p>
+                            <p class="tr-key">trouble</p>
+                            <p class="tr-tgt">I had <input class="gp wide" data-a="no trouble finding"> the address.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">She began learning Italian two years ago.</p>
+                            <p class="tr-key">been</p>
+                            <p class="tr-tgt">She <input class="gp wide" data-a="has been learning"> Italian for two years.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tab-mixed">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div><h2>Смешанное</h2><p class="lesson-header-sub">всё сразу, как на экзамене</p></div>
+                </div>
+                
+
+                <div class="note-card" data-ex>
+                    <h3>Смешанное <span class="cue">&mdash; всё вперемешку</span></h3>
+                    <div class="trlist">
+                    <div class="tr">
+                        <div class="tr-n">1</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Although it was raining, we went out.</p>
+                            <p class="tr-key">spite</p>
+                            <p class="tr-tgt">We went out <input class="gp wide" data-a="in spite of the rain|in spite of the rain,"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">2</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Despite the noise, I slept well.</p>
+                            <p class="tr-key">although</p>
+                            <p class="tr-tgt">I slept well <input class="gp wide" data-a="although it was noisy|although there was noise"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">3</div>
+                        <div class="tr-body">
+                            <p class="tr-src">The last time I saw her was in June.</p>
+                            <p class="tr-key">since</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="haven&#x27;t seen her since|have not seen her since"> June.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">4</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I started this job three years ago.</p>
+                            <p class="tr-key">for</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="have worked here for|have been working here for"> three years.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">5</div>
+                        <div class="tr-body">
+                            <p class="tr-src">This is the first time I've eaten sushi.</p>
+                            <p class="tr-key">never</p>
+                            <p class="tr-tgt">I <input class="gp wide" data-a="have never eaten|&#x27;ve never eaten"> sushi before.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">6</div>
+                        <div class="tr-body">
+                            <p class="tr-src">My brother is taller than me.</p>
+                            <p class="tr-key">as</p>
+                            <p class="tr-tgt">I'm <input class="gp wide" data-a="not as tall as"> my brother.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">7</div>
+                        <div class="tr-body">
+                            <p class="tr-src">Nobody in the team plays better than Ana.</p>
+                            <p class="tr-key">best</p>
+                            <p class="tr-tgt">Ana is <input class="gp wide" data-a="the best player"> in the team.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">8</div>
+                        <div class="tr-body">
+                            <p class="tr-src">They are going to knock the old cinema down.</p>
+                            <p class="tr-key">pulled</p>
+                            <p class="tr-tgt">The old cinema <input class="gp wide" data-a="is going to be pulled"> down.</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">9</div>
+                        <div class="tr-body">
+                            <p class="tr-src">He drove carefully because the road was icy.</p>
+                            <p class="tr-key">so</p>
+                            <p class="tr-tgt">The road was icy, <input class="gp wide" data-a="so he drove carefully"> .</p>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="tr-n">10</div>
+                        <div class="tr-body">
+                            <p class="tr-src">I don't know the answer, so I can't help.</p>
+                            <p class="tr-key">knew</p>
+                            <p class="tr-tgt">If I <input class="gp wide" data-a="knew the answer"> I could help.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="tbar">
+                        <button class="tbtn check" onclick="checkText(this)">&#x2713; Проверить</button>
+                        <button class="tbtn show" onclick="showText(this)">&#x1F441; Показать ответы</button>
+                        <span class="tscore"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+<script>
+        function norm(s) {
+            return s.toLowerCase().trim().replace(/[\u2018\u2019\u02bc]/g, "'").replace(/\s+/g, ' ').replace(/[.,!?]+$/, '');
+        }
+        function checkText(btn) {
+            const card = btn.closest('[data-ex]');
+            const gaps = card.querySelectorAll('.gp');
+            let ok = 0;
+            gaps.forEach(g => {
+                const answers = g.dataset.a.split('|').map(norm);
+                const val = norm(g.value);
+                g.classList.remove('ok','bad');
+                if (!val) return;
+                if (answers.includes(val)) { g.classList.add('ok'); ok++; } else g.classList.add('bad');
+            });
+            const sc = card.querySelector('.tscore');
+            sc.textContent = ok + ' / ' + gaps.length;
+            sc.style.color = ok === gaps.length ? 'var(--color-green)' : ok >= gaps.length*0.6 ? 'var(--color-orange)' : 'var(--color-red)';
+        }
+        function showText(btn) {
+            const card = btn.closest('[data-ex]');
+            card.querySelectorAll('.gp').forEach(g => { g.value = g.dataset.a.split('|')[0]; g.classList.remove('bad'); g.classList.add('ok'); });
+            const sc = card.querySelector('.tscore');
+            sc.textContent = 'ответы показаны';
+            sc.style.color = 'var(--color-orange)';
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('gp')) {
+                checkText(e.target.closest('[data-ex]').querySelector('.tbtn.check'));
+            }
+        });
+</script>
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        document.querySelectorAll('.sol').forEach(s => {
+            s.classList.add('hidden-sol');
+            s.addEventListener('click', () => s.classList.toggle('hidden-sol'));
+        });
+
+        const Q_TOTAL = document.querySelectorAll('.quiz-question').length;
+        let qScore = 0, qDone = 0;
+        function checkQ(btn, answer) {
+            const q = btn.closest('.quiz-question');
+            if (q.classList.contains('answered')) return;
+            q.classList.add('answered');
+            const correct = q.dataset.answer;
+            const feedback = q.querySelector('.quiz-feedback');
+            q.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+            qDone++;
+            if (answer === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = 'Correct! \u2705';
+                feedback.style.color = 'var(--color-green)';
+                qScore++;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = 'Not quite \u274C \u2014 ' + (q.dataset.why || '');
+                feedback.style.color = 'var(--color-red)';
+            }
+            const scoreEl = document.getElementById('q-score');
+            if (qDone === Q_TOTAL && scoreEl) {
+                const pct = qScore / Q_TOTAL;
+                if (pct === 1) scoreEl.innerHTML = '\uD83C\uDF1F ' + qScore + '/' + Q_TOTAL + ' \u2014 Perfect!';
+                else if (pct >= 0.8) scoreEl.innerHTML = '\u2705 ' + qScore + '/' + Q_TOTAL + ' \u2014 Great!';
+                else if (pct >= 0.6) scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 Good, \u043f\u043e\u0432\u0442\u043e\u0440\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438';
+                else scoreEl.innerHTML = qScore + '/' + Q_TOTAL + ' \u2014 \u043f\u0440\u043e\u0439\u0434\u0438 \u0432\u043a\u043b\u0430\u0434\u043a\u0438 \u0435\u0449\u0451 \u0440\u0430\u0437 \uD83D\uDCAA';
+                scoreEl.style.color = pct >= 0.8 ? 'var(--color-green)' : pct >= 0.6 ? 'var(--color-orange)' : 'var(--color-red)';
+            }
+        }
+    </script>
+</body>
+</html>
