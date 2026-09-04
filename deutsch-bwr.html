@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BWR &mdash; die sieben Handlungsfelder | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Handlungsfeld-Karten ---- */
+    .hf-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:0.8rem; margin-top:0.8rem; }
+    .hf-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:0.9rem 1rem; border-left:3px solid var(--color-accent); }
+    .hf-card.c1 { border-left-color:#f472b6; }
+    .hf-card.c2 { border-left-color:#fbbf24; }
+    .hf-card.c3 { border-left-color:#86efac; }
+    .hf-card.c4 { border-left-color:#79b8ff; }
+    .hf-card.c5 { border-left-color:#c4b5fd; }
+    .hf-card.c6 { border-left-color:#5eead4; }
+    .hf-card.c7 { border-left-color:#fb923c; }
+    .hf-nr { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .hf-card h4 { margin:0.1rem 0 0.35rem; font-size:1.05rem; color:#fff; }
+    .hf-q { color:#fbbf24; font-size:0.9rem; font-style:italic; margin:0 0 0.5rem; line-height:1.45; }
+    .hf-card p { font-size:0.9rem; line-height:1.55; color:rgba(230,230,235,0.78); margin:0 0 0.45rem; }
+    .hf-words { font-size:0.83rem; line-height:1.7; color:rgba(230,230,235,0.6); }
+    .hf-words b { color:#fff; font-weight:600; }
+    .hf-exam { margin-top:0.5rem; padding-top:0.45rem; border-top:1px dashed rgba(255,255,255,0.13);
+               font-size:0.83rem; color:rgba(230,230,235,0.62); }
+    .hf-exam b { color:#86efac; font-weight:600; }
+
+    /* ---- Wertstrom ---- */
+    .ws-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:0.5rem; margin:0.8rem 0; }
+    .ws-box { flex:1 1 150px; background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:0.7rem 0.8rem; text-align:center; }
+    .ws-box b { display:block; color:#fff; font-size:0.95rem; margin-bottom:0.2rem; }
+    .ws-box span { font-size:0.8rem; color:rgba(230,230,235,0.6); }
+    .ws-arrow { display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--color-accent); flex:0 0 auto; }
+    .ws-legend { display:flex; flex-wrap:wrap; gap:1.2rem; font-size:0.85rem; margin-top:0.3rem; }
+    .ws-legend span b { font-weight:700; }
+    .ws-l-ware { color:#86efac; }
+    .ws-l-geld { color:#fbbf24; }
+
+    /* ---- Prozesskette ---- */
+    .pk { list-style:none; padding:0; margin:0.7rem 0 0; counter-reset:pk; }
+    .pk li { position:relative; padding:0.5rem 0 0.5rem 2.4rem; border-bottom:1px solid rgba(255,255,255,0.06);
+             font-size:0.93rem; color:rgba(230,230,235,0.82); line-height:1.5; }
+    .pk li:last-child { border-bottom:none; }
+    .pk li::before { counter-increment:pk; content:counter(pk); position:absolute; left:0; top:0.45rem;
+                     width:1.6rem; height:1.6rem; border-radius:50%; background:rgba(251,146,60,0.16);
+                     color:#fb923c; font-size:0.8rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+    .pk li b { color:#fff; }
+    .pk li em { color:#86efac; font-style:normal; }
+
+    /* ---- Trainer ---- */
+    .tz-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tz-prompt { font-size:1.05rem; color:#fff; line-height:1.55; text-align:center; margin:0.3rem 0 0.2rem; }
+    .tz-from { text-align:center; color:rgba(230,230,235,0.55); font-size:0.83rem; margin-bottom:1rem; }
+    .tz-opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.45rem; }
+    .tz-opt { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+              padding:0.55rem 0.7rem; color:rgba(230,230,235,0.85); font-size:0.87rem; cursor:pointer;
+              font-family:inherit; text-align:left; transition:all .15s; }
+    .tz-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(255,255,255,0.08); }
+    .tz-opt:disabled { cursor:default; opacity:0.75; }
+    .tz-opt.ok { border-color:var(--color-green); background:rgba(63,185,80,0.14); color:#86efac; }
+    .tz-opt.no { border-color:#f85149; background:rgba(248,81,73,0.12); color:#ff9d97; }
+    .tz-fb { margin-top:0.85rem; font-size:0.92rem; line-height:1.55; min-height:1.4rem; color:rgba(230,230,235,0.8); }
+    .tz-fb b { color:#fff; }
+    .tz-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tz-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.55rem 1.15rem;
+              font-size:0.92rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tz-btn:hover { background:var(--color-accent-hover); }
+    .tz-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tz-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tz-stats b { color:#fff; }
+
+    /* ---- Selbsttest (Klick = Antwort) ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .bw-de { color:#fff; font-weight:600; }
+    .bw-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .bw-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .bw-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    @media (max-width:600px) { .bw-vs { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">BWR</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zur H&ouml;heren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>BWR &mdash; die sieben Handlungsfelder</h1>
+            <p class="page-subtitle">Betriebswirtschaftslehre mit Rechnungswesen &middot; як влаштований головний предмет: сім напрямів, їхні Leitfragen і те, як усе сходиться у Wertstr&ouml;me</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="system">&#x1F9ED; Система</button>
+            <button class="tab" data-tab="felder">&#x1F3ED; Сім напрямів</button>
+            <button class="tab" data-tab="zusammenhang">&#x1F517; Зв&#39;язок</button>
+            <button class="tab" data-tab="rw">&#x1F9FE; Rechnungswesen</button>
+            <button class="tab" data-tab="trainer">&#x1F3AF; Тренажер</button>
+        </div>
+
+        <!-- ==================== SYSTEM ==================== -->
+        <div class="tab-content active" id="tab-system">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9ED;</span>
+                    <div>
+                        <h2>Що таке BWR і навіщо сім напрямів</h2>
+                        <p class="lesson-header-sub">Один предмет, дві половини: BWL — як фірма діє, RW — як це записують у цифрах</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Головна думка</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        <b class="bw-de">BWR</b> = <b class="bw-de">Betriebswirtschaftslehre mit Rechnungswesen</b>.
+                        Предмет не вчить «бізнес узагалі» &mdash; він розкладає роботу будь-якої фірми на
+                        <strong>сім Handlungsfelder</strong>. Шість із них щось <em>роблять</em>: керують, купують,
+                        виробляють, продають, наймають людей, вкладають гроші. Сьомий нічого не робить &mdash;
+                        він <strong>записує</strong> все, що зробили інші шість.
+                    </p>
+                    <p style="font-size:0.98rem; line-height:1.65; margin-top:0.6rem;">
+                        Тому будь-яке завдання на іспиті зводиться до одного питання:
+                        <b style="color:#fbbf24;">про який із семи напрямів тут ідеться</b> &mdash; і що це означає для решти.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5FA;&#xFE0F; Сім Handlungsfelder і їхні Leitfragen</h3>
+                    <p>Leitfrage &mdash; це головне питання напряму. Якщо знаєш сім питань, ти вже вмієш сортувати завдання.</p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.7rem; min-width:560px;">
+                        <tr><th>HF</th><th>Назва</th><th>Leitfrage</th><th>Кабінет у фірмі</th></tr>
+                        <tr><td><b>1</b></td><td class="bw-de">Unternehmensstrategien und Management</td><td>Wof&uuml;r steht unser Unternehmen, und wer entscheidet was?</td><td>Leitung</td></tr>
+                        <tr><td><b>2</b></td><td class="bw-de">Beschaffung</td><td>Woher bekommen wir Material &mdash; rechtzeitig, g&uuml;nstig und verl&auml;sslich?</td><td>Wareneingang / Einkauf</td></tr>
+                        <tr><td><b>3</b></td><td class="bw-de">Leistungserstellung</td><td>Wie entsteht aus dem Material ein fertiges Produkt?</td><td>Fertigung / Montage</td></tr>
+                        <tr><td><b>4</b></td><td class="bw-de">Absatz</td><td>Wie kommt unser Produkt zu Kundinnen und Kunden?</td><td>Verkauf</td></tr>
+                        <tr><td><b>5</b></td><td class="bw-de">Personal</td><td>Wer arbeitet bei uns, und unter welchen Bedingungen?</td><td>Personalb&uuml;ro</td></tr>
+                        <tr><td><b>6</b></td><td class="bw-de">Investition und Finanzierung</td><td>Woher kommt das Geld f&uuml;r gro&szlig;e Anschaffungen?</td><td>Finanzb&uuml;ro</td></tr>
+                        <tr><td><b>7</b></td><td class="bw-de">Wertstr&ouml;me</td><td>Wie werden alle Vorg&auml;nge in Zahlen erfasst und ausgewertet?</td><td>Buchhaltung</td></tr>
+                    </table>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.9rem; color:rgba(230,230,235,0.62);">
+                        Порядок не випадковий: <b class="bw-de">2 &rarr; 3 &rarr; 4</b> &mdash; це шлях товару крізь фірму
+                        (купили &rarr; зробили &rarr; продали). <b class="bw-de">1</b> стоїть над ними, <b class="bw-de">5</b> і
+                        <b class="bw-de">6</b> дають ресурси, <b class="bw-de">7</b> охоплює все.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2699;&#xFE0F; Kernprozess vs. Unterst&uuml;tzungsprozess</h3>
+                    <p>Друге сортування, яке люблять на іспиті. Питання просте: <i>чи заробляє цей процес гроші сам?</i></p>
+                    <div class="bw-vs">
+                        <div>
+                            <h5>&#x1F3ED; der Kernprozess</h5>
+                            Те, заради чого фірма існує: <b class="bw-de">Beschaffung &rarr; Leistungserstellung &rarr; Absatz</b>.
+                            Прибери його &mdash; і фірми немає.
+                        </div>
+                        <div>
+                            <h5>&#x1F6E0;&#xFE0F; der Unterst&uuml;tzungsprozess</h5>
+                            Сам нічого не виробляє, але без нього основний стане:
+                            <b class="bw-de">Personal, Buchhaltung, Verwaltung, IT</b>.
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Пастка: <b class="bw-de">Investition und Finanzierung</b> &mdash; теж підтримка, а не ядро.
+                        Гроші не є метою фірми, вони засіб.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D0; Ziele: за чим фірму міряють</h3>
+                    <p>Кожне <b class="bw-de">Unternehmensziel</b> має бути вимірним. Класична трійка:</p>
+                    <ul class="note-list">
+                        <li><b class="bw-de">&ouml;konomische Ziele</b> &mdash; прибуток, оборот, частка ринку. <i>Gewinn, Umsatz, Marktanteil</i>.</li>
+                        <li><b class="bw-de">soziale Ziele</b> &mdash; умови праці, безпека, справедлива оплата.</li>
+                        <li><b class="bw-de">&ouml;kologische Ziele</b> &mdash; матеріали, енергія, відходи.</li>
+                    </ul>
+                    <p style="margin-top:0.5rem;">
+                        Над цілями стоїть <b class="bw-de">das Leitbild</b> &mdash; письмово сформульовані цінності:
+                        <i>«Sind wir das g&uuml;nstigste oder das nachhaltigste Produkt?»</i> Цілі мають бути з ним сумісні,
+                        інакше на іспиті це називають <b class="bw-de">Zielkonflikt</b>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DD; Як читати завдання</h3>
+                    <ol class="pk">
+                        <li>Знайди, <b>хто пише або діє</b>: Lieferant, Kundschaft, Betriebsrat, Bank, Buchhaltung.</li>
+                        <li>Постав питання <b>«коли це відбувається?»</b>: до виробництва &rarr; HF2, під час &rarr; HF3, після &rarr; HF4.</li>
+                        <li>Якщо йдеться про <b>людей у фірмі</b> &mdash; це HF5, навіть якщо вони працюють у монтажі.</li>
+                        <li>Якщо йдеться про <b>велику покупку й гроші на неї</b> &mdash; HF6.</li>
+                        <li>Якщо є слова <em>Beleg, Buchung, Bilanz, Jahresabschluss</em> &mdash; це HF7.</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== FELDER ==================== -->
+        <div class="tab-content" id="tab-felder">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3ED;</span>
+                    <div>
+                        <h2>Сім напрямів зблизька</h2>
+                        <p class="lesson-header-sub">Що всередині кожного, які слова треба знати і що з цього питають</p>
+                    </div>
+                </div>
+
+                <div class="hf-grid">
+                    <div class="hf-card c1">
+                        <div class="hf-nr">Handlungsfeld 1</div>
+                        <h4>Unternehmensstrategien und Management</h4>
+                        <p class="hf-q">Wof&uuml;r steht unser Unternehmen, und wer entscheidet was?</p>
+                        <p>Тут визначають, куди фірма йде: <b class="bw-de">Leitbild</b>, цілі, стратегія.
+                           Сюди ж належить структура &mdash; хто кому підпорядкований &mdash; і <b class="bw-de">Controlling</b>:
+                           постійне звіряння плану з фактом.</p>
+                        <div class="hf-words">
+                            <b>Leitbild</b> &middot; <b>Unternehmensziel</b> &middot; <b>Unternehmensstrategie</b> &middot;
+                            <b>Unternehmensf&uuml;hrung</b> &middot; <b>Controlling</b> &middot; <b>Kennzahl</b> &middot;
+                            <b>Rechtsform</b> &middot; <b>Zielkonflikt</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> назвати три види цілей і показати конфлікт між ними; пояснити, чим Controlling відрізняється від контролю людей.</div>
+                    </div>
+
+                    <div class="hf-card c2">
+                        <div class="hf-nr">Handlungsfeld 2</div>
+                        <h4>Beschaffung</h4>
+                        <p class="hf-q">Woher bekommen wir Material &mdash; rechtzeitig, g&uuml;nstig und verl&auml;sslich?</p>
+                        <p>Усе, що відбувається <b>до</b> виробництва: знайти постачальників, порівняти пропозиції,
+                           замовити, прийняти товар, стежити за складом.</p>
+                        <div class="hf-words">
+                            <b>Bezugsquelle</b> &middot; <b>Angebotsvergleich</b> &middot; <b>Bestellmenge</b> &middot;
+                            <b>Bestandsplanung</b> &middot; <b>Mindestbestand</b> &middot; <b>Meldebestand</b> &middot;
+                            <b>Wareneingang</b> &middot; <b>Lieferant</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> порівняти два Angebote не лише за ціною (Lieferzeit, Qualität, Zuverlässigkeit); порахувати, коли треба дозамовляти.</div>
+                    </div>
+
+                    <div class="hf-card c3">
+                        <div class="hf-nr">Handlungsfeld 3</div>
+                        <h4>Leistungserstellung</h4>
+                        <p class="hf-q">Wie entsteht aus dem Material ein fertiges Produkt?</p>
+                        <p>Цех: порядок операцій, скільки часу йде на одну одиницю, скільки змін працює
+                           і як не випустити брак назовні.</p>
+                        <div class="hf-words">
+                            <b>Fertigung</b> (Einzel-, Serien-, Massenfertigung) &middot; <b>Montage</b> &middot;
+                            <b>Arbeitsablauf</b> &middot; <b>Durchlaufzeit</b> &middot; <b>Schicht</b> &middot;
+                            <b>Qualit&auml;tskontrolle</b> &middot; <b>Qualit&auml;tssicherung</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> різниця Kontrolle (шукає брак у кінці) vs. Sicherung (не дає браку виникнути); чому вузьке місце на одній станції зупиняє всю лінію.</div>
+                    </div>
+
+                    <div class="hf-card c4">
+                        <div class="hf-nr">Handlungsfeld 4</div>
+                        <h4>Absatz</h4>
+                        <p class="hf-q">Wie kommt unser Produkt zu Kundinnen und Kunden?</p>
+                        <p>Усе <b>після</b> виробництва: дізнатися, чого хоче ринок, повідомити про себе,
+                           укласти договір, доставити &mdash; і розібратися, якщо щось пішло не так.</p>
+                        <div class="hf-words">
+                            <b>Marktforschung</b> &middot; <b>Werbung</b> &middot; <b>Zielgruppe</b> &middot;
+                            <b>Angebot</b> &middot; <b>Kaufvertrag</b> &middot; <b>Kundenauftrag</b> &middot;
+                            <b>Auslieferung</b> &middot; <b>Kundschaft</b> &middot; <b>Reklamation</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> коли саме виникає Kaufvertrag; що робити при Lieferverzug; чи була реклама успішною (за Kennzahlen).</div>
+                    </div>
+
+                    <div class="hf-card c5">
+                        <div class="hf-nr">Handlungsfeld 5</div>
+                        <h4>Personal</h4>
+                        <p class="hf-q">Wer arbeitet bei uns, und unter welchen Bedingungen?</p>
+                        <p>Люди від першого оголошення про вакансію до останнього дня: пошук, договір,
+                           оплата, навчання, звільнення. І <b class="bw-de">Betriebsrat</b>, який має право голосу.</p>
+                        <div class="hf-words">
+                            <b>Arbeitsvertrag</b> &middot; <b>Probezeit</b> &middot; <b>Lohn</b> / <b>Gehalt</b> &middot;
+                            <b>Lohnabrechnung</b> &middot; <b>Entlohnung</b> &middot; <b>K&uuml;ndigung</b> &middot;
+                            <b>Ausbildung</b> &middot; <b>&Uuml;bernahme</b> &middot; <b>Weiterbildung</b> &middot; <b>Betriebsrat</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> Lohn vs. Gehalt; що змінює Probezeit у строках звільнення; чому Betriebsrat треба вислухати перед Kündigung.</div>
+                    </div>
+
+                    <div class="hf-card c6">
+                        <div class="hf-nr">Handlungsfeld 6</div>
+                        <h4>Investition und Finanzierung</h4>
+                        <p class="hf-q">Woher kommt das Geld f&uuml;r gro&szlig;e Anschaffungen?</p>
+                        <p>Машина або будівля коштує грошей <b>до того</b>, як почне їх приносити.
+                           Два різні питання: куди вкласти (Investition) і звідки взяти (Finanzierung).</p>
+                        <div class="hf-words">
+                            <b>Investition</b> &middot; <b>Finanzierung</b> &middot; <b>Anschaffung</b> &middot;
+                            <b>Eigenkapital</b> &middot; <b>Fremdkapital</b> &middot; <b>Kredit</b> &middot;
+                            <b>Zins</b> &middot; <b>Tilgung</b> &middot; <b>Leasing</b> &middot; <b>Liquidit&auml;t</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> порівняти Kredit і Leasing (власність, витрати, гнучкість); чи окупиться інвестиція за N років.</div>
+                    </div>
+
+                    <div class="hf-card c7">
+                        <div class="hf-nr">Handlungsfeld 7</div>
+                        <h4>Wertstr&ouml;me</h4>
+                        <p class="hf-q">Wie werden alle Vorg&auml;nge in Zahlen erfasst und ausgewertet?</p>
+                        <p>Це і є <b class="bw-de">Rechnungswesen</b>. Напрям не виробляє й не продає &mdash;
+                           він фіксує те, що зробили решта шість, і повертає їм цифри назад як підставу для рішень.</p>
+                        <div class="hf-words">
+                            <b>Gesch&auml;ftsvorfall</b> &middot; <b>Beleg</b> &middot; <b>Buchung</b> &middot;
+                            <b>Konto</b> &middot; <b>Soll</b> / <b>Haben</b> &middot; <b>Inventur</b> &middot;
+                            <b>Bilanz</b> &middot; <b>GuV</b> &middot; <b>Jahresabschluss</b> &middot; <b>Auswertung</b>
+                        </div>
+                        <div class="hf-exam"><b>Питають:</b> чому HF7 не «восьмий острів», а рамка навколо решти; що станеться з річним звітом, якщо загубити Belege.</div>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card" style="margin-top:1rem;">
+                    <span class="tip-icon">&#x1F9E0;</span>
+                    <div>
+                        <p><b>Мнемоніка порядку:</b> уяви шлях одного виробу.
+                        Хтось <b>вирішив</b> його робити (1), матеріал <b>купили</b> (2), виріб <b>зібрали</b> (3),
+                        його <b>продали</b> (4). Робили це <b>люди</b> (5), обладнання <b>оплатили</b> заздалегідь (6),
+                        і кожен крок <b>записали</b> (7).</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== ZUSAMMENHANG ==================== -->
+        <div class="tab-content" id="tab-zusammenhang">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F517;</span>
+                    <div>
+                        <h2>Сім напрямів &mdash; не сім островів</h2>
+                        <p class="lesson-header-sub">Одне рішення зачіпає всі; товар і гроші йдуть у протилежні боки</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F30A; Рішення тягне за собою все</h3>
+                    <p style="font-size:0.96rem; line-height:1.6;">
+                        Найчастіша помилка на іспиті &mdash; відповісти «це стосується тільки виробництва».
+                        Візьмімо рішення: <i>виробляти 500 одиниць замість 300</i>.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.7rem; min-width:520px;">
+                        <tr><th>HF</th><th>Що там зміниться</th></tr>
+                        <tr><td><b>1</b> Management</td><td>чи взагалі сумісне таке зростання з Leitbild і цілями</td></tr>
+                        <tr><td><b>2</b> Beschaffung</td><td>більше матеріалу; потрібні постачальники, які потягнуть обсяг</td></tr>
+                        <tr><td><b>3</b> Leistungserstellung</td><td>інші Arbeitsabl&auml;ufe, можливо друга Schicht, нові Durchlaufzeiten</td></tr>
+                        <tr><td><b>4</b> Absatz</td><td>200 зайвих одиниць треба ще й <b>продати</b> &mdash; потрібні нові Zielgruppen</td></tr>
+                        <tr><td><b>5</b> Personal</td><td>більше людей: знайти, найняти, ввести в роботу, платити</td></tr>
+                        <tr><td><b>6</b> Investition</td><td>більша площа й машини &mdash; гроші потрібні <b>до</b> першого продажу</td></tr>
+                        <tr><td><b>7</b> Wertstr&ouml;me</td><td>кожна закупівля, зарплата й продаж дають Belege; цифри повертаються керівництву</td></tr>
+                    </table>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.9rem; color:rgba(230,230,235,0.65);">
+                        Зверни увагу на останній рядок: це <b>зворотний зв&#39;язок</b>. HF7 не тільки приймає дані &mdash;
+                        він віддає їх назад у HF1, і з них виростає наступне рішення.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F504; Два зустрічні потоки</h3>
+                    <p>Кожна операція має <b>дві сторони</b>: <span class="ws-l-ware"><b>Leistung</b></span> (товар або послуга)
+                       іде в один бік, <span class="ws-l-geld"><b>Geld</b></span> &mdash; у протилежний. Саме це і є Wertstr&ouml;me.</p>
+                    <div class="ws-flow">
+                        <div class="ws-box"><b>Lieferant</b><span>матеріал</span></div>
+                        <div class="ws-arrow">&#8644;</div>
+                        <div class="ws-box"><b>Unser Betrieb</b><span>тут виникає Wertsch&ouml;pfung</span></div>
+                        <div class="ws-arrow">&#8644;</div>
+                        <div class="ws-box"><b>Kundschaft</b><span>готовий виріб</span></div>
+                    </div>
+                    <div class="ws-legend">
+                        <span class="ws-l-ware">&rarr; <b>Leistung</b>: матеріал &rarr; фірма &rarr; готовий виріб</span>
+                        <span class="ws-l-geld">&larr; <b>Geld</b>: Einkaufspreis &larr; фірма &larr; Kaufpreis</span>
+                    </div>
+                    <p style="margin-top:0.7rem;">
+                        <b class="bw-de">die Wertsch&ouml;pfung</b> &mdash; це різниця між тим, що фірма віддала назовні,
+                        і тим, що вона отримала ззовні. Простими словами: <i>наскільки виріб став дорожчим,
+                        поки був усередині фірми</i>. Це те, чим фірма виправдовує своє існування.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B6; Rein oder raus? &mdash; напрям грошей</h3>
+                    <p>Швидка перевірка, яку варто робити автоматично:</p>
+                    <div class="bw-vs">
+                        <div>
+                            <h5>&#x2B05;&#xFE0F; Geld flie&szlig;t heraus</h5>
+                            Ми платимо: <i>Rechnung f&uuml;r Material &uuml;berweisen</i>, <i>L&ouml;hne auszahlen</i>,
+                            <i>Miete zahlen</i>, <i>Kredit tilgen</i>.
+                        </div>
+                        <div>
+                            <h5>&#x27A1;&#xFE0F; Geld flie&szlig;t herein</h5>
+                            Нам платять: <i>Kundschaft zahlt den Kaufpreis</i>, <i>Anzahlung geht ein</i>,
+                            <i>Kredit wird ausgezahlt</i>.
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Пастка: <b class="bw-de">Anzahlung</b> &mdash; гроші вже прийшли, а виробу ще немає.
+                        Потоки не зобов&#39;язані збігатися в часі.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Gesch&auml;ftsprozess: шлях одного замовлення</h3>
+                    <p>Класичне завдання &mdash; поставити кроки в правильному порядку. Логіка: спершу домовляються,
+                       потім роблять, платять в кінці.</p>
+                    <ol class="pk">
+                        <li>Кундшафт надсилає <b class="bw-de">Anfrage</b> &mdash; питає про товар. <em>HF4</em></li>
+                        <li>Фірма надсилає <b class="bw-de">Angebot</b> з ціною, комплектацією і строком. <em>HF4</em></li>
+                        <li>Кундшафт робить <b class="bw-de">Bestellung</b> &mdash; тут виникає <b>Kaufvertrag</b>. <em>HF4</em></li>
+                        <li>Виріб <b class="bw-de">wird gefertigt</b> у цеху. <em>HF3</em></li>
+                        <li>Виріб <b class="bw-de">wird geliefert</b>, іде <b>Rechnung</b>. <em>HF4</em></li>
+                        <li>Кундшафт платить &mdash; <b class="bw-de">Zahlungseingang</b>. <em>HF7 фіксує</em></li>
+                    </ol>
+                    <div class="info-block warning" style="margin-top:0.8rem; padding:0.8rem 1rem; border-radius:10px;">
+                        <div class="info-block-content">
+                            <p><b>Kaufvertrag</b> виникає не з підписом і не з доставкою, а тоді, коли є
+                            <b>дві згідні заяви</b>: <i>Antrag</i> (пропозиція) + <i>Annahme</i> (прийняття).
+                            У прикладі вище це крок 3.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== RW ==================== -->
+        <div class="tab-content" id="tab-rw">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9FE;</span>
+                    <div>
+                        <h2>Rechnungswesen &mdash; сьомий напрям зсередини</h2>
+                        <p class="lesson-header-sub">Від паперового Beleg до Bilanz: як дія перетворюється на число</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Одне правило, з якого все росте</h3>
+                    <p style="font-size:1.05rem; line-height:1.6; color:#fbbf24; font-weight:600;">
+                        Keine Buchung ohne Beleg.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.6; margin-top:0.4rem;">
+                        Жодного запису без документа. Тому <b class="bw-de">der Beleg</b> &mdash; не формальність:
+                        без нього наприкінці року неможливо скласти <b class="bw-de">Jahresabschluss</b>,
+                        і податкова цього не приймає.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x27A1;&#xFE0F; Ланцюжок обліку</h3>
+                    <ol class="pk">
+                        <li><b class="bw-de">der Gesch&auml;ftsvorfall</b> &mdash; сталася подія, що змінила майно або борги фірми.</li>
+                        <li><b class="bw-de">der Beleg</b> &mdash; на неї є документ: рахунок, квитанція, виписка.</li>
+                        <li><b class="bw-de">die Buchung</b> &mdash; подію записують на два рахунки: <em>Soll an Haben</em>.</li>
+                        <li><b class="bw-de">die Inventur</b> &mdash; раз на рік усе перераховують наживо.</li>
+                        <li><b class="bw-de">die Bilanz</b> і <b class="bw-de">die GuV</b> &mdash; підсумок року у двох таблицях.</li>
+                        <li><b class="bw-de">die Auswertung</b> &mdash; цифри повертаються керівництву як підстава для рішень.</li>
+                    </ol>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Bilanz: дві сторони одного майна</h3>
+                    <p>Баланс &mdash; це не список. Це <b>одне й те саме майно, показане двічі</b>:
+                       ліворуч &mdash; у що вкладено, праворуч &mdash; чиї це гроші. Тому суми завжди рівні.</p>
+                    <div class="bw-vs">
+                        <div>
+                            <h5>Aktiva (ліворуч)</h5>
+                            <b class="bw-de">Wohin</b> вкладені кошти:<br>
+                            Geb&auml;ude, Maschinen, Waren, Forderungen, Bank, Kasse.
+                        </div>
+                        <div>
+                            <h5>Passiva (праворуч)</h5>
+                            <b class="bw-de">Woher</b> кошти взялися:<br>
+                            Eigenkapital, Fremdkapital (Kredite, Verbindlichkeiten).
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.9rem;">
+                        Ось звідки зв&#39;язок із HF6: <b class="bw-de">Investition</b> &mdash; це ліва сторона,
+                        <b class="bw-de">Finanzierung</b> &mdash; права.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CA; Bilanz vs. GuV</h3>
+                    <div class="bw-vs">
+                        <div>
+                            <h5>die Bilanz</h5>
+                            <b>Знімок на дату</b> (31.12.): що фірма має і кому винна <i>цієї миті</i>.
+                        </div>
+                        <div>
+                            <h5>die GuV</h5>
+                            <b>Фільм за період</b>: усі Ertr&auml;ge й Aufwendungen за рік. Результат &mdash; Gewinn або Verlust.
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Повна назва GuV &mdash; <b class="bw-de">die Gewinn- und Verlustrechnung</b>.
+                        Разом із Bilanz вона утворює <b class="bw-de">den Jahresabschluss</b>.
+                    </p>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F4DA;</span>
+                    <div>
+                        <p>Уся лексика цих напрямів &mdash; з артиклями, множиною й озвучкою &mdash; лежить у блоках
+                        <b>&#x1F9ED; BWR</b>, <b>&#x1F465; Personal</b> і <b>&#x1F9FE; Rechnungswesen</b> на сторінці
+                        <a href="deutsch-handelsschule.html">H&ouml;here Handelsschule</a>.
+                        Відсотки й калькуляцію повторюй у <a href="mathe-prozent.html">Prozentrechnung</a>.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ==================== TRAINER ==================== -->
+        <div class="tab-content" id="tab-trainer">
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Тренажер: до якого напряму це належить?</h2>
+                        <p class="lesson-header-sub">Повідомлення з робочого дня &mdash; познач Handlungsfeld</p>
+                    </div>
+                </div>
+
+                <div class="tz-box">
+                    <div class="tz-from" id="tzFrom"></div>
+                    <div class="tz-prompt" id="tzPrompt"></div>
+                    <div class="tz-opts" id="tzOpts"></div>
+                    <div class="tz-fb" id="tzFb"></div>
+                    <div class="tz-actions">
+                        <button class="tz-btn" id="tzNext">Далі &rarr;</button>
+                        <button class="tz-btn ghost" id="tzReset">&#x21A9;&#xFE0F; Спочатку</button>
+                    </div>
+                    <div class="tz-stats">
+                        <span>Пройдено: <b id="tzDone">0</b> / <b id="tzTotal">0</b></span>
+                        <span>Правильно з першого разу: <b id="tzOk">0</b></span>
+                    </div>
+                </div>
+
+                <div class="note-card" style="margin-top:1.2rem;">
+                    <h3>&#x1F5E3;&#xFE0F; Питання на себе</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Натисни, щоб побачити відповідь.</p>
+                    <div id="stList"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== TABS ===================== */
+document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+        document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function (c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
+
+/* ===================== DATEN ===================== */
+var HF = [
+    { id: 'hf1', label: 'HF 1 · Management' },
+    { id: 'hf2', label: 'HF 2 · Beschaffung' },
+    { id: 'hf3', label: 'HF 3 · Leistungserstellung' },
+    { id: 'hf4', label: 'HF 4 · Absatz' },
+    { id: 'hf5', label: 'HF 5 · Personal' },
+    { id: 'hf6', label: 'HF 6 · Investition/Finanzierung' },
+    { id: 'hf7', label: 'HF 7 · Wertströme' }
+];
+
+var ITEMS = [
+    { von: 'Rahmenbau GmbH', txt: 'Ab dem 1. Oktober erhöhen wir die Preise für Aluminiumrahmen um 12 Prozent.', hf: 'hf2',
+      erkl: 'Ціни й вибір постачальників — це <b>Beschaffung</b>. Усе, що відбувається до виробництва.' },
+    { von: 'Lagerleitung', txt: 'Wir haben noch 400 Sattelstützen, aber nur 3 Akkus. Nächste Woche sollen 40 Räder montiert werden.', hf: 'hf2',
+      erkl: 'Склад і момент дозамовлення — <b>Bestandsplanung</b>, тобто теж Beschaffung, а не виробництво.' },
+    { von: 'Schichtleitung', txt: 'An Station 3 stapeln sich die Rahmen, die Stationen 4 und 5 stehen seit einer Stunde still.', hf: 'hf3',
+      erkl: 'Затор у цеху — проблема <b>Arbeitsablauf</b> і <b>Durchlaufzeit</b>: Leistungserstellung.' },
+    { von: 'Endkontrolle', txt: 'Bei 5 von 50 montierten Rädern war die Bremsschraube nicht fest angezogen.', hf: 'hf3',
+      erkl: '<b>Qualitätssicherung</b> належить до виробництва: брак не повинен виникати вже в процесі.' },
+    { von: 'Kita Rheinzwerge', txt: 'Wir hätten gern sechs Lastenräder. Bitte senden Sie uns ein Angebot mit Preis und Liefertermin.', hf: 'hf4',
+      erkl: '<b>Anfrage</b> від покупця → Angebot → Kaufvertrag. Це шлях товару до клієнта: Absatz.' },
+    { von: 'Social Media', txt: 'Unser Video hat 40.000 Aufrufe, aber nur 12 Leute haben danach den Shop geöffnet.', hf: 'hf4',
+      erkl: '<b>Werbung</b> і вимірювання її дії через Kennzahlen — інструменти Absatz.' },
+    { von: 'Betriebsrat', txt: 'Zwei Kolleginnen aus der Montage haben zum Monatsende gekündigt.', hf: 'hf5',
+      erkl: 'Пастка: слово «Montage» тут ні до чого. Ідеться про <b>людей</b> — Personal.' },
+    { von: 'Stadtsparkasse', txt: 'Für die zweite Montagehalle sind 380.000 Euro nötig. Kredit aufnehmen oder Maschinen leasen?', hf: 'hf6',
+      erkl: 'Питання «звідки гроші на велику покупку» — <b>Investition und Finanzierung</b>.' },
+    { von: 'Steuerberatung', txt: 'Für den Jahresabschluss fehlen uns noch die Belege aus dem letzten Quartal.', hf: 'hf7',
+      erkl: 'Beleg, Buchung, Bilanz, Jahresabschluss — сигнальні слова <b>Wertströme</b>.' },
+    { von: 'Geschäftsführung', txt: 'Sind wir das günstigste oder das nachhaltigste Produkt? Bitte Vorschläge für unsere Unternehmensziele.', hf: 'hf1',
+      erkl: 'Leitbild і Unternehmensziele вирішують нагорі — <b>Management</b>.' },
+    { von: 'Personalbüro', txt: 'Eine Auszubildende fragt, ob sie nach ihrer Ausbildung übernommen wird.', hf: 'hf5',
+      erkl: 'Ausbildung, Übernahme, Weiterbildung — усе це <b>Personal</b>.' },
+    { von: 'Einkauf', txt: 'Wir schlagen vor, Akkus künftig alle zwei Wochen fest zu bestellen.', hf: 'hf2',
+      erkl: 'Ритм і обсяг замовлень — <b>Bestellmenge</b>, класична Beschaffung.' },
+    { von: 'Kundendienst', txt: 'Ein Kunde tritt vom Kaufvertrag zurück, weil sein Rad drei Wochen zu spät kommt.', hf: 'hf4',
+      erkl: 'Kaufvertrag і його порушення (Lieferverzug) — <b>Absatz</b>.' },
+    { von: 'Buchhaltung', txt: 'Zum 31. Dezember stellen wir die Bilanz auf.', hf: 'hf7',
+      erkl: 'Підсумок року в цифрах — <b>Wertströme</b>.' },
+    { von: 'Fertigungsplanung', txt: 'Mit einer zweiten Schicht könnten wir die Durchlaufzeit pro Rad um zwei Stunden senken.', hf: 'hf3',
+      erkl: 'Schicht і Durchlaufzeit — організація виробництва: <b>Leistungserstellung</b>.' },
+    { von: 'Controlling', txt: 'Die Kosten liegen 8 Prozent über dem Plan. Wir sollten die Ziele für das nächste Jahr anpassen.', hf: 'hf1',
+      erkl: '<b>Controlling</b> і коригування цілей — це рівень керівництва, HF1. Числа дала Buchhaltung, але рішення ухвалює Management.' },
+    { von: 'Marketing', txt: 'Eine Umfrage zeigt: Familien wünschen sich größere Transportkisten.', hf: 'hf4',
+      erkl: '<b>Marktforschung</b> — інструмент Absatz.' },
+    { von: 'Finanzbüro', txt: 'Beim Leasing bliebe die Maschine Eigentum der Leasingfirma — dafür schonen wir unser Eigenkapital.', hf: 'hf6',
+      erkl: 'Вибір між Kredit, Leasing і Eigenkapital — <b>Finanzierung</b>.' },
+    { von: 'Wareneingang', txt: 'Die heutige Lieferung war 12 Stück zu klein. Sollen wir die Annahme verweigern?', hf: 'hf2',
+      erkl: 'Приймання й перевірка товару — <b>Wareneingang</b>, тобто Beschaffung.' },
+    { von: 'Lohnbuchhaltung', txt: 'Auf der Abrechnung von Herrn Kaya fehlt der Zuschlag für die Nachtschicht.', hf: 'hf5',
+      erkl: 'Пастка: слово «Buchhaltung» у назві відділу. Але йдеться про <b>оплату праці</b> — Personal.' }
+];
+
+var SELBST = [
+    { q: 'Чим Handlungsfeld 7 відрізняється від решти шести?',
+      a: 'Шість напрямів <b>діють</b>, сьомий <b>записує</b>. Wertströme не виробляють і не продають — вони фіксують кожен Vorgang у цифрах і повертають результат керівництву. Тому це не восьмий острів, а рамка навколо всіх.' },
+    { q: 'Назви Leitfrage напряму 2 і напряму 6 — і чим вони відрізняються.',
+      a: 'HF2: <i>Woher bekommen wir Material?</i> HF6: <i>Woher kommt das Geld für große Anschaffungen?</i> Обидва про «звідки», але HF2 — про поточний матеріал, HF6 — про разові дорогі вкладення.' },
+    { q: 'Kernprozess чи Unterstützungsprozess: Buchhaltung, Fertigung, Personal, Verkauf?',
+      a: '<b>Kern:</b> Fertigung, Verkauf (і Einkauf). <b>Unterstützung:</b> Buchhaltung, Personal. Питання-ключ: чи заробляє процес гроші сам?' },
+    { q: 'У чому різниця між Investition і Finanzierung?',
+      a: '<b>Investition</b> — куди гроші йдуть (машина, будівля) = Aktiva. <b>Finanzierung</b> — звідки вони беруться (Eigenkapital, Kredit, Leasing) = Passiva. Це дві сторони одного балансу.' },
+    { q: 'Коли саме виникає Kaufvertrag?',
+      a: 'Коли є <b>дві згідні заяви</b>: <i>Antrag</i> (пропозиція) і <i>Annahme</i> (прийняття). Не з доставкою і не з оплатою — тобто вже на етапі Bestellung.' },
+    { q: 'Що таке Wertschöpfung простими словами?',
+      a: 'Різниця між тим, що фірма віддала назовні, і тим, що отримала ззовні. Наскільки виріб подорожчав, поки був усередині фірми.' },
+    { q: 'Lohn чи Gehalt?',
+      a: '<b>Lohn</b> — за відпрацьовані години (робітники), сума коливається. <b>Gehalt</b> — фіксована сума на місяць (службовці).' },
+    { q: 'Qualitätskontrolle чи Qualitätssicherung?',
+      a: '<b>Kontrolle</b> шукає брак у готовому виробі. <b>Sicherung</b> — система, щоб брак не виникав узагалі. Sicherung діє раніше.' },
+    { q: 'Чому рішення «виробляти на 200 одиниць більше» стосується Absatz?',
+      a: 'Бо їх ще треба <b>продати</b>. Інакше зайве виробництво просто ляже на склад — і замість прибутку дасть витрати.' },
+    { q: 'Чому Bilanz завжди сходиться?',
+      a: 'Бо це <b>одне й те саме майно, показане двічі</b>: ліворуч — у що вкладено (Aktiva), праворуч — чиї це кошти (Passiva).' }
+];
+
+/* ===================== TRAINER ===================== */
+var order = [], pos = 0, done = 0, okFirst = 0, answered = false, triedThis = false;
+
+function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1)), t = a[i];
+        a[i] = a[j]; a[j] = t;
+    }
+    return a;
+}
+
+function hfLabel(id) {
+    for (var i = 0; i < HF.length; i++) { if (HF[i].id === id) { return HF[i].label; } }
+    return id;
+}
+
+function render() {
+    var it = ITEMS[order[pos]];
+    answered = false; triedThis = false;
+    document.getElementById('tzFrom').textContent = 'Von: ' + it.von;
+    document.getElementById('tzPrompt').textContent = '«' + it.txt + '»';
+    document.getElementById('tzFb').innerHTML = '';
+    var box = document.getElementById('tzOpts');
+    box.innerHTML = '';
+    HF.forEach(function (h) {
+        var b = document.createElement('button');
+        b.className = 'tz-opt';
+        b.type = 'button';
+        b.textContent = h.label;
+        b.addEventListener('click', function () { pick(b, h.id, it); });
+        box.appendChild(b);
+    });
+    document.getElementById('tzDone').textContent = done;
+    document.getElementById('tzOk').textContent = okFirst;
+}
+
+function pick(btn, id, it) {
+    if (answered) { return; }
+    if (id === it.hf) {
+        btn.classList.add('ok');
+        answered = true;
+        done++;
+        if (!triedThis) { okFirst++; }
+        document.getElementById('tzFb').innerHTML = '&#x2705; <b>' + hfLabel(it.hf) + '</b> — ' + it.erkl;
+        document.querySelectorAll('#tzOpts .tz-opt').forEach(function (b) { b.disabled = true; });
+        document.getElementById('tzDone').textContent = done;
+        document.getElementById('tzOk').textContent = okFirst;
+    } else {
+        btn.classList.add('no');
+        btn.disabled = true;
+        triedThis = true;
+        document.getElementById('tzFb').innerHTML = '&#x274C; Ще раз. Спитай себе: <i>коли</i> це відбувається — до виробництва, під час, після? І <i>про кого</i> йдеться — про матеріал, людей, гроші чи документи?';
+    }
+}
+
+function next() {
+    if (!answered) {
+        var it = ITEMS[order[pos]];
+        document.getElementById('tzFb').innerHTML = '&#x1F4A1; Правильна відповідь: <b>' + hfLabel(it.hf) + '</b> — ' + it.erkl;
+        answered = true;
+        done++;
+        document.getElementById('tzDone').textContent = done;
+        return;
+    }
+    pos++;
+    if (pos >= order.length) {
+        document.getElementById('tzFrom').textContent = '';
+        document.getElementById('tzPrompt').textContent = 'Готово! ' + okFirst + ' з ' + order.length + ' — з першого разу.';
+        document.getElementById('tzOpts').innerHTML = '';
+        document.getElementById('tzFb').innerHTML = okFirst === order.length
+            ? '&#x1F3C6; Жодної помилки. Сім напрямів ти розрізняєш.'
+            : 'Повтори ті, де вагався — і запусти ще раз.';
+        return;
+    }
+    render();
+}
+
+function reset() {
+    order = shuffle(ITEMS.map(function (_, i) { return i; }));
+    pos = 0; done = 0; okFirst = 0;
+    document.getElementById('tzTotal').textContent = order.length;
+    render();
+}
+
+document.getElementById('tzNext').addEventListener('click', next);
+document.getElementById('tzReset').addEventListener('click', reset);
+reset();
+
+/* ===================== SELBSTTEST ===================== */
+(function () {
+    var box = document.getElementById('stList');
+    SELBST.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+})();
+</script>
+</body>
+</html>
