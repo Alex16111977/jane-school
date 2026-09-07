@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Deutsch — Kommunikation | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #egb-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+        /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+
+    /* ---- Situationskarten ---- */
+    .sk-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:1rem 1.15rem; margin-bottom:1rem; border-left:3px solid var(--color-accent); }
+    .sk-card.s1 { border-left-color:#79b8ff; }
+    .sk-card.s2 { border-left-color:#f472b6; }
+    .sk-card.s3 { border-left-color:#fbbf24; }
+    .sk-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .sk-card h4 { margin:0.15rem 0 0.6rem; font-size:1.08rem; color:#fff; }
+    .kb-msg { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+              padding:0.7rem 0.9rem; font-style:italic; color:rgba(230,230,235,0.85); margin:0 0 0.9rem; line-height:1.6; }
+    .kb-msg b { font-style:normal; color:rgba(230,230,235,0.5); font-size:0.76rem; text-transform:uppercase;
+                letter-spacing:0.06em; display:block; margin-bottom:0.3rem; }
+    .kb-qa { margin-top:0.85rem; padding-top:0.75rem; border-top:1px dashed rgba(255,255,255,0.12); }
+    .kb-qa:first-of-type { border-top:none; padding-top:0; margin-top:0; }
+    .kb-q { color:#fbbf24; font-size:0.89rem; margin-bottom:0.4rem; }
+    .kb-a { color:#fff; font-weight:600; font-size:0.95rem; line-height:1.6; background:rgba(63,185,80,0.1);
+            border:1px solid rgba(63,185,80,0.25); border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.4rem; }
+    .kb-a.kb-email { font-weight:400; }
+    .kb-why { font-size:0.87rem; color:rgba(230,230,235,0.68); line-height:1.6; }
+    .kb-why b { color:#c8a5ff; font-weight:600; }
+    .kb-de { color:#fff; font-weight:600; }
+
+    /* ---- Sender-Empfänger Diagramm ---- */
+    .se-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:0.5rem; margin:0.8rem 0; }
+    .se-box { flex:1 1 150px; background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:0.7rem 0.8rem; text-align:center; }
+    .se-box b { display:block; color:#fff; font-size:0.95rem; margin-bottom:0.2rem; }
+    .se-box span { font-size:0.8rem; color:rgba(230,230,235,0.6); }
+    .se-arrow { display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--color-accent); flex:0 0 auto; }
+
+    /* ---- Redemittel ---- */
+    .rm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:0.55rem; margin-top:0.6rem; }
+    .rm-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.6rem 0.8rem; }
+    .rm-de { color:#fff; font-weight:600; font-size:0.91rem; }
+    .rm-ru { color:rgba(230,230,235,0.6); font-size:0.82rem; margin-top:0.25rem; }
+    .rm-group-title { color:#86efac; font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+                       margin:1.1rem 0 0.2rem; }
+    .rm-group-title:first-child { margin-top:0; }
+
+    /* ---- Selbsttest (Klick = Antwort) ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .kb-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .kb-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                    <a href="deutsch-egb.html" class="active">EGB Deutsch</a>
+                    <a href="iw-egb.html">EGB Informationswirtschaft</a>
+                    <a href="ec-egb.html">EGB E-Commerce</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB Deutsch</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zur Höheren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Deutsch</h1>
+            <p class="page-subtitle">Arbeitsblätter aus dem Deutschunterricht am Erich-Gutenberg-Berufskolleg &mdash; Thema für Thema · <b>Thema 1: Kommunikation</b> — так отвечать вслух, чтобы получить «sehr gut» и уверенно поднимать руку</p>
+        </div>
+
+        <div id="egb-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="egb-search" placeholder="Thema suchen&hellip; z.B. Redemittel, Watzlawick, Wortschatz" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="egb-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Arbeitsbl&auml;tter aus dem Deutschunterricht
+        </h2>
+        <p id="egb-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждая часть урока &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#f472b6,#f9a8d4); color:#2a0a18;">1</span>
+            <h3 style="color:#f9a8d4;">Kommunikation &mdash; Arbeitsblatt 1</h3>
+            <span class="iw-sec-note">4 Teile &middot; Theorie, Aufgaben, Redemittel, Wortschatz</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#k1" class="subject-card glass-card" data-lesson="k1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F9E0;</span>
+                <h3>Grundlagen der Kommunikation</h3>
+                <p>Watzlawick «Man kann nicht nicht kommunizieren», 4-Ohren-Modell von Schulz von Thun, verbal/nonverbal, aktives Zuh&ouml;ren, Ich- und Du-Botschaft</p>
+            </a>
+            <a href="#k2" class="subject-card glass-card" data-lesson="k2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F4CB;</span>
+                <h3>Die drei Situationen</h3>
+                <p>E-Mail von Jonas, Sarah am Empfang, Tim in der Besprechung &mdash; готовые ответы вслух с обоснованием через «weil»</p>
+            </a>
+            <a href="#k3" class="subject-card glass-card" data-lesson="k3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F64B;</span>
+                <h3>Redemittel &amp; Checkliste</h3>
+                <p>Готовые фразы, чтобы поднять руку, согласиться, возразить и подвести итог + чеклист на оценку «sehr gut»</p>
+            </a>
+            <a href="#k4" class="subject-card glass-card" data-lesson="k4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F9E9;</span>
+                <h3>Wortschatz &amp; Selbsttest</h3>
+                <p>Мини-словарь темы и вопросы на самопроверку &mdash; проверь, держится ли теория в голове</p>
+            </a>
+        </div>
+
+        </div><!-- /egb-hub -->
+
+        <div id="egb-lessons">
+
+        <div class="lesson" id="ls-k1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil A: Theorie ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E0;</span>
+                    <div>
+                        <h2>Grundlagen: wie Kommunikation funktioniert</h2>
+                        <p class="lesson-header-sub">Die Theorie hinter dem Arbeitsblatt — kennst du diese Begriffe, kannst du jede Aufgabe zur Kommunikation lösen, nicht nur diese drei</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Главное правило: «Man kann nicht nicht kommunizieren»</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        Это первая аксиома коммуникации психолога <b class="kb-de">Paul Watzlawick</b>, и именно вокруг неё
+                        построен весь ваш Arbeitsblatt. По-немецки: <b style="color:#fbbf24;">„Man kann nicht nicht kommunizieren.“</b>
+                        Даже когда человек молчит, не смотрит в глаза или просто вздыхает — он всё равно посылает сообщение.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.6; margin-top:0.5rem;">
+                        Именно поэтому в ситуации 2 (Sarah на ресепшене) и в ситуации 3 (Tim на совещании) никто не сказал
+                        ничего «плохого» вслух — но проблема всё равно возникла: <b>само поведение</b> уже было сообщением.
+                    </p>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Если учитель спросит «Was bedeutet dieses Zitat?», можно ответить целым предложением:
+                        <i>„Auch Schweigen, Blicke oder Körperhaltung sind eine Form von Kommunikation.“</i>
+                        (= даже молчание, взгляды или поза — это тоже форма коммуникации.)
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4E1; Sender-Empfänger-Modell</h3>
+                    <p>Базовая модель того, как вообще происходит общение. <b class="kb-de">Der Sender</b> кодирует мысль
+                       в сообщение и отправляет её по каналу; <b class="kb-de">der Empfänger</b> получает и декодирует её.</p>
+                    <div class="se-flow">
+                        <div class="se-box"><b>der Sender</b><span>codiert die Nachricht</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>die Nachricht</b><span>über einen Kanal: Wort, E-Mail, Blick, Tonfall</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>der Empfänger</b><span>decodiert die Nachricht</span></div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.9rem; line-height:1.6;">
+                        Проблема в том, что <b class="kb-de">Codierung</b> и <b class="kb-de">Decodierung</b> могут не совпасть —
+                        тогда возникает <b class="kb-de">eine Kommunikationsstörung</b> (сбой в коммуникации). Например, Jonas
+                        закодировал своё сообщение (ситуация 1) как «между своими, по-дружески», а начальник декодировал
+                        его как «безответственно и неуважительно» — текст один, а прочтения разные.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F442; Vier Seiten einer Nachricht (Schulz von Thun)</h3>
+                    <p>Каждое сообщение содержит не одну, а сразу четыре стороны — их называют
+                       <b class="kb-de">„4-Ohren-Modell“</b> (у слушателя как будто четыре уха):</p>
+                    <ul class="note-list">
+                        <li><b class="kb-de">der Sachinhalt</b> — что фактически сообщается (сам факт).</li>
+                        <li><b class="kb-de">die Selbstoffenbarung</b> — что говорящий сообщает о себе.</li>
+                        <li><b class="kb-de">die Beziehung</b> — как он видит адресата и отношения между вами.</li>
+                        <li><b class="kb-de">der Appell</b> — чего он хочет добиться, что должен сделать адресат.</li>
+                    </ul>
+                    <p style="margin-top:0.6rem; font-size:0.9rem;">Разберём по этой модели e-mail Jonas'а из ситуации 1:</p>
+                    <div class="kb-msg"><b>Jonas an Herrn Meier</b>„Hi Herr Meier, bin morgen nicht da, muss zum Arzt. Schicke die AU, wenn ich wieder da bin. Ciao, Jonas.“</div>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.3rem; min-width:520px;">
+                        <tr><th>Ebene</th><th>Was hier steckt</th></tr>
+                        <tr><td class="kb-de">Sachinhalt</td><td>Jonas ist morgen nicht da, er geht zum Arzt.</td></tr>
+                        <tr><td class="kb-de">Selbstoffenbarung</td><td>Jonas nimmt seine Pflichten als Azubi nicht ernst, wirkt unorganisiert.</td></tr>
+                        <tr><td class="kb-de">Beziehung</td><td>Er behandelt seinen Chef wie einen gleichgestellten Kumpel, nicht wie eine Führungskraft.</td></tr>
+                        <tr><td class="kb-de">Appell</td><td>„Kümmere du dich um den Rest“ — regeln Sie die Vertretung selbst.</td></tr>
+                    </table>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Именно эту таблицу стоит проговорить вслух на вопрос №2 ситуации 1 — учитель услышит термины
+                        <i>Sachinhalt / Selbstoffenbarung / Beziehungsebene</i> и сразу поймёт, что ты применяешь теорию.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F645;&#x200D;&#x2640;&#xFE0F; Verbal und nonverbal — der Fall Sarah</h3>
+                    <p>Большая часть впечатления от сообщения возникает не из самих слов, а из того,
+                       <b>как</b> они сказаны: <b class="kb-de">die Körpersprache</b>, <b class="kb-de">die Mimik</b>,
+                       <b class="kb-de">die Gestik</b>, <b class="kb-de">der Blickkontakt</b>, <b class="kb-de">der Tonfall</b>.</p>
+                    <p style="margin-top:0.5rem;">Sarah говорит нейтральную, даже вежливую фразу „Ja bitte?“ — с точки зрения
+                       слов всё в порядке. Но: она не поднимает взгляд, продолжает печатать, молчит десять секунд.
+                       Язык тела полностью перекрывает смысл слов.</p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>verbal (Worte)</h5>
+                            „Ja bitte?“ — само по себе нейтрально и даже вежливо.
+                        </div>
+                        <div>
+                            <h5>nonverbal (Verhalten)</h5>
+                            Kein Blickkontakt, 10 Sekunden Wartezeit, weiter tippen — signalisiert Desinteresse.
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Когда вербальный и невербальный сигналы противоречат друг другу, это называют
+                        <b class="kb-de">eine Diskrepanz</b> — и люди почти всегда больше доверяют <b>невербальному</b> сигналу.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F442; Aktives Zuhören &amp; Ich-Botschaften — der Fall Tim</h3>
+                    <p><b class="kb-de">Aktives Zuhören</b> — техники, которые показывают собеседнику, что его слышат:
+                       Blickkontakt halten, nicken, nicht unterbrechen, das Gesagte in eigenen Worten zusammenfassen
+                       (paraphrasieren), gezielt nachfragen.</p>
+                    <div class="kb-vs" style="margin-top:0.7rem;">
+                        <div>
+                            <h5>die Du-Botschaft</h5>
+                            Звучит как обвинение: <i>„Du sagst ja nie was!“</i> — вызывает защитную реакцию.
+                        </div>
+                        <div>
+                            <h5>die Ich-Botschaft</h5>
+                            Описывает своё чувство, без обвинения: <i>„Ich hätte mir gewünscht, dass du deine Meinung sagst.“</i>
+                        </div>
+                    </div>
+                    <p style="margin-top:0.6rem; font-size:0.9rem; line-height:1.6;">
+                        Вместо молчаливого вздоха Tim должен был подать <b class="kb-de">eine Wortmeldung</b> — открыто
+                        озвучить сомнение через Ich-Botschaft, например: <i>„Ich habe noch Bedenken beim neuen Dienstplan.“</i>
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-k2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil B: Die drei Situationen ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CB;</span>
+                    <div>
+                        <h2>Die drei Situationen — Musterantworten fürs Sprechen</h2>
+                        <p class="lesson-header-sub">Твои черновики с урока были на верном пути — вот они же полными предложениями, с термином и обоснованием «weil…»</p>
+                    </div>
+                </div>
+
+                <div class="sk-card s1">
+                    <div class="sk-tag">Situation 1</div>
+                    <h4>Die „kurze“ E-Mail an den Chef</h4>
+                    <div class="kb-msg"><b>Jonas, Sonntagabend, vom Smartphone</b>„Hi Herr Meier, bin morgen nicht da, muss zum Arzt. Schicke die AU, wenn ich wieder da bin. Ciao, Jonas.“</div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">1. Wie wirkt diese Nachricht auf den Chef?</div>
+                        <div class="kb-a">„Die Nachricht wirkt auf den Chef unprofessionell, respektlos und unzuverlässig, weil Jonas so kurzfristig und so beiläufig absagt.“</div>
+                        <div class="kb-why">Твой черновик „ungenügend, unzuverlässig“ был верным — здесь просто то же самое
+                            полным предложением с <b>weil</b>-обоснованием. Учитель ценит обоснование больше, чем одно слово.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">2. Welche Signale (Tonfall, Form) werden hier gesendet?</div>
+                        <div class="kb-a">„Der Tonfall ist zu locker für eine Führungskraft: Die Anrede ‚Hi‘, die Grußformel ‚Ciao‘ und die knappen Sätze ohne Begründung wirken umgangssprachlich und unsachlich.“</div>
+                        <div class="kb-why">Это как раз <b>Selbstoffenbarung</b> и <b>Beziehungsebene</b> из модели Schulz von Thun
+                            (см. таблицу выше). Назови эти термины вслух — учитель услышит, что ты применяешь теорию, а не угадываешь.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">3. Wie würde eine professionelle Nachricht lauten?</div>
+                        <div class="kb-a kb-email">„Sehr geehrter Herr Meier,<br>
+                            leider muss ich Sie kurzfristig informieren, dass ich morgen einen Arzttermin habe und deshalb nicht zur Arbeit kommen kann. Die Arbeitsunfähigkeitsbescheinigung reiche ich nach, sobald ich sie habe.<br>
+                            Für die Unannehmlichkeiten entschuldige ich mich.<br>
+                            Mit freundlichen Grüßen<br>
+                            Jonas [Nachname]“</div>
+                        <div class="kb-why">Вопрос прямо просит переписать письмо — покажи готовый текст, а не одно словосочетание.
+                            Структура: <b>höfliche Anrede → Grund → konkrete Information → Entschuldigung → Grußformel</b>.
+                            Именно это ты и написал(а) коротко на листе — здесь это развёрнуто в целое письмо.</div>
+                    </div>
+                </div>
+
+                <div class="sk-card s2">
+                    <div class="sk-tag">Situation 2</div>
+                    <h4>Missverständnis am Empfang</h4>
+                    <div class="kb-msg"><b>Sarah, ohne Blickkontakt, nach 10 Sekunden</b>„Ja bitte?“</div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">1. Was kommuniziert Sarah durch ihr Verhalten (Körpersprache/Blick)?</div>
+                        <div class="kb-a">„Sarah kommuniziert nonverbal, dass die Kundin für sie im Moment nicht wichtig ist — durch den fehlenden Blickkontakt und die zehn Sekunden Wartezeit wirkt sie desinteressiert und abweisend, obwohl ihre Worte neutral sind.“</div>
+                        <div class="kb-why">Твой ответ „dass sie beschäftigt ist“ — это, наверное, то, что Sarah <i>хотела</i> сказать.
+                            Но клиентка восприняла иначе. Разница между «что имелось в виду» и «что было получено» — это и есть
+                            <b>Kommunikationsstörung</b>. На уроке стоит проговорить обе стороны.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">2. Wie fühlt sich die Kundin in dieser Situation vermutlich?</div>
+                        <div class="kb-a">„Die Kundin fühlt sich vermutlich übersehen, nicht willkommen und unwichtig — sie hat das Gefühl, zu stören.“</div>
+                        <div class="kb-why">Твоё „nicht zufrieden“ расширено до конкретных чувств. На устном ответе конкретные
+                            слова (<i>übersehen, nicht willkommen</i>) звучат весомее общей фразы.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">3. Welche Auswirkung kann das auf das Geschäft haben?</div>
+                        <div class="kb-a">„Das kann dem Geschäft schaden: Die Kundin geht vielleicht zur Konkurrenz, hinterlässt eine schlechte Bewertung, oder erzählt anderen von der schlechten Erfahrung — das schadet dem Ruf des Autohauses.“</div>
+                        <div class="kb-why">Твой набросок («schlechte … Abwertung … nicht betreuen wollen») уже шёл в верную
+                            сторону — вот чистая версия одним связным предложением с тремя конкретными последствиями.</div>
+                    </div>
+                </div>
+
+                <div class="sk-card s3">
+                    <div class="sk-tag">Situation 3</div>
+                    <h4>Das Schweigen in der Besprechung</h4>
+                    <div class="kb-msg"><b>Die Chefin fragt</b>„Gibt es noch Einwände gegen den neuen Dienstplan?“<br>
+                        <b>Tim schaut zu Boden, seufzt hörbar, sagt aber nichts.</b><br>
+                        <b>Die Chefin</b>„Super, dann sind ja alle einverstanden!“</div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">1. Hat Tim kommuniziert, obwohl er nichts gesagt hat?</div>
+                        <div class="kb-a">„Ja — Tim hat trotzdem kommuniziert: Sein Seufzen und sein Blick zum Boden sind nonverbale Signale, die zeigen, dass er unzufrieden ist. Das bestätigt: Man kann nicht nicht kommunizieren.“</div>
+                        <div class="kb-why">Твой ответ „Ja, mit dem Seufzen“ уже правильный — просто добавь фразу
+                            <b>„Man kann nicht nicht kommunizieren“</b>, и учитель сразу увидит связь примера с теорией.
+                            Это самый ценный ход во всей теме.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">2. Warum hat die Chefin ihn vermutlich falsch verstanden?</div>
+                        <div class="kb-a">„Die Chefin hat nur auf der verbalen Ebene reagiert: Weil Tim nichts gesagt hat, hat sie sein Schweigen als Zustimmung interpretiert, statt seine Körpersprache zu deuten.“</div>
+                        <div class="kb-why">Твоё „weil er nichts dagegen gesagt hat“ верно — здесь добавлена причина:
+                            она проигнорировала невербальный уровень и услышала только отсутствие слов.</div>
+                    </div>
+
+                    <div class="kb-qa">
+                        <div class="kb-q">3. Was hätte Tim stattdessen tun müssen?</div>
+                        <div class="kb-a">„Tim hätte sich zu Wort melden und seine Bedenken offen ansprechen müssen, zum Beispiel: ‚Ich habe noch Einwände gegen den neuen Dienstplan.‘“</div>
+                        <div class="kb-why">Идея верна. Маленькая грамматика на заметку ниже.</div>
+                    </div>
+
+                    <div class="info-block warning" style="margin-top:0.3rem; padding:0.8rem 1rem; border-radius:10px;">
+                        <div class="info-block-content">
+                            <p><b>Grammatik-Tipp:</b> глагол <b class="kb-de">ansprechen</b> требует <b>Akkusativ</b>, поэтому
+                            правильно <i>seine Chefin ansprechen</i> (не <i>seiner Chefin</i>, как в черновике). Запомни:
+                            <i>jemanden (Akk.) ansprechen</i>.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-k3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil C: Redemittel & Checkliste ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F64B;</span>
+                    <div>
+                        <h2>Bereit zum Melden: Redemittel &amp; Checkliste</h2>
+                        <p class="lesson-header-sub">Готовые фразы, чтобы поднять руку и говорить уверенно — вместо того чтобы бормотать одно слово</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Redemittel fürs Mitmachen</h3>
+                    <div class="rm-group-title">Sich melden</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Ich möchte dazu etwas sagen.“</div><div class="rm-ru">Я хочу кое-что сказать по этому поводу.</div></div>
+                        <div class="rm-item"><div class="rm-de">„Darf ich einen Punkt ergänzen?“</div><div class="rm-ru">Можно я кое-что добавлю?</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich hätte dazu eine Idee.“</div><div class="rm-ru">У меня есть мысль по этому поводу.</div></div>
+                    </div>
+                    <div class="rm-group-title">Meinung äußern</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Meiner Meinung nach…“</div><div class="rm-ru">По-моему, …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich denke/glaube, dass…“</div><div class="rm-ru">Я думаю, что…</div></div>
+                        <div class="rm-item"><div class="rm-de">„Für mich bedeutet das, dass…“</div><div class="rm-ru">Для меня это значит, что…</div></div>
+                    </div>
+                    <div class="rm-group-title">Begründen — самое важное для оценки</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„…, weil…“</div><div class="rm-ru">…, потому что…</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das erkennt man daran, dass…“</div><div class="rm-ru">Это видно по тому, что…</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ein Beispiel dafür ist…“</div><div class="rm-ru">Примером этого является…</div></div>
+                    </div>
+                    <div class="rm-group-title">Zustimmen / widersprechen</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Das sehe ich genauso.“</div><div class="rm-ru">Я вижу это так же.</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich sehe das etwas anders, und zwar…“</div><div class="rm-ru">Я вижу это немного иначе, а именно…</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das stimmt, aber man sollte auch bedenken, dass…“</div><div class="rm-ru">Это верно, но стоит также учесть, что…</div></div>
+                    </div>
+                    <div class="rm-group-title">Zusammenfassen</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Kurz zusammengefasst…“</div><div class="rm-ru">Коротко говоря, …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das heißt also, dass…“</div><div class="rm-ru">Это значит, что…</div></div>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card" style="margin-top:1rem;">
+                    <span class="tip-icon">&#x1F3AF;</span>
+                    <div>
+                        <p><b>Как получить «sehr gut» (1) за устный ответ:</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li>Отвечай <b>полным предложением</b>, не одним словом.</li>
+                            <li>Называй <b>термин</b> (Sachebene, Beziehungsebene, nonverbale Kommunikation, Ich-Botschaft usw.) — учитель сразу видит, что ты понимаешь теорию, а не угадываешь.</li>
+                            <li>Обосновывай через <b>„weil“</b> / <b>„das erkennt man daran, dass“</b>.</li>
+                            <li>Если можешь — приведи <b>свой пример</b> или свяжи с другой ситуацией из задания.</li>
+                            <li>Начинай с фразы для поднятия руки (см. выше) — это уже создаёт впечатление активного участия, ещё до сути ответа.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-k4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil D: Wortschatz & Selbsttest ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Wortschatz &amp; Selbsttest</h2>
+                        <p class="lesson-header-sub">Проверь, закрепилась ли теория — и терминология, которая должна прозвучать в твоих устных ответах</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E0; Проверь себя</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Не читай ответ сразу — сначала попробуй ответить сам(а) вслух, потом жми.</p>
+                    <div id="stListKomm"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Mini-Wortschatz</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:480px;">
+                        <tr><th>Deutsch</th><th>Русский</th></tr>
+                        <tr><td class="kb-de">die Kommunikation</td><td>коммуникация, общение</td></tr>
+                        <tr><td class="kb-de">der Sender / der Empfänger</td><td>отправитель / получатель</td></tr>
+                        <tr><td class="kb-de">die Nachricht / der Kanal</td><td>сообщение / канал передачи</td></tr>
+                        <tr><td class="kb-de">codieren / decodieren</td><td>кодировать / декодировать (сообщение)</td></tr>
+                        <tr><td class="kb-de">die Kommunikationsstörung</td><td>сбой в коммуникации, недопонимание</td></tr>
+                        <tr><td class="kb-de">der Sachinhalt</td><td>фактическое содержание сообщения</td></tr>
+                        <tr><td class="kb-de">die Selbstoffenbarung</td><td>что говорящий сообщает о себе</td></tr>
+                        <tr><td class="kb-de">die Beziehungsebene</td><td>уровень отношений между собеседниками</td></tr>
+                        <tr><td class="kb-de">der Appell</td><td>призыв, побуждение адресата к действию</td></tr>
+                        <tr><td class="kb-de">verbal / nonverbal</td><td>вербальный (словесный) / невербальный</td></tr>
+                        <tr><td class="kb-de">die Körpersprache</td><td>язык тела</td></tr>
+                        <tr><td class="kb-de">die Mimik / die Gestik</td><td>мимика / жестикуляция</td></tr>
+                        <tr><td class="kb-de">der Blickkontakt</td><td>зрительный контакт</td></tr>
+                        <tr><td class="kb-de">aktives Zuhören</td><td>активное слушание</td></tr>
+                        <tr><td class="kb-de">die Ich-Botschaft / die Du-Botschaft</td><td>я-сообщение / ты-сообщение (обвинение)</td></tr>
+                        <tr><td class="kb-de">das Feedback</td><td>обратная связь</td></tr>
+                        <tr><td class="kb-de">der Arbeitsauftrag</td><td>задание (в рабочем листе)</td></tr>
+                        <tr><td class="kb-de">der/die Sitznachbar:in</td><td>сосед/соседка по парте</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Эта страница будет расти: каждая новая тема с урока Deutsch в EGB получит здесь свою
+                        вкладку — так же, как это уже происходит на странице
+                        <a href="deutsch-bwr.html">BWR</a>. Общая карта предметов и словарь по школе —
+                        на странице <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        </div><!-- /egb-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Lektion ===================== */
+(function () {
+    var hub = document.getElementById('egb-hub');
+    var wrap = document.getElementById('egb-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Deutsch | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('egb-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_egb_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('egb-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+
+/* ===================== SELBSTTEST ===================== */
+var SELBST_KOMM = [
+    { q: 'Как называется первая аксиома Watzlawick и что она означает?',
+      a: '<b>„Man kann nicht nicht kommunizieren“</b> — даже отсутствие слов (молчание, взгляд, поза) уже является сообщением.' },
+    { q: 'Назови четыре стороны сообщения по модели Schulz von Thun.',
+      a: '<b>Sachinhalt, Selbstoffenbarung, Beziehung, Appell.</b>' },
+    { q: 'Коллега за столом закатывает глаза, когда ты предлагаешь идею, но вслух говорит «Klingt gut». Что здесь противоречит друг другу?',
+      a: '<b>Verbale</b> (слова: „Klingt gut“) и <b>nonverbale</b> (мимика: закатывание глаз) коммуникация противоречат друг другу — это <i>eine Diskrepanz</i>. Обычно люди больше доверяют невербальному сигналу.' },
+    { q: 'В чём разница между Ich-Botschaft и Du-Botschaft? Приведи пример.',
+      a: '<b>Du-Botschaft</b> звучит как обвинение („Du hörst nie zu!“). <b>Ich-Botschaft</b> описывает своё чувство без обвинения („Ich fühle mich nicht gehört, wenn…“). Ich-Botschaften снижают конфликт.' },
+    { q: 'Назови минимум три техники aktives Zuhören.',
+      a: 'Blickkontakt halten, nicken, nicht unterbrechen, das Gesagte zusammenfassen (paraphrasieren), gezielt nachfragen.' },
+    { q: 'Почему письмо Jonas можно назвать примером «gestörter Kommunikation», хотя сам факт (завтра к врачу) передан верно?',
+      a: 'Потому что проблема не в <b>Sachinhalt</b>, а в <b>Beziehungsebene</b> и <b>Selbstoffenbarung</b> — тон и форма разрушают доверие, даже когда факт правильный.' },
+    { q: 'Sarah не сказала клиентке ничего грубого — почему клиентка всё равно почувствовала себя плохо?',
+      a: 'Потому что <b>nonverbale Signale</b> (отсутствие взгляда, задержка, продолжение печатать) оказались сильнее нейтральных слов „Ja bitte?“.' }
+];
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+renderSelbst('stListKomm', SELBST_KOMM);
+</script>
+</body>
+</html>

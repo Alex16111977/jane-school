@@ -1,0 +1,2794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Informationswirtschaft — KI-Grundlagen | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #iw-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+        /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+
+    /* ---- Begriffskarten ---- */
+    .sk-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:1rem 1.15rem; margin-bottom:1rem; border-left:3px solid var(--color-accent); }
+    .sk-card.s1 { border-left-color:#79b8ff; }
+    .sk-card.s2 { border-left-color:#f472b6; }
+    .sk-card.s3 { border-left-color:#fbbf24; }
+    .sk-card.s4 { border-left-color:#86efac; }
+    .sk-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .sk-card h4 { margin:0.15rem 0 0.6rem; font-size:1.08rem; color:#fff; }
+    .sk-card p { font-size:0.93rem; line-height:1.62; color:rgba(230,230,235,0.8); margin:0 0 0.55rem; }
+    .sk-card p:last-child { margin-bottom:0; }
+
+    .kb-msg { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+              padding:0.7rem 0.9rem; font-style:italic; color:rgba(230,230,235,0.85); margin:0 0 0.9rem; line-height:1.6; }
+    .kb-msg b { font-style:normal; color:rgba(230,230,235,0.5); font-size:0.76rem; text-transform:uppercase;
+                letter-spacing:0.06em; display:block; margin-bottom:0.3rem; }
+    .kb-de { color:#fff; font-weight:600; }
+    .kb-say { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.25); border-radius:8px;
+              padding:0.6rem 0.8rem; margin:0.6rem 0 0; color:#fff; font-size:0.95rem; line-height:1.6; }
+    .kb-say b { color:#86efac; display:block; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.07em;
+                margin-bottom:0.25rem; font-weight:700; }
+
+    /* ---- Ablauf-Diagramm ---- */
+    .se-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:0.5rem; margin:0.8rem 0; }
+    .se-box { flex:1 1 130px; background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:0.7rem 0.8rem; text-align:center; }
+    .se-box b { display:block; color:#fff; font-size:0.93rem; margin-bottom:0.2rem; }
+    .se-box span { font-size:0.79rem; color:rgba(230,230,235,0.6); line-height:1.45; display:block; }
+    .se-arrow { display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--color-accent); flex:0 0 auto; }
+
+    /* ---- KI / ML / DL Ringe ---- */
+    .ki-ring { border-radius:16px; padding:1.1rem; text-align:center; }
+    .ki-ring > span { display:block; font-weight:700; color:#fff; font-size:0.98rem; margin-bottom:0.15rem; }
+    .ki-ring > small { display:block; font-size:0.79rem; color:rgba(230,230,235,0.62); line-height:1.5; margin-bottom:0.8rem; }
+    .ki-r1 { background:rgba(121,184,255,0.09); border:1px solid rgba(121,184,255,0.35); }
+    .ki-r2 { background:rgba(244,114,182,0.09); border:1px solid rgba(244,114,182,0.38); }
+    .ki-r3 { background:rgba(251,191,36,0.1);  border:1px solid rgba(251,191,36,0.4); padding-bottom:1.1rem; }
+
+    /* ---- Risikostufen (AI Act) ---- */
+    .ki-risk { border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.5rem; border:1px solid rgba(255,255,255,0.1); }
+    .ki-risk b { display:block; color:#fff; font-size:0.95rem; margin-bottom:0.2rem; }
+    .ki-risk span { font-size:0.86rem; color:rgba(230,230,235,0.75); line-height:1.55; }
+    .ki-risk.r-verboten { background:rgba(248,81,73,0.13); border-color:rgba(248,81,73,0.4); }
+    .ki-risk.r-hoch    { background:rgba(251,146,60,0.12); border-color:rgba(251,146,60,0.4); }
+    .ki-risk.r-begrenzt{ background:rgba(121,184,255,0.1); border-color:rgba(121,184,255,0.35); }
+    .ki-risk.r-minimal { background:rgba(63,185,80,0.1);  border-color:rgba(63,185,80,0.3); }
+
+    /* ---- Redemittel ---- */
+    .rm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:0.55rem; margin-top:0.6rem; }
+    .rm-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.6rem 0.8rem; }
+    .rm-de { color:#fff; font-weight:600; font-size:0.91rem; }
+    .rm-ru { color:rgba(230,230,235,0.6); font-size:0.82rem; margin-top:0.25rem; }
+    .rm-group-title { color:#86efac; font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+                       margin:1.1rem 0 0.2rem; }
+    .rm-group-title:first-child { margin-top:0; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- Trainer ---- */
+    .tz-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tz-prompt { font-size:1.05rem; color:#fff; line-height:1.55; text-align:center; margin:0.3rem 0 0.2rem; }
+    .tz-from { text-align:center; color:rgba(230,230,235,0.55); font-size:0.83rem; margin-bottom:1rem; }
+    .tz-opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.45rem; }
+    .tz-opt { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+              padding:0.55rem 0.7rem; color:rgba(230,230,235,0.85); font-size:0.87rem; cursor:pointer;
+              font-family:inherit; text-align:left; transition:all .15s; }
+    .tz-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(255,255,255,0.08); }
+    .tz-opt:disabled { cursor:default; opacity:0.75; }
+    .tz-opt.ok { border-color:var(--color-green); background:rgba(63,185,80,0.14); color:#86efac; }
+    .tz-opt.no { border-color:#f85149; background:rgba(248,81,73,0.12); color:#ff9d97; }
+    .tz-fb { margin-top:0.85rem; font-size:0.92rem; line-height:1.55; min-height:1.4rem; color:rgba(230,230,235,0.8); }
+    .tz-fb b { color:#fff; }
+    .tz-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tz-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.55rem 1.15rem;
+              font-size:0.92rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tz-btn:hover { background:var(--color-accent-hover); }
+    .tz-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tz-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tz-stats b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .kb-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .kb-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    .kb-vs ul { margin:0.3rem 0 0; padding-left:1.05rem; }
+    .kb-vs li { margin-bottom:0.28rem; }
+    @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                    <a href="deutsch-egb.html">EGB Deutsch</a>
+                    <a href="iw-egb.html" class="active">EGB Informationswirtschaft</a>
+                    <a href="ec-egb.html">EGB E-Commerce</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB Informationswirtschaft</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zur Höheren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Informationswirtschaft</h1>
+            <p class="page-subtitle">Themen aus dem IW-Unterricht am Erich-Gutenberg-Berufskolleg &mdash; <b>каждый урок = отдельная карточка</b>.<br>Сейчас здесь 15 уроков (<b>KI-Grundlagen</b> и <b>Rechtsformen: Kraft&rsquo;s Brewery</b>) плюс словарь и тренировки Höhere Handelsschule &mdash; объяснения по-русски, термины по-немецки. Тема <b>E-Commerce</b> переехала на отдельную страницу <a href="ec-egb.html">EGB E-Commerce</a></p>
+        </div>
+
+        <div id="iw-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="iw-search" placeholder="Thema suchen&hellip; z.B. Haftung, GmbH, Prompt" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="iw-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Themen aus dem IW-Unterricht
+        </h2>
+        <p id="iw-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждый урок &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#58a6ff,#a5d8ff);">KI</span>
+            <h3 style="color:#a5d8ff;">K&uuml;nstliche Intelligenz &mdash; Workshop</h3>
+            <span class="iw-sec-note">5 Lektionen &middot; Grundlagen, Recht, &Uuml;bung</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#ki" class="subject-card glass-card" data-lesson="ki" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.35);">
+                <span class="subject-icon">&#x1F916;</span>
+                <h3>KI &mdash; Grundlagen</h3>
+                <p>Что такое KI, вложенные KI &rarr; ML &rarr; Deep Learning, три вида обучения, нейросеть, качество данных и Bias</p>
+            </a>
+            <a href="#ki2" class="subject-card glass-card" data-lesson="ki2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.35);">
+                <span class="subject-icon">&#x1F4AC;</span>
+                <h3>Sprachmodelle &amp; Prompting</h3>
+                <p>LLM и токены, почему возникает Halluzination, формула промпта Rolle + Kontext + Aufgabe + Format</p>
+            </a>
+            <a href="#ki3" class="subject-card glass-card" data-lesson="ki3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.35);">
+                <span class="subject-icon">&#x1F3E2;</span>
+                <h3>KI im Betrieb</h3>
+                <p>Где ИИ реально стоит в фирме по Handlungsfelder + Chancen und Risiken для устного ответа</p>
+            </a>
+            <a href="#ki4" class="subject-card glass-card" data-lesson="ki4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.35);">
+                <span class="subject-icon">&#x2696;&#xFE0F;</span>
+                <h3>KI, Recht &amp; Ethik</h3>
+                <p>DSGVO, EU AI Act и четыре ступени риска, Urheberrecht, Täuschungsversuch в школе</p>
+            </a>
+            <a href="#ki5" class="subject-card glass-card" data-lesson="ki5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(88,166,255,0.35);">
+                <span class="subject-icon">&#x1F3AE;</span>
+                <h3>KI &uuml;ben</h3>
+                <p>Redemittel для workshop, чеклист на «sehr gut», тренажёр Lernarten, 15 вопросов, словарь на 41 термин</p>
+            </a>
+        </div>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">RF</span>
+            <h3 style="color:#fbbf24;">Rechtsformen &mdash; Fall Kraft&rsquo;s Brewery</h3>
+            <span class="iw-sec-note">10 Lektionen &middot; e.K. bis AG + Handelsregister</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#rf1" class="subject-card glass-card" data-lesson="rf1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F37A;</span>
+                <h3>Der Fall: Kraft&rsquo;s Brewery</h3>
+                <p>Два Мюллера и 200.000 € ущерба, пять критериев Rechtsform, кейс Georg Kraft и его три цели</p>
+            </a>
+            <a href="#rf2" class="subject-card glass-card" data-lesson="rf2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F464;</span>
+                <h3>Einzelunternehmung (e.K.)</h3>
+                <p>Один владелец: без Mindestkapital, unbeschränkte und unmittelbare Haftung, решает всё сам</p>
+            </a>
+            <a href="#gbr" class="subject-card glass-card" data-lesson="gbr" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F91F;</span>
+                <h3>GbR</h3>
+                <p>Формально — самая простая форма для нескольких лиц: без договора, без Mindestkapital; но стоит начать Handelsgewerbe — и она сама становится OHG</p>
+            </a>
+            <a href="#rf3" class="subject-card glass-card" data-lesson="rf3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F91D;</span>
+                <h3>OHG</h3>
+                <p>Все Gesellschafter отвечают unbeschränkt, unmittelbar и gesamtschuldnerisch; каждый вправе подписывать</p>
+            </a>
+            <a href="#rf4" class="subject-card glass-card" data-lesson="rf4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x2696;&#xFE0F;</span>
+                <h3>KG</h3>
+                <p>Komplementär против Kommanditist: кто отвечает всем, кто только вкладом + GmbH &amp; Co. KG</p>
+            </a>
+            <a href="#rf5" class="subject-card glass-card" data-lesson="rf5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F6E1;&#xFE0F;</span>
+                <h3>GmbH</h3>
+                <p>Stammkapital 25.000 €, нотариус, juristische Person — отвечает только Gesellschaftsvermögen</p>
+            </a>
+            <a href="#rf6" class="subject-card glass-card" data-lesson="rf6" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F3DB;&#xFE0F;</span>
+                <h3>AG</h3>
+                <p>Grundkapital 50.000 €, акции и дивиденд, три органа: Vorstand, Aufsichtsrat, Hauptversammlung</p>
+            </a>
+            <a href="#rf7" class="subject-card glass-card" data-lesson="rf7" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4CA;</span>
+                <h3>Vergleich &amp; Empfehlung</h3>
+                <p>Таблица всех пяти форм, проверка трёх целей Georg и готовая обоснованная рекомендация</p>
+            </a>
+            <a href="#rf8" class="subject-card glass-card" data-lesson="rf8" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4D6;</span>
+                <h3>Handelsregister &amp; Firma</h3>
+                <p>Abteilung A и B, öffentlicher Glaube, Firma / Unternehmen / Betrieb, семь Firmengrundsätze</p>
+            </a>
+            <a href="#rf9" class="subject-card glass-card" data-lesson="rf9" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4DA;</span>
+                <h3>Wortschatz &amp; Trainer</h3>
+                <p>47 терминов с объяснением и примером + тренажёр «какая это Rechtsform?» и 17 вопросов на себя</p>
+            </a>
+        </div>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#3fb950,#86efac);">WS</span>
+            <h3 style="color:#86efac;">Fachwortschatz H&ouml;here Handelsschule</h3>
+            <span class="iw-sec-note">Wortschatz &amp; Theorie zum Bildungsgang</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="deutsch-handelsschule.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F4D6;</span>
+                <h3>Fachwortschatz &mdash; 375 W&ouml;rter</h3>
+                <p>Словарь направления в 11 блоках с объяснением по-русски и озвучкой + упражнения, Matching, карта предметов и лайфхаки по оценкам</p>
+            </a>
+            <a href="deutsch-bwr.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F9ED;</span>
+                <h3>BWR &mdash; sieben Handlungsfelder</h3>
+                <p>Теория предмета: семь направлений фирмы, Wertstr&ouml;me, Rechnungswesen, основы BWL, спрос и предложение + тренажёр</p>
+            </a>
+        </div>
+
+        </div><!-- /iw-hub -->
+
+        <div id="iw-lessons">
+
+        <!-- ==================== KI-GRUNDLAGEN ==================== -->
+        <div class="lesson" id="ls-ki">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil A: Was ist KI ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E0;</span>
+                    <div>
+                        <h2>Teil A · Was ist Künstliche Intelligenz?</h2>
+                        <p class="lesson-header-sub">Определение, отличие от обычной программы, три вложенных понятия KI → ML → Deep Learning</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Определение, которое надо уметь сказать вслух</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        <b class="kb-de">Künstliche Intelligenz (KI)</b> — это компьютерные системы, которые решают задачи,
+                        требующие у человека интеллекта: распознавать образы, понимать язык, делать прогнозы, принимать решения.
+                        Ключевое отличие от обычной программы: правила <b>не прописаны программистом вручную</b>, а
+                        <b style="color:#fbbf24;">выведены системой из данных</b>.
+                    </p>
+                    <div class="kb-say">
+                        <b>So sagst du es im Unterricht</b>
+                        „Künstliche Intelligenz bezeichnet Systeme, die Aufgaben lösen, für die beim Menschen Intelligenz nötig ist.
+                        Der entscheidende Unterschied zu einem normalen Programm ist: Die KI lernt ihre Regeln aus Daten,
+                        statt sie vom Programmierer vorgegeben zu bekommen.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Klassisches Programm vs. KI-System</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Klassisches Programm (regelbasiert)</h5>
+                            Человек пишет каждое правило сам: <i>„WENN Rechnungsbetrag &gt; 1.000 €, DANN Freigabe durch die Chefin.“</i>
+                            <ul>
+                                <li>Результат всегда одинаковый и объяснимый</li>
+                                <li>Ошибку можно найти в коде</li>
+                                <li>Ничему не учится само</li>
+                                <li>Пример: Lohnabrechnung, Kassensystem, Excel-Formel</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>KI-System (lernend)</h5>
+                            Человек даёт примеры, систему <b>тренируют</b>, шаблон она находит сама.
+                            <ul>
+                                <li>Результат — вероятность, а не гарантия</li>
+                                <li>Может ошибаться и часто «Blackbox» (не видно, почему так)</li>
+                                <li>Становится лучше с новыми данными</li>
+                                <li>Пример: Spamfilter, Bilderkennung, ChatGPT</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.7rem;">
+                        <b>Ловушка на уроке:</b> не всякая автоматизация — это KI. Автоматическая касса, макрос в Excel или
+                        сортировка по алфавиту — это <b class="kb-de">Automatisierung</b>, но не искусственный интеллект,
+                        потому что там нет обучения на данных.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CF; Schwache KI und starke KI</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Schwache KI (schwache/enge KI)</h5>
+                            Решает <b>одну конкретную</b> задачу: переводить, распознавать лица, рекомендовать товар.
+                            Это <b>всё</b>, что реально существует сегодня — включая ChatGPT.
+                        </div>
+                        <div>
+                            <h5>Starke KI (AGI)</h5>
+                            Гипотетическая система с универсальным пониманием и сознанием, которая переносит опыт
+                            с одной задачи на любую другую. Существует <b>только в теории и в кино</b>.
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Jede KI, die es heute gibt, ist eine schwache KI. Sie ist in ihrem Bereich sehr gut,
+                        aber sie versteht die Welt nicht.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; Drei Begriffe, die ineinander liegen</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Самый частый вопрос учителя: «Ist Deep Learning dasselbe wie KI?» Нет — это вложенные круги,
+                        от общего к частному.
+                    </p>
+                    <div class="ki-ring ki-r1">
+                        <span>Künstliche Intelligenz (KI)</span>
+                        <small>Обобщающее понятие. Сюда входят и старые regelbasierte Expertensysteme без всякого обучения.</small>
+                        <div class="ki-ring ki-r2">
+                            <span>Maschinelles Lernen (ML)</span>
+                            <small>Система выводит правила <b>из данных</b>, а не получает их готовыми.</small>
+                            <div class="ki-ring ki-r3">
+                                <span>Deep Learning</span>
+                                <small>ML на <b>künstliche neuronale Netze</b> со многими слоями. На этом построены ChatGPT,
+                                распознавание изображений и речи.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F551; Kurze Geschichte — на случай вопроса «seit wann gibt es das?»</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Jahr</th><th>Was passiert</th></tr>
+                        <tr><td><b>1950</b></td><td><b class="kb-de">Alan Turing</b> формулирует <b class="kb-de">Turing-Test</b>: сможет ли человек в переписке отличить машину от человека?</td></tr>
+                        <tr><td><b>1956</b></td><td>Конференция в Дартмуте — там впервые прозвучал термин «Künstliche Intelligenz».</td></tr>
+                        <tr><td><b>1966</b></td><td><b class="kb-de">ELIZA</b> — первый чат-бот, полностью на жёстких правилах.</td></tr>
+                        <tr><td><b>1970–80er</b></td><td><b class="kb-de">Expertensysteme</b> (regelbasiert), затем «KI-Winter»: надежды не оправдались, деньги ушли.</td></tr>
+                        <tr><td><b>1997</b></td><td>Deep Blue обыгрывает чемпиона мира по шахматам.</td></tr>
+                        <tr><td><b>2012</b></td><td>Прорыв <b class="kb-de">Deep Learning</b> в распознавании изображений — много данных + мощные видеокарты.</td></tr>
+                        <tr><td><b>2016</b></td><td>AlphaGo выигрывает в го — успех <b class="kb-de">bestärkendes Lernen</b>.</td></tr>
+                        <tr><td><b>2022</b></td><td><b class="kb-de">ChatGPT</b>: generative KI становится массовой и попадает в каждый офис.</td></tr>
+                        <tr><td><b>2024/25</b></td><td><b class="kb-de">EU AI Act</b> — первый в мире закон, регулирующий ИИ (см. Teil E).</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.92rem; line-height:1.6; margin-top:0.7rem;">
+                        <b>Warum gerade jetzt?</b> Три причины — их стоит назвать одним предложением:
+                        <b class="kb-de">1. riesige Datenmengen</b> (Big Data),
+                        <b class="kb-de">2. hohe Rechenleistung</b> (GPU, Cloud),
+                        <b class="kb-de">3. bessere Algorithmen</b> (Deep Learning).
+                    </p>
+                </div>
+            </section>
+
+            <!-- ===== Teil B: Wie lernt eine KI ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4C8;</span>
+                    <div>
+                        <h2>Teil B · Wie lernt eine KI?</h2>
+                        <p class="lesson-header-sub">Путь «данные → обучение → модель → применение», три вида обучения и почему всё зависит от качества данных</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F501; Der Ablauf — цепочка, которую спрашивают чаще всего</h3>
+                    <div class="se-flow">
+                        <div class="se-box"><b>Daten</b><span>Trainingsdaten: примеры, из которых учат</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Training</b><span>модель подбирает веса и уменьшает ошибку</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Modell</b><span>выученные закономерности</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Anwendung</b><span>новые данные → Vorhersage</span></div>
+                    </div>
+                    <p style="font-size:0.92rem; line-height:1.6;">
+                        Немецкие термины по шагам: <b class="kb-de">die Trainingsdaten</b> · <b class="kb-de">das Training</b> ·
+                        <b class="kb-de">das Modell</b> · <b class="kb-de">die Vorhersage / die Prognose</b>.
+                        Отдельно: часть данных всегда откладывают как <b class="kb-de">Testdaten</b> —
+                        на них проверяют, работает ли модель на том, чего она не видела.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F393; Die drei Lernarten</h3>
+
+                    <div class="sk-card s1">
+                        <div class="sk-tag">Lernart 1</div>
+                        <h4>Überwachtes Lernen (supervised learning)</h4>
+                        <p>Данные <b>с правильными ответами</b> — с метками (<b class="kb-de">Label</b>). Модель учится
+                        воспроизводить эти ответы на новых случаях.</p>
+                        <p><b>Beispiel:</b> 10.000 e-mail помечены «Spam / kein Spam» → фильтр учится классифицировать новое письмо.</p>
+                        <p>Две подзадачи: <b class="kb-de">Klassifikation</b> (какая категория: спам / не спам, i.O. / n.i.O.)
+                        и <b class="kb-de">Regression</b> (какое число: цена, объём продаж в декабре).</p>
+                    </div>
+
+                    <div class="sk-card s2">
+                        <div class="sk-tag">Lernart 2</div>
+                        <h4>Unüberwachtes Lernen (unsupervised learning)</h4>
+                        <p>Данные <b>без меток</b>. Система сама ищет структуру и группы, которые никто заранее не задавал.</p>
+                        <p><b>Beispiel:</b> интернет-магазин делит клиентов на сегменты по поведению
+                        (<b class="kb-de">Kundensegmentierung</b>, <b class="kb-de">Clustering</b>);
+                        <b class="kb-de">Warenkorbanalyse</b> находит, что покупатели принтера часто берут и бумагу.</p>
+                        <p>Сюда же относится <b class="kb-de">Anomalieerkennung</b> — «эта транзакция не похожа на все остальные».</p>
+                    </div>
+
+                    <div class="sk-card s3">
+                        <div class="sk-tag">Lernart 3</div>
+                        <h4>Bestärkendes Lernen (Reinforcement Learning)</h4>
+                        <p>Нет ни меток, ни готовых групп: агент <b>пробует действия</b> в среде и получает
+                        <b class="kb-de">Belohnung</b> или <b class="kb-de">Bestrafung</b>. Стратегия улучшается методом проб.</p>
+                        <p><b>Beispiel:</b> складской робот, оптимизация маршрута, AlphaGo (миллионы партий против самого себя).</p>
+                    </div>
+
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7);">
+                        <b>Как отличить за секунду:</b> есть готовые правильные ответы → <b>überwacht</b>;
+                        ответов нет, ищем группы → <b>unüberwacht</b>; есть награда за поведение → <b>bestärkend</b>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F578;&#xFE0F; Künstliches neuronales Netz — что сказать, если спросят «wie funktioniert das?»</h3>
+                    <div class="se-flow">
+                        <div class="se-box"><b>Eingabeschicht</b><span>входные данные: пиксели, числа, слова</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Verborgene Schichten</b><span>нейроны находят признаки: края → формы → объекты</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Ausgabeschicht</b><span>результат с вероятностью: «94 % — это eine 7»</span></div>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.62;">
+                        Один <b class="kb-de">Neuron</b> — это маленькая функция: она получает числа, умножает каждое на свой
+                        <b class="kb-de">Gewicht</b>, складывает и решает, передавать сигнал дальше или нет.
+                        <b>Обучение = подгонка этих весов</b> так, чтобы ошибка на обучающих примерах становилась меньше.
+                        Именно поэтому нельзя «заглянуть внутрь» и прочитать правило словами — отсюда слово
+                        <b class="kb-de">Blackbox</b> и требование <b class="kb-de">Nachvollziehbarkeit</b> (объяснимость) в законе.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x26A0;&#xFE0F; Datenqualität: «Garbage in, garbage out»</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Модель <b>не может быть лучше своих данных</b>. Это самый благодарный пункт для устного ответа,
+                        потому что он объясняет почти все проблемы ИИ:
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:520px;">
+                        <tr><th>Проблема</th><th>Что это значит</th></tr>
+                        <tr><td><b class="kb-de">Verzerrung / Bias</b></td><td>Данные отражают перекос прошлого — модель его повторяет и усиливает. Известный случай: инструмент отбора резюме учился на анкетах, где почти все принятые были мужчины, и стал занижать оценки женщинам.</td></tr>
+                        <tr><td><b class="kb-de">Überanpassung (Overfitting)</b></td><td>Модель выучила обучающие примеры наизусть и проваливается на новых. Лечится разделением на Trainings- и Testdaten.</td></tr>
+                        <tr><td><b class="kb-de">Repräsentativität</b></td><td>Данные должны отражать реальность применения: система, обученная на фото при дневном свете, ночью не работает.</td></tr>
+                        <tr><td><b class="kb-de">Datenmenge</b></td><td>Слишком мало примеров — модель не находит закономерность, а ловит случайности.</td></tr>
+                        <tr><td><b class="kb-de">Aktualität</b></td><td>Мир меняется, данные стареют: модель цен 2019 года не знает инфляции 2023-го.</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-say">
+                        <b>Ein Satz, der immer passt</b>
+                        „Eine KI ist nur so gut wie ihre Trainingsdaten. Sind die Daten verzerrt, übernimmt und verstärkt
+                        die KI diese Verzerrung — deshalb braucht es menschliche Kontrolle.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-ki2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil C: Sprachmodelle & Prompting ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>Teil C · Sprachmodelle (LLM) und Prompting</h2>
+                        <p class="lesson-header-sub">Почему ChatGPT «выдумывает» — и как формулировать задание так, чтобы результат был пригодным</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Wie ein Sprachmodell wirklich arbeitet</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        <b class="kb-de">Ein großes Sprachmodell (LLM, Large Language Model)</b> обучено на огромных объёмах
+                        текста и делает по сути одну вещь: <b>предсказывает наиболее вероятное продолжение</b>.
+                        Текст режется на <b class="kb-de">Token</b> (слово или кусок слова), и модель шаг за шагом выбирает
+                        следующий токен.
+                    </p>
+                    <div class="kb-msg">
+                        <b>Beispiel</b>
+                        «Die Rechnung wird per E-Mail …» → модель считает, что дальше вероятнее всего «versendet»,
+                        и выдаёт это слово. Никакой базы фактов при этом не открывается.
+                    </div>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        Отсюда главное следствие: модель <b>не «знает» фактов</b>, она порождает правдоподобный текст.
+                        Если факта в данных не было, она всё равно уверенно что-то напишет — это и есть
+                        <b style="color:#fbbf24;">Halluzination</b> (галлюцинация): выдуманные цифры, законы, цитаты и источники,
+                        поданные абсолютно убедительным тоном.
+                    </p>
+                    <p style="font-size:0.93rem; line-height:1.6;">
+                        Второе следствие — <b class="kb-de">das Kontextfenster</b>: модель «помнит» только ограниченный кусок
+                        диалога. Что вышло за его пределы, для неё больше не существует.
+                    </p>
+                    <div class="kb-say">
+                        <b>So formulierst du es</b>
+                        „Ein Sprachmodell versteht den Inhalt nicht, es berechnet das wahrscheinlichste nächste Wort.
+                        Deshalb kann es überzeugend klingen und trotzdem falsch sein — man nennt das Halluzination.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2699;&#xFE0F; Die Prompt-Formel: Rolle + Kontext + Aufgabe + Format</h3>
+                    <p style="font-size:0.93rem; line-height:1.6;">
+                        <b class="kb-de">Der Prompt</b> — это задание, которое ты даёшь модели. Плохой промпт даёт общий,
+                        бесполезный текст; хороший — готовый к применению результат. Четыре обязательных элемента:
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:520px;">
+                        <tr><th>Baustein</th><th>Вопрос, на который он отвечает</th></tr>
+                        <tr><td><b class="kb-de">Rolle</b></td><td>Кем должна быть модель? «Du bist Sachbearbeiter im Einkauf.»</td></tr>
+                        <tr><td><b class="kb-de">Kontext</b></td><td>Что важно знать о ситуации? Фирма, клиент, срок, тон.</td></tr>
+                        <tr><td><b class="kb-de">Aufgabe</b></td><td>Что именно сделать? Один чёткий глагол: schreiben, zusammenfassen, vergleichen.</td></tr>
+                        <tr><td><b class="kb-de">Format</b></td><td>В каком виде? Длина, язык, таблица/список, стиль (formell / du).</td></tr>
+                        <tr><td><b class="kb-de">Beispiel</b> <span style="opacity:.6">(по желанию)</span></td><td>Образец, на который надо ориентироваться — сильнее любых описаний.</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-vs" style="margin-top:0.9rem;">
+                        <div>
+                            <h5>&#x274C; Schwacher Prompt</h5>
+                            <i>„Schreib was über KI.“</i>
+                            <ul>
+                                <li>нет роли, адресата и объёма</li>
+                                <li>результат общий и плоский</li>
+                                <li>переписывать придётся всё</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x2705; Guter Prompt</h5>
+                            <i>„Du bist Auszubildende(r) im Büromanagement. Schreibe für unseren Newsletter einen sachlichen
+                            Absatz von 120 Wörtern darüber, wie KI im Kundendienst eingesetzt wird. Nenne zwei Vorteile
+                            und ein Risiko. Sprache: formelles Deutsch, Sie-Form.“</i>
+                            <ul>
+                                <li>роль, контекст, задача, формат — всё на месте</li>
+                                <li>результат можно использовать почти без правок</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p style="font-size:0.92rem; line-height:1.6; margin-top:0.8rem;">
+                        <b>Дальше — итерация:</b> первый ответ почти никогда не финальный. Нормальный рабочий приём —
+                        уточнять: <i>„Kürzer, maximal 80 Wörter.“</i> · <i>„Formeller.“</i> ·
+                        <i>„Nenne die Quelle für diese Zahl.“</i> · <i>„Gib mir drei Varianten zur Auswahl.“</i>
+                    </p>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F6D1;</span>
+                    <div>
+                        <p><b>Was KI (noch) nicht kann — это спрашивают почти всегда:</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li><b>Verantwortung übernehmen.</b> За ошибку отвечает человек или фирма, а не программа.</li>
+                            <li><b>Fakten garantieren.</b> Цифры, законы, цитаты нужно проверять по источнику.</li>
+                            <li><b>Wirklich verstehen.</b> Нет опыта, тела, намерения — только статистика языка.</li>
+                            <li><b>Vertrauliche Daten schützen.</b> Всё, что ты ввёл в публичный сервис, ты отдал наружу.</li>
+                            <li><b>Kreativ im engen Sinn sein.</b> Модель комбинирует то, что уже было в данных.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-ki3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil D: KI im Betrieb ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3E2;</span>
+                    <div>
+                        <h2>Teil D · KI im Betrieb — der Teil für Informationswirtschaft</h2>
+                        <p class="lesson-header-sub">Где ИИ реально стоит в фирме, что это даёт и чем рискует — по знакомым Handlungsfelder</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4BC; Anwendungen — по направлениям предприятия</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:600px;">
+                        <tr><th>Bereich</th><th>Anwendung</th><th>Konkretes Beispiel</th></tr>
+                        <tr><td><b class="kb-de">Absatz / Marketing</b></td><td>Empfehlungssystem, персонализация</td><td>«Das könnte Ihnen auch gefallen» в онлайн-магазине</td></tr>
+                        <tr><td><b class="kb-de">Preispolitik</b></td><td>dynamische Preisgestaltung</td><td>цена авиабилета и отеля меняется по спросу</td></tr>
+                        <tr><td><b class="kb-de">Kundendienst</b></td><td>Chatbot, автоматическая маршрутизация обращений</td><td>бот отвечает на «Wo ist meine Bestellung?» круглосуточно</td></tr>
+                        <tr><td><b class="kb-de">Beschaffung / Lager</b></td><td>Absatzprognose, предложение по заказу</td><td>система считает, сколько товара заказать к декабрю</td></tr>
+                        <tr><td><b class="kb-de">Leistungserstellung</b></td><td>Predictive Maintenance, Bilderkennung в контроле качества</td><td>станок сигналит о поломке до того, как встал</td></tr>
+                        <tr><td><b class="kb-de">Rechnungswesen</b></td><td>распознавание Belege (OCR), Betrugserkennung</td><td>счёт с фото автоматически попадает в проводку</td></tr>
+                        <tr><td><b class="kb-de">Personal</b></td><td>предварительный отбор кандидатов, планирование смен</td><td>внимание: по AI Act это <b>hohes Risiko</b></td></tr>
+                        <tr><td><b class="kb-de">Logistik</b></td><td>Routenoptimierung</td><td>маршрут доставки на 30 адресов за секунды</td></tr>
+                        <tr><td><b class="kb-de">IT-Sicherheit</b></td><td>Anomalieerkennung, Spam- und Malwarefilter</td><td>необычный вход в систему в 3 часа ночи</td></tr>
+                        <tr><td><b class="kb-de">Büro / Kommunikation</b></td><td>перевод, черновики текстов, протоколы</td><td>описание товара для шопа, конспект совещания</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        Направления слева — те же <a href="deutsch-bwr.html">Handlungsfelder</a>, что и в BWR.
+                        Если на уроке спросят пример, всегда выигрышно связать: <i>«Im Handlungsfeld Absatz nutzt man KI für …»</i>
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Chancen und Risiken — готовая структура для ответа</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x2705; Chancen</h5>
+                            <ul>
+                                <li><b>Zeitersparnis</b> — рутина уходит машине</li>
+                                <li><b>Kostensenkung</b> при больших объёмах</li>
+                                <li><b>Verfügbarkeit</b> 24/7, без выходных</li>
+                                <li><b>bessere Prognosen</b> — меньше залежавшегося товара</li>
+                                <li><b>Personalisierung</b> → выше Umsatz</li>
+                                <li><b>gleichbleibende Qualität</b>, без усталости</li>
+                                <li>сотрудники освобождаются для сложных задач</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x26A0;&#xFE0F; Risiken</h5>
+                            <ul>
+                                <li><b>Datenschutz</b> — персональные данные наружу</li>
+                                <li><b>Bias</b> и дискриминация решений</li>
+                                <li><b>Blackbox</b> — решение не объяснить клиенту</li>
+                                <li><b>Fehlentscheidungen</b> при слепом доверии</li>
+                                <li><b>Abhängigkeit</b> от одного поставщика</li>
+                                <li>исчезновение <b>Routinearbeitsplätze</b></li>
+                                <li>высокие <b>Einführungskosten</b> и нехватка know-how</li>
+                                <li><b>Urheberrecht</b> у сгенерированных текстов и картинок</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Fazit-Satz für die Diskussion</b>
+                        „KI ersetzt selten einen ganzen Beruf, sondern einzelne Tätigkeiten — vor allem Routineaufgaben.
+                        Neu entstehen dafür Aufgaben in Kontrolle, Datenpflege und im Umgang mit KI selbst.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-ki4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil E: Recht, Datenschutz, Ethik ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2696;&#xFE0F;</span>
+                    <div>
+                        <h2>Teil E · Recht, Datenschutz und Ethik</h2>
+                        <p class="lesson-header-sub">DSGVO, четыре ступени риска в EU AI Act, авторское право и правила в школе</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F510; Datenschutz (DSGVO)</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        <b class="kb-de">Personenbezogene Daten</b> — любые данные, по которым можно узнать конкретного человека:
+                        имя, адрес, e-mail, номер клиента, фото, IP. Как только такие данные попадают в систему ИИ,
+                        включается <b class="kb-de">DSGVO (Datenschutz-Grundverordnung)</b>.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:520px;">
+                        <tr><th>Grundsatz</th><th>Что это значит на практике</th></tr>
+                        <tr><td><b class="kb-de">Rechtmäßigkeit</b></td><td>нужно основание: согласие, договор или закон</td></tr>
+                        <tr><td><b class="kb-de">Zweckbindung</b></td><td>данные собраны для доставки — нельзя тихо использовать их для рекламы</td></tr>
+                        <tr><td><b class="kb-de">Datenminimierung</b></td><td>только то, что реально нужно для задачи</td></tr>
+                        <tr><td><b class="kb-de">Transparenz</b></td><td>человек должен знать, что и зачем о нём обрабатывают</td></tr>
+                        <tr><td><b class="kb-de">Speicherbegrenzung</b></td><td>хранить не дольше, чем нужно</td></tr>
+                        <tr><td><b class="kb-de">Betroffenenrechte</b></td><td>Auskunft, Berichtigung, Löschung, Widerspruch</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-say">
+                        <b>Praxisregel für Schule und Betrieb</b>
+                        „Keine personenbezogenen oder vertraulichen Daten in ein öffentliches KI-Tool eingeben —
+                        also keine Kundennamen, keine Adressen, keine internen Zahlen.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F1EA;&#x1F1FA; EU AI Act — четыре ступени риска</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Логика закона: чем больше система может навредить человеку, тем строже требования.
+                    </p>
+                    <div class="ki-risk r-verboten">
+                        <b>1. Unannehmbares Risiko — verboten</b>
+                        <span>Social Scoring государством, манипулятивные системы, эксплуатация уязвимости людей,
+                        массовое биометрическое наблюдение в общественных местах.</span>
+                    </div>
+                    <div class="ki-risk r-hoch">
+                        <b>2. Hohes Risiko — strenge Auflagen</b>
+                        <span>Отбор кандидатов на работу, выдача кредита, медицина, критическая инфраструктура, экзамены.
+                        Требуются документация, качество данных, <b>menschliche Aufsicht</b> и объяснимость решения.</span>
+                    </div>
+                    <div class="ki-risk r-begrenzt">
+                        <b>3. Begrenztes Risiko — Transparenzpflicht</b>
+                        <span>Чат-боты и генерируемый контент: человек должен знать, что общается с ИИ,
+                        а Deepfake должен быть помечен.</span>
+                    </div>
+                    <div class="ki-risk r-minimal">
+                        <b>4. Minimales Risiko — frei</b>
+                        <span>Спам-фильтр, рекомендации фильмов, соперник в компьютерной игре. Особых требований нет.</span>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Urheberrecht, Verantwortung, Schulregeln</h3>
+                    <p style="font-size:0.93rem; line-height:1.62;">
+                        <b class="kb-de">Urheberrecht:</b> модели обучены в том числе на защищённых текстах и изображениях —
+                        поэтому спорны и обучение, и результат. Практическое правило: чужой текст нельзя выдавать за свой,
+                        а картинку из генератора нельзя автоматически считать «своей» для рекламы.
+                    </p>
+                    <p style="font-size:0.93rem; line-height:1.62;">
+                        <b class="kb-de">Verantwortung:</b> ответственность всегда остаётся на человеке и фирме.
+                        Формула для ответа: <i>„Die KI schlägt vor, der Mensch entscheidet.“</i>
+                    </p>
+                    <p style="font-size:0.93rem; line-height:1.62;">
+                        <b class="kb-de">Mitbestimmung:</b> если ИИ может контролировать работу сотрудников
+                        (учёт времени, оценка производительности), в дело вступает <b class="kb-de">Betriebsrat</b> —
+                        это связь с Handlungsfeld Personal.
+                    </p>
+                    <p style="font-size:0.93rem; line-height:1.62;">
+                        <b class="kb-de">In der Schule:</b> ИИ — это <b>Hilfsmittel</b>, а не автор.
+                        Использование указывают (<i>Quellenangabe / Hinweis auf KI-Nutzung</i>), а сданная как своя
+                        полностью сгенерированная работа — это <b class="kb-de">Täuschungsversuch</b>.
+                        Безопасный путь: просить у ИИ структуру, вопросы, проверку — а формулировать самому.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-ki5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <!-- ===== Teil F: Workshop ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E3;&#xFE0F;</span>
+                    <div>
+                        <h2>Teil F · Im Workshop reden</h2>
+                        <p class="lesson-header-sub">Готовые фразы для выступления и дискуссии + чеклист на оценку «sehr gut»</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4AC; Redemittel</h3>
+
+                    <div class="rm-group-title">Einen Begriff erklären</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Unter KI versteht man …“</div><div class="rm-ru">Под ИИ понимают …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Vereinfacht gesagt bedeutet das, dass …“</div><div class="rm-ru">Упрощённо это значит, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Der entscheidende Unterschied ist, dass …“</div><div class="rm-ru">Решающее отличие в том, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das lässt sich an einem Beispiel zeigen: …“</div><div class="rm-ru">Это можно показать на примере: …</div></div>
+                    </div>
+
+                    <div class="rm-group-title">Vor- und Nachteile abwägen</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Ein klarer Vorteil ist …, allerdings besteht die Gefahr, dass …“</div><div class="rm-ru">Явный плюс — …, однако есть риск, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Einerseits … andererseits …“</div><div class="rm-ru">С одной стороны … с другой стороны …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das hängt stark davon ab, wofür man die KI einsetzt.“</div><div class="rm-ru">Это сильно зависит от того, для чего ИИ применяют.</div></div>
+                        <div class="rm-item"><div class="rm-de">„Insgesamt überwiegen für mich die Chancen, weil …“</div><div class="rm-ru">В целом для меня плюсы перевешивают, потому что …</div></div>
+                    </div>
+
+                    <div class="rm-group-title">Im Workshop präsentieren</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„In unserer Gruppe haben wir uns mit … beschäftigt.“</div><div class="rm-ru">В нашей группе мы занимались …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich gliedere meinen Beitrag in drei Punkte.“</div><div class="rm-ru">Я разделю своё выступление на три пункта.</div></div>
+                        <div class="rm-item"><div class="rm-de">„Damit komme ich zum nächsten Punkt: …“</div><div class="rm-ru">Тем самым перехожу к следующему пункту: …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Zusammenfassend lässt sich sagen, dass …“</div><div class="rm-ru">Подводя итог, можно сказать, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Gibt es dazu noch Fragen?“</div><div class="rm-ru">Есть ли ещё вопросы по этому?</div></div>
+                    </div>
+
+                    <div class="rm-group-title">Zustimmen, widersprechen, nachfragen</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Da stimme ich zu, ich würde aber ergänzen, dass …“</div><div class="rm-ru">Согласен, но добавил бы, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Das sehe ich anders, denn …“</div><div class="rm-ru">Я вижу это иначе, потому что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Könntest du das an einem Beispiel erklären?“</div><div class="rm-ru">Можешь объяснить это на примере?</div></div>
+                        <div class="rm-item"><div class="rm-de">„Habe ich das richtig verstanden, dass …?“</div><div class="rm-ru">Я правильно понял, что …?</div></div>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F3AF;</span>
+                    <div>
+                        <p><b>Как получить «sehr gut» в этом workshop:</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li>Назови <b>термин по-немецки</b>: <i>maschinelles Lernen, Trainingsdaten, Halluzination, Bias, DSGVO</i>. Одно точное слово стоит трёх общих фраз.</li>
+                            <li>Каждое утверждение — с <b>примером из фирмы</b>: Chatbot, Empfehlungssystem, Absatzprognose.</li>
+                            <li>Всегда добавляй <b>вторую сторону</b>: назвал плюс — назови и риск. Учитель ждёт именно abwägen.</li>
+                            <li>Свяжи с <b>BWR</b>: «Das gehört zum Handlungsfeld Absatz/Personal» — это показывает, что ты видишь предмет целиком.</li>
+                            <li>В конце — <b>своя позиция с обоснованием</b>: «Meiner Meinung nach …, weil …».</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== Teil G: Trainer, Selbsttest, Wortschatz ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AE;</span>
+                    <div>
+                        <h2>Teil G · Тренажёр, самопроверка, словарь</h2>
+                        <p class="lesson-header-sub">Определи вид обучения — и проверь, держатся ли термины в голове</p>
+                    </div>
+                </div>
+
+                <div class="tz-box">
+                    <div class="tz-from" id="tzFrom"></div>
+                    <div class="tz-prompt" id="tzPrompt"></div>
+                    <div class="tz-opts" id="tzOpts"></div>
+                    <div class="tz-fb" id="tzFb"></div>
+                    <div class="tz-actions">
+                        <button class="tz-btn" id="tzNext">Далее &rarr;</button>
+                        <button class="tz-btn ghost" id="tzReset">&#x21A9;&#xFE0F; Сначала</button>
+                    </div>
+                    <div class="tz-stats">
+                        <span>Пройдено: <b id="tzDone">0</b> / <b id="tzTotal">0</b></span>
+                        <span>Правильно с первого раза: <b id="tzOk">0</b></span>
+                    </div>
+                </div>
+
+                <div class="note-card" style="margin-top:1.2rem;">
+                    <h3>&#x1F9E0; Проверь себя</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Сначала ответь вслух сам(а) — потом жми и сверяй.</p>
+                    <div id="stListKI"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Mini-Wortschatz</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:480px;">
+                        <tr><th>Deutsch</th><th>Русский</th></tr>
+                        <tr><td class="kb-de">die künstliche Intelligenz (KI)</td><td>искусственный интеллект</td></tr>
+                        <tr><td class="kb-de">das maschinelle Lernen</td><td>машинное обучение</td></tr>
+                        <tr><td class="kb-de">das tiefe Lernen / Deep Learning</td><td>глубокое обучение</td></tr>
+                        <tr><td class="kb-de">das künstliche neuronale Netz</td><td>искусственная нейронная сеть</td></tr>
+                        <tr><td class="kb-de">die Schicht (Eingabe-/Ausgabeschicht)</td><td>слой (входной / выходной)</td></tr>
+                        <tr><td class="kb-de">das Gewicht</td><td>вес (параметр нейросети)</td></tr>
+                        <tr><td class="kb-de">der Algorithmus</td><td>алгоритм</td></tr>
+                        <tr><td class="kb-de">regelbasiert</td><td>основанный на жёстких правилах</td></tr>
+                        <tr><td class="kb-de">die Trainingsdaten / die Testdaten</td><td>обучающие / тестовые данные</td></tr>
+                        <tr><td class="kb-de">das Label / die Kennzeichnung</td><td>метка (правильный ответ в данных)</td></tr>
+                        <tr><td class="kb-de">überwachtes Lernen</td><td>обучение с учителем</td></tr>
+                        <tr><td class="kb-de">unüberwachtes Lernen</td><td>обучение без учителя</td></tr>
+                        <tr><td class="kb-de">bestärkendes Lernen</td><td>обучение с подкреплением</td></tr>
+                        <tr><td class="kb-de">die Belohnung / die Bestrafung</td><td>вознаграждение / штраф</td></tr>
+                        <tr><td class="kb-de">die Klassifikation / die Regression</td><td>классификация / регрессия (число)</td></tr>
+                        <tr><td class="kb-de">das Clustering / die Gruppierung</td><td>кластеризация, группировка</td></tr>
+                        <tr><td class="kb-de">die Anomalieerkennung</td><td>обнаружение аномалий</td></tr>
+                        <tr><td class="kb-de">die Mustererkennung</td><td>распознавание закономерностей</td></tr>
+                        <tr><td class="kb-de">die Vorhersage / die Prognose</td><td>предсказание / прогноз</td></tr>
+                        <tr><td class="kb-de">die Überanpassung (Overfitting)</td><td>переобучение</td></tr>
+                        <tr><td class="kb-de">die Verzerrung / der Bias</td><td>искажение, предвзятость данных</td></tr>
+                        <tr><td class="kb-de">das große Sprachmodell (LLM)</td><td>большая языковая модель</td></tr>
+                        <tr><td class="kb-de">generative KI</td><td>генеративный ИИ</td></tr>
+                        <tr><td class="kb-de">der Token</td><td>токен (кусок слова)</td></tr>
+                        <tr><td class="kb-de">das Kontextfenster</td><td>окно контекста (сколько модель «помнит»)</td></tr>
+                        <tr><td class="kb-de">die Halluzination</td><td>галлюцинация (уверенно выдуманный ответ)</td></tr>
+                        <tr><td class="kb-de">die Eingabeaufforderung / der Prompt</td><td>запрос, задание для модели</td></tr>
+                        <tr><td class="kb-de">die Blackbox</td><td>«чёрный ящик» — непрозрачное решение</td></tr>
+                        <tr><td class="kb-de">die Nachvollziehbarkeit</td><td>прослеживаемость, объяснимость</td></tr>
+                        <tr><td class="kb-de">die menschliche Aufsicht</td><td>человеческий контроль над системой</td></tr>
+                        <tr><td class="kb-de">personenbezogene Daten</td><td>персональные данные</td></tr>
+                        <tr><td class="kb-de">die Datenschutz-Grundverordnung (DSGVO)</td><td>общий регламент о защите данных</td></tr>
+                        <tr><td class="kb-de">die Zweckbindung / die Datenminimierung</td><td>привязка к цели / минимизация данных</td></tr>
+                        <tr><td class="kb-de">die Einwilligung</td><td>согласие (на обработку данных)</td></tr>
+                        <tr><td class="kb-de">das Urheberrecht</td><td>авторское право</td></tr>
+                        <tr><td class="kb-de">der Täuschungsversuch</td><td>попытка обмана (сдать чужое как своё)</td></tr>
+                        <tr><td class="kb-de">der Deepfake</td><td>дипфейк (поддельные видео/аудио)</td></tr>
+                        <tr><td class="kb-de">das Empfehlungssystem</td><td>рекомендательная система</td></tr>
+                        <tr><td class="kb-de">die vorausschauende Wartung</td><td>предиктивное обслуживание оборудования</td></tr>
+                        <tr><td class="kb-de">die Automatisierung</td><td>автоматизация</td></tr>
+                        <tr><td class="kb-de">die Rationalisierung</td><td>сокращение затрат за счёт оптимизации</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Эта страница будет расти: каждая новая тема с урока Informationswirtschaft получит здесь
+                        свою вкладку — так же, как это устроено на страницах
+                        <a href="deutsch-egb.html">EGB Deutsch</a> и <a href="deutsch-bwr.html">BWR</a>.
+                        Словарь по школе и карта предметов — на странице
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 1: DER FALL ==================== -->
+        <div class="lesson" id="ls-rf1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F37A;</span>
+                    <div>
+                        <h2>Rechtsformwahl: der Fall Kraft&rsquo;s Brewery</h2>
+                        <p class="lesson-header-sub">С чего начинается тема: три буквы в названии фирмы, которые решают, потеряешь ты дом или нет</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F6B2; Два Мюллера — одна улица, разный конец</h3>
+                    <p style="font-size:0.97rem; line-height:1.65;">
+                        Две велосипедные мастерские на одной улице. Обе принадлежат человеку по фамилии Müller.
+                        У обоих клиент падает из-за плохо смонтированного тормоза, ущерб — <b>200.000 евро</b>.
+                    </p>
+                    <p style="font-size:0.97rem; line-height:1.65;">
+                        Через год один Мюллер потерял дом и снимает квартиру. Второй спокойно чинит велосипеды дальше.
+                        Единственная разница между ними — <b style="color:#fbbf24;">три буквы в названии</b>:
+                        <b class="kb-de">Müller e.K.</b> и <b class="kb-de">Müller GmbH</b>.
+                    </p>
+                    <div class="kb-say">
+                        <b>Вот в чём разница</b>
+                        <b class="kb-de">e.K.</b> — Einzelunternehmung: владелец haftet <b>unbeschränkt</b>, то есть и личным имуществом.
+                        <b class="kb-de">GmbH</b> — Kapitalgesellschaft: haftet только <b>Gesellschaftsvermögen</b>, личный дом не трогают.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F511; Пять вопросов, на которые отвечает любая Rechtsform</h3>
+                    <p style="font-size:0.93rem; color:rgba(230,230,235,0.72);">
+                        Это скелет всей темы. По этим пяти критериям сравнивают все пять правовых форм — и именно
+                        так формулируют вопросы в контрольной.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:520px;">
+                        <tr><th>Kriterium</th><th>Вопрос простыми словами</th></tr>
+                        <tr><td><b class="kb-de">Gründung</b></td><td>Сколько бумажной работы и денег нужно, чтобы вообще начать?</td></tr>
+                        <tr><td><b class="kb-de">Haftung</b></td><td>Кто платит по долгам — только фирма или ещё и человек лично?</td></tr>
+                        <tr><td><b class="kb-de">Vertretung</b></td><td>Кто имеет право подписывать договоры от имени фирмы (наружу)?</td></tr>
+                        <tr><td><b class="kb-de">Geschäftsführung</b></td><td>Кто принимает решения внутри фирмы?</td></tr>
+                        <tr><td><b class="kb-de">Gewinn- und Verlustverteilung</b></td><td>Кто получает прибыль и кто несёт убыток?</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        <b>Запомни пару Innen/Außen:</b> <b class="kb-de">Geschäftsführung = Innenverhältnis</b> (что варим, кого нанимаем),
+                        <b class="kb-de">Vertretung = Außenverhältnis</b> (подпись под договором с клиентом, поставщиком, банком).
+                        Второе имя первого критерия — <b class="kb-de">Entscheidungen</b>: «кто в фирме решает» и
+                        «кто ведёт Geschäftsführung» — один и тот же вопрос.
+                    </p>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F4DD;</span>
+                    <div>
+                        <p><b>Kann-Liste für die Klausur — что должно быть готово к концу темы:</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li>Пять правовых форм: <b class="kb-de">e.K., GbR, OHG, KG, AG</b> — плюс <b class="kb-de">GmbH</b>,
+                            которая и есть решение самого кейса Georg Kraft.</li>
+                            <li>Пять критериев сравнения (см. таблицу выше) — по ним строится <b>каждый</b> вопрос в контрольной.</li>
+                            <li><b class="kb-de">Handelsregister</b> и <b class="kb-de">Firma</b> отдельно.</li>
+                            <li>Итоговое задание: проанализировать ситуацию Georg → сравнить формы →
+                            <b>eine begründete Empfehlung abgeben</b> — дать обоснованную рекомендацию.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CA; Сколько каких фирм в Германии</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Всего около <b>3,5 млн</b> предприятий. Самая частая форма — вовсе не GmbH, а
+                        <b class="kb-de">das Einzelunternehmen</b>: примерно <b>2,05 млн</b>, то есть около <b>59 %</b>.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:420px;">
+                        <tr><th>Gruppe</th><th>ca. Anteil</th></tr>
+                        <tr><td><b class="kb-de">Einzelunternehmen</b></td><td>&#x2248; 59&ndash;60 %</td></tr>
+                        <tr><td><b class="kb-de">Kapitalgesellschaften</b> (GmbH, AG, UG&nbsp;&hellip;)</td><td>&#x2248; 25 %</td></tr>
+                        <tr><td><b class="kb-de">Personengesellschaften</b> (GbR, OHG, KG)</td><td>&#x2248; 12 %</td></tr>
+                        <tr><td><b class="kb-de">Vereine</b> u.&nbsp;a.</td><td>&lt; 10 %</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.6;">
+                        Почему тогда вокруг одни GmbH? Потому что маленькие фирмы не печатают упаковку и не возят товар
+                        по всей стране. Видно в первую очередь того, кто крупный, — а крупным становится тот,
+                        кому нужен чужой капитал.
+                    </p>
+                </div>
+            </section>
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3ED;</span>
+                    <div>
+                        <h2>Der Fall: Kraft&rsquo;s Brewery</h2>
+                        <p class="lesson-header-sub">Каждая цифра из этого текста нужна дальше — выучи их</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F37A; Ausgangssituation</h3>
+                    <div class="kb-msg">
+                        <b>Der Fall</b>
+                        Georg Kraft (35) владеет маленькой пивоварней <b>Kraft&rsquo;s Brewery</b> в Тюбингене и ведёт её
+                        уже <b>семь лет</b> как <b class="kb-de">Einzelunternehmung</b> — он единственный собственник и шеф.
+                        В пивоварне работают <b>17 Beschäftigte</b>. Особенно хорошо идёт безалкогольное
+                        Bio-Weizenbier со вкусом зелёного чая. Оборот за прошлый год — более <b>600.000 евро</b>.
+                        Проблема: он <b>не может сварить столько пива, сколько просит рынок</b>.
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.6;">
+                        Короче: дело идёт хорошо — <i>слишком</i> хорошо для нынешнего оборудования. Нужна новая линия,
+                        а на неё нужны деньги.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; Georgs drei Ziele — мерка для всех пяти форм</h3>
+                    <div class="sk-card s1">
+                        <div class="sk-tag">Ziel 1</div>
+                        <h4>Kapital</h4>
+                        <p>Двое друзей со студенческих времён готовы войти как <b class="kb-de">Investoren</b>:
+                        каждый вносит <b>150.000 €</b>, вместе — <b>300.000 €</b> Eigenkapital.</p>
+                    </div>
+                    <div class="sk-card s2">
+                        <div class="sk-tag">Ziel 2</div>
+                        <h4>Entscheidungen</h4>
+                        <p>Georg хочет и дальше <b>сам</b> принимать предпринимательские решения: какое пиво варить
+                        и как вести дело.</p>
+                    </div>
+                    <div class="sk-card s3">
+                        <div class="sk-tag">Ziel 3</div>
+                        <h4>Haftung</h4>
+                        <p>Он хочет <b>ограничить риск</b>. Сейчас он haftet <b class="kb-de">unbeschränkt</b> —
+                        своим Privatvermögen. Денег в деле стало больше, и это надо менять.</p>
+                    </div>
+                    <div class="kb-say">
+                        <b>Формула ответа на контрольной</b>
+                        „Georg Kraft steht vor einer Rechtsformwahl: Er braucht 300.000 Euro Kapital, will weiterhin
+                        allein entscheiden und seine Haftung begrenzen. Die Einzelunternehmung kann das nicht leisten.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Что уже отсюда следует</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Факт из кейса</th><th>Вывод</th></tr>
+                        <tr><td>двое друзей вносят деньги</td><td>это больше не может быть Einzelunternehmung — появляется <b class="kb-de">Gesellschaft</b></td></tr>
+                        <tr><td>17 Beschäftigte, 600.000 € Umsatz</td><td>это <b class="kb-de">Handelsgewerbe</b> → обязательна запись в Handelsregister, и даже с друзьями это уже не может остаться <b class="kb-de">GbR</b> — минимум OHG</td></tr>
+                        <tr><td>хочет решать сам</td><td>формы, где решают все вместе (OHG), не подходят полностью</td></tr>
+                        <tr><td>хочет ограничить Haftung</td><td>значит нужна <b class="kb-de">Kapitalgesellschaft</b> — или роль Kommanditist</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 2: e.K. ==================== -->
+        <div class="lesson" id="ls-rf2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F464;</span>
+                    <div>
+                        <h2>Die Einzelunternehmung (e.K.)</h2>
+                        <p class="lesson-header-sub">Один человек — все права и весь риск. Так Georg работает сейчас</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Предприятие принадлежит <b>одному человеку</b> — он <b class="kb-de">Inhaber / Inhaberin</b>.
+                        Никаких <b class="kb-de">Formvorschriften</b>: ни договора, ни нотариуса.
+                        Нотариус нужен только если в дело вносят земельный участок (Grundstück) — тогда договор
+                        требует <b class="kb-de">notarielle Beurkundung</b>.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Mindestkapital</b> нет — теоретически можно стартовать с 0 евро Eigenkapital.
+                        Но кто ведёт <b class="kb-de">Handelsgewerbe</b>, обязан зарегистрироваться в
+                        <b class="kb-de">Handelsregister</b>, и тогда в названии появляется приставка <b>e.K.</b>
+                        (§ 19 Abs. 1 Nr. 1 HGB).
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Georg зарегистрировал Gewerbe и внёс фирму в Handelsregister. С тех пор его предприятие называется <b>Kraft&rsquo;s Brewery e.K.</b></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Владелец haftet <b style="color:#ff9d97;">unbeschränkt und unmittelbar</b>.
+                    </p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>unbeschränkt</h5>
+                            Отвечает <b>Betriebsvermögen</b> и вдобавок <b>Privatvermögen</b>: дом, машина, сбережения.
+                        </div>
+                        <div>
+                            <h5>unmittelbar</h5>
+                            <b class="kb-de">Gläubiger</b> может обратиться <b>сразу и напрямую</b> к самому человеку,
+                            не судясь сначала с фирмой.
+                        </div>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Пивоварня должна поставщику солода <b>20.000 €</b>. На фирменном счету только <b>5.000 €</b>. Оставшиеся <b>15.000 €</b> Georg платит со своего личного счёта.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9ED; Geschäftsführung und Vertretung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Владелец решает <b>один</b> — и внутри, и снаружи.
+                        <b class="kb-de">Innen (Geschäftsführung)</b>: что варить, кого нанимать, что закупать.
+                        <b class="kb-de">Außen (Vertretung)</b>: подписывать договоры с клиентами, поставщиками и банками.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>В понедельник Georg решает варить новое пиво, во вторник подписывает договор на сырьё. Спрашивать разрешения не у кого.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Вся прибыль принадлежит владельцу — но и убыток он несёт один. Фиксированной зарплаты,
+                        как у Angestellte, у него нет: он живёт из прибыли предприятия.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Осталось 45.000 € Gewinn — все его. Пивоварня сделала 30.000 € Verlust — тоже целиком его.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>простое и <b>formlose Gründung</b></li>
+                                <li>не нужен Mindestkapital</li>
+                                <li>быстрые решения без согласований</li>
+                                <li>высокая мотивация: вся прибыль твоя</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>высокий риск из-за <b>unbeschränkte Haftung</b></li>
+                                <li>ошибки из-за единоличных решений</li>
+                                <li>успех держится на одном человеке</li>
+                                <li>трудно привлечь много капитала</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Bei der Einzelunternehmung entscheidet eine Person allein — und haftet mit Betriebs- und Privatvermögen.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF GbR ==================== -->
+        <div class="lesson" id="ls-gbr">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F91F;</span>
+                    <div>
+                        <h2>Die Gesellschaft b&uuml;rgerlichen Rechts (GbR)</h2>
+                        <p class="lesson-header-sub">Самая простая форма для нескольких человек — но и самая незащищённая. База, из которой вырастает OHG</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Нужны <b>минимум два человека</b> с общей целью (<b class="kb-de">Gesellschaftszweck</b>) — и эта цель
+                        вообще не обязана быть коммерческой. Договор можно заключить <b>устно</b> или даже просто
+                        совместными действиями (<i>konkludentes Handeln</i>): нотариус и письменный
+                        <b class="kb-de">Gesellschaftsvertrag</b> не нужны — кроме случая, когда в дело вносят участок земли.
+                        <b class="kb-de">Mindestkapital</b> нет вообще.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Главное условие: GbR <b>не ведёт Handelsgewerbe</b>. Регулируется § 705 и далее BGB
+                        (реформа <b>MoPeG</b>, действует с 1 января 2024 года). С этой реформы GbR можно добровольно
+                        внести в новый <b class="kb-de">Gesellschaftsregister</b> — тогда в названии появляется
+                        приставка <b>eGbR</b>, но это необязательно.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Zwei Studienfreundinnen betreiben zusammen einen kleinen Fahrradreparaturstand auf dem Wochenmarkt — ohne Notar, ohne Kapital, nur mit einer mündlichen Absprache.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Точно как в OHG: все Gesellschafter haften <b style="color:#ff9d97;">unbeschränkt, unmittelbar
+                        und gesamtschuldnerisch</b> — Betriebs- <b>и</b> Privatvermögen, кредитор может обратиться
+                        сразу к любому из них, и с одного можно потребовать весь долг целиком.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Der Reparaturstand schuldet einem Teilelieferanten 4.000 €. Der Lieferant darf die gesamte Summe von nur einer der beiden Gr&uuml;nderinnen verlangen.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9ED; Geschäftsführung und Vertretung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Мангels анderer Vereinbarung решают <b>все вместе</b> (<b class="kb-de">Gesamtgeschäftsführung</b>
+                        и <b class="kb-de">Gesamtvertretung</b>) — но в договоре можно прописать и единоличные полномочия
+                        для одного из участников, как в OHG.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Ohne besondere Abrede müssen beide Gründerinnen gemeinsam entscheiden, ob sie einen dritten Marktstand er&ouml;ffnen.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Если в договоре ничего не оговорено — делят <b class="kb-de">nach Köpfen</b>, поровну на человека
+                        (§ 709 BGB). Ровно та же базовая норма, что стоит и за правилом OHG.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>самая быстрая и <b>дешёвая Gründung</b> из всех форм</li>
+                                <li>кein Mindestkapital, обычно не нужен нотариус</li>
+                                <li>идеально для Freiberufler-Sozietäten (Anwälte, Ärzte, Architekten) и маленьких общих проектов</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>unbeschränkte Haftung всех участников — как в OHG</li>
+                                <li>ниже доверие партнёров и банков для крупных сделок</li>
+                                <li>при росте до Handelsgewerbe автоматически становится <b>OHG</b></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Die GbR ist formfrei und ohne Mindestkapital gegründet, aber alle Gesellschafter haften
+                        unbeschränkt — genau wie bei der OHG.“
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F500; GbR vs. OHG — где проходит граница</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Haftung, Geschäftsführung и Gewinnverteilung у обеих форм совпадают почти дословно.
+                        Разница ровно одна: <b class="kb-de">betreibt die Gesellschaft ein Handelsgewerbe?</b>
+                    </p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>GbR</h5>
+                            Небольшой оборот, без кассовой бухгалтерии в купеческом смысле, часто —
+                            Freiberufler или маленький проект.
+                        </div>
+                        <div>
+                            <h5>OHG</h5>
+                            Настоящий <b class="kb-de">Handelsgewerbe</b>: заметный оборот, персонал, склад,
+                            обязательная запись в Handelsregister.
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        Как только GbR дорастает до Handelsgewerbe, она становится OHG <b>автоматически</b> —
+                        не нужно ничего специально «превращать». Именно поэтому Kraft&rsquo;s Brewery (17 Beschäftigte,
+                        600.000 € Umsatz) вообще не может остаться GbR, даже если Georg возьмёт партнёров неформально.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 3: OHG ==================== -->
+        <div class="lesson" id="ls-rf3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F91D;</span>
+                    <div>
+                        <h2>Die Offene Handelsgesellschaft (OHG)</h2>
+                        <p class="lesson-header-sub">Несколько человек вместе — и все отвечают полностью</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        OHG — объединение <b>минимум двух Gesellschafter</b>, которые вместе ведут предприятие.
+                        Основа — <b class="kb-de">Gesellschaftsvertrag</b>. Если в нём чего-то не написано,
+                        автоматически действуют правила <b class="kb-de">HGB</b> (Handelsgesetzbuch).
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Mindestkapital не нужен. В названии обязателен зусатц <b>OHG</b> (или «offene Handelsgesellschaft»).
+                        Поскольку в центре стоят <b>люди</b> и минимум один отвечает неограниченно, OHG — это
+                        <b style="color:#79b8ff;">Personengesellschaft</b>.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Georg и двое друзей заключают договор. Фирма называется <b>Kraft&rsquo;s Brewery OHG</b>.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung — три слова, которые надо назвать</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Все Gesellschafter отвечают Betriebs- <b>и</b> Privatvermögen. У этой ответственности три признака:
+                    </p>
+                    <div class="ki-risk r-verboten"><b>unbeschränkt</b><span>в счёт идёт и всё личное имущество</span></div>
+                    <div class="ki-risk r-hoch"><b>unmittelbar</b><span>Gläubiger может обратиться сразу к любому участнику по своему выбору</span></div>
+                    <div class="ki-risk r-begrenzt"><b>gesamtschuldnerisch</b><span>с одного участника можно потребовать <b>всю</b> сумму, а не его долю</span></div>
+                    <p style="font-size:0.93rem; line-height:1.6; margin-top:0.6rem;">
+                        <b>Важно:</b> ограничить эту ответственность договором <b>по отношению к кредиторам нельзя</b>.
+                        Внутри между собой участники потом рассчитываются.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>OHG должна <b>90.000 €</b>. Поставщик вправе потребовать все 90.000 € с участника №2 — даже если тот внёс лишь треть. Свои деньги он потом вернёт с остальных.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9ED; Geschäftsführung und Vertretung</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Ebene</th><th>Правило</th></tr>
+                        <tr><td><b class="kb-de">Innen nach HGB</b></td><td>каждый участник вправе и обязан вести дела; обычные решения — единолично (<b>Einzelgeschäftsführungsbefugnis</b>), необычные — только все вместе</td></tr>
+                        <tr><td><b class="kb-de">Innen nach Vertrag</b></td><td>можно поделить зоны: один — Einkauf, другой — Verkauf</td></tr>
+                        <tr><td><b class="kb-de">Außen</b></td><td>каждый участник может <b>один</b> представлять OHG и заключать действительные договоры; договором можно ввести <b>Gesamtvertretung</b> — но тогда это должно стоять в Handelsregister</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Один участник в одиночку заказывает 5.000 бутылок. Договор действует для всей OHG — даже если Georg этого не хотел.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Порядок ступенчатый: сначала <b>по договорённым Beteiligungsverhältnisse</b>;
+                        если не договорились — по стоимости вкладов; если и этого нет — <b class="kb-de">nach Köpfen</b>,
+                        то есть поровну на человека (§ 709 BGB, § 120 HGB).
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>90.000 € прибыли и деление nach Köpfen → каждому из троих по <b>30.000 €</b>.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>объединяются разные знания и умения</li>
+                                <li>риск, Haftung и работа — на нескольких плечах</li>
+                                <li>новые участники приносят капитал</li>
+                                <li>высокая <b>Kreditwürdigkeit</b> именно из-за полной ответственности</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>все отвечают неограниченно, в том числе лично</li>
+                                <li>ссоры между участниками вредят фирме</li>
+                                <li>привлечь капитал сложнее, чем в Kapitalgesellschaft</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Bei der OHG haften alle Gesellschafter unbeschränkt, unmittelbar und gesamtschuldnerisch —
+                        jeder darf grundsätzlich allein entscheiden.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 4: KG ==================== -->
+        <div class="lesson" id="ls-rf4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2696;&#xFE0F;</span>
+                    <div>
+                        <h2>Die Kommanditgesellschaft (KG)</h2>
+                        <p class="lesson-header-sub">Два вида участников: один отвечает всем, другой — только своим вкладом</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Вся суть KG в двух словах</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Komplementär — Vollhafter</h5>
+                            Ведёт и представляет фирму. Haftet <b>unbeschränkt</b>: Betriebs- <b>и</b> Privatvermögen.
+                        </div>
+                        <div>
+                            <h5>Kommanditist — Teilhafter</h5>
+                            Вносит деньги. Haftet <b>только своей Einlage</b>. Privatvermögen защищено — но и решать он не вправе.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        KG очень похожа на OHG. Нужны минимум <b>один Komplementär</b> и <b>один Kommanditist</b>.
+                        Основа — <b class="kb-de">Gesellschaftsvertrag</b>, Mindestkapital не требуется.
+                        В названии обязателен зусатц <b>KG</b>, остальное имя свободно. KG — тоже
+                        <b style="color:#79b8ff;">Personengesellschaft</b>.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Georg становится Komplementär, оба друга — Kommanditisten по 150.000 €. Фирма: <b>Kraft&rsquo;s Brewery KG</b>.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung</h3>
+                    <div class="kb-msg"><b>Beispiel</b>KG должна <b>400.000 €</b>. Kommanditist с вкладом 150.000 € теряет максимум эти <b>150.000 €</b>. Georg как Komplementär отвечает сверх того <b>личным имуществом</b>.</div>
+                    <p style="font-size:0.93rem; line-height:1.6;">
+                        Именно здесь отличие от OHG: <b>не все отвечают одинаково</b>. Это первый шаг к ограничению риска —
+                        но только для тех, кто даёт деньги, а не для того, кто руководит.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9ED; Geschäftsführung und Vertretung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Вести дела (Innenverhältnis) и представлять фирму перед клиентами, поставщиками и банками
+                        (Außenverhältnis) вправе <b>только Komplementäre</b>. Kommanditisten этого не могут,
+                        но у них есть два права:
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Recht</th><th>Что оно даёт</th></tr>
+                        <tr><td><b class="kb-de">Kontrollrecht</b></td><td>смотреть бухгалтерские книги и требовать копию Bilanz</td></tr>
+                        <tr><td><b class="kb-de">Widerspruchsrecht</b></td><td>возразить против <b>außergewöhnliche Geschäfte</b> — например, покупки земельного участка</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Рецептуры Georg определяет один. А вот купить участок без согласия Kommanditisten он не может — они вправе возразить.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Как в OHG: сначала по договору, потом по стоимости вкладов, потом nach Köpfen
+                        (§ 709 BGB, § 120 HGB).
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>В договоре: Georg 50 %, каждый Kommanditist 25 %. При прибыли 80.000 € → Georg 40.000 €, каждый Kommanditist 20.000 €.</div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F4A1;</span>
+                    <div>
+                        <p><b>Sonderform: die GmbH &amp; Co. KG.</b> Здесь Komplementär — не живой человек, а <b>GmbH</b>.
+                        Так ответственность даже полного участника ограничивается имуществом общества.
+                        Это любимый вопрос «на подумать» — назови её, и будет плюс.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>относительно высокая Kreditwürdigkeit</li>
+                                <li>разделение труда: Komplementär ведёт, Kommanditist финансирует</li>
+                                <li>новых Kommanditisten легко принять как источник капитала</li>
+                                <li>Kommanditist рискует только вкладом</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>Komplementär по-прежнему отвечает личным имуществом</li>
+                                <li>нужны доверительные отношения</li>
+                                <li>Kommanditisten не участвуют в решениях</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „In der KG haftet der Komplementär voll — auch privat. Der Kommanditist haftet nur mit seiner
+                        Einlage, darf dafür aber nicht mitentscheiden.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 5: GmbH ==================== -->
+        <div class="lesson" id="ls-rf5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F6E1;&#xFE0F;</span>
+                    <div>
+                        <h2>Die Gesellschaft mit beschränkter Haftung (GmbH)</h2>
+                        <p class="lesson-header-sub">Здесь в центре не люди, а капитал — и отвечает только он</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F504; Смена категории: Personen- → Kapitalgesellschaft</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Personengesellschaft (OHG, KG)</h5>
+                            В центре — <b>Gesellschafter</b>. Минимум один отвечает лично и неограниченно.
+                        </div>
+                        <div>
+                            <h5>Kapitalgesellschaft (GmbH, AG)</h5>
+                            В центре — <b>внесённый капитал</b>. Отвечает только он. Общество — <b class="kb-de">juristische Person</b>:
+                            само покупает, продаёт, судится и может быть ответчиком.
+                        </div>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Не Georg покупает линию розлива, а <b>Kraft&rsquo;s Brewery GmbH</b>. Georg только подписывает за неё.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung — четыре числа, которые спросят</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Пункт</th><th>Правило</th></tr>
+                        <tr><td>Кто основывает</td><td>одно или несколько лиц</td></tr>
+                        <tr><td>Vertrag</td><td>Gesellschaftsvertrag обязательно <b class="kb-de">notariell beurkundet</b></td></tr>
+                        <tr><td><b class="kb-de">Geschäftsanteil</b> (раньше Stammeinlage)</td><td>доли могут быть разными; Nennbetrag — целые евро, минимум <b>1 €</b></td></tr>
+                        <tr><td><b class="kb-de">Stammkapital</b></td><td>сумма всех долей, минимум <b>25.000 €</b></td></tr>
+                        <tr><td>При регистрации</td><td>реально внесено минимум <b>12.500 €</b></td></tr>
+                        <tr><td>Момент возникновения</td><td>GmbH возникает только с <b>Eintragung ins Handelsregister</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Georg берёт долю 15.000 €, каждый друг — по 5.000 €. Вместе 25.000 € Stammkapital, у Georg <b>60 %</b> долей.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung — главный аргумент</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        GmbH отвечает <b>только Gesellschaftsvermögen</b>. Личная ответственность участников
+                        не предусмотрена: кто внёс свою долю, дальше не отвечает ничем.
+                        Это и есть большое отличие от e.K., OHG и KG.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>GmbH не может заплатить <b>400.000 €</b>. Квартиру Georg никто не трогает — он теряет «только» свою долю в 15.000 €.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9ED; Geschäftsführung und Vertretung</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Wer</th><th>Aufgabe</th></tr>
+                        <tr><td><b class="kb-de">Geschäftsführer</b></td><td>ведут дела (Innen) и представляют GmbH (Außen). Это могут быть участники, а могут — наёмные люди <b>без долей</b>. При нескольких — Einzel- или Gesamtbefugnis</td></tr>
+                        <tr><td><b class="kb-de">Gesellschafterversammlung</b></td><td>решает важные вопросы: использование прибыли, назначение и отзыв Geschäftsführer; участники вправе в любой момент требовать информацию</td></tr>
+                        <tr><td><b class="kb-de">Aufsichtsrat</b></td><td>обязателен в больших GmbH — <b>более 500 Beschäftigte</b></td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">Кто вправе представлять GmbH, публикуется в Handelsregister.</p>
+                    <div class="kb-msg"><b>Beispiel</b>Georg держит 60 % долей и одновременно становится Geschäftsführer. В Gesellschafterversammlung у него большинство — то есть он и дальше решает.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Прибыль делится <b>пропорционально долям в Stammkapital</b>: у кого 30 % капитала,
+                        тому 30 % Ausschüttung. Убытки покрываются за счёт Stammkapital или
+                        сформированных <b class="kb-de">Rücklagen</b>.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Прибыль 50.000 €, доля Georg 60 % → ему 30.000 €, каждому другу по 10.000 €.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>Haftung ограничена долями, Privatvermögen защищено</li>
+                                <li>руководить может человек без доли (наёмный Geschäftsführer)</li>
+                                <li>позже можно принять новых участников</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>нужен Mindestkapital <b>25.000 €</b></li>
+                                <li>ниже Kreditwürdigkeit — никто не отвечает лично</li>
+                                <li>дороже и дольше при основании из-за нотариуса</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Bei der GmbH haftet nur das Gesellschaftsvermögen. Dafür sind 25.000 Euro Stammkapital und
+                        ein notariell beurkundeter Vertrag nötig.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 6: AG ==================== -->
+        <div class="lesson" id="ls-rf6">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3DB;&#xFE0F;</span>
+                    <div>
+                        <h2>Die Aktiengesellschaft (AG)</h2>
+                        <p class="lesson-header-sub">Форма для очень большого капитала — и с тремя органами управления</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3D7;&#xFE0F; Gründung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        AG, как и GmbH, — <b>Kapitalgesellschaft</b> и <b class="kb-de">juristische Person</b>.
+                        Основывают одно или несколько лиц, Gesellschaftsvertrag <b>notariell beurkundet</b>,
+                        AG возникает с <b>Eintragung ins Handelsregister</b>.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Grundkapital</b> — минимум <b>50.000 €</b>. Оно делится на доли — <b class="kb-de">Aktien</b>,
+                        минимальный номинал акции <b>1 €</b>. Владельцы долей называются <b class="kb-de">Aktionäre</b>.
+                        Акции покупают и продают на бирже — поэтому войти в дело и выйти из него очень просто.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Siemens AG, Deutsche Bank AG. Для пивоварни с 17 сотрудниками такая форма была бы слишком громоздкой.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Haftung</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        По долгам AG отвечает <b>только своим Unternehmensvermögen</b>. Акционеры личным имуществом
+                        не отвечают: их риск в том, что акции потеряют в цене — в худшем случае до нуля.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Кто купил акции на 2.000 €, потеряет максимум эти 2.000 €. Доплачивать никто не обязан.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3DB;&#xFE0F; Die drei Organe — обязательно знать наизусть</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        <b class="kb-de">Ein Organ</b> — это группа лиц с определённой задачей.
+                    </p>
+                    <div class="sk-card s1">
+                        <div class="sk-tag">leitendes Organ</div>
+                        <h4>Vorstand</h4>
+                        <p>Ведёт дела и представляет AG наружу. Это «правление».</p>
+                    </div>
+                    <div class="sk-card s2">
+                        <div class="sk-tag">überwachendes Organ</div>
+                        <h4>Aufsichtsrat</h4>
+                        <p>Выбирает Vorstand и контролирует его. Сам избирается акционерами и работниками.
+                        В текущие дела не вмешивается.</p>
+                    </div>
+                    <div class="sk-card s3">
+                        <div class="sk-tag">beschließendes Organ</div>
+                        <h4>Hauptversammlung</h4>
+                        <p>Собрание всех акционеров раз в год. Избирает Aufsichtsrat и решает,
+                        что делать с прибылью.</p>
+                    </div>
+                    <div class="se-flow" style="margin-top:0.8rem;">
+                        <div class="se-box"><b>Hauptversammlung</b><span>акционеры выбирают</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Aufsichtsrat</b><span>выбирает и контролирует</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Vorstand</b><span>ведёт дела и отчитывается</span></div>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Vorstand хочет построить вторую пивоварню. Aufsichtsrat проверяет решение. Hauptversammlung потом решает, сколько прибыли выплатить.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B0; Gewinn und Verlust</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Акционеры имеют право на долю прибыли — она называется <b class="kb-de">Dividende</b>,
+                        её размер определяет Hauptversammlung. Вместо выплаты прибыль можно направить
+                        в <b class="kb-de">Rücklagen</b> — на чёрный день или на крупные инвестиции.
+                        При убытке не выплачивают ничего, пока убыток не покрыт.
+                    </p>
+                    <div class="kb-msg"><b>Beispiel</b>Дивиденд 0,50 € на акцию → за 100 акций выплатят 50 €.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>Haftung ограничена, Privatvermögen акционеров защищено</li>
+                                <li>доли легко продать и передать</li>
+                                <li>высокая репутация формы (Ansehen)</li>
+                                <li>очень большой капитал через биржу</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>Mindestkapital <b>50.000 €</b></li>
+                                <li>высокие расходы на основание, в том числе нотариус</li>
+                                <li>большой организационный аппарат из трёх органов</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „Die AG haftet nur mit ihrem Unternehmensvermögen, braucht 50.000 Euro Grundkapital und wird
+                        von drei Organen gesteuert: Vorstand, Aufsichtsrat und Hauptversammlung.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 7: VERGLEICH ==================== -->
+        <div class="lesson" id="ls-rf7">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CA;</span>
+                    <div>
+                        <h2>Vergleich und Entscheidung</h2>
+                        <p class="lesson-header-sub">Все пять форм рядом — и обоснованная рекомендация для Georg Kraft</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Die Vergleichstabelle — это надо уметь нарисовать по памяти</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:640px;">
+                        <tr><th>Rechtsform</th><th>Mindestkapital</th><th>Haftung mit Privatvermögen</th><th>Wer entscheidet?</th><th>Art</th></tr>
+                        <tr><td><b class="kb-de">Einzelunternehmung (e.K.)</b></td><td>kein Mindestkapital</td><td>ja, unbeschränkt</td><td>die Inhaberin / der Inhaber allein</td><td>Einzelunternehmen</td></tr>
+                        <tr><td><b class="kb-de">OHG</b></td><td>kein Mindestkapital</td><td>ja, unbeschränkt (alle)</td><td>jeder Gesellschafter</td><td>Personengesellschaft</td></tr>
+                        <tr><td><b class="kb-de">KG</b></td><td>kein Mindestkapital</td><td>nur der Komplementär</td><td>nur die Komplementäre</td><td>Personengesellschaft</td></tr>
+                        <tr><td><b class="kb-de">GmbH</b></td><td>25.000 €</td><td>nein, geschützt</td><td>die Geschäftsführer</td><td>Kapitalgesellschaft</td></tr>
+                        <tr><td><b class="kb-de">AG</b></td><td>50.000 €</td><td>nein, geschützt</td><td>der Vorstand</td><td>Kapitalgesellschaft</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        Граница между двумя мирами проходит между KG и GmbH: выше — <b>Personengesellschaften</b>
+                        (кто-то отвечает лично), ниже — <b>Kapitalgesellschaften</b> (отвечает только капитал).
+                    </p>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-top:0.5rem;">
+                        <b class="kb-de">GbR</b> в этой таблице нет: она устроена точно как OHG (Haftung, Geschäftsführung,
+                        Gewinnverteilung — те же), но её вообще нельзя выбрать для Kraft&rsquo;s Brewery — фирма Georg
+                        уже <b>Handelsgewerbe</b>, а значит минимум OHG. Подробности — на вкладке <a href="#gbr">GbR</a>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Проверка по трём целям Georg</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:600px;">
+                        <tr><th>Rechtsform</th><th>Kapital 300.000 €</th><th>selbst entscheiden</th><th>Haftung begrenzt</th></tr>
+                        <tr><td><b class="kb-de">e.K.</b></td><td>&#x274C; чужие деньги невозможны</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+                        <tr><td><b class="kb-de">OHG</b></td><td>&#x2705;</td><td>&#x274C; каждый вправе решать один</td><td>&#x274C;</td></tr>
+                        <tr><td><b class="kb-de">KG</b></td><td>&#x2705;</td><td>&#x2705; как Komplementär</td><td>&#x274C; Komplementär отвечает лично</td></tr>
+                        <tr><td><b class="kb-de">GmbH</b></td><td>&#x2705;</td><td>&#x2705; 60 % долей = большинство</td><td>&#x2705;</td></tr>
+                        <tr><td><b class="kb-de">AG</b></td><td>&#x2705;</td><td>&#x274C; решает Vorstand, контролирует Aufsichtsrat</td><td>&#x2705;</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3C1; Empfehlung: die GmbH</h3>
+                    <p style="font-size:0.97rem; line-height:1.65;">
+                        <b>GmbH — единственная форма, которая закрывает все три цели сразу:</b>
+                        друзья вносят капитал как Gesellschafter, Georg держит <b>60 %</b> долей и потому имеет
+                        большинство в Gesellschafterversammlung (плюс может стать Geschäftsführer),
+                        а ответственность ограничена Gesellschaftsvermögen.
+                    </p>
+                    <p style="font-size:0.94rem; line-height:1.6;">
+                        <b>Почему не AG,</b> хотя она тоже защищает личное имущество: 50.000 € Grundkapital,
+                        дорогое основание и три органа — слишком громоздко для пивоварни с 17 сотрудниками,
+                        и решать в одиночку Georg там уже не смог бы.
+                    </p>
+                    <div class="kb-say">
+                        <b>Готовый ответ на «Geben Sie eine begründete Empfehlung ab»</b>
+                        „Ich empfehle Herrn Kraft die GmbH. Sie erfüllt alle drei Ziele: Die Freunde können als
+                        Gesellschafter 300.000 Euro einbringen, Herr Kraft behält mit 60 Prozent der Geschäftsanteile
+                        die Mehrheit und kann zugleich Geschäftsführer sein, und die Haftung ist auf das
+                        Gesellschaftsvermögen beschränkt. Die AG wäre wegen 50.000 Euro Grundkapital und der drei
+                        Organe zu aufwendig.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 8: HANDELSREGISTER ==================== -->
+        <div class="lesson" id="ls-rf8">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D6;</span>
+                    <div>
+                        <h2>Handelsregister und Firma</h2>
+                        <p class="lesson-header-sub">Где регистрируют предприятие и как оно вправе называться</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Das Handelsregister</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Das Handelsregister</b> — публичный, официально ведомый реестр (§§ 8–15 HGB).
+                        В нём стоят все сведения о предприятии, важные для делового оборота.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Что вносится</th><th>Пояснение</th></tr>
+                        <tr><td>die <b class="kb-de">Firma</b></td><td>название предприятия</td></tr>
+                        <tr><td>Sitz und Niederlassungen</td><td>место и филиалы</td></tr>
+                        <tr><td>Unternehmensgegenstand</td><td>чем предприятие занимается</td></tr>
+                        <tr><td>Rechtsform</td><td>e.K., OHG, KG, GmbH, AG</td></tr>
+                        <tr><td>Stamm- oder Grundkapital</td><td>у GmbH и AG</td></tr>
+                        <tr><td>Vertretungsberechtigte</td><td>кто вправе подписывать и в каком объёме</td></tr>
+                        <tr><td>besondere Veränderungen</td><td>например Insolvenz или Auflösung</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.94rem; line-height:1.62; margin-top:0.6rem;">
+                        Реестр пользуется «<b class="kb-de">öffentlicher Glaube</b>» (§ 15 HGB): на то, что там записано,
+                        можно положиться. С <b>1 января 2007</b> он ведётся электронно, а с <b>1 августа 2022</b>
+                        просмотр бесплатен и доступен каждому на <b>handelsregister.de</b>.
+                    </p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Abteilung A</h5>
+                            Einzelkaufleute (<b>e.K.</b>) и Personengesellschaften (<b>OHG</b>, <b>KG</b>).
+                        </div>
+                        <div>
+                            <h5>Abteilung B</h5>
+                            Kapitalgesellschaften: <b>GmbH</b> и <b>AG</b>.
+                        </div>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Поставщик перед крупным заказом смотрит в Handelsregister, кто вправе представлять Kraft&rsquo;s Brewery GmbH и каков размер Stammkapital.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3F7;&#xFE0F; Die Firma — это имя, а не предприятие</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        В быту «Firma» говорят про всё предприятие. Юридически <b class="kb-de">die Firma</b> — только
+                        <b>имя</b>, под которым коммерсант ведёт дела и ставит подпись (§ 17 HGB).
+                        Под этим именем предприятие может судиться и быть ответчиком.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:520px;">
+                        <tr><th>Begriff</th><th>Bedeutung</th><th>Beispiel</th></tr>
+                        <tr><td><b class="kb-de">Firma</b></td><td>имя предприятия</td><td>Kraft&rsquo;s Brewery GmbH</td></tr>
+                        <tr><td><b class="kb-de">Unternehmen</b></td><td>правовая единица</td><td>сама GmbH</td></tr>
+                        <tr><td><b class="kb-de">Betrieb</b></td><td>место, где создаётся продукт</td><td>пивоварня в Тюбингене</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.94rem; line-height:1.62; margin-top:0.6rem;">
+                        В каждой Firma обязателен <b class="kb-de">Rechtsformzusatz</b>: e.K., OHG, KG, GmbH или AG
+                        (§ 19 HGB, § 4 GmbHG). Остальное имя с реформы <b>1998</b> года свободно:
+                        <b>Personen-, Sach-, Fantasie-</b> или <b>Mischfirma</b>. Имя должно обладать
+                        <b class="kb-de">Unterscheidungskraft</b> (§ 18 Abs. 1 HGB) и не вводить в заблуждение (§ 18 Abs. 2 HGB).
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CF; Die sieben Firmengrundsätze</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:560px;">
+                        <tr><th>Grundsatz</th><th>Что требует</th></tr>
+                        <tr><td><b class="kb-de">Firmenzusatz</b></td><td>имя обязано указывать правовую форму</td></tr>
+                        <tr><td><b class="kb-de">Firmenklarheit</b></td><td>имя должно годиться для опознания и различаться</td></tr>
+                        <tr><td><b class="kb-de">Firmenwahrheit</b></td><td>имя не должно обманывать о виде, размере или положении дела</td></tr>
+                        <tr><td><b class="kb-de">Firmenausschließlichkeit</b></td><td>имя должно отличаться от уже внесённых фирм той же общины</td></tr>
+                        <tr><td><b class="kb-de">Firmenbeständigkeit</b></td><td>прежнее имя можно вести дальше даже при смене участников</td></tr>
+                        <tr><td><b class="kb-de">Firmenöffentlichkeit</b></td><td>имя, место и адрес вносятся в Handelsregister</td></tr>
+                        <tr><td><b class="kb-de">Firmeneinheit</b></td><td>у одного предприятия только одна Firma</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>«Tübinger <b>Groß</b>brauerei GmbH» при 17 сотрудниках проблематично: приставка «Groß» вводит в заблуждение о размере — нарушение <b>Firmenwahrheit</b>.</div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== RF 9: WORTSCHATZ + ÜBEN ==================== -->
+        <div class="lesson" id="ls-rf9">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AE;</span>
+                    <div>
+                        <h2>Тренажёр: какая это Rechtsform?</h2>
+                        <p class="lesson-header-sub">Признак из контрольной — назови форму</p>
+                    </div>
+                </div>
+
+                <div class="tz-box">
+                    <div class="tz-from" id="rzFrom"></div>
+                    <div class="tz-prompt" id="rzPrompt"></div>
+                    <div class="tz-opts" id="rzOpts"></div>
+                    <div class="tz-fb" id="rzFb"></div>
+                    <div class="tz-actions">
+                        <button class="tz-btn" id="rzNext">Далее &rarr;</button>
+                        <button class="tz-btn ghost" id="rzReset">&#x21A9;&#xFE0F; Сначала</button>
+                    </div>
+                    <div class="tz-stats">
+                        <span>Пройдено: <b id="rzDone">0</b> / <b id="rzTotal">0</b></span>
+                        <span>Правильно с первого раза: <b id="rzOk">0</b></span>
+                    </div>
+                </div>
+
+                <div class="note-card" style="margin-top:1.2rem;">
+                    <h3>&#x1F9E0; Проверь себя</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Сначала ответь вслух, потом жми.</p>
+                    <div id="stListRF"></div>
+                </div>
+            </section>
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DA;</span>
+                    <div>
+                        <h2>Wortspeicher — 47 незнакомых слов</h2>
+                        <p class="lesson-header-sub">Все термины темы с объяснением и примером из кейса</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.3rem; min-width:640px;">
+                        <tr><th>Deutsch</th><th>Что это значит</th><th>Beispiel</th></tr>
+                        <tr><td class="kb-de">die Aktie</td><td>доля в Grundkapital акционерного общества; купил акцию — тебе принадлежит кусочек фирмы</td><td>50.000 € Grundkapital = 50.000 Aktien по 1 €</td></tr>
+                        <tr><td class="kb-de">der Aktionär / die Aktionärin</td><td>тот, кому принадлежат акции AG</td><td>Кто держит 100 акций Kraft&rsquo;s Brewery, тот акционер</td></tr>
+                        <tr><td class="kb-de">der Aufsichtsrat</td><td>орган, который выбирает Vorstand и контролирует его; текущими делами не занимается</td><td>Проверяет, разумно ли Vorstand купил линию розлива</td></tr>
+                        <tr><td class="kb-de">das Außenverhältnis</td><td>всё, что происходит наружу: действия перед клиентами, поставщиками, банками. Это Vertretung</td><td>Georg подписывает договор на 2 тонны солода</td></tr>
+                        <tr><td class="kb-de">das Betriebsvermögen</td><td>всё, что принадлежит предприятию: машины, товар, транспорт, деньги на фирменном счету (= Geschäftsvermögen)</td><td>Котлы, фургон и склад пивоварни</td></tr>
+                        <tr><td class="kb-de">die beschränkte Haftung</td><td>по долгам отвечают только деньги, вложенные в предприятие; личные деньги защищены</td><td>GmbH не платит счёт — дом участника не трогают</td></tr>
+                        <tr><td class="kb-de">die Dividende</td><td>доля прибыли, которую акционер получает на каждую акцию</td><td>0,50 € на акцию → за 100 акций 50 €</td></tr>
+                        <tr><td class="kb-de">das Eigenkapital</td><td>деньги, которые владельцы вносят сами; возвращать их не нужно</td><td>Двое друзей вносят по 150.000 € Eigenkapital</td></tr>
+                        <tr><td class="kb-de">die Firma</td><td>имя, под которым предприятие ведёт дела, подписывает, судится. Юридически это только название, а не всё предприятие</td><td>Firma: Kraft&rsquo;s Brewery GmbH</td></tr>
+                        <tr><td class="kb-de">das Fremdkapital</td><td>деньги, взятые взаймы; их надо вернуть, обычно с процентами</td><td>Кредит банка 100.000 € на линию розлива</td></tr>
+                        <tr><td class="kb-de">die gesamtschuldnerische Haftung</td><td>с каждого участника можно потребовать <b>весь</b> долг, а не только его долю</td><td>OHG должна 90.000 € — поставщик требует всё с одного</td></tr>
+                        <tr><td class="kb-de">der Geschäftsanteil</td><td>доля участника в Stammkapital GmbH (раньше — Stammeinlage); номинал в целых евро, минимум 1 €</td><td>Georg держит 15.000 € из 25.000 € = 60 %</td></tr>
+                        <tr><td class="kb-de">die Geschäftsführung</td><td>решения внутри предприятия: что закупать, производить, планировать</td><td>Georg решает, что с марта варят новое пиво</td></tr>
+                        <tr><td class="kb-de">der Gesellschafter / die Gesellschafterin</td><td>человек, которому принадлежит часть предприятия и который внёс капитал</td><td>Друзья становятся участниками с 150.000 € каждый</td></tr>
+                        <tr><td class="kb-de">der Gesellschaftsvertrag</td><td>договор при основании: кто сколько вносит, кто решает, как делят прибыль</td><td>В договоре: рецептуры определяет Georg</td></tr>
+                        <tr><td class="kb-de">die GbR (Gesellschaft b&uuml;rgerlichen Rechts)</td><td>простейшее товарищество минимум двух лиц с общей целью; без Handelsgewerbe, без Mindestkapital, можно устно</td><td>Zwei Freundinnen betreiben zusammen einen kleinen Marktstand</td></tr>
+                        <tr><td class="kb-de">der Gesellschaftszweck</td><td>общая цель, ради которой люди объединяются в товарищество; необязательно коммерческая</td><td>Bei der GbR reicht ein gemeinsames Projekt als Zweck</td></tr>
+                        <tr><td class="kb-de">der Gläubiger / die Gläubigerin</td><td>кредитор: тот, кому предприятие должно деньги</td><td>Поставщик солода ждёт 20.000 €</td></tr>
+                        <tr><td class="kb-de">das Grundkapital</td><td>минимальный капитал AG — не менее 50.000 €, поделён на акции</td><td>50.000 € = 50.000 акций</td></tr>
+                        <tr><td class="kb-de">die Haftung</td><td>отвечать по долгам и платить их</td><td>Счёт на 20.000 € не оплачен — проверяют, кто haftet</td></tr>
+                        <tr><td class="kb-de">das Handelsgewerbe</td><td>предприятие, настолько крупное, что должно быть организовано по-купечески: бухгалтерия, склад, персонал</td><td>Пивоварня с 17 сотрудниками и оборотом 600.000 €</td></tr>
+                        <tr><td class="kb-de">das Handelsregister</td><td>публичный реестр, который ведут участковые суды; там важные данные о коммерсантах и предприятиях</td><td>На handelsregister.de видно, кто вправе представлять GmbH</td></tr>
+                        <tr><td class="kb-de">die Hauptversammlung</td><td>ежегодное собрание всех акционеров AG; решает об использовании прибыли и выбирает Aufsichtsrat</td><td>Решено выплатить 0,50 € дивиденда на акцию</td></tr>
+                        <tr><td class="kb-de">das Innenverhältnis</td><td>всё, что решается внутри предприятия. Это Geschäftsführung</td><td>Решение ввести вторую смену</td></tr>
+                        <tr><td class="kb-de">der Investor / die Investorin</td><td>тот, кто вкладывает деньги в предприятие, чтобы оно росло</td><td>Друзья Georg хотят вложить по 150.000 €</td></tr>
+                        <tr><td class="kb-de">die juristische Person</td><td>предприятие с собственными правами и обязанностями: само покупает, продаёт, судится — как человек, только на бумаге</td><td>Линию покупает не Georg, а Kraft&rsquo;s Brewery GmbH</td></tr>
+                        <tr><td class="kb-de">der Kaufmann / die Kauffrau</td><td>тот, кто ведёт Handelsgewerbe; для таких лиц действует HGB</td><td>Georg как владелец пивоварни — Kaufmann</td></tr>
+                        <tr><td class="kb-de">der Kommanditist / die Kommanditistin</td><td>частичный ответчик в KG: вносит деньги и отвечает только вкладом; личное имущество защищено, но решать он не вправе</td><td>Друг даёт 150.000 € и больше потерять не может</td></tr>
+                        <tr><td class="kb-de">der Komplementär / die Komplementärin</td><td>полный ответчик в KG: ведёт и представляет фирму, отвечает Betriebs- и Privatvermögen</td><td>В KG Georg был бы Komplementär</td></tr>
+                        <tr><td class="kb-de">die Kreditwürdigkeit</td><td>кредитоспособность: насколько банк уверен, что получит деньги назад</td><td>У OHG она высокая, потому что отвечают и личным имуществом</td></tr>
+                        <tr><td class="kb-de">die Kapitalgesellschaft</td><td>общество, где в центре внесённый капитал; отвечает только имущество общества. Это GmbH и AG</td><td>В GmbH важно, сколько внесено, а не кто человек</td></tr>
+                        <tr><td class="kb-de">das Mindestkapital</td><td>сумма, которая обязана быть при основании</td><td>GmbH 25.000 €, AG 50.000 €; e.K., OHG, KG — не нужен</td></tr>
+                        <tr><td class="kb-de">die notarielle Beurkundung</td><td>нотариус проходит договор со всеми участниками, объясняет последствия и удостоверяет его; стоит времени и денег, зато даёт правовую надёжность</td><td>Договор GmbH обязан быть notariell beurkundet</td></tr>
+                        <tr><td class="kb-de">die Personengesellschaft</td><td>общество, где в центре люди; минимум один отвечает неограниченно. Это OHG и KG</td><td>В OHG важно, кто участвует — они отвечают всем</td></tr>
+                        <tr><td class="kb-de">das Privatvermögen</td><td>всё, что принадлежит человеку лично: дом, машина, сбережения, зарплата</td><td>Квартира Georg и его накопления</td></tr>
+                        <tr><td class="kb-de">die Rechtsform</td><td>правовая форма предприятия: определяет, кто отвечает, кто решает и кто получает прибыль</td><td>«e.K.» показывает форму Einzelunternehmung</td></tr>
+                        <tr><td class="kb-de">der Rechtsformzusatz</td><td>часть названия, показывающая правовую форму; обязательна, чтобы партнёр сразу видел, кто отвечает</td><td>e.K., OHG, KG, GmbH, AG</td></tr>
+                        <tr><td class="kb-de">die Rücklagen</td><td>прибыль, которую не выплачивают, а оставляют в фирме — как подушка или на крупные инвестиции</td><td>AG откладывает 40.000 € на новый цех</td></tr>
+                        <tr><td class="kb-de">das Stammkapital</td><td>капитал GmbH: минимум 25.000 €, складывается из Geschäftsanteile участников</td><td>15.000 + 5.000 + 5.000 = 25.000 €</td></tr>
+                        <tr><td class="kb-de">der Umsatz</td><td>деньги, которые приходят от продаж, ещё без вычета расходов</td><td>Пивоварня сделала более 600.000 € оборота</td></tr>
+                        <tr><td class="kb-de">die unbeschränkte Haftung</td><td>отвечаешь всем, что есть: Betriebsvermögen плюс Privatvermögen</td><td>Не хватило денег фирмы — Georg платит из личных</td></tr>
+                        <tr><td class="kb-de">die unmittelbare Haftung</td><td>кредитор вправе обратиться сразу и напрямую к участнику, не судясь сначала с фирмой</td><td>Напоминание приходит прямо участнику №2</td></tr>
+                        <tr><td class="kb-de">die Vertretung</td><td>действия наружу: заключать договоры, заказывать, подписывать от имени фирмы</td><td>Кто вправе представлять GmbH — стоит в Handelsregister</td></tr>
+                        <tr><td class="kb-de">der Vorstand</td><td>руководящий орган AG: ведёт дела и представляет AG наружу</td><td>Vorstand решает о строительстве второй пивоварни</td></tr>
+                        <tr><td class="kb-de">Geld einbringen</td><td>вносить деньги в дело как капитал</td><td>Jeder Freund bringt 150.000 &euro; ein</td></tr>
+                        <tr><td class="kb-de">eine Empfehlung / Begr&uuml;ndung abgeben</td><td>дать рекомендацию с обоснованием — именно это спрашивают в итоговом задании про Georg Kraft</td><td>Geben Sie eine begr&uuml;ndete Empfehlung f&uuml;r Herrn Kraft ab</td></tr>
+                        <tr><td class="kb-de">sich f&uuml;r etw. entscheiden</td><td>сделать выбор в пользу чего-то, определиться</td><td>Warum haben Sie sich f&uuml;r die GmbH entschieden?</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Каждая новая тема с урока Informationswirtschaft получает здесь <b>свою вкладку</b>.
+                        Общая лексика по школе — на странице
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>, теория предприятия —
+                        на <a href="deutsch-bwr.html">BWR</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        </div><!-- /iw-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Lektion ===================== */
+(function () {
+    var hub = document.getElementById('iw-hub');
+    var wrap = document.getElementById('iw-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Informationswirtschaft | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('iw-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#iw-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#iw-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_iw_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('iw-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#iw-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+/* ===================== TRAINER: welche Lernart? ===================== */
+var LERN = [
+    { id: 'sup',  label: 'Überwachtes Lernen' },
+    { id: 'uns',  label: 'Unüberwachtes Lernen' },
+    { id: 'rl',   label: 'Bestärkendes Lernen' },
+    { id: 'gen',  label: 'Generative KI (Sprachmodell)' },
+    { id: 'kein', label: 'Keine KI — festes Regelwerk' }
+];
+
+var ITEMS = [
+    { von: 'Qualitätssicherung', txt: '10.000 Fotos von Bauteilen sind mit „i.O.“ und „n.i.O.“ beschriftet. Das System lernt daraus, Ausschuss zu erkennen.', lern: 'sup',
+      erkl: 'Есть готовые правильные ответы (Label «i.O./n.i.O.») → <b>überwachtes Lernen</b>, задача Klassifikation.' },
+    { von: 'Online-Shop', txt: 'Das System teilt 80.000 Kundinnen und Kunden nach ihrem Kaufverhalten in Gruppen ein. Welche Gruppen es gibt, war vorher nicht bekannt.', lern: 'uns',
+      erkl: 'Меток нет, группы система нашла сама — это <b>Clustering</b>, то есть unüberwachtes Lernen.' },
+    { von: 'Lagerlogistik', txt: 'Ein Roboter probiert Fahrwege aus. Für jede freie Fahrt bekommt er Pluspunkte, für jede Kollision Minuspunkte.', lern: 'rl',
+      erkl: 'Награда и штраф за поведение — классическое <b>bestärkendes Lernen</b>.' },
+    { von: 'Buchhaltung', txt: 'Das Programm addiert auf jede Rechnung automatisch 19 % Mehrwertsteuer.', lern: 'kein',
+      erkl: 'Жёсткое правило, написанное человеком. Автоматизация — но <b>не KI</b>: система ничему не училась.' },
+    { von: 'Büro', txt: 'Ein Assistent formuliert aus drei Stichpunkten eine höfliche Kundenmail und schreibt den Text selbst.', lern: 'gen',
+      erkl: 'Порождается новый текст, слово за словом по вероятности — <b>generative KI</b> (LLM).' },
+    { von: 'IT-Abteilung', txt: 'Der Spamfilter wurde mit E-Mails trainiert, die als „Spam“ oder „kein Spam“ markiert waren.', lern: 'sup',
+      erkl: 'Снова обучение по меткам → <b>überwacht</b>. Это самый частый пример в учебнике.' },
+    { von: 'Marketing', txt: 'Eine Warenkorbanalyse zeigt: Wer einen Drucker kauft, kauft oft auch Papier. Vorgegeben war diese Regel nicht.', lern: 'uns',
+      erkl: 'Система нашла связь сама, без меток → <b>unüberwacht</b> (Assoziationsanalyse).' },
+    { von: 'Rechnungsprüfung', txt: 'Bei jedem Betrag über 10.000 € erscheint ein Warnhinweis für die Chefin.', lern: 'kein',
+      erkl: 'Условие WENN … DANN. Порог задал человек — обучения нет, значит <b>keine KI</b>.' },
+    { von: 'Forschung', txt: 'Ein Programm spielt Millionen Partien gegen sich selbst; Belohnung gibt es nur für den Sieg.', lern: 'rl',
+      erkl: 'Игра против себя ради награды — <b>bestärkendes Lernen</b>, как у AlphaGo.' },
+    { von: 'Vertrieb', txt: 'Aus den Verkaufszahlen der letzten drei Jahre sagt das Modell den Umsatz im Dezember in Euro voraus.', lern: 'sup',
+      erkl: 'Учили на прошлых данных с известным результатом, а предсказываем <b>число</b> → überwachtes Lernen, Regression.' },
+    { von: 'Kundendienst', txt: 'Der Chatbot des Shops formuliert die Antwort an die Kundin in eigenen Worten.', lern: 'gen',
+      erkl: 'Ответ не выбран из готового списка, а сгенерирован → <b>generative KI</b>.' },
+    { von: 'Stadtverwaltung', txt: 'Die Ampel schaltet nach festem Takt: 30 Sekunden grün, 30 Sekunden rot.', lern: 'kein',
+      erkl: 'Фиксированный такт по расписанию — обычное управление, <b>keine KI</b>.' },
+    { von: 'Qualitätsmanagement', txt: 'Aus 50.000 Kundenbewertungen bildet das System selbstständig Themengruppen wie „Lieferzeit“ oder „Verpackung“.', lern: 'uns',
+      erkl: 'Темы никто не задавал — система сгруппировала сама → <b>unüberwacht</b>.' },
+    { von: 'Poststelle', txt: 'Handschriftliche Postleitzahlen werden erkannt. Trainiert wurde mit Ziffernbildern, bei denen die richtige Zahl dabeistand.', lern: 'sup',
+      erkl: 'Изображение + правильная цифра как Label → <b>überwachtes Lernen</b>.' },
+    { von: 'Finanzabteilung', txt: 'Ein Handelsprogramm testet Strategien und bekommt Gewinn oder Verlust als Rückmeldung.', lern: 'rl',
+      erkl: 'Прибыль и убыток работают как Belohnung/Bestrafung → <b>bestärkendes Lernen</b>.' },
+    { von: 'E-Commerce', txt: 'Ein Werkzeug schreibt aus technischen Daten einen Produkttext für den Online-Shop.', lern: 'gen',
+      erkl: 'Создаётся новый текст → <b>generative KI</b>.' },
+    { von: 'Banken-IT', txt: 'Auffällige Kontobewegungen werden gemeldet — ohne dass jemand vorher definiert hat, wie „auffällig“ aussieht.', lern: 'uns',
+      erkl: 'Определения «подозрительно» не было, система ищет отклонения сама → <b>Anomalieerkennung</b>, unüberwacht.' },
+    { von: 'Sekretariat', txt: 'Eine Excel-Formel sucht über SVERWEIS den Preis zur Artikelnummer.', lern: 'kein',
+      erkl: 'Поиск по таблице по заданной формуле — <b>keine KI</b>.' },
+    { von: 'Personalabteilung', txt: 'Aus alten Bewerbungen mit der Info „eingestellt / nicht eingestellt“ lernt ein Modell, neue Bewerbungen zu bewerten.', lern: 'sup',
+      erkl: 'Метки «принят / не принят» → <b>überwacht</b>. Осторожно: по EU AI Act это <b>hohes Risiko</b> и источник Bias.' },
+    { von: 'Übersetzungsbüro', txt: 'Ein Tool überträgt eine deutsche E-Mail in flüssiges Englisch.', lern: 'gen',
+      erkl: 'Перевод современных систем — это порождение текста нейросетью → <b>generative KI</b>.' }
+];
+
+var SELBST_KI = [
+    { q: 'Дай определение KI одним предложением — так, как сказал бы на уроке.',
+      a: '<b>„Künstliche Intelligenz bezeichnet Systeme, die Aufgaben lösen, für die beim Menschen Intelligenz nötig ist — sie lernen ihre Regeln aus Daten, statt sie vorgegeben zu bekommen.“</b>' },
+    { q: 'Чем KI отличается от обычной автоматизации? Приведи пример «не KI».',
+      a: 'Обычная программа выполняет <b>жёсткие правила человека</b> (WENN … DANN), KI выводит правила <b>из данных</b>. Не KI: расчёт НДС, SVERWEIS в Excel, светофор по расписанию.' },
+    { q: 'Как соотносятся KI, maschinelles Lernen и Deep Learning?',
+      a: 'Вложенные круги: <b>KI</b> — самое широкое понятие, внутри него <b>maschinelles Lernen</b> (учится на данных), внутри него <b>Deep Learning</b> (нейросети со многими слоями).' },
+    { q: 'Назови три вида обучения и по одному примеру.',
+      a: '<b>Überwacht</b> — Spamfilter (данные с метками). <b>Unüberwacht</b> — Kundensegmentierung (групп заранее нет). <b>Bestärkend</b> — робот получает Belohnung/Bestrafung.' },
+    { q: 'В чём разница между Klassifikation и Regression?',
+      a: '<b>Klassifikation</b> предсказывает категорию (Spam / kein Spam), <b>Regression</b> — число (Umsatz в декабре, цена).' },
+    { q: 'Что такое Halluzination и почему она вообще возникает?',
+      a: 'Модель уверенно выдаёт выдуманный факт, потому что <b>считает вероятное следующее слово</b>, а не проверяет базу знаний. Поэтому цифры, законы и цитаты нужно проверять.' },
+    { q: 'Из каких элементов состоит хороший Prompt?',
+      a: '<b>Rolle + Kontext + Aufgabe + Format</b> (по желанию — Beispiel). Плюс итерация: «kürzer», «formeller», «drei Varianten».' },
+    { q: 'Что означает «Garbage in, garbage out» применительно к ИИ?',
+      a: 'Модель не бывает лучше своих <b>Trainingsdaten</b>: искажение в данных (<b>Bias</b>) она повторит и усилит.' },
+    { q: 'Что такое Overfitting и как с ним борются?',
+      a: '<b>Überanpassung</b>: модель выучила примеры наизусть и плохо работает на новых данных. Проверяют, разделив данные на <b>Trainings-</b> и <b>Testdaten</b>.' },
+    { q: 'Назови четыре ступени риска в EU AI Act.',
+      a: '<b>Unannehmbar</b> (запрещено, напр. Social Scoring), <b>hoch</b> (Bewerberauswahl, Kredit, Medizin — строгие требования), <b>begrenzt</b> (чат-боты — Transparenzpflicht), <b>minimal</b> (спам-фильтр — без требований).' },
+    { q: 'Почему нельзя вводить данные клиентов в публичный ИИ-сервис?',
+      a: 'Это <b>personenbezogene Daten</b>: по DSGVO нужны основание и Zweckbindung, а введённые данные покидают предприятие. Нарушение грозит штрафом.' },
+    { q: 'Назови три применения ИИ на фирме и Handlungsfeld к каждому.',
+      a: '<b>Empfehlungssystem</b> → Absatz; <b>Absatzprognose für die Bestellung</b> → Beschaffung; <b>Predictive Maintenance</b> → Leistungserstellung.' },
+    { q: 'Назови по два плюса и два риска ИИ в фирме.',
+      a: 'Плюсы: <b>Zeitersparnis</b>, круглосуточная доступность, лучшие прогнозы. Риски: <b>Datenschutz</b>, <b>Bias</b>, Blackbox, потеря рутинных рабочих мест.' },
+    { q: 'Кто отвечает за решение, принятое системой ИИ?',
+      a: 'Всегда <b>человек и предприятие</b>. Формула: „Die KI schlägt vor, der Mensch entscheidet“ — закон требует menschliche Aufsicht при высоком риске.' },
+    { q: 'Можно ли сдать работу, полностью написанную ИИ?',
+      a: 'Нет: это <b>Täuschungsversuch</b>. ИИ — <b>Hilfsmittel</b>, использование указывают; формулировать и отвечать за содержание нужно самому.' }
+];
+
+/* ===================== TRAINER-LOGIK ===================== */
+var order = [], pos = 0, done = 0, okFirst = 0, answered = false, triedThis = false;
+
+function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1)), t = a[i];
+        a[i] = a[j]; a[j] = t;
+    }
+    return a;
+}
+
+function lernLabel(id) {
+    for (var i = 0; i < LERN.length; i++) { if (LERN[i].id === id) { return LERN[i].label; } }
+    return id;
+}
+
+function render() {
+    var it = ITEMS[order[pos]];
+    answered = false; triedThis = false;
+    document.getElementById('tzFrom').textContent = 'Aus dem Bereich: ' + it.von;
+    document.getElementById('tzPrompt').textContent = '«' + it.txt + '»';
+    document.getElementById('tzFb').innerHTML = '';
+    var box = document.getElementById('tzOpts');
+    box.innerHTML = '';
+    LERN.forEach(function (l) {
+        var b = document.createElement('button');
+        b.className = 'tz-opt';
+        b.type = 'button';
+        b.textContent = l.label;
+        b.addEventListener('click', function () { pick(b, l.id, it); });
+        box.appendChild(b);
+    });
+    document.getElementById('tzDone').textContent = done;
+    document.getElementById('tzOk').textContent = okFirst;
+}
+
+function pick(btn, id, it) {
+    if (answered) { return; }
+    if (id === it.lern) {
+        btn.classList.add('ok');
+        answered = true;
+        done++;
+        if (!triedThis) { okFirst++; }
+        document.getElementById('tzFb').innerHTML = '&#x2705; <b>' + lernLabel(it.lern) + '</b> — ' + it.erkl;
+        document.querySelectorAll('#tzOpts .tz-opt').forEach(function (b) { b.disabled = true; });
+        document.getElementById('tzDone').textContent = done;
+        document.getElementById('tzOk').textContent = okFirst;
+    } else {
+        btn.classList.add('no');
+        btn.disabled = true;
+        triedThis = true;
+        document.getElementById('tzFb').innerHTML = '&#x274C; Ещё раз. Спроси себя: есть ли в данных <i>готовые правильные ответы</i> (Label)? Ищет ли система <i>группы сама</i>? Есть ли <i>награда за поведение</i>? Порождается ли <i>новый текст</i>? Или правило просто <i>написал человек</i>?';
+    }
+}
+
+function next() {
+    if (!answered) {
+        var it = ITEMS[order[pos]];
+        document.getElementById('tzFb').innerHTML = '&#x1F4A1; Правильный ответ: <b>' + lernLabel(it.lern) + '</b> — ' + it.erkl;
+        answered = true;
+        done++;
+        document.getElementById('tzDone').textContent = done;
+        return;
+    }
+    pos++;
+    if (pos >= order.length) {
+        document.getElementById('tzFrom').textContent = '';
+        document.getElementById('tzPrompt').textContent = 'Готово! ' + okFirst + ' из ' + order.length + ' — с первого раза.';
+        document.getElementById('tzOpts').innerHTML = '';
+        document.getElementById('tzFb').innerHTML = okFirst === order.length
+            ? '&#x1F3C6; Ни одной ошибки — виды обучения ты различаешь уверенно.'
+            : 'Повтори те, где сомневался, и запусти ещё раз.';
+        return;
+    }
+    render();
+}
+
+function reset() {
+    order = shuffle(ITEMS.map(function (_, i) { return i; }));
+    pos = 0; done = 0; okFirst = 0;
+    document.getElementById('tzTotal').textContent = order.length;
+    render();
+}
+
+document.getElementById('tzNext').addEventListener('click', next);
+document.getElementById('tzReset').addEventListener('click', reset);
+reset();
+
+/* ===================== SELBSTTEST ===================== */
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+renderSelbst('stListKI', SELBST_KI);
+
+/* ===================== TRAINER 2: welche Rechtsform? ===================== */
+var RF = [
+    { id: 'ek',   label: 'Einzelunternehmung (e.K.)' },
+    { id: 'gbr',  label: 'GbR' },
+    { id: 'ohg',  label: 'OHG' },
+    { id: 'kg',   label: 'KG' },
+    { id: 'gmbh', label: 'GmbH' },
+    { id: 'ag',   label: 'AG' }
+];
+
+var RITEMS = [
+    { von: 'Mindestkapital', txt: 'Mindestens 25.000 Euro Kapital, davon bei der Anmeldung mindestens 12.500 Euro eingezahlt.', rf: 'gmbh',
+      erkl: '25.000 € Stammkapital и половина при регистрации — признак <b>GmbH</b>.' },
+    { von: 'Gesellschafter', txt: 'Es gibt zwei Arten von Gesellschaftern: einen Vollhafter und einen Teilhafter.', rf: 'kg',
+      erkl: 'Komplementär (Vollhafter) + Kommanditist (Teilhafter) = <b>KG</b>.' },
+    { von: 'Gründung', txt: 'Eine einzige Person, kein Gesellschaftsvertrag, kein Mindestkapital, keine Formvorschriften.', rf: 'ek',
+      erkl: 'Один владелец без формальностей — <b>Einzelunternehmung (e.K.)</b>.' },
+    { von: 'Kapital', txt: 'Das Grundkapital von mindestens 50.000 Euro ist in Anteile aufgeteilt, die an der Börse gehandelt werden.', rf: 'ag',
+      erkl: 'Grundkapital 50.000 € и акции на бирже — <b>AG</b>.' },
+    { von: 'Haftung', txt: 'Alle Gesellschafter haften unbeschränkt, unmittelbar und gesamtschuldnerisch.', rf: 'ohg',
+      erkl: 'Три признака ответственности сразу у <b>всех</b> участников — <b>OHG</b>.' },
+    { von: 'Organe', txt: 'Vorstand, Aufsichtsrat und Hauptversammlung teilen sich die Aufgaben.', rf: 'ag',
+      erkl: 'Три органа есть только у <b>AG</b>.' },
+    { von: 'Geschäftsführung', txt: 'Nur der Vollhafter führt die Geschäfte. Der Geldgeber hat dafür ein Kontroll- und ein Widerspruchsrecht.', rf: 'kg',
+      erkl: 'Ведёт только Komplementär, у Kommanditist — Kontroll- и Widerspruchsrecht: <b>KG</b>.' },
+    { von: 'Entscheidungen', txt: 'Die Gesellschafterversammlung bestellt und entlässt die Geschäftsführer.', rf: 'gmbh',
+      erkl: 'Gesellschafterversammlung + Geschäftsführer — <b>GmbH</b>.' },
+    { von: 'Haftung', txt: 'Der Inhaber haftet mit Betriebs- und Privatvermögen und entscheidet allein – innen wie außen.', rf: 'ek',
+      erkl: 'Один отвечает всем и решает всё — <b>e.K.</b>' },
+    { von: 'Gründung', txt: 'Mindestens zwei Personen, kein Mindestkapital, jeder darf das Unternehmen allein vertreten.', rf: 'ohg',
+      erkl: 'Двое и больше, без капитала, каждый вправе подписывать — <b>OHG</b>.' },
+    { von: 'Gewinn', txt: 'Die Anteilseigner heißen Aktionäre und bekommen eine Dividende je Anteil.', rf: 'ag',
+      erkl: 'Aktionäre и Dividende — <b>AG</b>.' },
+    { von: 'Gewinn', txt: 'Der Gewinn wird nach dem Anteil am Stammkapital verteilt.', rf: 'gmbh',
+      erkl: 'Слово <b>Stammkapital</b> есть только у <b>GmbH</b> (у AG — Grundkapital).' },
+    { von: 'Handelsregister', txt: 'Eintragung in Abteilung A, das Unternehmen gehört einer einzigen Person.', rf: 'ek',
+      erkl: 'Abteilung A + один человек — <b>e.K.</b> (в A стоят ещё OHG и KG, но там участников несколько).' },
+    { von: 'Haftung', txt: 'Ein Gesellschafter haftet voll, die anderen nur mit ihrer Einlage.', rf: 'kg',
+      erkl: 'Разная ответственность у участников — <b>KG</b>.' },
+    { von: 'Kapitalbeschaffung', txt: 'Die Anteile lassen sich unkompliziert über die Börse verkaufen und übertragen.', rf: 'ag',
+      erkl: 'Биржа и свободная передача долей — <b>AG</b>.' },
+    { von: 'Recht', txt: 'Juristische Person, Vertrag beim Notar, ab 500 Beschäftigten ist ein Aufsichtsrat Pflicht.', rf: 'gmbh',
+      erkl: 'Aufsichtsrat с 500 сотрудников — правило для <b>GmbH</b>.' },
+    { von: 'Praxis', txt: 'Mehrere Partner bringen Wissen und Arbeit ein und wollen die höchste Kreditwürdigkeit.', rf: 'ohg',
+      erkl: 'Высокая Kreditwürdigkeit из-за полной личной ответственности всех — <b>OHG</b>.' },
+    { von: 'Fall Kraft', txt: 'Die Freunde bringen 300.000 Euro ein, Georg behält mit 60 Prozent die Mehrheit und haftet nicht privat.', rf: 'gmbh',
+      erkl: 'Все три цели Georg выполняет только <b>GmbH</b>.' },
+    { von: 'Freiberufler', txt: 'Drei Anwältinnen gründen zusammen eine Kanzlei — ohne Notar, ohne Mindestkapital, ohne Handelsgewerbe.', rf: 'gbr',
+      erkl: 'Freiberufler-Sozietäten ohne Handelsgewerbe sind das klassische Beispiel für die <b>GbR</b>.' },
+    { von: 'Gründung', txt: 'Mindestens zwei Personen, ein gemeinsamer Zweck reicht, sogar eine mündliche Absprache genügt.', rf: 'gbr',
+      erkl: 'Formfreie Gründung ohne Handelsgewerbe — <b>GbR</b>.' },
+    { von: 'Register', txt: 'Die Eintragung in ein eigenes Register ist freiwillig; wer sich einträgt, führt danach ein kleines „e“ vor dem Namen der Rechtsform.', rf: 'gbr',
+      erkl: 'Freiwillige Eintragung + Zusatz &bdquo;e&ldquo; (eGbR) &mdash; das gibt es nur bei der <b>GbR</b>.' }
+];
+
+var SELBST_RF = [
+    { q: 'Назови пять критериев, по которым сравнивают правовые формы.',
+      a: '<b>Gründung, Haftung, Vertretung, Geschäftsführung, Gewinn- und Verlustverteilung.</b>' },
+    { q: 'В чём разница между Geschäftsführung и Vertretung?',
+      a: '<b>Geschäftsführung</b> — решения внутри (Innenverhältnis). <b>Vertretung</b> — действия наружу, подпись под договорами (Außenverhältnis).' },
+    { q: 'Что значит unbeschränkt, unmittelbar и gesamtschuldnerisch?',
+      a: '<b>Unbeschränkt</b> — отвечаешь и личным имуществом. <b>Unmittelbar</b> — кредитор идёт сразу к участнику. <b>Gesamtschuldnerisch</b> — с одного можно потребовать весь долг.' },
+    { q: 'Чем Personengesellschaft отличается от Kapitalgesellschaft? Назови примеры.',
+      a: 'В <b>Personengesellschaft</b> (OHG, KG) в центре люди и минимум один отвечает лично. В <b>Kapitalgesellschaft</b> (GmbH, AG) отвечает только внесённый капитал.' },
+    { q: 'Кто такой Komplementär и кто такой Kommanditist?',
+      a: '<b>Komplementär</b> — Vollhafter: ведёт и представляет фирму, отвечает и личным имуществом. <b>Kommanditist</b> — Teilhafter: отвечает только Einlage, но не решает; у него Kontroll- и Widerspruchsrecht.' },
+    { q: 'Сколько составляет Stammkapital GmbH и сколько должно быть внесено при регистрации?',
+      a: 'Минимум <b>25.000 €</b>, при Anmeldung внесено минимум <b>12.500 €</b>. GmbH возникает только с записью в Handelsregister.' },
+    { q: 'Какие три органа у AG и что делает каждый?',
+      a: '<b>Vorstand</b> — ведёт дела (leitend), <b>Aufsichtsrat</b> — выбирает и контролирует Vorstand (überwachend), <b>Hauptversammlung</b> — собрание акционеров, решает о прибыли (beschließend).' },
+    { q: 'Как делится прибыль в OHG, если в договоре ничего не написано?',
+      a: 'Сначала по стоимости вкладов, а если и этого нет — <b>nach Köpfen</b>, поровну на человека (§ 709 BGB, § 120 HGB).' },
+    { q: 'Что такое juristische Person?',
+      a: 'Предприятие с собственными правами и обязанностями: само покупает, продаёт, судится. Это GmbH и AG — поэтому линию покупает <b>GmbH</b>, а не Georg.' },
+    { q: 'Какие две отделения у Handelsregister и кто в них стоит?',
+      a: '<b>Abteilung A</b>: e.K., OHG, KG. <b>Abteilung B</b>: GmbH, AG.' },
+    { q: 'Чем отличаются Firma, Unternehmen и Betrieb?',
+      a: '<b>Firma</b> — имя предприятия, <b>Unternehmen</b> — правовая единица, <b>Betrieb</b> — место, где создаётся продукт.' },
+    { q: 'Назови три Firmengrundsätze и объясни один на примере.',
+      a: 'Например <b>Firmenzusatz</b>, <b>Firmenwahrheit</b>, <b>Firmenausschließlichkeit</b>. «Tübinger Großbrauerei GmbH» при 17 сотрудниках нарушает Firmenwahrheit — вводит в заблуждение о размере.' },
+    { q: 'Какие три цели у Georg Kraft?',
+      a: '<b>300.000 € Kapital</b> от двух друзей, <b>решать самому</b> и <b>ограничить Haftung</b>.' },
+    { q: 'Почему для Kraft&rsquo;s Brewery подходит именно GmbH?',
+      a: 'Друзья входят как Gesellschafter (капитал), Georg с <b>60 %</b> долей держит большинство и может быть Geschäftsführer, а отвечает только Gesellschaftsvermögen. AG слишком дорога: 50.000 € и три органа.' },
+    { q: 'Что такое GmbH & Co. KG?',
+      a: 'Особая форма KG, где Komplementär — не человек, а <b>GmbH</b>. Так и полный ответчик рискует только имуществом общества.' },
+    { q: 'Чем GbR отличается от OHG, если Haftung и Geschäftsführung у них одинаковые?',
+      a: 'Единственная разница — <b class="kb-de">Handelsgewerbe</b>: GbR его не ведёт (небольшой оборот, Freiberufler), OHG — ведёт. Как только GbR дорастает до Handelsgewerbe, она <b>автоматически</b> становится OHG.' },
+    { q: 'Можно ли основать GbR устно, без письменного договора?',
+      a: 'Да — <b>formfrei</b>: не нужны ни письменный Gesellschaftsvertrag, ни нотариус (кроме случая, когда в дело вносят Grundstück). Достаточно общей цели минимум двух человек и Mindestkapital вообще не требуется.' }
+];
+
+/* ===================== TRAINER-FABRIK (2. Trainer) ===================== */
+function makeTrainer(prefix, opts, items, key, hint, doneMsg) {
+    var order = [], pos = 0, done = 0, okFirst = 0, answered = false, triedThis = false;
+    function el(id) { return document.getElementById(prefix + id); }
+    function label(id) {
+        for (var i = 0; i < opts.length; i++) { if (opts[i].id === id) { return opts[i].label; } }
+        return id;
+    }
+    function shuffleArr(a) {
+        a = a.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1)), t = a[i];
+            a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+    function draw() {
+        var it = items[order[pos]];
+        answered = false; triedThis = false;
+        el('From').textContent = 'Merkmal: ' + it.von;
+        el('Prompt').textContent = '«' + it.txt + '»';
+        el('Fb').innerHTML = '';
+        var box = el('Opts');
+        box.innerHTML = '';
+        opts.forEach(function (o) {
+            var b = document.createElement('button');
+            b.className = 'tz-opt';
+            b.type = 'button';
+            b.textContent = o.label;
+            b.addEventListener('click', function () { choose(b, o.id, it); });
+            box.appendChild(b);
+        });
+        el('Done').textContent = done;
+        el('Ok').textContent = okFirst;
+    }
+    function choose(btn, id, it) {
+        if (answered) { return; }
+        if (id === it[key]) {
+            btn.classList.add('ok');
+            answered = true; done++;
+            if (!triedThis) { okFirst++; }
+            el('Fb').innerHTML = '&#x2705; <b>' + label(it[key]) + '</b> — ' + it.erkl;
+            box_disable();
+            el('Done').textContent = done;
+            el('Ok').textContent = okFirst;
+        } else {
+            btn.classList.add('no');
+            btn.disabled = true;
+            triedThis = true;
+            el('Fb').innerHTML = '&#x274C; ' + hint;
+        }
+    }
+    function box_disable() {
+        var bs = el('Opts').querySelectorAll('.tz-opt');
+        for (var i = 0; i < bs.length; i++) { bs[i].disabled = true; }
+    }
+    function nextItem() {
+        if (!answered) {
+            var it = items[order[pos]];
+            el('Fb').innerHTML = '&#x1F4A1; Правильный ответ: <b>' + label(it[key]) + '</b> — ' + it.erkl;
+            answered = true; done++;
+            el('Done').textContent = done;
+            return;
+        }
+        pos++;
+        if (pos >= order.length) {
+            el('From').textContent = '';
+            el('Prompt').textContent = 'Готово! ' + okFirst + ' из ' + order.length + ' — с первого раза.';
+            el('Opts').innerHTML = '';
+            el('Fb').innerHTML = okFirst === order.length ? '&#x1F3C6; ' + doneMsg : 'Повтори те, где сомневался, и запусти ещё раз.';
+            return;
+        }
+        draw();
+    }
+    function restart() {
+        order = shuffleArr(items.map(function (_, i) { return i; }));
+        pos = 0; done = 0; okFirst = 0;
+        el('Total').textContent = order.length;
+        draw();
+    }
+    if (!el('Next')) { return; }
+    el('Next').addEventListener('click', nextItem);
+    el('Reset').addEventListener('click', restart);
+    restart();
+}
+
+makeTrainer('rz', RF, RITEMS, 'rf', RITEMS.length
+    ? 'Ещё раз. Спроси себя: сколько человек участвует? Нужен ли Mindestkapital? Кто отвечает личным имуществом? Как называется капитал — Stammkapital или Grundkapital?'
+    : '', 'Все пять правовых форм ты различаешь уверенно.');
+renderSelbst('stListRF', SELBST_RF);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB E-Commerce | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #ec-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+        /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+
+    /* ---- Begriffskarten ---- */
+    .sk-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:1rem 1.15rem; margin-bottom:1rem; border-left:3px solid var(--color-accent); }
+    .sk-card.s1 { border-left-color:#79b8ff; }
+    .sk-card.s2 { border-left-color:#f472b6; }
+    .sk-card.s3 { border-left-color:#fbbf24; }
+    .sk-card.s4 { border-left-color:#86efac; }
+    .sk-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .sk-card h4 { margin:0.15rem 0 0.6rem; font-size:1.08rem; color:#fff; }
+    .sk-card p { font-size:0.93rem; line-height:1.62; color:rgba(230,230,235,0.8); margin:0 0 0.55rem; }
+    .sk-card p:last-child { margin-bottom:0; }
+
+    .kb-msg { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+              padding:0.7rem 0.9rem; font-style:italic; color:rgba(230,230,235,0.85); margin:0 0 0.9rem; line-height:1.6; }
+    .kb-msg b { font-style:normal; color:rgba(230,230,235,0.5); font-size:0.76rem; text-transform:uppercase;
+                letter-spacing:0.06em; display:block; margin-bottom:0.3rem; }
+    .kb-de { color:#fff; font-weight:600; }
+    .kb-say { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.25); border-radius:8px;
+              padding:0.6rem 0.8rem; margin:0.6rem 0 0; color:#fff; font-size:0.95rem; line-height:1.6; }
+    .kb-say b { color:#86efac; display:block; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.07em;
+                margin-bottom:0.25rem; font-weight:700; }
+
+    /* ---- Ablauf-Diagramm ---- */
+    .se-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:0.5rem; margin:0.8rem 0; }
+    .se-box { flex:1 1 130px; background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:0.7rem 0.8rem; text-align:center; }
+    .se-box b { display:block; color:#fff; font-size:0.93rem; margin-bottom:0.2rem; }
+    .se-box span { font-size:0.79rem; color:rgba(230,230,235,0.6); line-height:1.45; display:block; }
+    .se-arrow { display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--color-accent); flex:0 0 auto; }
+
+    /* ---- KI / ML / DL Ringe ---- */
+    .ki-ring { border-radius:16px; padding:1.1rem; text-align:center; }
+    .ki-ring > span { display:block; font-weight:700; color:#fff; font-size:0.98rem; margin-bottom:0.15rem; }
+    .ki-ring > small { display:block; font-size:0.79rem; color:rgba(230,230,235,0.62); line-height:1.5; margin-bottom:0.8rem; }
+    .ki-r1 { background:rgba(121,184,255,0.09); border:1px solid rgba(121,184,255,0.35); }
+    .ki-r2 { background:rgba(244,114,182,0.09); border:1px solid rgba(244,114,182,0.38); }
+    .ki-r3 { background:rgba(251,191,36,0.1);  border:1px solid rgba(251,191,36,0.4); padding-bottom:1.1rem; }
+
+    /* ---- Risikostufen (AI Act) ---- */
+    .ki-risk { border-radius:10px; padding:0.7rem 0.9rem; margin-bottom:0.5rem; border:1px solid rgba(255,255,255,0.1); }
+    .ki-risk b { display:block; color:#fff; font-size:0.95rem; margin-bottom:0.2rem; }
+    .ki-risk span { font-size:0.86rem; color:rgba(230,230,235,0.75); line-height:1.55; }
+    .ki-risk.r-verboten { background:rgba(248,81,73,0.13); border-color:rgba(248,81,73,0.4); }
+    .ki-risk.r-hoch    { background:rgba(251,146,60,0.12); border-color:rgba(251,146,60,0.4); }
+    .ki-risk.r-begrenzt{ background:rgba(121,184,255,0.1); border-color:rgba(121,184,255,0.35); }
+    .ki-risk.r-minimal { background:rgba(63,185,80,0.1);  border-color:rgba(63,185,80,0.3); }
+
+    /* ---- Redemittel ---- */
+    .rm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:0.55rem; margin-top:0.6rem; }
+    .rm-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.6rem 0.8rem; }
+    .rm-de { color:#fff; font-weight:600; font-size:0.91rem; }
+    .rm-ru { color:rgba(230,230,235,0.6); font-size:0.82rem; margin-top:0.25rem; }
+    .rm-group-title { color:#86efac; font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+                       margin:1.1rem 0 0.2rem; }
+    .rm-group-title:first-child { margin-top:0; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- Trainer ---- */
+    .tz-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tz-prompt { font-size:1.05rem; color:#fff; line-height:1.55; text-align:center; margin:0.3rem 0 0.2rem; }
+    .tz-from { text-align:center; color:rgba(230,230,235,0.55); font-size:0.83rem; margin-bottom:1rem; }
+    .tz-opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.45rem; }
+    .tz-opt { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+              padding:0.55rem 0.7rem; color:rgba(230,230,235,0.85); font-size:0.87rem; cursor:pointer;
+              font-family:inherit; text-align:left; transition:all .15s; }
+    .tz-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(255,255,255,0.08); }
+    .tz-opt:disabled { cursor:default; opacity:0.75; }
+    .tz-opt.ok { border-color:var(--color-green); background:rgba(63,185,80,0.14); color:#86efac; }
+    .tz-opt.no { border-color:#f85149; background:rgba(248,81,73,0.12); color:#ff9d97; }
+    .tz-fb { margin-top:0.85rem; font-size:0.92rem; line-height:1.55; min-height:1.4rem; color:rgba(230,230,235,0.8); }
+    .tz-fb b { color:#fff; }
+    .tz-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tz-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.55rem 1.15rem;
+              font-size:0.92rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tz-btn:hover { background:var(--color-accent-hover); }
+    .tz-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tz-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tz-stats b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .kb-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .kb-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    .kb-vs ul { margin:0.3rem 0 0; padding-left:1.05rem; }
+    .kb-vs li { margin-bottom:0.28rem; }
+    @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                    <a href="deutsch-egb.html">EGB Deutsch</a>
+                    <a href="iw-egb.html">EGB Informationswirtschaft</a>
+                    <a href="ec-egb.html" class="active">EGB E-Commerce</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB E-Commerce</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zur Höheren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB E-Commerce</h1>
+            <p class="page-subtitle">Themen aus dem E-Commerce-Unterricht am Erich-Gutenberg-Berufskolleg &mdash; <b>каждый урок = отдельная карточка</b>.<br>Начинается с Selbstpräsentation vor der Kamera, дальше &mdash; сам предмет: B2B/B2C, Bestellprozess, Recht, Marketing &mdash; объяснения по-русски, термины по-немецки</p>
+        </div>
+
+        <div id="ec-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="ec-search" placeholder="Thema suchen&hellip; z.B. Widerrufsrecht, Conversion, B2B" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="ec-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F6D2; Themen aus dem E-Commerce-Unterricht
+        </h2>
+        <p id="ec-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждый урок &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#3fb950,#86efac); color:#052e0f;">EC</span>
+            <h3 style="color:#86efac;">E-Commerce &amp; Onlinehandel</h3>
+            <span class="iw-sec-note">6 Lektionen &middot; Selbstpräsentation, Grundlagen, Recht, Marketing</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#ec0" class="subject-card glass-card" data-lesson="ec0" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F3A5;</span>
+                <h3>Selbstpräsentation: Warum FHR?</h3>
+                <p>Первое задание курса перед камерой &mdash; структура из пяти частей, чеклист по камере и одежде, готовые Redemittel</p>
+            </a>
+            <a href="#ec1" class="subject-card glass-card" data-lesson="ec1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F6D2;</span>
+                <h3>Grundlagen des E-Commerce</h3>
+                <p>Was E-Commerce von normalem Handel unterscheidet, B2B/B2C/C2C/B2G, Online-Shop vs. Marktplatz, Vor- und Nachteile</p>
+            </a>
+            <a href="#ec2" class="subject-card glass-card" data-lesson="ec2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F6D2;</span>
+                <h3>Bestellprozess &amp; Kennzahlen</h3>
+                <p>Von Warenkorb bis Retoure, Kaufabbruch und Conversion-Rate mit Rechenbeispiel, die wichtigsten Zahlungsarten</p>
+            </a>
+            <a href="#ec3" class="subject-card glass-card" data-lesson="ec3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x2696;&#xFE0F;</span>
+                <h3>Recht im Online-Handel</h3>
+                <p>Fernabsatzvertrag, Widerrufsrecht mit Ausnahmen, AGB und Impressum, Gewährleistung vs. Garantie, DSGVO kurz</p>
+            </a>
+            <a href="#ec4" class="subject-card glass-card" data-lesson="ec4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F4E3;</span>
+                <h3>Marketing &amp; Kundenbindung</h3>
+                <p>SEO und Reichweite, der Trichter von Besuch zu Kauf, Kundenbewertungen und Newsletter, Marktplatz gegen eigenen Shop</p>
+            </a>
+            <a href="#ec5" class="subject-card glass-card" data-lesson="ec5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F4DA;</span>
+                <h3>Wortschatz &amp; Trainer</h3>
+                <p>Тренажёр «B2B, B2C, C2C или B2G?», 12 вопросов на себя и словарь новых терминов</p>
+            </a>
+        </div>
+
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#3fb950,#86efac);">WS</span>
+            <h3 style="color:#86efac;">Fachwortschatz H&ouml;here Handelsschule</h3>
+            <span class="iw-sec-note">Basis-Wortschatz &amp; verwandte Themen</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="deutsch-handelsschule.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F4D6;</span>
+                <h3>Fachwortschatz &mdash; 375 W&ouml;rter</h3>
+                <p>Блок &#x1F6D2; E-Commerce &amp; Onlinehandel (30 базовых слов: Onlineshop, Retoure, AGB, Impressum, Marktplatz...) + весь остальной словарь направления</p>
+            </a>
+            <a href="iw-egb.html" class="subject-card glass-card" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(63,185,80,0.35);">
+                <span class="subject-icon">&#x1F916;</span>
+                <h3>EGB Informationswirtschaft</h3>
+                <p>KI-Grundlagen и Rechtsformen: Kraft&rsquo;s Brewery &mdash; остальные темы этого предмета</p>
+            </a>
+        </div>
+
+        </div><!-- /ec-hub -->
+
+        <div id="ec-lessons">
+
+        <div class="lesson" id="ls-ec0">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3A5;</span>
+                    <div>
+                        <h2>Selbstpr&auml;sentation: Warum strebe ich die Fachhochschulreife an?</h2>
+                        <p class="lesson-header-sub">Erste Aufgabe dieses Kurses, noch vor dem eigentlichen E-Commerce-Stoff &mdash; digitale Selbstpr&auml;sentation vor der Kamera, 3&ndash;5 Minuten, n&auml;chste Woche mit erster Bewertung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CD; Почему это в E-Commerce, а не в Deutsch</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Прежде чем начать сам курс, преподаватель попросила сначала всех представиться на камеру:
+                        <i>„Wenn wir die Präsentationen hinter uns haben, dann starten wir mit unserem
+                        E-Commerce-Unterricht.“</i> Это разминка перед курсом — заодно тренировка того самого
+                        <b class="kb-de">professionellen Auftritts</b> перед камерой, который потом понадобится
+                        и в самом E-Commerce (видеозвонки с клиентами, презентации проектов).
+                    </p>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Arbeitsauftrag в двух словах</h3>
+                    <p style="font-size:0.97rem; line-height:1.65;">
+                        Ты обдумываешь <b>свои личные</b> мотивы, цели и планы на будущее — и рассказываешь о них
+                        коротко <b>перед камерой</b>. Это не письменная работа: письменно можно только
+                        <b>подготовить заметки</b> (Word-Datei или просто шпаргалка), а сдаёшь ты именно
+                        <b>устную презентацию</b>, 3&ndash;5 минут, на следующем уроке.
+                    </p>
+                    <div class="kb-say">
+                        <b>Зачем это вообще</b>
+                        Презентация тренирует ровно то, что понадобится на настоящем <b class="kb-de">Vorstellungs-</b>
+                        или <b class="kb-de">Bewerbungsgespräch</b> — говорить о себе связно, уверенно и по делу
+                        перед камерой. За неё сразу ставят первую оценку.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Пять частей — структура твоей презентации</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Это официальная структура из задания. Ответы — <b>только твои собственные</b>, я не могу
+                        придумать их за тебя. Ниже — что должно прозвучать в каждой части и наводящие вопросы.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:640px;">
+                        <tr><th>Teil</th><th>Was hinein muss</th><th>Leitfragen zur Orientierung</th></tr>
+                        <tr><td><b>1. Pers&ouml;nliche Vorstellung</b></td><td>имя + твои текущие учебные или профессиональные интересы</td><td>&mdash;</td></tr>
+                        <tr><td><b>2. Beweggr&uuml;nde f&uuml;r die FHR</b></td><td>личные мотивы, интересы, ожидания</td><td>Warum ist die FHR für dich wichtig?<br>Welche Chancen verbindest du mit diesem Abschluss?<br>Welche Ziele möchtest du damit erreichen?<br>Wer oder was hat dich zu dieser Entscheidung motiviert?</td></tr>
+                        <tr><td><b>3. Zukunftsperspektiven</b></td><td>планы после FHR</td><td>gewünschtes Studium oder Ausbildung<br>angestrebter Beruf<br>persönliche Karriereziele<br>Weiterbildungs- und Entwicklungsmöglichkeiten</td></tr>
+                        <tr><td><b>4. Reflexion der eigenen St&auml;rken</b></td><td>какие твои качества и способности помогут тебе успешно закончить FHR и достичь целей</td><td>Beispiele: Durchhaltevermögen, Zuverlässigkeit, Lernbereitschaft, Teamfähigkeit, Selbstständigkeit, Organisationstalent</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F4A1;</span>
+                    <div>
+                        <p><b>Как на самом деле готовить часть 4 (Stärken) — приём из объяснения преподавателя:</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li>Вспомни цель, которую ты уже <b>достиг(ла)</b> — например, mittlerer Schulabschluss или
+                            любую другую важную для тебя цель.</li>
+                            <li>Спроси себя: <i>какие именно качества</i> помогли тебе тогда её достичь? Именно они
+                            и есть твои <b class="kb-de">Stärken</b> для этой части.</li>
+                            <li>Можно взять и обратный пример: <i>где ты когда-то не справился(лась)</i> — это тоже
+                            нормально назвать, если сразу добавить, что именно ты хочешь в себе улучшить.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4F7; Professioneller Auftritt vor der Kamera</h3>
+                    <p style="font-size:0.93rem; color:rgba(230,230,235,0.72);">
+                        Это не отдельная часть речи, а то, <b>как</b> ты всё это показываешь — и именно на это
+                        обращают внимание при оценке в первую очередь.
+                    </p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F5E3;&#xFE0F; Ausdrucksweise &amp; Auftreten</h5>
+                            <ul>
+                                <li>говори чётко и достаточно громко</li>
+                                <li>дружелюбное, уверенное выражение лица</li>
+                                <li>не слишком серьёзно — иногда можно улыбнуться</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F4BB; Technik &amp; Umgebung</h5>
+                            <ul>
+                                <li><b>Kleidung:</b> так же уместно, как на Vorstellungsgespräch, а не по-домашнему</li>
+                                <li><b>Licht:</b> ноутбук так, чтобы лицо было хорошо видно — не слишком темно и не слишком ярко</li>
+                                <li><b>Hintergrund:</b> спокойный, не пёстрый и не отвлекающий</li>
+                                <li><b>Blickkontakt:</b> смотри в камеру, а не всё время в шпаргалку сбоку</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x23F1;&#xFE0F; Zeitrahmen: 3&ndash;5 Minuten</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Меньше 3 минут — плохо: в реальной ситуации с работодателем это выглядит так, будто тебе
+                        нечего о себе рассказать. Больше 5 — тоже плохо, надо укладываться. Ориентир —
+                        <b>около 4 минут</b>.
+                    </p>
+                    <div class="kb-msg"><b>Как тренироваться</b>Проговори всю презентацию вслух хотя бы раз с таймером. Так ты почувствуешь, где можно рассказать подробнее, а где — сократить, и не будешь всё время читать с листа.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Redemittel f&uuml;r die Selbstpr&auml;sentation</h3>
+                    <div class="rm-group-title">Einstieg</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Mein Name ist … und ich interessiere mich zurzeit besonders für …“</div><div class="rm-ru">Меня зовут … и сейчас меня особенно интересует …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich möchte mich Ihnen heute kurz vorstellen.“</div><div class="rm-ru">Сегодня я хочу коротко представиться.</div></div>
+                    </div>
+                    <div class="rm-group-title">Beweggr&uuml;nde</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Ich habe mich für die Fachhochschulreife entschieden, weil …“</div><div class="rm-ru">Я решил(а) получать Fachhochschulreife, потому что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Was mich dabei besonders motiviert hat, ist …“</div><div class="rm-ru">Особенно меня мотивировало …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Für mich ist dieser Abschluss wichtig, weil …“</div><div class="rm-ru">Для меня этот аттестат важен, потому что …</div></div>
+                    </div>
+                    <div class="rm-group-title">Zukunftsperspektiven</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Nach der Fachhochschulreife möchte ich …“</div><div class="rm-ru">После FHR я хочу …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Mein Ziel ist es, … zu studieren / eine Ausbildung als … zu machen.“</div><div class="rm-ru">Моя цель — учиться на … / пройти обучение на …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Langfristig strebe ich an, …“</div><div class="rm-ru">В долгосрочной перспективе я стремлюсь …</div></div>
+                    </div>
+                    <div class="rm-group-title">St&auml;rken</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Eine meiner Stärken ist … Das zeigt sich zum Beispiel daran, dass …“</div><div class="rm-ru">Одна из моих сильных сторон — … Это проявляется, например, в том, что …</div></div>
+                        <div class="rm-item"><div class="rm-de">„Diese Eigenschaft wird mir dabei helfen, …“</div><div class="rm-ru">Это качество поможет мне …</div></div>
+                    </div>
+                    <div class="rm-group-title">Abschluss</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">„Vielen Dank für Ihre Aufmerksamkeit.“</div><div class="rm-ru">Спасибо за внимание.</div></div>
+                        <div class="rm-item"><div class="rm-de">„Ich freue mich auf Ihre Fragen.“</div><div class="rm-ru">Буду рад(а) вопросам.</div></div>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x2705;</span>
+                    <div>
+                        <p><b>Checkliste &mdash; bereit f&uuml;r n&auml;chste Woche?</b></p>
+                        <ol class="pk" style="margin-top:0.5rem;">
+                            <li>Все пять частей продуманы, и это <b>твои настоящие</b> мысли, а не общие фразы.</li>
+                            <li>Презентация прорепетирована вслух с таймером — <b>3&ndash;5 минут</b>.</li>
+                            <li>Заметки под рукой, но ты <b>не читаешь</b> их слово в слово.</li>
+                            <li>Проверены Licht, Hintergrund и угол камеры <b>заранее</b>, не в последний момент.</li>
+                            <li>Одежда и выражение лица — как на Vorstellungsgespräch: опрятно и дружелюбно.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DA; Mini-Wortschatz</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:480px;">
+                        <tr><th>Deutsch</th><th>Русский</th></tr>
+                        <tr><td class="kb-de">die Selbstpräsentation</td><td>само-презентация</td></tr>
+                        <tr><td class="kb-de">der Beweggrund</td><td>мотив, побуждение</td></tr>
+                        <tr><td class="kb-de">die Zukunftsperspektive</td><td>перспектива на будущее</td></tr>
+                        <tr><td class="kb-de">die Reflexion (der eigenen Stärken)</td><td>осмысление, разбор (своих сильных сторон)</td></tr>
+                        <tr><td class="kb-de">das Durchhaltevermögen</td><td>упорство, умение не сдаваться</td></tr>
+                        <tr><td class="kb-de">die Zuverlässigkeit</td><td>надёжность</td></tr>
+                        <tr><td class="kb-de">die Lernbereitschaft</td><td>готовность учиться</td></tr>
+                        <tr><td class="kb-de">die Teamfähigkeit</td><td>умение работать в команде</td></tr>
+                        <tr><td class="kb-de">die Selbstständigkeit</td><td>самостоятельность</td></tr>
+                        <tr><td class="kb-de">das Organisationstalent</td><td>организаторские способности</td></tr>
+                        <tr><td class="kb-de">der Blickkontakt</td><td>зрительный контакт</td></tr>
+                        <tr><td class="kb-de">die Lichtverhältnisse</td><td>освещение</td></tr>
+                        <tr><td class="kb-de">angemessen</td><td>уместный, подобающий</td></tr>
+                        <tr><td class="kb-de">überzeugend</td><td>убедительный</td></tr>
+                        <tr><td class="kb-de">das Vorstellungsgespräch / das Bewerbungsgespräch</td><td>собеседование при приёме</td></tr>
+                        <tr><td class="kb-de">der Auftritt</td><td>манера держаться, выступление</td></tr>
+                    </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== EC 1: GRUNDLAGEN ==================== -->
+        <div class="lesson" id="ls-ec1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F6D2;</span>
+                    <div>
+                        <h2>Grundlagen des E-Commerce</h2>
+                        <p class="lesson-header-sub">Что вообще считается электронной торговлей — и по каким четырём осям её делят</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Определение</h3>
+                    <p style="font-size:0.97rem; line-height:1.65;">
+                        <b class="kb-de">E-Commerce (elektronischer Handel)</b> — заключение и обработка сделок купли-продажи
+                        через интернет: от поиска товара до оплаты и доставки. Ключевое отличие от обычной торговли —
+                        не «есть сайт», а то, что <b>сама сделка</b> (Bestellung, Zahlung) проходит в сети, а не у прилавка.
+                    </p>
+                    <div class="kb-say">
+                        <b>Ловушка на уроке</b>
+                        Сайт-визитка с адресом и телефоном для звонка — это ещё не E-Commerce, ведь заказ и оплата
+                        всё равно происходят офлайн. E-Commerce начинается там, где есть <b class="kb-de">Warenkorb</b>
+                        и онлайн-оплата.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F465; Wer handelt mit wem — vier Achsen</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:560px;">
+                        <tr><th>Kürzel</th><th>Bedeutung</th><th>Beispiel</th></tr>
+                        <tr><td><b class="kb-de">B2C</b></td><td>Business-to-Consumer: фирма продаёт частному лицу</td><td>Ты покупаешь кроссовки в интернет-магазине</td></tr>
+                        <tr><td><b class="kb-de">B2B</b></td><td>Business-to-Business: фирма продаёт фирме</td><td>Оптовый поставщик продаёт ткань швейной фабрике</td></tr>
+                        <tr><td><b class="kb-de">C2C</b></td><td>Consumer-to-Consumer: частное лицо продаёт частному лицу</td><td>Продажа б/у велосипеда на площадке объявлений</td></tr>
+                        <tr><td><b class="kb-de">B2G</b></td><td>Business-to-Government: фирма продаёт государству/учреждению</td><td>Поставка школьных парт через госзакупку</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        <b>Как определить за секунду:</b> спроси, <i>кто продавец</i> и <i>кто покупатель</i> —
+                        фирма или частное лицо (или государство). Название формулы читается слева направо:
+                        первая буква — продавец, вторая — покупатель.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3EA; Drei Formen, wo online verkauft wird</h3>
+                    <div class="sk-card s1">
+                        <div class="sk-tag">Form 1</div>
+                        <h4>Eigener Online-Shop</h4>
+                        <p>Собственная площадка фирмы (своя система, свой домен). Полный контроль над дизайном,
+                        ценами и данными клиентов — но всю посещаемость (<b class="kb-de">Reichweite</b>) нужно
+                        привлекать самому.</p>
+                    </div>
+                    <div class="sk-card s2">
+                        <div class="sk-tag">Form 2</div>
+                        <h4>Marktplatz</h4>
+                        <p>Продавец размещает товар на чужой крупной площадке (Amazon, eBay и подобные).
+                        Готовая аудитория с первого дня — но за это фирма отдаёт <b class="kb-de">Provision</b>
+                        с каждой продажи и не видит своих клиентов напрямую.</p>
+                    </div>
+                    <div class="sk-card s3">
+                        <div class="sk-tag">Form 3</div>
+                        <h4>Social Commerce / Preisvergleich</h4>
+                        <p>Продажа прямо в соцсети или через агрегатор, который сравнивает цены разных магазинов
+                        и просто направляет покупателя дальше.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Vorteile und Nachteile für den Händler</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>&#x1F44D; Vorteile</h5>
+                            <ul>
+                                <li>магазин открыт <b>24/7</b>, без выходных</li>
+                                <li>доступ к покупателям <b>по всей стране</b>, а не только рядом с точкой</li>
+                                <li>ниже расходы на аренду и персонал, чем у офлайн-магазина такого же охвата</li>
+                                <li>каждый клик и покупка измеримы — легко анализировать, что работает</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>&#x1F44E; Nachteile</h5>
+                            <ul>
+                                <li>высокая <b class="kb-de">Wettbewerbsintensität</b> — конкурент в одном клике</li>
+                                <li>покупатель не может потрогать товар → выше доля возвратов (<b class="kb-de">Retouren</b>)</li>
+                                <li>нужно завоёвывать доверие без личного контакта</li>
+                                <li>расходы на IT, доставку и обработку возвратов</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Merksatz</b>
+                        „E-Commerce senkt die Eintrittsbarriere für den Verkauf, erhöht aber gleichzeitig den
+                        Wettbewerbsdruck — jeder Konkurrent ist nur einen Klick entfernt.“
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== EC 2: BESTELLPROZESS ==================== -->
+        <div class="lesson" id="ls-ec2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F6D2;</span>
+                    <div>
+                        <h2>Der Bestellprozess &amp; Kennzahlen</h2>
+                        <p class="lesson-header-sub">Путь одного заказа от корзины до посылки — и как его измеряют цифрами</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F501; Der Bestellvorgang — шесть шагов</h3>
+                    <div class="se-flow">
+                        <div class="se-box"><b>Warenkorb</b><span>товары собраны, но заказ ещё не оформлен</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Checkout</b><span>адрес, способ оплаты и доставки</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Bestellbestätigung</b><span>подтверждение по e-mail</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Versand</b><span>отправка со склада</span></div>
+                    </div>
+                    <div class="se-flow" style="margin-top:0.4rem;">
+                        <div class="se-box"><b>Sendungsverfolgung</b><span>трек-номер, статус доставки</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Zustellung</b><span>товар у клиента &mdash; или Retoure, если он его вернул</span></div>
+                    </div>
+                    <p style="font-size:0.92rem; line-height:1.6; margin-top:0.7rem;">
+                        Юридически важный момент — <b class="kb-de">Bestellbestätigung</b>: именно с неё
+                        начинается отсчёт срока <b class="kb-de">Widerrufsrecht</b> (см. следующий урок).
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C9; Kaufabbruch und Conversion-Rate</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Kaufabbruch (Warenkorbabbruch)</b> — покупатель добавил товар в корзину,
+                        но так и не оформил заказ: ушёл на этапе Checkout, испугался стоимости доставки или просто
+                        передумал. Это одна из главных проблем любого онлайн-магазина.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Conversion-Rate</b> — доля посетителей, которые в итоге купили:
+                    </p>
+                    <div class="kb-msg" style="text-align:center; font-style:normal;">
+                        <b class="kb-de">Conversion-Rate = (Anzahl Käufe &divide; Anzahl Besucher) &times; 100 %</b>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Магазин посетили 2.000 человек за день, купили 40. Conversion-Rate = (40 : 2.000) &times; 100 % = <b>2 %</b>. Для розничного E-Commerce это близко к типичному значению — единицы процентов.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4B3; Die wichtigsten Zahlungsarten</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:560px;">
+                        <tr><th>Zahlungsart</th><th>Wie es funktioniert</th><th>Risiko liegt bei</th></tr>
+                        <tr><td><b class="kb-de">Vorkasse</b></td><td>клиент платит до отправки товара</td><td>покупателе — а вдруг товар не пришлёт?</td></tr>
+                        <tr><td><b class="kb-de">Kauf auf Rechnung</b></td><td>товар приходит, клиент платит потом по счёту</td><td>продавце — а вдруг не заплатят?</td></tr>
+                        <tr><td><b class="kb-de">Lastschrift</b></td><td>сумма списывается со счёта клиента по разрешению</td><td>продавце — платёж можно отозвать</td></tr>
+                        <tr><td><b class="kb-de">Kreditkarte</b></td><td>оплата картой сразу, с проверкой</td><td>распределено, есть страхование чарджбэков</td></tr>
+                        <tr><td><b class="kb-de">Zahlungsdienstleister</b> (PayPal и подобные)</td><td>посредник берёт риск на себя за комиссию</td><td>сервисе-посреднике</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        <b>Правило запоминания:</b> чем больше выбор способов оплаты в магазине, тем ниже
+                        <b class="kb-de">Kaufabbruch</b> — клиенты не любят, когда их привычного способа нет.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== EC 3: RECHT ==================== -->
+        <div class="lesson" id="ls-ec3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2696;&#xFE0F;</span>
+                    <div>
+                        <h2>Recht im Online-Handel</h2>
+                        <p class="lesson-header-sub">Fernabsatzvertrag, Widerrufsrecht, AGB и что обязано быть на любом немецком сайте</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DD; Wie ein Fernabsatzvertrag entsteht</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        Договор в интернет-магазине — это обычный <b class="kb-de">Kaufvertrag</b>, только заключённый
+                        на расстоянии (<b class="kb-de">Fernabsatzvertrag</b>): без личной встречи продавца и покупателя.
+                        Работает та же формула, что и в обычном праве: <b class="kb-de">Angebot</b> (товар в магазине
+                        с ценой) + <b class="kb-de">Annahme</b> (клиент нажал «Kaufen» и получил Bestellbestätigung).
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x21A9;&#xFE0F; Widerrufsrecht — 14 дней без объяснения причин</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Widerrufsrecht</b> — право покупателя отказаться от покупки в течение
+                        <b>14 дней</b> с момента получения товара, <b>без каких-либо причин</b>. Это не гарантия
+                        качества — товар может быть полностью исправен, и всё равно его можно вернуть.
+                    </p>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Действует</h5>
+                            Обычные физические товары: одежда, техника, книги.
+                        </div>
+                        <div>
+                            <h5>Есть исключения</h5>
+                            Скоропортящиеся товары, вскрытые товары гигиены (например, распечатанная косметика),
+                            цифровой контент, начатый сразу после покупки с согласия клиента.
+                        </div>
+                    </div>
+                    <div class="kb-msg"><b>Beispiel</b>Клиентка заказала куртку, надела её дома один раз и решила, что цвет не тот. Она вправе вернуть куртку в течение 14 дней — магазин обязан принять возврат.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C4; AGB und Impressum — обязательные страницы</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:560px;">
+                        <tr><th>Was</th><th>Wofür</th></tr>
+                        <tr><td><b class="kb-de">AGB</b> (Allgemeine Geschäftsbedingungen)</td><td>единые условия для всех покупателей: доставка, оплата, возвраты, ответственность</td></tr>
+                        <tr><td><b class="kb-de">Impressum</b></td><td>обязательные данные о владельце сайта: название фирмы, адрес, контакты, Handelsregister — чтобы покупатель знал, с кем имеет дело</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        Магазин без Impressum в Германии — это уже нарушение закона, независимо от того,
+                        насколько маленький этот магазин.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2696;&#xFE0F; Gewährleistung vs. Garantie — не путать</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Gewährleistung</h5>
+                            Обязанность продавца <b>по закону</b> — отвечает за дефекты, о которых покупатель
+                            не мог знать при покупке. Действует всегда, независимо от желания продавца.
+                        </div>
+                        <div>
+                            <h5>Garantie</h5>
+                            <b>Добровольное</b> обещание производителя или продавца сверх закона — например,
+                            «2 года гарантии» от бренда. Условия придумывает сам, кто её даёт.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F510;</span>
+                    <div>
+                        <p><b>DSGVO в двух словах для этой темы:</b> любой заказ содержит
+                        <b class="kb-de">personenbezogene Daten</b> клиента (имя, адрес, номер карты) — магазин обязан
+                        собирать их только для выполнения заказа (<b class="kb-de">Zweckbindung</b>) и защищать их.
+                        Полная теория DSGVO и AI Act — на вкладке <a href="#ki4">KI, Recht &amp; Ethik</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== EC 4: MARKETING ==================== -->
+        <div class="lesson" id="ls-ec4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4E3;</span>
+                    <div>
+                        <h2>Marketing, Sichtbarkeit &amp; Kundenbindung</h2>
+                        <p class="lesson-header-sub">Как магазин находят, как ему доверяют и как удерживают клиента после первой покупки</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50D; Sichtbar werden: Reichweite und SEO</h3>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Reichweite</b> — сколько людей вообще увидели магазин или рекламу.
+                        Без Reichweite нет продаж, сколько бы товар ни был хорош.
+                    </p>
+                    <p style="font-size:0.95rem; line-height:1.62;">
+                        <b class="kb-de">Suchmaschinenoptimierung (SEO)</b> — меры, чтобы сайт стоял выше в результатах
+                        поиска <b>бесплатно</b>, без оплаты за рекламу: правильные ключевые слова в описаниях товаров,
+                        быстрая загрузка сайта, понятная структура категорий.
+                    </p>
+                    <div class="kb-say">
+                        <b>Пара терминов</b>
+                        SEO — это <i>organische</i> (естественная, бесплатная) видимость. Платная реклама в поиске
+                        и соцсетях называется <i>SEA/Online-Werbung</i> — их часто комбинируют.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EA; Der Trichter: von Besuch zu Kauf</h3>
+                    <div class="se-flow">
+                        <div class="se-box"><b>Reichweite</b><span>сколько людей увидели магазин</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Besucher</b><span>сколько зашли на сайт</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Warenkorb</b><span>сколько добавили товар</span></div>
+                        <div class="se-arrow">&#8594;</div>
+                        <div class="se-box"><b>Kauf</b><span>Conversion &mdash; сколько реально купили</span></div>
+                    </div>
+                    <p style="font-size:0.92rem; line-height:1.6; margin-top:0.7rem;">
+                        На каждом шаге часть людей уходит — это нормально, и именно поэтому одной высокой
+                        Reichweite мало: важно, что происходит на <b>каждом</b> следующем шаге воронки.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2B50; Vertrauen und Wiederkauf</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.4rem; min-width:560px;">
+                        <tr><th>Instrument</th><th>Wofür es sorgt</th></tr>
+                        <tr><td><b class="kb-de">Kundenbewertung</b></td><td>доверие новых покупателей — «другие уже купили и довольны»</td></tr>
+                        <tr><td><b class="kb-de">Kundenservice</b></td><td>помощь до и после покупки, быстрые ответы на вопросы</td></tr>
+                        <tr><td><b class="kb-de">Newsletter</b></td><td>напоминание о магазине без новой рекламы — самый дешёвый повторный контакт</td></tr>
+                        <tr><td><b class="kb-de">Kundenbindung</b></td><td>общее название для всех мер, чтобы клиент вернулся снова</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        Привлечь нового клиента почти всегда дороже, чем удержать старого — поэтому
+                        <b class="kb-de">Kundenbindung</b> так важна именно в E-Commerce, где конкурент всегда рядом.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3EA; Marktplatz gegen eigenen Shop — снова тот же выбор</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Eigener Shop</h5>
+                            Реклама и Reichweite — забота самого продавца, зато <b>все данные клиентов</b>
+                            и вся выручка без Provision — его.
+                        </div>
+                        <div>
+                            <h5>Marktplatz</h5>
+                            Готовая аудитория и доверие площадки с первого дня — но <b class="kb-de">Provision</b>
+                            с каждой продажи и клиент, по сути, принадлежит площадке, а не продавцу.
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.7); margin-top:0.6rem;">
+                        На практике многие фирмы используют оба канала одновременно — это называется
+                        <b class="kb-de">Multichannel-Vertrieb</b>.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <!-- ==================== EC 5: WORTSCHATZ + TRAINER ==================== -->
+        <div class="lesson" id="ls-ec5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AE;</span>
+                    <div>
+                        <h2>Тренажёр: B2B, B2C, C2C или B2G?</h2>
+                        <p class="lesson-header-sub">Кто продавец, кто покупатель — определи модель по ситуации</p>
+                    </div>
+                </div>
+
+                <div class="tz-box">
+                    <div class="tz-from" id="ezFrom"></div>
+                    <div class="tz-prompt" id="ezPrompt"></div>
+                    <div class="tz-opts" id="ezOpts"></div>
+                    <div class="tz-fb" id="ezFb"></div>
+                    <div class="tz-actions">
+                        <button class="tz-btn" id="ezNext">Далее &rarr;</button>
+                        <button class="tz-btn ghost" id="ezReset">&#x21A9;&#xFE0F; Сначала</button>
+                    </div>
+                    <div class="tz-stats">
+                        <span>Пройдено: <b id="ezDone">0</b> / <b id="ezTotal">0</b></span>
+                        <span>Правильно с первого раза: <b id="ezOk">0</b></span>
+                    </div>
+                </div>
+
+                <div class="note-card" style="margin-top:1.2rem;">
+                    <h3>&#x1F9E0; Проверь себя</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Сначала ответь вслух, потом жми.</p>
+                    <div id="stListEC"></div>
+                </div>
+            </section>
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DA;</span>
+                    <div>
+                        <h2>Mini-Wortschatz</h2>
+                        <p class="lesson-header-sub">Новые термины этой темы — базовые 30 слов E-Commerce уже есть на странице Höhere Handelsschule</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.3rem; min-width:560px;">
+                        <tr><th>Deutsch</th><th>Что это значит</th></tr>
+                        <tr><td class="kb-de">der E-Commerce (elektronischer Handel)</td><td>торговля, где сама сделка (заказ, оплата) проходит через интернет</td></tr>
+                        <tr><td class="kb-de">B2B (Business-to-Business)</td><td>фирма продаёт фирме</td></tr>
+                        <tr><td class="kb-de">B2C (Business-to-Consumer)</td><td>фирма продаёт частному лицу</td></tr>
+                        <tr><td class="kb-de">C2C (Consumer-to-Consumer)</td><td>частное лицо продаёт частному лицу</td></tr>
+                        <tr><td class="kb-de">B2G (Business-to-Government)</td><td>фирма продаёт государству, учреждению</td></tr>
+                        <tr><td class="kb-de">der Fernabsatzvertrag</td><td>договор купли-продажи, заключённый на расстоянии, без личной встречи</td></tr>
+                        <tr><td class="kb-de">der Checkout</td><td>этап оформления заказа: адрес, оплата, доставка</td></tr>
+                        <tr><td class="kb-de">die Wettbewerbsintensität</td><td>насколько сильна конкуренция в этой нише</td></tr>
+                        <tr><td class="kb-de">der Multichannel-Vertrieb</td><td>продажа сразу через несколько каналов — свой магазин и маркетплейс одновременно</td></tr>
+                        <tr><td class="kb-de">das Social Commerce</td><td>продажа прямо внутри социальной сети</td></tr>
+                        <tr><td class="kb-de">der Zahlungsdienstleister</td><td>посредник, который берёт на себя риск платежа за комиссию (например PayPal)</td></tr>
+                        <tr><td class="kb-de">die Vorkasse</td><td>оплата до отправки товара</td></tr>
+                        <tr><td class="kb-de">die Lastschrift</td><td>списание суммы со счёта клиента по разрешению</td></tr>
+                        <tr><td class="kb-de">der Trichter (Sales-Funnel)</td><td>воронка продаж: Reichweite → Besucher → Warenkorb → Kauf</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Базовые 30 слов E-Commerce (der Onlineshop, die Retoure, das Widerrufsrecht, die AGB,
+                        das Impressum и другие) уже озвучены на странице
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>, блок
+                        <b>&#x1F6D2; E-Commerce &amp; Onlinehandel</b> — здесь их не дублируем.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        </div><!-- /ec-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Lektion ===================== */
+(function () {
+    var hub = document.getElementById('ec-hub');
+    var wrap = document.getElementById('ec-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Informationswirtschaft | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('ec-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#ec-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#ec-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_ec_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('ec-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#ec-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+function makeTrainer(prefix, opts, items, key, hint, doneMsg) {
+    var order = [], pos = 0, done = 0, okFirst = 0, answered = false, triedThis = false;
+    function el(id) { return document.getElementById(prefix + id); }
+    function label(id) {
+        for (var i = 0; i < opts.length; i++) { if (opts[i].id === id) { return opts[i].label; } }
+        return id;
+    }
+    function shuffleArr(a) {
+        a = a.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1)), t = a[i];
+            a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+    function draw() {
+        var it = items[order[pos]];
+        answered = false; triedThis = false;
+        el('From').textContent = 'Merkmal: ' + it.von;
+        el('Prompt').textContent = '«' + it.txt + '»';
+        el('Fb').innerHTML = '';
+        var box = el('Opts');
+        box.innerHTML = '';
+        opts.forEach(function (o) {
+            var b = document.createElement('button');
+            b.className = 'tz-opt';
+            b.type = 'button';
+            b.textContent = o.label;
+            b.addEventListener('click', function () { choose(b, o.id, it); });
+            box.appendChild(b);
+        });
+        el('Done').textContent = done;
+        el('Ok').textContent = okFirst;
+    }
+    function choose(btn, id, it) {
+        if (answered) { return; }
+        if (id === it[key]) {
+            btn.classList.add('ok');
+            answered = true; done++;
+            if (!triedThis) { okFirst++; }
+            el('Fb').innerHTML = '&#x2705; <b>' + label(it[key]) + '</b> — ' + it.erkl;
+            box_disable();
+            el('Done').textContent = done;
+            el('Ok').textContent = okFirst;
+        } else {
+            btn.classList.add('no');
+            btn.disabled = true;
+            triedThis = true;
+            el('Fb').innerHTML = '&#x274C; ' + hint;
+        }
+    }
+    function box_disable() {
+        var bs = el('Opts').querySelectorAll('.tz-opt');
+        for (var i = 0; i < bs.length; i++) { bs[i].disabled = true; }
+    }
+    function nextItem() {
+        if (!answered) {
+            var it = items[order[pos]];
+            el('Fb').innerHTML = '&#x1F4A1; Правильный ответ: <b>' + label(it[key]) + '</b> — ' + it.erkl;
+            answered = true; done++;
+            el('Done').textContent = done;
+            return;
+        }
+        pos++;
+        if (pos >= order.length) {
+            el('From').textContent = '';
+            el('Prompt').textContent = 'Готово! ' + okFirst + ' из ' + order.length + ' — с первого раза.';
+            el('Opts').innerHTML = '';
+            el('Fb').innerHTML = okFirst === order.length ? '&#x1F3C6; ' + doneMsg : 'Повтори те, где сомневался, и запусти ещё раз.';
+            return;
+        }
+        draw();
+    }
+    function restart() {
+        order = shuffleArr(items.map(function (_, i) { return i; }));
+        pos = 0; done = 0; okFirst = 0;
+        el('Total').textContent = order.length;
+        draw();
+    }
+    if (!el('Next')) { return; }
+    el('Next').addEventListener('click', nextItem);
+    el('Reset').addEventListener('click', restart);
+    restart();
+}
+
+/* ===================== TRAINER 3: B2B, B2C, C2C oder B2G? ===================== */
+var ECCATS = [
+    { id: 'b2c', label: 'B2C' },
+    { id: 'b2b', label: 'B2B' },
+    { id: 'c2c', label: 'C2C' },
+    { id: 'b2g', label: 'B2G' }
+];
+
+var ECITEMS = [
+    { von: 'Online-Shop', txt: 'Ein Kunde kauft in einem Modeshop online eine Jacke für sich selbst.', cat: 'b2c',
+      erkl: 'Firma verkauft an eine Privatperson — <b>B2C</b>.' },
+    { von: 'Großhandel', txt: 'Eine Bäckerei bestellt monatlich 200 kg Mehl bei einem Mühlenbetrieb.', cat: 'b2b',
+      erkl: 'Zwei Firmen handeln miteinander — <b>B2B</b>.' },
+    { von: 'Kleinanzeigen', txt: 'Eine Studentin verkauft ihr altes Fahrrad über eine Anzeigenplattform an eine andere Privatperson.', cat: 'c2c',
+      erkl: 'Privatperson an Privatperson — <b>C2C</b>.' },
+    { von: 'Ausschreibung', txt: 'Ein IT-Unternehmen liefert neue Computer für eine städtische Schule nach einer öffentlichen Ausschreibung.', cat: 'b2g',
+      erkl: 'Firma liefert an eine staatliche Einrichtung — <b>B2G</b>.' },
+    { von: 'Marktplatz', txt: 'Ein Kunde bestellt über einen großen Online-Marktplatz einen Staubsauger für den eigenen Haushalt.', cat: 'b2c',
+      erkl: 'Auch über einen Marktplatz bleibt es <b>B2C</b> — Verkäufer ist eine Firma, Käufer eine Privatperson.' },
+    { von: 'Rohstoffe', txt: 'Ein Stahlwerk liefert Bleche an eine Autofabrik.', cat: 'b2b',
+      erkl: 'Zwei Unternehmen — <b>B2B</b>.' },
+    { von: 'Second Hand', txt: 'Zwei Privatpersonen tauschen über eine App gebrauchte Kinderkleidung gegen Geld.', cat: 'c2c',
+      erkl: 'Privat an privat — <b>C2C</b>.' },
+    { von: 'Behörde', txt: 'Ein Büromöbelhersteller liefert Schreibtische für ein neues Finanzamt.', cat: 'b2g',
+      erkl: 'Lieferung an eine Behörde — <b>B2G</b>.' },
+    { von: 'Abo', txt: 'Eine Privatperson bestellt sich online ein monatliches Kaffee-Abo eines Röstereis.', cat: 'b2c',
+      erkl: 'Firma an Privatperson — <b>B2C</b>, auch als Abo statt Einzelbestellung.' },
+    { von: 'Zulieferer', txt: 'Ein Verpackungshersteller beliefert eine Brauerei mit Flaschenetiketten.', cat: 'b2b',
+      erkl: 'Firma an Firma — <b>B2B</b>.' },
+    { von: 'Flohmarkt-App', txt: 'Ein Sammler verkauft eine seltene Schallplatte an einen anderen Sammler über eine Kleinanzeigen-App.', cat: 'c2c',
+      erkl: 'Privat an privat — <b>C2C</b>.' },
+    { von: 'Ausrüstung', txt: 'Ein Sportartikelhersteller liefert Trikots für die Nationalmannschaft eines Landes.', cat: 'b2g',
+      erkl: 'Lieferung an eine staatliche Institution — <b>B2G</b>.' },
+    { von: 'Onlinekurs', txt: 'Eine Sprachschule verkauft Online-Kurse direkt an einzelne Lernende.', cat: 'b2c',
+      erkl: 'Firma an Privatperson — <b>B2C</b>.' },
+    { von: 'Software-Lizenz', txt: 'Ein Softwarehaus verkauft eine Lizenz für ein Warenwirtschaftssystem an eine mittelständische Firma.', cat: 'b2b',
+      erkl: 'Firma an Firma — <b>B2B</b>.' },
+    { von: 'Handwerksbetrieb', txt: 'Ein Trockenbau-Unternehmen bestellt Gipskartonplatten bei einem Baustoffhändler.', cat: 'b2b',
+      erkl: 'Firma an Firma — <b>B2B</b>.' },
+    { von: 'Ministerium', txt: 'Ein Verlag liefert neue Lehrbücher an das Bildungsministerium eines Bundeslandes.', cat: 'b2g',
+      erkl: 'Lieferung an eine staatliche Stelle — <b>B2G</b>.' }
+];
+
+var SELBST_EC = [
+    { q: 'В чём разница между eigenem Online-Shop и Marktplatz?',
+      a: '<b>Eigener Shop</b> — все данные клиентов и вся выручка твои, но Reichweite создаёшь сам. <b>Marktplatz</b> — готовая аудитория, но Provision с каждой продажи, и клиент «принадлежит» площадке.' },
+    { q: 'Расшифруй B2B, B2C, C2C, B2G.',
+      a: '<b>B2B</b> — фирма-фирме, <b>B2C</b> — фирма частному лицу, <b>C2C</b> — частное лицо частному лицу, <b>B2G</b> — фирма государству.' },
+    { q: 'Что такое Kaufabbruch и почему он важен для магазина?',
+      a: 'Покупатель добавил товар в <b class="kb-de">Warenkorb</b>, но не оформил заказ. Чем меньше Kaufabbruch, тем выше выручка при той же посещаемости.' },
+    { q: 'Дай формулу Conversion-Rate и посчитай для 5.000 посетителей и 100 покупок.',
+      a: '<b>(Käufe &divide; Besucher) &times; 100 %</b>. (100 : 5.000) &times; 100 % = <b>2 %</b>.' },
+    { q: 'Что такое Fernabsatzvertrag и из чего он возникает?',
+      a: 'Договор купли-продажи, заключённый на расстоянии — как обычный Kaufvertrag: <b>Angebot</b> (товар с ценой) + <b>Annahme</b> (клиент оформил заказ).' },
+    { q: 'Сколько дней действует Widerrufsrecht и нужно ли объяснять причину?',
+      a: '<b>14 дней</b> с момента получения товара, <b>без объяснения причин</b>.' },
+    { q: 'Приведи товар, на который Widerrufsrecht НЕ распространяется.',
+      a: 'Например скоропортящиеся товары или вскрытые товары гигиены.' },
+    { q: 'Чем Gewährleistung отличается от Garantie?',
+      a: '<b>Gewährleistung</b> — обязанность по закону, действует всегда. <b>Garantie</b> — добровольное обещание продавца или производителя сверх закона.' },
+    { q: 'Что обязательно должно быть на любом немецком сайте-магазине?',
+      a: '<b class="kb-de">Impressum</b> с данными о владельце и <b class="kb-de">AGB</b> с условиями продажи.' },
+    { q: 'Что такое SEO простыми словами?',
+      a: 'Бесплатное повышение позиции сайта в поисковой выдаче — через ключевые слова, скорость сайта и удобную структуру.' },
+    { q: 'Опиши воронку от Reichweite до Kauf.',
+      a: '<b>Reichweite &rarr; Besucher &rarr; Warenkorb &rarr; Kauf</b> — на каждом шаге часть людей уходит.' },
+    { q: 'Почему Kundenbindung дешевле, чем привлечение нового клиента?',
+      a: 'Постоянный клиент уже знает и доверяет магазину — не нужно заново тратиться на рекламу и убеждение, как для нового покупателя.' }
+];
+
+makeTrainer('ez', ECCATS, ECITEMS, 'cat',
+    'Ещё раз. Спроси себя: продавец — фирма или частное лицо? А покупатель — фирма, частное лицо или государство?',
+    'Все четыре модели ты различаешь уверенно.');
+renderSelbst('stListEC', SELBST_EC);
+</script>
+</body>
+</html>
