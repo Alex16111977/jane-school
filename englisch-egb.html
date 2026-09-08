@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Englisch — Finding the Right Job | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Hub (cards) and lesson view ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #egb-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+    /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+    /* ---- Job-ad breakdown ---- */
+    .sk-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:1rem 1.15rem; margin-bottom:1rem; border-left:3px solid var(--color-accent); }
+    .sk-card.s1 { border-left-color:#79b8ff; }
+    .sk-card.s2 { border-left-color:#f472b6; }
+    .sk-card.s3 { border-left-color:#fbbf24; }
+    .sk-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .sk-card h4 { margin:0.15rem 0 0.6rem; font-size:1.08rem; color:#fff; }
+    .kb-msg { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+              padding:0.7rem 0.9rem; font-style:italic; color:rgba(230,230,235,0.85); margin:0 0 0.9rem; line-height:1.6; }
+    .kb-msg b { font-style:normal; color:rgba(230,230,235,0.5); font-size:0.76rem; text-transform:uppercase;
+                letter-spacing:0.06em; display:block; margin-bottom:0.3rem; }
+    .kb-qa { margin-top:0.85rem; padding-top:0.75rem; border-top:1px dashed rgba(255,255,255,0.12); }
+    .kb-qa:first-of-type { border-top:none; padding-top:0; margin-top:0; }
+    .kb-q { color:#fbbf24; font-size:0.89rem; margin-bottom:0.4rem; }
+    .kb-a { color:#fff; font-weight:600; font-size:0.95rem; line-height:1.6; background:rgba(63,185,80,0.1);
+            border:1px solid rgba(63,185,80,0.25); border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.4rem; }
+    .kb-why { font-size:0.87rem; color:rgba(230,230,235,0.68); line-height:1.6; }
+    .kb-why b { color:#c8a5ff; font-weight:600; }
+    .kb-de { color:#fff; font-weight:600; }
+
+    /* ---- Skill grid / phrase grid ---- */
+    .rm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:0.55rem; margin-top:0.6rem; }
+    .rm-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.6rem 0.8rem; }
+    .rm-de { color:#fff; font-weight:600; font-size:0.91rem; }
+    .rm-ru { color:rgba(230,230,235,0.6); font-size:0.82rem; margin-top:0.25rem; }
+    .rm-group-title { color:#86efac; font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+                       margin:1.1rem 0 0.2rem; }
+    .rm-group-title:first-child { margin-top:0; }
+
+    /* ---- Self-test (click = answer) ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- small helpers ---- */
+    .kb-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .kb-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .kb-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+
+    /* ---- self-assessment table ---- */
+    .sa-table { width:100%; border-collapse:collapse; margin-top:0.6rem; font-size:0.88rem; }
+    .sa-table td, .sa-table th { padding:0.45rem 0.6rem; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .sa-table th { color:rgba(230,230,235,0.55); font-weight:600; text-align:center; font-size:0.8rem; }
+    .sa-table td:first-child { color:#fff; }
+    .sa-table td:not(:first-child) { text-align:center; opacity:0.35; font-size:0.8rem; }
+
+    /* ---- word family table ---- */
+    .wf-table { width:100%; border-collapse:collapse; margin-top:0.6rem; font-size:0.88rem; }
+    .wf-table td, .wf-table th { padding:0.5rem 0.7rem; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .wf-table th { color:#86efac; font-weight:700; text-align:left; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; }
+    .wf-table td:first-child { color:#fff; font-weight:600; }
+    .wf-table td { color:rgba(230,230,235,0.75); }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="biologie.html">Biologie</a>
+                    <a href="deutsch-egb.html">EGB Deutsch</a>
+                    <a href="englisch-egb.html" class="active">EGB Englisch</a>
+                    <a href="iw-egb.html">EGB Informationswirtschaft</a>
+                    <a href="ec-egb.html">EGB E-Commerce</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB Englisch</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Back to H&ouml;here Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Englisch</h1>
+            <p class="page-subtitle">Real worksheets from English class at Erich-Gutenberg-Berufskolleg &mdash; unit by unit &middot; <b>Unit 1: Finding the Right Job</b></p>
+        </div>
+
+        <div id="egb-hub">
+
+        <!-- ===== Search bar ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="egb-search" placeholder="Search a topic&hellip; e.g. cover letter, vocabulary, self-assessment" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="Clear" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Clear search">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nothing found for &ldquo;<span id="search-query-display"></span>&rdquo; &mdash; try another word
+            </div>
+        </div>
+
+        <h2 id="egb-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Worksheets from English Class
+        </h2>
+        <p id="egb-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Every part of the lesson is its own card below. Click <strong>+</strong> in the corner of a card to sort it into
+            <strong style="color:#fbbf24;">This Week</strong>, mark it <strong style="color:#86efac;">Done</strong>,
+            or save it for <strong style="color:#c9b3ff;">Later</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#79b8ff,#a8d3ff); color:#061424;">1</span>
+            <h3 style="color:#a8d3ff;">Unit 1 &mdash; Finding the Right Job</h3>
+            <span class="iw-sec-note">4 parts &middot; job ads, speaking, reading, vocabulary</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#u1a" class="subject-card glass-card" data-lesson="u1a" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(121,184,255,0.35);">
+                <span class="subject-icon">&#x1F3AF;</span>
+                <h3>Two Job Ads</h3>
+                <p>Assistant Store Manager vs. Management Assistant &mdash; how a job advert is built, plus a model spoken answer comparing the two roles</p>
+            </a>
+            <a href="#u1b" class="subject-card glass-card" data-lesson="u1b" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(121,184,255,0.35);">
+                <span class="subject-icon">&#x1F5E3;&#xFE0F;</span>
+                <h3>Talking About the Perfect Job</h3>
+                <p>The self-assessment test, ready-made phrases for talking about your strengths, and sentence starters for your dream job</p>
+            </a>
+            <a href="#u1c" class="subject-card glass-card" data-lesson="u1c" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(121,184,255,0.35);">
+                <span class="subject-icon">&#x1F4F0;</span>
+                <h3>Job Applications in a Changing World</h3>
+                <p>How CVs, cover letters and interviews work today &mdash; online applications, AI-screened CVs, and why persistence still matters</p>
+            </a>
+            <a href="#u1d" class="subject-card glass-card" data-lesson="u1d" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(121,184,255,0.35);">
+                <span class="subject-icon">&#x1F4DA;</span>
+                <h3>Vocabulary &amp; Self-Test</h3>
+                <p>35 key words from this unit, each explained in English with an example, plus word families and a click-to-check self-test</p>
+            </a>
+        </div>
+
+        </div><!-- /egb-hub -->
+
+        <div id="egb-lessons">
+
+        <div class="lesson" id="ls-u1a">
+        <button class="iw-back" data-back="1">&#8592; Back to overview</button>
+        <div class="zp-notes">
+
+            <!-- ===== Part A: Two job ads ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Two Job Ads, Two Different Roles</h2>
+                        <p class="lesson-header-sub">The Lernsituation: you compare two real job adverts to decide which one fits you best. Here's how an English job ad is built, and how to talk about it.</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; How a job ad is built</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        Almost every English-language job advert follows the same shape, so once you recognise the parts,
+                        you can read any of them quickly:
+                    </p>
+                    <ul class="note-list">
+                        <li><b class="kb-de">Why join us? / Intro</b> — a short pitch that makes the company sound attractive.</li>
+                        <li><b class="kb-de">Responsibilities / What you'll do</b> — the actual daily tasks of the job.</li>
+                        <li><b class="kb-de">Key requirements / What we're looking for</b> — the qualifications, skills and experience a candidate needs.</li>
+                        <li><b class="kb-de">Benefits / What we offer</b> — pay, holidays, and other reasons to accept the job.</li>
+                        <li><b class="kb-de">How to apply</b> — exactly what to send, and to whom.</li>
+                    </ul>
+                    <p style="margin-top:0.6rem; font-size:0.88rem; color:rgba(230,230,235,0.62);">
+                        Knowing these five labels also helps you write your own cover letter: it should answer the
+                        <i>requirements</i> section point by point.
+                    </p>
+                </div>
+
+                <div class="sk-card s1">
+                    <div class="sk-tag">Job Ad 1 &middot; Retail, Cork (Ireland)</div>
+                    <h4>Assistant Store Manager (full-time)</h4>
+                    <div class="kb-msg"><b>Shift and schedule</b>Weekend availability required &mdash; this is a hands-on, in-store role.</div>
+                    <div class="rm-group-title">Responsibilities</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">assisting the Store Manager</div><div class="rm-ru">помогать управляющему магазином</div></div>
+                        <div class="rm-item"><div class="rm-de">customer care and service</div><div class="rm-ru">забота о клиентах и обслуживание</div></div>
+                        <div class="rm-item"><div class="rm-de">hygiene standards</div><div class="rm-ru">нормы гигиены</div></div>
+                        <div class="rm-item"><div class="rm-de">supply chain procedures</div><div class="rm-ru">процедуры цепочки поставок</div></div>
+                    </div>
+                    <div class="rm-group-title">Key requirements</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">some previous retail work experience</div><div class="rm-ru">небольшой опыт работы в рознице</div></div>
+                        <div class="rm-item"><div class="rm-de">high customer service standards</div><div class="rm-ru">высокие стандарты обслуживания клиентов</div></div>
+                    </div>
+                    <div class="rm-group-title">Benefits</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">store and fuel discounts</div><div class="rm-ru">скидки в магазине и на топливо</div></div>
+                        <div class="rm-item"><div class="rm-de">competitive salary with growth opportunities</div><div class="rm-ru">конкурентная зарплата с возможностью роста</div></div>
+                        <div class="rm-item"><div class="rm-de">30-day holiday entitlement</div><div class="rm-ru">30 оплачиваемых дней отпуска в год</div></div>
+                        <div class="rm-item"><div class="rm-de">outstanding career development opportunities</div><div class="rm-ru">отличные возможности карьерного роста</div></div>
+                    </div>
+                </div>
+
+                <div class="sk-card s2">
+                    <div class="sk-tag">Job Ad 2 &middot; Office, Munich (Germany)</div>
+                    <h4>Management Assistant &mdash; full-time</h4>
+                    <div class="kb-msg"><b>Company</b>An English-speaking company in Germany, supporting the leadership team in the Munich office.</div>
+                    <div class="rm-group-title">What they're looking for</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">a degree in business management or similar</div><div class="rm-ru">диплом по менеджменту или смежной специальности</div></div>
+                        <div class="rm-item"><div class="rm-de">excellent organizational and communication skills</div><div class="rm-ru">отличные организаторские и коммуникативные навыки</div></div>
+                        <div class="rm-item"><div class="rm-de">fluency in English (written and spoken)</div><div class="rm-ru">свободное владение английским (письменно и устно)</div></div>
+                        <div class="rm-item"><div class="rm-de">proficiency in standard office software</div><div class="rm-ru">уверенное владение стандартным офисным ПО</div></div>
+                        <div class="rm-item"><div class="rm-de">a proactive and team-focused individual</div><div class="rm-ru">проактивный человек, нацеленный на командную работу</div></div>
+                    </div>
+                    <div class="rm-group-title">What you'll do</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">administrative and organizational tasks</div><div class="rm-ru">административные и организационные задачи</div></div>
+                        <div class="rm-item"><div class="rm-de">prepare reports, presentations, meeting materials</div><div class="rm-ru">готовить отчёты, презентации, материалы для встреч</div></div>
+                        <div class="rm-item"><div class="rm-de">coordinate schedules and appointments</div><div class="rm-ru">координировать расписание и встречи</div></div>
+                        <div class="rm-item"><div class="rm-de">handle general office operations</div><div class="rm-ru">вести общие офисные процессы</div></div>
+                    </div>
+                    <div class="rm-group-title">What they offer</div>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">28 days paid leave</div><div class="rm-ru">28 дней оплачиваемого отпуска</div></div>
+                        <div class="rm-item"><div class="rm-de">hybrid working options</div><div class="rm-ru">гибридный формат работы (офис + дом)</div></div>
+                        <div class="rm-item"><div class="rm-de">professional training &amp; career development</div><div class="rm-ru">профессиональное обучение и карьерный рост</div></div>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Comparing the two roles &mdash; a model spoken answer</h3>
+                    <div class="kb-vs">
+                        <div>
+                            <h5>Assistant Store Manager</h5>
+                            Hands-on, customer-facing, in-store. Success depends mostly on practical retail experience and people skills.
+                        </div>
+                        <div>
+                            <h5>Management Assistant</h5>
+                            Office-based, behind the scenes. Success depends mostly on organisation, written English and software skills.
+                        </div>
+                    </div>
+                    <div class="kb-qa">
+                        <div class="kb-q">Question: What is the main difference between these two jobs, and what skills does each one require?</div>
+                        <div class="kb-a">"The Assistant Store Manager role mainly requires practical retail experience and strong customer service skills, because the employee works directly with customers and has to keep the store running smoothly on a daily basis. The Management Assistant role, on the other hand, requires organisational and communication skills plus fluent English, because the job is about supporting a team with administrative work rather than serving customers face to face."</div>
+                        <div class="kb-why">Notice the structure: <b>claim &rarr; reason with "because" &rarr; contrast with "on the other hand"</b>. That pattern works for almost any "compare two things" question in an oral exam.</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-u1b">
+        <button class="iw-back" data-back="1">&#8592; Back to overview</button>
+        <div class="zp-notes">
+
+            <!-- ===== Part B: Talking about the perfect job ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E3;&#xFE0F;</span>
+                    <div>
+                        <h2>Focus on Communication &mdash; What Would You Like to Do?</h2>
+                        <p class="lesson-header-sub">Self-assessment, ready phrases for talking about yourself, and how to describe a job that doesn't exist yet: your dream job.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Self-assessment test</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.4rem;">
+                        A <b>self-assessment</b> is an honest rating of your own skills or preferences &mdash; here, from
+                        &#x1F641; (I don't like this / I'm not good at this) to &#x1F642; (I like this / I'm good at this).
+                        Go through the list below and decide for yourself.
+                    </p>
+                    <table class="sa-table">
+                        <tr><th style="text-align:left;">Task</th><th>&#x1F641;</th><th>&#x1F610;</th><th>&#x1F642;</th></tr>
+                        <tr><td>use my language skills <span style="opacity:.55;font-size:.85em;">— применять языковые навыки</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>work in a team <span style="opacity:.55;font-size:.85em;">— работать в команде</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>do administrative work <span style="opacity:.55;font-size:.85em;">— заниматься административной работой</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>help people <span style="opacity:.55;font-size:.85em;">— помогать людям</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>communicate a lot <span style="opacity:.55;font-size:.85em;">— много общаться</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>advise customers <span style="opacity:.55;font-size:.85em;">— консультировать клиентов</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>learn new skills <span style="opacity:.55;font-size:.85em;">— осваивать новые навыки</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>organize and plan processes <span style="opacity:.55;font-size:.85em;">— организовывать и планировать процессы</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>work in an office <span style="opacity:.55;font-size:.85em;">— работать в офисе</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>travel a lot <span style="opacity:.55;font-size:.85em;">— много путешествовать</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>sell products <span style="opacity:.55;font-size:.85em;">— продавать товары</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                        <tr><td>work outdoors <span style="opacity:.55;font-size:.85em;">— работать на улице</span></td><td>&#9633;</td><td>&#9633;</td><td>&#9633;</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4AC; Language help &mdash; talking about your strengths</h3>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">"I (don't) like &hellip; very much because &hellip;"</div><div class="rm-ru">мне (не) очень нравится &hellip;, потому что &hellip; &mdash; предпочтение сразу с обоснованием</div></div>
+                        <div class="rm-item"><div class="rm-de">"I think I'm quite good at (advising) &hellip;"</div><div class="rm-ru">мне кажется, у меня неплохо получается &hellip; &mdash; после "good at" ставится форма на <b>-ing</b></div></div>
+                        <div class="rm-item"><div class="rm-de">"I've always been interested in &hellip;. That's why &hellip;"</div><div class="rm-ru">меня всегда интересовало &hellip;, поэтому &hellip; &mdash; давний интерес и его следствие</div></div>
+                        <div class="rm-item"><div class="rm-de">"I quite enjoy &hellip;"</div><div class="rm-ru">мне вполне нравится &hellip; &mdash; мягче, чем "I love"</div></div>
+                        <div class="rm-item"><div class="rm-de">"&hellip; is not my strong point, so &hellip;"</div><div class="rm-ru">&hellip; не самая сильная моя сторона, поэтому &hellip; &mdash; вежливо признать слабость</div></div>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F31F; The perfect job &mdash; sentence starters with model answers</h3>
+                    <p style="font-size:0.9rem; color:rgba(230,230,235,0.65); margin-bottom:0.5rem;">
+                        Grammar note: <b class="kb-de">would</b> here describes an imagined, hypothetical job &mdash; not a real
+                        one. <i>"would have to"</i> = a hypothetical obligation.
+                    </p>
+                    <div class="kb-qa">
+                        <div class="kb-q">"In my dream job I would/wouldn't have to &hellip;"</div>
+                        <div class="kb-a">"In my dream job I wouldn't have to work early morning shifts."</div>
+                    </div>
+                    <div class="kb-qa">
+                        <div class="kb-q">"The perfect job for me would be &hellip;"</div>
+                        <div class="kb-a">"The perfect job for me would be something creative that also lets me help other people."</div>
+                    </div>
+                    <div class="kb-qa">
+                        <div class="kb-q">"What's most important to me is &hellip;"</div>
+                        <div class="kb-a">"What's most important to me is having a good relationship with my colleagues."</div>
+                    </div>
+                    <div class="kb-qa">
+                        <div class="kb-q">"For me, it would be important to have &hellip;"</div>
+                        <div class="kb-a">"For me, it would be important to have flexible working hours."</div>
+                    </div>
+                    <div class="kb-qa">
+                        <div class="kb-q">"Earning a lot of money would &hellip;"</div>
+                        <div class="kb-a">"Earning a lot of money would be nice, but it isn't the most important thing for me."</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-u1c">
+        <button class="iw-back" data-back="1">&#8592; Back to overview</button>
+        <div class="zp-notes">
+
+            <!-- ===== Part C: Reading — Job applications in a changing world ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4F0;</span>
+                    <div>
+                        <h2>How Job Applications Have Changed</h2>
+                        <p class="lesson-header-sub">A summary of the "Focus on words" reading text, in plain English &mdash; the key vocabulary is <b class="kb-de">bolded</b> so you can spot it.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5A5;&#xFE0F; From paper to a few clicks</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        In the past, a <b class="kb-de">job seeker</b> printed a <b class="kb-de">CV</b> and often visited
+                        employers in person. Today, most of the process &mdash; finding a <b class="kb-de">job advert</b>,
+                        sending a CV, writing a <b class="kb-de">cover letter</b>, <b class="kb-de">attending interviews</b> &mdash;
+                        happens online. Adverts list the <b class="kb-de">open position</b>, the <b class="kb-de">required
+                        skills</b> and the deadline; because so many more people see them online, the
+                        <b class="kb-de">competition</b> for each job has increased too.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F393; Internships and work placements</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        Companies use short <b class="kb-de">internships</b> and <b class="kb-de">work placements</b> to
+                        train new <b class="kb-de">employees</b> and give them real <b class="kb-de">work experience</b>.
+                        These are often unpaid, which makes them hard to live on &mdash; but for students and recent
+                        <b class="kb-de">graduates</b>, they're still a common way to start a career.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4C4; The CV: your personal advertisement</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        A CV is a factual summary of someone's education, skills and work experience. Because CVs are
+                        increasingly screened by <b class="kb-de">AI (artificial intelligence)</b> before a human ever
+                        reads them, they need to be clear, well-structured and specific. Even a candidate with little
+                        formal experience can strengthen a CV with <b class="kb-de">transferable skills</b>
+                        (skills useful in more than one job), <b class="kb-de">volunteer work</b>, and school projects.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DD; The cover letter: your personal story</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        While a CV just lists facts, a cover letter lets an <b class="kb-de">applicant</b> show
+                        personality: it links past experience to future <b class="kb-de">goals</b> and explains why
+                        this particular person is right for the role. If you use AI to help write one, make sure the
+                        result still sounds natural, not robotic.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DE; The interview &mdash; and what comes after</h3>
+                    <p style="font-size:0.95rem; line-height:1.65;">
+                        Interviews can happen in person, by phone, or by video call. Good preparation &mdash;
+                        researching the company, practising answers &mdash; helps <b class="kb-de">build
+                        confidence</b>. A short thank-you email afterwards shows the <b class="kb-de">candidate</b> is
+                        still interested. If the company decides not to take someone on, that
+                        <b class="kb-de">unsuccessful applicant</b> receives a <b class="kb-de">rejection letter</b> &mdash;
+                        a normal, expected part of a <b class="kb-de">competitive</b> job market. Over the last twenty
+                        years, social media and professional networking sites have also become an important way to
+                        find <b class="kb-de">job opportunities</b> even before applying.
+                    </p>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3C1; The bottom line</h3>
+                    <p style="font-size:0.98rem; line-height:1.65;">
+                        Technology changed <i>how</i> people apply for jobs &mdash; but finding a job is still a
+                        <b class="kb-de">challenging</b>, time-consuming process. Whether you apply online or in
+                        person, <b class="kb-de">effort</b>, <b class="kb-de">persistence</b> and a positive
+                        <b class="kb-de">attitude</b> are still what actually help you <b class="kb-de">succeed</b>.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        <div class="lesson" id="ls-u1d">
+        <button class="iw-back" data-back="1">&#8592; Back to overview</button>
+        <div class="zp-notes">
+
+            <!-- ===== Part D: Vocabulary & self-test ===== -->
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DA;</span>
+                    <div>
+                        <h2>Vocabulary &amp; Self-Test</h2>
+                        <p class="lesson-header-sub">Every word explained in English, the way a learner's dictionary would &mdash; plus a quick Russian translation, so you can check yourself either way.</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E0; Check yourself first</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">Try to answer out loud before you click.</p>
+                    <div id="stListJob"></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E9; Word families</h3>
+                    <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.4rem;">
+                        Recognising the root of a word helps you guess its meaning &mdash; and pick the right form in a
+                        sentence (verb, person, quality, or adjective).
+                    </p>
+                    <table class="wf-table">
+                        <tr><th>Verb</th><th>Noun (thing/action)</th><th>Noun (person)</th><th>Adjective</th></tr>
+                        <tr><td>to apply</td><td>application</td><td>applicant</td><td>&mdash;</td></tr>
+                        <tr><td>to compete</td><td>competition</td><td>competitor</td><td>competitive</td></tr>
+                        <tr><td>to succeed</td><td>success</td><td>&mdash;</td><td>successful</td></tr>
+                        <tr><td>to employ</td><td>employment</td><td>employee / employer</td><td>&mdash;</td></tr>
+                        <tr><td>to advertise</td><td>advertisement / advert</td><td>&mdash;</td><td>&mdash;</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Key vocabulary from this unit</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:720px;">
+                        <tr><th>Word / phrase</th><th>По-русски</th><th>What it means</th><th>Example</th></tr>
+                        <tr><td class="kb-de">job seeker</td><td>соискатель</td><td>a person who is looking for a job</td><td>"The website has advice for job seekers writing their first CV."</td></tr>
+                        <tr><td class="kb-de">CV (curriculum vitae)</td><td>резюме</td><td>a short document listing your education, skills and work experience</td><td>"Please send your CV and a short cover letter."</td></tr>
+                        <tr><td class="kb-de">job advert</td><td>объявление о вакансии</td><td>a public notice announcing that a position is available</td><td>"She found the job advert on the company's website."</td></tr>
+                        <tr><td class="kb-de">cover letter</td><td>сопроводительное письмо</td><td>a short letter sent with a CV, explaining why you're a good match for one specific job</td><td>"A good cover letter explains why you want this job, not just any job."</td></tr>
+                        <tr><td class="kb-de">to attend an interview</td><td>прийти на собеседование</td><td>to go to a meeting where an employer asks you questions to decide whether to hire you</td><td>"Arrive ten minutes early to attend the interview."</td></tr>
+                        <tr><td class="kb-de">open position</td><td>открытая вакансия</td><td>a job that is currently available and not yet filled</td><td>"There are three open positions in the marketing team."</td></tr>
+                        <tr><td class="kb-de">required skills</td><td>требуемые навыки</td><td>the abilities a candidate must already have to do the job well</td><td>"Fluency in English is one of the required skills."</td></tr>
+                        <tr><td class="kb-de">competition</td><td>конкуренция</td><td>the situation where several people try to get the same thing</td><td>"Online adverts have increased the competition for good jobs."</td></tr>
+                        <tr><td class="kb-de">internship</td><td>стажировка</td><td>a short, often unpaid, work placement that gives real work experience</td><td>"She did a three-month internship before finishing university."</td></tr>
+                        <tr><td class="kb-de">work placement</td><td>практика на предприятии</td><td>a period spent working for a company, usually as part of a course of study</td><td>"The school arranges a two-week work placement for every student."</td></tr>
+                        <tr><td class="kb-de">employee</td><td>сотрудник</td><td>a person who is paid to work for a company</td><td>"New employees get a week of training."</td></tr>
+                        <tr><td class="kb-de">graduate</td><td>выпускник</td><td>someone who has completed a course of study, especially at university</td><td>"Recent graduates often lack work experience."</td></tr>
+                        <tr><td class="kb-de">work experience</td><td>опыт работы</td><td>practical skill gained by actually doing a job, not just studying it</td><td>"He gained valuable work experience during his summer job."</td></tr>
+                        <tr><td class="kb-de">transferable skills</td><td>универсальные (переносимые) навыки</td><td>abilities (like teamwork) that are useful in many different jobs, not just one</td><td>"She listed teamwork and time management as transferable skills."</td></tr>
+                        <tr><td class="kb-de">volunteer work</td><td>волонтёрская работа</td><td>work you do without being paid, usually to help others</td><td>"Volunteer work at the shelter looks great on a CV."</td></tr>
+                        <tr><td class="kb-de">applicant</td><td>кандидат, подавший заявку</td><td>a person who has formally applied for a job</td><td>"Only five applicants were invited to interview."</td></tr>
+                        <tr><td class="kb-de">goal</td><td>цель</td><td>something you are aiming to achieve</td><td>"Explain how this job connects to your future goals."</td></tr>
+                        <tr><td class="kb-de">candidate</td><td>кандидат (в шорт-листе)</td><td>a person being seriously considered for a job, often already shortlisted</td><td>"The company invited three candidates for a second interview."</td></tr>
+                        <tr><td class="kb-de">to build confidence</td><td>обрести уверенность</td><td>to gradually feel more sure of yourself and your abilities</td><td>"Practising your answers out loud helps build confidence."</td></tr>
+                        <tr><td class="kb-de">(un)successful applicant</td><td>(не)прошедший отбор кандидат</td><td>describes whether or not someone got the job</td><td>"The unsuccessful applicants received a short rejection letter."</td></tr>
+                        <tr><td class="kb-de">rejection letter</td><td>письмо-отказ</td><td>a letter or email saying a job application was not accepted</td><td>"It's normal to get a few rejection letters before the right job."</td></tr>
+                        <tr><td class="kb-de">job opportunity</td><td>возможность трудоустройства</td><td>a chance to get a job or develop your career</td><td>"Networking sites help people discover job opportunities."</td></tr>
+                        <tr><td class="kb-de">challenging</td><td>сложный, требующий усилий</td><td>difficult in a way that tests your ability or effort</td><td>"Finding your first job can be a challenging process."</td></tr>
+                        <tr><td class="kb-de">competitive</td><td>высококонкурентный</td><td>describes a situation where many people are trying to win the same thing</td><td>"The graduate job market is highly competitive."</td></tr>
+                        <tr><td class="kb-de">employer</td><td>работодатель</td><td>a person or company that pays others to work for them</td><td>"Many employers expect some experience even for entry-level jobs."</td></tr>
+                        <tr><td class="kb-de">effort</td><td>усилие</td><td>the energy you put into trying to do something</td><td>"Finding a job still takes time and effort."</td></tr>
+                        <tr><td class="kb-de">persistence</td><td>настойчивость</td><td>continuing to try, even when something is difficult or slow</td><td>"Persistence pays off — most people apply more than once."</td></tr>
+                        <tr><td class="kb-de">attitude</td><td>отношение, настрой</td><td>the way you think and feel about something, shown in how you behave</td><td>"A positive attitude can matter as much as your qualifications."</td></tr>
+                        <tr><td class="kb-de">to succeed</td><td>добиться успеха</td><td>to achieve what you were trying to do</td><td>"Good preparation helps you succeed in a competitive market."</td></tr>
+                        <tr><td class="kb-de">proactive</td><td>проактивный (действующий на опережение)</td><td>taking action to make things happen, instead of just reacting</td><td>"They want a proactive person who doesn't need to be told what to do."</td></tr>
+                        <tr><td class="kb-de">hybrid working</td><td>гибридный формат работы</td><td>a way of working that mixes office days with days at home</td><td>"The company offers hybrid working options."</td></tr>
+                        <tr><td class="kb-de">proficiency</td><td>высокий уровень владения</td><td>a high level of skill in something, especially a language or software</td><td>"Proficiency in standard office software is required."</td></tr>
+                        <tr><td class="kb-de">supply chain</td><td>цепочка поставок</td><td>the whole process of getting a product from raw material to customer</td><td>"She had to learn all aspects of supply chain procedures."</td></tr>
+                        <tr><td class="kb-de">administrative task</td><td>административная задача</td><td>office work connected with organising and running a business</td><td>"His job involves administrative tasks like filing and scheduling."</td></tr>
+                        <tr><td class="kb-de">self-assessment</td><td>самооценка</td><td>the process of honestly judging your own abilities or preferences</td><td>"The self-assessment test shows which tasks you actually enjoy."</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>This page will grow: every new unit from English class gets its own tab here, the same way
+                        <a href="deutsch-egb.html">EGB Deutsch</a> already does. The full subject map for the
+                        Handelsschule is on <a href="deutsch-handelsschule.html">H&ouml;here Handelsschule</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        </div>
+
+        </div><!-- /egb-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: hub <-> lesson ===================== */
+(function () {
+    var hub = document.getElementById('egb-hub');
+    var wrap = document.getElementById('egb-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Englisch | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SEARCH ===================== */
+(function () {
+    var input = document.getElementById('egb-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: This Week / Done / Later ===================== */
+(function () {
+    var KEY = 'neostudy_en_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'This Week', done: 'Done', later: 'Later' };
+    var TIPS = { week: 'Mark as done →', done: 'Move to Later →', later: 'Remove label →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">This Week</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Done</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Later</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">All</button>' +
+            '<button class="pf-btn" data-f="week">📅 This Week</button>' +
+            '<button class="pf-btn" data-f="done">✓ Done</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Later</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('egb-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'No cards here yet.<br><span style="font-size:0.8rem;opacity:0.6;">Click the <strong>+</strong> on a card to sort it.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'This Week / Done / Later';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+
+/* ===================== SELF-TEST ===================== */
+var SELBST_JOB = [
+    { q: 'What do you call a short letter sent together with your CV that explains why you\'re right for the job?',
+      a: 'A <b>cover letter</b>.' },
+    { q: 'What\'s the English word for someone who is looking for a job?',
+      a: 'A <b>job seeker</b>.' },
+    { q: 'A company publishes a notice online saying a position is available — what do we call that notice?',
+      a: 'A <b>job advert</b> (or "job posting").' },
+    { q: 'What do we call skills that are useful in many different jobs, not just one — for example, teamwork or communication?',
+      a: '<b>Transferable skills</b>.' },
+    { q: 'What is it called when a company turns down your application and sends you a letter about it?',
+      a: 'A <b>rejection letter</b>.' },
+    { q: 'Give the adjective that describes a job market where many people are trying to get the same few jobs.',
+      a: '<b>Competitive</b>.' },
+    { q: 'What\'s the difference between an "applicant" and a "candidate"?',
+      a: 'An <b>applicant</b> is anyone who has sent in an application; a <b>candidate</b> is usually someone who has already been shortlisted and is being seriously considered.' },
+    { q: 'What does it mean to be "proactive" at work?',
+      a: 'Taking action and making things happen yourself, instead of waiting to be told what to do.' },
+    { q: 'Name two things that, according to the text, still matter for job-hunting success even though technology has changed everything else.',
+      a: '<b>Effort</b> and <b>persistence</b> (plus a positive attitude and good preparation).' },
+    { q: 'What\'s the difference in meaning between "I quite enjoy…" and "I really love…"?',
+      a: '"Quite enjoy" is a softer, more modest way of saying you like something; "really love" is much stronger.' }
+];
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+renderSelbst('stListJob', SELBST_JOB);
+</script>
+</body>
+</html>
