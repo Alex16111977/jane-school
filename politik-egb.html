@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Politik | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #pk-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+        /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+
+    /* ---- Begriffskarten ---- */
+    .sk-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px;
+               padding:1rem 1.15rem; margin-bottom:1rem; border-left:3px solid var(--color-accent); }
+    .sk-card.s1 { border-left-color:#79b8ff; }
+    .sk-card.s2 { border-left-color:#f472b6; }
+    .sk-card.s3 { border-left-color:#fbbf24; }
+    .sk-card.s4 { border-left-color:#86efac; }
+    .sk-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:rgba(230,230,235,0.45); }
+    .sk-card h4 { margin:0.15rem 0 0.6rem; font-size:1.08rem; color:#fff; }
+    .sk-card p { font-size:0.93rem; line-height:1.62; color:rgba(230,230,235,0.8); margin:0 0 0.55rem; }
+    .sk-card p:last-child { margin-bottom:0; }
+
+    .kb-msg { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+              padding:0.7rem 0.9rem; font-style:italic; color:rgba(230,230,235,0.85); margin:0 0 0.9rem; line-height:1.6; }
+    .kb-msg b { font-style:normal; color:rgba(230,230,235,0.5); font-size:0.76rem; text-transform:uppercase;
+                letter-spacing:0.06em; display:block; margin-bottom:0.3rem; }
+    .kb-de { color:#fff; font-weight:600; }
+    .kb-say { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.25); border-radius:8px;
+              padding:0.6rem 0.8rem; margin:0.6rem 0 0; color:#fff; font-size:0.95rem; line-height:1.6; }
+    .kb-say b { color:#86efac; display:block; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.07em;
+                margin-bottom:0.25rem; font-weight:700; }
+
+    /* ---- Ablauf-Diagramm ---- */
+    .se-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:0.5rem; margin:0.8rem 0; }
+    .se-box { flex:1 1 130px; background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.1);
+              border-radius:10px; padding:0.7rem 0.8rem; text-align:center; }
+    .se-box b { display:block; color:#fff; font-size:0.93rem; margin-bottom:0.2rem; }
+    .se-box span { font-size:0.79rem; color:rgba(230,230,235,0.6); line-height:1.45; display:block; }
+    .se-arrow { display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--color-accent); flex:0 0 auto; }
+
+
+    /* ---- Redemittel ---- */
+    .rm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:0.55rem; margin-top:0.6rem; }
+    .rm-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:0.6rem 0.8rem; }
+    .rm-de { color:#fff; font-weight:600; font-size:0.91rem; }
+    .rm-ru { color:rgba(230,230,235,0.6); font-size:0.82rem; margin-top:0.25rem; }
+    .rm-group-title { color:#86efac; font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+                       margin:1.1rem 0 0.2rem; }
+    .rm-group-title:first-child { margin-top:0; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.55; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- Trainer ---- */
+    .tz-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tz-prompt { font-size:1.05rem; color:#fff; line-height:1.55; text-align:center; margin:0.3rem 0 0.2rem; }
+    .tz-from { text-align:center; color:rgba(230,230,235,0.55); font-size:0.83rem; margin-bottom:1rem; }
+    .tz-opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.45rem; }
+    .tz-opt { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+              padding:0.55rem 0.7rem; color:rgba(230,230,235,0.85); font-size:0.87rem; cursor:pointer;
+              font-family:inherit; text-align:left; transition:all .15s; }
+    .tz-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(255,255,255,0.08); }
+    .tz-opt:disabled { cursor:default; opacity:0.75; }
+    .tz-opt.ok { border-color:var(--color-green); background:rgba(63,185,80,0.14); color:#86efac; }
+    .tz-opt.no { border-color:#f85149; background:rgba(248,81,73,0.12); color:#ff9d97; }
+    .tz-fb { margin-top:0.85rem; font-size:0.92rem; line-height:1.55; min-height:1.4rem; color:rgba(230,230,235,0.8); }
+    .tz-fb b { color:#fff; }
+    .tz-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tz-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.55rem 1.15rem;
+              font-size:0.92rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tz-btn:hover { background:var(--color-accent-hover); }
+    .tz-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tz-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tz-stats b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-vs { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.7rem; }
+    .kb-vs > div { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+                   border-radius:10px; padding:0.7rem 0.85rem; font-size:0.89rem; line-height:1.55;
+                   color:rgba(230,230,235,0.78); }
+    .kb-vs h5 { margin:0 0 0.35rem; font-size:0.95rem; color:#fff; }
+    .kb-vs ul { margin:0.3rem 0 0; padding-left:1.05rem; }
+    .kb-vs li { margin-bottom:0.28rem; }
+    @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+
+    /* ---- Quellenlinks auf die Website ---- */
+    .sl { margin:0.75rem 0 0; padding:0.6rem 0.85rem; border-left:2px solid rgba(200,165,255,0.45);
+          background:rgba(200,165,255,0.06); border-radius:0 10px 10px 0;
+          font-size:0.845rem; color:rgba(230,230,235,0.62); line-height:1.8; }
+    .sl-t { display:block; color:rgba(230,230,235,0.85); font-weight:700; font-size:0.8rem;
+            letter-spacing:0.02em; margin-bottom:0.15rem; }
+    .sl a { color:#c8a5ff; text-decoration:none; border-bottom:1px dotted rgba(200,165,255,0.55); }
+    .sl a:hover { color:#fff; border-bottom-color:#fff; }
+
+    /* ---- Originaltext aus dem Arbeitsblatt ---- */
+    .tx-box { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.16);
+              border-radius:12px; padding:0.9rem 1.05rem; margin:0.7rem 0 0; }
+    .tx-head { color:#fff; font-weight:700; font-size:0.98rem; margin:0 0 0.5rem; line-height:1.45; }
+    .tx-head span { display:inline-block; background:rgba(255,255,255,0.12); border-radius:50px;
+                    padding:0.05rem 0.55rem; margin-right:0.45rem; font-size:0.82rem; }
+    .tx-box p { font-size:0.94rem; line-height:1.72; color:rgba(235,235,240,0.92); margin:0; }
+    .tx-box p b { color:#fff; font-weight:600; }
+
+    /* ---- Mindmap-Gruppen ---- */
+    .mm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:0.6rem; margin-top:0.7rem; }
+    .mm-grp { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+              border-radius:11px; padding:0.7rem 0.85rem; }
+    .mm-grp h5 { margin:0 0 0.4rem; font-size:0.87rem; color:#fbbf24; text-transform:uppercase;
+                 letter-spacing:0.05em; }
+    .mm-grp ul { margin:0; padding-left:1.05rem; }
+    .mm-grp li { font-size:0.88rem; line-height:1.6; color:rgba(230,230,235,0.82); margin-bottom:0.2rem; }
+    .mm-grp li i { color:rgba(230,230,235,0.5); font-style:normal; font-size:0.83rem; }
+
+    /* ---- Tafelbild ---- */
+    .tf-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:0.6rem; margin-top:0.7rem; }
+    .tf-col { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+              border-radius:11px; padding:0.75rem 0.85rem; }
+    .tf-col h5 { margin:0; font-size:1rem; color:#f472b6; }
+    .tf-land { font-size:0.79rem; color:rgba(230,230,235,0.55); display:block; margin:0.05rem 0 0.35rem; }
+    .tf-thema { display:inline-block; color:#fff; font-weight:700; font-size:0.92rem;
+                border-bottom:1.5px solid rgba(244,114,182,0.5); padding-bottom:0.15rem; margin-bottom:0.55rem; }
+    .tf-col ul { margin:0; padding:0; list-style:none; }
+    .tf-col li { font-size:0.88rem; line-height:1.55; color:rgba(230,230,235,0.85); margin-bottom:0.4rem;
+                 padding-left:1.5rem; text-indent:-1.5rem; }
+    .tf-col li b { color:var(--color-accent); font-weight:700; }
+    /* ---- Vokabeltrainer ---- */
+    .vt-row { display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; margin:0 0 0.55rem; }
+    .vt-lab { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em;
+              color:rgba(230,230,235,0.45); margin-right:0.25rem; min-width:5.2rem; }
+    .vt-chip { padding:0.3rem 0.75rem; border-radius:20px; border:1.5px solid rgba(255,255,255,0.14);
+               background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.58); font-size:0.8rem;
+               font-weight:700; cursor:pointer; font-family:inherit; transition:all .18s; }
+    .vt-chip:hover { background:rgba(255,255,255,0.11); color:#fff; }
+    .vt-chip.on { background:rgba(244,114,182,0.18); border-color:rgba(244,114,182,0.55); color:#f9a8d4; }
+    .vt-prog { display:flex; align-items:center; gap:0.7rem; margin:0.75rem 0 1rem;
+               font-size:0.82rem; color:rgba(230,230,235,0.6); }
+    .vt-track { flex:1; height:7px; border-radius:6px; background:rgba(255,255,255,0.08); overflow:hidden; }
+    .vt-fill { display:block; height:100%; width:0; transition:width .3s;
+               background:linear-gradient(90deg,#f472b6,#fbbf24); }
+    .vt-src { display:block; text-align:center; font-size:0.72rem; letter-spacing:0.06em;
+              text-transform:uppercase; color:rgba(230,230,235,0.42); margin-bottom:0.5rem; min-height:1rem; }
+    .vt-inrow { display:flex; gap:0.5rem; margin-top:0.3rem; }
+    .vt-input { flex:1; padding:0.6rem 0.85rem; border-radius:9px; border:1.5px solid rgba(255,255,255,0.16);
+                background:rgba(0,0,0,0.32); color:#fff; font-size:1rem; font-family:inherit; }
+    .vt-input:focus { outline:none; border-color:var(--color-accent); }
+    .vt-input.ok { border-color:var(--color-green); }
+    .vt-input.no { border-color:#f85149; }
+    .vt-clear { background:none; border:none; color:rgba(230,230,235,0.42); font-size:0.78rem;
+                cursor:pointer; font-family:inherit; text-decoration:underline; padding:0; }
+    .vt-clear:hover { color:#ff9d97; }
+    @media (max-width:520px) { .vt-inrow { flex-direction:column; } .vt-lab { min-width:100%; } }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html" class="active">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB Politik</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zur Höheren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Politik</h1>
+            <p class="page-subtitle">Politik-Unterricht am Erich-Gutenberg-Berufskolleg &mdash; <b>каждый урок = отдельная карточка</b>.<br>Всё на странице &mdash; с реального Arbeitsblatt и с доски: Einstieg-Mindmap, четыре текста молодых людей о политике, Stichpunkte и словарь</p>
+        </div>
+
+        <div id="pk-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="pk-search" placeholder="Thema suchen&hellip; z.B. Stichpunkte, Menschenrechte, Mindmap" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="pk-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F5F3;&#xFE0F; Themen aus dem Politik-Unterricht
+        </h2>
+        <p id="pk-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждая часть урока &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#f472b6,#fbbf24); color:#2a0a18;">PK</span>
+            <h3 style="color:#f9a8d4;">Politik &mdash; erste Stunde</h3>
+            <span class="iw-sec-note">5 Teile &middot; Mindmap, Text, Stichpunkte, Wortschatz, Trainer</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#pk0" class="subject-card glass-card" data-lesson="pk0" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F4AD;</span>
+                <h3>&bdquo;Das verbinde ich mit Politik&hellip;&ldquo;</h3>
+                <p>Einstieg: учитель спросил, что у вас связано с политикой &mdash; вся Mindmap с доски со словами и переводом</p>
+            </a>
+            <a href="#pk1" class="subject-card glass-card" data-lesson="pk1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F4C4;</span>
+                <h3>Vier Jugendliche über Politik</h3>
+                <p>Текст с листа целиком: C&eacute;lia, Nombuso, Nada, Melanie &mdash; о чём каждый и какие слова оттуда учить</p>
+            </a>
+            <a href="#pk2" class="subject-card glass-card" data-lesson="pk2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F4DD;</span>
+                <h3>Stichpunkte &mdash; das Tafelbild</h3>
+                <p>Что учитель написал на доске по каждому тексту, твои собственные заметки с листа и самопроверка</p>
+            </a>
+            <a href="#pk3" class="subject-card glass-card" data-lesson="pk3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(244,114,182,0.35);">
+                <span class="subject-icon">&#x1F4DA;</span>
+                <h3>Wortschatz aus dem Arbeitsblatt</h3>
+                <p>Все политические слова из четырёх текстов и с доски одним списком &mdash; плюс слова с полей листа</p>
+            </a>
+            <a href="#pk4" class="subject-card glass-card" data-lesson="pk4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,191,36,0.45);">
+                <span class="subject-icon">&#x1F3AF;</span>
+                <h3>Wörter trainieren</h3>
+                <p>Тренажёр по всем 78 словам урока: DE&rarr;RU, RU&rarr;DE и ввод с клавиатуры, прогресс сохраняется</p>
+            </a>
+        </div>
+
+        </div><!-- /pk-hub -->
+
+        <div id="pk-lessons">
+
+        <!-- ================= pk0 ================= -->
+        <div class="lesson" id="ls-pk0">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AD;</span>
+                    <div>
+                        <h2>&bdquo;Das verbinde ich mit Politik&hellip;&ldquo;</h2>
+                        <p class="lesson-header-sub">Einstieg der ersten Stunde &mdash; Mindmap an der Tafel: alles, was der Kurs mit dem Wort <i>Politik</i> verbindet</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CD; Как начался урок</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Ещё до всякого текста учитель спросил класс: <b class="kb-de">Was verbindet ihr mit Politik?</b>
+                        Всё, что называли, он записывал на доску вокруг облака
+                        <i>&bdquo;Das verbinde ich mit Politik&hellip;&ldquo;</i>. Ниже &mdash; <b>ровно те слова, которые
+                        оказались на доске</b>, только сгруппированные, чтобы их легче было выучить.
+                    </p>
+                    <div class="kb-msg"><b>Зачем это спрашивают</b>В начале темы важно не «правильный ответ», а свои ассоциации. Одно слово из этого списка + одно предложение почему &mdash; уже готовый ответ, если тебя спросят.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5FA;&#xFE0F; Mindmap с доски &mdash; по группам</h3>
+                    <div class="mm-grid">
+                        <div class="mm-grp">
+                            <h5>Wahlen &amp; Beteiligung</h5>
+                            <ul>
+                                <li>die Wahlen <i>&mdash; выборы</i></li>
+                                <li>die Parteien <i>&mdash; партии</i></li>
+                                <li>die Aktivistin <i>&mdash; активистка</i></li>
+                                <li>die Demos <i>&mdash; демонстрации</i></li>
+                                <li>die Plakate <i>&mdash; плакаты</i></li>
+                                <li>die Diskussionen <i>&mdash; дискуссии</i></li>
+                                <li>die Gewerkschaften <i>&mdash; профсоюзы</i></li>
+                            </ul>
+                        </div>
+                        <div class="mm-grp">
+                            <h5>Staat &amp; Recht</h5>
+                            <ul>
+                                <li>Deutschland <i>&mdash; Германия</i></li>
+                                <li>der Bundestag <i>&mdash; бундестаг, парламент</i></li>
+                                <li>die Gesetze <i>&mdash; законы</i></li>
+                                <li>die Entscheidungen <i>&mdash; решения</i></li>
+                                <li>die Steuern <i>&mdash; налоги</i></li>
+                            </ul>
+                        </div>
+                        <div class="mm-grp">
+                            <h5>Rechte</h5>
+                            <ul>
+                                <li>die Rechte <i>&mdash; права</i></li>
+                                <li>die Gleichberechtigung <i>&mdash; равноправие</i></li>
+                                <li>die Menschenrechte <i>&mdash; права человека</i></li>
+                                <li>das Recht auf Bildung <i>&mdash; право на образование</i></li>
+                                <li>der Kampf für (Frauen-)Rechte <i>&mdash; борьба за (женские) права</i></li>
+                            </ul>
+                        </div>
+                        <div class="mm-grp">
+                            <h5>Konflikt &amp; Sicherheit</h5>
+                            <ul>
+                                <li>die Konflikte <i>&mdash; конфликты</i></li>
+                                <li>der Krieg <i>&mdash; война</i></li>
+                                <li>der Putschversuch <i>&mdash; попытка переворота</i></li>
+                                <li>die Sicherheit <i>&mdash; безопасность</i></li>
+                            </ul>
+                        </div>
+                        <div class="mm-grp">
+                            <h5>Wirtschaft &amp; Alltag</h5>
+                            <ul>
+                                <li>gerechte Wirtschaft <i>&mdash; справедливая экономика</i></li>
+                                <li>die Inflation <i>&mdash; инфляция</i></li>
+                                <li>die Gesundheit <i>&mdash; здоровье</i></li>
+                                <li>der Stress <i>&mdash; стресс</i></li>
+                                <li>die Nachrichten <i>&mdash; новости</i></li>
+                                <li>die Kritik <i>&mdash; критика</i></li>
+                                <li>langweilig <i>&mdash; скучно</i></li>
+                            </ul>
+                        </div>
+                        <div class="mm-grp">
+                            <h5>Namen von der Tafel</h5>
+                            <ul>
+                                <li>Olaf Scholz</li>
+                                <li>Alice Weidel</li>
+                                <li>Donald Trump</li>
+                                <li>Herr Merz</li>
+                                <li>Putin</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a> &mdash; там уже есть <i>Demokratie, Armut, Ungleichheit, Nachhaltigkeit, Korruption</i> с примерами: продолжение этого словаря<br>
+                        <a href="deutsch-fremdwoerter.html">Fremdw&ouml;rter</a> &mdash; <i>Politik, Inflation, Demo, Diskussion, Kritik</i> &mdash; заимствования, у которых род не угадывается<br>
+                        <a href="deutsch-komposita.html">Komposita</a> &mdash; как читать длинные слова вроде <i>Putschversuch, Gewerkschaft, Menschenrechte</i><br>
+                        <a href="deutsch-haltungen.html">Haltung &amp; Meinung</a> &mdash; словарь взрослой дискуссии: чем ответить, если спросят твоё мнение
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x2705; Итог, который учитель написал под Mindmap</h3>
+                    <div class="kb-say">
+                        <b>Satz von der Tafel</b>
+                        Politik soll ein <b class="kb-de">menschenwürdiges Leben</b> ermöglichen und
+                        <b class="kb-de">demokratische Lösungen</b> finden.
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.6; margin-top:0.7rem;">
+                        По-русски: <i>политика должна делать возможной достойную человека жизнь и находить
+                        демократические решения.</i> Это одно предложение стоит выучить наизусть &mdash; им можно
+                        закончить почти любой ответ на этом курсе.
+                    </p>
+                    <div class="kb-msg"><b>Разбор двух слов</b><b class="kb-de">menschenwürdig</b> = Mensch + Würde («достоинство») → «достойный человека». <b class="kb-de">ermöglichen</b> = möglich + ge-…-en → «делать возможным».</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-wortbildung.html">Wortbildung</a> &mdash; как из <i>möglich</i> получается <i>ermöglichen</i>, а из <i>Würde</i> &mdash; <i>menschenwürdig</i><br>
+                        <a href="deutsch-nomen-verb.html">Nomen-Verb-Verbindungen</a> &mdash; <i>eine Lösung finden, ins Leben rufen, Maßnahmen ergreifen</i> и другие связки этого типа
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= pk1 ================= -->
+        <div class="lesson" id="ls-pk1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4C4;</span>
+                    <div>
+                        <h2>Vier Jugendliche über Politik</h2>
+                        <p class="lesson-header-sub">Текст с Arbeitsblatt: четыре человека 15&ndash;19 лет из разных стран говорят, какая политическая тема для них самая важная</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CD; Что было с этим текстом на уроке</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        После Mindmap раздали лист с четырьмя блоками <b>A, B, C, D</b> &mdash; по одному человеку
+                        в каждом. Мы читали их и вытаскивали из каждого текста <b class="kb-de">Stichpunkte</b>
+                        (ключевые пункты), а потом собирали их вместе на доске &mdash; это отдельная карточка
+                        <a href="#pk2" style="color:var(--color-accent);">Stichpunkte &mdash; das Tafelbild</a>.
+                    </p>
+                </div>
+
+                <!-- A -->
+                <div class="note-card">
+                    <h3>&#x1F1EB;&#x1F1F7; A &mdash; C&eacute;lia, 16, Frankreich</h3>
+                    <div class="tx-box">
+                        <p class="tx-head"><span>A</span>C&eacute;lia, 16, Frankreich: &bdquo;Der Klimawandel betrifft uns alle&ldquo;</p>
+                        <p>&bdquo;Der Klimawandel ist für mich die wichtigste Herausforderung, mit der wir uns politisch,
+                        aber auch als Einzelne befassen müssen. Denn wenn wir diesen Planeten zerstören, ist niemand
+                        mehr da, um über diese Themen zu reden. Worauf warten wir also? Es gibt viele Lösungsansätze,
+                        um unsere Welt zu einem wunderbaren Ort zum Leben zu machen und trotzdem weiter zu produzieren:
+                        durch Innovation und durch die Verbreitung von Wissen. Viele umweltfreundliche Initiativen
+                        werden rund um den Globus ins Leben gerufen, aber leider nicht zentral koordiniert. Die Mehrheit
+                        der Menschen interessiert sich gar nicht dafür, weil sie nicht verstehen, dass auch sie direkt
+                        betroffen sind. Deshalb wollen wir, die junge Generation, dass die Menschen als Einzelpersonen
+                        und als Gemeinschaft für Klimaschutz handeln. Es geht um unsere Zukunft.&ldquo;</p>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.62; margin-top:0.8rem;">
+                        <b>О чём:</b> климат &mdash; самая важная задача, и заниматься ею надо и политически,
+                        и каждому лично. Решения есть (инновации + распространение знаний), но инициативы
+                        по миру никто не координирует, а большинство людей просто не понимает, что это касается их
+                        напрямую.
+                    </p>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">die Herausforderung</div><div class="rm-ru">вызов, сложная задача</div></div>
+                        <div class="rm-item"><div class="rm-de">sich mit etwas befassen</div><div class="rm-ru">заниматься чем-то (темой)</div></div>
+                        <div class="rm-item"><div class="rm-de">als Einzelne</div><div class="rm-ru">как отдельные люди, каждый сам</div></div>
+                        <div class="rm-item"><div class="rm-de">der Lösungsansatz, -ansätze</div><div class="rm-ru">подход к решению</div></div>
+                        <div class="rm-item"><div class="rm-de">die Verbreitung von Wissen</div><div class="rm-ru">распространение знаний</div></div>
+                        <div class="rm-item"><div class="rm-de">umweltfreundlich</div><div class="rm-ru">экологичный, дружественный к среде</div></div>
+                        <div class="rm-item"><div class="rm-de">ins Leben rufen</div><div class="rm-ru">запускать, создавать (инициативу)</div></div>
+                        <div class="rm-item"><div class="rm-de">rund um den Globus</div><div class="rm-ru">по всему миру</div></div>
+                        <div class="rm-item"><div class="rm-de">betroffen sein</div><div class="rm-ru">быть затронутым, это тебя касается</div></div>
+                        <div class="rm-item"><div class="rm-de">die Gemeinschaft</div><div class="rm-ru">сообщество, все вместе</div></div>
+                        <div class="rm-item"><div class="rm-de">der Klimaschutz</div><div class="rm-ru">защита климата</div></div>
+                        <div class="rm-item"><div class="rm-de">Es geht um &hellip;</div><div class="rm-ru">речь идёт о &hellip;</div></div>
+                    </div>
+                    <div class="kb-msg"><b>Грамматика прямо из этого текста</b><i>&hellip;die wichtigste Herausforderung, <b class="kb-de">mit der</b> wir uns befassen müssen</i> &mdash; относительное придаточное с предлогом. И <i>interessiert sich gar nicht <b class="kb-de">dafür</b></i> &mdash; вместо «für das» ставится da(r)+предлог.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-relativsaetze.html">Relativsätze</a> &mdash; <i>die Herausforderung, mit der wir uns befassen</i> &mdash; почему <i>der</i>, а не <i>die</i><br>
+                        <a href="deutsch-pronominaladverbien.html">Pronominaladverbien</a> &mdash; <i>dafür, darüber, damit</i> &mdash; ровно то <i>dafür</i> из текста<br>
+                        <a href="deutsch-verben-praep.html">Verben mit Präpositionen</a> &mdash; <i>sich interessieren für, warten auf</i> &mdash; оба глагола есть в этом абзаце
+                    </div>
+                </div>
+
+                <!-- B -->
+                <div class="note-card">
+                    <h3>&#x1F1FF;&#x1F1E6; B &mdash; Nombuso, 19, S&uuml;dafrika</h3>
+                    <div class="tx-box">
+                        <p class="tx-head"><span>B</span>Nombuso, 19, Südafrika: &bdquo;Krisen entstehen, weil Menschenrechte verletzt werden&ldquo;</p>
+                        <p>&bdquo;Transparenz in staatlichen Institutionen halte ich für besonders wichtig: Nur so können
+                        die Menschen ihrer Regierung vertrauen und über die Dinge diskutieren, die sie betreffen.
+                        Transparenz ist der beste Schutz gegen Korruption und die Basis für eine friedliche
+                        Zusammenarbeit zwischen Volk und Regierung &ndash; und damit eine der Säulen von Demokratie.
+                        Ich setze mich leidenschaftlich für Menschenrechte ein, weil ich glaube, dass Menschen vor allem
+                        respektiert und mit Ehre und Würde behandelt werden sollten. Ich denke, dass die meisten Krisen
+                        durch die Unzufriedenheit der Menschen entstehen &ndash; und weil elementare Menschenrechte nicht
+                        eingehalten werden.&ldquo;</p>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.62; margin-top:0.8rem;">
+                        <b>О чём:</b> прозрачность государства &mdash; условие доверия к власти и лучшая защита от
+                        коррупции, одна из опор демократии. Кризисы возникают из-за недовольства людей и из-за того,
+                        что базовые права человека не соблюдаются.
+                    </p>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">die Transparenz</div><div class="rm-ru">прозрачность</div></div>
+                        <div class="rm-item"><div class="rm-de">staatliche Institutionen</div><div class="rm-ru">государственные институты</div></div>
+                        <div class="rm-item"><div class="rm-de">etwas für wichtig halten</div><div class="rm-ru">считать что-то важным</div></div>
+                        <div class="rm-item"><div class="rm-de">der Regierung vertrauen</div><div class="rm-ru">доверять правительству (Dativ!)</div></div>
+                        <div class="rm-item"><div class="rm-de">der Schutz gegen Korruption</div><div class="rm-ru">защита от коррупции</div></div>
+                        <div class="rm-item"><div class="rm-de">das Volk</div><div class="rm-ru">народ</div></div>
+                        <div class="rm-item"><div class="rm-de">eine der Säulen von Demokratie</div><div class="rm-ru">одна из опор демократии</div></div>
+                        <div class="rm-item"><div class="rm-de">sich für etwas einsetzen</div><div class="rm-ru">выступать за что-то, бороться за</div></div>
+                        <div class="rm-item"><div class="rm-de">mit Ehre und Würde behandeln</div><div class="rm-ru">обращаться с честью и достоинством</div></div>
+                        <div class="rm-item"><div class="rm-de">die Unzufriedenheit</div><div class="rm-ru">недовольство</div></div>
+                        <div class="rm-item"><div class="rm-de">Menschenrechte verletzen</div><div class="rm-ru">нарушать права человека</div></div>
+                        <div class="rm-item"><div class="rm-de">einhalten</div><div class="rm-ru">соблюдать (правила, права)</div></div>
+                    </div>
+                    <div class="kb-msg"><b>Грамматика прямо из этого текста</b>Весь заголовок &mdash; пассив: <i>weil Menschenrechte <b class="kb-de">verletzt werden</b></i>, дальше <i>respektiert und behandelt <b class="kb-de">werden</b> sollten</i>, <i>nicht <b class="kb-de">eingehalten werden</b></i>. Кто именно нарушает &mdash; не называется, и это здесь смысловой приём.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-passiv.html">Aktiv &amp; Passiv</a> &mdash; <i>werden verletzt / eingehalten</i>: как строится и зачем нужен, когда исполнитель не назван<br>
+                        <a href="deutsch-nebensaetze.html">Nebensätze &amp; Komma</a> &mdash; <i>weil&hellip;, dass&hellip;</i> &mdash; в этом абзаце их пять штук подряд<br>
+                        <a href="deutsch-verbvalenz.html">Verbvalenz &amp; Rektion</a> &mdash; <i>der Regierung vertrauen</i> &mdash; глагол требует Dativ, а не Akkusativ
+                    </div>
+                </div>
+
+                <!-- C -->
+                <div class="note-card">
+                    <h3>&#x1F1EE;&#x1F1F9; C &mdash; Nada, 15, Italien</h3>
+                    <div class="tx-box">
+                        <p class="tx-head"><span>C</span>Nada, 15, Italien: &bdquo;Armut ist das größte Problem&ldquo;</p>
+                        <p>&bdquo;Eine gerechtere Wirtschaft ist für mich eine Wirtschaft, in der die Menschen würdig
+                        leben können: ausreichend ernährt, mit Gesundheitsvorsorge und einer Bildung, durch die sie ihre
+                        Stellung in der Gesellschaft verbessern können. Armut und die wachsende Ungleichheit sind die
+                        größten aktuellen Probleme, insbesondere in der westlichen Welt. Trotzdem finde ich, dass
+                        besonders fähige Menschen oder solche mit besonderer Qualifikation ein höheres Einkommen
+                        verdienen. Die aktuelle Krise hat ihre Ursache in einer ungenügenden Regulation der
+                        internationalen Märkte. Deshalb sollten Regierungen die Märkte stärker überwachen und
+                        kontrollieren. Ich möchte mich auch für ein besseres Bildungssystem einsetzen. Gerade durch
+                        Bildung kann Demokratie gestärkt werden. Besonders wichtig ist das im Moment, weil radikale
+                        Parteien immer mehr an Einfluss gewinnen durch die Stimmen von Menschen, die die Komplexität
+                        der Probleme selbst nicht durchschauen können.&ldquo;</p>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.62; margin-top:0.8rem;">
+                        <b>О чём:</b> справедливая экономика &mdash; это когда человек может жить достойно: еда,
+                        здравоохранение, образование, которое поднимает его положение в обществе. Бедность и растущее
+                        неравенство &mdash; главные проблемы; причина кризиса &mdash; слабое регулирование рынков.
+                        И отдельно: образование укрепляет демократию, потому что радикальные партии набирают силу
+                        за счёт голосов тех, кто не видит сложности проблем.
+                    </p>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">die Armut</div><div class="rm-ru">бедность</div></div>
+                        <div class="rm-item"><div class="rm-de">gerecht &rarr; gerechter</div><div class="rm-ru">справедливый &rarr; справедливее</div></div>
+                        <div class="rm-item"><div class="rm-de">würdig leben</div><div class="rm-ru">жить достойно</div></div>
+                        <div class="rm-item"><div class="rm-de">die Gesundheitsvorsorge</div><div class="rm-ru">забота о здоровье, профилактика</div></div>
+                        <div class="rm-item"><div class="rm-de">die Stellung in der Gesellschaft</div><div class="rm-ru">положение в обществе</div></div>
+                        <div class="rm-item"><div class="rm-de">die wachsende Ungleichheit</div><div class="rm-ru">растущее неравенство</div></div>
+                        <div class="rm-item"><div class="rm-de">fähig</div><div class="rm-ru">способный</div></div>
+                        <div class="rm-item"><div class="rm-de">das Einkommen</div><div class="rm-ru">доход</div></div>
+                        <div class="rm-item"><div class="rm-de">die Ursache</div><div class="rm-ru">причина</div></div>
+                        <div class="rm-item"><div class="rm-de">ungenügende Regulation</div><div class="rm-ru">недостаточное регулирование</div></div>
+                        <div class="rm-item"><div class="rm-de">die Märkte überwachen</div><div class="rm-ru">контролировать рынки, следить за ними</div></div>
+                        <div class="rm-item"><div class="rm-de">das Bildungssystem</div><div class="rm-ru">система образования</div></div>
+                        <div class="rm-item"><div class="rm-de">radikale Parteien</div><div class="rm-ru">радикальные партии</div></div>
+                        <div class="rm-item"><div class="rm-de">an Einfluss gewinnen</div><div class="rm-ru">набирать влияние</div></div>
+                        <div class="rm-item"><div class="rm-de">die Stimmen</div><div class="rm-ru">голоса (на выборах)</div></div>
+                        <div class="rm-item"><div class="rm-de">die Komplexität durchschauen</div><div class="rm-ru">видеть насквозь сложность проблемы</div></div>
+                    </div>
+                    <div class="kb-msg"><b>Грамматика прямо из этого текста</b>Тут почти всё на сравнительной степени: <i>eine <b class="kb-de">gerechtere</b> Wirtschaft, ein <b class="kb-de">höheres</b> Einkommen, die Märkte <b class="kb-de">stärker</b> überwachen, ein <b class="kb-de">besseres</b> Bildungssystem</i>. Плюс превосходная: <i>die <b class="kb-de">größten</b> Probleme</i>.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-komparativ.html">Komparativ &amp; Superlativ</a> &mdash; <i>gerechter, höher, stärker, am größten</i> &mdash; формы и окончания<br>
+                        <a href="deutsch-adjektive.html">Adjektivdeklination</a> &mdash; почему <i>ein höher<b>es</b> Einkommen</i>, но <i>die größt<b>en</b> Probleme</i><br>
+                        <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a> &mdash; <i>Armut, Ungleichheit, Bildungssystem</i> с примерами предложений
+                    </div>
+                </div>
+
+                <!-- D -->
+                <div class="note-card">
+                    <h3>&#x1F1F5;&#x1F1F7; D &mdash; Melanie, 16, Puerto Rico</h3>
+                    <div class="tx-box">
+                        <p class="tx-head"><span>D</span>Melanie, 16, Puerto Rico: &bdquo;Frauen sollen Schlüsselrollen übernehmen&ldquo;</p>
+                        <p>&bdquo;Wenn ich gefragt werde, welches politische Thema ich am wichtigsten finde, ist meine
+                        Antwort klar: die Gleichberechtigung der Geschlechter. Frauen spielen eine entscheidende Rolle
+                        für Nachhaltigkeit und wirtschaftliche Entwicklung. Die Gleichberechtigung voranzutreiben ist
+                        deshalb ein großer Schritt in Richtung einer besseren Zukunft. Egal, um welches Gebiet es geht
+                        &ndash; Frauen können eine Schlüsselrolle spielen, in Unternehmen und Regierungen genauso wie
+                        beim Heranwachsen einer global denkenden Generation von Kindern und Jugendlichen.&ldquo;</p>
+                    </div>
+                    <p style="font-size:0.93rem; line-height:1.62; margin-top:0.8rem;">
+                        <b>О чём:</b> самая важная тема &mdash; равноправие полов. Женщины играют решающую роль
+                        для устойчивого развития и экономики, поэтому продвигать равноправие &mdash; большой шаг
+                        к лучшему будущему: в компаниях, в правительствах и в воспитании поколения, которое мыслит
+                        глобально.
+                    </p>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">die Gleichberechtigung der Geschlechter</div><div class="rm-ru">равноправие полов</div></div>
+                        <div class="rm-item"><div class="rm-de">eine entscheidende Rolle spielen</div><div class="rm-ru">играть решающую роль</div></div>
+                        <div class="rm-item"><div class="rm-de">die Nachhaltigkeit</div><div class="rm-ru">устойчивость, бережное развитие</div></div>
+                        <div class="rm-item"><div class="rm-de">die wirtschaftliche Entwicklung</div><div class="rm-ru">экономическое развитие</div></div>
+                        <div class="rm-item"><div class="rm-de">etwas vorantreiben</div><div class="rm-ru">продвигать вперёд</div></div>
+                        <div class="rm-item"><div class="rm-de">ein Schritt in Richtung &hellip;</div><div class="rm-ru">шаг в направлении &hellip;</div></div>
+                        <div class="rm-item"><div class="rm-de">Egal, um welches Gebiet es geht</div><div class="rm-ru">неважно, о какой сфере речь</div></div>
+                        <div class="rm-item"><div class="rm-de">die Schlüsselrolle übernehmen</div><div class="rm-ru">брать на себя ключевую роль</div></div>
+                        <div class="rm-item"><div class="rm-de">das Unternehmen</div><div class="rm-ru">предприятие, компания</div></div>
+                        <div class="rm-item"><div class="rm-de">das Heranwachsen</div><div class="rm-ru">взросление (как процесс)</div></div>
+                        <div class="rm-item"><div class="rm-de">global denkend</div><div class="rm-ru">мыслящий глобально</div></div>
+                    </div>
+                    <div class="kb-msg"><b>Грамматика прямо из этого текста</b><i><b class="kb-de">Die Gleichberechtigung voranzutreiben</b> ist ein großer Schritt</i> &mdash; целая инфинитивная группа стоит на месте подлежащего. И <i>beim <b class="kb-de">Heranwachsen</b></i> &mdash; глагол превращён в существительное (Nominalstil).</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-infinitiv.html">Infinitivkonstruktionen</a> &mdash; <i>etwas zu tun ist ein Schritt&hellip;</i> &mdash; инфинитив с <i>zu</i> как подлежащее<br>
+                        <a href="deutsch-nominalstil.html">Nominalstil</a> &mdash; <i>beim Heranwachsen</i> вместо <i>wenn eine Generation heranwächst</i><br>
+                        <a href="deutsch-partizip.html">Partizip als Adjektiv</a> &mdash; <i>eine global denkend<b>e</b> Generation, eine entscheidend<b>e</b> Rolle</i>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= pk2 ================= -->
+        <div class="lesson" id="ls-pk2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DD;</span>
+                    <div>
+                        <h2>Stichpunkte &mdash; das Tafelbild</h2>
+                        <p class="lesson-header-sub">Что учитель собрал на доске из четырёх текстов &mdash; и что записала на листе ты</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CD; Задание было такое</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        К каждому тексту нужно было выписать <b class="kb-de">Stichpunkte</b> &mdash; ключевые пункты:
+                        не пересказ целыми предложениями, а короткие пометки. Потом всё сошлось на доске в таблицу
+                        из четырёх колонок: <b>имя &mdash; страна &mdash; тема</b>, а под чертой &mdash; сами пункты.
+                    </p>
+                    <div class="kb-msg"><b>Как это выглядело на доске</b>Стрелка <b>&rarr;</b> &mdash; то, что человек говорит о проблеме. Двойная стрелка <b>&rArr;</b> &mdash; вывод или требование. Полных предложений почти нет: <i>«mehr Maßnahmen zum Klimaschutz»</i>, а не <i>«Célia sagt, dass es mehr Maßnahmen geben soll»</i>.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5A4; Das Tafelbild &mdash; alle vier Spalten</h3>
+                    <div class="tf-grid">
+                        <div class="tf-col">
+                            <h5>C&eacute;lia</h5>
+                            <span class="tf-land">Frankreich</span>
+                            <span class="tf-thema">Klimawandel</span>
+                            <ul>
+                                <li><b>&rarr;</b> interessiert zu wenige Menschen</li>
+                                <li><b>&rarr;</b> mehr Maßnahmen zum Klimaschutz</li>
+                                <li><b>&rArr;</b> Wissen + Innovation</li>
+                            </ul>
+                        </div>
+                        <div class="tf-col">
+                            <h5>Nombuso</h5>
+                            <span class="tf-land">Südafrika</span>
+                            <span class="tf-thema">Menschenrechte</span>
+                            <ul>
+                                <li><b>&rarr;</b> es gibt zu viele Verletzungen der MR</li>
+                                <li><b>&rArr;</b> Demokratie leidet darunter</li>
+                                <li><b>&rArr;</b> alle Menschen sollten würdig behandelt werden</li>
+                            </ul>
+                        </div>
+                        <div class="tf-col">
+                            <h5>Nada</h5>
+                            <span class="tf-land">Italien</span>
+                            <span class="tf-thema">Gerechte Wirtschaft</span>
+                            <ul>
+                                <li><b>&rarr;</b> mehr Gesundheit und Bildung für alle</li>
+                                <li><b>&rArr;</b> radikale Parteien verlieren an Macht, wenn Menschen sich gerecht behandelt fühlen</li>
+                            </ul>
+                        </div>
+                        <div class="tf-col">
+                            <h5>Melanie</h5>
+                            <span class="tf-land">Puerto Rico</span>
+                            <span class="tf-thema">Frauenrechte</span>
+                            <ul>
+                                <li><b>&rarr;</b> Gleichberechtigung</li>
+                                <li><b>&#x21B3;</b> Frauen in der Wirtschaft in der ganzen Welt</li>
+                                <li><b>&#x21B3;</b> auch in der Politik</li>
+                                <li><b>&rArr;</b> Vorbilder für junge Menschen</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="kb-say">
+                        <b>Линия, соединяющая все четыре колонки</b>
+                        alle suchen <b class="kb-de">bessere Zukunft</b> &mdash; при разных темах вывод у всех четверых один.
+                    </div>
+                    <div class="kb-msg"><b>Сокращение с доски</b><b class="kb-de">MR</b> = Menschenrechte. Учитель пишет так, чтобы успевать; в своей тетради лучше расшифровывать полностью.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270D;&#xFE0F; Что ты записала на самом листе</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Твои Stichpunkte под текстами &mdash; отдельными словами. Сравни их с доской: часть слов
+                        совпадает по смыслу, часть у тебя даже конкретнее.
+                    </p>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:560px;">
+                        <tr><th>Кто</th><th>Твои пункты с листа</th><th>Тема на доске</th></tr>
+                        <tr><td><b>C&eacute;lia</b></td><td>Klimaschutz &middot; Nachhaltigkeit &middot; Recycling &middot; Treibhausgase &middot; Wissen &amp; Innovation</td><td>Klimawandel</td></tr>
+                        <tr><td><b>Nada</b></td><td>Ungleichheit &middot; Bildungssystem &middot; Menschenrechte &middot; radikale Parteien</td><td>Gerechte Wirtschaft</td></tr>
+                        <tr><td><b>Nombuso</b></td><td>Gleichberechtigung &middot; Recht auf Leben &middot; Demokratie leidet darunter</td><td>Menschenrechte</td></tr>
+                        <tr><td><b>Melanie</b></td><td>Benachteiligung &middot; Frauenrechte</td><td>Frauenrechte</td></tr>
+                    </table>
+                    </div>
+                    <div class="kb-msg"><b>Слово, которого нет в тексте, но которое ты написала</b><b class="kb-de">die Benachteiligung</b> &mdash; ущемление, дискриминация (кого-то ставят в худшее положение). Хорошее слово для темы Frauenrechte: <i>Frauen erfahren immer noch Benachteiligung.</i></div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-inhaltsangabe.html">Inhaltsangabe</a> &mdash; следующий шаг после Stichpunkte: как из пунктов собрать краткое содержание<br>
+                        <a href="deutsch-nominalstil.html">Nominalstil</a> &mdash; почему Stichpunkte почти всегда существительные: <i>mehr Maßnahmen zum Klimaschutz</i><br>
+                        <a href="deutsch-komposita.html">Komposita</a> &mdash; <i>Treibhausgase, Bildungssystem, Frauenrechte</i> &mdash; как складываются такие слова<br>
+                        <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a> &mdash; больше слов на эти же темы, с переводом и примерами
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E0; Selbstkontrolle</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Вопросы &mdash; по самому уроку: задание с листа и доска. Ответы &mdash; то, что реально стояло на доске.
+                        Нажми на вопрос, чтобы увидеть ответ.
+                    </p>
+                    <div id="stListPK" style="margin-top:0.6rem;"></div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= pk3 ================= -->
+        <div class="lesson" id="ls-pk3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DA;</span>
+                    <div>
+                        <h2>Wortschatz aus dem Arbeitsblatt</h2>
+                        <p class="lesson-header-sub">Все слова этого урока в одном списке &mdash; из четырёх текстов, с доски и с полей листа</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F30D; Politik &amp; Gesellschaft &mdash; die wichtigsten Wörter</h3>
+                    <div class="table-wrapper" style="overflow-x:auto">
+                    <table class="unit-table" style="margin-top:0.5rem; min-width:600px;">
+                        <tr><th>Deutsch</th><th>Русский</th><th>Woher</th></tr>
+                        <tr><td>der Klimawandel</td><td>изменение климата</td><td>Text A / Tafel</td></tr>
+                        <tr><td>der Klimaschutz</td><td>защита климата</td><td>Text A</td></tr>
+                        <tr><td>die Herausforderung</td><td>вызов, сложная задача</td><td>Text A</td></tr>
+                        <tr><td>der Lösungsansatz</td><td>подход к решению</td><td>Text A</td></tr>
+                        <tr><td>die Verbreitung von Wissen</td><td>распространение знаний</td><td>Text A</td></tr>
+                        <tr><td>umweltfreundlich</td><td>экологичный</td><td>Text A</td></tr>
+                        <tr><td>die Gemeinschaft</td><td>сообщество</td><td>Text A</td></tr>
+                        <tr><td>die Transparenz</td><td>прозрачность</td><td>Text B</td></tr>
+                        <tr><td>die Korruption</td><td>коррупция</td><td>Text B</td></tr>
+                        <tr><td>staatliche Institutionen</td><td>государственные институты</td><td>Text B</td></tr>
+                        <tr><td>die Regierung</td><td>правительство</td><td>Text B / D</td></tr>
+                        <tr><td>das Volk</td><td>народ</td><td>Text B</td></tr>
+                        <tr><td>die Säule der Demokratie</td><td>опора демократии</td><td>Text B</td></tr>
+                        <tr><td>die Menschenrechte verletzen</td><td>нарушать права человека</td><td>Text B / Tafel</td></tr>
+                        <tr><td>einhalten</td><td>соблюдать</td><td>Text B</td></tr>
+                        <tr><td>die Würde</td><td>достоинство</td><td>Text B</td></tr>
+                        <tr><td>die Unzufriedenheit</td><td>недовольство</td><td>Text B</td></tr>
+                        <tr><td>die Armut</td><td>бедность</td><td>Text C</td></tr>
+                        <tr><td>die Ungleichheit</td><td>неравенство</td><td>Text C</td></tr>
+                        <tr><td>die Gesundheitsvorsorge</td><td>забота о здоровье</td><td>Text C</td></tr>
+                        <tr><td>das Bildungssystem</td><td>система образования</td><td>Text C</td></tr>
+                        <tr><td>das Einkommen</td><td>доход</td><td>Text C</td></tr>
+                        <tr><td>die Ursache</td><td>причина</td><td>Text C</td></tr>
+                        <tr><td>die Märkte überwachen</td><td>контролировать рынки</td><td>Text C</td></tr>
+                        <tr><td>radikale Parteien</td><td>радикальные партии</td><td>Text C / Tafel</td></tr>
+                        <tr><td>an Einfluss gewinnen</td><td>набирать влияние</td><td>Text C</td></tr>
+                        <tr><td>die Stimme, -n</td><td>голос (на выборах)</td><td>Text C</td></tr>
+                        <tr><td>die Gleichberechtigung</td><td>равноправие</td><td>Text D / Tafel</td></tr>
+                        <tr><td>die Nachhaltigkeit</td><td>устойчивое развитие</td><td>Text D</td></tr>
+                        <tr><td>die wirtschaftliche Entwicklung</td><td>экономическое развитие</td><td>Text D</td></tr>
+                        <tr><td>vorantreiben</td><td>продвигать вперёд</td><td>Text D</td></tr>
+                        <tr><td>die Schlüsselrolle</td><td>ключевая роль</td><td>Text D</td></tr>
+                        <tr><td>das Heranwachsen</td><td>взросление</td><td>Text D</td></tr>
+                        <tr><td>die Wahlen</td><td>выборы</td><td>Tafel</td></tr>
+                        <tr><td>die Partei, -en</td><td>партия</td><td>Tafel</td></tr>
+                        <tr><td>der Bundestag</td><td>бундестаг</td><td>Tafel</td></tr>
+                        <tr><td>das Gesetz, -e</td><td>закон</td><td>Tafel</td></tr>
+                        <tr><td>die Steuer, -n</td><td>налог</td><td>Tafel</td></tr>
+                        <tr><td>die Gewerkschaft, -en</td><td>профсоюз</td><td>Tafel</td></tr>
+                        <tr><td>die Demo, -s</td><td>демонстрация</td><td>Tafel</td></tr>
+                        <tr><td>das Plakat, -e</td><td>плакат</td><td>Tafel</td></tr>
+                        <tr><td>der Putschversuch</td><td>попытка переворота</td><td>Tafel</td></tr>
+                        <tr><td>die Inflation</td><td>инфляция</td><td>Tafel</td></tr>
+                        <tr><td>die Entscheidung, -en</td><td>решение</td><td>Tafel</td></tr>
+                        <tr><td>die Kritik</td><td>критика</td><td>Tafel</td></tr>
+                        <tr><td>menschenwürdig</td><td>достойный человека</td><td>Tafel</td></tr>
+                        <tr><td>ermöglichen</td><td>делать возможным</td><td>Tafel</td></tr>
+                        <tr><td>die Benachteiligung</td><td>ущемление, дискриминация</td><td>deine Notiz</td></tr>
+                    </table>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a> &mdash; главный склад слов на эти темы: <i>Demokratie, Armut, Ungleichheit, Nachhaltigkeit</i> с примерами и аудио<br>
+                        <a href="deutsch-nomen-verb.html">Nomen-Verb-Verbindungen</a> &mdash; <i>an Einfluss gewinnen, eine Rolle spielen, ins Leben rufen, Maßnahmen ergreifen</i> &mdash; такие связки надо учить целиком<br>
+                        <a href="deutsch-kollokationen.html">Kollokationen</a> &mdash; какие слова с какими ходят вместе: <i>eine Entscheidung treffen, Kritik üben</i><br>
+                        <a href="deutsch-haltungen.html">Haltung &amp; Meinung</a> &mdash; чем сказать своё мнение по этим темам на уроке
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270F;&#xFE0F; Слова, выписанные на полях листа</h3>
+                    <p style="font-size:0.92rem; color:rgba(230,230,235,0.72);">
+                        Эти четыре слова прозвучали на уроке отдельно &mdash; они не из текстов, а с полей:
+                    </p>
+                    <div class="rm-grid">
+                        <div class="rm-item"><div class="rm-de">der Fachbegriff, -e</div><div class="rm-ru">термин, специальное понятие</div></div>
+                        <div class="rm-item"><div class="rm-de">nachreichen</div><div class="rm-ru">донести, дослать позже (то, чего не хватало)</div></div>
+                        <div class="rm-item"><div class="rm-de">die Vermittlung</div><div class="rm-ru">посредничество; передача (знаний)</div></div>
+                        <div class="rm-item"><div class="rm-de">das Department = die Abteilung</div><div class="rm-ru">отдел, подразделение</div></div>
+                    </div>
+                    <div class="kb-msg"><b>Как это использовать</b><i>Ich reiche die Aufgabe morgen nach.</i> &mdash; сдам задание завтра. <i>Das ist ein Fachbegriff aus der Politik.</i> &mdash; это термин из политики.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-praefix-verben.html">Verben mit Präfixen</a> &mdash; <i>nach|reichen</i>: почему <i>ich reiche nach</i>, но <i>ich habe nachgereicht</i><br>
+                        <a href="deutsch-fremdwoerter.html">Fremdwörter</a> &mdash; <i>das Department</i> и другие английские слова в немецком: когда лучше сказать <i>Abteilung</i>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+
+        <!-- ================= pk4 ================= -->
+        <div class="lesson" id="ls-pk4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3AF;</span>
+                    <div>
+                        <h2>Wörter trainieren</h2>
+                        <p class="lesson-header-sub">Подготовка к следующему уроку: все 78 слов этого Arbeitsblatt и доски &mdash; на активное вспоминание, а не на «где-то видела»</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CD; Как этим пользоваться</h3>
+                    <p style="font-size:0.94rem; line-height:1.62;">
+                        Три режима. Начни с <b>DE &rarr; RU</b> (узнавание), потом <b>RU &rarr; DE</b> (выбор),
+                        и только потом <b>печатать</b> &mdash; там слово нужно достать из головы целиком.
+                        Слово считается <b>выученным</b> после двух правильных ответов подряд; ошибка сбрасывает
+                        его обратно и возвращает в конце круга.
+                    </p>
+                    <div class="kb-msg"><b>Про артикль и мелочи</b>При вводе можно писать с артиклем и без: <i>Transparenz</i> и <i>die Transparenz</i> &mdash; оба верно. <i>ä ö ü ß</i> можно набирать как <i>ae oe ue ss</i>. Прогресс лежит в этом браузере, на телефоне будет свой.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3B2; Trainer</h3>
+                    <div class="vt-row">
+                        <span class="vt-lab">Modus</span>
+                        <button class="vt-chip on" data-mode="de2ru" type="button">&#x1F1E9;&#x1F1EA; &rarr; &#x1F1F7;&#x1F1FA;</button>
+                        <button class="vt-chip" data-mode="ru2de" type="button">&#x1F1F7;&#x1F1FA; &rarr; &#x1F1E9;&#x1F1EA;</button>
+                        <button class="vt-chip" data-mode="type" type="button">&#x2328;&#xFE0F; печатать</button>
+                    </div>
+                    <div class="vt-row">
+                        <span class="vt-lab">Wörter</span>
+                        <button class="vt-chip on" data-filter="all" type="button">Alle</button>
+                        <button class="vt-chip" data-filter="A" type="button">Text A</button>
+                        <button class="vt-chip" data-filter="B" type="button">Text B</button>
+                        <button class="vt-chip" data-filter="C" type="button">Text C</button>
+                        <button class="vt-chip" data-filter="D" type="button">Text D</button>
+                        <button class="vt-chip" data-filter="T" type="button">Tafel</button>
+                        <button class="vt-chip" data-filter="R" type="button">Rand</button>
+                    </div>
+                    <div class="vt-prog">
+                        <span class="vt-track"><i class="vt-fill" id="vtFill"></i></span>
+                        <span id="vtProgTxt">Выучено 0 из 78</span>
+                        <button class="vt-clear" id="vtClear" type="button">сбросить</button>
+                    </div>
+
+                    <div class="tz-box">
+                        <span class="vt-src" id="vtSrc"></span>
+                        <div class="tz-prompt" id="vtPrompt"></div>
+                        <div class="tz-opts" id="vtOpts" style="margin-top:0.9rem;"></div>
+                        <div class="vt-inrow" id="vtInWrap" hidden>
+                            <input type="text" class="vt-input" id="vtInput" placeholder="auf Deutsch tippen&hellip;" autocomplete="off" autocapitalize="off" spellcheck="false">
+                            <button class="tz-btn" id="vtCheck" type="button">Prüfen</button>
+                        </div>
+                        <div class="tz-fb" id="vtFb"></div>
+                        <div class="tz-actions">
+                            <button class="tz-btn" id="vtNext" type="button">Weiter &rarr;</button>
+                            <button class="tz-btn ghost" id="vtReset" type="button">Neu starten</button>
+                        </div>
+                        <div class="tz-stats">
+                            <span>Осталось в круге: <b id="vtLeft">0</b></span>
+                            <span>Верно: <b id="vtOk">0</b></span>
+                            <span>Ошибок: <b id="vtErr">0</b></span>
+                        </div>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где взять больше слов на эти темы</span>
+                        <a href="deutsch-c1-gesellschaft.html">C1 Gesellschaft</a> &mdash; главный склад слов про общество и политику, с карточками и аудио<br>
+                        <a href="deutsch-nomen-verb.html">Nomen-Verb-Verbindungen</a> &mdash; связки вроде <i>an Einfluss gewinnen, eine Rolle spielen</i> &mdash; их учат целиком<br>
+                        <a href="deutsch-grundwortschatz.html">Grundwortschatz</a> &mdash; если какое-то базовое слово в вариантах ответа непонятно
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        </div>
+
+        </div><!-- /pk-lessons -->
+    </div>
+<script>
+/* ===================== ROUTER: Karten <-> Lektion ===================== */
+(function () {
+    var hub = document.getElementById('pk-hub');
+    var wrap = document.getElementById('pk-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Politik | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('pk-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#pk-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#pk-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_pk_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('pk-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#pk-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+
+/* ===== Selbstkontrolle: Fragen aus der Aufgabe, Antworten vom Tafelbild ===== */
+var SELBST_PK = [
+    { q: 'Célia, Frankreich — welches Thema und welche Stichpunkte stehen an der Tafel?',
+      a: 'Thema: <b>Klimawandel</b>. &rarr; interessiert zu wenige Menschen &rarr; mehr Maßnahmen zum Klimaschutz &rArr; Wissen + Innovation.' },
+    { q: 'Nombuso, Südafrika — welches Thema und welche Stichpunkte?',
+      a: 'Thema: <b>Menschenrechte</b>. &rarr; es gibt zu viele Verletzungen der MR &rArr; Demokratie leidet darunter &rArr; alle Menschen sollten würdig behandelt werden.' },
+    { q: 'Nada, Italien — welches Thema und welche Stichpunkte?',
+      a: 'Thema: <b>Gerechte Wirtschaft</b>. &rarr; mehr Gesundheit und Bildung für alle &rArr; radikale Parteien verlieren an Macht, wenn Menschen sich gerecht behandelt fühlen.' },
+    { q: 'Melanie, Puerto Rico — welches Thema und welche Stichpunkte?',
+      a: 'Thema: <b>Frauenrechte</b>. &rarr; Gleichberechtigung &#x21B3; Frauen in der Wirtschaft in der ganzen Welt &#x21B3; auch in der Politik &rArr; Vorbilder für junge Menschen.' },
+    { q: 'Was steht an der Tafel als gemeinsamer Punkt über allen vier Spalten?',
+      a: '<b>alle suchen bessere Zukunft</b> — темы разные, вывод у всех четверых один.' },
+    { q: 'Wofür steht die Abkürzung MR an der Tafel?',
+      a: '<b>MR = Menschenrechte.</b>' },
+    { q: 'Welcher Satz stand unter der Mindmap „Das verbinde ich mit Politik…“?',
+      a: '<b>Politik soll ein menschenwürdiges Leben ermöglichen und demokratische Lösungen finden.</b>' }
+];
+renderSelbst('stListPK', SELBST_PK);
+
+/* ===================== VOKABELTRAINER: Wörter dieser Stunde ===================== */
+var PKVOC = [
+    { de: "die Herausforderung", ru: "вызов, сложная задача", s: 'A' },
+    { de: "sich mit etwas befassen", ru: "заниматься чем-то (темой)", s: 'A' },
+    { de: "als Einzelne", ru: "как отдельные люди, каждый сам", s: 'A' },
+    { de: "der Lösungsansatz, -ansätze", ru: "подход к решению", s: 'A' },
+    { de: "die Verbreitung von Wissen", ru: "распространение знаний", s: 'A' },
+    { de: "umweltfreundlich", ru: "экологичный, дружественный к среде", s: 'A' },
+    { de: "ins Leben rufen", ru: "запускать, создавать (инициативу)", s: 'A' },
+    { de: "rund um den Globus", ru: "по всему миру", s: 'A' },
+    { de: "betroffen sein", ru: "быть затронутым, это тебя касается", s: 'A' },
+    { de: "die Gemeinschaft", ru: "сообщество, все вместе", s: 'A' },
+    { de: "der Klimaschutz", ru: "защита климата", s: 'A' },
+    { de: "Es geht um …", ru: "речь идёт о …", s: 'A' },
+    { de: "die Transparenz", ru: "прозрачность", s: 'B' },
+    { de: "staatliche Institutionen", ru: "государственные институты", s: 'B' },
+    { de: "etwas für wichtig halten", ru: "считать что-то важным", s: 'B' },
+    { de: "der Regierung vertrauen", ru: "доверять правительству (Dativ!)", s: 'B' },
+    { de: "der Schutz gegen Korruption", ru: "защита от коррупции", s: 'B' },
+    { de: "das Volk", ru: "народ", s: 'B' },
+    { de: "eine der Säulen von Demokratie", ru: "одна из опор демократии", s: 'B' },
+    { de: "sich für etwas einsetzen", ru: "выступать за что-то, бороться за", s: 'B' },
+    { de: "mit Ehre und Würde behandeln", ru: "обращаться с честью и достоинством", s: 'B' },
+    { de: "die Unzufriedenheit", ru: "недовольство", s: 'B' },
+    { de: "Menschenrechte verletzen", ru: "нарушать права человека", s: 'B' },
+    { de: "einhalten", ru: "соблюдать (правила, права)", s: 'B' },
+    { de: "die Armut", ru: "бедность", s: 'C' },
+    { de: "gerecht → gerechter", ru: "справедливый → справедливее", s: 'C' },
+    { de: "würdig leben", ru: "жить достойно", s: 'C' },
+    { de: "die Gesundheitsvorsorge", ru: "забота о здоровье, профилактика", s: 'C' },
+    { de: "die Stellung in der Gesellschaft", ru: "положение в обществе", s: 'C' },
+    { de: "die wachsende Ungleichheit", ru: "растущее неравенство", s: 'C' },
+    { de: "fähig", ru: "способный", s: 'C' },
+    { de: "das Einkommen", ru: "доход", s: 'C' },
+    { de: "die Ursache", ru: "причина", s: 'C' },
+    { de: "ungenügende Regulation", ru: "недостаточное регулирование", s: 'C' },
+    { de: "die Märkte überwachen", ru: "контролировать рынки, следить за ними", s: 'C' },
+    { de: "das Bildungssystem", ru: "система образования", s: 'C' },
+    { de: "radikale Parteien", ru: "радикальные партии", s: 'C' },
+    { de: "an Einfluss gewinnen", ru: "набирать влияние", s: 'C' },
+    { de: "die Stimmen", ru: "голоса (на выборах)", s: 'C' },
+    { de: "die Komplexität durchschauen", ru: "видеть насквозь сложность проблемы", s: 'C' },
+    { de: "die Gleichberechtigung der Geschlechter", ru: "равноправие полов", s: 'D' },
+    { de: "eine entscheidende Rolle spielen", ru: "играть решающую роль", s: 'D' },
+    { de: "die Nachhaltigkeit", ru: "устойчивость, бережное развитие", s: 'D' },
+    { de: "die wirtschaftliche Entwicklung", ru: "экономическое развитие", s: 'D' },
+    { de: "etwas vorantreiben", ru: "продвигать вперёд", s: 'D' },
+    { de: "ein Schritt in Richtung …", ru: "шаг в направлении …", s: 'D' },
+    { de: "Egal, um welches Gebiet es geht", ru: "неважно, о какой сфере речь", s: 'D' },
+    { de: "die Schlüsselrolle übernehmen", ru: "брать на себя ключевую роль", s: 'D' },
+    { de: "das Unternehmen", ru: "предприятие, компания", s: 'D' },
+    { de: "das Heranwachsen", ru: "взросление (как процесс)", s: 'D' },
+    { de: "global denkend", ru: "мыслящий глобально", s: 'D' },
+    { de: "der Klimawandel", ru: "изменение климата", s: 'A' },
+    { de: "die Korruption", ru: "коррупция", s: 'B' },
+    { de: "die Regierung", ru: "правительство", s: 'B' },
+    { de: "die Säule der Demokratie", ru: "опора демократии", s: 'B' },
+    { de: "die Würde", ru: "достоинство", s: 'B' },
+    { de: "die Ungleichheit", ru: "неравенство", s: 'C' },
+    { de: "die Gleichberechtigung", ru: "равноправие", s: 'D' },
+    { de: "die Schlüsselrolle", ru: "ключевая роль", s: 'D' },
+    { de: "die Wahlen", ru: "выборы", s: 'T' },
+    { de: "die Partei, -en", ru: "партия", s: 'T' },
+    { de: "der Bundestag", ru: "бундестаг", s: 'T' },
+    { de: "das Gesetz, -e", ru: "закон", s: 'T' },
+    { de: "die Steuer, -n", ru: "налог", s: 'T' },
+    { de: "die Gewerkschaft, -en", ru: "профсоюз", s: 'T' },
+    { de: "die Demo, -s", ru: "демонстрация", s: 'T' },
+    { de: "das Plakat, -e", ru: "плакат", s: 'T' },
+    { de: "der Putschversuch", ru: "попытка переворота", s: 'T' },
+    { de: "die Inflation", ru: "инфляция", s: 'T' },
+    { de: "die Entscheidung, -en", ru: "решение", s: 'T' },
+    { de: "die Kritik", ru: "критика", s: 'T' },
+    { de: "menschenwürdig", ru: "достойный человека", s: 'T' },
+    { de: "ermöglichen", ru: "делать возможным", s: 'T' },
+    { de: "die Benachteiligung", ru: "ущемление, дискриминация", s: 'N' },
+    { de: "der Fachbegriff, -e", ru: "термин, специальное понятие", s: 'R' },
+    { de: "nachreichen", ru: "донести, дослать позже (то, чего не хватало)", s: 'R' },
+    { de: "die Vermittlung", ru: "посредничество; передача (знаний)", s: 'R' },
+    { de: "das Department = die Abteilung", ru: "отдел, подразделение", s: 'R' }
+];
+
+(function () {
+    var SRCL = { A: 'Text A · Célia · Klimawandel', B: 'Text B · Nombuso · Menschenrechte',
+                 C: 'Text C · Nada · Gerechte Wirtschaft', D: 'Text D · Melanie · Frauenrechte',
+                 T: 'Tafel · Mindmap', N: 'deine Notiz', R: 'Rand des Blattes' };
+    var KEY = 'neostudy_pk_voc';
+    var mode = 'de2ru', filter = 'all';
+    var queue = [], pos = 0, again = [], answered = false, finished = false;
+    var okCount = 0, errCount = 0;
+
+    function el(id) { return document.getElementById(id); }
+    if (!el('vtPrompt')) { return; }
+
+    var state = (function () { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } })();
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+    function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function plural(n, one, few, many) {
+        var n10 = n % 10, n100 = n % 100;
+        if (n10 === 1 && n100 !== 11) { return one; }
+        if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) { return few; }
+        return many;
+    }
+    function shuffle(a) {
+        a = a.slice();
+        for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+        return a;
+    }
+    function pool() { return filter === 'all' ? PKVOC : PKVOC.filter(function (w) { return w.s === filter; }); }
+    function norm(t) {
+        return String(t).toLowerCase()
+            .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+            .replace(/,\s*-[^,]*$/, '')
+            .replace(/[.,;:!?()"'’„“\-–—]/g, ' ')
+            .replace(/^\s*(der|die|das)\s+/, '')
+            .replace(/\s+/g, ' ').trim();
+    }
+    function accepted(w) {
+        var list = [];
+        w.de.split('=').forEach(function (part) {
+            list.push(norm(part));
+            list.push(norm(part).replace(/^(der|die|das)\s+/, ''));
+        });
+        list.push(norm(w.de));
+        return list;
+    }
+    function distractors(w, n) {
+        var base = pool().length >= 6 ? pool() : PKVOC;
+        var cand = base.filter(function (x) {
+            if (x === w) { return false; }
+            if (norm(x.de).slice(0, 8) === norm(w.de).slice(0, 8)) { return false; }
+            if (x.ru.slice(0, 7) === w.ru.slice(0, 7)) { return false; }
+            return true;
+        });
+        return shuffle(cand).slice(0, n);
+    }
+
+    function renderProgress() {
+        var p = pool();
+        var learned = p.filter(function (w) { return (state[w.de] || 0) >= 2; }).length;
+        el('vtFill').style.width = (p.length ? Math.round(learned / p.length * 100) : 0) + '%';
+        el('vtProgTxt').textContent = 'Выучено ' + learned + ' из ' + p.length;
+    }
+    function updStats() {
+        el('vtLeft').textContent = Math.max(queue.length - pos - (answered ? 1 : 0), 0);
+        el('vtOk').textContent = okCount;
+        el('vtErr').textContent = errCount;
+    }
+    function lock() {
+        if (mode === 'type') { el('vtInput').disabled = true; }
+        else {
+            Array.prototype.forEach.call(el('vtOpts').querySelectorAll('.tz-opt'), function (b) { b.disabled = true; });
+        }
+    }
+    function mark(w, good) {
+        if (good) { okCount++; state[w.de] = Math.min((state[w.de] || 0) + 1, 3); }
+        else { errCount++; state[w.de] = 0; again.push(w); }
+        save(); renderProgress(); updStats();
+    }
+
+    function draw() {
+        var w = queue[pos];
+        answered = false; finished = false;
+        el('vtSrc').textContent = SRCL[w.s] || '';
+        el('vtFb').innerHTML = '';
+        var optsBox = el('vtOpts'), inWrap = el('vtInWrap');
+        optsBox.innerHTML = '';
+        if (mode === 'type') {
+            optsBox.hidden = true; inWrap.hidden = false;
+            el('vtPrompt').textContent = w.ru;
+            var inp = el('vtInput');
+            inp.value = ''; inp.className = 'vt-input'; inp.disabled = false;
+            try { inp.focus(); } catch (e) {}
+        } else {
+            optsBox.hidden = false; inWrap.hidden = true;
+            var isDe = mode === 'de2ru';
+            el('vtPrompt').textContent = isDe ? w.de : w.ru;
+            shuffle(distractors(w, 3).concat([w])).forEach(function (o) {
+                var b = document.createElement('button');
+                b.className = 'tz-opt'; b.type = 'button';
+                b.textContent = isDe ? o.ru : o.de;
+                b.addEventListener('click', function () { choose(b, o, w); });
+                optsBox.appendChild(b);
+            });
+        }
+        updStats();
+    }
+
+    function choose(btn, o, w) {
+        if (answered) { return; }
+        answered = true;
+        lock();
+        if (o === w) {
+            btn.classList.add('ok');
+            el('vtFb').innerHTML = '&#x2705; <b>' + esc(w.de) + '</b> &mdash; ' + esc(w.ru);
+            mark(w, true);
+        } else {
+            btn.classList.add('no');
+            var right = mode === 'de2ru' ? w.ru : w.de;
+            Array.prototype.forEach.call(el('vtOpts').querySelectorAll('.tz-opt'), function (b) {
+                if (b.textContent === right) { b.classList.add('ok'); }
+            });
+            el('vtFb').innerHTML = '&#x274C; <b>' + esc(w.de) + '</b> &mdash; ' + esc(w.ru) +
+                '<br><span style="opacity:.65;font-size:0.85rem;">Слово вернётся в конце круга.</span>';
+            mark(w, false);
+        }
+    }
+
+    function check() {
+        if (answered) { next(); return; }
+        var w = queue[pos], inp = el('vtInput'), val = inp.value;
+        if (!val.trim()) { try { inp.focus(); } catch (e) {} return; }
+        answered = true; inp.disabled = true;
+        var good = accepted(w).indexOf(norm(val)) !== -1;
+        inp.classList.add(good ? 'ok' : 'no');
+        el('vtFb').innerHTML = (good ? '&#x2705; ' : '&#x274C; ') + '<b>' + esc(w.de) + '</b> &mdash; ' + esc(w.ru) +
+            (good ? '' : '<br><span style="opacity:.65;font-size:0.85rem;">Слово вернётся в конце круга.</span>');
+        mark(w, good);
+    }
+
+    function finish() {
+        finished = true; answered = true;
+        el('vtSrc').textContent = '';
+        el('vtOpts').hidden = false; el('vtOpts').innerHTML = ''; el('vtInWrap').hidden = true;
+        el('vtPrompt').textContent = 'Готово: ' + okCount + ' верно, ' + errCount + ' с ошибкой.';
+        el('vtFb').innerHTML = errCount === 0
+            ? '&#x1F3C6; Весь круг без единой ошибки. Возьми следующий режим или другой фильтр.'
+            : 'Нажми <b>Weiter</b> или <b>Neu starten</b> &mdash; порядок слов будет другим.';
+        updStats();
+    }
+
+    function next() {
+        if (finished) { start(); return; }
+        if (!answered) {
+            var w = queue[pos];
+            answered = true; lock();
+            el('vtFb').innerHTML = '&#x1F4A1; <b>' + esc(w.de) + '</b> &mdash; ' + esc(w.ru) +
+                '<br><span style="opacity:.65;font-size:0.85rem;">Слово вернётся в конце круга.</span>';
+            mark(w, false);
+            return;
+        }
+        pos++;
+        if (pos >= queue.length) {
+            if (again.length) {
+                queue = shuffle(again); again = []; pos = 0;
+                draw();
+                el('vtFb').innerHTML = '&#x1F501; Круг пройден. Повторяем ' + queue.length + ' ' +
+                    plural(queue.length, 'слово', 'слова', 'слов') + ', где были ошибки.';
+                return;
+            }
+            finish(); return;
+        }
+        draw();
+    }
+
+    function start() {
+        var p = pool();
+        queue = shuffle(p); pos = 0; again = []; okCount = 0; errCount = 0; finished = false;
+        renderProgress();
+        if (!queue.length) {
+            el('vtPrompt').textContent = 'Здесь пока нет слов.';
+            el('vtOpts').innerHTML = ''; el('vtInWrap').hidden = true; el('vtFb').innerHTML = '';
+            return;
+        }
+        draw();
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.vt-chip[data-mode]'), function (b) {
+        b.addEventListener('click', function () {
+            mode = b.dataset.mode;
+            Array.prototype.forEach.call(document.querySelectorAll('.vt-chip[data-mode]'), function (x) { x.classList.remove('on'); });
+            b.classList.add('on');
+            start();
+        });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.vt-chip[data-filter]'), function (b) {
+        b.addEventListener('click', function () {
+            filter = b.dataset.filter;
+            Array.prototype.forEach.call(document.querySelectorAll('.vt-chip[data-filter]'), function (x) { x.classList.remove('on'); });
+            b.classList.add('on');
+            start();
+        });
+    });
+    el('vtNext').addEventListener('click', next);
+    el('vtReset').addEventListener('click', start);
+    el('vtCheck').addEventListener('click', check);
+    el('vtInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); if (answered) { next(); } else { check(); } }
+    });
+    el('vtClear').addEventListener('click', function () {
+        state = {}; save(); renderProgress();
+        el('vtFb').innerHTML = 'Прогресс сброшен.';
+    });
+
+    start();
+})();
+</script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>

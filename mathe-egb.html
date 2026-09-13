@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Mathe — Deskriptive Statistik | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #egb-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+    /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute; bottom: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4); font-size: 0.72rem; font-weight: 800; line-height: 1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: all 0.18s;
+        z-index: 3; flex-shrink: 0; padding: 0; font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    .plan-badge {
+        position: absolute; top: -8px; left: 8px; font-size: 0.6rem; font-weight: 800;
+        padding: 0.13rem 0.48rem; border-radius: 20px; white-space: nowrap; letter-spacing: 0.05em;
+        pointer-events: none; z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px; padding: 0.9rem 1.1rem; margin-bottom: 1.4rem;
+        display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.55); font-size: 0.8rem;
+        font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg { display: none; text-align: center; color: rgba(255,255,255,0.3);
+                      padding: 2.5rem 0; font-size: 0.9rem; line-height: 1.8; }
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+    /* ---- Ссылки на разборы на сайте ---- */
+    .sl { margin:0.75rem 0 0; padding:0.6rem 0.85rem; border-left:2px solid rgba(200,165,255,0.45);
+          background:rgba(200,165,255,0.06); border-radius:0 10px 10px 0;
+          font-size:0.845rem; color:rgba(230,230,235,0.62); line-height:1.8; }
+    .sl-t { display:block; color:rgba(230,230,235,0.85); font-weight:700; font-size:0.8rem;
+            letter-spacing:0.02em; margin-bottom:0.15rem; }
+    .sl a { color:#c8a5ff; text-decoration:none; border-bottom:1px dotted rgba(200,165,255,0.55); }
+    .sl a:hover { color:#fff; border-bottom-color:#fff; }
+
+    /* ---- Tabellen ---- */
+    .mt-wrap { overflow-x:auto; margin:0.8rem 0; }
+    .mt { width:100%; border-collapse:collapse; font-size:0.92rem; min-width:420px; }
+    .mt th, .mt td { border:1px solid rgba(255,255,255,0.14); padding:0.45rem 0.65rem; text-align:center; color:rgba(230,230,235,0.85); }
+    .mt th { background:rgba(255,255,255,0.07); color:#fff; font-weight:700; font-size:0.85rem; line-height:1.35; }
+    .mt td.l, .mt th.l { text-align:left; }
+    .mt tr.sum td { background:rgba(63,185,80,0.1); font-weight:700; color:#fff; }
+    .mt td.hl { background:rgba(251,191,36,0.14); color:#fbbf24; font-weight:800; }
+    .mt td.dim { color:rgba(230,230,235,0.45); }
+    .mt caption { caption-side:top; text-align:left; font-size:0.82rem; color:rgba(230,230,235,0.5);
+                  padding-bottom:0.35rem; }
+
+    /* ---- Rechenweg ---- */
+    .rw { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+          padding:0.75rem 0.95rem; margin:0.55rem 0; font-size:1rem; color:#fff; line-height:2; }
+    .rw .step { display:block; color:rgba(230,230,235,0.48); font-size:0.79rem; line-height:1.5;
+                margin-top:0.35rem; }
+    .rw .step:first-child { margin-top:0; }
+    .rw b { color:#fbbf24; }
+    .rw .erg { color:#86efac; font-weight:800; }
+
+    /* ---- Deutscher Satz zum Vorlesen ---- */
+    .dsatz { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.28); border-radius:9px;
+             padding:0.6rem 0.85rem; color:#fff; font-size:0.97rem; line-height:1.65; margin:0.5rem 0 0.15rem; }
+    .dsatz-ru { font-size:0.86rem; color:rgba(230,230,235,0.62); margin:0 0 0.9rem 0.25rem; line-height:1.6; }
+    .dsatz-ru b { color:#c8a5ff; font-weight:600; }
+
+    /* ---- falsch / richtig ---- */
+    .fr { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin:0.7rem 0; }
+    .fr > div { border-radius:10px; padding:0.7rem 0.85rem; font-size:0.9rem; line-height:1.6;
+                color:rgba(230,230,235,0.8); }
+    .fr .f { background:rgba(248,113,113,0.09); border:1px solid rgba(248,113,113,0.32); }
+    .fr .r { background:rgba(63,185,80,0.09); border:1px solid rgba(63,185,80,0.32); }
+    .fr h5 { margin:0 0 0.35rem; font-size:0.9rem; }
+    .fr .f h5 { color:#fca5a5; } .fr .r h5 { color:#86efac; }
+    @media (max-width:600px) { .fr { grid-template-columns:1fr; } }
+
+    /* ---- Säulendiagramm ---- */
+    .chart { display:flex; align-items:flex-end; gap:0.55rem; height:200px; padding:1.7rem 0.3rem 0;
+             border-bottom:2px solid rgba(255,255,255,0.2); margin-top:0.8rem; }
+    .chart-col { flex:1; display:flex; flex-direction:column; justify-content:flex-end;
+                 align-items:center; height:100%; }
+    .chart-bar { width:100%; max-width:62px; border-radius:6px 6px 0 0; flex-shrink:0;
+                 background:linear-gradient(180deg,#f472b6,#a371f7); }
+    .chart-val { font-size:0.78rem; color:#fff; font-weight:800; margin-bottom:0.22rem; flex-shrink:0; }
+    .chart-x { display:flex; gap:0.55rem; margin-top:0.4rem; padding:0 0.3rem; }
+    .chart-x div { flex:1; text-align:center; font-size:0.74rem; color:rgba(230,230,235,0.6); line-height:1.35; }
+    .chart-y { font-size:0.76rem; color:rgba(230,230,235,0.45); margin-bottom:-0.4rem; }
+
+    /* ---- Kreisdiagramm ---- */
+    .pie { width:180px; height:180px; border-radius:50%; margin:0.8rem auto 0.7rem;
+           box-shadow:0 0 0 3px rgba(255,255,255,0.07); }
+    .pie-leg { display:flex; flex-wrap:wrap; gap:0.4rem 1.1rem; justify-content:center;
+               font-size:0.83rem; color:rgba(230,230,235,0.72); }
+    .pie-leg span i { width:11px; height:11px; border-radius:3px; display:inline-block; margin-right:0.35rem; }
+
+    /* ---- Trainer ---- */
+    .tr-inp { width:66px; background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.18);
+              border-radius:7px; color:#fff; padding:0.28rem 0.35rem; text-align:center;
+              font-family:inherit; font-size:0.92rem; }
+    .tr-inp:focus { outline:none; border-color:var(--color-accent); }
+    .tr-inp.ok { border-color:#3fb950; background:rgba(63,185,80,0.16); color:#86efac; }
+    .tr-inp.no { border-color:#f87171; background:rgba(248,113,113,0.14); color:#fca5a5; }
+    .tr-btn { margin-top:0.7rem; padding:0.45rem 1.1rem; border-radius:20px; cursor:pointer;
+              border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07);
+              color:#fff; font-family:inherit; font-size:0.88rem; font-weight:700; transition:all .15s; }
+    .tr-btn:hover { background:rgba(255,255,255,0.14); border-color:var(--color-accent); }
+    .tr-msg { margin-top:0.55rem; font-size:0.88rem; font-weight:700; min-height:1.2em; }
+
+    /* ---- Wortschatz ---- */
+    .vt { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    .vt td { border-bottom:1px solid rgba(255,255,255,0.08); padding:0.45rem 0.55rem; vertical-align:top; }
+    .vt td.de { color:#fff; font-weight:600; width:42%; }
+    .vt td.ru { color:rgba(230,230,235,0.68); line-height:1.55; }
+    .vt tr:last-child td { border-bottom:none; }
+
+    /* ---- Schritte ---- */
+    .schritte { list-style:none; padding:0; margin:0.6rem 0 0; counter-reset:sc; }
+    .schritte li { position:relative; padding:0.5rem 0 0.5rem 2.3rem; counter-increment:sc;
+                   font-size:0.93rem; color:rgba(230,230,235,0.8); line-height:1.65;
+                   border-bottom:1px dashed rgba(255,255,255,0.08); }
+    .schritte li:last-child { border-bottom:none; }
+    .schritte li::before { content:counter(sc); position:absolute; left:0; top:0.5rem;
+        width:1.55rem; height:1.55rem; border-radius:50%; background:rgba(244,114,182,0.18);
+        border:1px solid rgba(244,114,182,0.45); color:#f9a8d4; font-size:0.8rem; font-weight:800;
+        display:flex; align-items:center; justify-content:center; }
+    .schritte li b { color:#fff; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.6; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-de { color:#fff; font-weight:600; }
+    .warn { background:rgba(248,113,113,0.09); border:1px solid rgba(248,113,113,0.3);
+            border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+            color:rgba(230,230,235,0.82); line-height:1.65; }
+    .warn b { color:#fca5a5; }
+    .gut { background:rgba(63,185,80,0.09); border:1px solid rgba(63,185,80,0.3);
+           border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+           color:rgba(230,230,235,0.82); line-height:1.65; }
+    .gut b { color:#86efac; }
+    .sprech { background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.28);
+              border-radius:10px; padding:0.6rem 0.9rem; margin:0.6rem 0; font-size:0.88rem;
+              color:rgba(230,230,235,0.78); line-height:1.7; }
+    .sprech b { color:#93c5fd; }
+    .urliste { display:flex; flex-wrap:wrap; gap:0.35rem; margin:0.6rem 0; }
+    .urliste span { width:2.1rem; height:2.1rem; display:flex; align-items:center; justify-content:center;
+                    border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14);
+                    color:#fff; font-weight:700; font-size:0.95rem; }
+    .urliste span.v1 { border-color:rgba(248,113,113,0.5); }
+    .urliste span.v2 { border-color:rgba(251,146,60,0.5); }
+    .urliste span.v3 { border-color:rgba(251,191,36,0.5); }
+    .urliste span.v4 { border-color:rgba(63,185,80,0.5); background:rgba(63,185,80,0.12); }
+    .urliste span.v5 { border-color:rgba(96,165,250,0.5); background:rgba(96,165,250,0.12); }
+    .urliste .mid { border-color:#fbbf24; box-shadow:0 0 0 2px rgba(251,191,36,0.35); }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html" class="active">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="mathe.html">Mathematik</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB Mathe</span>
+        </nav>
+        <a href="mathe.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu Mathematik</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Mathe</h1>
+            <p class="page-subtitle">Arbeitsblätter aus dem Matheunterricht am Erich-Gutenberg-Berufskolleg &mdash; Aufgabe für Aufgabe · <b>Thema 1: Grundlagen der deskriptiven Statistik</b> &mdash; решение по-немецки, объяснение по-русски, чтобы уверенно отвечать вслух</p>
+        </div>
+
+        <div id="egb-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="egb-search" placeholder="Thema suchen&hellip; z.B. Median, Häufigkeit, Merkmal" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="egb-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Arbeitsbl&auml;tter aus dem Matheunterricht
+        </h2>
+        <p id="egb-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждое задание с листа &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#60a5fa,#93c5fd); color:#0a1628;">1</span>
+            <h3 style="color:#93c5fd;">Von Daten zur Auswertung &mdash; Einstieg &amp; Diagnose</h3>
+            <span class="iw-sec-note">Arbeitsblatt Seite 1&ndash;2 &middot; OfficeLine GmbH &middot; Aufgabe 1 und Aufgabe 2 a&ndash;e</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#m1" class="subject-card glass-card" data-lesson="m1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F4C4;</span>
+                <h3>Das Arbeitsblatt: worum geht es?</h3>
+                <p>OfficeLine GmbH, zehn Kunden, Bewertungen 1&ndash;5 &mdash; что за данные, что именно спрашивают и что учительница хочет услышать</p>
+            </a>
+            <a href="#m2" class="subject-card glass-card" data-lesson="m2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F9EE;</span>
+                <h3>Aufgabe 1: Daten aufbereiten</h3>
+                <p>Полное решение в шести шагах + готовый текст «Dokumentation des Vorgehens» и две Aussagen для ответа вслух</p>
+            </a>
+            <a href="#m3" class="subject-card glass-card" data-lesson="m3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F50E;</span>
+                <h3>Твои записи: что верно, что поправить</h3>
+                <p>Разбор того, что уже написано на листе карандашом &mdash; две ошибки, из-за которых снимут баллы, и как их сказать правильно</p>
+            </a>
+            <a href="#m4" class="subject-card glass-card" data-lesson="m4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F3F7;&#xFE0F;</span>
+                <h3>Aufgabe 2 a&ndash;c: Fachbegriffe</h3>
+                <p>Merkmal, Merkmalsausprägung, Stichprobenumfang n &mdash; готовые ответы одним предложением + вся терминология вокруг</p>
+            </a>
+            <a href="#m5" class="subject-card glass-card" data-lesson="m5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F4CA;</span>
+                <h3>Aufgabe 2 d: Häufigkeitstabelle</h3>
+                <p>Правильно заполненная таблица, две проверки суммы и тренажёр: заполни сама и проверь</p>
+            </a>
+            <a href="#m6" class="subject-card glass-card" data-lesson="m6" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F4AC;</span>
+                <h3>Aufgabe 2 e: Interpretation</h3>
+                <p>«Im Sachzusammenhang» &mdash; шаблон предложения и готовый ответ про Bewertung 4</p>
+            </a>
+            <a href="#m7" class="subject-card glass-card" data-lesson="m7" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F4D0;</span>
+                <h3>Kennzahlen: Mittelwert, Median, Modus</h3>
+                <p>Все четыре Lagemaße посчитаны на этих же числах, по шагам, с формулой и проговоркой</p>
+            </a>
+            <a href="#m8" class="subject-card glass-card" data-lesson="m8" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F4C8;</span>
+                <h3>Diagramme zeichnen</h3>
+                <p>Säulendiagramm и Kreisdiagramm по этим данным: как считать градусы и что подписывать</p>
+            </a>
+            <a href="#m9" class="subject-card glass-card" data-lesson="m9" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F5E3;&#xFE0F;</span>
+                <h3>Redemittel: как сказать это вслух</h3>
+                <p>Фразы для доски и с места + как по-немецки читаются 3,8 · 0,5 · n = 10 · H&#8324; · x&#772;</p>
+            </a>
+            <a href="#m10" class="subject-card glass-card" data-lesson="m10" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(96,165,250,0.35);">
+                <span class="subject-icon">&#x1F9E9;</span>
+                <h3>Wortschatz &amp; Selbsttest</h3>
+                <p>Словарь темы DE&rarr;RU и вопросы строго по этому листу &mdash; ровно то, что может спросить учительница</p>
+            </a>
+        </div>
+
+        </div><!-- /egb-hub -->
+
+        <div id="egb-lessons">
+
+        <!-- ================= m1 ================= -->
+        <div class="lesson" id="ls-m1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4C4;</span>
+                    <div>
+                        <h2>Das Arbeitsblatt: worum geht es?</h2>
+                        <p class="lesson-header-sub">Bildungsgang CBF · Fach Mathe · «Grundlagen der deskriptiven Statistik» — Von Daten zur Auswertung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Ausgangssituation — дословно с листа</h3>
+                    <p style="font-size:0.93rem;line-height:1.7;">
+                        <i>„Die OfficeLine GmbH vertreibt Büroausstattung über einen eigenen Onlineshop. Um die
+                        Zufriedenheit ihrer Kunden zu untersuchen, wurden zehn Kunden nach Abschluss ihrer Bestellung
+                        gebeten, die Abwicklung zu bewerten.“</i>
+                    </p>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.62);line-height:1.7;margin-top:0.5rem;">
+                        По-русски: фирма OfficeLine торгует офисным оборудованием через свой интернет-магазин.
+                        Чтобы выяснить, довольны ли клиенты, десять покупателей после оформления заказа попросили
+                        оценить <b class="kb-de">die Abwicklung</b> — то, как прошёл процесс (заказ, оплата, доставка).
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th>Bewertung</th><th class="l">Bedeutung</th><th class="l">по-русски</th></tr>
+                        <tr><td>1</td><td class="l">sehr unzufrieden</td><td class="l">очень недоволен</td></tr>
+                        <tr><td>2</td><td class="l">unzufrieden</td><td class="l">недоволен</td></tr>
+                        <tr><td>3</td><td class="l">teils / teils</td><td class="l">отчасти да, отчасти нет</td></tr>
+                        <tr><td>4</td><td class="l">zufrieden</td><td class="l">доволен</td></tr>
+                        <tr><td>5</td><td class="l">sehr zufrieden</td><td class="l">очень доволен</td></tr>
+                    </table>
+                    </div>
+                    <div class="warn">
+                        <b>Внимание — здесь легко перепутать!</b> У школьных оценок 1 — это лучшее. Здесь наоборот:
+                        <b>1 = хуже всего</b>, <b>5 = лучше всего</b>. Половина ошибок на этом листе — из-за этого.
+                        Скажи себе один раз вслух: <i>„Eins ist sehr unzufrieden, fünf ist sehr zufrieden.“</i>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F522; Die Daten — die Urliste</h3>
+                    <p style="font-size:0.9rem;">На листе стоит: <i>„Die zehn Kunden gaben folgende Bewertungen ab:“</i></p>
+                    <div class="urliste">
+                        <span class="v4">4</span><span class="v5">5</span><span class="v3">3</span><span class="v4">4</span><span class="v2">2</span>
+                        <span class="v4">4</span><span class="v5">5</span><span class="v3">3</span><span class="v4">4</span><span class="v4">4</span>
+                    </div>
+                    <p style="font-size:0.89rem;color:rgba(230,230,235,0.65);line-height:1.7;">
+                        Это <b class="kb-de">die Urliste</b> — «сырой» список: числа стоят в том порядке, в котором их
+                        собрали, никак не отсортированы. Из неё вырастает вообще всё задание, поэтому первым делом
+                        её переписывают <b>по порядку</b>.
+                    </p>
+                    <div class="dsatz">„Die Urliste ist die Liste der Daten in der Reihenfolge, in der sie erhoben wurden.“</div>
+                    <div class="dsatz-ru">Урлисте — список данных в том порядке, в каком их собрали. <b>erheben</b> = собирать (данные), <b>die Erhebung</b> = сбор данных.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; Что вообще требуют — два задания</h3>
+                    <ul class="note-list">
+                        <li><b>Aufgabe 1</b> — <i>„Bereiten Sie die erhobenen Daten so auf, dass die Geschäftsführung
+                            einen möglichst aussagekräftigen Überblick erhält.“</i> Плюс: <b>mindestens zwei Aussagen</b>
+                            и <b>Dokumentieren Sie Ihr Vorgehen</b>. То есть мало посчитать — надо ещё написать,
+                            <b>как</b> ты считала и <b>что из этого следует</b>.</li>
+                        <li><b>Aufgabe 2 a–e</b> — терминология (Merkmal, Ausprägungen, n), заполнить
+                            Häufigkeitstabelle и объяснить, что значат H и h «im Sachzusammenhang».</li>
+                    </ul>
+                    <div class="gut">
+                        <b>Ключевые слова задания.</b>
+                        <b class="kb-de">aufbereiten</b> — привести данные в удобный вид (отсортировать, посчитать, свести в таблицу, нарисовать диаграмму).
+                        <b class="kb-de">aussagekräftig</b> — «говорящий», информативный.
+                        <b class="kb-de">ableiten</b> — вывести (утверждение из данных).
+                        <b class="kb-de">nachvollziehbar</b> — так, чтобы чужой человек мог проследить твой ход мысли.
+                    </div>
+                    <p style="font-size:0.87rem;color:rgba(230,230,235,0.6);margin-top:0.6rem;">
+                        На листе к Aufgabe 1 есть <b>QR-код: „Hilfekarte zu Aufgabe 1“</b> — это подсказка для тех,
+                        кто застрял. Если ты решаешь по шагам из следующей карточки, подсказка тебе не нужна.
+                    </p>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это уже разобрано на сайте</span>
+                        <a href="mathe-stochastik.html">Stochastik</a> — Mittelwert, Median, Spannweite, absolute Häufigkeit: базовая теория этого листа<br>
+                        <a href="mathe-wahrscheinlichkeit.html">Wahrscheinlichkeit &amp; Daten</a> — блок <i>Daten auswerten</i>: тот же путь «данные → таблица → вывод»<br>
+                        <a href="mathe-prozent.html">Prozentrechnung</a> — понадобится, чтобы 5 из 10 превратить в 50 %
+                    </div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F4CD;</span>
+                    <div>
+                        <p>На фото были <b>Seite 1 und 2 von 4</b>. Задания с третьей и четвёртой страницы сюда ещё
+                        не внесены — как сфотографируешь, добавлю их новыми карточками, эти останутся на месте.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m2 ================= -->
+        <div class="lesson" id="ls-m2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9EE;</span>
+                    <div>
+                        <h2>Aufgabe 1: Daten aufbereiten</h2>
+                        <p class="lesson-header-sub">Полное решение шаг за шагом — так, как его ждёт учительница</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F5FA;&#xFE0F; План решения — шесть шагов</h3>
+                    <ol class="schritte">
+                        <li><b>Urliste ordnen</b> — переписать числа по возрастанию (Rangliste).</li>
+                        <li><b>Auszählen</b> — посчитать, сколько раз встречается каждая оценка (Strichliste).</li>
+                        <li><b>Häufigkeitstabelle</b> — свести в таблицу: absolute + relative Häufigkeit + Prozent.</li>
+                        <li><b>Kennzahlen berechnen</b> — Mittelwert, Median, Modalwert, Spannweite.</li>
+                        <li><b>Diagramm zeichnen</b> — Säulendiagramm (или Kreisdiagramm).</li>
+                        <li><b>Aussagen formulieren</b> — минимум два вывода предложениями.</li>
+                    </ol>
+                    <p style="font-size:0.87rem;color:rgba(230,230,235,0.6);margin-top:0.7rem;">
+                        Именно этот порядок и есть «Dokumentation des Vorgehens». Если запишешь шаги —
+                        задание «dokumentieren Sie Ihr Vorgehen» уже выполнено.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>1&#xFE0F;&#x20E3; Schritt 1: Urliste ordnen &rarr; Rangliste</h3>
+                    <div class="dsatz">„Zuerst ordne ich die Urliste der Größe nach.“</div>
+                    <div class="dsatz-ru">Сначала я сортирую данные по величине. <b>der Größe nach ordnen</b> = упорядочить по возрастанию.</div>
+                    <div class="urliste">
+                        <span class="v2">2</span><span class="v3">3</span><span class="v3">3</span><span class="v4">4</span>
+                        <span class="v4 mid">4</span><span class="v4 mid">4</span><span class="v4">4</span><span class="v4">4</span>
+                        <span class="v5">5</span><span class="v5">5</span>
+                    </div>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.65);">
+                        Жёлтой рамкой отмечены 5-е и 6-е числа — они понадобятся для Median.
+                        Отсортированный список называется <b class="kb-de">die Rangliste</b> (или «geordnete Urliste»).
+                    </p>
+                    <div class="gut"><b>Проверка сразу:</b> в Rangliste должно остаться ровно 10 чисел — столько же,
+                        сколько было. Пересчитай пальцем, это стоит три секунды и спасает от глупой ошибки.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>2&#xFE0F;&#x20E3; Schritt 2: Auszählen — die Strichliste</h3>
+                    <p style="font-size:0.9rem;">Идём по Rangliste и считаем, сколько раз стоит каждая оценка:</p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th>Bewertung x<sub>i</sub></th><th>Strichliste</th><th>Anzahl</th></tr>
+                        <tr><td>1</td><td>—</td><td>0</td></tr>
+                        <tr><td>2</td><td>|</td><td>1</td></tr>
+                        <tr><td>3</td><td>| |</td><td>2</td></tr>
+                        <tr><td>4</td><td>| | | | |</td><td class="hl">5</td></tr>
+                        <tr><td>5</td><td>| |</td><td>2</td></tr>
+                        <tr class="sum"><td>Summe</td><td></td><td>10 = n</td></tr>
+                    </table>
+                    </div>
+                    <div class="gut"><b>Контроль:</b> 0 + 1 + 2 + 5 + 2 = <b>10</b>. Сумма палочек обязана быть равна
+                        количеству опрошенных. Если получилось не 10 — где-то потеряла или посчитала дважды.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>3&#xFE0F;&#x20E3; Schritt 3: Häufigkeitstabelle</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <caption>Häufigkeitstabelle der Kundenbewertungen (n = 10)</caption>
+                        <tr><th>Bewertung<br>x<sub>i</sub></th><th>Bedeutung</th><th>absolute Häufigkeit<br>H<sub>i</sub></th><th>relative Häufigkeit<br>h<sub>i</sub></th><th>in Prozent</th></tr>
+                        <tr><td>1</td><td>sehr unzufrieden</td><td>0</td><td>0</td><td>0 %</td></tr>
+                        <tr><td>2</td><td>unzufrieden</td><td>1</td><td>0,1</td><td>10 %</td></tr>
+                        <tr><td>3</td><td>teils / teils</td><td>2</td><td>0,2</td><td>20 %</td></tr>
+                        <tr><td>4</td><td>zufrieden</td><td class="hl">5</td><td class="hl">0,5</td><td class="hl">50 %</td></tr>
+                        <tr><td>5</td><td>sehr zufrieden</td><td>2</td><td>0,2</td><td>20 %</td></tr>
+                        <tr class="sum"><td>Summe</td><td></td><td>10</td><td>1</td><td>100 %</td></tr>
+                    </table>
+                    </div>
+                    <div class="rw">
+                        <span class="step">Формула относительной частоты:</span>
+                        h<sub>i</sub> = H<sub>i</sub> : n
+                        <span class="step">для оценки 4:</span>
+                        h<sub>4</sub> = 5 : 10 = <span class="erg">0,5</span> = 50 %
+                    </div>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.65);line-height:1.7;">
+                        <b class="kb-de">Absolute Häufigkeit H</b> — это <b>штуки</b> (сколько человек), никогда не проценты.
+                        <b class="kb-de">Relative Häufigkeit h</b> — это <b>доля</b>: H разделить на n. Получается число
+                        от 0 до 1; умножишь на 100 — получишь проценты.
+                    </p>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это уже разобрано на сайте</span>
+                        <a href="mathe-brueche.html">Bruchrechnung</a> — 5 : 10 = <sup>1</sup>&frasl;<sub>2</sub>: сокращение дробей, если хочется писать h как дробь<br>
+                        <a href="mathe-komma.html">Komma verschieben</a> — 0,5 &rarr; 50 %: перенос запятой на два знака при умножении на 100<br>
+                        <a href="mathe-prozent.html">Prozentrechnung</a> — Grundwert / Prozentwert / Prozentsatz: n здесь Grundwert, H — Prozentwert
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>4&#xFE0F;&#x20E3; Schritt 4: Kennzahlen</h3>
+                    <div class="rw">
+                        <span class="step">Mittelwert (arithmetisches Mittel):</span>
+                        x&#772; = (4+5+3+4+2+4+5+3+4+4) : 10 = 38 : 10 = <span class="erg">3,8</span>
+                        <span class="step">Median (n = 10, gerade &rarr; Mittel aus dem 5. und 6. Wert):</span>
+                        x&#771; = (4 + 4) : 2 = <span class="erg">4</span>
+                        <span class="step">Modalwert (häufigster Wert):</span>
+                        x<sub>mod</sub> = <span class="erg">4</span> &nbsp;(5-mal genannt)
+                        <span class="step">Spannweite:</span>
+                        R = x<sub>max</sub> &minus; x<sub>min</sub> = 5 &minus; 2 = <span class="erg">3</span>
+                    </div>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.65);">
+                        Подробный разбор каждой величины — в карточке
+                        <b>«Kennzahlen: Mittelwert, Median, Modus»</b>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>5&#xFE0F;&#x20E3; Schritt 5: Diagramm</h3>
+                    <div class="chart-y">H<sub>i</sub> (Anzahl der Kunden)</div>
+                    <div class="chart">
+                        <div class="chart-col"><span class="chart-val">0</span><div class="chart-bar" style="height:2%"></div></div>
+                        <div class="chart-col"><span class="chart-val">1</span><div class="chart-bar" style="height:20%"></div></div>
+                        <div class="chart-col"><span class="chart-val">2</span><div class="chart-bar" style="height:40%"></div></div>
+                        <div class="chart-col"><span class="chart-val">5</span><div class="chart-bar" style="height:100%"></div></div>
+                        <div class="chart-col"><span class="chart-val">2</span><div class="chart-bar" style="height:40%"></div></div>
+                    </div>
+                    <div class="chart-x">
+                        <div>1<br>sehr un&shy;zufrieden</div><div>2<br>un&shy;zufrieden</div><div>3<br>teils/teils</div>
+                        <div>4<br>zufrieden</div><div>5<br>sehr zufrieden</div>
+                    </div>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.65);margin-top:0.8rem;">
+                        Как чертить это в тетради (оси, подписи, масштаб) — в карточке <b>«Diagramme zeichnen»</b>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>6&#xFE0F;&#x20E3; Schritt 6: Die Aussagen — минимум две</h3>
+                    <p style="font-size:0.89rem;color:rgba(230,230,235,0.65);">
+                        Требуется <i>„mindestens zwei Aussagen, die sich aus Ihrer Auswertung ableiten lassen“</i>.
+                        Возьми любые две-три — но каждая должна опираться на <b>число</b> из твоей таблицы.
+                    </p>
+
+                    <div class="dsatz">„70 % der befragten Kunden sind zufrieden oder sehr zufrieden, denn sieben von zehn Kunden haben mit 4 oder 5 bewertet.“</div>
+                    <div class="dsatz-ru">70 % опрошенных довольны или очень довольны: 5 + 2 = 7 из 10. Самая сильная фраза — начни с неё.</div>
+
+                    <div class="dsatz">„Die häufigste Bewertung ist die 4 — die Hälfte der Kunden, also 50 %, ist zufrieden.“</div>
+                    <div class="dsatz-ru">Самая частая оценка — 4; ровно половина клиентов довольна. <b>die Hälfte</b> = половина.</div>
+
+                    <div class="dsatz">„Kein einziger Kunde ist sehr unzufrieden; nur ein Kunde, also 10 %, ist unzufrieden.“</div>
+                    <div class="dsatz-ru">Ни один клиент не «очень недоволен», только один (10 %) недоволен. <b>kein einziger</b> = ни один.</div>
+
+                    <div class="dsatz">„Der Mittelwert beträgt 3,8 und der Median liegt bei 4. Die Kundenzufriedenheit ist damit insgesamt gut.“</div>
+                    <div class="dsatz-ru">Среднее 3,8, медиана 4 — в целом удовлетворённость хорошая. <b>betragen</b> = составлять (о числе), <b>liegen bei</b> = равняться.</div>
+
+                    <div class="dsatz">„Trotzdem bewerten 30 % der Kunden höchstens mit ‚teils/teils‘. Hier besteht Verbesserungspotenzial.“</div>
+                    <div class="dsatz-ru">И всё же 30 % ставят максимум «так себе» — есть куда расти. 20 % + 10 % = 30 %. Такое предложение — плюс к оценке: ты не просто описала, а сделала вывод для фирмы.</div>
+
+                    <div class="dsatz">„Einschränkung: Es wurden nur zehn Kunden befragt. Die Ergebnisse sind daher ein erster Hinweis, aber nicht repräsentativ.“</div>
+                    <div class="dsatz-ru">Оговорка: опросили всего десять человек, результат не репрезентативен. Эту фразу учителя любят особенно — она показывает, что ты понимаешь границы выборки.</div>
+
+                    <div class="warn">
+                        <b>Так писать нельзя:</b> „Die Kunden sind zufrieden.“ Без числа это не Aussage, а мнение.
+                        Правило: <b>в каждом предложении — цифра из таблицы</b>.
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4DD; Готовый текст «Dokumentation des Vorgehens»</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.62);">Можно списать в тетрадь целиком:</p>
+                    <div class="dsatz" style="line-height:1.85;">
+                        „Zuerst habe ich die Urliste der Größe nach geordnet. Danach habe ich ausgezählt, wie oft
+                        jede Bewertung vorkommt, und die Werte in eine Häufigkeitstabelle eingetragen. Zu jeder
+                        absoluten Häufigkeit habe ich die relative Häufigkeit berechnet (h<sub>i</sub> = H<sub>i</sub> : n)
+                        und in Prozent umgerechnet. Anschließend habe ich den Mittelwert, den Median, den Modalwert
+                        und die Spannweite bestimmt. Zum Schluss habe ich die Verteilung in einem Säulendiagramm
+                        dargestellt und aus Tabelle und Kennzahlen meine Aussagen abgeleitet.“
+                    </div>
+                    <div class="dsatz-ru">
+                        Обрати внимание на времена: весь текст в <b>Perfekt</b> („ich habe … geordnet“), потому что
+                        ты рассказываешь о том, что уже сделала. Порядок слов: <i>habe</i> — на втором месте,
+                        причастие — в самый конец.
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-zeitformen.html">Zeitformen</a> — Perfekt: <i>ich habe geordnet, ich habe berechnet</i> — время рассказа о своей работе<br>
+                        <a href="deutsch-satzbau.html">Satzbau</a> — почему <i>geordnet</i> уезжает в конец предложения<br>
+                        <a href="deutsch-erklaeren.html">Erläutern &amp; Erklären</a> — как строить объяснение по-немецки, шаг за шагом
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m3 ================= -->
+        <div class="lesson" id="ls-m3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F50E;</span>
+                    <div>
+                        <h2>Твои записи на листе — разбор</h2>
+                        <p class="lesson-header-sub">Что уже сделано правильно и две вещи, которые надо исправить</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x2705; Что уже верно</h3>
+                    <ul class="note-list">
+                        <li><b>Подсчёт частот.</b> «5 — 4 → 50 %», «2 — 5 → 20 %», «2 — 3 → 20 %», «1 — 2 → 10 %»,
+                            сверху «10 = 100 %» — всё сосчитано правильно, ни одного числа не потеряно.</li>
+                        <li><b>Mittelwert.</b> (4+5+3+4+2+4+5+3+4+4) : 10 = 3,8 — верно, и записано как положено:
+                            дробью, а не «в уме».</li>
+                        <li><b>Идея оформления.</b> «tabellarische Übersicht mit Prozenten → Häufigkeitstabelle» —
+                            это ровно то, чего требует Aufgabe 1.</li>
+                        <li><b>Median: Daten sortieren</b> — правильный первый шаг. Не хватает только второго
+                            (что делать при чётном n) — он ниже.</li>
+                    </ul>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x274C; Ошибка 1: перепутаны «zufrieden» и «sehr zufrieden»</h3>
+                    <div class="fr">
+                        <div class="f">
+                            <h5>Так написано на листе</h5>
+                            „50 % der Kunden sind <b>sehr zufrieden</b>, 20 % sind <b>zufrieden</b>.“
+                        </div>
+                        <div class="r">
+                            <h5>Так правильно</h5>
+                            „50 % der Kunden sind <b>zufrieden</b> (Bewertung 4), 20 % sind <b>sehr zufrieden</b> (Bewertung 5).“
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Пятьдесят процентов — это пятеро с оценкой <b>4</b>, а 4 по таблице = <b>zufrieden</b>.
+                        Оценку <b>5</b> (sehr zufrieden) поставили двое, это 20 %.
+                    </p>
+                    <div class="gut"><b>Как больше не путать:</b> всегда пиши в скобках номер оценки —
+                        <i>„zufrieden (4)“</i>, <i>„sehr zufrieden (5)“</i>. Тогда слово и число проверяют друг друга.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x274C; Ошибка 2: в столбце «absolute Häufigkeit» стоят проценты</h3>
+                    <div class="fr">
+                        <div class="f">
+                            <h5>Так на листе (Aufgabe 2 d)</h5>
+                            H(2) = 10 %, H(3) = 20 %, H(4) = 50 %, H(5) = 20 %, Summe = 100 %
+                        </div>
+                        <div class="r">
+                            <h5>Так правильно</h5>
+                            H(2) = 1, H(3) = 2, H(4) = 5, H(5) = 2, H(1) = 0, Summe = <b>10</b>
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        <b class="kb-de">Absolut</b> = «сколько штук», голое количество людей. Проценты — это уже
+                        <b class="kb-de">relativ</b>, они стоят в соседнем столбце (или третьим столбцом «in Prozent»).
+                        Проценты в столбце H — типовая ошибка, за которую снимают балл, хотя сами числа посчитаны верно.
+                    </p>
+                    <div class="rw">
+                        <span class="step">Запомни связку:</span>
+                        H = Anzahl (штуки) &nbsp;&middot;&nbsp; h = H : n (доля) &nbsp;&middot;&nbsp; Prozent = h &times; 100
+                        <span class="step">и две проверки:</span>
+                        &sum;H = n = <span class="erg">10</span> &nbsp;&nbsp; &sum;h = <span class="erg">1</span>
+                    </div>
+                    <div class="warn"><b>Мелочь, за которую тоже снимают:</b> в строке Bewertung 1 клетка
+                        relative Häufigkeit осталась пустой. Там должен стоять <b>0</b> — пустая клетка читается как
+                        «не решено».</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270D;&#xFE0F; Мелочи в написании</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">на листе</th><th class="l">правильно</th><th class="l">почему</th></tr>
+                        <tr><td class="l">38</td><td class="l">3,8</td><td class="l">без запятой это «тридцать восемь» — в немецком десятичный разделитель именно запятая</td></tr>
+                        <tr><td class="l">Durchschnits</td><td class="l">der Durchschnitt</td><td class="l">два t; но на уроке лучше термин: <b>der Mittelwert</b> / <b>das arithmetische Mittel</b></td></tr>
+                        <tr><td class="l">tabellarisch Übersicht</td><td class="l">eine tabellarisch<b>e</b> Übersicht</td><td class="l">прилагательное перед существительным получает окончание</td></tr>
+                        <tr><td class="l">Häufig keitstabelle</td><td class="l">Häufigkeitstabelle</td><td class="l">одно слово, без пробела — Häufigkeit + s + Tabelle</td></tr>
+                        <tr><td class="l">Median: Daten sortieren</td><td class="l">Median: Daten der Größe nach sortieren, dann die Mitte nehmen</td><td class="l">при n = 10 середины две — берём среднее из 5-го и 6-го значения</td></tr>
+                    </table>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-adjektive.html">Adjektivendungen</a> — <i>eine tabellarisch<b>e</b> Übersicht</i>: откуда берётся -e<br>
+                        <a href="deutsch-komposita.html">Komposita</a> — почему <i>Häufigkeitstabelle</i> пишется слитно и со связкой -s-<br>
+                        <a href="mathe-stochastik.html">Stochastik</a> — Median при чётном количестве значений
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; Итог: что переписать в тетради</h3>
+                    <ol class="schritte">
+                        <li>В таблице Aufgabe 2 d поменять проценты на <b>штуки</b>: 0, 1, 2, 5, 2; Summe = 10.</li>
+                        <li>В строке 1 в столбце h написать <b>0</b>, а не оставить пусто.</li>
+                        <li>В выводе поменять местами слова: <b>50 % zufrieden (4)</b>, <b>20 % sehr zufrieden (5)</b>.</li>
+                        <li>Дописать Median = 4, Modalwert = 4, Spannweite = 3 — они на листе ещё не посчитаны.</li>
+                        <li>Дописать вторую Aussage с числом (например про 70 %) — задание требует минимум две.</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m4 ================= -->
+        <div class="lesson" id="ls-m4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F3F7;&#xFE0F;</span>
+                    <div>
+                        <h2>Aufgabe 2 a–c: die Fachbegriffe</h2>
+                        <p class="lesson-header-sub">„Bei der statistischen Untersuchung werden verschiedene Fachbegriffe verwendet.“</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>a) Das untersuchte Merkmal</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.65);">
+                        Вопрос: <i>„Geben Sie für die Untersuchung der OfficeLine GmbH das untersuchte Merkmal an.“</i>
+                    </p>
+                    <div class="dsatz">„Das untersuchte Merkmal ist die Zufriedenheit der Kunden mit der Abwicklung ihrer Bestellung.“</div>
+                    <div class="dsatz-ru">Исследуемый признак — удовлетворённость клиентов тем, как прошёл их заказ. Короткий вариант, если спросят одним словом: <b>die Kundenzufriedenheit</b>.</div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        <b class="kb-de">Das Merkmal</b> — это <b>то, что измеряют</b>, одно на всё исследование.
+                        Проверь себя вопросом: «что именно мы у всех десяти спрашивали?» — удовлетворённость.
+                        Не «клиенты» (это носители признака) и не «оценки от 1 до 5» (это уже значения признака).
+                    </p>
+                    <div class="warn"><b>Частая ошибка:</b> написать в ответ «die Kunden» или «die Bewertung 1–5».
+                        Merkmal — <b>свойство</b>, а не люди и не шкала.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>b) Drei mögliche Merkmalsausprägungen</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.65);">
+                        <i>„Geben Sie drei mögliche Merkmalsausprägungen an.“</i> — назвать любые три из пяти.
+                    </p>
+                    <div class="dsatz">„Mögliche Merkmalsausprägungen sind ‚unzufrieden‘ (2), ‚teils/teils‘ (3) und ‚zufrieden‘ (4).“</div>
+                    <div class="dsatz-ru">Возможные значения признака: «недоволен» (2), «так себе» (3), «доволен» (4). Можно назвать любые три — например 1, 3 и 5.</div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        <b class="kb-de">Die Merkmalsausprägung</b> — это <b>конкретное значение</b>, которое признак может
+                        принимать. Merkmal один (Zufriedenheit), а Ausprägungen здесь пять: от «sehr unzufrieden» до
+                        «sehr zufrieden». Аналогия: Merkmal = «цвет глаз», Ausprägungen = «blau, braun, grün».
+                    </p>
+                    <div class="gut"><b>Как сказать надёжно:</b> называй и слово, и цифру — <i>„zufrieden, also die Bewertung 4“</i>.
+                        Так ответ засчитают, даже если учительница ждала числа, а не слова.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>c) Der Umfang n der Stichprobe</h3>
+                    <div class="dsatz">„Der Umfang der Stichprobe beträgt n = 10, denn es wurden zehn Kunden befragt.“</div>
+                    <div class="dsatz-ru">Объём выборки n = 10, потому что опросили десять клиентов. <b>der Stichprobenumfang</b> = объём выборки.</div>
+                    <div class="rw">
+                        <span class="step">Проверка n по своей же таблице:</span>
+                        n = &sum;H<sub>i</sub> = 0 + 1 + 2 + 5 + 2 = <span class="erg">10</span>
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        n — это <b>сколько единиц</b> попало в исследование, а не сколько разных ответов было.
+                        Ответов пять видов, а n = 10.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9E0; Вся терминология вокруг — чтобы не поплыть на доп. вопросе</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Fachbegriff</th><th class="l">по-русски</th><th class="l">в нашей задаче</th></tr>
+                        <tr><td class="l"><b class="kb-de">die Grundgesamtheit</b></td><td class="l">генеральная совокупность</td><td class="l">все клиенты OfficeLine GmbH</td></tr>
+                        <tr><td class="l"><b class="kb-de">die Stichprobe</b></td><td class="l">выборка</td><td class="l">те десять, кого опросили</td></tr>
+                        <tr><td class="l"><b class="kb-de">der Stichprobenumfang n</b></td><td class="l">объём выборки</td><td class="l">n = 10</td></tr>
+                        <tr><td class="l"><b class="kb-de">das Merkmal</b></td><td class="l">признак</td><td class="l">die Kundenzufriedenheit</td></tr>
+                        <tr><td class="l"><b class="kb-de">die Merkmalsausprägung</b></td><td class="l">значение признака</td><td class="l">sehr unzufrieden … sehr zufrieden (1–5)</td></tr>
+                        <tr><td class="l"><b class="kb-de">der Merkmalsträger</b></td><td class="l">носитель признака</td><td class="l">der einzelne Kunde — отдельный клиент</td></tr>
+                        <tr><td class="l"><b class="kb-de">die Urliste</b></td><td class="l">исходный список</td><td class="l">4–5–3–4–2–4–5–3–4–4</td></tr>
+                        <tr><td class="l"><b class="kb-de">die Rangliste</b></td><td class="l">отсортированный список</td><td class="l">2–3–3–4–4–4–4–4–5–5</td></tr>
+                        <tr><td class="l"><b class="kb-de">die Befragung / die Erhebung</b></td><td class="l">опрос / сбор данных</td><td class="l">die Kundenbefragung</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F393; Бонус на «sehr gut»: welche Art von Merkmal?</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        Если спросят про вид признака (или если хочешь добавить сама — это заметно поднимает ответ):
+                    </p>
+                    <div class="dsatz">„Es handelt sich um ein qualitatives Merkmal, das ordinal skaliert ist: Die Ausprägungen lassen sich in eine Rangfolge bringen, die Abstände zwischen ihnen sind aber nicht gleich groß.“</div>
+                    <div class="dsatz-ru">Это качественный признак с порядковой шкалой: значения можно выстроить по порядку (1 хуже 2, 2 хуже 3), но расстояния между ними не равны — «разница» между 4 и 5 не обязана быть такой же, как между 1 и 2.</div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        Отсюда следует красивый вывод, который можно сказать вслух:
+                    </p>
+                    <div class="dsatz">„Deshalb ist der Median hier aussagekräftiger als der Mittelwert.“</div>
+                    <div class="dsatz-ru">Поэтому медиана здесь показательнее среднего. Среднее 3,8 считать можно и нужно (так делают со школьными оценками), но медиана 4 честнее описывает «типичного» клиента.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="mathe-stochastik.html">Stochastik</a> — Mittelwert против Median: когда какая величина честнее<br>
+                        <a href="mathe-wahrscheinlichkeit.html">Wahrscheinlichkeit &amp; Daten</a> — Daten auswerten: те же понятия на других примерах<br>
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a> — словарь школы: <i>Merkmal, Umfang, Auswertung</i> и другие термины уроков
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m5 ================= -->
+        <div class="lesson" id="ls-m5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4CA;</span>
+                    <div>
+                        <h2>Aufgabe 2 d: die Häufigkeitstabelle</h2>
+                        <p class="lesson-header-sub">„Vervollständigen Sie die Häufigkeitstabelle.“ — заполнить до конца</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x2705; Так таблица выглядит правильно</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th>Bewertung<br>x<sub>i</sub></th><th>absolute Häufigkeit<br>H<sub>i</sub></th><th>relative Häufigkeit<br>h<sub>i</sub></th></tr>
+                        <tr><td>1</td><td>0</td><td>0</td></tr>
+                        <tr><td>2</td><td>1</td><td>0,1</td></tr>
+                        <tr><td>3</td><td>2</td><td>0,2</td></tr>
+                        <tr><td>4</td><td class="hl">5</td><td class="hl">0,5</td></tr>
+                        <tr><td>5</td><td>2</td><td>0,2</td></tr>
+                        <tr class="sum"><td>Summe:</td><td>10</td><td>1</td></tr>
+                    </table>
+                    </div>
+                    <p style="font-size:0.89rem;color:rgba(230,230,235,0.68);line-height:1.7;">
+                        В графе <b>H</b> — только целые числа (люди), в графе <b>h</b> — доли с запятой.
+                        Если учительница разрешает, рядом можно дописать проценты — 0 %, 10 %, 20 %, 50 %, 20 % —
+                        но <b>внутрь столбца H проценты не ставят</b>.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; Откуда каждое число — по одному</h3>
+                    <div class="rw">
+                        <span class="step">Bewertung 1 — никто не выбрал:</span>
+                        H<sub>1</sub> = 0 &nbsp;&rarr;&nbsp; h<sub>1</sub> = 0 : 10 = <span class="erg">0</span>
+                        <span class="step">Bewertung 2 — один раз:</span>
+                        H<sub>2</sub> = 1 &nbsp;&rarr;&nbsp; h<sub>2</sub> = 1 : 10 = <span class="erg">0,1</span>
+                        <span class="step">Bewertung 3 — два раза:</span>
+                        H<sub>3</sub> = 2 &nbsp;&rarr;&nbsp; h<sub>3</sub> = 2 : 10 = <span class="erg">0,2</span>
+                        <span class="step">Bewertung 4 — пять раз:</span>
+                        H<sub>4</sub> = 5 &nbsp;&rarr;&nbsp; h<sub>4</sub> = 5 : 10 = <span class="erg">0,5</span>
+                        <span class="step">Bewertung 5 — два раза:</span>
+                        H<sub>5</sub> = 2 &nbsp;&rarr;&nbsp; h<sub>5</sub> = 2 : 10 = <span class="erg">0,2</span>
+                    </div>
+                    <p style="font-size:0.89rem;color:rgba(230,230,235,0.65);">
+                        Делить на 10 просто: запятая едет на один знак влево. 5 &rarr; 0,5; 2 &rarr; 0,2; 1 &rarr; 0,1.
+                    </p>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="mathe-komma.html">Komma verschieben</a> — деление на 10, 100, 1000: ровно этот приём<br>
+                        <a href="mathe-brueche.html">Bruchrechnung</a> — h можно записать и дробью: <sup>5</sup>&frasl;<sub>10</sub> = <sup>1</sup>&frasl;<sub>2</sub><br>
+                        <a href="mathe-basisteil.html">Basisteil Trainer</a> — такие деления без калькулятора, в уме
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50D; Две проверки, которые ловят почти любую ошибку</h3>
+                    <div class="rw">
+                        <span class="step">Проверка 1 — сумма абсолютных частот равна n:</span>
+                        &sum;H<sub>i</sub> = 0 + 1 + 2 + 5 + 2 = <span class="erg">10</span> = n
+                        <span class="step">Проверка 2 — сумма относительных частот равна 1:</span>
+                        &sum;h<sub>i</sub> = 0 + 0,1 + 0,2 + 0,5 + 0,2 = <span class="erg">1</span> &nbsp;(= 100 %)
+                    </div>
+                    <div class="gut"><b>Скажи это вслух, если спросят «woher weißt du, dass es stimmt?»:</b>
+                        <i>„Die Summe der absoluten Häufigkeiten muss den Stichprobenumfang ergeben, die Summe der
+                        relativen Häufigkeiten muss 1 sein. Beides stimmt.“</i></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x270F;&#xFE0F; Тренажёр: заполни сама</h3>
+                    <p style="font-size:0.89rem;color:rgba(230,230,235,0.65);">
+                        Данные те же: 4 – 5 – 3 – 4 – 2 – 4 – 5 – 3 – 4 – 4. Впиши H и h, потом нажми «Prüfen».
+                        Десятичные можно писать через запятую или точку.
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt" id="tr-table">
+                        <tr><th>x<sub>i</sub></th><th>H<sub>i</sub></th><th>h<sub>i</sub></th></tr>
+                        <tr><td>1</td><td><input class="tr-inp" data-a="0" inputmode="decimal"></td><td><input class="tr-inp" data-a="0" inputmode="decimal"></td></tr>
+                        <tr><td>2</td><td><input class="tr-inp" data-a="1" inputmode="decimal"></td><td><input class="tr-inp" data-a="0,1" inputmode="decimal"></td></tr>
+                        <tr><td>3</td><td><input class="tr-inp" data-a="2" inputmode="decimal"></td><td><input class="tr-inp" data-a="0,2" inputmode="decimal"></td></tr>
+                        <tr><td>4</td><td><input class="tr-inp" data-a="5" inputmode="decimal"></td><td><input class="tr-inp" data-a="0,5" inputmode="decimal"></td></tr>
+                        <tr><td>5</td><td><input class="tr-inp" data-a="2" inputmode="decimal"></td><td><input class="tr-inp" data-a="0,2" inputmode="decimal"></td></tr>
+                        <tr class="sum"><td>Summe</td><td><input class="tr-inp" data-a="10" inputmode="decimal"></td><td><input class="tr-inp" data-a="1" inputmode="decimal"></td></tr>
+                    </table>
+                    </div>
+                    <button class="tr-btn" id="tr-check">Prüfen</button>
+                    <button class="tr-btn" id="tr-reset">Nochmal</button>
+                    <div class="tr-msg" id="tr-msg"></div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m6 ================= -->
+        <div class="lesson" id="ls-m6">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4AC;</span>
+                    <div>
+                        <h2>Aufgabe 2 e: Interpretation im Sachzusammenhang</h2>
+                        <p class="lesson-header-sub">„Interpretieren Sie die absolute und die relative Häufigkeit der Bewertung 4 im Sachzusammenhang.“</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Что значит «im Sachzusammenhang»</h3>
+                    <p style="font-size:0.92rem;color:rgba(230,230,235,0.75);line-height:1.75;">
+                        Дословно — «в предметной связи», то есть <b>не голое число, а что оно означает про людей</b>.
+                        Ответ «H = 5, h = 0,5» здесь не засчитают: в предложении обязаны появиться
+                        <b>клиенты</b>, <b>оценка «zufrieden»</b> и <b>десять опрошенных</b>.
+                    </p>
+                    <div class="rw">
+                        <span class="step">Шаблон предложения:</span>
+                        &lt;число&gt; von den &lt;n&gt; befragten Kunden … &rarr; das entspricht … %
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; Готовый ответ</h3>
+                    <div class="dsatz">„Die absolute Häufigkeit der Bewertung 4 beträgt H = 5. Das bedeutet: Fünf der zehn befragten Kunden haben die Abwicklung mit ‚zufrieden‘ bewertet.“</div>
+                    <div class="dsatz-ru">Абсолютная частота оценки 4 равна 5: пятеро из десяти опрошенных оценили обслуживание как «доволен».</div>
+
+                    <div class="dsatz">„Die relative Häufigkeit beträgt h = 0,5; das entspricht 50 %. Damit ist genau die Hälfte aller befragten Kunden mit der Abwicklung zufrieden.“</div>
+                    <div class="dsatz-ru">Относительная частота 0,5 = 50 %: ровно половина опрошенных довольна обслуживанием. <b>entsprechen</b> = соответствовать.</div>
+
+                    <div class="dsatz">„Der Unterschied: Die absolute Häufigkeit nennt die reine Anzahl, die relative Häufigkeit setzt diese Anzahl ins Verhältnis zum Stichprobenumfang und macht das Ergebnis mit anderen Befragungen vergleichbar.“</div>
+                    <div class="dsatz-ru">Разница: абсолютная называет количество, относительная соотносит это количество с объёмом выборки и делает результат сравнимым с другими опросами. Это третье предложение — то самое «на пятёрку»: показывает, что ты понимаешь <b>зачем</b> нужны две разные величины.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4A1; Почему относительная частота вообще нужна</h3>
+                    <p style="font-size:0.92rem;color:rgba(230,230,235,0.75);line-height:1.75;">
+                        Представь второй опрос: там 40 человек поставили «4». Больше ли это? Само по себе число
+                        ничего не говорит — если опросили 400 человек, то это всего 10 %, то есть <b>хуже</b>, чем наши 50 %.
+                        Абсолютные числа сравнивать нельзя, относительные — можно. Отсюда и слово
+                        <b class="kb-de">vergleichbar</b> (сравнимый).
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l"></th><th>Befragung A (unsere)</th><th>Befragung B</th></tr>
+                        <tr><td class="l">Anzahl „zufrieden“ (H)</td><td>5</td><td>40</td></tr>
+                        <tr><td class="l">Stichprobenumfang n</td><td>10</td><td>400</td></tr>
+                        <tr><td class="l">relative Häufigkeit h</td><td class="hl">0,5 = 50 %</td><td>0,1 = 10 %</td></tr>
+                    </table>
+                    </div>
+                    <div class="gut"><b>Фраза для урока:</b> <i>„Die absolute Häufigkeit allein sagt wenig aus, weil sie
+                        vom Stichprobenumfang abhängt. Erst die relative Häufigkeit macht zwei Befragungen vergleichbar.“</i></div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="mathe-prozent.html">Prozentrechnung</a> — «часть от целого»: Grundwert n, Prozentwert H, Prozentsatz h · 100<br>
+                        <a href="mathe-stochastik.html">Stochastik</a> — absolute и relative Häufigkeit в общем виде<br>
+                        <a href="deutsch-erklaeren.html">Erläutern &amp; Erklären</a> — как по-немецки строить «das bedeutet …, das heißt …»
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m7 ================= -->
+        <div class="lesson" id="ls-m7">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Kennzahlen: Mittelwert, Median, Modalwert, Spannweite</h2>
+                        <p class="lesson-header-sub">Все четыре величины посчитаны на наших числах — с формулой, ходом решения и фразой для ответа</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Все результаты сразу</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Kennzahl</th><th>Zeichen</th><th>Wert</th><th class="l">по-русски</th></tr>
+                        <tr><td class="l">arithmetisches Mittel</td><td>x&#772;</td><td class="hl">3,8</td><td class="l">среднее арифметическое</td></tr>
+                        <tr><td class="l">Median (Zentralwert)</td><td>x&#771;</td><td class="hl">4</td><td class="l">медиана — значение посередине</td></tr>
+                        <tr><td class="l">Modalwert (Modus)</td><td>x<sub>mod</sub></td><td class="hl">4</td><td class="l">самое частое значение</td></tr>
+                        <tr><td class="l">Spannweite</td><td>R</td><td class="hl">3</td><td class="l">размах: от самого низкого до самого высокого</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>1&#xFE0F;&#x20E3; Der Mittelwert x&#772;</h3>
+                    <div class="rw">
+                        <span class="step">Formel:</span>
+                        x&#772; = (x<sub>1</sub> + x<sub>2</sub> + … + x<sub>n</sub>) : n
+                        <span class="step">einsetzen:</span>
+                        x&#772; = (4+5+3+4+2+4+5+3+4+4) : 10
+                        <span class="step">Summe zuerst:</span>
+                        x&#772; = 38 : 10 = <span class="erg">3,8</span>
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.72);line-height:1.75;">
+                        Второй способ — через таблицу частот, он быстрее и надёжнее, если чисел много:
+                    </p>
+                    <div class="rw">
+                        <span class="step">über die Häufigkeitstabelle:</span>
+                        x&#772; = (1&middot;0 + 2&middot;1 + 3&middot;2 + 4&middot;5 + 5&middot;2) : 10
+                        <span class="step">= (0 + 2 + 6 + 20 + 10) : 10</span>
+                        x&#772; = 38 : 10 = <span class="erg">3,8</span>
+                    </div>
+                    <div class="dsatz">„Der Mittelwert beträgt 3,8. Im Durchschnitt bewerten die Kunden die Abwicklung also zwischen ‚teils/teils‘ und ‚zufrieden‘, aber deutlich näher an ‚zufrieden‘.“</div>
+                    <div class="dsatz-ru">Среднее 3,8: в среднем клиенты оценивают между «так себе» и «доволен», но заметно ближе к «доволен». Эта вторая половина фразы — интерпретация, за неё дают балл.</div>
+                    <div class="warn"><b>Осторожно:</b> x&#772; = 3,8 — такой оценки в списке нет и быть не может.
+                        Среднее не обязано совпадать ни с одним реальным ответом. Это нормально, не ошибка.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>2&#xFE0F;&#x20E3; Der Median x&#771;</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Медиана — число, которое стоит <b>ровно посередине отсортированного списка</b>: половина
+                        значений не больше него, половина не меньше.
+                    </p>
+                    <div class="urliste">
+                        <span class="v2">2</span><span class="v3">3</span><span class="v3">3</span><span class="v4">4</span>
+                        <span class="v4 mid">4</span><span class="v4 mid">4</span><span class="v4">4</span><span class="v4">4</span>
+                        <span class="v5">5</span><span class="v5">5</span>
+                    </div>
+                    <div class="rw">
+                        <span class="step">n = 10 — чётное, значит середины две: 5-е и 6-е значение</span>
+                        x&#771; = (x<sub>5</sub> + x<sub>6</sub>) : 2 = (4 + 4) : 2 = <span class="erg">4</span>
+                        <span class="step">Wäre n ungerade (z. B. n = 9), dann:</span>
+                        x&#771; = x<sub>(n+1):2</sub> = x<sub>5</sub> &mdash; просто среднее число списка
+                    </div>
+                    <div class="dsatz">„Der Median liegt bei 4. Mindestens die Hälfte der Kunden hat also mit ‚zufrieden‘ oder besser bewertet.“</div>
+                    <div class="dsatz-ru">Медиана равна 4: как минимум половина клиентов оценила на «доволен» или выше.</div>
+                    <div class="warn"><b>Две классические ошибки:</b> (1) искать медиану в <b>неотсортированном</b>
+                        списке — тогда получится 2 вместо 4; (2) при чётном n брать одно число вместо среднего
+                        из двух. Здесь оба средних числа равны 4, поэтому результат «красивый», но записать
+                        деление на 2 всё равно нужно — за ход решения тоже дают баллы.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>3&#xFE0F;&#x20E3; Der Modalwert x<sub>mod</sub></h3>
+                    <div class="rw">
+                        <span class="step">Самое частое значение — смотрим в столбец H:</span>
+                        H<sub>4</sub> = 5 — größter Wert &nbsp;&rarr;&nbsp; x<sub>mod</sub> = <span class="erg">4</span>
+                    </div>
+                    <div class="dsatz">„Der Modalwert ist 4, denn die Bewertung 4 wurde am häufigsten genannt — nämlich fünfmal.“</div>
+                    <div class="dsatz-ru">Мода равна 4: эту оценку называли чаще всего — пять раз. <b>am häufigsten</b> = чаще всего, <b>fünfmal</b> = пять раз (слитно).</div>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.62);">
+                        Если бы два значения встречались одинаково часто, мод было бы две — тогда говорят
+                        <i>„die Verteilung ist bimodal“</i>. У нас максимум один, всё просто.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>4&#xFE0F;&#x20E3; Die Spannweite R</h3>
+                    <div class="rw">
+                        <span class="step">Formel:</span>
+                        R = x<sub>max</sub> &minus; x<sub>min</sub>
+                        <span class="step">einsetzen:</span>
+                        R = 5 &minus; 2 = <span class="erg">3</span>
+                    </div>
+                    <div class="dsatz">„Die Spannweite beträgt 3: Die Bewertungen reichen von 2 bis 5. Die Bewertung 1 wurde von niemandem vergeben.“</div>
+                    <div class="dsatz-ru">Размах равен 3: оценки идут от 2 до 5, единицу не поставил никто. <b>reichen von … bis …</b> = простираться от… до…, <b>vergeben</b> = поставить (оценку).</div>
+                    <div class="gut"><b>Что R показывает:</b> насколько мнения разошлись. Маленький R —
+                        клиенты единодушны, большой — мнения сильно расходятся. У нас R = 3 при шкале из пяти
+                        делений: разброс есть, но крайних недовольных нет вовсе.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; Бонус: kumulierte relative Häufigkeit</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Накопленная частота отвечает на вопрос «сколько человек поставили <b>не выше</b> такой-то оценки».
+                        Из неё и получается самая красивая фраза про 70 %.
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th>x<sub>i</sub></th><th>h<sub>i</sub></th><th>kumuliert (h &le; x<sub>i</sub>)</th><th class="l">читается как</th></tr>
+                        <tr><td>1</td><td>0</td><td>0</td><td class="l">никто не поставил 1</td></tr>
+                        <tr><td>2</td><td>0,1</td><td>0,1 = 10 %</td><td class="l">10 % поставили 2 или хуже</td></tr>
+                        <tr><td>3</td><td>0,2</td><td>0,3 = 30 %</td><td class="l">30 % поставили максимум «teils/teils»</td></tr>
+                        <tr><td>4</td><td>0,5</td><td>0,8 = 80 %</td><td class="l">80 % поставили максимум 4</td></tr>
+                        <tr><td>5</td><td>0,2</td><td>1 = 100 %</td><td class="l">все, разумеется, поставили максимум 5</td></tr>
+                    </table>
+                    </div>
+                    <div class="rw">
+                        <span class="step">Отсюда главная цифра для выводов:</span>
+                        h(4) + h(5) = 0,5 + 0,2 = 0,7 = <span class="erg">70 %</span> zufrieden oder sehr zufrieden
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="mathe-stochastik.html">Stochastik</a> — Mittelwert, Median, Spannweite: формулы и другие примеры<br>
+                        <a href="mathe-wahrscheinlichkeit.html">Wahrscheinlichkeit &amp; Daten</a> — Boxplot: там Median и Spannweite работают вместе<br>
+                        <a href="mathe-formelsammlung.html">Formelsammlung</a> — все формулы в одном месте, чтобы не искать<br>
+                        <a href="mathe-rechnen.html">Rechnen</a> — сложение длинного ряда чисел без ошибок
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m8 ================= -->
+        <div class="lesson" id="ls-m8">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4C8;</span>
+                    <div>
+                        <h2>Diagramme zeichnen</h2>
+                        <p class="lesson-header-sub">Säulendiagramm и Kreisdiagramm по нашим данным — что чертить и что подписывать</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CA; Das Säulendiagramm — основной вариант</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Для оценок 1–5 столбики — самый наглядный вариант: сразу видно, что «4» выше всех.
+                    </p>
+                    <div class="chart-y">H<sub>i</sub> (Anzahl der Kunden)</div>
+                    <div class="chart">
+                        <div class="chart-col"><span class="chart-val">0</span><div class="chart-bar" style="height:2%"></div></div>
+                        <div class="chart-col"><span class="chart-val">1</span><div class="chart-bar" style="height:20%"></div></div>
+                        <div class="chart-col"><span class="chart-val">2</span><div class="chart-bar" style="height:40%"></div></div>
+                        <div class="chart-col"><span class="chart-val">5</span><div class="chart-bar" style="height:100%"></div></div>
+                        <div class="chart-col"><span class="chart-val">2</span><div class="chart-bar" style="height:40%"></div></div>
+                    </div>
+                    <div class="chart-x">
+                        <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+                    </div>
+                    <p style="font-size:0.83rem;color:rgba(230,230,235,0.5);text-align:center;margin-top:0.3rem;">Bewertung x<sub>i</sub></p>
+                    <ol class="schritte">
+                        <li><b>Achsen zeichnen.</b> Горизонтальная — <i>Bewertung (x<sub>i</sub>)</i>, вертикальная —
+                            <i>absolute Häufigkeit (H<sub>i</sub>)</i>. Обе подписать: без подписей осей снимают балл.</li>
+                        <li><b>Maßstab wählen.</b> Одна клетка = один клиент; хватит шести клеток вверх (максимум 5).</li>
+                        <li><b>Säulen einzeichnen.</b> Пять столбиков одинаковой ширины и с одинаковыми промежутками,
+                            высоты 0, 1, 2, 5, 2. Столбик над «1» не рисуем — там ноль, и это тоже информация.</li>
+                        <li><b>Beschriften.</b> Сверху над каждым столбиком — число, под каждым — оценка.
+                            Заголовок: <i>„Bewertungen der Kunden der OfficeLine GmbH (n = 10)“</i>.</li>
+                    </ol>
+                    <div class="gut"><b>n = 10 в заголовке — обязательно.</b> Без объёма выборки диаграмма
+                        «не aussagekräftig»: непонятно, 5 из 10 это или 5 из 500.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F967; Das Kreisdiagramm — если хочется показать доли</h3>
+                    <div class="pie" style="background:conic-gradient(#f97316 0deg 36deg,#fbbf24 36deg 108deg,#3fb950 108deg 288deg,#60a5fa 288deg 360deg);"></div>
+                    <div class="pie-leg">
+                        <span><i style="background:#f97316"></i>2 — unzufrieden · 10 %</span>
+                        <span><i style="background:#fbbf24"></i>3 — teils/teils · 20 %</span>
+                        <span><i style="background:#3fb950"></i>4 — zufrieden · 50 %</span>
+                        <span><i style="background:#60a5fa"></i>5 — sehr zufrieden · 20 %</span>
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;margin-top:0.8rem;">
+                        Углы секторов считаются из относительной частоты:
+                    </p>
+                    <div class="rw">
+                        <span class="step">Formel:</span>
+                        &alpha;<sub>i</sub> = h<sub>i</sub> &middot; 360&deg;
+                        <span class="step">für jede Bewertung:</span>
+                        &alpha;<sub>1</sub> = 0 &middot; 360&deg; = 0&deg; &nbsp;&middot;&nbsp;
+                        &alpha;<sub>2</sub> = 0,1 &middot; 360&deg; = <span class="erg">36&deg;</span>
+                        &alpha;<sub>3</sub> = 0,2 &middot; 360&deg; = <span class="erg">72&deg;</span> &nbsp;&middot;&nbsp;
+                        &alpha;<sub>4</sub> = 0,5 &middot; 360&deg; = <span class="erg">180&deg;</span> &nbsp;&middot;&nbsp;
+                        &alpha;<sub>5</sub> = 0,2 &middot; 360&deg; = <span class="erg">72&deg;</span>
+                        <span class="step">Kontrolle:</span>
+                        0 + 36 + 72 + 180 + 72 = <span class="erg">360&deg;</span>
+                    </div>
+                    <div class="gut"><b>Проверка на глаз:</b> 50 % — это ровно половина круга, 180°.
+                        Если твой сектор «zufrieden» не половина — где-то ошибка в расчёте.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="mathe-geometrie.html">Geometrie</a> — Winkel: как отмерять 36°, 72°, 180° транспортиром<br>
+                        <a href="mathe-prozent.html">Prozentrechnung</a> — проценты &rarr; градусы: 100 % = 360°, значит 1 % = 3,6°<br>
+                        <a href="mathe-basisteil.html">Basisteil Trainer</a> — блок <i>Diagramme lesen</i>: обратная задача, читать чужую диаграмму
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F914; Какую диаграмму выбрать — и как это обосновать</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Diagramm</th><th class="l">wofür</th><th class="l">в нашей задаче</th></tr>
+                        <tr><td class="l"><b class="kb-de">das Säulendiagramm</b></td><td class="l">сравнить количества</td><td class="l">лучший выбор: видно, какая оценка чаще</td></tr>
+                        <tr><td class="l"><b class="kb-de">das Balkendiagramm</b></td><td class="l">то же, но столбики лежат горизонтально</td><td class="l">годится, если подписи длинные</td></tr>
+                        <tr><td class="l"><b class="kb-de">das Kreisdiagramm</b></td><td class="l">показать доли от целого</td><td class="l">годится: хорошо видно «половина довольна»</td></tr>
+                        <tr><td class="l"><b class="kb-de">das Liniendiagramm</b></td><td class="l">развитие во времени</td><td class="l">не подходит — у нас нет времени, только оценки</td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">„Ich habe ein Säulendiagramm gewählt, weil man damit die Häufigkeiten der einzelnen Bewertungen direkt miteinander vergleichen kann.“</div>
+                    <div class="dsatz-ru">Я выбрала столбчатую диаграмму, потому что так можно напрямую сравнить частоты отдельных оценок. Если спросят «warum dieses Diagramm?» — вот ответ.</div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m9 ================= -->
+        <div class="lesson" id="ls-m9">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E3;&#xFE0F;</span>
+                    <div>
+                        <h2>Redemittel: как сказать это вслух</h2>
+                        <p class="lesson-header-sub">Фразы для ответа с места и у доски + как по-немецки читаются числа и знаки</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F522; Как читаются числа и знаки</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th>пишем</th><th class="l">говорим по-немецки</th><th class="l">по-русски</th></tr>
+                        <tr><td>3,8</td><td class="l">drei Komma acht</td><td class="l">три запятая восемь</td></tr>
+                        <tr><td>0,5</td><td class="l">null Komma fünf</td><td class="l">ноль запятая пять</td></tr>
+                        <tr><td>50 %</td><td class="l">fünfzig Prozent</td><td class="l">пятьдесят процентов</td></tr>
+                        <tr><td>n = 10</td><td class="l">en ist gleich zehn</td><td class="l">эн равно десяти</td></tr>
+                        <tr><td>x&#772;</td><td class="l">x quer</td><td class="l">«икс с чертой» — Mittelwert</td></tr>
+                        <tr><td>x&#771;</td><td class="l">x Schlange — oder einfach: der Median</td><td class="l">медиана; проще сказать словом</td></tr>
+                        <tr><td>H<sub>4</sub> = 5</td><td class="l">die absolute Häufigkeit der Bewertung vier beträgt fünf</td><td class="l">не читай «ха-четыре» — скажи словами, звучит увереннее</td></tr>
+                        <tr><td>h<sub>i</sub> = H<sub>i</sub> : n</td><td class="l">die relative Häufigkeit ist die absolute Häufigkeit geteilt durch n</td><td class="l"><b>geteilt durch</b> = делить на</td></tr>
+                        <tr><td>5 &minus; 2 = 3</td><td class="l">fünf minus zwei ist gleich drei</td><td class="l">минус / равно</td></tr>
+                        <tr><td>&sum;</td><td class="l">die Summe</td><td class="l">сумма</td></tr>
+                        <tr><td>&frac12;</td><td class="l">ein halb / die Hälfte</td><td class="l">половина</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F64B; Начать ответ</h3>
+                    <div class="dsatz">„Ich habe zuerst die Urliste der Größe nach geordnet.“</div>
+                    <div class="dsatz-ru">Сначала я отсортировала данные по величине.</div>
+                    <div class="dsatz">„Dann habe ich ausgezählt, wie oft jede Bewertung vorkommt.“</div>
+                    <div class="dsatz-ru">Потом посчитала, сколько раз встречается каждая оценка. <b>vorkommen</b> = встречаться, попадаться.</div>
+                    <div class="dsatz">„Anschließend habe ich die Werte in eine Häufigkeitstabelle eingetragen.“</div>
+                    <div class="dsatz-ru">Затем внесла значения в таблицу частот. <b>eintragen</b> = вносить, вписывать.</div>
+                    <div class="dsatz">„Zum Schluss habe ich die Kennzahlen berechnet.“</div>
+                    <div class="dsatz-ru">В конце посчитала характеристики. <b>zum Schluss</b> = напоследок.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CA; Назвать результат</h3>
+                    <div class="dsatz">„Der Mittelwert beträgt 3,8.“ · „Der Median liegt bei 4.“</div>
+                    <div class="dsatz-ru">Два глагола под числа: <b>betragen</b> (составлять) и <b>liegen bei</b> (быть равным). Оба звучат по-взрослому — лучше, чем «ist».</div>
+                    <div class="dsatz">„Fünf von zehn Kunden, also 50 %, haben mit ‚zufrieden‘ bewertet.“</div>
+                    <div class="dsatz-ru">Пятеро из десяти, то есть 50 %, оценили на «доволен». <b>also</b> = то есть.</div>
+                    <div class="dsatz">„Das entspricht einem Anteil von 50 %.“</div>
+                    <div class="dsatz-ru">Это соответствует доле в 50 %. <b>der Anteil</b> = доля.</div>
+                    <div class="dsatz">„Daraus lässt sich ableiten, dass die Mehrheit der Kunden zufrieden ist.“</div>
+                    <div class="dsatz-ru">Отсюда можно вывести, что большинство клиентов довольны. Точно тот глагол, который стоит в задании (<i>ableiten</i>) — учителя это ценят.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F6A9; Если не уверена или ошиблась</h3>
+                    <div class="dsatz">„Moment, ich korrigiere mich: Es sind 50 % zufrieden und 20 % sehr zufrieden.“</div>
+                    <div class="dsatz-ru">Момент, поправлюсь: 50 % довольны и 20 % очень довольны. Поправить себя вслух — это плюс, а не минус.</div>
+                    <div class="dsatz">„Ich bin mir bei der Bezeichnung nicht sicher — heißt das Merkmal ‚Kundenzufriedenheit‘?“</div>
+                    <div class="dsatz-ru">Я не уверена в названии — признак называется «удовлетворённость клиентов»? Вопрос по существу тоже считается участием.</div>
+                    <div class="dsatz">„Könnten Sie das bitte noch einmal erklären? Ich habe den Unterschied zwischen H und h noch nicht ganz verstanden.“</div>
+                    <div class="dsatz-ru">Не могли бы вы объяснить ещё раз? Я пока не до конца поняла разницу между H и h.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-redemittel.html">Redemittel</a> — общий банк фраз для урока: согласиться, возразить, переспросить<br>
+                        <a href="deutsch-sprechen.html">Sprechen</a> — как говорить связно, когда волнуешься<br>
+                        <a href="deutsch-erklaeren.html">Erläutern &amp; Erklären</a> — конструкции объяснения: <i>das bedeutet, daraus folgt, das heißt</i><br>
+                        <a href="deutsch-egb.html">EGB Deutsch</a> — те же Redemittel, но с урока немецкого
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= m10 ================= -->
+        <div class="lesson" id="ls-m10">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Wortschatz &amp; Selbsttest</h2>
+                        <p class="lesson-header-sub">Словарь темы и вопросы строго по этому листу</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Wortschatz: Statistik</h3>
+                    <table class="vt">
+                        <tr><td class="de">die Statistik</td><td class="ru">статистика</td></tr>
+                        <tr><td class="de">die deskriptive Statistik</td><td class="ru">описательная статистика — та, что описывает данные, не делая прогнозов</td></tr>
+                        <tr><td class="de">die Untersuchung</td><td class="ru">исследование; <i>untersuchen</i> — исследовать</td></tr>
+                        <tr><td class="de">die Befragung, die Kundenbefragung</td><td class="ru">опрос, опрос клиентов; <i>befragen</i> — опрашивать</td></tr>
+                        <tr><td class="de">die Daten (Pl.)</td><td class="ru">данные — всегда во множественном числе</td></tr>
+                        <tr><td class="de">erheben — erhoben</td><td class="ru">собирать данные; <i>die erhobenen Daten</i> — собранные данные</td></tr>
+                        <tr><td class="de">auswerten, die Auswertung</td><td class="ru">анализировать, обрабатывать; обработка данных</td></tr>
+                        <tr><td class="de">aufbereiten</td><td class="ru">привести в удобный вид: отсортировать, свести, изобразить</td></tr>
+                        <tr><td class="de">die Urliste</td><td class="ru">исходный список данных, как собрали</td></tr>
+                        <tr><td class="de">die Rangliste</td><td class="ru">отсортированный по величине список</td></tr>
+                        <tr><td class="de">das Merkmal</td><td class="ru">признак — то, что измеряют</td></tr>
+                        <tr><td class="de">die Merkmalsausprägung</td><td class="ru">значение признака</td></tr>
+                        <tr><td class="de">der Merkmalsträger</td><td class="ru">носитель признака — отдельный клиент</td></tr>
+                        <tr><td class="de">die Grundgesamtheit</td><td class="ru">генеральная совокупность — все возможные</td></tr>
+                        <tr><td class="de">die Stichprobe, der Stichprobenumfang n</td><td class="ru">выборка, её объём</td></tr>
+                        <tr><td class="de">die absolute Häufigkeit H</td><td class="ru">абсолютная частота — количество штук</td></tr>
+                        <tr><td class="de">die relative Häufigkeit h</td><td class="ru">относительная частота — доля от n</td></tr>
+                        <tr><td class="de">die Häufigkeitstabelle</td><td class="ru">таблица частот</td></tr>
+                        <tr><td class="de">die Strichliste</td><td class="ru">список палочек при подсчёте</td></tr>
+                        <tr><td class="de">der Mittelwert / das arithmetische Mittel</td><td class="ru">среднее арифметическое</td></tr>
+                        <tr><td class="de">der Median / der Zentralwert</td><td class="ru">медиана</td></tr>
+                        <tr><td class="de">der Modalwert / der Modus</td><td class="ru">мода — самое частое значение</td></tr>
+                        <tr><td class="de">die Spannweite</td><td class="ru">размах: максимум минус минимум</td></tr>
+                        <tr><td class="de">das Säulendiagramm / das Kreisdiagramm</td><td class="ru">столбчатая / круговая диаграмма</td></tr>
+                        <tr><td class="de">die Achse, beschriften</td><td class="ru">ось, подписывать</td></tr>
+                        <tr><td class="de">der Anteil</td><td class="ru">доля</td></tr>
+                        <tr><td class="de">betragen / liegen bei / entsprechen</td><td class="ru">составлять / равняться / соответствовать — три глагола для чисел</td></tr>
+                        <tr><td class="de">ableiten</td><td class="ru">выводить (утверждение из данных)</td></tr>
+                        <tr><td class="de">aussagekräftig</td><td class="ru">информативный, «говорящий»</td></tr>
+                        <tr><td class="de">nachvollziehbar</td><td class="ru">понятный, прослеживаемый — про ход решения</td></tr>
+                        <tr><td class="de">repräsentativ</td><td class="ru">репрезентативный — отражающий всю совокупность</td></tr>
+                        <tr><td class="de">die Abwicklung</td><td class="ru">оформление и исполнение заказа — то, что оценивали клиенты</td></tr>
+                        <tr><td class="de">die Büroausstattung, vertreiben</td><td class="ru">офисное оборудование; продавать, сбывать</td></tr>
+                        <tr><td class="de">die Geschäftsführung</td><td class="ru">руководство фирмы — для кого делается обзор</td></tr>
+                    </table>
+                    <div class="sl"><span class="sl-t">&#x1F517; Где это разобрано на сайте</span>
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a> — школьный словарь: <i>Auswertung, Übersicht, Untersuchung</i><br>
+                        <a href="deutsch-komposita.html">Komposita</a> — длинные слова вроде <i>Stichprobenumfang</i> разбираются на части<br>
+                        <a href="deutsch-nomen-artikel.html">Nomen &amp; Artikel</a> — почему <i>das</i> Merkmal, но <i>die</i> Häufigkeit
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; Selbsttest — нажми на вопрос, чтобы увидеть ответ</h3>
+                    <div id="stListMathe"></div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Эта страница будет расти: каждая новая тема с урока Mathe в EGB получит здесь свою
+                        карточку — так же, как это уже происходит на страницах
+                        <a href="deutsch-egb.html">EGB Deutsch</a> и <a href="iw-egb.html">EGB Informationswirtschaft</a>.
+                        Общая теория по математике — на странице <a href="mathe.html">Mathematik</a>.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        </div><!-- /egb-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Aufgabe ===================== */
+(function () {
+    var hub = document.getElementById('egb-hub');
+    var wrap = document.getElementById('egb-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Mathe | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('egb-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_mathe_egb_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('egb-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+/* ===================== TRAINER: Häufigkeitstabelle ===================== */
+(function () {
+    var table = document.getElementById('tr-table');
+    if (!table) { return; }
+    var inputs = Array.prototype.slice.call(table.querySelectorAll('.tr-inp'));
+    var msg = document.getElementById('tr-msg');
+
+    function norm(v) {
+        return String(v).trim().replace(',', '.').replace(/\s|%/g, '');
+    }
+    document.getElementById('tr-check').addEventListener('click', function () {
+        var ok = 0, leer = 0;
+        inputs.forEach(function (inp) {
+            var val = norm(inp.value);
+            if (val === '') { leer++; inp.className = 'tr-inp'; return; }
+            var soll = norm(inp.dataset.a);
+            if (parseFloat(val) === parseFloat(soll)) { inp.className = 'tr-inp ok'; ok++; }
+            else { inp.className = 'tr-inp no'; }
+        });
+        if (leer === inputs.length) {
+            msg.style.color = '#fbbf24';
+            msg.textContent = 'Noch nichts eingetragen — trag erst die Werte ein.';
+        } else if (ok === inputs.length) {
+            msg.style.color = '#86efac';
+            msg.textContent = '✓ Alles richtig! ΣH = 10 = n und Σh = 1 — die Tabelle stimmt.';
+        } else {
+            msg.style.color = '#fca5a5';
+            msg.textContent = ok + ' von ' + inputs.length + ' richtig. Denk dran: H sind Stück (0, 1, 2, 5, 2), h ist H : 10.';
+        }
+    });
+    document.getElementById('tr-reset').addEventListener('click', function () {
+        inputs.forEach(function (inp) { inp.value = ''; inp.className = 'tr-inp'; });
+        msg.textContent = '';
+    });
+})();
+
+/* ===================== SELBSTTEST ===================== */
+var SELBST_MATHE = [
+    { q: 'Was bedeutet die Bewertung 1 auf diesem Arbeitsblatt?',
+      a: '<b>sehr unzufrieden</b> — то есть хуже всего. Не путать со школьной оценкой «1». <b>5 = sehr zufrieden</b> — лучше всего.' },
+    { q: 'Nenne die Urliste und die Rangliste.',
+      a: 'Urliste: <b>4 – 5 – 3 – 4 – 2 – 4 – 5 – 3 – 4 – 4</b>. Rangliste (der Größe nach geordnet): <b>2 – 3 – 3 – 4 – 4 – 4 – 4 – 4 – 5 – 5</b>.' },
+    { q: 'Aufgabe 2a: Wie lautet das untersuchte Merkmal?',
+      a: '„Das untersuchte Merkmal ist die <b>Zufriedenheit der Kunden mit der Abwicklung ihrer Bestellung</b>“ — kurz: die <b>Kundenzufriedenheit</b>. Не «die Kunden» и не «die Bewertungen 1–5».' },
+    { q: 'Aufgabe 2b: Nenne drei Merkmalsausprägungen.',
+      a: 'Например: <b>„unzufrieden“ (2)</b>, <b>„teils/teils“ (3)</b>, <b>„zufrieden“ (4)</b>. Всего их пять. Называй слово <i>и</i> цифру.' },
+    { q: 'Aufgabe 2c: Wie groß ist der Stichprobenumfang?',
+      a: '<b>n = 10</b> — „Es wurden zehn Kunden befragt.“ Проверка: ΣH = 0+1+2+5+2 = 10.' },
+    { q: 'Was ist der Unterschied zwischen absoluter und relativer Häufigkeit?',
+      a: '<b>H</b> — количество штук (сколько человек). <b>h = H : n</b> — доля от общего числа, от 0 до 1, в процентах — умножить на 100. Проценты <b>не</b> пишут в столбец H.' },
+    { q: 'Wie groß sind H und h für die Bewertung 4 — und was heißt das im Sachzusammenhang?',
+      a: '<b>H = 5</b>: пятеро из десяти опрошенных оценили «zufrieden». <b>h = 0,5 = 50 %</b>: это ровно половина всех опрошенных. По-немецки: „Fünf der zehn befragten Kunden haben mit ‚zufrieden‘ bewertet, das entspricht 50 %.“' },
+    { q: 'Welche zwei Kontrollen zeigen, dass die Häufigkeitstabelle stimmt?',
+      a: '<b>ΣH = n = 10</b> и <b>Σh = 1</b> (то есть 100 %). Если хоть одна не сходится — где-то ошибка в подсчёте.' },
+    { q: 'Berechne den Mittelwert.',
+      a: 'x̄ = (4+5+3+4+2+4+5+3+4+4) : 10 = 38 : 10 = <b>3,8</b>. Через таблицу: (1·0 + 2·1 + 3·2 + 4·5 + 5·2) : 10 = 38 : 10 = 3,8.' },
+    { q: 'Berechne den Median — und erkläre den Schritt bei n = 10.',
+      a: 'Сначала сортируем. n = 10 — чётное, поэтому берём среднее из <b>5-го и 6-го</b> значения: x̃ = (4 + 4) : 2 = <b>4</b>. При нечётном n просто берут число посередине.' },
+    { q: 'Was ist der Modalwert und was die Spannweite?',
+      a: '<b>Modalwert = 4</b> — самая частая оценка (5 раз). <b>Spannweite R = x<sub>max</sub> − x<sub>min</sub> = 5 − 2 = 3</b> — насколько разошлись мнения.' },
+    { q: 'Formuliere zwei Aussagen aus der Auswertung.',
+      a: '1) „<b>70 %</b> der befragten Kunden sind zufrieden oder sehr zufrieden.“ 2) „<b>Kein einziger</b> Kunde ist sehr unzufrieden; nur ein Kunde (10 %) ist unzufrieden.“ В каждой Aussage — цифра.' },
+    { q: 'Warum sind 50 % „zufrieden“ und nicht „sehr zufrieden“?',
+      a: 'Потому что 50 % — это пятеро с оценкой <b>4</b>, а 4 по таблице = <b>zufrieden</b>. «sehr zufrieden» — это оценка <b>5</b>, её поставили двое, то есть 20 %.' },
+    { q: 'Wie groß sind die Winkel im Kreisdiagramm?',
+      a: 'α = h · 360°: Bewertung 2 → <b>36°</b>, 3 → <b>72°</b>, 4 → <b>180°</b>, 5 → <b>72°</b>, 1 → 0°. Сумма = 360°.' },
+    { q: 'Welche Einschränkung solltest du bei der Auswertung erwähnen?',
+      a: '„Es wurden nur zehn Kunden befragt, die Ergebnisse sind daher <b>nicht repräsentativ</b>.“ Маленькая выборка — только первый ориентир.' },
+    { q: 'Was heißt „Dokumentieren Sie Ihr Vorgehen“?',
+      a: 'Записать <b>шаги</b>, а не только ответ: ordnen → auszählen → Häufigkeitstabelle → Kennzahlen → Diagramm → Aussagen. По-немецки в Perfekt: „Zuerst habe ich … geordnet, dann habe ich …“.' }
+];
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+renderSelbst('stListMathe', SELBST_MATHE);
+</script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>
