@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wortfamilien &mdash; vom Wortstamm zum Wort | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .wf-intro {
+            background: rgba(163,113,247,0.09);
+            border: 1px solid rgba(163,113,247,0.28);
+            border-left: 4px solid #a371f7;
+            border-radius: 0 12px 12px 0;
+            padding: 0.95rem 1.15rem;
+            margin: 1.1rem 0 1.4rem;
+            color: rgba(226,232,240,0.88);
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+        .wf-intro b { color: #c8a5ff; }
+        .wf-intro .wf-ex-inline { color: rgba(230,215,248,0.9); font-style: italic; }
+
+        .wf-legend {
+            display: flex; gap: 1.1rem; flex-wrap: wrap;
+            font-size: 0.78rem; color: rgba(200,210,230,0.6);
+            margin: 0.6rem 0 1.3rem;
+            align-items: center;
+        }
+        .wf-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+        .wf-bar {
+            display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;
+            margin: 1rem 0 0.7rem;
+        }
+        .wf-search {
+            flex: 1 1 260px; min-width: 190px;
+            background: rgba(15,15,30,0.75);
+            border: 1.5px solid rgba(163,113,247,0.32);
+            border-radius: 12px;
+            padding: 0.6rem 0.95rem;
+            color: #e2e8f0; font-size: 0.95rem; font-family: inherit; outline: none;
+        }
+        .wf-search:focus { border-color: #a371f7; box-shadow: 0 0 0 3px rgba(163,113,247,0.15); }
+        .wf-cnt { font-size: 0.82rem; color: rgba(200,220,255,0.55); margin-bottom: 1rem; }
+
+        .wf-block {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 0.25s;
+        }
+        .wf-block:hover { border-color: rgba(163,113,247,0.32); }
+        .wf-block.wf-hide { display: none; }
+
+        .wf-head {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem 1.3rem;
+            cursor: pointer; user-select: none;
+        }
+        .wf-root {
+            font-size: 1.28rem; font-weight: 900;
+            font-family: 'Playfair Display', Georgia, serif;
+            background: linear-gradient(135deg, #fff 25%, #c8a5ff 65%, #f9a8d4 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            flex-shrink: 0;
+        }
+        .wf-meaning { font-size: 0.84rem; color: rgba(230,210,245,0.55); font-style: italic; flex: 1; }
+        .wf-count {
+            font-size: 0.72rem; font-weight: 700;
+            background: rgba(163,113,247,0.12); color: rgba(200,165,255,0.85);
+            border-radius: 999px; padding: 0.15rem 0.6rem; white-space: nowrap;
+        }
+        .wf-arrow { color: rgba(163,113,247,0.45); font-size: 0.9rem; transition: transform 0.3s; }
+        .wf-block.open .wf-arrow { transform: rotate(90deg); color: #a371f7; }
+
+        .wf-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.45s ease, padding 0.3s ease;
+            padding: 0 1.3rem;
+        }
+        .wf-block.open .wf-body { max-height: 6000px; padding-bottom: 1.2rem; }
+
+        .wf-note {
+            font-size: 0.8rem; color: #fda4af;
+            background: rgba(244,63,94,0.08);
+            border-left: 3px solid rgba(244,63,94,0.5);
+            border-radius: 0 8px 8px 0;
+            padding: 0.5rem 0.7rem;
+            margin-bottom: 0.8rem; line-height: 1.55;
+        }
+        .wf-note b { color: #fecdd3; }
+
+        .wf-group-label {
+            font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+            color: rgba(163,113,247,0.65);
+            margin: 0.9rem 0 0.35rem;
+        }
+        .wf-group-label:first-child { margin-top: 0; }
+
+        .wf-row {
+            display: flex; gap: 0.9rem; align-items: flex-start;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.055);
+        }
+        .wf-row:last-child { border-bottom: none; }
+        .wf-row-compact { padding: 0.4rem 0; }
+        .wf-row-compact .wf-ua { margin-bottom: 0; }
+        .wf-word-wrap { min-width: 190px; flex-shrink: 0; }
+        .wf-word { font-size: 0.98rem; font-weight: 800; color: #fff; }
+        .wf-pos {
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+            border-radius: 20px; padding: 0.1rem 0.45rem; margin-left: 0.4rem;
+            vertical-align: 0.1rem;
+            background: rgba(148,163,184,0.16); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.25);
+        }
+        .wf-pos.n { background: rgba(251,146,60,0.14); color: #fdba74; border-color: rgba(251,146,60,0.28); }
+        .wf-pos.v { background: rgba(52,211,153,0.14); color: #6ee7b7; border-color: rgba(52,211,153,0.28); }
+        .wf-pos.adj { background: rgba(56,189,248,0.14); color: #7dd3fc; border-color: rgba(56,189,248,0.28); }
+        .wf-src {
+            display: inline-block; font-size: 0.62rem; font-weight: 800;
+            color: #86efac; background: rgba(52,211,153,0.12);
+            border: 1px solid rgba(52,211,153,0.3);
+            border-radius: 999px; padding: 0.05rem 0.4rem; margin-top: 0.3rem;
+        }
+        .wf-body-r { flex: 1; min-width: 0; }
+        .wf-ua { font-size: 0.87rem; color: rgba(210,185,245,0.7); margin-bottom: 0.3rem; }
+        .wf-ex {
+            font-size: 0.84rem; color: rgba(230,215,248,0.8); font-style: italic; line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .wf-row { flex-direction: column; gap: 0.3rem; }
+            .wf-word-wrap { min-width: 0; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/moon.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html" class="active">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+            <a href="gallery.html">Gallery</a>
+            <a href="study-tips.html">How to Study</a>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="deutsch.html">Deutsch</a>
+            <span class="separator">›</span>
+            <span class="current">Wortfamilien</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem; margin-bottom:0.6rem;">
+            <h1>Wortfamilien <span style="color:#a371f7;">🌱</span></h1>
+            <p class="page-subtitle" id="wfsubtitle">38 родин слів · Nomen / Verben / Adjektive одного кореня · слова з vokabeln.html позначені ✓</p>
+        </div>
+
+        <div class="wf-intro">
+            <b>Що таке Wortfamilie?</b> Купа німецьких слів — це насправді одне й те саме слово в різній «одежі».
+            Візьми приклад: <b>quälen</b> (мучити) → <b>quälend</b> (болісний) → <b>die Qual</b> (муки) —
+            один корінь <b>quäl-</b>, три різні частини мови. До родини належать не лише прямі похідні, а й
+            складні слова з тим самим коренем: <b>arbeiten</b> → <b>der Arbeitsplatz</b>, <b>der Arbeitgeber</b>,
+            <b>arbeitslos</b> — усе це теж «arbeiten». Нижче — 69 таких родин, зібраних навколо слів, які вже
+            трапляються у твоєму <a href="vokabeln.html" style="color:#c8a5ff;">vokabeln.html</a>: до кожного
+            «посадженого» слова я додав(-ла) якомога більше реальних родичів — іменників, дієслів, прикметників.
+        </div>
+
+        <div class="wf-legend">
+            <span><span class="wf-pos v" style="margin-left:0">V</span> дієслово</span>
+            <span><span class="wf-pos n" style="margin-left:0">N</span> іменник</span>
+            <span><span class="wf-pos adj" style="margin-left:0">Adj</span> прикметник/дієприкметник</span>
+            <span><span class="wf-src" style="margin-top:0">✓</span> вже є у vokabeln.html</span>
+        </div>
+
+        <div class="wf-bar">
+            <input class="wf-search" id="wfq" type="search" placeholder="Пошук: корінь, слово, значення…" autocomplete="off">
+        </div>
+        <div class="wf-cnt" id="wfcnt"></div>
+        <div id="wflist"></div>
+
+        <div style="text-align:center; margin-top:2.5rem; padding-bottom:2rem;">
+            <a href="deutsch.html" style="font-size:0.85rem; color:rgba(163,113,247,0.6); text-decoration:none;">
+                ← zurück zu Deutsch
+            </a>
+        </div>
+    </div>
+
+    <script>
+    var FAMILIES = [
+    {
+        word: 'arbeiten', meaning: 'працювати',
+        items: [
+            {w:'arbeiten', p:'v', ua:'працювати', ex:'Sie arbeitet seit drei Jahren in dieser Firma.', s:true},
+            {w:'die Arbeit', p:'n', ua:'робота', ex:'Die Arbeit macht ihm wirklich Freude.', s:true},
+            {w:'die Arbeitsweise', p:'n', ua:'спосіб роботи', ex:'Jeder Kollege hat seine eigene Arbeitsweise.', s:true},
+            {w:'arbeitslos', p:'adj', ua:'безробітний', ex:'Nach der Insolvenz der Firma war er ein Jahr arbeitslos.', s:true},
+            {w:'bearbeiten', p:'v', ua:'обробляти, розглядати (заявку)', ex:'Der Antrag wird gerade bearbeitet.', s:false},
+            {w:'der Mitarbeiter', p:'n', ua:'співробітник', ex:'Die Firma sucht neue Mitarbeiter für die IT-Abteilung.', s:false},
+            {w:'der Arbeiter / die Arbeiterin', p:'n', ua:'робітник / робітниця'},
+            {w:'der Bauarbeiter', p:'n', ua:'будівельник'},
+            {w:'der Arbeitgeber', p:'n', ua:'роботодавець'},
+            {w:'der Arbeitnehmer', p:'n', ua:'найманий працівник'},
+            {w:'der Arbeitsplatz', p:'n', ua:'робоче місце'},
+            {w:'die Arbeitsstelle', p:'n', ua:'місце роботи, посада'},
+            {w:'der Arbeitstag', p:'n', ua:'робочий день'},
+            {w:'die Nachtarbeit', p:'n', ua:'нічна робота'},
+            {w:'die Schichtarbeit', p:'n', ua:'позмінна робота'},
+            {w:'die Handarbeit', p:'n', ua:'ручна робота, рукоділля'},
+            {w:'die Fabrikarbeit', p:'n', ua:'робота на фабриці'},
+            {w:'mitarbeiten', p:'v', ua:'співпрацювати'},
+            {w:'nacharbeiten', p:'v', ua:'доробляти'},
+            {w:'erarbeiten', p:'v', ua:'напрацьовувати, розробляти', s:true},
+            {w:'aufarbeiten', p:'v', ua:'переробляти; наздоганяти (борг)'},
+            {w:'abarbeiten', p:'v', ua:'відпрацьовувати'},
+            {w:'arbeitend', p:'adj', ua:'працюючий'},
+            {w:'arbeitsam', p:'adj', ua:'працьовитий'}
+        ]
+    },
+    {
+        word: 'beweisen', meaning: 'доводити',
+        items: [
+            {w:'beweisen', p:'v', ua:'доводити', ex:'Er konnte seine Unschuld beweisen.', s:true},
+            {w:'der Beweis', p:'n', ua:'доказ', ex:'Die Polizei fand keinen einzigen Beweis.', s:true},
+            {w:'nachweisen', p:'v', ua:'довести, підтвердити', ex:'Die Studie konnte den Zusammenhang klar nachweisen.', s:true},
+            {w:'der Nachweis', p:'n', ua:'підтвердження, довідка', ex:'Für die Anmeldung brauchen Sie einen Nachweis.', s:false},
+            {w:'beweisbar', p:'adj', ua:'те, що можна довести', ex:'Diese Behauptung ist wissenschaftlich nicht beweisbar.', s:false},
+            {w:'die Beweisführung', p:'n', ua:'аргументація, доведення'},
+            {w:'die Beweislast', p:'n', ua:'тягар доведення'},
+            {w:'der Gegenbeweis', p:'n', ua:'контраргумент, спростування'},
+            {w:'beweiskräftig', p:'adj', ua:'переконливий, доказовий'}
+        ]
+    },
+    {
+        word: 'bewegen', meaning: 'рухати(ся)',
+        items: [
+            {w:'sich bewegen', p:'v', ua:'рухатися', ex:'Du solltest dich jeden Tag ein bisschen bewegen.', s:true},
+            {w:'die Bewegung', p:'n', ua:'рух, фіз. активність', ex:'Regelmäßige Bewegung tut dem Körper gut.', s:true},
+            {w:'beweglich', p:'adj', ua:'рухливий, мобільний', ex:'Trotz seines Alters ist er noch sehr beweglich.', s:false},
+            {w:'unbeweglich', p:'adj', ua:'нерухомий', ex:'Nach dem Sturz blieb ihr Arm tagelang unbeweglich.', s:false},
+            {w:'unbewegt', p:'adj', ua:'незворушний, нерухомий'},
+            {w:'die Bewegungsfreiheit', p:'n', ua:'свобода пересування'},
+            {w:'der Beweggrund', p:'n', ua:'мотив, спонука', s:true},
+            {w:'bewegend', p:'adj', ua:'зворушливий'}
+        ]
+    },
+    {
+        word: 'bilden', meaning: 'формувати; Bild = образ',
+        items: [
+            {w:'das Bild', p:'n', ua:'картина, зображення', ex:'Das Bild hing schief an der Wand.', s:false},
+            {w:'bilden', p:'v', ua:'формувати, утворювати', ex:'Diese vier Wörter bilden zusammen eine Wortfamilie.', s:false},
+            {w:'die Bildung', p:'n', ua:'освіта, формування', ex:'Gute Bildung öffnet viele Türen.', s:true},
+            {w:'die Ausbildung', p:'n', ua:'профосвіта, навчання', ex:'Nach der Ausbildung fand sie sofort eine Stelle.', s:true},
+            {w:'das Vorbild', p:'n', ua:'приклад для наслідування', ex:'Seine Großmutter war für ihn immer ein Vorbild.', s:true},
+            {w:'sich weiterbilden', p:'v', ua:'підвищувати кваліфікацію', ex:'Er möchte sich unbedingt beruflich weiterbilden.', s:true},
+            {w:'die Weiterbildung', p:'n', ua:'підвищення кваліфікації', ex:'Die Firma bezahlt ihm die Weiterbildung.', s:true},
+            {w:'gebildet', p:'adj', ua:'освічений', ex:'Sie ist eine sehr gebildete und belesene Frau.', s:false},
+            {w:'die Abbildung', p:'n', ua:'зображення, ілюстрація'},
+            {w:'die Einbildung', p:'n', ua:'уява; самонавіювання'},
+            {w:'die Fortbildung', p:'n', ua:'підвищення кваліфікації'},
+            {w:'abbilden', p:'v', ua:'зображувати, відображати', s:true},
+            {w:'sich einbilden', p:'v', ua:'уявляти собі (помилково)', s:true},
+            {w:'ungebildet', p:'adj', ua:'неосвічений'},
+            {w:'bildhaft', p:'adj', ua:'образний, наочний'}
+        ]
+    },
+    {
+        word: 'denken', meaning: 'думати',
+        items: [
+            {w:'denken', p:'v', ua:'думати', ex:'Ich denke oft an meine Schulzeit zurück.', s:true},
+            {w:'denkbar', p:'adj', ua:'уявний, можливий', ex:'Es ist durchaus denkbar, dass wir uns irren.', s:true},
+            {w:'die Denkweise', p:'n', ua:'спосіб мислення', ex:'Seine Denkweise ist sehr analytisch.', s:true},
+            {w:'der Gedanke', p:'n', ua:'думка', ex:'Dieser Gedanke lässt mir keine Ruhe.', s:true},
+            {w:'nachdenken', p:'v', ua:'розмірковувати', ex:'Sie muss noch einmal in Ruhe nachdenken.', s:true},
+            {w:'bedenken', p:'v', ua:'враховувати, брати до уваги', ex:'Man muss auch die Kosten bedenken.', s:false},
+            {w:'das Bedenken', p:'n', ua:'сумнів, застереження', ex:'Ich habe da noch ein paar Bedenken.', s:false},
+            {w:'das Andenken', p:'n', ua:'сувенір; спогад'},
+            {w:'der Denkfehler', p:'n', ua:'помилка в міркуванні'},
+            {w:'die Bedenkzeit', p:'n', ua:'час на роздуми'},
+            {w:'überdenken', p:'v', ua:'переосмислювати'},
+            {w:'umdenken', p:'v', ua:'змінити спосіб мислення'},
+            {w:'bedenklich', p:'adj', ua:'сумнівний, тривожний'},
+            {w:'undenkbar', p:'adj', ua:'немислимий'}
+        ]
+    },
+    {
+        word: 'entscheiden', meaning: 'вирішувати',
+        items: [
+            {w:'entscheiden', p:'v', ua:'вирішувати', ex:'Du musst dich jetzt entscheiden.', s:true},
+            {w:'entscheidend', p:'adj', ua:'вирішальний', ex:'Das war der entscheidende Moment im Spiel.', s:true},
+            {w:'die Entscheidung', p:'n', ua:'рішення', ex:'Das war keine leichte Entscheidung für mich.', s:true},
+            {w:'entschlossen', p:'adj', ua:'сповнений рішучості', ex:'Sie wirkte fest entschlossen, das Projekt zu Ende zu bringen.', s:false},
+            {w:'der Entschluss', p:'n', ua:'рішення, намір', ex:'Er fasste den Entschluss, im Ausland zu studieren.', s:false},
+            {w:'der Entscheidungsträger', p:'n', ua:'той, хто приймає рішення'},
+            {w:'die Entscheidungsfreiheit', p:'n', ua:'свобода вибору'},
+            {w:'mitentscheiden', p:'v', ua:'брати участь у прийнятті рішення'},
+            {w:'unentschieden', p:'adj', ua:'нерішений; внічию'},
+            {w:'entscheidungsfreudig', p:'adj', ua:'рішучий, здатний швидко вирішувати'}
+        ]
+    },
+    {
+        word: 'fordern ↔ fördern', meaning: 'вимагати ↔ підтримувати',
+        note: '<b>fordern</b> (вимагати) і <b>fördern</b> (підтримувати, сприяти) — два різні дієслова, які через одну літеру легко переплутати.',
+        items: [
+            {w:'fordern', p:'v', ua:'вимагати', ex:'Die Angestellten fordern höhere Löhne.', s:true, g:'fordern'},
+            {w:'die Forderung', p:'n', ua:'вимога', ex:'Die Forderung wurde sofort abgelehnt.', s:false, g:'fordern'},
+            {w:'auffordern', p:'v', ua:'закликати, вимагати від когось', ex:'Der Lehrer forderte die Klasse zur Ruhe auf.', s:true, g:'fordern'},
+            {w:'herausfordern', p:'v', ua:'кидати виклик', ex:'Die neue Aufgabe hat ihn richtig herausgefordert.', s:false, g:'fordern'},
+            {w:'die Herausforderung', p:'n', ua:'виклик', ex:'Das Projekt war eine echte Herausforderung.', s:true, g:'fordern'},
+            {w:'herausfordernd', p:'adj', ua:'складний, що є викликом', ex:'Die Prüfung war ziemlich herausfordernd.', s:true, g:'fordern'},
+            {w:'überfordern', p:'v', ua:'вимагати забагато, перевантажувати', s:true, g:'fordern'},
+            {w:'überfordert', p:'adj', ua:'перевантажений, не здатний впоратися', g:'fordern'},
+            {w:'die Rückforderung', p:'n', ua:'вимога повернення', g:'fordern'},
+            {w:'einfordern', p:'v', ua:'наполегливо вимагати', g:'fordern'},
+            {w:'fördern', p:'v', ua:'підтримувати, сприяти', ex:'Lesen fördert die Fantasie von Kindern.', s:true, g:'fördern'},
+            {w:'die Förderung', p:'n', ua:'підтримка, сприяння', ex:'Die Förderung junger Talente liegt ihr am Herzen.', s:true, g:'fördern'},
+            {w:'förderlich', p:'adj', ua:'сприятливий', ex:'Frische Luft ist der Konzentration förderlich.', s:false, g:'fördern'},
+            {w:'das Förderprogramm', p:'n', ua:'програма підтримки', g:'fördern'},
+            {w:'die Fördermittel', p:'n', ua:'кошти на підтримку, гранти', g:'fördern'},
+            {w:'unterfordern', p:'v', ua:'не використовувати потенціал, недовантажувати', g:'fördern'}
+        ]
+    },
+    {
+        word: 'forschen', meaning: 'досліджувати',
+        items: [
+            {w:'forschen', p:'v', ua:'займатися наукою, досліджувати', ex:'Sie forscht seit Jahren zum Thema Klimawandel.', s:false},
+            {w:'erforschen', p:'v', ua:'досліджувати, вивчати (щось конкретне)', ex:'Wissenschaftler erforschen die Ursachen der Krankheit.', s:true},
+            {w:'die Forschung', p:'n', ua:'наука, дослідження', ex:'Die Forschung in diesem Bereich steckt noch in den Anfängen.', s:true},
+            {w:'der Forscher', p:'n', ua:'науковець', ex:'Die Forscherin arbeitet seit Jahren an diesem Projekt.', s:false},
+            {w:'die Forschungsfrage', p:'n', ua:'дослідницьке питання', ex:'Die Forschungsfrage der Arbeit ist klar formuliert.', s:true},
+            {w:'die Forschungslücke', p:'n', ua:'прогалина в дослідженнях', ex:'Die Studie schließt eine wichtige Forschungslücke.', s:true},
+            {w:'das Forschungsprojekt', p:'n', ua:'дослідницький проєкт'},
+            {w:'das Forschungsergebnis', p:'n', ua:'результат дослідження'},
+            {w:'die Erforschung', p:'n', ua:'дослідження, вивчення'},
+            {w:'unerforscht', p:'adj', ua:'недосліджений'}
+        ]
+    },
+    {
+        word: 'fühlen', meaning: 'почувати(ся)',
+        items: [
+            {w:'sich fühlen', p:'v', ua:'почувати(ся)', ex:'Wie fühlst du dich heute?', s:true},
+            {w:'das Gefühl', p:'n', ua:'почуття', ex:'Ich habe das Gefühl, dass etwas nicht stimmt.', s:false},
+            {w:'das Mitgefühl', p:'n', ua:'співчуття', ex:'Sie zeigte echtes Mitgefühl für die Betroffenen.', s:true},
+            {w:'gefühlvoll', p:'adj', ua:'з почуттям, чуттєвий', ex:'Er schrieb ihr einen sehr gefühlvollen Brief.', s:false},
+            {w:'gefühllos', p:'adj', ua:'байдужий, бездушний', ex:'Seine gefühllose Reaktion hat sie verletzt.', s:false},
+            {w:'einfühlsam', p:'adj', ua:'чуйний, здатний співпереживати', ex:'Die Ärztin war sehr einfühlsam und geduldig.', s:false},
+            {w:'die Gefühlswelt', p:'n', ua:'світ почуттів'},
+            {w:'das Fingerspitzengefühl', p:'n', ua:'тонке чуття, такт'},
+            {w:'das Vorgefühl', p:'n', ua:'передчуття'},
+            {w:'mitfühlen', p:'v', ua:'співпереживати'},
+            {w:'fühlbar', p:'adj', ua:'відчутний'},
+            {w:'gefühlsmäßig', p:'adj', ua:'інтуїтивний, емоційний'}
+        ]
+    },
+    {
+        word: 'geben', meaning: 'давати',
+        items: [
+            {w:'geben', p:'v', ua:'давати', ex:'Gib mir bitte das Buch.', s:false},
+            {w:'die Gabe', p:'n', ua:'дар, талант', ex:'Musikalität ist eine seltene Gabe.', s:false},
+            {w:'aufgeben', p:'v', ua:'здаватися, кидати', ex:'Gib nicht so schnell auf, du schaffst das!', s:true},
+            {w:'die Aufgabe', p:'n', ua:'завдання', ex:'Die Aufgabe war schwerer, als ich dachte.', s:true},
+            {w:'ausgeben', p:'v', ua:'витрачати', ex:'Wir geben jeden Monat zu viel für Lieferdienste aus.', s:true},
+            {w:'nachgeben', p:'v', ua:'поступатися', ex:'Nach langer Diskussion hat er schließlich nachgegeben.', s:true},
+            {w:'das Ergebnis', p:'n', ua:'результат', ex:'Das Ergebnis der Studie hat alle überrascht.', s:true},
+            {w:'die Angabe', p:'n', ua:'дані, твердження'},
+            {w:'die Hingabe', p:'n', ua:'відданість'},
+            {w:'die Vorgabe', p:'n', ua:'норматив, вказівка'},
+            {w:'die Zugabe', p:'n', ua:'додаток, біс (на концерті)'},
+            {w:'die Rückgabe', p:'n', ua:'повернення'},
+            {w:'die Vergebung', p:'n', ua:'прощення'},
+            {w:'angeben', p:'v', ua:'вказувати; хвалитися'},
+            {w:'übergeben', p:'v', ua:'передавати'},
+            {w:'vergeben', p:'v', ua:'прощати; присуджувати'},
+            {w:'zurückgeben', p:'v', ua:'повертати'},
+            {w:'ergiebig', p:'adj', ua:'продуктивний, багатий'},
+            {w:'freigebig', p:'adj', ua:'щедрий'}
+        ]
+    },
+    {
+        word: 'gehören', meaning: 'належати',
+        items: [
+            {w:'gehören', p:'v', ua:'належати', ex:'Dieses Fahrrad gehört meinem Bruder.', s:true},
+            {w:'dazugehören', p:'v', ua:'бути частиною групи', ex:'Als Neue in der Klasse wollte sie unbedingt dazugehören.', s:true},
+            {w:'die Zugehörigkeit', p:'n', ua:'приналежність', ex:'Das Gefühl der Zugehörigkeit ist für Jugendliche sehr wichtig.', s:true},
+            {w:'angehören', p:'v', ua:'належати до (формально)', ex:'Er gehört seit Jahren diesem Verein an.', s:false},
+            {w:'der Angehörige', p:'n', ua:'родич, член', ex:'Die Angehörigen wurden sofort informiert.', s:false},
+            {w:'das Zubehör', p:'n', ua:'приладдя, аксесуари'},
+            {w:'zugehörig', p:'adj', ua:'приналежний'}
+        ]
+    },
+    {
+        word: 'Grund', meaning: 'причина, основа',
+        items: [
+            {w:'der Grund', p:'n', ua:'причина, підстава', ex:'Der Grund für die Verspätung war ein Stau.', s:true},
+            {w:'die Grundlage', p:'n', ua:'основа, підстава', ex:'Vertrauen ist die Grundlage jeder guten Beziehung.', s:true},
+            {w:'grundlegend', p:'adj', ua:'основоположний, фундаментальний', ex:'Das ist ein grundlegender Unterschied zwischen beiden Modellen.', s:true},
+            {w:'begründen', p:'v', ua:'обґрунтовувати', ex:'Bitte begründen Sie Ihre Entscheidung kurz.', s:true},
+            {w:'die Begründung', p:'n', ua:'обґрунтування', ex:'Seine Begründung hat mich nicht überzeugt.', s:false},
+            {w:'grundsätzlich', p:'adj', ua:'принципово, в принципі', ex:'Grundsätzlich stimme ich dir zu, aber nicht in diesem Fall.', s:false},
+            {w:'das Grundstück', p:'n', ua:'земельна ділянка'},
+            {w:'die Grundschule', p:'n', ua:'початкова школа'},
+            {w:'das Grundgesetz', p:'n', ua:'основний закон, конституція'},
+            {w:'das Grundrecht', p:'n', ua:'основне право', s:true},
+            {w:'der Hintergrund', p:'n', ua:'тло, підґрунтя', s:true},
+            {w:'der Untergrund', p:'n', ua:'підземка; підґрунтя'},
+            {w:'begründet', p:'adj', ua:'обґрунтований'},
+            {w:'grundverschieden', p:'adj', ua:'докорінно різний'}
+        ]
+    },
+    {
+        word: 'halten', meaning: 'тримати, зупинятися',
+        items: [
+            {w:'halten', p:'v', ua:'тримати, зупинятися', ex:'Kannst du das bitte kurz halten?', s:false},
+            {w:'die Haltung', p:'n', ua:'1) поза 2) позиція, ставлення', ex:'Ihre Haltung zu dem Thema hat sich verändert.', s:true},
+            {w:'festhalten', p:'v', ua:'міцно тримати; фіксувати письмово', ex:'Wir haben die Ergebnisse schriftlich festgehalten.', s:true},
+            {w:'innehalten', p:'v', ua:'зробити паузу, зупинитися', ex:'Er hielt kurz inne, bevor er weitersprach.', s:true},
+            {w:'standhalten', p:'v', ua:'вистояти, витримати (+Dat.)', ex:'Die Brücke hält dem Sturm stand.', s:true},
+            {w:'zusammenhalten', p:'v', ua:'тримaтися разом', ex:'In der Krise hat die Familie stark zusammengehalten.', s:true},
+            {w:'der Zusammenhalt', p:'n', ua:'згуртованість', ex:'Der Zusammenhalt in der Familie war beeindruckend.', s:true},
+            {w:'sich verhalten', p:'v', ua:'поводитися', ex:'Er wusste nicht, wie er sich in dieser Situation verhalten sollte.', s:true},
+            {w:'das Verhalten', p:'n', ua:'поведінка', ex:'Sein Verhalten hat alle überrascht.', s:false},
+            {w:'die Haltestelle', p:'n', ua:'зупинка (транспорту)'},
+            {w:'der Inhalt', p:'n', ua:'зміст', s:true},
+            {w:'der Unterhalt', p:'n', ua:'утримання, аліменти'},
+            {w:'die Unterhaltung', p:'n', ua:'розвага; розмова'},
+            {w:'der Anhalter', p:'n', ua:'автостопник'},
+            {w:'unterhalten', p:'v', ua:'розважати; утримувати'},
+            {w:'enthalten', p:'v', ua:'містити', s:true},
+            {w:'aufhalten', p:'v', ua:'затримувати'},
+            {w:'anhalten', p:'v', ua:'зупиняти(ся)'},
+            {w:'haltbar', p:'adj', ua:'міцний; тривалого зберігання'},
+            {w:'unhaltbar', p:'adj', ua:'нестерпний, неспроможний'}
+        ]
+    },
+    {
+        word: 'kaufen', meaning: 'купувати',
+        items: [
+            {w:'kaufen', p:'v', ua:'купувати', ex:'Wo hast du diese Jacke gekauft?', s:true},
+            {w:'der Kauf', p:'n', ua:'купівля, покупка', ex:'Der Kauf des Autos war eine spontane Entscheidung.', s:false},
+            {w:'verkaufen', p:'v', ua:'продавати', ex:'Er will sein altes Fahrrad verkaufen.', s:true},
+            {w:'der Verkäufer', p:'n', ua:'продавець', ex:'Der Verkäufer war sehr hilfsbereit.', s:false},
+            {w:'einkaufen', p:'v', ua:'робити покупки', ex:'Ich muss heute noch einkaufen gehen.', s:true},
+            {w:'käuflich', p:'adj', ua:'1) продажний 2) який можна купити', ex:'Ihre Loyalität war nicht käuflich.', s:false},
+            {w:'das Kaufhaus', p:'n', ua:'універмаг'},
+            {w:'das Einkaufszentrum', p:'n', ua:'торговий центр'},
+            {w:'der Kaufvertrag', p:'n', ua:'договір купівлі-продажу'},
+            {w:'der Ausverkauf', p:'n', ua:'розпродаж'},
+            {w:'unverkäuflich', p:'adj', ua:'непродажний'}
+        ]
+    },
+    {
+        word: 'klar', meaning: 'ясний, зрозумілий',
+        items: [
+            {w:'klar', p:'adj', ua:'ясний, зрозумілий', ex:'Seine Erklärung war klar und einfach.', s:true},
+            {w:'klären', p:'v', ua:'з’ясовувати', ex:'Wir müssen noch ein paar Details klären.', s:false},
+            {w:'erklären', p:'v', ua:'пояснювати', ex:'Kannst du mir das bitte noch einmal erklären?', s:true},
+            {w:'die Klärung', p:'n', ua:'з’ясування', ex:'Die Klärung des Problems hat lange gedauert.', s:true},
+            {w:'die Erklärung', p:'n', ua:'пояснення', ex:'Dafür gibt es eine ganz einfache Erklärung.', s:false},
+            {w:'klarmachen', p:'v', ua:'чітко дати зрозуміти', ex:'Er hat ihr klargemacht, dass er nicht mitkommt.', s:true},
+            {w:'die Klarheit', p:'n', ua:'ясність'},
+            {w:'die Aufklärung', p:'n', ua:'просвітництво; з’ясування', s:true},
+            {w:'aufklären', p:'v', ua:'з’ясовувати; просвіщати', s:true},
+            {w:'unklar', p:'adj', ua:'незрозумілий'},
+            {w:'glasklar', p:'adj', ua:'кришталево ясний'}
+        ]
+    },
+    {
+        word: 'quälen', meaning: 'мучити, завдавати болю',
+        note: 'Звернь увагу: дієслово <b>quälen</b> має умлаут (ä), а іменник <b>die Qual</b> — без нього. Просто запам’ятай обидві форми окремо.',
+        items: [
+            {w:'quälen', p:'v', ua:'мучити, катувати (когось/себе)', ex:'Warum quälst du deine Schwester mit solchen Fragen?', s:false},
+            {w:'die Qual', p:'n', ua:'муки, страждання', ex:'Die letzten Minuten vor der Prüfung waren die reinste Qual.', s:false},
+            {w:'quälend', p:'adj', ua:'болісний, виснажливий', ex:'Das Warten auf die Diagnose war quälend lang.', s:true},
+            {w:'die Quälerei', p:'n', ua:'тортури, катування (розм.)', ex:'Für ihn war der Matheunterricht die reinste Quälerei.', s:false},
+            {w:'der Quälgeist', p:'n', ua:'докучлива людина, зануда'},
+            {w:'die Selbstquälerei', p:'n', ua:'самокатування'},
+            {w:'quälerisch', p:'adj', ua:'мучительський, садистський'}
+        ]
+    },
+    {
+        word: 'reißen', meaning: 'рвати(ся)',
+        items: [
+            {w:'reißen', p:'v', ua:'рвати(ся)', ex:'Das Seil ist plötzlich gerissen.', s:false},
+            {w:'zerreißen', p:'v', ua:'розірвати на частини', ex:'Er zerriss den Brief, ohne ihn zu lesen.', s:true},
+            {w:'die Zerrissenheit', p:'n', ua:'внутрішній розлад, розшарпаність', ex:'Die Zerrissenheit zwischen Pflicht und Wunsch quälte sie.', s:true},
+            {w:'der Riss', p:'n', ua:'тріщина, розрив', ex:'In der Wand war ein tiefer Riss zu sehen.', s:false},
+            {w:'der Ausreißer', p:'n', ua:'втікач; викид у статистиці'},
+            {w:'der Einriss', p:'n', ua:'розрив, надрив'},
+            {w:'abreißen', p:'v', ua:'зносити, відривати'},
+            {w:'ausreißen', p:'v', ua:'тікати; виривати'},
+            {w:'mitreißen', p:'v', ua:'захоплювати, нести за собою'},
+            {w:'reißend', p:'adj', ua:'бурхливий, стрімкий (про річку)'}
+        ]
+    },
+    {
+        word: 'schwer', meaning: 'важкий, складний',
+        items: [
+            {w:'schwer', p:'adj', ua:'важкий, складний', ex:'Die Prüfung war viel schwerer als erwartet.', s:false},
+            {w:'schwierig', p:'adj', ua:'складний', ex:'Die Situation ist gerade sehr schwierig für sie.', s:true},
+            {w:'die Schwierigkeit', p:'n', ua:'складність', ex:'Er hatte große Schwierigkeiten, den Text zu verstehen.', s:true},
+            {w:'erschweren', p:'v', ua:'ускладнювати', ex:'Der starke Regen erschwerte die Suche nach den Wanderern.', s:true},
+            {w:'die Erschwernis', p:'n', ua:'ускладнення, перешкода', ex:'Der Sprachunterschied war eine zusätzliche Erschwernis.', s:false},
+            {w:'der Schwerpunkt', p:'n', ua:'акцент, центр ваги'},
+            {w:'die Schwerkraft', p:'n', ua:'сила тяжіння'},
+            {w:'das Schwergewicht', p:'n', ua:'важка вага; головний акцент'},
+            {w:'die Beschwerde', p:'n', ua:'скарга'},
+            {w:'sich beschweren', p:'v', ua:'скаржитися', s:true},
+            {w:'erschwert', p:'adj', ua:'ускладнений'}
+        ]
+    },
+    {
+        word: 'wählen', meaning: 'вибирати, голосувати',
+        items: [
+            {w:'wählen', p:'v', ua:'вибирати, голосувати', ex:'Wen wirst du bei der nächsten Wahl wählen?', s:true},
+            {w:'die Wahl', p:'n', ua:'вибір, вибори', ex:'Die Wahl des richtigen Studiengangs war nicht einfach.', s:true},
+            {w:'auswählen', p:'v', ua:'обирати (з декількох)', ex:'Sie musste ein Geschenk für ihn auswählen.', s:false},
+            {w:'die Auswahl', p:'n', ua:'вибір, асортимент', ex:'Die Auswahl an Käsesorten war riesig.', s:false},
+            {w:'die Wahlmöglichkeit', p:'n', ua:'можливість вибору', ex:'Am Ende blieb ihm keine Wahlmöglichkeit.', s:true},
+            {w:'der Wähler', p:'n', ua:'виборець'},
+            {w:'der Wahlkampf', p:'n', ua:'виборча кампанія'},
+            {w:'das Wahlrecht', p:'n', ua:'виборче право'},
+            {w:'die Wahlbeteiligung', p:'n', ua:'явка виборців'},
+            {w:'abwählen', p:'v', ua:'не переобрати, голосувати проти'},
+            {w:'wählerisch', p:'adj', ua:'перебірливий'}
+        ]
+    },
+    {
+        word: 'wandeln', meaning: 'перетворювати(ся)',
+        items: [
+            {w:'der Wandel', p:'n', ua:'зміна, перетворення', ex:'Der digitale Wandel verändert unsere Arbeitswelt.', s:true},
+            {w:'wandeln', p:'v', ua:'перетворювати(ся) (урочисто)', ex:'Die Raupe wandelt sich in einen Schmetterling.', s:true},
+            {w:'umwandeln', p:'v', ua:'перетворювати, конвертувати', ex:'Die Sonnenenergie wird in Strom umgewandelt.', s:true},
+            {w:'verwandeln', p:'v', ua:'перетворювати', ex:'Die Liebe hat ihn völlig verwandelt.', s:false},
+            {w:'die Verwandlung', p:'n', ua:'перетворення', ex:'Seine Verwandlung war für alle überraschend.', s:false},
+            {w:'die Umwandlung', p:'n', ua:'перетворення, конвертація'},
+            {w:'wandelbar', p:'adj', ua:'мінливий, здатний змінюватися'}
+        ]
+    },
+    {
+        word: 'sehen', meaning: 'бачити',
+        items: [
+            {w:'sehen', p:'v', ua:'бачити', ex:'Ich sehe dich morgen in der Schule.', s:false},
+            {w:'die Sicht', p:'n', ua:'вигляд, точка зору', ex:'Aus meiner Sicht war die Entscheidung richtig.', s:false},
+            {w:'die Absicht', p:'n', ua:'намір, ціль', ex:'Er hatte nicht die Absicht, sie zu verletzen.', s:true},
+            {w:'die Aussicht', p:'n', ua:'перспектива, краєвид', ex:'Von hier oben hat man eine tolle Aussicht.', s:true},
+            {w:'die Ansicht', p:'n', ua:'погляд, думка', ex:'Meiner Ansicht nach ist das keine gute Idee.', s:true},
+            {w:'ansehen', p:'v', ua:'дивитися на, оглядати', ex:'Wir haben uns gestern den neuen Film angesehen.', s:true},
+            {w:'die Rücksicht', p:'n', ua:'уважність, тактовність (до когось)', ex:'Er nimmt nie Rücksicht auf andere.', s:false},
+            {w:'die Vorsicht', p:'n', ua:'обережність'},
+            {w:'die Weitsicht', p:'n', ua:'далекоглядність'},
+            {w:'übersehen', p:'v', ua:'не помітити, проглядіти'},
+            {w:'nachsehen', p:'v', ua:'перевірити, подивитися'},
+            {w:'vorsehen', p:'v', ua:'передбачати, планувати'},
+            {w:'fernsehen', p:'v', ua:'дивитися телевізор', s:true},
+            {w:'sichtbar', p:'adj', ua:'видимий'},
+            {w:'unsichtbar', p:'adj', ua:'невидимий'}
+        ]
+    },
+    {
+        word: 'stellen', meaning: 'ставити, класти',
+        items: [
+            {w:'stellen', p:'v', ua:'ставити, класти (вертикально)', ex:'Stell die Vase bitte auf den Tisch.', s:false},
+            {w:'die Stellung', p:'n', ua:'позиція, посада', ex:'Sie hat eine wichtige Stellung im Unternehmen.', s:true},
+            {w:'die Einstellung', p:'n', ua:'ставлення; прийняття на роботу', ex:'Seine Einstellung zur Arbeit hat sich verändert.', s:true},
+            {w:'feststellen', p:'v', ua:'констатувати, з’ясовувати', ex:'Der Arzt konnte keine Verletzung feststellen.', s:true},
+            {w:'sich vorstellen', p:'v', ua:'уявляти собі; представлятися', ex:'Ich kann mir das gar nicht vorstellen.', s:true},
+            {w:'die Vorstellung', p:'n', ua:'уявлення; вистава', ex:'Ihre Vorstellung von Erfolg ist anders als meine.', s:true},
+            {w:'darstellen', p:'v', ua:'зображати, представляти', ex:'Das Gemälde stellt eine Landschaft dar.', s:true},
+            {w:'die Darstellung', p:'n', ua:'зображення, виклад', ex:'Die Darstellung der Ereignisse war sehr detailliert.', s:false},
+            {w:'die Anstellung', p:'n', ua:'працевлаштування, посада', s:true},
+            {w:'die Herstellung', p:'n', ua:'виробництво'},
+            {w:'die Bereitstellung', p:'n', ua:'надання, забезпечення'},
+            {w:'herstellen', p:'v', ua:'виробляти', s:true},
+            {w:'anstellen', p:'v', ua:'наймати на роботу; коїти'},
+            {w:'bereitstellen', p:'v', ua:'надавати, готувати'},
+            {w:'angestellt', p:'adj', ua:'найнятий, працевлаштований'}
+        ]
+    },
+    {
+        word: 'ziehen', meaning: 'тягнути, рухатися',
+        items: [
+            {w:'ziehen', p:'v', ua:'тягнути; переїжджати', ex:'Wir ziehen im Sommer in eine neue Wohnung.', s:false},
+            {w:'anziehen', p:'v', ua:'одягати; притягувати', ex:'Zieh dir eine warme Jacke an.', s:true},
+            {w:'ausziehen', p:'v', ua:'знімати (одяг); виїжджати', ex:'Er ist letzte Woche aus der WG ausgezogen.', s:true},
+            {w:'beziehen', p:'v', ua:'отримувати регулярно; стосуватися', ex:'Diese Aussage bezieht sich auf das letzte Kapitel.', s:true},
+            {w:'vorziehen', p:'v', ua:'віддавати перевагу', ex:'Ich ziehe Tee dem Kaffee vor.', s:true},
+            {w:'durchziehen', p:'v', ua:'довести до кінця', ex:'Sie hat ihren Plan konsequent durchgezogen.', s:true},
+            {w:'heranziehen', p:'v', ua:'залучати (джерело, приклад)', ex:'Der Autor zieht mehrere Studien zur Beweisführung heran.', s:true},
+            {w:'der Zug', p:'n', ua:'потяг; ковток; хід (у грі)', ex:'Der Zug nach Berlin fährt in zehn Minuten.', s:true},
+            {w:'die Beziehung', p:'n', ua:'стосунки, зв’язок'},
+            {w:'die Erziehung', p:'n', ua:'виховання'},
+            {w:'der Umzug', p:'n', ua:'переїзд'},
+            {w:'der Anzug', p:'n', ua:'костюм'},
+            {w:'der Auszug', p:'n', ua:'виїзд; витяг (з тексту)'},
+            {w:'der Bezug', p:'n', ua:'покриття; посилання'},
+            {w:'erziehen', p:'v', ua:'виховувати'},
+            {w:'umziehen', p:'v', ua:'переїжджати; переодягатися', s:true}
+        ]
+    },
+    {
+        word: 'fallen', meaning: 'падати',
+        items: [
+            {w:'fallen', p:'v', ua:'падати', ex:'Das Blatt fällt langsam vom Baum.', s:false},
+            {w:'der Fall', p:'n', ua:'випадок; падіння', ex:'In diesem Fall hast du recht.', s:true},
+            {w:'auffallen', p:'v', ua:'впадати в око, виділятися', ex:'Ihr neues Kleid ist allen sofort aufgefallen.', s:true},
+            {w:'wegfallen', p:'v', ua:'скасовуватися, зникати', ex:'Diese Regel wird ab nächstem Jahr wegfallen.', s:true},
+            {w:'zusammenfallen', p:'v', ua:'збігатися (у часі)', ex:'Ihre Geburtstage fallen genau zusammen.', s:true},
+            {w:'leichtfallen', p:'v', ua:'даватися легко', ex:'Mathematik ist ihr schon immer leichtgefallen.', s:true},
+            {w:'schwerfallen', p:'v', ua:'даватися важко', ex:'Es fällt ihm schwer, um Hilfe zu bitten.', s:true},
+            {w:'der Zufall', p:'n', ua:'випадковість'},
+            {w:'der Ausfall', p:'n', ua:'відмова, збій'},
+            {w:'der Verfall', p:'n', ua:'занепад, розпад'},
+            {w:'der Einfall', p:'n', ua:'ідея, задум', s:true},
+            {w:'ausfallen', p:'v', ua:'скасовуватися; випадати'},
+            {w:'verfallen', p:'v', ua:'занепадати; втрачати чинність'},
+            {w:'einfallen', p:'v', ua:'спадати на думку'},
+            {w:'zufällig', p:'adj', ua:'випадковий'}
+        ]
+    },
+    {
+        word: 'Sinn', meaning: 'сенс, чуття',
+        items: [
+            {w:'der Sinn', p:'n', ua:'сенс, значення', ex:'Ich verstehe den Sinn dieser Übung nicht.', s:true},
+            {w:'sinnvoll', p:'adj', ua:'осмислений, доцільний', ex:'Es wäre sinnvoll, früher anzufangen.', s:false},
+            {w:'sinnlos', p:'adj', ua:'безглуздий', ex:'Diese Diskussion ist völlig sinnlos.', s:false},
+            {w:'sinnieren', p:'v', ua:'роздумувати, розмірковувати', ex:'Er saß am Fenster und sinnierte über sein Leben.', s:true},
+            {w:'die Sinnhaftigkeit', p:'n', ua:'осмисленість', ex:'Viele hinterfragen die Sinnhaftigkeit ihrer Arbeit.', s:true},
+            {w:'der Wahnsinn', p:'n', ua:'божевілля'},
+            {w:'der Unsinn', p:'n', ua:'нісенітниця'},
+            {w:'wahnsinnig', p:'adj', ua:'божевільний', s:true},
+            {w:'sinngemäß', p:'adj', ua:'за змістом, приблизний'}
+        ]
+    },
+    {
+        word: 'kennen', meaning: 'знати, бути знайомим',
+        items: [
+            {w:'kennen', p:'v', ua:'знати, бути знайомим', ex:'Ich kenne diese Stadt sehr gut.', s:false},
+            {w:'erkennen', p:'v', ua:'впізнавати, розпізнавати', ex:'Ich habe ihn sofort erkannt.', s:true},
+            {w:'die Erkenntnis', p:'n', ua:'висновок, відкриття', ex:'Diese Erkenntnis hat die Forschung verändert.', s:true},
+            {w:'bekannt', p:'adj', ua:'відомий, знайомий', ex:'Sie ist eine bekannte Schauspielerin.', s:false},
+            {w:'die Kenntnis', p:'n', ua:'знання, обізнаність', ex:'Gute Sprachkenntnisse sind hier Voraussetzung.', s:false},
+            {w:'die Anerkennung', p:'n', ua:'визнання'},
+            {w:'das Kennzeichen', p:'n', ua:'ознака; номерний знак'},
+            {w:'anerkennen', p:'v', ua:'визнавати'},
+            {w:'sich auskennen', p:'v', ua:'добре орієнтуватися, розбиратися'},
+            {w:'kennzeichnen', p:'v', ua:'позначати, характеризувати'},
+            {w:'kenntlich', p:'adj', ua:'розпізнаваний'},
+            {w:'unkenntlich', p:'adj', ua:'невпізнаваний'}
+        ]
+    },
+    {
+        word: 'greifen', meaning: 'хапати, сягати',
+        items: [
+            {w:'greifen', p:'v', ua:'хапати, сягати рукою', ex:'Sie griff nach ihrem Handy.', s:true},
+            {w:'begreifen', p:'v', ua:'осягати, розуміти', ex:'Er konnte einfach nicht begreifen, warum sie gegangen war.', s:true},
+            {w:'der Begriff', p:'n', ua:'поняття, термін', ex:'Kannst du diesen Begriff genauer erklären?', s:false},
+            {w:'begreiflich', p:'adj', ua:'зрозумілий', ex:'Ihre Reaktion ist durchaus begreiflich.', s:false},
+            {w:'der Angriff', p:'n', ua:'напад, атака'},
+            {w:'der Zugriff', p:'n', ua:'доступ'},
+            {w:'der Eingriff', p:'n', ua:'втручання'},
+            {w:'angreifen', p:'v', ua:'атакувати'},
+            {w:'zugreifen', p:'v', ua:'отримувати доступ; хапати'},
+            {w:'eingreifen', p:'v', ua:'втручатися', s:true},
+            {w:'greifbar', p:'adj', ua:'відчутний, досяжний'},
+            {w:'unbegreiflich', p:'adj', ua:'незбагненний'}
+        ]
+    },
+    {
+        word: 'schätzen', meaning: 'оцінювати, цінувати',
+        items: [
+            {w:'schätzen', p:'v', ua:'оцінювати; цінувати', ex:'Ich schätze deine Ehrlichkeit sehr.', s:true},
+            {w:'die Schätzung', p:'n', ua:'оцінка, прикидка', ex:'Nach ersten Schätzungen kostet das Projekt eine Million.', s:false},
+            {w:'die Wertschätzung', p:'n', ua:'повага, визнання', ex:'Ihm fehlt oft die Wertschätzung seiner Kollegen.', s:false},
+            {w:'unterschätzen', p:'v', ua:'недооцінювати', ex:'Man sollte diesen Gegner nicht unterschätzen.', s:false},
+            {w:'überschätzen', p:'v', ua:'переоцінювати', ex:'Er hat seine eigenen Fähigkeiten überschätzt.', s:false},
+            {w:'geringschätzen', p:'v', ua:'зневажати, недооцінювати'},
+            {w:'die Einschätzung', p:'n', ua:'оцінка, судження'},
+            {w:'die Geringschätzung', p:'n', ua:'зневага'},
+            {w:'einschätzen', p:'v', ua:'оцінювати, судити про'},
+            {w:'geschätzt', p:'adj', ua:'шанований; оцінений'}
+        ]
+    },
+    {
+        word: 'führen', meaning: 'вести, керувати',
+        items: [
+            {w:'führen', p:'v', ua:'вести, керувати', ex:'Sie führt die Abteilung seit zwei Jahren.', s:false},
+            {w:'die Führung', p:'n', ua:'керівництво, провід', ex:'Die Führung des Unternehmens hat gewechselt.', s:false},
+            {w:'anführen', p:'v', ua:'очолювати; наводити (докази)', ex:'Er konnte keine überzeugenden Argumente anführen.', s:true},
+            {w:'einführen', p:'v', ua:'вводити, впроваджувати', ex:'Die Schule will ein neues Bewertungssystem einführen.', s:true},
+            {w:'durchführen', p:'v', ua:'проводити, здійснювати', ex:'Die Studie wurde an drei Universitäten durchgeführt.', s:true},
+            {w:'der Anführer', p:'n', ua:'ватажок, лідер'},
+            {w:'die Ausführung', p:'n', ua:'виконання, версія'},
+            {w:'die Verführung', p:'n', ua:'спокуса'},
+            {w:'der Führerschein', p:'n', ua:'водійські права'},
+            {w:'vorführen', p:'v', ua:'демонструвати'},
+            {w:'verführen', p:'v', ua:'спокушати'},
+            {w:'ausführlich', p:'adj', ua:'детальний, докладний'}
+        ]
+    },
+    {
+        word: 'sagen', meaning: 'казати',
+        items: [
+            {w:'sagen', p:'v', ua:'казати', ex:'Sag mir bitte die Wahrheit.', s:false},
+            {w:'die Aussage', p:'n', ua:'висловлювання, свідчення', ex:'Seine Aussage widersprach den Tatsachen.', s:true},
+            {w:'aussagekräftig', p:'adj', ua:'промовистий, показовий', ex:'Die Grafik ist sehr aussagekräftig.', s:true},
+            {w:'die Ansage', p:'n', ua:'оголошення', ex:'Am Bahnhof kam eine Ansage über die Verspätung.', s:false},
+            {w:'versagen', p:'v', ua:'зазнавати невдачі; відмовляти (про техніку)', ex:'Die Bremsen haben plötzlich versagt.', s:false},
+            {w:'die Absage', p:'n', ua:'відмова, скасування'},
+            {w:'die Zusage', p:'n', ua:'згода, підтвердження'},
+            {w:'absagen', p:'v', ua:'скасовувати, відмовляти'},
+            {w:'zusagen', p:'v', ua:'погоджуватися, підходити'},
+            {w:'untersagen', p:'v', ua:'офіційно забороняти'}
+        ]
+    },
+    {
+        word: 'springen', meaning: 'стрибати',
+        items: [
+            {w:'springen', p:'v', ua:'стрибати', ex:'Die Kinder springen fröhlich auf dem Trampolin.', s:false},
+            {w:'entspringen', p:'v', ua:'походити, брати початок від', ex:'Seine Angst entspringt einer Kindheitserinnerung.', s:true},
+            {w:'der Ursprung', p:'n', ua:'походження, першоджерело', ex:'Der Ursprung dieser Tradition liegt im Mittelalter.', s:false},
+            {w:'der Sprung', p:'n', ua:'стрибок', ex:'Der Sprung ins kalte Wasser fiel ihr schwer.', s:false},
+            {w:'das Sprungbrett', p:'n', ua:'трамплін, стартова платформа'},
+            {w:'der Vorsprung', p:'n', ua:'перевага, фора'},
+            {w:'überspringen', p:'v', ua:'перестрибувати, пропускати'},
+            {w:'abspringen', p:'v', ua:'зіскакувати; відмовлятися (від плану)'},
+            {w:'ursprünglich', p:'adj', ua:'первісний, оригінальний'}
+        ]
+    },
+    {
+        word: 'treiben', meaning: 'гнати, займатися (спортом)',
+        items: [
+            {w:'treiben', p:'v', ua:'займатися (спортом); гнати', ex:'Er treibt jeden Tag Sport.', s:true},
+            {w:'der Antrieb', p:'n', ua:'спонука, поштовх', ex:'Neugier war schon immer ihr größter Antrieb.', s:true},
+            {w:'vorantreiben', p:'v', ua:'просувати вперед', ex:'Die Firma will die Digitalisierung vorantreiben.', s:true},
+            {w:'der Betrieb', p:'n', ua:'підприємство; робота (механізму)', ex:'Der Betrieb beschäftigt über 200 Mitarbeiter.', s:false},
+            {w:'der Zeitvertreib', p:'n', ua:'проведення часу, розвага'},
+            {w:'die Vertreibung', p:'n', ua:'вигнання'},
+            {w:'das Treibhaus', p:'n', ua:'теплиця, оранжерея'},
+            {w:'vertreiben', p:'v', ua:'виганяти; продавати'},
+            {w:'auftreiben', p:'v', ua:'роздобути'}
+        ]
+    },
+    {
+        word: 'schlagen', meaning: 'бити',
+        items: [
+            {w:'schlagen', p:'v', ua:'бити; перемагати', ex:'Er hat mit der Faust auf den Tisch geschlagen.', s:true},
+            {w:'der Schlag', p:'n', ua:'удар', ex:'Der Schlag traf ihn völlig unvorbereitet.', s:false},
+            {w:'vorschlagen', p:'v', ua:'пропонувати', ex:'Ich schlage vor, dass wir morgen früh starten.', s:false},
+            {w:'der Vorschlag', p:'n', ua:'пропозиція', ex:'Das war ein wirklich guter Vorschlag.', s:true},
+            {w:'der Anschlag', p:'n', ua:'замах; оголошення'},
+            {w:'der Ausschlag', p:'n', ua:'висип; вирішальний фактор'},
+            {w:'der Einschlag', p:'n', ua:'удар, влучення'},
+            {w:'einschlagen', p:'v', ua:'влучати; йти певним шляхом'},
+            {w:'zuschlagen', p:'v', ua:'бити; захряснути'},
+            {w:'schlagkräftig', p:'adj', ua:'потужний, ефективний'}
+        ]
+    },
+    {
+        word: 'leiten', meaning: 'керувати, спрямовувати',
+        items: [
+            {w:'leiten', p:'v', ua:'керувати, спрямовувати', ex:'Wer leitet dieses Projekt?', s:true},
+            {w:'der Leiter', p:'n', ua:'керівник', ex:'Der Leiter der Abteilung ist heute nicht im Haus.', s:true},
+            {w:'die Leitung', p:'n', ua:'керівництво; лінія (кабель)', ex:'Die Leitung des Krankenhauses hat sich geändert.', s:false},
+            {w:'einleiten', p:'v', ua:'започатковувати, вводити', ex:'Der Anwalt hat rechtliche Schritte eingeleitet.', s:false},
+            {w:'die Anleitung', p:'n', ua:'інструкція, посібник'},
+            {w:'die Ableitung', p:'n', ua:'похідне слово; виведення'},
+            {w:'die Weiterleitung', p:'n', ua:'пересилання'},
+            {w:'ableiten', p:'v', ua:'виводити, встановлювати похідне'},
+            {w:'anleiten', p:'v', ua:'інструктувати, скеровувати'},
+            {w:'weiterleiten', p:'v', ua:'пересилати'},
+            {w:'leitend', p:'adj', ua:'керівний, провідний'}
+        ]
+    },
+    {
+        word: 'dienen', meaning: 'служити',
+        items: [
+            {w:'dienen', p:'v', ua:'служити, слугувати', ex:'Dieses Zimmer dient jetzt als Büro.', s:false},
+            {w:'der Dienst', p:'n', ua:'служба, послуга', ex:'Er ist seit zehn Jahren im öffentlichen Dienst.', s:true},
+            {w:'bedienen', p:'v', ua:'обслуговувати; керувати (пристроєм)', ex:'Können Sie diese Maschine bedienen?', s:false},
+            {w:'die Bedienung', p:'n', ua:'обслуговування', ex:'Die Bedienung im Restaurant war sehr freundlich.', s:false},
+            {w:'die Dienstleistung', p:'n', ua:'послуга'},
+            {w:'der Dienstleister', p:'n', ua:'постачальник послуг'},
+            {w:'die Dienstreise', p:'n', ua:'відрядження'},
+            {w:'der Verdienst', p:'n', ua:'заробіток; заслуга'},
+            {w:'verdienen', p:'v', ua:'заробляти; заслуговувати', s:true}
+        ]
+    },
+    {
+        word: 'teilen', meaning: 'ділити, ділитися',
+        items: [
+            {w:'teilen', p:'v', ua:'ділити, ділитися', ex:'Wir haben uns die Pizza geteilt.', s:true},
+            {w:'mitteilen', p:'v', ua:'повідомляти', ex:'Sie hat uns die Neuigkeit sofort mitgeteilt.', s:true},
+            {w:'die Mitteilung', p:'n', ua:'повідомлення', ex:'Ich habe eine wichtige Mitteilung für euch.', s:false},
+            {w:'der Anteil', p:'n', ua:'частка, частина', ex:'Ihr Anteil am Erfolg wird oft unterschätzt.', s:false},
+            {w:'beteiligen', p:'v', ua:'залучати, брати участь', ex:'Alle Mitarbeiter waren an dem Projekt beteiligt.', s:false},
+            {w:'die Abteilung', p:'n', ua:'відділ'},
+            {w:'das Urteil', p:'n', ua:'вирок, судження', s:true},
+            {w:'das Vorurteil', p:'n', ua:'упередження', s:true},
+            {w:'die Teilnahme', p:'n', ua:'участь'},
+            {w:'der Teilnehmer', p:'n', ua:'учасник'},
+            {w:'urteilen', p:'v', ua:'судити, виносити вирок'},
+            {w:'verurteilen', p:'v', ua:'засуджувати', s:true},
+            {w:'teilnehmen', p:'v', ua:'брати участь'}
+        ]
+    },
+    {
+        word: 'sorgen', meaning: 'турбуватися',
+        items: [
+            {w:'sich Sorgen machen', p:'v', ua:'турбуватися, хвилюватися', ex:'Mach dir keine Sorgen, alles wird gut.', s:false},
+            {w:'die Sorge', p:'n', ua:'турбота, тривога', ex:'Die Sorge um ihre Zukunft ließ sie nicht schlafen.', s:false},
+            {w:'sorgen für', p:'v', ua:'дбати, піклуватися про', ex:'Er sorgt allein für seine drei Kinder.', s:false},
+            {w:'besorgt', p:'adj', ua:'занепокоєний', ex:'Die Eltern wirkten sehr besorgt.', s:false},
+            {w:'versorgen', p:'v', ua:'забезпечувати, доглядати', ex:'Sie versorgt ihre kranke Mutter jeden Tag.', s:false},
+            {w:'die Fürsorge', p:'n', ua:'турбота, соціальна опіка'},
+            {w:'die Vorsorge', p:'n', ua:'профілактика, запобіжні заходи'},
+            {w:'die Sorgfalt', p:'n', ua:'ретельність'},
+            {w:'das Sorgerecht', p:'n', ua:'право опіки'},
+            {w:'vorsorgen', p:'v', ua:'дбати заздалегідь, робити запас'},
+            {w:'sorgfältig', p:'adj', ua:'ретельний'},
+            {w:'sorglos', p:'adj', ua:'безтурботний'},
+            {w:'fürsorglich', p:'adj', ua:'турботливий'}
+        ]
+    },
+    {
+        word: 'finden', meaning: 'знаходити',
+        items: [
+            {w:'sich finden', p:'v', ua:'знайтися; знайти себе', ex:'Zum Glück hat sich der verlorene Schlüssel wiedergefunden.', s:true},
+            {w:'auffinden', p:'v', ua:'відшуковувати', ex:'Die Wanderer wurden nach zwei Tagen aufgefunden.', s:true},
+            {w:'erfinden', p:'v', ua:'винаходити', ex:'Wer hat eigentlich das Telefon erfunden?', s:true},
+            {w:'die Erfindung', p:'n', ua:'винахід', ex:'Diese Erfindung hat die Kommunikation revolutioniert.', s:false},
+            {w:'vorfinden', p:'v', ua:'заставати (у певному стані)', ex:'Er fand die Wohnung in einem chaotischen Zustand vor.', s:true},
+            {w:'der Erfinder', p:'n', ua:'винахідник'},
+            {w:'der Fund', p:'n', ua:'знахідка'},
+            {w:'das Fundbüro', p:'n', ua:'бюро знахідок'},
+            {w:'findig', p:'adj', ua:'кмітливий, винахідливий'},
+            {w:'unauffindbar', p:'adj', ua:'той, кого/що неможливо знайти'}
+        ]
+    },
+    {
+        word: 'sprechen', meaning: 'говорити',
+        items: [
+            {w:'sprechen', p:'v', ua:'говорити', ex:'Sprichst du auch Französisch?', s:false},
+            {w:'versprechen', p:'v', ua:'обіцяти', ex:'Er hat versprochen, pünktlich zu sein.', s:true},
+            {w:'das Versprechen', p:'n', ua:'обіцянка'},
+            {w:'besprechen', p:'v', ua:'обговорювати', ex:'Wir sollten das Problem in Ruhe besprechen.', s:true},
+            {w:'die Besprechung', p:'n', ua:'нарада, обговорення'},
+            {w:'entsprechen', p:'v', ua:'відповідати (вимогам)', ex:'Das Ergebnis entspricht nicht unseren Erwartungen.', s:true},
+            {w:'entsprechend', p:'adj', ua:'відповідний'},
+            {w:'ansprechen', p:'v', ua:'звертатися до; зачіпати (тему)', ex:'Sie hat mich direkt auf das Problem angesprochen.', s:true},
+            {w:'ansprechend', p:'adj', ua:'привабливий', s:true},
+            {w:'die Sprache', p:'n', ua:'мова'},
+            {w:'das Gespräch', p:'n', ua:'розмова'},
+            {w:'die Ansprache', p:'n', ua:'промова, звернення'},
+            {w:'der Widerspruch', p:'n', ua:'суперечність'},
+            {w:'die Aussprache', p:'n', ua:'вимова; з’ясування стосунків'},
+            {w:'widersprechen', p:'v', ua:'суперечити'},
+            {w:'aussprechen', p:'v', ua:'вимовляти; висловлювати'},
+            {w:'sprachlos', p:'adj', ua:'той, хто втратив мову (від подиву)'}
+        ]
+    },
+    {
+        word: 'brauchen', meaning: 'потребувати',
+        items: [
+            {w:'brauchen', p:'v', ua:'потребувати, бути потрібним', ex:'Ich brauche noch etwas Zeit.', s:true},
+            {w:'gebrauchen', p:'v', ua:'застосовувати, використовувати', ex:'Diesen alten Trick kann man immer gebrauchen.', s:true},
+            {w:'der Gebrauch', p:'n', ua:'вживання, застосування'},
+            {w:'verbrauchen', p:'v', ua:'споживати', ex:'Der neue Kühlschrank verbraucht weniger Strom.', s:true},
+            {w:'der Verbrauch', p:'n', ua:'споживання'},
+            {w:'der Verbraucher', p:'n', ua:'споживач'},
+            {w:'missbrauchen', p:'v', ua:'зловживати'},
+            {w:'der Missbrauch', p:'n', ua:'зловживання'},
+            {w:'unbrauchbar', p:'adj', ua:'непридатний'},
+            {w:'gebräuchlich', p:'adj', ua:'вживаний, поширений'}
+        ]
+    },
+    {
+        word: 'setzen', meaning: 'садити, ставити',
+        items: [
+            {w:'setzen', p:'v', ua:'садити, ставити', ex:'Setz den Topf auf den Herd.', s:false},
+            {w:'sich setzen', p:'v', ua:'сідати', ex:'Setz dich doch bitte.', s:true},
+            {w:'einsetzen', p:'v', ua:'застосовувати, залучати', ex:'Die Firma setzt neue Technologien ein.', s:true},
+            {w:'der Einsatz', p:'n', ua:'застосування; ставка; самовіддача'},
+            {w:'fortsetzen', p:'v', ua:'продовжувати', ex:'Wir setzen die Diskussion morgen fort.', s:true},
+            {w:'die Fortsetzung', p:'n', ua:'продовження'},
+            {w:'voraussetzen', p:'v', ua:'припускати, вимагати', ex:'Der Job setzt gute Englischkenntnisse voraus.', s:true},
+            {w:'die Voraussetzung', p:'n', ua:'передумова'},
+            {w:'sich durchsetzen', p:'v', ua:'домагатися свого, утверджуватися', ex:'Sie hat sich gegen alle Widerstände durchgesetzt.', s:true},
+            {w:'ersetzen', p:'v', ua:'заміняти', ex:'Diesen Fehler kann nichts ersetzen.', s:true},
+            {w:'der Ersatz', p:'n', ua:'заміна'},
+            {w:'umsetzen', p:'v', ua:'реалізовувати, втілювати', ex:'Die Idee lässt sich schwer umsetzen.', s:true},
+            {w:'die Umsetzung', p:'n', ua:'реалізація, втілення'},
+            {w:'übersetzen', p:'v', ua:'перекладати'},
+            {w:'die Übersetzung', p:'n', ua:'переклад'},
+            {w:'der Übersetzer', p:'n', ua:'перекладач'},
+            {w:'besetzen', p:'v', ua:'займати; заповнювати (посаду)'},
+            {w:'die Besetzung', p:'n', ua:'склад (акторів); заповнення посади', s:true}
+        ]
+    },
+    {
+        word: 'ändern', meaning: 'змінювати',
+        items: [
+            {w:'ändern', p:'v', ua:'змінювати', ex:'Wir müssen den Plan ändern.', s:true},
+            {w:'verändern', p:'v', ua:'змінювати, перетворювати', ex:'Die Stadt hat sich in zehn Jahren stark verändert.', s:true},
+            {w:'die Veränderung', p:'n', ua:'зміна', s:true},
+            {w:'abändern', p:'v', ua:'вносити зміни', s:true},
+            {w:'die Änderung', p:'n', ua:'зміна'},
+            {w:'unverändert', p:'adj', ua:'незмінний'},
+            {w:'veränderlich', p:'adj', ua:'мінливий'}
+        ]
+    },
+    {
+        word: 'lassen', meaning: 'дозволяти, залишати',
+        items: [
+            {w:'lassen', p:'v', ua:'дозволяти; залишати', ex:'Lass mich bitte in Ruhe.', s:false},
+            {w:'zulassen', p:'v', ua:'допускати', ex:'Der Direktor lässt keine Ausnahmen zu.', s:true},
+            {w:'zulässig', p:'adj', ua:'допустимий', s:true},
+            {w:'die Zulassung', p:'n', ua:'допуск; ліцензія, реєстрація'},
+            {w:'verlassen', p:'v', ua:'залишати, покидати', ex:'Sie hat die Stadt vor zwei Jahren verlassen.', s:false},
+            {w:'sich verlassen auf', p:'v', ua:'покладатися на'},
+            {w:'loslassen', p:'v', ua:'відпускати', s:true},
+            {w:'nachlassen', p:'v', ua:'слабшати', s:true},
+            {w:'auslassen', p:'v', ua:'пропускати', s:true},
+            {w:'unterlassen', p:'v', ua:'утримуватися від, не робити'},
+            {w:'überlassen', p:'v', ua:'залишати на розсуд, передавати'},
+            {w:'gelassen', p:'adj', ua:'спокійний, незворушний'},
+            {w:'die Gelassenheit', p:'n', ua:'спокій, незворушність'}
+        ]
+    },
+    {
+        word: 'drücken', meaning: 'тиснути',
+        items: [
+            {w:'drücken', p:'v', ua:'тиснути', ex:'Bitte auf den roten Knopf drücken.', s:false},
+            {w:'ausdrücken', p:'v', ua:'виражати', ex:'Sie konnte ihre Gefühle nicht in Worte fassen und ausdrücken.', s:true},
+            {w:'der Ausdruck', p:'n', ua:'вираз (обличчя, слово)', s:true},
+            {w:'ausdrücklich', p:'adj', ua:'явний, чіткий, недвозначний'},
+            {w:'der Eindruck', p:'n', ua:'враження', s:true},
+            {w:'eindrucksvoll', p:'adj', ua:'вражаючий', s:true},
+            {w:'unterdrücken', p:'v', ua:'придушувати, пригнічувати', ex:'Das Regime unterdrückt jede Kritik.', s:true},
+            {w:'die Unterdrückung', p:'n', ua:'придушення, гноблення'},
+            {w:'bedrücken', p:'v', ua:'гнітити'},
+            {w:'bedrückend', p:'adj', ua:'гнітючий'},
+            {w:'erdrücken', p:'v', ua:'розчавити; пригнічувати'},
+            {w:'der Druck', p:'n', ua:'тиск', s:true},
+            {w:'drückend', p:'adj', ua:'задушливий', s:true}
+        ]
+    },
+    {
+        word: 'lesen', meaning: 'читати',
+        items: [
+            {w:'lesen', p:'v', ua:'читати', ex:'Er liest jeden Abend vor dem Schlafen.', s:false},
+            {w:'vorlesen', p:'v', ua:'читати вголос'},
+            {w:'die Vorlesung', p:'n', ua:'лекція'},
+            {w:'durchlesen', p:'v', ua:'прочитати повністю'},
+            {w:'nachlesen', p:'v', ua:'перечитати, звіритися з текстом'},
+            {w:'die Lesung', p:'n', ua:'читання (публічне)'},
+            {w:'der Leser', p:'n', ua:'читач'},
+            {w:'die Leserschaft', p:'n', ua:'читацька аудиторія'},
+            {w:'belesen', p:'adj', ua:'начитаний'},
+            {w:'erlesen', p:'adj', ua:'вишуканий, добірний'}
+        ]
+    },
+    {
+        word: 'glauben', meaning: 'вірити, гадати',
+        items: [
+            {w:'glauben', p:'v', ua:'гадати, вірити', ex:'Ich glaube, das war keine gute Idee.', s:true},
+            {w:'der Glaube', p:'n', ua:'віра'},
+            {w:'die Glaubwürdigkeit', p:'n', ua:'достовірність'},
+            {w:'glaubwürdig', p:'adj', ua:'достовірний, той, кому можна вірити'},
+            {w:'unglaublich', p:'adj', ua:'неймовірний'},
+            {w:'gläubig', p:'adj', ua:'віруючий'},
+            {w:'der Gläubige', p:'n', ua:'вірянин'},
+            {w:'der Aberglaube', p:'n', ua:'забобон'},
+            {w:'beglaubigen', p:'v', ua:'засвідчувати (офіційно)'},
+            {w:'die Beglaubigung', p:'n', ua:'засвідчення'}
+        ]
+    },
+    {
+        word: 'hoffen', meaning: 'сподіватися',
+        items: [
+            {w:'hoffen', p:'v', ua:'сподіватися', ex:'Ich hoffe, dass alles gut wird.', s:false},
+            {w:'sich erhoffen', p:'v', ua:'сподіватися на, розраховувати на'},
+            {w:'die Hoffnung', p:'n', ua:'надія'},
+            {w:'hoffnungsvoll', p:'adj', ua:'сповнений надії'},
+            {w:'hoffnungslos', p:'adj', ua:'безнадійний'},
+            {w:'hoffentlich', p:'adj', ua:'сподіваюся, що…'}
+        ]
+    },
+    {
+        word: 'lieben', meaning: 'любити',
+        items: [
+            {w:'lieben', p:'v', ua:'любити', ex:'Sie liebt ihre Arbeit sehr.', s:false},
+            {w:'sich verlieben', p:'v', ua:'закохуватися'},
+            {w:'die Liebe', p:'n', ua:'любов'},
+            {w:'die Beliebtheit', p:'n', ua:'популярність'},
+            {w:'lieb', p:'adj', ua:'милий, дорогий'},
+            {w:'liebevoll', p:'adj', ua:'люблячий, ніжний'},
+            {w:'beliebt', p:'adj', ua:'популярний'},
+            {w:'verliebt', p:'adj', ua:'закоханий'},
+            {w:'der Liebhaber', p:'n', ua:'коханець; поціновувач'}
+        ]
+    },
+    {
+        word: 'nehmen', meaning: 'брати',
+        items: [
+            {w:'nehmen', p:'v', ua:'брати', ex:'Nimm dir noch etwas Kuchen.', s:false},
+            {w:'annehmen', p:'v', ua:'припускати; приймати', ex:'Ich nehme an, dass er schon informiert ist.', s:true},
+            {w:'die Annahme', p:'n', ua:'припущення; прийняття'},
+            {w:'unternehmen', p:'v', ua:'вживати заходів, робити щось', ex:'Man sollte endlich etwas gegen das Problem unternehmen.'},
+            {w:'das Unternehmen', p:'n', ua:'підприємство, фірма', s:true},
+            {w:'übernehmen', p:'v', ua:'переймати, брати на себе'},
+            {w:'die Übernahme', p:'n', ua:'поглинання; переймання'},
+            {w:'zunehmen', p:'v', ua:'збільшуватися', s:true},
+            {w:'die Zunahme', p:'n', ua:'зростання'},
+            {w:'abnehmen', p:'v', ua:'зменшуватися; худнути', s:true},
+            {w:'wahrnehmen', p:'v', ua:'сприймати', s:true},
+            {w:'die Wahrnehmung', p:'n', ua:'сприйняття', s:true},
+            {w:'entnehmen', p:'v', ua:'діставати; робити висновок', s:true},
+            {w:'hinnehmen', p:'v', ua:'миритися з, терпіти'},
+            {w:'die Ausnahme', p:'n', ua:'виняток'},
+            {w:'die Einnahme', p:'n', ua:'дохід; прийом (ліків)'}
+        ]
+    },
+    {
+        word: 'bringen', meaning: 'приносити',
+        items: [
+            {w:'bringen', p:'v', ua:'приносити', ex:'Kannst du mir bitte ein Glas Wasser bringen?', s:false},
+            {w:'verbringen', p:'v', ua:'проводити (час)', ex:'Wir haben den Urlaub am Meer verbracht.', s:true},
+            {w:'mitbringen', p:'v', ua:'приносити з собою'},
+            {w:'unterbringen', p:'v', ua:'розміщувати, забезпечувати житлом'},
+            {w:'die Unterbringung', p:'n', ua:'розміщення, забезпечення житлом'},
+            {w:'umbringen', p:'v', ua:'вбивати'},
+            {w:'einbringen', p:'v', ua:'вносити; приносити (користь)'},
+            {w:'hervorbringen', p:'v', ua:'породжувати, створювати'},
+            {w:'beibringen', p:'v', ua:'навчати, прищеплювати'}
+        ]
+    },
+    {
+        word: 'stärken', meaning: 'зміцнювати; stark = сильний',
+        items: [
+            {w:'stark', p:'adj', ua:'сильний', ex:'Der Kaffee war viel zu stark.'},
+            {w:'stärken', p:'v', ua:'зміцнювати', ex:'Sport stärkt das Immunsystem.', s:true},
+            {w:'die Stärke', p:'n', ua:'сила, сильна сторона', ex:'Geduld ist eine ihrer größten Stärken.', s:true},
+            {w:'verstärken', p:'v', ua:'посилювати'},
+            {w:'die Verstärkung', p:'n', ua:'підкріплення, посилення'},
+            {w:'bestärken', p:'v', ua:'підбадьорювати, зміцнювати впевненість'},
+            {w:'erstarken', p:'v', ua:'міцніти, набирати сили'}
+        ]
+    },
+    {
+        word: 'legen', meaning: 'класти',
+        items: [
+            {w:'legen', p:'v', ua:'класти (горизонтально)', ex:'Leg das Buch bitte zurück ins Regal.', s:false},
+            {w:'anlegen', p:'v', ua:'інвестувати; закладати', ex:'Sie hat ihr Geld in Aktien angelegt.'},
+            {w:'festlegen', p:'v', ua:'визначати, встановлювати', ex:'Der Termin wurde noch nicht festgelegt.'},
+            {w:'die Festlegung', p:'n', ua:'визначення, встановлення'},
+            {w:'vorlegen', p:'v', ua:'подавати, пред’являти', ex:'Bitte legen Sie Ihren Ausweis vor.', s:true},
+            {w:'auflegen', p:'v', ua:'класти; видавати (книгу); класти слухавку'},
+            {w:'überlegen', p:'v', ua:'обмірковувати', ex:'Ich muss mir das noch einmal überlegen.', s:true},
+            {w:'die Überlegung', p:'n', ua:'роздум, міркування'},
+            {w:'die Lage', p:'n', ua:'становище, положення', s:true},
+            {w:'die Anlage', p:'n', ua:'установка; парк; здібність', s:true},
+            {w:'die Vorlage', p:'n', ua:'шаблон, зразок', s:true},
+            {w:'die Auflage', p:'n', ua:'наклад; умова'},
+            {w:'die Beilage', p:'n', ua:'додаток; гарнір'},
+            {w:'unterlegen', p:'adj', ua:'слабший, поступливий (у порівнянні)'},
+            {w:'überlegen', p:'adj', ua:'переважаючий, зверхній (naголос інший, ніж у дієслова)'}
+        ]
+    },
+    {
+        word: 'laufen', meaning: 'бігти, іти',
+        items: [
+            {w:'laufen', p:'v', ua:'бігти, іти', ex:'Sie läuft jeden Morgen eine Stunde.', s:true},
+            {w:'verlaufen', p:'v', ua:'проходити, відбуватися; sich verlaufen — заблукати', ex:'Das Gespräch verlief sehr freundlich.'},
+            {w:'ablaufen', p:'v', ua:'закінчуватися (термін); відбуватися', ex:'Mein Reisepass läuft nächsten Monat ab.'},
+            {w:'einlaufen', p:'v', ua:'прибувати (потяг); сідати (про тканину)'},
+            {w:'der Lauf', p:'n', ua:'біг; хід (подій)'},
+            {w:'der Verlauf', p:'n', ua:'перебіг', s:true},
+            {w:'der Ablauf', p:'n', ua:'перебіг; закінчення терміну', s:true},
+            {w:'der Zulauf', p:'n', ua:'приплив, наплив (людей)'},
+            {w:'der Ausläufer', p:'n', ua:'відгалуження; передгір’я'},
+            {w:'geläufig', p:'adj', ua:'звичний, вживаний'},
+            {w:'laufend', p:'adj', ua:'поточний, постійний'}
+        ]
+    },
+    {
+        word: 'fahren', meaning: 'їхати',
+        items: [
+            {w:'fahren', p:'v', ua:'їхати', ex:'Wir fahren morgen ans Meer.', s:false},
+            {w:'erfahren', p:'v', ua:'дізнаватися; зазнавати', ex:'Ich habe erst gestern davon erfahren.'},
+            {w:'verfahren', p:'v', ua:'діяти, чинити (певним чином)'},
+            {w:'abfahren', p:'v', ua:'відправлятися', ex:'Der Zug fährt in fünf Minuten ab.', s:true},
+            {w:'überfahren', p:'v', ua:'переїхати (когось/щось)'},
+            {w:'die Fahrt', p:'n', ua:'поїздка'},
+            {w:'die Erfahrung', p:'n', ua:'досвід', s:true},
+            {w:'das Verfahren', p:'n', ua:'процедура, метод', s:true},
+            {w:'die Abfahrt', p:'n', ua:'відправлення'},
+            {w:'die Ausfahrt', p:'n', ua:'виїзд'},
+            {w:'die Einfahrt', p:'n', ua:'в’їзд'},
+            {w:'die Vorfahrt', p:'n', ua:'перевага проїзду'},
+            {w:'erfahren', p:'adj', ua:'досвідчений'},
+            {w:'fahrbar', p:'adj', ua:'придатний для їзди; пересувний'}
+        ]
+    },
+    {
+        word: 'hören', meaning: 'чути',
+        items: [
+            {w:'hören', p:'v', ua:'чути', ex:'Hörst du die Musik von nebenan?', s:false},
+            {w:'zuhören', p:'v', ua:'слухати (уважно)', ex:'Er hört seinen Schülern immer genau zu.'},
+            {w:'gehorchen', p:'v', ua:'коритися, слухатися'},
+            {w:'aufhören', p:'v', ua:'припиняти', ex:'Hör auf zu reden und iss endlich.', s:true},
+            {w:'anhören', p:'v', ua:'вислухати; sich anhören — звучати'},
+            {w:'verhören', p:'v', ua:'допитувати'},
+            {w:'das Gehör', p:'n', ua:'слух'},
+            {w:'der Zuhörer', p:'n', ua:'слухач'},
+            {w:'das Verhör', p:'n', ua:'допит'},
+            {w:'der Hörsaal', p:'n', ua:'лекційна зала'},
+            {w:'hörbar', p:'adj', ua:'чутний'},
+            {w:'unerhört', p:'adj', ua:'нечуваний, обурливий'}
+        ]
+    },
+    {
+        word: 'suchen', meaning: 'шукати',
+        items: [
+            {w:'suchen', p:'v', ua:'шукати', ex:'Ich suche schon seit Stunden meine Schlüssel.', s:false},
+            {w:'versuchen', p:'v', ua:'намагатися, пробувати', ex:'Versuch es doch einfach noch einmal.', s:true},
+            {w:'untersuchen', p:'v', ua:'досліджувати, обстежувати', ex:'Der Arzt hat sie gründlich untersucht.', s:true},
+            {w:'besuchen', p:'v', ua:'відвідувати', ex:'Wir besuchen am Wochenende unsere Großeltern.', s:true},
+            {w:'heimsuchen', p:'v', ua:'вражати, спіткати (про лихо)'},
+            {w:'die Suche', p:'n', ua:'пошук'},
+            {w:'der Versuch', p:'n', ua:'спроба'},
+            {w:'die Untersuchung', p:'n', ua:'дослідження, обстеження'},
+            {w:'der Besuch', p:'n', ua:'візит'},
+            {w:'der Besucher', p:'n', ua:'відвідувач'},
+            {w:'gesucht', p:'adj', ua:'затребуваний; розшукуваний'}
+        ]
+    },
+    {
+        word: 'fragen', meaning: 'питати',
+        items: [
+            {w:'fragen', p:'v', ua:'питати', ex:'Darf ich dich etwas fragen?', s:true},
+            {w:'anfragen', p:'v', ua:'робити запит'},
+            {w:'befragen', p:'v', ua:'опитувати'},
+            {w:'hinterfragen', p:'v', ua:'ставити під сумнів, критично осмислювати', ex:'Man sollte solche Aussagen immer hinterfragen.', s:true},
+            {w:'nachfragen', p:'v', ua:'розпитувати; цікавитися попитом'},
+            {w:'die Frage', p:'n', ua:'питання'},
+            {w:'die Anfrage', p:'n', ua:'запит', s:true},
+            {w:'die Befragung', p:'n', ua:'опитування'},
+            {w:'die Nachfrage', p:'n', ua:'попит', s:true},
+            {w:'fraglich', p:'adj', ua:'сумнівний, під питанням'},
+            {w:'fragwürdig', p:'adj', ua:'сумнівний, непевний'}
+        ]
+    },
+    {
+        word: 'folgen', meaning: 'слідувати',
+        items: [
+            {w:'folgen', p:'v', ua:'слідувати', ex:'Folgen Sie mir bitte in mein Büro.', s:false},
+            {w:'erfolgen', p:'v', ua:'відбуватися (формально)'},
+            {w:'verfolgen', p:'v', ua:'переслідувати; стежити за', ex:'Die Polizei verfolgte den Verdächtigen.', s:true},
+            {w:'die Folge', p:'n', ua:'наслідок', s:true},
+            {w:'der Erfolg', p:'n', ua:'успіх', s:true},
+            {w:'die Verfolgung', p:'n', ua:'переслідування'},
+            {w:'die Folgerung', p:'n', ua:'висновок'},
+            {w:'erfolgreich', p:'adj', ua:'успішний'},
+            {w:'folgend', p:'adj', ua:'наступний'},
+            {w:'folgenreich', p:'adj', ua:'багатий на наслідки', s:true},
+            {w:'folgsam', p:'adj', ua:'слухняний'}
+        ]
+    },
+    {
+        word: 'wachsen', meaning: 'рости',
+        items: [
+            {w:'wachsen', p:'v', ua:'рости', ex:'Die Kinder wachsen so schnell!', s:false},
+            {w:'aufwachsen', p:'v', ua:'зростати, виховуватися', ex:'Sie ist auf dem Land aufgewachsen.', s:true},
+            {w:'heranwachsen', p:'v', ua:'підростати'},
+            {w:'zuwachsen', p:'v', ua:'заростати'},
+            {w:'anwachsen', p:'v', ua:'зростати, збільшуватися'},
+            {w:'das Wachstum', p:'n', ua:'зростання', s:true},
+            {w:'der Erwachsene', p:'n', ua:'дорослий', s:true},
+            {w:'erwachsen', p:'adj', ua:'дорослий'}
+        ]
+    },
+    {
+        word: 'schreiben', meaning: 'писати',
+        items: [
+            {w:'schreiben', p:'v', ua:'писати', ex:'Sie schreibt gerade an ihrem ersten Roman.', s:false},
+            {w:'beschreiben', p:'v', ua:'описувати', ex:'Kannst du die Person genauer beschreiben?', s:true},
+            {w:'unterschreiben', p:'v', ua:'підписувати'},
+            {w:'abschreiben', p:'v', ua:'списувати; амортизувати'},
+            {w:'aufschreiben', p:'v', ua:'записувати', ex:'Ich schreibe mir die Nummer schnell auf.', s:true},
+            {w:'umschreiben', p:'v', ua:'перефразовувати; переписувати'},
+            {w:'vorschreiben', p:'v', ua:'приписувати, вказувати'},
+            {w:'die Schrift', p:'n', ua:'почерк; шрифт', s:true},
+            {w:'der Schriftsteller', p:'n', ua:'письменник'},
+            {w:'die Schreibweise', p:'n', ua:'правопис; спосіб написання'},
+            {w:'die Beschreibung', p:'n', ua:'опис'},
+            {w:'die Unterschrift', p:'n', ua:'підпис'},
+            {w:'die Anschrift', p:'n', ua:'адреса (офіційно)'},
+            {w:'die Vorschrift', p:'n', ua:'припис, інструкція'},
+            {w:'die Rechtschreibung', p:'n', ua:'орфографія'},
+            {w:'schriftlich', p:'adj', ua:'письмовий'},
+            {w:'unbeschreiblich', p:'adj', ua:'неописанний'}
+        ]
+    },
+    {
+        word: 'zeigen', meaning: 'показувати',
+        items: [
+            {w:'zeigen', p:'v', ua:'показувати', ex:'Zeig mir bitte, wie das funktioniert.', s:false},
+            {w:'anzeigen', p:'v', ua:'показувати (прилад); подавати заяву в поліцію'},
+            {w:'bezeichnen', p:'v', ua:'позначати, називати'},
+            {w:'auszeichnen', p:'v', ua:'відзначати, нагороджувати'},
+            {w:'zeichnen', p:'v', ua:'малювати'},
+            {w:'unterzeichnen', p:'v', ua:'підписувати (офіційно)'},
+            {w:'verzeichnen', p:'v', ua:'фіксувати, реєструвати'},
+            {w:'das Zeichen', p:'n', ua:'знак', s:true},
+            {w:'die Anzeige', p:'n', ua:'оголошення; заява в поліцію'},
+            {w:'die Bezeichnung', p:'n', ua:'назва, позначення'},
+            {w:'die Auszeichnung', p:'n', ua:'нагорода, відзнака'},
+            {w:'die Zeichnung', p:'n', ua:'малюнок'},
+            {w:'bezeichnend', p:'adj', ua:'промовистий, характерний', s:true}
+        ]
+    },
+    {
+        word: 'bauen', meaning: 'будувати',
+        items: [
+            {w:'bauen', p:'v', ua:'будувати', ex:'Sie bauen sich ein Haus auf dem Land.', s:false},
+            {w:'aufbauen', p:'v', ua:'будувати, вибудовувати', ex:'Er hat die Firma von null an aufgebaut.', s:true},
+            {w:'umbauen', p:'v', ua:'перебудовувати'},
+            {w:'abbauen', p:'v', ua:'демонтувати; видобувати (корисні копалини)'},
+            {w:'anbauen', p:'v', ua:'прибудовувати; вирощувати (рослини)'},
+            {w:'das Gebäude', p:'n', ua:'будівля'},
+            {w:'der Bau', p:'n', ua:'будівництво'},
+            {w:'die Baustelle', p:'n', ua:'будмайданчик'},
+            {w:'der Umbau', p:'n', ua:'перебудова'},
+            {w:'der Aufbau', p:'n', ua:'структура, побудова', s:true},
+            {w:'die Bauweise', p:'n', ua:'спосіб будівництва'},
+            {w:'baufällig', p:'adj', ua:'аварійний, ветхий'}
+        ]
+    },
+    {
+        word: 'wohnen', meaning: 'мешкати',
+        items: [
+            {w:'wohnen', p:'v', ua:'мешкати', ex:'Wir wohnen seit fünf Jahren in dieser Stadt.', s:false},
+            {w:'bewohnen', p:'v', ua:'населяти, мешкати в'},
+            {w:'die Wohnung', p:'n', ua:'квартира'},
+            {w:'der Wohnort', p:'n', ua:'місце проживання'},
+            {w:'das Wohnzimmer', p:'n', ua:'вітальня'},
+            {w:'der Bewohner', p:'n', ua:'мешканець'},
+            {w:'der Anwohner', p:'n', ua:'місцевий житель'},
+            {w:'wohnlich', p:'adj', ua:'затишний, придатний для життя'},
+            {w:'bewohnbar', p:'adj', ua:'придатний для проживання'}
+        ]
+    },
+    {
+        word: 'reden', meaning: 'говорити',
+        items: [
+            {w:'reden', p:'v', ua:'говорити, розмовляти', ex:'Wir müssen dringend miteinander reden.', s:false},
+            {w:'überreden', p:'v', ua:'вмовляти, переконувати'},
+            {w:'anreden', p:'v', ua:'звертатися до когось'},
+            {w:'zureden', p:'v', ua:'умовляти, підбадьорювати'},
+            {w:'sich etw einreden', p:'v', ua:'навіювати собі щось'},
+            {w:'die Rede', p:'n', ua:'промова, мова'},
+            {w:'die Ausrede', p:'n', ua:'відмовка'},
+            {w:'das Gerede', p:'n', ua:'балачки, плітки'},
+            {w:'redselig', p:'adj', ua:'балакучий'}
+        ]
+    },
+    {
+        word: 'gewinnen', meaning: 'вигравати, отримувати',
+        items: [
+            {w:'gewinnen', p:'v', ua:'вигравати, отримувати', ex:'Unsere Mannschaft hat das Finale gewonnen.', s:true},
+            {w:'zurückgewinnen', p:'v', ua:'повертати собі (довіру, позиції)'},
+            {w:'der Gewinn', p:'n', ua:'виграш, прибуток', s:true},
+            {w:'der Gewinner', p:'n', ua:'переможець'},
+            {w:'die Gewinnung', p:'n', ua:'видобуток'},
+            {w:'das Gewinnspiel', p:'n', ua:'розіграш призів'},
+            {w:'gewinnbringend', p:'adj', ua:'прибутковий'},
+            {w:'gewinnend', p:'adj', ua:'привабливий, чарівний (напр. про посмішку)'}
+        ]
+    },
+    {
+        word: 'verlieren', meaning: 'втрачати',
+        items: [
+            {w:'verlieren', p:'v', ua:'втрачати, програвати', ex:'Er hat bei dem Deal viel Geld verloren.', s:true},
+            {w:'sich verlieren', p:'v', ua:'губитися, зникати'},
+            {w:'der Verlust', p:'n', ua:'втрата'},
+            {w:'der Verlierer', p:'n', ua:'невдаха, той, хто програв'},
+            {w:'verloren', p:'adj', ua:'загублений, втрачений'}
+        ]
+    },
+    {
+        word: 'zahlen', meaning: 'платити',
+        items: [
+            {w:'zahlen', p:'v', ua:'платити', ex:'Können wir bitte zahlen?', s:false},
+            {w:'bezahlen', p:'v', ua:'оплачувати', ex:'Wer bezahlt die Rechnung?', s:true},
+            {w:'auszahlen', p:'v', ua:'виплачувати; sich auszahlen — окупитися'},
+            {w:'zurückzahlen', p:'v', ua:'повертати гроші'},
+            {w:'einzahlen', p:'v', ua:'вносити (гроші на рахунок)'},
+            {w:'die Zahlung', p:'n', ua:'оплата'},
+            {w:'die Bezahlung', p:'n', ua:'оплата, винагорода'},
+            {w:'die Auszahlung', p:'n', ua:'виплата'},
+            {w:'die Rückzahlung', p:'n', ua:'повернення коштів'},
+            {w:'zahlungsfähig', p:'adj', ua:'платоспроможний'},
+            {w:'zahlbar', p:'adj', ua:'що підлягає оплаті'}
+        ]
+    },
+    {
+        word: 'schließen', meaning: 'закривати, укладати',
+        items: [
+            {w:'schließen', p:'v', ua:'закривати; укладати (угоду)', ex:'Bitte schließen Sie die Tür hinter sich.', s:false},
+            {w:'abschließen', p:'v', ua:'завершувати; замикати', ex:'Sie hat ihr Studium erfolgreich abgeschlossen.', s:true},
+            {w:'beschließen', p:'v', ua:'вирішувати, ухвалювати'},
+            {w:'einschließen', p:'v', ua:'включати в себе; замикати'},
+            {w:'ausschließen', p:'v', ua:'виключати'},
+            {w:'anschließen', p:'v', ua:'під’єднувати; sich anschließen — приєднуватися'},
+            {w:'erschließen', p:'v', ua:'освоювати, розкривати', ex:'Die neue U-Bahn erschließt das ganze Viertel.', s:true},
+            {w:'der Schluss', p:'n', ua:'кінець, висновок'},
+            {w:'der Abschluss', p:'n', ua:'завершення; диплом', s:true},
+            {w:'die Schließung', p:'n', ua:'закриття'},
+            {w:'der Beschluss', p:'n', ua:'рішення, постанова'},
+            {w:'der Anschluss', p:'n', ua:'під’єднання, зв’язок'},
+            {w:'der Ausschluss', p:'n', ua:'виключення'},
+            {w:'abschließend', p:'adj', ua:'завершальний'},
+            {w:'ausschließlich', p:'adj', ua:'винятково, виключно'},
+            {w:'geschlossen', p:'adj', ua:'закритий'}
+        ]
+    },
+    {
+        word: 'wissen', meaning: 'знати',
+        items: [
+            {w:'wissen', p:'v', ua:'знати', ex:'Weißt du, wie spät es ist?', s:false},
+            {w:'das Wissen', p:'n', ua:'знання'},
+            {w:'die Wissenschaft', p:'n', ua:'наука'},
+            {w:'der Wissenschaftler', p:'n', ua:'науковець'},
+            {w:'das Bewusstsein', p:'n', ua:'свідомість', s:true},
+            {w:'bewusst', p:'adj', ua:'свідомий'},
+            {w:'gewiss', p:'adj', ua:'певний'},
+            {w:'wissenschaftlich', p:'adj', ua:'науковий'},
+            {w:'unwissend', p:'adj', ua:'невігласький'}
+        ]
+    }
+    ];
+
+    var listBox = document.getElementById('wflist');
+    var cntBox = document.getElementById('wfcnt');
+    var qInput = document.getElementById('wfq');
+    var CAT_LABEL = { n: 'Іменники', v: 'Дієслова', adj: 'Прикметники' };
+    var CAT_ORDER = { n: 0, v: 1, adj: 2 };
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function posLabel(p) {
+        return p === 'v' ? 'V' : (p === 'n' ? 'N' : 'Adj');
+    }
+
+    function renderItem(it) {
+        var row = document.createElement('div');
+        row.className = 'wf-row' + (it.ex ? '' : ' wf-row-compact');
+        row.innerHTML =
+            '<div class="wf-word-wrap">' +
+                '<span class="wf-word">' + esc(it.w) + '</span>' +
+                '<span class="wf-pos ' + it.p + '">' + posLabel(it.p) + '</span>' +
+                (it.s ? '<br><span class="wf-src">✓ Vokabeln</span>' : '') +
+            '</div>' +
+            '<div class="wf-body-r">' +
+                '<div class="wf-ua">' + esc(it.ua) + '</div>' +
+                (it.ex ? '<div class="wf-ex">„' + esc(it.ex) + '“</div>' : '') +
+            '</div>';
+        return row;
+    }
+
+    function renderFamily(fam, idx) {
+        var block = document.createElement('div');
+        block.className = 'wf-block' + (idx === 0 ? ' open' : '');
+        block.dataset.search = (fam.word + ' ' + fam.meaning + ' ' + fam.items.map(function (it) {
+            return it.w + ' ' + it.ua + ' ' + (it.ex || '');
+        }).join(' ')).toLowerCase();
+
+        var head = document.createElement('div');
+        head.className = 'wf-head';
+        head.innerHTML =
+            '<span class="wf-root">' + esc(fam.word) + '</span>' +
+            '<span class="wf-meaning">' + esc(fam.meaning) + '</span>' +
+            '<span class="wf-count">' + fam.items.length + ' слів' + '</span>' +
+            '<span class="wf-arrow">›</span>';
+        head.addEventListener('click', function () { block.classList.toggle('open'); });
+        block.appendChild(head);
+
+        var body = document.createElement('div');
+        body.className = 'wf-body';
+
+        if (fam.note) {
+            var note = document.createElement('div');
+            note.className = 'wf-note';
+            note.innerHTML = fam.note;
+            body.appendChild(note);
+        }
+
+        var hasCustomGroups = fam.items.some(function (it) { return it.g; });
+        var displayItems = fam.items;
+        if (!hasCustomGroups) {
+            displayItems = fam.items.slice().sort(function (a, b) {
+                return (CAT_ORDER[a.p] === undefined ? 9 : CAT_ORDER[a.p]) - (CAT_ORDER[b.p] === undefined ? 9 : CAT_ORDER[b.p]);
+            });
+        }
+
+        var lastGroup = null;
+        displayItems.forEach(function (it) {
+            var groupKey = it.g || CAT_LABEL[it.p] || null;
+            if (groupKey && groupKey !== lastGroup) {
+                var lbl = document.createElement('div');
+                lbl.className = 'wf-group-label';
+                lbl.textContent = groupKey;
+                body.appendChild(lbl);
+                lastGroup = groupKey;
+            }
+            body.appendChild(renderItem(it));
+        });
+
+        block.appendChild(body);
+        return block;
+    }
+
+    function render() {
+        listBox.innerHTML = '';
+        FAMILIES.forEach(function (fam, idx) {
+            listBox.appendChild(renderFamily(fam, idx));
+        });
+        updateCount();
+        var totalWords = FAMILIES.reduce(function (n, f) { return n + f.items.length; }, 0);
+        document.getElementById('wfsubtitle').textContent =
+            FAMILIES.length + ' родин слів · ' + totalWords + ' слів · Nomen / Verben / Adjektive одного кореня · слова з vokabeln.html позначені ✓';
+    }
+
+    function updateCount(visible) {
+        var totalWords = FAMILIES.reduce(function (n, f) { return n + f.items.length; }, 0);
+        var srcWords = FAMILIES.reduce(function (n, f) { return n + f.items.filter(function (it) { return it.s; }).length; }, 0);
+        if (visible === undefined) {
+            cntBox.textContent = FAMILIES.length + ' родин · ' + totalWords + ' слів · ' + srcWords + ' вже у vokabeln.html';
+        } else {
+            cntBox.textContent = 'Знайдено: ' + visible + ' з ' + FAMILIES.length + ' родин';
+        }
+    }
+
+    qInput.addEventListener('input', function () {
+        var q = qInput.value.trim().toLowerCase();
+        var blocks = listBox.querySelectorAll('.wf-block');
+        if (!q) {
+            Array.prototype.forEach.call(blocks, function (b) { b.classList.remove('wf-hide'); });
+            updateCount();
+            return;
+        }
+        var visible = 0;
+        Array.prototype.forEach.call(blocks, function (b) {
+            var match = b.dataset.search.indexOf(q) > -1;
+            b.classList.toggle('wf-hide', !match);
+            if (match) { b.classList.add('open'); visible++; }
+        });
+        updateCount(visible);
+    });
+
+    render();
+    </script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>
