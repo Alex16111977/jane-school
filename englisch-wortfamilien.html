@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Families &mdash; vom Wortstamm zum Wort | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <style>
+        .wf-intro {
+            background: rgba(68,147,248,0.09);
+            border: 1px solid rgba(68,147,248,0.28);
+            border-left: 4px solid #4493f8;
+            border-radius: 0 12px 12px 0;
+            padding: 0.95rem 1.15rem;
+            margin: 1.1rem 0 1.4rem;
+            color: rgba(226,232,240,0.88);
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+        .wf-intro b { color: #79b8ff; }
+
+        .wf-legend {
+            display: flex; gap: 1.1rem; flex-wrap: wrap;
+            font-size: 0.78rem; color: rgba(200,210,230,0.6);
+            margin: 0.6rem 0 1.3rem;
+            align-items: center;
+        }
+        .wf-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+        .wf-bar {
+            display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;
+            margin: 1rem 0 0.7rem;
+        }
+        .wf-search {
+            flex: 1 1 260px; min-width: 190px;
+            background: rgba(15,15,30,0.75);
+            border: 1.5px solid rgba(68,147,248,0.32);
+            border-radius: 12px;
+            padding: 0.6rem 0.95rem;
+            color: #e2e8f0; font-size: 0.95rem; font-family: inherit; outline: none;
+        }
+        .wf-search:focus { border-color: #4493f8; box-shadow: 0 0 0 3px rgba(68,147,248,0.15); }
+        .wf-cnt { font-size: 0.82rem; color: rgba(200,220,255,0.55); margin-bottom: 1rem; }
+
+        .wf-block {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 0.25s;
+        }
+        .wf-block:hover { border-color: rgba(68,147,248,0.32); }
+        .wf-block.wf-hide { display: none; }
+
+        .wf-head {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem 1.3rem;
+            cursor: pointer; user-select: none;
+        }
+        .wf-root {
+            font-size: 1.28rem; font-weight: 900;
+            font-family: 'Playfair Display', Georgia, serif;
+            background: linear-gradient(135deg, #fff 25%, #79b8ff 65%, #a8d3ff 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            flex-shrink: 0;
+        }
+        .wf-meaning { font-size: 0.84rem; color: rgba(200,220,245,0.55); font-style: italic; flex: 1; }
+        .wf-count {
+            font-size: 0.72rem; font-weight: 700;
+            background: rgba(68,147,248,0.12); color: rgba(140,190,255,0.85);
+            border-radius: 999px; padding: 0.15rem 0.6rem; white-space: nowrap;
+        }
+        .wf-arrow { color: rgba(68,147,248,0.45); font-size: 0.9rem; transition: transform 0.3s; }
+        .wf-block.open .wf-arrow { transform: rotate(90deg); color: #4493f8; }
+
+        .wf-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.45s ease, padding 0.3s ease;
+            padding: 0 1.3rem;
+        }
+        .wf-block.open .wf-body { max-height: 9000px; padding-bottom: 1.2rem; }
+
+        .wf-group-label {
+            font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+            color: rgba(68,147,248,0.65);
+            margin: 0.9rem 0 0.35rem;
+        }
+        .wf-group-label:first-child { margin-top: 0; }
+
+        .wf-row {
+            display: flex; gap: 0.9rem; align-items: flex-start;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.055);
+        }
+        .wf-row:last-child { border-bottom: none; }
+        .wf-row-compact { padding: 0.4rem 0; }
+        .wf-word-wrap { min-width: 210px; flex-shrink: 0; }
+        .wf-word { font-size: 0.98rem; font-weight: 800; color: #fff; }
+        .wf-pos {
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+            border-radius: 20px; padding: 0.1rem 0.45rem; margin-left: 0.4rem;
+            vertical-align: 0.1rem;
+            background: rgba(148,163,184,0.16); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.25);
+        }
+        .wf-pos.n { background: rgba(251,146,60,0.14); color: #fdba74; border-color: rgba(251,146,60,0.28); }
+        .wf-pos.v { background: rgba(52,211,153,0.14); color: #6ee7b7; border-color: rgba(52,211,153,0.28); }
+        .wf-pos.adj { background: rgba(56,189,248,0.14); color: #7dd3fc; border-color: rgba(56,189,248,0.28); }
+        .wf-tr { display: block; color: #79b8ff; font-weight: 500; font-size: 0.82rem; margin-top: 0.2rem; letter-spacing: 0.01em; }
+        .wf-body-r { flex: 1; min-width: 0; }
+        .wf-de { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 0.25rem; }
+        .wf-ru { font-size: 0.86rem; color: rgba(200,220,245,0.68); margin-bottom: 0.3rem; }
+        .wf-ex {
+            font-size: 0.84rem; color: rgba(200,220,245,0.55); font-style: italic; line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .wf-row { flex-direction: column; gap: 0.3rem; }
+            .wf-word-wrap { min-width: 0; }
+        }
+    </style>
+</head>
+<body class="dark-theme page-bg-image" style="background:transparent">
+
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.88)"></div>
+    </div>
+
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html" class="active">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">›</span>
+            <a href="englisch.html">Englisch</a>
+            <span class="separator">›</span>
+            <span class="current">Word Families</span>
+        </nav>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem; margin-bottom:0.6rem;">
+            <h1>Word Families <span style="color:#4493f8;">🌱</span></h1>
+            <p class="page-subtitle" id="wfsubtitle">Wortfamilien aus dem A&ndash;Z-Glossar eines Business-Englisch-Lehrbuchs</p>
+        </div>
+
+        <div class="wf-intro">
+            <b>Was ist eine Word Family?</b> Ein Wortstamm, mehrere Wortarten. Zum Beispiel:
+            <b>to communicate</b> (kommunizieren) → <b>communication</b> (Kommunikation) →
+            <b>communicator</b> (jemand, der gut kommuniziert) &mdash; ein Stamm, drei Wortarten.
+            Auf einer Pr&uuml;fung wird oft genau das verlangt: die richtige Form einsetzen. Zu jedem Wort
+            stehen die deutsche &Uuml;bersetzung, die russische &Uuml;bersetzung und die Aussprache in
+            russischen Buchstaben. Die W&ouml;rter stammen aus dem A&ndash;Z-Glossar (Anhang) eines Lehrbuchs
+            f&uuml;r Business-Englisch sowie aus dem Wortschatz von
+            <a href="englisch-egb.html" style="color:#79b8ff;">EGB Englisch</a>, und stehen noch auf keiner
+            anderen Seite dieser Website &mdash; alles, was schon in
+            <a href="englisch-wortbildung.html" style="color:#79b8ff;">Wortbildung</a> vorkommt
+            (z.&nbsp;B. <i>decide/decision, employ/employment, compete/competition</i>), ist hier bewusst
+            weggelassen.
+        </div>
+
+        <div class="wf-legend">
+            <span><span class="wf-pos v" style="margin-left:0">V</span> Verb</span>
+            <span><span class="wf-pos n" style="margin-left:0">N</span> Nomen</span>
+            <span><span class="wf-pos adj" style="margin-left:0">Adj</span> Adjektiv</span>
+        </div>
+
+        <div class="wf-bar">
+            <input class="wf-search" id="wfq" type="search" placeholder="Suche: Wortstamm, Wort, Bedeutung…" autocomplete="off">
+        </div>
+        <div class="wf-cnt" id="wfcnt"></div>
+        <div id="wflist"></div>
+
+        <div style="text-align:center; margin-top:2.5rem; padding-bottom:2rem;">
+            <a href="englisch.html" style="font-size:0.85rem; color:rgba(68,147,248,0.6); text-decoration:none;">
+                ← zurück zu Englisch
+            </a>
+        </div>
+    </div>
+
+    <script>
+    var FAMILIES = [
+    { word:'to apply', meaning:'sich bewerben', items:[
+        {w:'to apply for a job', p:'v', tr:'ту эпла́й фор э джоб', de:'sich auf eine Stelle bewerben', ru:'подавать заявку на работу', ex:'I applied for three positions last week.'},
+        {w:'application', p:'n', tr:'эплике́йшн', de:'die Bewerbung', ru:'заявка, отклик на вакансию', ex:'Most applications happen online with just a few clicks.'},
+        {w:'applicant', p:'n', tr:'э́пликэнт', de:'der Bewerber, die Bewerberin', ru:'кандидат, подавший заявку', ex:'Only five applicants were invited to interview.'}
+    ]},
+    { word:'to assess', meaning:'einschätzen', items:[
+        {w:'to assess sth', p:'v', tr:'ту эсэ́с', de:'etw. einschätzen, etw. beurteilen', ru:'оценивать что-л.'},
+        {w:'self-assessment', p:'n', tr:'селф эсэ́смэнт', de:'die Selbsteinschätzung', ru:'самооценка', ex:'The self-assessment test shows which tasks you actually enjoy.'}
+    ]},
+    { word:'to graduate', meaning:'den Abschluss machen', items:[
+        {w:'to graduate', p:'v', tr:'ту гра́джуэйт', de:'den (Schul-/Universitäts-)Abschluss machen', ru:'окончить учёбу'},
+        {w:'graduate', p:'n', tr:'гре́джуэт', de:'der Absolvent, die Absolventin', ru:'выпускник', ex:'A recent graduate often has little work experience yet.'}
+    ]},
+    { word:'to communicate', meaning:'kommunizieren', items:[
+        {w:'to communicate', p:'v', tr:'ту кэмью́никейт', de:'kommunizieren', ru:'общаться, сообщать', ex:'Good managers communicate clearly with their team.'},
+        {w:'communication', p:'n', tr:'кэмьюникэ́йшн', de:'die Kommunikation', ru:'общение, коммуникация', ex:'Business communication should always be polite and clear.'},
+        {w:'round-the-clock communication', p:'n', tr:'раунд-зэ-клок кэмьюникэ́йшн', de:'Kommunikation rund um die Uhr', ru:'круглосуточная связь'},
+        {w:'communicator (to be a good ~)', p:'n', tr:'кэмью́никейтэ', de:'kommunikativ sein', ru:'быть коммуникабельным'}
+    ]},
+    { word:'to compare', meaning:'vergleichen', items:[
+        {w:'to compare (to sth)', p:'v', tr:'ту компэ́э', de:'im Vergleich zu etw. dastehen, sich mit etw. vergleichen lassen', ru:'сравниваться (с чем-л.), выглядеть в сравнении'},
+        {w:'to compare well with sth', p:'v', tr:'ту компэ́э уэл уиз', de:'im Vergleich zu etw. gut dastehen', ru:'хорошо смотреться в сравнении с чем-л.'},
+        {w:'comparison', p:'n', tr:'компэ́рисн', de:'der Vergleich', ru:'сравнение', ex:'In comparison with last year, sales have doubled.'}
+    ]},
+    { word:'to complain', meaning:'sich beschweren', items:[
+        {w:'to complain about sth', p:'v', tr:'ту компле́йн эбаут', de:'sich über etw. beschweren', ru:'жаловаться на что-л.'},
+        {w:'to complain of sth', p:'v', tr:'ту компле́йн ов', de:'über etw. klagen', ru:'сетовать на что-л.'},
+        {w:'complaint', p:'n', tr:'комплэ́йнт', de:'die Reklamation, die Beschwerde', ru:'жалоба, рекламация', ex:'The hotel received a complaint about the noise.'},
+        {w:'to make a complaint', p:'v', tr:'ту мейк э комплэ́йнт', de:'etw. beanstanden', ru:'подать жалобу'}
+    ]},
+    { word:'to confirm', meaning:'bestätigen', items:[
+        {w:'to confirm sth', p:'v', tr:'ту конфё́м', de:'etw. bestätigen', ru:'подтверждать что-л.', ex:'Please confirm your order by email.'},
+        {w:'confirmation', p:'n', tr:'конфомэ́йшн', de:'die Bestätigung', ru:'подтверждение'},
+        {w:'order confirmation', p:'n', tr:'о́дэ конфомэ́йшн', de:'die Auftragsbestätigung', ru:'подтверждение заказа'}
+    ]},
+    { word:'confident', meaning:'zuversichtlich', items:[
+        {w:'confident (to be ~)', p:'adj', tr:'ко́нфидэнт', de:'sich sicher sein, zuversichtlich sein', ru:'быть уверенным', ex:'She felt confident about the interview.'},
+        {w:'confidence', p:'n', tr:'ко́нфидэнс', de:'das Selbstvertrauen; das Vertrauen', ru:'уверенность в себе'},
+        {w:'to build confidence', p:'v', tr:'ту билд ко́нфидэнс', de:'Selbstvertrauen schaffen', ru:'укреплять уверенность в себе'}
+    ]},
+    { word:'to consist', meaning:'bestehen (aus)', items:[
+        {w:'to consist of sth', p:'v', tr:'ту консист ов', de:'aus etw. bestehen', ru:'состоять из чего-л.', ex:'The team consists of five developers and one designer.'},
+        {w:'consistent', p:'adj', tr:'консистэнт', de:'konsequent, einheitlich; regelmäßig, dauerhaft', ru:'последовательный, стабильный'},
+        {w:'consistently', p:'adj', tr:'консистэнтли', de:'durchweg, gleichbleibend', ru:'неизменно, стабильно'}
+    ]},
+    { word:'to consume', meaning:'verbrauchen', items:[
+        {w:'consumer', p:'n', tr:'консью́мэ', de:'der/die Verbraucher(in)', ru:'потребитель', ex:'Consumers are paying more attention to where products come from.'},
+        {w:'consumer goods', p:'n', tr:'консью́мэ гудз', de:'die Konsumgüter', ru:'потребительские товары'},
+        {w:'consumer electronics', p:'n', tr:'консью́мэ илектро́никс', de:'die Heimelektronik, die Unterhaltungselektronik', ru:'бытовая электроника'},
+        {w:'consumer protection', p:'n', tr:'консью́мэ протэ́кшн', de:'der Verbraucherschutz', ru:'защита прав потребителей'},
+        {w:'consumer-centric', p:'adj', tr:'консью́мэ-сэнтрик', de:'verbraucherorientiert', ru:'ориентированный на потребителя'},
+        {w:'consumption', p:'n', tr:'консампшн', de:'der Konsum', ru:'потребление'}
+    ]},
+    { word:'to contribute', meaning:'beitragen', items:[
+        {w:'to contribute to sth', p:'v', tr:'ту контри́бьют ту', de:'zu etw. beitragen, einen Beitrag zu etw. leisten', ru:'вносить вклад во что-л.', ex:'Every team member contributed to the project.'},
+        {w:'contribution', p:'n', tr:'контрибью́шн', de:'der Beitrag', ru:'вклад'}
+    ]},
+    { word:'to correspond', meaning:'entsprechen', items:[
+        {w:'to correspond to sth', p:'v', tr:'ту кориспо́нд ту', de:'einer Sache entsprechen, das Gegenstück zu etw. sein', ru:'соответствовать чему-л.'},
+        {w:'correspondence', p:'n', tr:'корисподнэнс', de:'die Korrespondenz', ru:'переписка, корреспонденция', ex:'She handles all commercial correspondence in English.'},
+        {w:'commercial correspondence', p:'n', tr:'комэ́шл корисподнэнс', de:'die Handelskorrespondenz, die Geschäftskorrespondenz', ru:'деловая переписка'}
+    ]},
+    { word:'to criticize', meaning:'kritisieren', items:[
+        {w:'to criticize sb/sth', p:'v', tr:'ту критисайз', de:'jdn./etw. kritisieren', ru:'критиковать кого-л./что-л.'},
+        {w:'criticism', p:'n', tr:'критисизм', de:'die Kritik', ru:'критика', ex:'He didn’t take the criticism well.'},
+        {w:'critical', p:'adj', tr:'критикл', de:'entscheidend, ausschlaggebend; kritisch', ru:'решающий; критический'},
+        {w:'critical perspective', p:'n', tr:'критикл пэспэ́ктив', de:'die kritische Betrachtung(sweise)', ru:'критический взгляд'}
+    ]},
+    { word:'to defend', meaning:'verteidigen', items:[
+        {w:'defence', p:'n', tr:'дифэ́нс', de:'die Verteidigung', ru:'защита'},
+        {w:'defensive', p:'adj', tr:'дифэ́нсив', de:'abwehrend, defensiv', ru:'оборонительный; защищающийся', ex:'He got very defensive when I asked about the delay.'}
+    ]},
+    { word:'to determine', meaning:'bestimmen', items:[
+        {w:'to determine sth', p:'v', tr:'ту дитё́мин', de:'etw. bestimmen', ru:'определять что-л.', ex:'The committee will determine the final price.'},
+        {w:'determination', p:'n', tr:'дитёминэ́йшн', de:'die Entschlossenheit, die Zielstrebigkeit', ru:'решительность, целеустремлённость'}
+    ]},
+    { word:'to develop', meaning:'entwickeln', items:[
+        {w:'to develop sth', p:'v', tr:'ту дивэ́лэп', de:'etw. weiterentwickeln', ru:'развивать что-л.'},
+        {w:'developer', p:'n', tr:'дивэ́лэпэ', de:'der/die Entwickler(in)', ru:'разработчик', ex:'She works as a software developer.'},
+        {w:'development', p:'n', tr:'дивэ́лэпмэнт', de:'die Weiterentwicklung, die Entwicklung', ru:'развитие'},
+        {w:'career development', p:'n', tr:'кэри́э дивэ́лэпмэнт', de:'die berufliche Weiterentwicklung', ru:'профессиональное развитие'},
+        {w:'product development', p:'n', tr:'про́дакт дивэ́лэпмэнт', de:'die Produktentwicklung', ru:'разработка продукта'}
+    ]},
+    { word:'to disrupt', meaning:'stören', items:[
+        {w:'to disrupt sth', p:'v', tr:'ту дисра́пт', de:'etw. stören, etw. beeinträchtigen', ru:'нарушать, срывать что-л.', ex:'The strike disrupted deliveries for a week.'},
+        {w:'disruption', p:'n', tr:'дисра́пшн', de:'die Störung, die Unterbrechung', ru:'нарушение, сбой'}
+    ]},
+    { word:'dissatisfied', meaning:'unzufrieden', items:[
+        {w:'dissatisfied', p:'adj', tr:'дисса́тисфайд', de:'unzufrieden', ru:'неудовлетворённый'},
+        {w:'dissatisfaction', p:'n', tr:'диссатисфа́кшн', de:'die Unzufriedenheit', ru:'неудовлетворённость', ex:'The survey measures customer dissatisfaction.'},
+        {w:'to increase customer dissatisfaction', p:'v', tr:'ту инкри́з ка́стэмэ диссатисфа́кшн', de:'die Unzufriedenheit der Kunden erhöhen', ru:'повышать недовольство клиентов'}
+    ]},
+    { word:'to distribute', meaning:'vertreiben', items:[
+        {w:'distribution', p:'n', tr:'дистрибью́шн', de:'der Vertrieb', ru:'сбыт, распределение', ex:'The company changed its distribution channel last year.'},
+        {w:'distribution channel', p:'n', tr:'дистрибью́шн чэнл', de:'der Vertriebskanal, der Vertriebsweg', ru:'канал сбыта'},
+        {w:'distributor', p:'n', tr:'дистри́бьютэ', de:'der/die Händler(in), der/die Vertriebshändler(in)', ru:'дистрибьютор'}
+    ]},
+    { word:'economic', meaning:'wirtschaftlich', items:[
+        {w:'economic recovery', p:'n', tr:'икэно́мик рика́вэри', de:'die Konjunkturerholung, der Wirtschaftsaufschwung', ru:'восстановление экономики'},
+        {w:'economics', p:'n', tr:'икэно́микс', de:'die Wirtschaft(swissenschaft), die Ökonomie', ru:'экономика (наука)', ex:'He studied economics at university.'},
+        {w:'economist', p:'n', tr:'ико́нэмист', de:'der/die Wirtschaftswissenschaftler(in), der/die Ökonom(in)', ru:'экономист'}
+    ]},
+    { word:'to engage', meaning:'sich einbringen', items:[
+        {w:'to engage with sb', p:'v', tr:'ту энгэ́йдж уиз', de:'auf jdn. zugehen, mit jdm. ins Gespräch kommen', ru:'вступать в контакт с кем-л.'},
+        {w:'customer engagement', p:'n', tr:'ка́стэмэ энгэ́йджмэнт', de:'der Kundendialog, die Kundenbindung', ru:'вовлечённость клиентов'},
+        {w:'engaging', p:'adj', tr:'энгэ́йджин', de:'ansprechend, fesselnd', ru:'увлекательный', ex:'The presentation was short but very engaging.'},
+        {w:'commitment (to sth)', p:'n', tr:'комитмэнт', de:'das Engagement (für etw.)', ru:'приверженность (чему-л.)'}
+    ]},
+    { word:'engineer', meaning:'konstruieren', items:[
+        {w:'product engineer', p:'n', tr:'про́дакт энджини́э', de:'der/die Produktingenieur(in)', ru:'инженер-разработчик'},
+        {w:'engineering', p:'n', tr:'энджини́эрин', de:'das Ingenieurwesen, der Maschinenbau', ru:'инженерное дело, машиностроение', ex:'She has a degree in mechanical engineering.'}
+    ]},
+    { word:'to entitle', meaning:'berechtigen', items:[
+        {w:'holiday entitlement', p:'n', tr:'хо́лидей энта́йтлмэнт', de:'der Urlaubsanspruch', ru:'право на отпуск', ex:'Full-time staff have 28 days of holiday entitlement.'}
+    ]},
+    { word:'environment', meaning:'die Umwelt', items:[
+        {w:'environment', p:'n', tr:'инва́йрэнмэнт', de:'die Umwelt; das Umfeld, die Umgebung', ru:'окружающая среда; окружение'},
+        {w:'work environment', p:'n', tr:'уёк инва́йрэнмэнт', de:'das Arbeitsumfeld, die Arbeitswelt', ru:'рабочая среда'},
+        {w:'environmental friendliness', p:'n', tr:'инвайрэнмэ́нтл фрэ́ндлинэс', de:'die Umweltfreundlichkeit', ru:'экологичность', ex:'Customers now expect a certain level of environmental friendliness.'},
+        {w:'environmentally aware', p:'adj', tr:'инвайрэнмэ́нтли эуэ́э', de:'umweltbewusst', ru:'экологически сознательный'},
+        {w:'environmentally-friendly', p:'adj', tr:'инвайрэнмэ́нтли-фрэ́ндли', de:'umweltfreundlich', ru:'экологичный'}
+    ]},
+    { word:'to establish', meaning:'gründen, etablieren', items:[
+        {w:'established customer', p:'n', tr:'иста́блишт ка́стэмэ', de:'der/die Bestandskunde/-kundin', ru:'постоянный клиент'},
+        {w:'to establish a reputation', p:'v', tr:'ту иста́блиш э репьютэ́йшн', de:'einen Ruf begründen', ru:'создать репутацию', ex:'It took years to establish a good reputation.'},
+        {w:'well-established', p:'adj', tr:'уэл-иста́блишт', de:'gut eingeführt, bestens bekannt', ru:'хорошо зарекомендовавший себя'}
+    ]},
+    { word:'ethical', meaning:'ethisch', items:[
+        {w:'work ethic', p:'n', tr:'уёк э́сик', de:'das Arbeitsethos, die Arbeitsmoral', ru:'трудовая этика'},
+        {w:'ethical', p:'adj', tr:'э́сикл', de:'moralisch', ru:'этичный', ex:'The company is proud of its ethical practices.'},
+        {w:'ethical practices', p:'n', tr:'э́сикл практисиз', de:'die ethischen Praktiken, das ethische Handeln', ru:'этичные методы работы'}
+    ]},
+    { word:'to exhibit', meaning:'ausstellen', items:[
+        {w:'to exhibit sth', p:'v', tr:'ту игзи́бит', de:'etw. ausstellen, etw. präsentieren', ru:'выставлять, демонстрировать что-л.'},
+        {w:'exhibition', p:'n', tr:'эксиби́шн', de:'die Messe, das Messezentrum', ru:'выставка', ex:'Our company has a stand at the trade exhibition.'},
+        {w:'exhibitor', p:'n', tr:'игзи́битэ', de:'der/die Aussteller(in)', ru:'экспонент, участник выставки'}
+    ]},
+    { word:'to expand', meaning:'erweitern', items:[
+        {w:'to expand sth', p:'v', tr:'ту икспа́нд', de:'etw. erweitern', ru:'расширять что-л.', ex:'The firm plans to expand into new markets.'},
+        {w:'expansion', p:'n', tr:'икспа́ншн', de:'die Ausweitung, die Erweiterung, die Expansion', ru:'расширение'}
+    ]},
+    { word:'to expect', meaning:'erwarten', items:[
+        {w:'customer expectations', p:'n', tr:'ка́стэмэ экспэктэ́йшнз', de:'die Kundenerwartungen', ru:'ожидания клиентов', ex:'The new model exceeded customer expectations.'}
+    ]},
+    { word:'to export', meaning:'exportieren', items:[
+        {w:'export clearance', p:'n', tr:'э́кспот кли́рэнс', de:'die Ausfuhrabfertigung, die Ausfuhrfreigabe', ru:'таможенное оформление на экспорт'},
+        {w:'export price list', p:'n', tr:'э́кспот прайс лист', de:'die Exportpreisliste', ru:'экспортный прайс-лист'},
+        {w:'exporter', p:'n', tr:'экспо́тэ', de:'der/die Exporteur(in)', ru:'экспортёр', ex:'Germany is one of the world’s biggest exporters.'}
+    ]},
+    { word:'to expose', meaning:'aussetzen', items:[
+        {w:'exposure (to sth)', p:'n', tr:'икспо́жэ', de:'die Belastung (durch etw.), die Einwirkung (von etw.)', ru:'воздействие (чего-л.), подверженность', ex:'Workers should avoid long exposure to loud noise.'}
+    ]},
+    { word:'to express', meaning:'ausdrücken', items:[
+        {w:'to express sth', p:'v', tr:'ту икспрэ́с', de:'etw. ausdrücken', ru:'выражать что-л.', ex:'He struggled to express his opinion clearly.'},
+        {w:'expression', p:'n', tr:'икспрэ́шн', de:'der Ausdruck', ru:'выражение'},
+        {w:'freedom of expression', p:'n', tr:'фри́дэм ов икспрэ́шн', de:'die Meinungsfreiheit', ru:'свобода слова'}
+    ]},
+    { word:'to facilitate', meaning:'erleichtern', items:[
+        {w:'to facilitate sth', p:'v', tr:'ту фэси́литейт', de:'etw. fördern, etw. begünstigen', ru:'способствовать, облегчать что-л.', ex:'New software facilitates communication between teams.'},
+        {w:'facilities', p:'n', tr:'фэси́литиз', de:'die Einrichtungen, die Anlagen, die Ausstattung', ru:'оснащение, объекты, помещения'}
+    ]},
+    { word:'to fail', meaning:'scheitern', items:[
+        {w:'to fail', p:'v', tr:'ту фейл', de:'pleite gehen; ausfallen, zusammenbrechen', ru:'обанкротиться; провалиться'},
+        {w:'to fail to do sth', p:'v', tr:'ту фейл ту ду', de:'es nicht schaffen, etw. zu tun', ru:'не суметь сделать что-л.'},
+        {w:'failure', p:'n', tr:'фэ́йльэ', de:'das Versäumnis, die Unterlassung', ru:'неудача, невыполнение', ex:'The failure of the system caused big delays.'}
+    ]},
+    { word:'flexible', meaning:'flexibel', items:[
+        {w:'flexible mindset', p:'n', tr:'флэ́ксибл ма́йндсэт', de:'flexible Einstellung, geistige Flexibilität', ru:'гибкое мышление'},
+        {w:'flexible working hours', p:'n', tr:'флэ́ксибл уёкин а́уэз', de:'flexible Arbeitszeiten', ru:'гибкий график работы'},
+        {w:'flexitime', p:'n', tr:'флэ́кситайм', de:'die Gleitzeit', ru:'скользящий график', ex:'Most staff here work flexitime.'}
+    ]},
+    { word:'to found', meaning:'gründen', items:[
+        {w:'to found sth', p:'v', tr:'ту фаунд', de:'etw. gründen', ru:'основывать что-л.'},
+        {w:'founder', p:'n', tr:'фа́ундэ', de:'der/die Gründer(in)', ru:'основатель', ex:'The founder of the company still works there part-time.'},
+        {w:'foundation', p:'n', tr:'фаундэ́йшн', de:'die Grundlage(n); das Fundament', ru:'основа, фундамент'}
+    ]},
+    { word:'franchise', meaning:'die Franchise', items:[
+        {w:'franchise', p:'n', tr:'фрэ́нчайз', de:'die Franchise', ru:'франшиза', ex:'They run a franchise of a big coffee chain.'},
+        {w:'franchisee', p:'n', tr:'фрэнчайзи́', de:'der/die Franchisenehmer(in)', ru:'франчайзи (получатель франшизы)'},
+        {w:'franchiser', p:'n', tr:'фрэ́нчайзэ', de:'der/die Franchisegeber(in)', ru:'франчайзер (владелец франшизы)'}
+    ]},
+    { word:'to grow', meaning:'wachsen', items:[
+        {w:'to grow sth', p:'v', tr:'ту гроу', de:'etw. weiterentwickeln', ru:'развивать что-л.'},
+        {w:'to grow a business', p:'v', tr:'ту гроу э би́знэс', de:'ein Unternehmen voranbringen/wachsen lassen', ru:'развивать бизнес'},
+        {w:'growth', p:'n', tr:'гроус', de:'das Wachstum, die Entwicklung', ru:'рост', ex:'The company reported strong growth this year.'}
+    ]},
+    { word:'to import', meaning:'importieren', items:[
+        {w:'import clearance', p:'n', tr:'и́мпот кли́рэнс', de:'die Einfuhrabfertigung, die Einfuhrfreigabe', ru:'таможенное оформление на импорт'},
+        {w:'importer', p:'n', tr:'импо́тэ', de:'der/die Importeur(in)', ru:'импортёр', ex:'The company is the main importer of the product in Europe.'}
+    ]},
+    { word:'to impress', meaning:'beeindrucken', items:[
+        {w:'impressive', p:'adj', tr:'импрэ́сив', de:'beeindruckend', ru:'впечатляющий', ex:'Her presentation was really impressive.'},
+        {w:'impression', p:'n', tr:'импрэ́шн', de:'der Eindruck', ru:'впечатление'}
+    ]},
+    { word:'to increase', meaning:'steigen, steigern', items:[
+        {w:'increase (in sth)', p:'n', tr:'и́нкрис', de:'der Anstieg (von etw.)', ru:'рост, увеличение (чего-л.)', ex:'There was a big increase in online orders.'},
+        {w:'increasingly', p:'adj', tr:'инкри́синли', de:'zunehmend', ru:'всё больше, всё чаще'}
+    ]},
+    { word:'industrial', meaning:'industriell', items:[
+        {w:'industrial action', p:'n', tr:'индастриэл а́кшн', de:'die Arbeitskampfmaßnahmen', ru:'забастовочные действия'},
+        {w:'industrialized country', p:'n', tr:'индастриэлайзд ка́нтри', de:'die Industrienation', ru:'индустриальная страна'},
+        {w:'industry', p:'n', tr:'и́ндастри', de:'die Branche, das Gewerbe', ru:'отрасль, промышленность', ex:'She has worked in the tourism industry for years.'}
+    ]},
+    { word:'initial', meaning:'anfänglich', items:[
+        {w:'initial order discount', p:'n', tr:'ини́шл о́дэ ди́скаунт', de:'der Erstbestellungsrabatt, der Nachlass für Erstaufträge', ru:'скидка на первый заказ'},
+        {w:'initially', p:'adj', tr:'ини́шэли', de:'zunächst, anfänglich', ru:'сначала, изначально', ex:'Initially, the plan seemed too expensive.'},
+        {w:'initials', p:'n', tr:'ини́шлз', de:'die Initialen', ru:'инициалы'}
+    ]},
+    { word:'to inspect', meaning:'prüfen', items:[
+        {w:'government inspection', p:'n', tr:'га́вэнмэнт инспэ́кшн', de:'die behördliche Prüfung', ru:'государственная проверка'},
+        {w:'third-party inspection', p:'n', tr:'сёд-па́ти инспэ́кшн', de:'die Fremdprüfung', ru:'проверка независимой стороной'},
+        {w:'inspector', p:'n', tr:'инспэ́ктэ', de:'der/die Kontrolleur(in)', ru:'инспектор', ex:'An inspector visited the factory last week.'}
+    ]},
+    { word:'to instruct', meaning:'anweisen', items:[
+        {w:'to instruct sb to do sth', p:'v', tr:'ту инстра́кт ту ду', de:'jdn. anweisen, etw. zu tun', ru:'поручить кому-л. сделать что-л.'},
+        {w:'instructions', p:'n', tr:'инстра́кшнз', de:'die Anleitung', ru:'инструкция', ex:'Please read the instructions before you start.'}
+    ]},
+    { word:'to insure', meaning:'versichern', items:[
+        {w:'to insure sth', p:'v', tr:'ту иншу́э', de:'etw. versichern', ru:'страховать что-л.'},
+        {w:'health insurance', p:'n', tr:'хэлс иншу́эрэнс', de:'die Krankenversicherung', ru:'медицинская страховка', ex:'The company pays for private health insurance.'},
+        {w:'insurance coverage', p:'n', tr:'иншу́эрэнс ка́вэридж', de:'die Versicherung(sschutz)', ru:'страховое покрытие'}
+    ]},
+    { word:'to intend', meaning:'beabsichtigen', items:[
+        {w:'to be intended for sb', p:'v', tr:'ту би интэ́ндид фо', de:'für jdn. gedacht sein', ru:'быть предназначенным для кого-л.'},
+        {w:'intention', p:'n', tr:'интэ́ншн', de:'die Absicht, der Zweck', ru:'намерение', ex:'It was never her intention to upset anyone.'}
+    ]},
+    { word:'to interrupt', meaning:'unterbrechen', items:[
+        {w:'to interrupt', p:'v', tr:'ту интэра́пт', de:'unterbrechen', ru:'прерывать', ex:'Sorry to interrupt, but there’s an urgent call for you.'},
+        {w:'interruption', p:'n', tr:'интэра́пшн', de:'die Unterbrechung, die Störung', ru:'прерывание, помеха'}
+    ]},
+    { word:'to introduce', meaning:'einführen', items:[
+        {w:'to introduce sth', p:'v', tr:'ту интродью́с', de:'etw. einführen', ru:'вводить, внедрять что-л.', ex:'The company introduced a new policy last month.'},
+        {w:'market introduction', p:'n', tr:'ма́кит интродакшн', de:'die Markteinführung', ru:'вывод на рынок'},
+        {w:'introductory', p:'adj', tr:'интродактэри', de:'Einführungs-', ru:'вводный, ознакомительный'}
+    ]},
+    { word:'to invest', meaning:'investieren', items:[
+        {w:'to invest', p:'v', tr:'ту инвэ́ст', de:'investieren', ru:'инвестировать', ex:'They decided to invest in new machinery.'},
+        {w:'investment', p:'n', tr:'инвэ́стмэнт', de:'die Investition', ru:'инвестиция'},
+        {w:'investor', p:'n', tr:'инвэ́стэ', de:'der/die Investor(in)', ru:'инвестор'}
+    ]},
+    { word:'to invite', meaning:'einladen', items:[
+        {w:'invitation', p:'n', tr:'инвитэ́йшн', de:'die Einladung', ru:'приглашение', ex:'She sent an invitation to all the clients.'}
+    ]},
+    { word:'to lead', meaning:'führen', items:[
+        {w:'global leader', p:'n', tr:'гло́убл ли́дэ', de:'der/die Weltmarktführer(in)', ru:'мировой лидер'},
+        {w:'team leader', p:'n', tr:'тим ли́дэ', de:'der/die Teamleiter(in)', ru:'руководитель команды', ex:'He was promoted to team leader after two years.'},
+        {w:'leadership role', p:'n', tr:'ли́дэшип роул', de:'die Führungsposition', ru:'руководящая роль'}
+    ]},
+    { word:'liable', meaning:'haftbar', items:[
+        {w:'liability', p:'n', tr:'лайэби́лити', de:'die Haftung', ru:'ответственность (юридическая)', ex:'The contract limits the company’s liability.'},
+        {w:'to be liable', p:'v', tr:'ту би ла́йэбл', de:'haften', ru:'нести ответственность'}
+    ]},
+    { word:'to limit', meaning:'begrenzen', items:[
+        {w:'to limit sth', p:'v', tr:'ту ли́мит', de:'etw. begrenzen', ru:'ограничивать что-л.'},
+        {w:'limited', p:'adj', tr:'ли́митид', de:'begrenzt, beschränkt', ru:'ограниченный', ex:'We only have limited stock left.'},
+        {w:'limitations', p:'n', tr:'лимитэ́йшнз', de:'die Grenzen', ru:'ограничения'}
+    ]},
+    { word:'to locate', meaning:'orten, ansiedeln', items:[
+        {w:'to locate sb/sth', p:'v', tr:'ту лоукэ́йт', de:'jdn./etw. orten, jdn./etw. lokalisieren', ru:'находить, определять местоположение кого-л./чего-л.'},
+        {w:'location', p:'n', tr:'лоукэ́йшн', de:'die Lage', ru:'местоположение', ex:'The shop has a great location in the city centre.'},
+        {w:'on location', p:'n', tr:'он лоукэ́йшн', de:'vor Ort', ru:'на месте'}
+    ]},
+    { word:'to maintain', meaning:'instand halten', items:[
+        {w:'to maintain sth', p:'v', tr:'ту мэйнтэ́йн', de:'etw. instandhalten; etw. aufrecht erhalten; etw. behaupten', ru:'поддерживать, обслуживать что-л.'},
+        {w:'maintenance', p:'n', tr:'мэ́йнтинэнс', de:'die Wartung, die Instandhaltung', ru:'техобслуживание', ex:'The machines need regular maintenance.'}
+    ]},
+    { word:'to manage', meaning:'leiten, verwalten', items:[
+        {w:'management', p:'n', tr:'ма́нидджмэнт', de:'die Unternehmensführung', ru:'управление, руководство', ex:'She works in project management.'},
+        {w:'project management', p:'n', tr:'про́джект ма́нидджмэнт', de:'das Projektmanagement', ru:'управление проектами'},
+        {w:'manageable', p:'adj', tr:'ма́ниджэбл', de:'überschaubar, handhabbar', ru:'управляемый, посильный'},
+        {w:'managing director (MD)', p:'n', tr:'ма́ниджин дирэ́ктэ', de:'der/die Geschäftsführer(in)', ru:'генеральный директор'}
+    ]},
+    { word:'to manufacture', meaning:'herstellen', items:[
+        {w:'to manufacture sth', p:'v', tr:'ту манью­фа́кчэ', de:'etw. fertigen, etw. herstellen', ru:'производить, изготавливать что-л.'},
+        {w:'manufacturer', p:'n', tr:'манью­фа́кчэрэ', de:'der/die Hersteller(in)', ru:'производитель', ex:'The manufacturer offers a two-year warranty.'},
+        {w:'manufacturing', p:'n', tr:'манью­фа́кчэрин', de:'die Fertigung, die Herstellung', ru:'производство'}
+    ]},
+    { word:'to migrate', meaning:'wandern, migrieren', items:[
+        {w:'migrant', p:'n', tr:'ма́йгрэнт', de:'der/die Migrant(in)', ru:'мигрант'},
+        {w:'mass migration', p:'n', tr:'мас майгрэ́йшн', de:'die massive Auswanderung, die Massenmigration', ru:'массовая миграция', ex:'The report looks at the causes of mass migration.'}
+    ]},
+    { word:'to modify', meaning:'verändern', items:[
+        {w:'to modify sth', p:'v', tr:'ту мо́дифай', de:'etw. verändern, etw. modifizieren', ru:'изменять что-л.', ex:'They had to modify the design after customer feedback.'},
+        {w:'modification', p:'n', tr:'модификэ́йшн', de:'die Änderung, die Ergänzung', ru:'изменение, модификация'}
+    ]},
+    { word:'to negotiate', meaning:'verhandeln', items:[
+        {w:'to negotiate', p:'v', tr:'ту нигоушиэйт', de:'verhandeln', ru:'вести переговоры', ex:'They negotiated a better price with the supplier.'},
+        {w:'negotiations', p:'n', tr:'нигоушиэ́йшнз', de:'die Verhandlungen', ru:'переговоры'}
+    ]},
+    { word:'to observe', meaning:'beobachten', items:[
+        {w:'to observe', p:'v', tr:'ту эбзё́в', de:'anmerken, bemerken', ru:'замечать, отмечать'},
+        {w:'observation', p:'n', tr:'обзэвэ́йшн', de:'die Beobachtung', ru:'наблюдение', ex:'Her observation about the market was very accurate.'}
+    ]},
+    { word:'to operate', meaning:'betreiben', items:[
+        {w:'to operate', p:'v', tr:'ту о́пэрэйт', de:'geschäftlich tätig sein; funktionieren, arbeiten', ru:'вести деятельность; работать, функционировать'},
+        {w:'operations', p:'n', tr:'опэрэ́йшнз', de:'die Betrieb(e), das operative Geschäft', ru:'операционная деятельность', ex:'She is in charge of daily operations.'},
+        {w:'operator', p:'n', tr:'о́пэрэйтэ', de:'der/die Reiseveranstalter(in) (tour ~)', ru:'оператор (туристический)'}
+    ]},
+    { word:'to organize', meaning:'organisieren', items:[
+        {w:'organization', p:'n', tr:'огэнайзэ́йшн', de:'das Unternehmen', ru:'организация, предприятие', ex:'She works for a large international organization.'},
+        {w:'organizational chart', p:'n', tr:'огэнайзэ́йшнл чат', de:'das Organigramm', ru:'организационная схема'}
+    ]},
+    { word:'origin', meaning:'der Ursprung', items:[
+        {w:'country of origin', p:'n', tr:'ка́нтри ов о́риджин', de:'das Ursprungsland', ru:'страна происхождения'},
+        {w:'origins', p:'n', tr:'о́риджинз', de:'die Anfänge, die Ursprünge', ru:'истоки, происхождение', ex:'The company’s origins go back to 1920.'},
+        {w:'to originate (in sth)', p:'v', tr:'ту ори́джинейт', de:'aus etw. stammen', ru:'брать начало (в чём-л.)'}
+    ]},
+    { word:'to own', meaning:'besitzen', items:[
+        {w:'to be on one’s own', p:'v', tr:'ту би он уанз о́ун', de:'auf sich allein gestellt sein', ru:'быть предоставленным самому себе'},
+        {w:'owner', p:'n', tr:'о́унэ', de:'der/die Inhaber(in), der/die Besitzer(in)', ru:'владелец', ex:'The owner opened the shop fifteen years ago.'},
+        {w:'ownership', p:'n', tr:'о́унэшип', de:'das Eigentum, das Eigentumsrecht', ru:'владение, право собственности'}
+    ]},
+    { word:'partner', meaning:'der Partner', items:[
+        {w:'partner', p:'n', tr:'па́тнэ', de:'der/die Gesellschafter(in)', ru:'партнёр', ex:'She became a partner in the law firm last year.'},
+        {w:'trading partner', p:'n', tr:'трэ́йдин па́тнэ', de:'der/die Handelspartner(in)', ru:'торговый партнёр'},
+        {w:'partnership', p:'n', tr:'па́тнэшип', de:'die Personengesellschaft, die offene Handelsgesellschaft', ru:'товарищество (форма компании)'}
+    ]},
+    { word:'to permit', meaning:'erlauben', items:[
+        {w:'permission', p:'n', tr:'пэми́шн', de:'die Erlaubnis, die Genehmigung', ru:'разрешение', ex:'You need permission before you can enter.'},
+        {w:'permit', p:'n', tr:'пёмит', de:'die (offizielle) Genehmigung', ru:'официальное разрешение'},
+        {w:'to permit sth', p:'v', tr:'ту пэми́т', de:'etw. gestatten, etw. erlauben', ru:'разрешать что-л.'}
+    ]},
+    { word:'to pollute', meaning:'verschmutzen', items:[
+        {w:'to pollute sth', p:'v', tr:'ту пэлю́т', de:'etw. verschmutzen', ru:'загрязнять что-л.'},
+        {w:'pollution', p:'n', tr:'пэлю́шн', de:'die Umweltverschmutzung', ru:'загрязнение', ex:'The city has a serious air pollution problem.'}
+    ]},
+    { word:'popular', meaning:'beliebt', items:[
+        {w:'popularity', p:'n', tr:'попьюла́рити', de:'die Beliebtheit', ru:'популярность', ex:'The product’s popularity grew fast.'}
+    ]},
+    { word:'to predict', meaning:'vorhersagen', items:[
+        {w:'to predict', p:'v', tr:'ту придикт', de:'vorhersagen, prognostizieren', ru:'предсказывать', ex:'It’s hard to predict how the market will react.'},
+        {w:'predictable', p:'adj', tr:'придиктэбл', de:'berechenbar, vorhersehbar', ru:'предсказуемый'}
+    ]},
+    { word:'to prepare', meaning:'vorbereiten', items:[
+        {w:'to prepare (for sth)', p:'v', tr:'ту припэ́э', de:'sich (auf etw.) vorbereiten', ru:'готовиться (к чему-л.)', ex:'Make sure you prepare well for the interview.'},
+        {w:'prepared (to be ~ to do sth)', p:'adj', tr:'припэ́эд', de:'bereit sein, etw. zu tun', ru:'быть готовым сделать что-л.'},
+        {w:'preparation (to sth)', p:'n', tr:'препэрэ́йшн', de:'die Vorbereitung (auf etw.)', ru:'подготовка (к чему-л.)'}
+    ]},
+    { word:'to prevent', meaning:'verhindern', items:[
+        {w:'to prevent sth', p:'v', tr:'ту привэ́нт', de:'etw. vermeiden, etw. verhindern', ru:'предотвращать что-л.', ex:'New rules were introduced to prevent accidents.'},
+        {w:'preventive', p:'adj', tr:'привэ́нтив', de:'vorbeugend, Vorsorge-', ru:'профилактический'}
+    ]},
+    { word:'professional', meaning:'professionell, die Fachkraft', items:[
+        {w:'professional', p:'n', tr:'прэфэ́шнл', de:'die Fachkraft; beruflich', ru:'профессионал; профессиональный', ex:'She is a real professional – always on time and well prepared.'},
+        {w:'professional training', p:'n', tr:'прэфэ́шнл трэ́йнин', de:'berufliche Schulung/Weiterbildung', ru:'профессиональное обучение'},
+        {w:'professionalism', p:'n', tr:'прэфэ́шнэлизм', de:'die Professionalität', ru:'профессионализм'}
+    ]},
+    { word:'proficient', meaning:'kompetent', items:[
+        {w:'proficiency (in sth)', p:'n', tr:'прэфи́шнси', de:'die Beherrschung (von etw.)', ru:'владение (чем-л. — языком)', ex:'The job requires proficiency in English and German.'},
+        {w:'to be proficient in sth', p:'v', tr:'ту би прэфи́шнт ин', de:'etw. beherrschen', ru:'хорошо владеть чем-л.'}
+    ]},
+    { word:'profit', meaning:'der Gewinn', items:[
+        {w:'profit margin', p:'n', tr:'про́фит ма́джин', de:'die Gewinnspanne', ru:'норма прибыли'},
+        {w:'profitable', p:'adj', tr:'про́фитэбл', de:'gewinnbringend, lukrativ', ru:'прибыльный', ex:'The new branch became profitable within a year.'},
+        {w:'profitability', p:'n', tr:'профитэби́лити', de:'die Rentabilität', ru:'рентабельность'}
+    ]},
+    { word:'to promote', meaning:'befördern, bewerben', items:[
+        {w:'promotion', p:'n', tr:'прэмо́ушн', de:'die Beförderung; die Werbung, die Absatzförderung', ru:'повышение; продвижение (товара)', ex:'She got a promotion after only one year.'},
+        {w:'promotional', p:'adj', tr:'прэмо́ушнл', de:'Werbe-', ru:'рекламный'}
+    ]},
+    { word:'to protect', meaning:'schützen', items:[
+        {w:'to protect sb/sth', p:'v', tr:'ту протэ́кт', de:'jdn./etw. schützen', ru:'защищать кого-л./что-л.', ex:'The new law protects consumer rights.'},
+        {w:'consumer protection', p:'n', tr:'консью́мэ протэ́кшн', de:'der Verbraucherschutz', ru:'защита прав потребителей'},
+        {w:'protective layer', p:'n', tr:'протэ́ктив лэ́йэ', de:'die Schutzschicht', ru:'защитный слой'}
+    ]},
+    { word:'to provide', meaning:'bereitstellen', items:[
+        {w:'to provide sth', p:'v', tr:'ту прэва́йд', de:'etw. bereitstellen', ru:'предоставлять что-л.', ex:'The company provides training for all new staff.'},
+        {w:'service provider', p:'n', tr:'сё́вис прэва́йдэ', de:'der/die Dienstleister(in)', ru:'поставщик услуг'}
+    ]},
+    { word:'to qualify', meaning:'qualifizieren', items:[
+        {w:'to qualify sb for sth', p:'v', tr:'ту куо́лифай фо', de:'jdn. zu etw. berechtigen', ru:'давать право кому-л. на что-л.'},
+        {w:'qualified', p:'adj', tr:'куо́лифайд', de:'qualifiziert', ru:'квалифицированный', ex:'We are looking for a qualified electrician.'},
+        {w:'higher education entrance qualification', p:'n', tr:'ха́йэ эдьюкэ́йшн э́нтрэнс куолификэ́йшн', de:'die Hochschulreife, das Abitur', ru:'аттестат для поступления в вуз'}
+    ]},
+    { word:'to quote', meaning:'zitieren, anbieten', items:[
+        {w:'to quote a price', p:'v', tr:'ту куо́ут э прайс', de:'einen Preis angeben/nennen', ru:'назвать цену', ex:'Can you quote a price for 500 units?'},
+        {w:'quotation', p:'n', tr:'куоутэ́йшн', de:'das Preisangebot, das Angebot', ru:'коммерческое предложение, цена'}
+    ]},
+    { word:'to recognize', meaning:'erkennen', items:[
+        {w:'to recognize sth', p:'v', tr:'ту рэ́когнайз', de:'etw. (wieder)erkennen', ru:'распознавать что-л.', ex:'The system can recognize a customer’s voice.'},
+        {w:'facial recognition', p:'n', tr:'фэ́йшл рэкогни́шн', de:'die Gesichtserkennung', ru:'распознавание лиц'}
+    ]},
+    { word:'to recommend', meaning:'empfehlen', items:[
+        {w:'to recommend sth', p:'v', tr:'ту рэкомэ́нд', de:'etw. empfehlen', ru:'рекомендовать что-л.', ex:'I would definitely recommend this supplier.'},
+        {w:'recommendation', p:'n', tr:'рэкомэндэ́йшн', de:'die Empfehlung', ru:'рекомендация'}
+    ]},
+    { word:'to recover', meaning:'sich erholen', items:[
+        {w:'to recover from sth', p:'v', tr:'ту рико́вэ фром', de:'sich von etw. erholen', ru:'восстанавливаться после чего-л.'},
+        {w:'economic recovery', p:'n', tr:'икэно́мик рико́вэри', de:'die Konjunkturerholung, der Wirtschaftsaufschwung', ru:'восстановление экономики', ex:'Economists expect a slow economic recovery.'}
+    ]},
+    { word:'to refuse', meaning:'sich weigern', items:[
+        {w:'to refuse to do sth', p:'v', tr:'ту рифью́з ту ду', de:'sich weigern, etw. zu tun', ru:'отказываться сделать что-л.', ex:'He refused to sign the contract.'},
+        {w:'refusal', p:'n', tr:'рифью́зл', de:'die Weigerung, die Verweigerung', ru:'отказ'}
+    ]},
+    { word:'to register', meaning:'registrieren', items:[
+        {w:'to register', p:'v', tr:'ту рэ́джистэ', de:'sich anmelden', ru:'регистрироваться', ex:'You need to register before the deadline.'},
+        {w:'business registration', p:'n', tr:'би́знэс рэджистрэ́йшн', de:'die Gewerbeanmeldung', ru:'регистрация предприятия'},
+        {w:'registered delivery', p:'n', tr:'рэ́джистэд диливэри', de:'das Einschreiben', ru:'заказное отправление'}
+    ]},
+    { word:'to regulate', meaning:'regulieren', items:[
+        {w:'to regulate sth', p:'v', tr:'ту рэ́гьюлейт', de:'etw. regeln, etw. regulieren', ru:'регулировать что-л.'},
+        {w:'regular customer', p:'n', tr:'рэ́гьюлэ ка́стэмэ', de:'der/die Stammkunde/-kundin', ru:'постоянный клиент', ex:'She has been a regular customer for ten years.'},
+        {w:'regulations', p:'n', tr:'рэгьюлэ́йшнз', de:'die Vorschriften', ru:'предписания, нормы'},
+        {w:'regulator', p:'n', tr:'рэ́гьюлейтэ', de:'die Aufsichtsbehörde', ru:'регулирующий орган'}
+    ]},
+    { word:'to reject', meaning:'ablehnen', items:[
+        {w:'to reject sb/sth', p:'v', tr:'ту риджэ́кт', de:'jdn./etw. ablehnen', ru:'отклонять кого-л./что-л.'},
+        {w:'rejection letter', p:'n', tr:'риджэ́кшн лэ́тэ', de:'das Ablehnungsschreiben, die schriftliche Absage', ru:'письмо-отказ', ex:'She received a rejection letter after the interview.'}
+    ]},
+    { word:'to relate', meaning:'sich beziehen (auf)', items:[
+        {w:'related (to sth)', p:'adj', tr:'рилэ́йтид', de:'verwandt (mit etw.)', ru:'связанный (с чем-л.)'},
+        {w:'public relations', p:'n', tr:'па́блик рилэ́йшнз', de:'die Öffentlichkeitsarbeit', ru:'связи с общественностью'},
+        {w:'relationship', p:'n', tr:'рилэ́йшншип', de:'die Beziehung, das Verhältnis', ru:'отношения, взаимосвязь', ex:'They have a good working relationship.'},
+        {w:'working relationship', p:'n', tr:'уёкин рилэ́йшншип', de:'das Arbeitsverhältnis', ru:'рабочие отношения'}
+    ]},
+    { word:'reliable', meaning:'zuverlässig', items:[
+        {w:'reliable', p:'adj', tr:'рила́йэбл', de:'zuverlässig', ru:'надёжный', ex:'He is a very reliable colleague.'},
+        {w:'reliability', p:'n', tr:'рилайэби́лити', de:'die Zuverlässigkeit', ru:'надёжность'}
+    ]},
+    { word:'to remind', meaning:'erinnern', items:[
+        {w:'to remind sb to do sth', p:'v', tr:'ту рима́йнд ту ду', de:'jdn. daran erinnern, etw. zu tun', ru:'напоминать кому-л. сделать что-л.', ex:'Please remind me to send the invoice.'},
+        {w:'reminder', p:'n', tr:'рима́йндэ', de:'die Zahlungserinnerung, die Mahnung', ru:'напоминание (об оплате)'}
+    ]},
+    { word:'to replace', meaning:'ersetzen', items:[
+        {w:'to replace sth', p:'v', tr:'ту риплэ́йс', de:'etw. austauschen, etw. ersetzen', ru:'заменять что-л.', ex:'The old machine was replaced last month.'},
+        {w:'replacement', p:'n', tr:'риплэ́йсмэнт', de:'der Ersatz, der Austausch', ru:'замена'}
+    ]},
+    { word:'to represent', meaning:'vertreten', items:[
+        {w:'to represent sb/sth', p:'v', tr:'ту рэпризэ́нт', de:'jdn./etw. repräsentieren', ru:'представлять кого-л./что-л.', ex:'She represents the company at trade fairs.'},
+        {w:'employee representation', p:'n', tr:'эмплойи́ рэпризэнтэ́йшн', de:'die Arbeitnehmervertretung', ru:'представительство работников'},
+        {w:'sales representative', p:'n', tr:'сэйлз рэпризэ́нтэтив', de:'der/die Handelsvertreter(in)', ru:'торговый представитель'}
+    ]},
+    { word:'to require', meaning:'benötigen, erfordern', items:[
+        {w:'to require sth', p:'v', tr:'ту рикуа́йэ', de:'etw. erfordern', ru:'требовать что-л.', ex:'The job requires good communication skills.'},
+        {w:'requirement', p:'n', tr:'рикуа́йэмэнт', de:'die Voraussetzung/Anforderung', ru:'требование'},
+        {w:'required skills', p:'n', tr:'рикуа́йэд скилз', de:'die erforderlichen Fähigkeiten/Kompetenzen', ru:'необходимые навыки'},
+        {w:'transferable skills', p:'n', tr:'трансфё́рэбл скилз', de:'übertragbare Fähigkeiten, Schlüsselqualifikationen', ru:'универсальные (переносимые) навыки', ex:'She listed teamwork and time management as transferable skills.'}
+    ]},
+    { word:'to resist', meaning:'widerstehen', items:[
+        {w:'to resist sth', p:'v', tr:'ту риэи́ст', de:'sich einer Sache widersetzen, sich gegen etw. sträuben', ru:'сопротивляться чему-л.'},
+        {w:'resistance band', p:'n', tr:'риэи́стэнс банд', de:'das Fitnessband', ru:'эспандер, резинка для фитнеса', ex:'She used a resistance band during the workout.'}
+    ]},
+    { word:'to respond', meaning:'antworten, reagieren', items:[
+        {w:'to respond to sth', p:'v', tr:'ту риэпо́нд ту', de:'auf etw. reagieren', ru:'реагировать на что-л.', ex:'The company responded quickly to the complaint.'},
+        {w:'respondent', p:'n', tr:'риэпо́ндэнт', de:'der/die Teilnehmer(in) (an einer Umfrage)', ru:'респондент (опроса)'},
+        {w:'response (to sth)', p:'n', tr:'риэпо́нс', de:'die Reaktion (auf etw.), die Antwort (auf etw.)', ru:'реакция, ответ (на что-л.)'}
+    ]},
+    { word:'to restrict', meaning:'einschränken', items:[
+        {w:'to restrict sth', p:'v', tr:'ту риэтрикт', de:'etw. einschränken', ru:'ограничивать что-л.'},
+        {w:'dietary restrictions', p:'n', tr:'да́йэтэри риэтрикшнз', de:'die Ernährungseinschränkungen', ru:'пищевые ограничения', ex:'Please tell us about any dietary restrictions.'}
+    ]},
+    { word:'retail', meaning:'der Einzelhandel', items:[
+        {w:'retail', p:'n', tr:'ри́тейл', de:'der Einzelhandel', ru:'розничная торговля', ex:'She has ten years of experience in retail.'},
+        {w:'retailer', p:'n', tr:'ри́тэйлэ', de:'der/die Einzelhändler(in)', ru:'розничный продавец'}
+    ]},
+    { word:'to retire', meaning:'in Rente gehen', items:[
+        {w:'to retire', p:'v', tr:'ту рита́йэ', de:'in den Ruhestand gehen', ru:'выходить на пенсию', ex:'He plans to retire at 65.'},
+        {w:'retired', p:'adj', tr:'рита́йэд', de:'pensioniert, im Ruhestand', ru:'на пенсии'},
+        {w:'retirement savings plan', p:'n', tr:'рита́йэмэнт сэ́йвинз план', de:'der Rentensparplan, die Altersvorsorge', ru:'пенсионный накопительный план'}
+    ]},
+    { word:'to satisfy', meaning:'zufriedenstellen', items:[
+        {w:'customer satisfaction', p:'n', tr:'ка́стэмэ сатисфа́кшн', de:'die Kundenzufriedenheit', ru:'удовлетворённость клиентов', ex:'Customer satisfaction is our top priority.'},
+        {w:'satisfying', p:'adj', tr:'са́тисфайин', de:'befriedigend', ru:'приносящий удовлетворение'},
+        {w:'satisfactory explanation', p:'n', tr:'сатисфа́ктэри икспланэ́йшн', de:'die zufriedenstellende Erklärung', ru:'удовлетворительное объяснение'}
+    ]},
+    { word:'to save', meaning:'sparen, retten', items:[
+        {w:'to save sth', p:'v', tr:'ту сэйв', de:'etw. aufheben, etw. aufbewahren; etw. retten', ru:'сохранять, откладывать; экономить что-л.'},
+        {w:'saving', p:'n', tr:'сэ́йвин', de:'die Ersparnis', ru:'экономия', ex:'They made big savings by switching supplier.'}
+    ]},
+    { word:'scary', meaning:'beängstigend', items:[
+        {w:'scare', p:'n', tr:'скэ́э', de:'das Schreckensszenario, die Panikmache', ru:'паника, испуг'},
+        {w:'scary', p:'adj', tr:'скэ́эри', de:'beängstigend, unheimlich', ru:'страшный', ex:'It was a bit scary to speak in front of so many people.'}
+    ]},
+    { word:'to settle', meaning:'begleichen, regeln', items:[
+        {w:'to settle a bill', p:'v', tr:'ту сэтл э бил', de:'eine Rechnung begleichen', ru:'оплатить счёт', ex:'The invoice must be settled within 30 days.'},
+        {w:'settlement', p:'n', tr:'сэ́тлмэнт', de:'die Begleichung', ru:'погашение, расчёт'},
+        {w:'monthly settlement', p:'n', tr:'ма́нсли сэ́тлмэнт', de:'die monatliche Abrechnung', ru:'ежемесячный расчёт'}
+    ]},
+    { word:'to ship', meaning:'versenden', items:[
+        {w:'shipping charge', p:'n', tr:'ши́пин чадж', de:'die Versandkosten', ru:'стоимость доставки'},
+        {w:'shipping company', p:'n', tr:'ши́пин ка́мпэни', de:'das Versandunternehmen, der Spediteur', ru:'транспортная компания'},
+        {w:'shipment', p:'n', tr:'ши́пмэнт', de:'die Sendung', ru:'партия груза, отправка', ex:'The shipment is expected to arrive next week.'},
+        {w:'port of shipment', p:'n', tr:'пот ов ши́пмэнт', de:'der Verschiffungshafen', ru:'порт отгрузки'}
+    ]},
+    { word:'signature', meaning:'die Unterschrift', items:[
+        {w:'signature', p:'n', tr:'си́гначэ', de:'die Unterschrift', ru:'подпись', ex:'The contract needs your signature.'},
+        {w:'signatory', p:'n', tr:'си́гнэтэри', de:'der/die Unterzeichnete/-r, der/die Unterzeichner(in)', ru:'подписавшая сторона'}
+    ]},
+    { word:'to structure', meaning:'strukturieren', items:[
+        {w:'to structure sth', p:'v', tr:'ту стра́кчэ', de:'etw. aufbauen, etw. gliedern', ru:'структурировать что-л.'},
+        {w:'well-structured', p:'adj', tr:'уэл-стра́кчэд', de:'übersichtlich, gut aufgebaut', ru:'хорошо структурированный', ex:'The report was clear and well-structured.'},
+        {w:'company structure', p:'n', tr:'ка́мпэни стра́кчэ', de:'die Unternehmensstruktur', ru:'структура компании'}
+    ]},
+    { word:'to subsidize', meaning:'subventionieren', items:[
+        {w:'to subsidize sth', p:'v', tr:'ту са́бсидайз', de:'etw. bezuschussen, etw. subventionieren', ru:'субсидировать что-л.'},
+        {w:'subsidized on-site nursery', p:'n', tr:'са́бсидайзд он-сайт нё́сэри', de:'der bezuschusste Betriebskindergarten', ru:'субсидируемый корпоративный детский сад'},
+        {w:'subsidiary', p:'n', tr:'сабси́диэри', de:'die Tochtergesellschaft', ru:'дочерняя компания', ex:'The German office is a subsidiary of the American parent company.'}
+    ]},
+    { word:'to suit', meaning:'passen', items:[
+        {w:'to suit sb', p:'v', tr:'ту сьют', de:'(zu) jdm. passen', ru:'подходить кому-л.'},
+        {w:'suitable', p:'adj', tr:'сью́тэбл', de:'geeignet', ru:'подходящий', ex:'This candidate seems very suitable for the role.'}
+    ]},
+    { word:'to summarize', meaning:'zusammenfassen', items:[
+        {w:'to summarize sth', p:'v', tr:'ту са́мэрайз', de:'etw. zusammenfassen', ru:'подводить итог, резюмировать что-л.', ex:'Let me summarize the main points.'},
+        {w:'summary', p:'n', tr:'са́мэри', de:'die Zusammenfassung', ru:'краткое изложение, резюме'}
+    ]},
+    { word:'to supervise', meaning:'beaufsichtigen', items:[
+        {w:'to supervise sb', p:'v', tr:'ту сью́пэвайз', de:'jdn. betreuen, jdn. beaufsichtigen', ru:'контролировать, курировать кого-л.'},
+        {w:'supervisor', p:'n', tr:'сью́пэвайзэ', de:'der/die Vorgesetzte(r), der/die Ausbildungsleiter(in)', ru:'руководитель, куратор', ex:'Ask your supervisor if you have questions.'}
+    ]},
+    { word:'suspicious', meaning:'misstrauisch', items:[
+        {w:'suspicion', p:'n', tr:'сэспи́шн', de:'der Verdacht', ru:'подозрение'},
+        {w:'suspicious', p:'adj', tr:'сэспи́шэс', de:'misstrauisch; verdächtig', ru:'подозрительный', ex:'The bank became suspicious of the transaction.'}
+    ]},
+    { word:'sustainable', meaning:'nachhaltig', items:[
+        {w:'sustainability', p:'n', tr:'сэстэйнэби́лити', de:'die Nachhaltigkeit', ru:'устойчивость (экологическая)', ex:'Sustainability is now part of the company’s strategy.'},
+        {w:'sustainable', p:'adj', tr:'сэстэ́йнэбл', de:'nachhaltig', ru:'устойчивый, экологичный'}
+    ]},
+    { word:'tax', meaning:'die Steuer', items:[
+        {w:'VAT (value added tax)', p:'n', tr:'ви-эй-ти', de:'die Mehrwertsteuer (MwSt)', ru:'НДС'},
+        {w:'taxation', p:'n', tr:'таксэ́йшн', de:'die Besteuerung, die Steuern', ru:'налогообложение', ex:'The government changed the rules on taxation.'},
+        {w:'tax officer', p:'n', tr:'такс о́фисэ', de:'der/die Finanzbeamte(r)', ru:'налоговый инспектор'}
+    ]},
+    { word:'technical', meaning:'technisch', items:[
+        {w:'technical devices', p:'n', tr:'тэ́кникл дива́йсиз', de:'die technischen Geräte', ru:'технические устройства'},
+        {w:'technician', p:'n', tr:'тэкни́шн', de:'der/die Techniker(in)', ru:'техник', ex:'A technician came to fix the printer.'},
+        {w:'technique', p:'n', tr:'тэкни́к', de:'die Methode, die Technik', ru:'метод, техника'}
+    ]},
+    { word:'to terminate', meaning:'beenden, kündigen', items:[
+        {w:'to terminate a contract', p:'v', tr:'ту тё́минэйт э контракт', de:'einen Vertrag aufheben/auflösen/kündigen', ru:'расторгнуть договор', ex:'Either side can terminate the contract with one month’s notice.'},
+        {w:'termination', p:'n', tr:'тёминэ́йшн', de:'die (Vertrags-)Auflösung, die Kündigung', ru:'расторжение, увольнение'}
+    ]},
+    { word:'to threaten', meaning:'drohen', items:[
+        {w:'threat', p:'n', tr:'срэт', de:'die Drohung', ru:'угроза', ex:'The email contained a serious threat.'},
+        {w:'to threaten sb/sth', p:'v', tr:'ту срэ́тн', de:'jdn./etw. bedrohen', ru:'угрожать кому-л./чему-л.'},
+        {w:'to threaten to do sth', p:'v', tr:'ту срэ́тн ту ду', de:'damit drohen, etw. zu tun', ru:'угрожать сделать что-л.'}
+    ]},
+    { word:'transaction', meaning:'die Transaktion', items:[
+        {w:'transaction', p:'n', tr:'транза́кшн', de:'der Geschäftsvorgang, die Transaktion', ru:'сделка, транзакция', ex:'The bank blocked the transaction.'},
+        {w:'transactional relationship', p:'n', tr:'транза́кшнл рилэ́йшншип', de:'die Geschäftsbeziehung', ru:'чисто деловые отношения'}
+    ]},
+    { word:'to transfer', meaning:'überweisen, übertragen', items:[
+        {w:'bank transfer', p:'n', tr:'банк тра́нсфё', de:'die Überweisung', ru:'банковский перевод', ex:'Please pay by bank transfer.'},
+        {w:'transferable', p:'adj', tr:'трансфё́рэбл', de:'übertragbar', ru:'передаваемый, переводимый'}
+    ]},
+    { word:'to treat', meaning:'behandeln', items:[
+        {w:'to treat sb', p:'v', tr:'ту трит', de:'jdn. behandeln', ru:'обращаться с кем-л.', ex:'All customers should be treated with respect.'},
+        {w:'treatment', p:'n', tr:'три́тмэнт', de:'die (ärztliche) Behandlung', ru:'лечение, обращение'}
+    ]},
+    { word:'to verify', meaning:'überprüfen', items:[
+        {w:'verifiable', p:'adj', tr:'вэ́рифайэбл', de:'nachweisbar, überprüfbar', ru:'проверяемый', ex:'All the figures in the report must be verifiable.'}
+    ]},
+    { word:'visible', meaning:'sichtbar', items:[
+        {w:'visibility', p:'n', tr:'визиби́лити', de:'die Sichtbarkeit', ru:'видимость, узнаваемость', ex:'Social media has increased the brand’s visibility.'}
+    ]},
+    { word:'to visualize', meaning:'veranschaulichen', items:[
+        {w:'visual', p:'adj', tr:'ви́жуэл', de:'visuell', ru:'визуальный'},
+        {w:'to visualize sth', p:'v', tr:'ту ви́жуэлайз', de:'etw. veranschaulichen, etw. visualisieren', ru:'наглядно представлять что-л.', ex:'The chart helps visualize the results.'},
+        {w:'visuals', p:'n', tr:'ви́жуэлз', de:'das Bildmaterial, die Optik', ru:'визуальные материалы'}
+    ]},
+    { word:'voluntary', meaning:'freiwillig', items:[
+        {w:'voluntary', p:'adj', tr:'во́лэнтэри', de:'freiwillig', ru:'добровольный'},
+        {w:'volunteer', p:'n', tr:'волэнти́э', de:'der/die ehrenamtliche Mitarbeiter(in), der/die Freiwillige(r)', ru:'волонтёр', ex:'She works as a volunteer at the shelter on weekends.'},
+        {w:'volunteer work', p:'n', tr:'волэнти́э уёк', de:'die ehrenamtliche Tätigkeit(en)', ru:'волонтёрская работа'},
+        {w:'volunteering', p:'n', tr:'волэнти́эрин', de:'die ehrenamtliche Tätigkeit, der Freiwilligendienst', ru:'волонтёрство'}
+    ]},
+    { word:'weight', meaning:'das Gewicht', items:[
+        {w:'weight', p:'n', tr:'уэйт', de:'das Gewicht', ru:'вес'},
+        {w:'weighted', p:'adj', tr:'уэ́йтид', de:'gewichtet', ru:'взвешенный', ex:'The final score is a weighted average.'},
+        {w:'weighting', p:'n', tr:'уэ́йтин', de:'die Gewichtung', ru:'взвешивание, весовой коэффициент'}
+    ]},
+    { word:'willing', meaning:'bereit', items:[
+        {w:'to be willing to do sth', p:'v', tr:'ту би уи́лин ту ду', de:'bereit sein, etw. zu tun', ru:'быть готовым сделать что-л.', ex:'She is willing to work overtime if needed.'},
+        {w:'willingness (to sth)', p:'n', tr:'уи́линнэс', de:'die Bereitschaft (zu/für etw.)', ru:'готовность (к чему-л.)'}
+    ]}
+    ];
+
+    var listBox = document.getElementById('wflist');
+    var cntBox = document.getElementById('wfcnt');
+    var qInput = document.getElementById('wfq');
+    var CAT_LABEL = { n: 'Nomen', v: 'Verben', adj: 'Adjektive' };
+    var CAT_ORDER = { v: 0, n: 1, adj: 2 };
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function posLabel(p) {
+        return p === 'v' ? 'V' : (p === 'n' ? 'N' : 'Adj');
+    }
+
+    function renderItem(it) {
+        var row = document.createElement('div');
+        row.className = 'wf-row' + (it.ex ? '' : ' wf-row-compact');
+        row.innerHTML =
+            '<div class="wf-word-wrap">' +
+                '<span class="wf-word">' + esc(it.w) + '</span>' +
+                '<span class="wf-pos ' + it.p + '">' + posLabel(it.p) + '</span>' +
+                (it.tr ? '<span class="wf-tr">[' + esc(it.tr) + ']</span>' : '') +
+            '</div>' +
+            '<div class="wf-body-r">' +
+                '<div class="wf-de">' + esc(it.de) + '</div>' +
+                (it.ru ? '<div class="wf-ru">' + esc(it.ru) + '</div>' : '') +
+                (it.ex ? '<div class="wf-ex">&bdquo;' + esc(it.ex) + '&ldquo;</div>' : '') +
+            '</div>';
+        return row;
+    }
+
+    function renderFamily(fam, idx) {
+        var block = document.createElement('div');
+        block.className = 'wf-block' + (idx === 0 ? ' open' : '');
+        block.dataset.search = (fam.word + ' ' + fam.meaning + ' ' + fam.items.map(function (it) {
+            return it.w + ' ' + it.de + ' ' + (it.ru || '') + ' ' + (it.ex || '');
+        }).join(' ')).toLowerCase();
+
+        var head = document.createElement('div');
+        head.className = 'wf-head';
+        head.innerHTML =
+            '<span class="wf-root">' + esc(fam.word) + '</span>' +
+            '<span class="wf-meaning">' + esc(fam.meaning) + '</span>' +
+            '<span class="wf-count">' + fam.items.length + ' Wörter' + '</span>' +
+            '<span class="wf-arrow">›</span>';
+        head.addEventListener('click', function () { block.classList.toggle('open'); });
+        block.appendChild(head);
+
+        var body = document.createElement('div');
+        body.className = 'wf-body';
+
+        var displayItems = fam.items.slice().sort(function (a, b) {
+            return (CAT_ORDER[a.p] === undefined ? 9 : CAT_ORDER[a.p]) - (CAT_ORDER[b.p] === undefined ? 9 : CAT_ORDER[b.p]);
+        });
+
+        var lastGroup = null;
+        displayItems.forEach(function (it) {
+            var groupKey = CAT_LABEL[it.p] || null;
+            if (groupKey && groupKey !== lastGroup) {
+                var lbl = document.createElement('div');
+                lbl.className = 'wf-group-label';
+                lbl.textContent = groupKey;
+                body.appendChild(lbl);
+                lastGroup = groupKey;
+            }
+            body.appendChild(renderItem(it));
+        });
+
+        block.appendChild(body);
+        return block;
+    }
+
+    function render() {
+        listBox.innerHTML = '';
+        FAMILIES.forEach(function (fam, idx) {
+            listBox.appendChild(renderFamily(fam, idx));
+        });
+        updateCount();
+        var totalWords = FAMILIES.reduce(function (n, f) { return n + f.items.length; }, 0);
+        document.getElementById('wfsubtitle').textContent =
+            FAMILIES.length + ' Wortfamilien · ' + totalWords + ' Wörter · DE + RU + Aussprache';
+    }
+
+    function updateCount(visible) {
+        var totalWords = FAMILIES.reduce(function (n, f) { return n + f.items.length; }, 0);
+        if (visible === undefined) {
+            cntBox.textContent = FAMILIES.length + ' Familien · ' + totalWords + ' Wörter';
+        } else {
+            cntBox.textContent = 'Gefunden: ' + visible + ' von ' + FAMILIES.length + ' Familien';
+        }
+    }
+
+    qInput.addEventListener('input', function () {
+        var q = qInput.value.trim().toLowerCase();
+        var blocks = listBox.querySelectorAll('.wf-block');
+        if (!q) {
+            Array.prototype.forEach.call(blocks, function (b) { b.classList.remove('wf-hide'); });
+            updateCount();
+            return;
+        }
+        var visible = 0;
+        Array.prototype.forEach.call(blocks, function (b) {
+            var match = b.dataset.search.indexOf(q) > -1;
+            b.classList.toggle('wf-hide', !match);
+            if (match) { b.classList.add('open'); visible++; }
+        });
+        updateCount(visible);
+    });
+
+    render();
+    </script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>
