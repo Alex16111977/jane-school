@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB BWR — Gewinnverteilung bei Personengesellschaften | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #egb-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #2a1600; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+    /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute; bottom: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4); font-size: 0.72rem; font-weight: 800; line-height: 1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: all 0.18s;
+        z-index: 3; flex-shrink: 0; padding: 0; font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    .plan-badge {
+        position: absolute; top: -8px; left: 8px; font-size: 0.6rem; font-weight: 800;
+        padding: 0.13rem 0.48rem; border-radius: 20px; white-space: nowrap; letter-spacing: 0.05em;
+        pointer-events: none; z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px; padding: 0.9rem 1.1rem; margin-bottom: 1.4rem;
+        display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.55); font-size: 0.8rem;
+        font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg { display: none; text-align: center; color: rgba(255,255,255,0.3);
+                      padding: 2.5rem 0; font-size: 0.9rem; line-height: 1.8; }
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+    /* ---- Ссылки на разборы на сайте ---- */
+    .sl { margin:0.75rem 0 0; padding:0.6rem 0.85rem; border-left:2px solid rgba(200,165,255,0.45);
+          background:rgba(200,165,255,0.06); border-radius:0 10px 10px 0;
+          font-size:0.845rem; color:rgba(230,230,235,0.62); line-height:1.8; }
+    .sl-t { display:block; color:rgba(230,230,235,0.85); font-weight:700; font-size:0.8rem;
+            letter-spacing:0.02em; margin-bottom:0.15rem; }
+    .sl a { color:#c8a5ff; text-decoration:none; border-bottom:1px dotted rgba(200,165,255,0.55); }
+    .sl a:hover { color:#fff; border-bottom-color:#fff; }
+
+    /* ---- Tabellen ---- */
+    .mt-wrap { overflow-x:auto; margin:0.8rem 0; }
+    .mt { width:100%; border-collapse:collapse; font-size:0.92rem; min-width:420px; }
+    .mt th, .mt td { border:1px solid rgba(255,255,255,0.14); padding:0.45rem 0.65rem; text-align:center; color:rgba(230,230,235,0.85); }
+    .mt th { background:rgba(255,255,255,0.07); color:#fff; font-weight:700; font-size:0.85rem; line-height:1.35; }
+    .mt td.l, .mt th.l { text-align:left; }
+    .mt tr.sum td { background:rgba(63,185,80,0.1); font-weight:700; color:#fff; }
+    .mt td.hl { background:rgba(251,191,36,0.14); color:#fbbf24; font-weight:800; }
+    .mt td.dim { color:rgba(230,230,235,0.45); }
+    .mt caption { caption-side:top; text-align:left; font-size:0.82rem; color:rgba(230,230,235,0.5);
+                  padding-bottom:0.35rem; }
+
+    /* ---- Rechenweg ---- */
+    .rw { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+          padding:0.75rem 0.95rem; margin:0.55rem 0; font-size:1rem; color:#fff; line-height:2; }
+    .rw .step { display:block; color:rgba(230,230,235,0.48); font-size:0.79rem; line-height:1.5;
+                margin-top:0.35rem; }
+    .rw .step:first-child { margin-top:0; }
+    .rw b { color:#fbbf24; }
+    .rw .erg { color:#86efac; font-weight:800; }
+
+    /* ---- Deutscher Satz zum Vorlesen ---- */
+    .dsatz { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.28); border-radius:9px;
+             padding:0.6rem 0.85rem; color:#fff; font-size:0.97rem; line-height:1.65; margin:0.5rem 0 0.15rem; }
+    .dsatz-ru { font-size:0.86rem; color:rgba(230,230,235,0.62); margin:0 0 0.9rem 0.25rem; line-height:1.6; }
+    .dsatz-ru b { color:#c8a5ff; font-weight:600; }
+
+    /* ---- Vertragsauszug ---- */
+    .vertrag { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.14); border-radius:10px;
+               padding:0.85rem 1rem; margin:0.7rem 0; font-size:0.92rem; color:rgba(230,230,235,0.85); line-height:1.75; }
+    .vertrag .vg-titel { color:#fbbf24; font-weight:800; font-size:0.88rem; margin-bottom:0.5rem; }
+    .vertrag .vg-p { color:#fff; font-weight:700; font-size:0.88rem; margin:0.6rem 0 0.15rem; }
+    .vertrag b { color:#fff; }
+
+    /* ---- Schritte ---- */
+    .schritte { list-style:none; padding:0; margin:0.6rem 0 0; counter-reset:sc; }
+    .schritte li { position:relative; padding:0.5rem 0 0.5rem 2.3rem; counter-increment:sc;
+                   font-size:0.93rem; color:rgba(230,230,235,0.8); line-height:1.65;
+                   border-bottom:1px dashed rgba(255,255,255,0.08); }
+    .schritte li:last-child { border-bottom:none; }
+    .schritte li::before { content:counter(sc); position:absolute; left:0; top:0.5rem;
+        width:1.55rem; height:1.55rem; border-radius:50%; background:rgba(245,158,11,0.18);
+        border:1px solid rgba(245,158,11,0.45); color:#fbbf24; font-size:0.8rem; font-weight:800;
+        display:flex; align-items:center; justify-content:center; }
+    .schritte li b { color:#fff; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.6; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-de { color:#fff; font-weight:600; }
+    .warn { background:rgba(248,113,113,0.09); border:1px solid rgba(248,113,113,0.3);
+            border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+            color:rgba(230,230,235,0.82); line-height:1.65; }
+    .warn b { color:#fca5a5; }
+    .gut { background:rgba(63,185,80,0.09); border:1px solid rgba(63,185,80,0.3);
+           border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+           color:rgba(230,230,235,0.82); line-height:1.65; }
+    .gut b { color:#86efac; }
+    .sprech { background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.28);
+              border-radius:10px; padding:0.6rem 0.9rem; margin:0.6rem 0; font-size:0.88rem;
+              color:rgba(230,230,235,0.78); line-height:1.7; }
+    .sprech b { color:#93c5fd; }
+
+    /* ---- Wortschatz ---- */
+    .vt { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    .vt td { border-bottom:1px solid rgba(255,255,255,0.08); padding:0.45rem 0.55rem; vertical-align:top; }
+    .vt td.de { color:#fff; font-weight:600; width:42%; }
+    .vt td.ru { color:rgba(230,230,235,0.68); line-height:1.55; }
+    .vt tr:last-child td { border-bottom:none; }
+
+    /* ---- gelöst-Badge ---- */
+    .solved-badge { display:inline-flex; align-items:center; gap:0.35rem; background:rgba(63,185,80,0.16);
+                    border:1px solid rgba(63,185,80,0.4); color:#86efac; font-size:0.78rem; font-weight:800;
+                    padding:0.25rem 0.7rem; border-radius:20px; margin-bottom:0.7rem; }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html" class="active">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-bwr.html">BWR</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB BWR</span>
+        </nav>
+        <a href="deutsch-bwr.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zu BWR &mdash; die sieben Handlungsfelder</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB BWR</h1>
+            <p class="page-subtitle">Reale F&auml;lle aus dem BWR-Unterricht am Erich-Gutenberg-Berufskolleg &mdash; Aufgabe f&uuml;r Aufgabe &middot; <b>Thema 1: Gewinnverteilung bei OHG und KG</b> &mdash; решение по-немецки, объяснение по-русски, чтобы уверенно отвечать вслух</p>
+        </div>
+
+        <div id="egb-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="egb-search" placeholder="Thema suchen&hellip; z.B. Vorab, Zinsen, Komplement&auml;r" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="egb-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Aus dem BWR-Unterricht
+        </h2>
+        <p id="egb-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Jeder Fall und jede &Uuml;bung von der Tafel &mdash; eigene Karte. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#2a1600;">1</span>
+            <h3 style="color:#fbbf24;">Gewinnverteilung bei OHG und KG</h3>
+            <span class="iw-sec-note">Besprechung &bdquo;01_BWR&ldquo; &middot; F&auml;lle 1, 2, 4, 5 + &Uuml;bungen 4 und 5</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#bwr1" class="subject-card glass-card" data-lesson="bwr1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F9EE;</span>
+                <h3>Fall 1: OHG nach Kapitaleinlagen</h3>
+                <p>Eda, Malin und Kim teilen 324.000 € im Verh&auml;ltnis ihrer Einlagen &mdash; die einfachste Verteilungsart</p>
+            </a>
+            <a href="#bwr2" class="subject-card glass-card" data-lesson="bwr2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F465;</span>
+                <h3>Fall 2: KG nach K&ouml;pfen</h3>
+                <p>Amar, Dino und Arda &mdash; keine Einlagen vereinbart, also wird 270.000 € einfach durch drei geteilt</p>
+            </a>
+            <a href="#bwr3" class="subject-card glass-card" data-lesson="bwr3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4D0;</span>
+                <h3>Die Reihenfolge: Vorab, Zinsen, Rest</h3>
+                <p>Warum der Vertrag eigene Regeln festlegen darf, und in welcher Reihenfolge sie gelten</p>
+            </a>
+            <a href="#bwr4" class="subject-card glass-card" data-lesson="bwr4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4BC;</span>
+                <h3>Fall 4: KG mit Vorab-Verg&uuml;tung</h3>
+                <p>Amar bekommt als Komplement&auml;r zuerst 40.000 € f&uuml;r die Gesch&auml;ftsf&uuml;hrung, der Rest folgt den Einlagen</p>
+            </a>
+            <a href="#bwr5" class="subject-card glass-card" data-lesson="bwr5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x2705;</span>
+                <h3>&Uuml;bung 4 (gel&ouml;st): Sonnental KG</h3>
+                <p>Hanna, Paul und Aylin &mdash; die Aufgabe war auf dem Blatt leer, hier komplett vorgerechnet</p>
+            </a>
+            <a href="#bwr6" class="subject-card glass-card" data-lesson="bwr6" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F4DC;</span>
+                <h3>Fall 5: Bauer KG &mdash; Vorab, Zinsen, Rest</h3>
+                <p>Echter Vertragsauszug (&sect;6/&sect;7) &mdash; alle drei Schritte auf einmal, mit Verzinsung des Kapitals</p>
+            </a>
+            <a href="#bwr7" class="subject-card glass-card" data-lesson="bwr7" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x2705;</span>
+                <h3>&Uuml;bung 5 (gel&ouml;st): Kaya KG</h3>
+                <p>Kaya, Wolf und Berg &mdash; auch diese Aufgabe war leer, hier vollst&auml;ndig gel&ouml;st mit Probe</p>
+            </a>
+            <a href="#bwr8" class="subject-card glass-card" data-lesson="bwr8" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F5E3;&#xFE0F;</span>
+                <h3>Rechenschema &amp; Redemittel</h3>
+                <p>Die sechs Schritte als Spickzettel f&uuml;r jede Aufgabe, plus fertige S&auml;tze, um das Ergebnis vorzutragen</p>
+            </a>
+            <a href="#bwr9" class="subject-card glass-card" data-lesson="bwr9" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(245,158,11,0.35);">
+                <span class="subject-icon">&#x1F9E9;</span>
+                <h3>Wortschatz &amp; Selbsttest</h3>
+                <p>Komplement&auml;r, Kommanditist, Restgewinn &hellip; Vokabular dieser Stunde und Fragen dazu</p>
+            </a>
+        </div>
+
+        </div><!-- /egb-hub -->
+
+        <div id="egb-lessons">
+
+        <!-- ================= bwr1 ================= -->
+        <div class="lesson" id="ls-bwr1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9EE;</span>
+                    <div>
+                        <h2>Fall 1: OHG nach Kapitaleinlagen</h2>
+                        <p class="lesson-header-sub">Lehrer-Input &middot; Musterl&ouml;sung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Eda, Malin und Kim f&uuml;hren gemeinsam eine <b class="kb-de">OHG</b> (offene Handelsgesellschaft).
+                        Gewinn: <b class="kb-de">324.000 €</b>. Im Vertrag sind nur die Einlagen festgelegt &rarr; der Gewinn
+                        wird nach den Einlagen verteilt.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Anteil<br><span style="font-weight:400;font-size:0.76rem;">Einlage : Gesamtkapital</span></th><th>Gewinnanteil<br><span style="font-weight:400;font-size:0.76rem;">Gewinn &times; Anteil</span></th></tr>
+                        <tr><td class="l">Eda</td><td>300.000 €</td><td>300.000 : 600.000 = <b>50 %</b></td><td class="hl">324.000 € &times; 50 % = 162.000 €</td></tr>
+                        <tr><td class="l">Malin</td><td>200.000 €</td><td>200.000 : 600.000 = 1/3 &approx; <b>33,33 %</b></td><td class="hl">324.000 € &times; 1/3 = 108.000 €</td></tr>
+                        <tr><td class="l">Kim</td><td>100.000 €</td><td>100.000 : 600.000 = 1/6 &approx; <b>16,67 %</b></td><td class="hl">324.000 € &times; 1/6 = 54.000 €</td></tr>
+                        <tr class="sum"><td class="l">Summe</td><td>300.000+200.000+100.000 = <b>600.000 €</b></td><td>= <b>100 %</b></td><td>162.000+108.000+54.000 = <b>324.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Der Gewinn wird im Verh&auml;ltnis der Kapitaleinlagen verteilt. Eda erh&auml;lt die H&auml;lfte des Gewinns, weil sie die H&auml;lfte des Gesamtkapitals eingebracht hat.&ldquo;</div>
+                    <div class="dsatz-ru">Прибыль делят пропорционально доле каждого в общем капитале. Эда внесла
+                        половину капитала (300.000 из 600.000) — значит, получает и половину прибыли. Так же и Малин
+                        (1/3 капитала → 1/3 прибыли) и Ким (1/6 → 1/6). <b>im Verhältnis von</b> — «пропорционально»,
+                        полезная формулировка для устного ответа.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr3">Die Reihenfolge: Vorab, Zinsen, Rest</a> — was gilt, wenn im Vertrag mehr als nur die Einlagen geregelt ist<br>
+                        <a href="iw-egb.html#rf3">EGB Informationswirtschaft — OHG</a> — Haftung und Gr&uuml;ndung der OHG als Rechtsform<br>
+                        <a href="#bwr9">Wortschatz &amp; Selbsttest</a> — alle Begriffe dieser Stunde gesammelt
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr2 ================= -->
+        <div class="lesson" id="ls-bwr2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F465;</span>
+                    <div>
+                        <h2>Fall 2: KG nach K&ouml;pfen</h2>
+                        <p class="lesson-header-sub">Lehrer-Input &middot; Musterl&ouml;sung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Amar, Dino und Arda f&uuml;hren eine <b class="kb-de">KG</b> (Kommanditgesellschaft). Gewinn:
+                        <b class="kb-de">270.000 €</b>. Im Vertrag wurde <b>weder die Beteiligung noch der Wert der
+                        Einlagen festgelegt</b> &rarr; Verteilung nach K&ouml;pfen.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Gewinnanteil<br><span style="font-weight:400;font-size:0.76rem;">Gewinn : Anzahl der Gesellschafter</span></th></tr>
+                        <tr><td class="l">Amar <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;r)</span></td><td class="dim">&ndash; (nicht vereinbart)</td><td class="hl">270.000 € : 3 = 90.000 €</td></tr>
+                        <tr><td class="l">Dino <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td class="dim">&ndash; (nicht vereinbart)</td><td class="hl">270.000 € : 3 = 90.000 €</td></tr>
+                        <tr><td class="l">Arda <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td class="dim">&ndash; (nicht vereinbart)</td><td class="hl">270.000 € : 3 = 90.000 €</td></tr>
+                        <tr class="sum"><td class="l">Anzahl: 3 Gesellschafter</td><td></td><td>90.000 € &times; 3 = <b>270.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Da im Vertrag weder die Beteiligung noch der Wert der Einlagen geregelt ist, wird der Gewinn zu gleichen Teilen nach K&ouml;pfen verteilt &mdash; unabh&auml;ngig davon, wer Komplement&auml;r und wer Kommanditist ist.&ldquo;</div>
+                    <div class="dsatz-ru">«Nach Köpfen» = поровну на каждого человека, независимо от размера вклада
+                        и от того, Komplementär он или Kommanditist. Это работает только тогда, когда в договоре
+                        вообще ничего не написано про распределение — сравни с <a href="#bwr1" style="color:#c8a5ff;">Fall 1</a>,
+                        где вклады были и делили именно по ним.</div>
+                    <div class="warn"><b>Achtung, Verwechslungsgefahr:</b> &bdquo;nach K&ouml;pfen&ldquo; hat nichts mit
+                        Komplement&auml;r/Kommanditist zu tun &mdash; Amar bekommt hier genauso viel wie Dino und Arda,
+                        obwohl er als Komplement&auml;r unbeschr&auml;nkt haftet. Die Rolle wirkt sich erst aus, wenn der
+                        Vertrag das ausdr&uuml;cklich regelt (siehe <a href="#bwr4" style="color:#fca5a5;">Fall 4</a>).</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="iw-egb.html#rf4">EGB Informationswirtschaft — KG</a> — Komplement&auml;r vs. Kommanditist, Haftung im Detail<br>
+                        <a href="#bwr4">Fall 4: KG mit Vorab-Verg&uuml;tung</a> — hier bekommt der Komplement&auml;r sehr wohl mehr<br>
+                        <a href="mathe-prozent.html">Prozentrechnung</a> — Anteile und Prozente allgemein üben
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr3 ================= -->
+        <div class="lesson" id="ls-bwr3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4D0;</span>
+                    <div>
+                        <h2>Die Reihenfolge: Vorab, Zinsen, Rest</h2>
+                        <p class="lesson-header-sub">Der Gesellschaftsvertrag darf eigene Regeln festlegen</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Grundregel</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.75);line-height:1.75;">
+                        Das Gesetz gilt nur, wenn die Gesellschafter <b>nichts anderes vereinbart haben</b>. Im
+                        Gesellschaftsvertrag k&ouml;nnen sie <b>eigene Regeln</b> festlegen &mdash; dann gilt der Vertrag.
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D0; Typische Reihenfolge bei der Gewinnverteilung</h3>
+                    <ol class="schritte">
+                        <li><b>Gewinn</b> — das ist der Betrag, der verteilt wird.</li>
+                        <li><b>Vorab-Verg&uuml;tung</b> — wer die Gesch&auml;fte f&uuml;hrt (z. B. der Komplement&auml;r), bekommt zuerst einen festen Betrag &mdash; wie ein Gehalt.</li>
+                        <li><b>Zinsen auf Einlagen</b> — jeder bekommt Zinsen auf seine Einlage, z. B. 10 %. Wer mehr eingezahlt hat, bekommt mehr.</li>
+                        <li><b>Restgewinn</b> — was dann &uuml;brig bleibt, wird verteilt &mdash; z. B. nach Kapitalanteilen oder nach K&ouml;pfen.</li>
+                    </ol>
+                    <div class="dsatz-ru">Это общая последовательность, если в договоре прописано несколько правил
+                        сразу. Не все шаги обязательны — в <a href="#bwr4" style="color:#c8a5ff;">Fall 4</a> есть
+                        только Vorab и Rest (без Zinsen), а в <a href="#bwr6" style="color:#c8a5ff;">Fall 5</a> есть
+                        все три шага. Смотри на формулировку в самом договоре, что именно оговорено.</div>
+                    <div class="gut"><b>Как узнать, какой метод нужен именно в твоей задаче:</b> если про распределение
+                        в договоре вообще ничего не сказано — nach Köpfen (<a href="#bwr2" style="color:#86efac;">Fall 2</a>).
+                        Если сказано только про Einlagen — nach Kapitaleinlagen (<a href="#bwr1" style="color:#86efac;">Fall 1</a>).
+                        Если есть слова vorab, Vergütung, verzinst — используй полную схему из этой карточки.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr8">Rechenschema &amp; Redemittel</a> — dieselbe Reihenfolge als konkrete Rechenschritte mit Formeln<br>
+                        <a href="iw-egb.html#rf11">EGB Informationswirtschaft — GmbH &amp; Co. KG</a> — noch ein Beispiel für eine Haftungsvergütung
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr4 ================= -->
+        <div class="lesson" id="ls-bwr4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4BC;</span>
+                    <div>
+                        <h2>Fall 4: KG mit Vorab-Verg&uuml;tung</h2>
+                        <p class="lesson-header-sub">Lehrer-Input &middot; Musterl&ouml;sung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        <b class="kb-de">KG</b> &middot; Gewinn: <b class="kb-de">200.000 €</b>. Vertrag: Amar (Komplement&auml;r)
+                        bekommt f&uuml;r die Gesch&auml;ftsf&uuml;hrung <b>vorab 40.000 €</b> &middot; der Rest wird nach
+                        Einlagen verteilt.
+                    </p>
+                    <div class="rw">
+                        <span class="step">Nebenrechnungen:</span>
+                        Restgewinn = 200.000 &minus; 40.000 = <b>160.000 €</b>
+                        <span class="step"></span>
+                        Gesamtkapital = 80.000 + 140.000 + 280.000 = <b>500.000 €</b>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Vorab<br><span style="font-weight:400;font-size:0.76rem;">laut Vertrag</span></th><th>Anteil<br><span style="font-weight:400;font-size:0.76rem;">Einlage : Gesamtkapital</span></th><th>Anteil am Restgewinn<br><span style="font-weight:400;font-size:0.76rem;">Restgewinn &times; Anteil</span></th><th>Gesamtgewinn<br><span style="font-weight:400;font-size:0.76rem;">Vorab + Anteil Rest</span></th></tr>
+                        <tr><td class="l">Amar <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;r)</span></td><td>80.000 €</td><td class="hl">40.000 €</td><td>16 %</td><td>160.000 € &times; 16 % = 25.600 €</td><td class="hl">40.000+25.600 = 65.600 €</td></tr>
+                        <tr><td class="l">Dino <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>140.000 €</td><td class="dim">&ndash;</td><td>28 %</td><td>160.000 € &times; 28 % = 44.800 €</td><td class="hl">nur Rest-Anteil = 44.800 €</td></tr>
+                        <tr><td class="l">Arda <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>280.000 €</td><td class="dim">&ndash;</td><td>56 %</td><td>160.000 € &times; 56 % = 89.600 €</td><td class="hl">nur Rest-Anteil = 89.600 €</td></tr>
+                        <tr class="sum"><td class="l">Summe</td><td><b>500.000 €</b></td><td>40.000 €</td><td><b>100 %</b></td><td><b>160.000 €</b></td><td>65.600+44.800+89.600 = <b>200.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Amar erh&auml;lt zun&auml;chst 40.000 Euro Vorab-Verg&uuml;tung f&uuml;r die
+                        Gesch&auml;ftsf&uuml;hrung. Vom verbleibenden Restgewinn von 160.000 Euro entfallen auf ihn
+                        weitere 16 Prozent, also 25.600 Euro. Insgesamt erh&auml;lt er somit 65.600 Euro.&ldquo;</div>
+                    <div class="dsatz-ru">Амар получает не долю от ВСЕЙ прибыли, а сначала фиксированные 40.000 €
+                        «зарплаты» за ведение дел (Vorab-Vergütung), и только ПОТОМ — свою долю от оставшихся
+                        160.000 €. Дино и Арда получают только долю от остатка — у них нет Vorab, они Kommanditisten.
+                        <b>entfallen auf jdn.</b> — «приходиться на кого-л. (о доле)».</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr5">&Uuml;bung 4: Sonnental KG</a> — genau dieselbe Methode an neuen Zahlen<br>
+                        <a href="#bwr6">Fall 5: Bauer KG</a> — dieselbe Methode plus Verzinsung des Kapitals<br>
+                        <a href="#bwr8">Rechenschema</a> — die sechs Schritte als Spickzettel
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr5 ================= -->
+        <div class="lesson" id="ls-bwr5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2705;</span>
+                    <div>
+                        <h2>&Uuml;bung 4: Sonnental KG</h2>
+                        <p class="lesson-header-sub">Von der Lehrkraft als eigenst&auml;ndige &Uuml;bung gestellt &mdash; hier vollst&auml;ndig gel&ouml;st</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Die Aufgabe</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;">
+                        Die <b class="kb-de">Sonnental KG</b> erzielt einen Gewinn von <b class="kb-de">250.000 €</b>. Laut
+                        Gesellschaftsvertrag erh&auml;lt die Komplement&auml;rin Hanna f&uuml;r die Gesch&auml;ftsf&uuml;hrung
+                        <b>vorab 40.000 €</b>. Der Rest wird nach den Kapitaleinlagen verteilt.
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th></tr>
+                        <tr><td class="l">Hanna <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;rin)</span></td><td>120.000 €</td></tr>
+                        <tr><td class="l">Paul <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>180.000 €</td></tr>
+                        <tr><td class="l">Aylin <span style="color:rgba(230,230,235,0.5);">(Kommanditistin)</span></td><td>300.000 €</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="solved-badge">&#x2705; Gel&ouml;st</div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="rw">
+                        <span class="step">Nebenrechnungen:</span>
+                        Restgewinn = 250.000 &minus; 40.000 = <b>210.000 €</b>
+                        <span class="step"></span>
+                        Gesamtkapital = 120.000 + 180.000 + 300.000 = <b>600.000 €</b>
+                    </div>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Vorab<br><span style="font-weight:400;font-size:0.76rem;">laut Vertrag</span></th><th>Anteil<br><span style="font-weight:400;font-size:0.76rem;">Einlage : Gesamtkapital</span></th><th>Anteil am Restgewinn<br><span style="font-weight:400;font-size:0.76rem;">Restgewinn &times; Anteil</span></th><th>Gesamtgewinn<br><span style="font-weight:400;font-size:0.76rem;">Vorab + Anteil Rest</span></th></tr>
+                        <tr><td class="l">Hanna <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;rin)</span></td><td>120.000 €</td><td class="hl">40.000 €</td><td>120.000 : 600.000 = <b>20 %</b></td><td>210.000 € &times; 20 % = 42.000 €</td><td class="hl">40.000+42.000 = 82.000 €</td></tr>
+                        <tr><td class="l">Paul <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>180.000 €</td><td class="dim">&ndash;</td><td>180.000 : 600.000 = <b>30 %</b></td><td>210.000 € &times; 30 % = 63.000 €</td><td class="hl">nur Rest-Anteil = 63.000 €</td></tr>
+                        <tr><td class="l">Aylin <span style="color:rgba(230,230,235,0.5);">(Kommanditistin)</span></td><td>300.000 €</td><td class="dim">&ndash;</td><td>300.000 : 600.000 = <b>50 %</b></td><td>210.000 € &times; 50 % = 105.000 €</td><td class="hl">nur Rest-Anteil = 105.000 €</td></tr>
+                        <tr class="sum"><td class="l">Summe</td><td><b>600.000 €</b></td><td>40.000 €</td><td><b>100 %</b></td><td><b>210.000 €</b></td><td>82.000+63.000+105.000 = <b>250.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Hanna erh&auml;lt als Komplement&auml;rin zun&auml;chst eine Vorab-Verg&uuml;tung
+                        von 40.000 Euro. Vom Restgewinn in H&ouml;he von 210.000 Euro entfallen auf sie weitere 20 Prozent,
+                        also 42.000 Euro. Insgesamt erh&auml;lt sie somit 82.000 Euro. Paul und Aylin erhalten keine
+                        Vorab-Verg&uuml;tung, sondern nur ihren Anteil am Restgewinn: 63.000 Euro bzw. 105.000 Euro.&ldquo;</div>
+                    <div class="dsatz-ru">Решение делается ровно по той же схеме, что и в Fall 4: сначала Vorab
+                        только Ханне (она Komplementärin), потом делим остаток 210.000 € пропорционально долям
+                        капитала. Проверка (Probe): 82.000+63.000+105.000 = 250.000 € — сходится с исходной прибылью,
+                        значит решение верное.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr4">Fall 4: KG mit Vorab-Verg&uuml;tung</a> — dieselbe Methode, hier von der Lehrkraft vorgerechnet<br>
+                        <a href="#bwr8">Rechenschema</a> — die sechs Schritte allgemein
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr6 ================= -->
+        <div class="lesson" id="ls-bwr6">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F4DC;</span>
+                    <div>
+                        <h2>Fall 5: Bauer KG &mdash; Vorab, Zinsen, Rest</h2>
+                        <p class="lesson-header-sub">Echter Vertragsauszug &middot; Lehrer-Input &middot; Musterl&ouml;sung</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4DC; Auszug aus dem Gesellschaftsvertrag der Bauer KG</h3>
+                    <div class="vertrag">
+                        <div class="vg-p">&sect; 6 Einlagen der Gesellschafter</div>
+                        Andreas Bauer (Komplement&auml;r): <b>800.000,00 €</b><br>
+                        Thomas Doberstein (Kommanditist): <b>400.000,00 €</b>
+                        <div class="vg-p">&sect; 7 Ergebnisverteilung</div>
+                        F&uuml;r die Gesch&auml;ftsf&uuml;hrung erh&auml;lt der Komplement&auml;r vom Reingewinn <b>vorab
+                        40.000,00 €</b>. Anschlie&szlig;end wird das eingesetzte Kapital <b>mit 10 % verzinst</b>. Der
+                        <b>restliche Gewinn</b> wird nach Kapitalanteilen verteilt.
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;margin-top:0.6rem;">
+                        Im ersten Gesch&auml;ftsjahr betr&auml;gt der Gewinn <b class="kb-de">400.000,00 €</b>.
+                        <br><b>Leitfrage:</b> Wie viel Gewinn bekommen Bauer und Doberstein jeweils?
+                    </p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="rw">
+                        <span class="step">Nebenrechnungen:</span>
+                        Restgewinn = 400.000 &minus; 40.000 &minus; 120.000 = <b>240.000 €</b>
+                        <span class="step"></span>
+                        Gesamtkapital = 800.000 + 400.000 = <b>1.200.000 €</b>
+                    </div>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Vorab<br><span style="font-weight:400;font-size:0.76rem;">laut Vertrag</span></th><th>Zinsen<br><span style="font-weight:400;font-size:0.76rem;">Einlage &times; 10 %</span></th><th>Anteil<br><span style="font-weight:400;font-size:0.76rem;">Einlage : Gesamtkapital</span></th><th>Anteil am Restgewinn<br><span style="font-weight:400;font-size:0.76rem;">Restgewinn &times; Anteil</span></th><th>Gesamt<br><span style="font-weight:400;font-size:0.76rem;">Vorab+Zinsen+Rest</span></th></tr>
+                        <tr><td class="l">Bauer <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;r)</span></td><td>800.000 €</td><td class="hl">40.000 €</td><td>800.000 &times; 10 % = 80.000 €</td><td>800.000 : 1.200.000 = 2/3 &approx; 66,67 %</td><td>240.000 € &times; 2/3 = 160.000 €</td><td class="hl">40.000+80.000+160.000 = 280.000 €</td></tr>
+                        <tr><td class="l">Doberstein <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>400.000 €</td><td class="dim">&ndash;</td><td>400.000 &times; 10 % = 40.000 €</td><td>400.000 : 1.200.000 = 1/3 &approx; 33,33 %</td><td>240.000 € &times; 1/3 = 80.000 €</td><td class="hl">40.000+80.000 = 120.000 €</td></tr>
+                        <tr class="sum"><td class="l">Summe</td><td><b>1.200.000 €</b></td><td>40.000 €</td><td>120.000 €</td><td><b>100 %</b></td><td><b>240.000 €</b></td><td>280.000+120.000 = <b>400.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Bauer erh&auml;lt als Komplement&auml;r zun&auml;chst eine Vorab-Verg&uuml;tung
+                        von 40.000 Euro f&uuml;r die Gesch&auml;ftsf&uuml;hrung. Anschlie&szlig;end wird sein Kapital mit
+                        10 Prozent verzinst, das ergibt 80.000 Euro. Vom verbleibenden Restgewinn entfallen auf ihn zwei
+                        Drittel, also 160.000 Euro. Insgesamt erh&auml;lt er somit 280.000 Euro. Doberstein erh&auml;lt
+                        keine Vorab-Verg&uuml;tung, aber Zinsen von 40.000 Euro und ein Drittel des Restgewinns, also
+                        80.000 Euro &mdash; insgesamt 120.000 Euro.&ldquo;</div>
+                    <div class="dsatz-ru">Здесь три шага сразу, как в теории (карточка «Die Reihenfolge»): 1) Bauer
+                        получает Vorab 40.000 € за ведение дел; 2) ОБА партнёра получают Zinsen — 10% от своего
+                        собственного вклада (это не только для Komplementär!); 3) то, что осталось (240.000 €),
+                        делится пропорционально капиталу. Probe: 280.000+120.000=400.000 € — совпадает с прибылью,
+                        значит верно.</div>
+                    <div class="warn"><b>Частая ошибка:</b> Zinsen — это не «премия только Komplementär», а
+                        процент, который получает КАЖДЫЙ участник на СВОЙ вклад. У Doberstein тоже есть Zinsen
+                        (40.000 €), хотя Vorab у него нет.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr7">&Uuml;bung 5: Kaya KG</a> — dieselbe volle Methode an neuen Zahlen<br>
+                        <a href="#bwr8">Rechenschema</a> — die sechs Schritte als Spickzettel<br>
+                        <a href="iw-egb.html#rf4">EGB Informationswirtschaft — KG</a> — was Komplement&auml;r und Kommanditist rechtlich unterscheidet
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr7 ================= -->
+        <div class="lesson" id="ls-bwr7">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x2705;</span>
+                    <div>
+                        <h2>&Uuml;bung 5: Kaya KG</h2>
+                        <p class="lesson-header-sub">Von der Lehrkraft als eigenst&auml;ndige &Uuml;bung gestellt &mdash; hier vollst&auml;ndig gel&ouml;st</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4DC; Auszug aus dem Gesellschaftsvertrag der Kaya KG</h3>
+                    <div class="vertrag">
+                        <div class="vg-p">&sect; 7 Ergebnisverteilung</div>
+                        Der Komplement&auml;r erh&auml;lt f&uuml;r die Gesch&auml;ftsf&uuml;hrung <b>vorab 30.000 €</b>.
+                        Danach wird das Kapital <b>mit 6 % verzinst</b>. Der Rest wird nach Kapitalanteilen verteilt.
+                    </div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.7);line-height:1.7;margin-top:0.6rem;">
+                        Gewinn im Gesch&auml;ftsjahr: <b class="kb-de">290.000 €</b>.
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th></tr>
+                        <tr><td class="l">Kaya <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;r)</span></td><td>500.000 €</td></tr>
+                        <tr><td class="l">Wolf <span style="color:rgba(230,230,235,0.5);">(Kommanditistin)</span></td><td>300.000 €</td></tr>
+                        <tr><td class="l">Berg <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>200.000 €</td></tr>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="solved-badge">&#x2705; Gel&ouml;st</div>
+
+                <div class="note-card">
+                    <h3>&#x1F9EE; L&ouml;sung</h3>
+                    <div class="rw">
+                        <span class="step">Nebenrechnungen:</span>
+                        Zinsen gesamt = 30.000+18.000+12.000 = <b>60.000 €</b>
+                        <span class="step"></span>
+                        Restgewinn = 290.000 &minus; 30.000 &minus; 60.000 = <b>200.000 €</b>
+                        <span class="step"></span>
+                        Gesamtkapital = 500.000 + 300.000 + 200.000 = <b>1.000.000 €</b>
+                    </div>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Gesellschafter</th><th>Kapitaleinlage</th><th>Vorab<br><span style="font-weight:400;font-size:0.76rem;">laut Vertrag</span></th><th>Zinsen<br><span style="font-weight:400;font-size:0.76rem;">Einlage &times; 6 %</span></th><th>Anteil<br><span style="font-weight:400;font-size:0.76rem;">Einlage : Gesamtkapital</span></th><th>Anteil am Restgewinn<br><span style="font-weight:400;font-size:0.76rem;">Restgewinn &times; Anteil</span></th><th>Gesamt<br><span style="font-weight:400;font-size:0.76rem;">Vorab+Zinsen+Rest</span></th></tr>
+                        <tr><td class="l">Kaya <span style="color:rgba(230,230,235,0.5);">(Komplement&auml;r)</span></td><td>500.000 €</td><td class="hl">30.000 €</td><td>500.000 &times; 6 % = 30.000 €</td><td>500.000 : 1.000.000 = <b>50 %</b></td><td>200.000 € &times; 50 % = 100.000 €</td><td class="hl">30.000+30.000+100.000 = 160.000 €</td></tr>
+                        <tr><td class="l">Wolf <span style="color:rgba(230,230,235,0.5);">(Kommanditistin)</span></td><td>300.000 €</td><td class="dim">&ndash;</td><td>300.000 &times; 6 % = 18.000 €</td><td>300.000 : 1.000.000 = <b>30 %</b></td><td>200.000 € &times; 30 % = 60.000 €</td><td class="hl">18.000+60.000 = 78.000 €</td></tr>
+                        <tr><td class="l">Berg <span style="color:rgba(230,230,235,0.5);">(Kommanditist)</span></td><td>200.000 €</td><td class="dim">&ndash;</td><td>200.000 &times; 6 % = 12.000 €</td><td>200.000 : 1.000.000 = <b>20 %</b></td><td>200.000 € &times; 20 % = 40.000 €</td><td class="hl">12.000+40.000 = 52.000 €</td></tr>
+                        <tr class="sum"><td class="l">Summe</td><td><b>1.000.000 €</b></td><td>30.000 €</td><td>60.000 €</td><td><b>100 %</b></td><td><b>200.000 €</b></td><td>160.000+78.000+52.000 = <b>290.000 € &check;</b></td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz">&bdquo;Kaya erh&auml;lt als Komplement&auml;r vorab 30.000 Euro. Zus&auml;tzlich
+                        wird sein Kapital mit 6 Prozent verzinst, das sind 30.000 Euro. Vom Restgewinn von 200.000 Euro
+                        entf&auml;llt auf ihn die H&auml;lfte, also 100.000 Euro. Insgesamt erh&auml;lt er somit
+                        160.000 Euro. Wolf und Berg erhalten jeweils nur Zinsen und ihren Anteil am Restgewinn:
+                        78.000 Euro bzw. 52.000 Euro.&ldquo;</div>
+                    <div class="dsatz-ru">Точно та же схема, что в Fall 5, только другие числа (6% вместо 10%,
+                        трое участников вместо двоих). Обрати внимание: Zinsen считаются на КАЖДОГО, а Vorab —
+                        только на Kaya (он один Komplementär). Probe: 160.000+78.000+52.000=290.000 € — совпадает
+                        с исходной прибылью.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr6">Fall 5: Bauer KG</a> — dieselbe Methode, hier von der Lehrkraft vorgerechnet<br>
+                        <a href="#bwr8">Rechenschema</a> — die sechs Schritte allgemein
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr8 ================= -->
+        <div class="lesson" id="ls-bwr8">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F5E3;&#xFE0F;</span>
+                    <div>
+                        <h2>Rechenschema &amp; Redemittel</h2>
+                        <p class="lesson-header-sub">Die sechs Schritte, die jede Aufgabe dieser Stunde l&ouml;sen</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4D0; Rechenschema</h3>
+                    <ol class="schritte">
+                        <li><b>Vorab-Verg&uuml;tung</b> eintragen (nur, wenn im Vertrag geregelt — meist nur f&uuml;r den Komplement&auml;r)</li>
+                        <li><b>Zinsen</b> = Einlage &times; Zinssatz (f&uuml;r <i>alle</i> Gesellschafter auf ihre eigene Einlage — nur, wenn im Vertrag geregelt)</li>
+                        <li><b>Restgewinn</b> = Gewinn &minus; Vorab &minus; Zinsen (gesamt)</li>
+                        <li><b>Anteil</b> = Einlage : Gesamtkapital</li>
+                        <li><b>Rest-Anteil</b> = Restgewinn &times; Anteil</li>
+                        <li><b>Gesamt</b> = Vorab + Zinsen + Rest-Anteil &middot; <b>Probe:</b> alle Gesamtbetr&auml;ge zusammen m&uuml;ssen wieder den Ausgangsgewinn ergeben</li>
+                    </ol>
+                    <div class="gut"><b>Merksatz:</b> Nicht jede Aufgabe braucht alle sechs Schritte. Fehlt die
+                        Vorab-Verg&uuml;tung, f&auml;llt Schritt 1 weg. Fehlen die Zinsen, f&auml;llt Schritt 2 weg. Lies
+                        den Vertragstext genau, bevor du rechnest.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F5E3;&#xFE0F; Das Ergebnis vortragen</h3>
+                    <div class="sprech"><b>Schritt f&uuml;r Schritt erkl&auml;ren:</b><br>
+                        &bdquo;[Name] erh&auml;lt als Komplement&auml;r(in) zun&auml;chst eine Vorab-Verg&uuml;tung von … Euro.&ldquo;<br>
+                        &bdquo;Anschlie&szlig;end wird das Kapital mit … Prozent verzinst, das ergibt … Euro.&ldquo;<br>
+                        &bdquo;Vom verbleibenden Restgewinn entf&auml;llt auf [Name] ein Anteil von … Prozent, also … Euro.&ldquo;<br>
+                        &bdquo;Insgesamt erh&auml;lt [Name] somit … Euro.&ldquo;
+                    </div>
+                    <div class="sprech"><b>Die Probe ansagen:</b><br>
+                        &bdquo;Addiert man alle Gesamtbetr&auml;ge, ergibt sich wieder der Ausgangsgewinn von … Euro —
+                        die Rechnung stimmt.&ldquo;
+                    </div>
+                    <div class="dsatz-ru"><b>entfallen auf jdn.</b> — приходиться на кого-л. (о доле); <b>sich belaufen auf</b> —
+                        составлять (о сумме); <b>betragen</b> — составлять/равняться (нейтральный деловой синоним к
+                        «sein» для чисел). Используй их вместо простого «ist», чтобы ответ звучал по-деловому.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50D; Welche Methode f&uuml;r welche Aufgabe?</h3>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Was steht im Vertrag?</th><th class="l">Methode</th><th class="l">Beispiel</th></tr>
+                        <tr><td class="l">Gar nichts zur Verteilung geregelt</td><td class="l">nach K&ouml;pfen</td><td class="l"><a href="#bwr2" style="color:#c8a5ff;">Fall 2</a></td></tr>
+                        <tr><td class="l">Nur die Einlagen genannt</td><td class="l">nach Kapitaleinlagen</td><td class="l"><a href="#bwr1" style="color:#c8a5ff;">Fall 1</a></td></tr>
+                        <tr><td class="l">Vorab-Verg&uuml;tung + Rest nach Einlagen</td><td class="l">Vorab, dann Rest</td><td class="l"><a href="#bwr4" style="color:#c8a5ff;">Fall 4</a> &middot; <a href="#bwr5" style="color:#c8a5ff;">&Uuml;bung 4</a></td></tr>
+                        <tr><td class="l">Vorab + Verzinsung + Rest nach Einlagen</td><td class="l">alle sechs Schritte</td><td class="l"><a href="#bwr6" style="color:#c8a5ff;">Fall 5</a> &middot; <a href="#bwr7" style="color:#c8a5ff;">&Uuml;bung 5</a></td></tr>
+                    </table>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#bwr3">Die Reihenfolge: Vorab, Zinsen, Rest</a> — dieselbe Logik als Flie&szlig;text<br>
+                        <a href="deutsch-nomen-verb.html">Nomen-Verb-Verbindungen</a> — mehr Formulierungen f&uuml;r Vertr&auml;ge und Zahlen
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= bwr9 ================= -->
+        <div class="lesson" id="ls-bwr9">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9E9;</span>
+                    <div>
+                        <h2>Wortschatz &amp; Selbsttest</h2>
+                        <p class="lesson-header-sub">Neue W&ouml;rter aus dieser Stunde, und Fragen dazu</p>
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Neue W&ouml;rter aus dieser Stunde</h3>
+                    <table class="vt">
+                        <tr><td class="de">die Personengesellschaft</td><td class="ru">товарищество (OHG, KG …) — форма, где как минимум один участник отвечает лично всем своим имуществом</td></tr>
+                        <tr><td class="de">die OHG (offene Handelsgesellschaft)</td><td class="ru">полное товарищество — все участники отвечают неограниченно</td></tr>
+                        <tr><td class="de">die KG (Kommanditgesellschaft)</td><td class="ru">коммандитное товарищество — минимум один Komplementär (полная ответственность) и минимум один Kommanditist (ответственность в пределах вклада)</td></tr>
+                        <tr><td class="de">der Komplement&auml;r / die Komplement&auml;rin</td><td class="ru">полный товарищ — ведёт дела, отвечает всем имуществом, часто получает Vorab-Vergütung</td></tr>
+                        <tr><td class="de">der Kommanditist / die Kommanditistin</td><td class="ru">коммандитист — отвечает только своим вкладом, обычно не ведёт дела сам</td></tr>
+                        <tr><td class="de">die Kapitaleinlage</td><td class="ru">вклад в капитал — сумма, которую участник внёс в фирму</td></tr>
+                        <tr><td class="de">das Gesamtkapital</td><td class="ru">суммарный капитал — сумма всех Kapitaleinlagen</td></tr>
+                        <tr><td class="de">der Gesellschaftsvertrag</td><td class="ru">учредительный договор товарищества</td></tr>
+                        <tr><td class="de">die Ergebnisverteilung / die Gewinnverteilung</td><td class="ru">распределение прибыли между участниками</td></tr>
+                        <tr><td class="de">die Vorab-Verg&uuml;tung</td><td class="ru">«зарплата вперёд» — фиксированная выплата за ведение дел, до дележа остальной прибыли</td></tr>
+                        <tr><td class="de">verzinsen</td><td class="ru">начислять проценты (на вклад)</td></tr>
+                        <tr><td class="de">der Restgewinn</td><td class="ru">оставшаяся прибыль — то, что осталось после Vorab и Zinsen, делится дальше</td></tr>
+                        <tr><td class="de">der Gewinnanteil</td><td class="ru">доля прибыли, причитающаяся одному участнику</td></tr>
+                        <tr><td class="de">nach K&ouml;pfen (verteilen)</td><td class="ru">делить поровну «по головам», независимо от вклада</td></tr>
+                        <tr><td class="de">der Reingewinn</td><td class="ru">чистая прибыль</td></tr>
+                        <tr><td class="de">der Auszug (aus dem Vertrag)</td><td class="ru">выдержка, выписка (из договора)</td></tr>
+                        <tr><td class="de">die Probe (machen)</td><td class="ru">проверка расчёта — сложить все доли и сверить с исходной суммой</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2753; Selbsttest — нажми на вопрос, чтобы увидеть ответ</h3>
+                    <div id="stListBWR"></div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Diese Karte w&auml;chst mit &mdash; sobald neue F&auml;lle oder &Uuml;bungen aus dem
+                        BWR-Unterricht dazukommen, bekommen sie hier eigene Karten in einer neuen Sektion.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        </div><!-- /egb-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Aufgabe ===================== */
+(function () {
+    var hub = document.getElementById('egb-hub');
+    var wrap = document.getElementById('egb-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB BWR | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('egb-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_bwr_egb_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('egb-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+/* ===================== SELBSTTEST ===================== */
+var SELBST_BWR = [
+    { q: 'Wann gilt „nach Köpfen“, wann „nach Kapitaleinlagen“?',
+      a: '<b>Nach Köpfen</b>: wenn im Vertrag <i>gar nichts</i> zur Verteilung geregelt ist (Fall 2). <b>Nach Kapitaleinlagen</b>: wenn nur die Einlagen genannt sind, aber keine weitere Regel (Fall 1).' },
+    { q: 'Fall 1: Wie viel Gewinn bekommt Malin, wenn Eda 300.000 €, Malin 200.000 € und Kim 100.000 € eingelegt haben und der Gewinn 324.000 € beträgt?',
+      a: 'Malins Anteil = 200.000 : 600.000 = 1/3. Gewinnanteil = 324.000 € × 1/3 = <b>108.000 €</b>.' },
+    { q: 'Was ist eine Vorab-Vergütung, und wer bekommt sie meistens?',
+      a: 'Ein <b>fester Betrag</b>, den der Gesellschafter zuerst bekommt — meistens der <b>Komplementär</b> als Ausgleich dafür, dass er die Geschäfte führt. Erst danach wird der Rest verteilt.' },
+    { q: 'Bekommen bei der Verzinsung (Fall 5, Übung 5) alle Gesellschafter Zinsen, oder nur der Komplementär?',
+      a: '<b>Alle</b> — jeder Gesellschafter bekommt Zinsen auf seine <b>eigene</b> Kapitaleinlage, unabhängig davon, ob er Komplementär oder Kommanditist ist. Nur die Vorab-Vergütung bekommt meist nur der Komplementär.' },
+    { q: 'Nenne die sechs Schritte des Rechenschemas in der richtigen Reihenfolge.',
+      a: '1. <b>Vorab</b> eintragen · 2. <b>Zinsen</b> = Einlage × Zinssatz · 3. <b>Restgewinn</b> = Gewinn − Vorab − Zinsen · 4. <b>Anteil</b> = Einlage : Gesamtkapital · 5. <b>Rest-Anteil</b> = Restgewinn × Anteil · 6. <b>Gesamt</b> = Vorab + Zinsen + Rest-Anteil, dann <b>Probe</b>.' },
+    { q: 'Wozu dient die „Probe“ am Ende der Rechnung?',
+      a: 'Man addiert alle <b>Gesamtbeträge</b> der Gesellschafter — die Summe muss wieder den <b>Ausgangsgewinn</b> ergeben. Stimmt sie nicht, liegt ein Rechenfehler vor.' },
+    { q: 'Übung 4 (Sonnental KG): Wie viel bekommt Hanna insgesamt, wenn sie 40.000 € Vorab und 20 % vom Restgewinn (210.000 €) bekommt?',
+      a: 'Anteil am Restgewinn = 210.000 € × 20 % = 42.000 €. Gesamt = 40.000 + 42.000 = <b>82.000 €</b>.' },
+    { q: 'Fall 5 (Bauer KG): Warum bekommt Doberstein trotzdem 40.000 € Zinsen, obwohl er keine Vorab-Vergütung erhält?',
+      a: 'Weil die <b>Verzinsung</b> auf die Kapitaleinlage <b>jedes</b> Gesellschafters gilt — Doberstein hat 400.000 € eingelegt, 10 % davon sind <b>40.000 €</b>. Die Vorab-Vergütung dagegen ist nur für die Geschäftsführung, die nur der Komplementär Bauer übernimmt.' },
+    { q: 'Was bedeutet der Zusatz „(nicht vereinbart)“ bei der Kapitaleinlage in Fall 2?',
+      a: 'Die Gesellschafter haben im Vertrag <b>keinen Wert</b> für ihre Einlage festgelegt — deshalb kann man nicht nach Kapitalanteilen rechnen, und der Gewinn wird stattdessen <b>nach Köpfen</b> (gleich auf alle) verteilt.' },
+    { q: 'Was ist der Unterschied zwischen Komplementär und Kommanditist bei der Gewinnverteilung (nicht bei der Haftung)?',
+      a: 'Rein rechnerisch gibt es keinen automatischen Unterschied — <b>beide</b> bekommen ihren Anteil nach Einlage bzw. Zinsen. Der Komplementär bekommt zusätzlich oft eine <b>Vorab-Vergütung</b>, aber nur, wenn der Vertrag das ausdrücklich so regelt.' }
+];
+
+function renderSelbst(containerId, data) {
+    var box = document.getElementById(containerId);
+    if (!box) { return; }
+    data.forEach(function (s) {
+        var d = document.createElement('div');
+        d.className = 'st-item';
+        var q = document.createElement('div');
+        q.className = 'st-q';
+        q.textContent = '▸ ' + s.q;
+        var a = document.createElement('div');
+        a.className = 'st-a';
+        a.innerHTML = s.a;
+        d.appendChild(q); d.appendChild(a);
+        d.addEventListener('click', function () { d.classList.toggle('open'); });
+        box.appendChild(d);
+    });
+}
+renderSelbst('stListBWR', SELBST_BWR);
+</script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>
