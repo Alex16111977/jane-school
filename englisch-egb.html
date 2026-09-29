@@ -277,6 +277,13 @@
     .sl-t { display:block; color:rgba(230,230,235,0.85); font-weight:700; font-size:0.8rem;
             letter-spacing:0.02em; margin-bottom:0.15rem; }
     .sl a { color:#c8a5ff; text-decoration:none; border-bottom:1px dotted rgba(200,165,255,0.55); }
+
+    /* ---- Weekly Vocab: drill-audio speaker button ---- */
+    .spk-btn{display:inline-flex;align-items:center;justify-content:center;width:1.55rem;height:1.55rem;margin-left:.35rem;border-radius:50%;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.18);color:inherit;font-size:.78rem;cursor:pointer;vertical-align:middle;transition:background .15s,transform .15s;flex:none;line-height:1;}
+    .spk-btn:hover{background:rgba(56,189,248,.28);transform:scale(1.1);}
+    .spk-btn:active{transform:scale(.9);}
+    .spk-btn.playing{background:rgba(56,189,248,.42);animation:spkPulse 1s ease-in-out infinite;}
+    @keyframes spkPulse{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.55);}50%{box-shadow:0 0 0 7px rgba(56,189,248,0);}}
 </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
@@ -1546,9 +1553,10 @@
                 <div class="note-card highlight-card">
                     <h3>&#x1F4CB; Die Liste</h3>
                     <p style="font-size:0.88rem; color:rgba(230,230,235,0.6); margin-bottom:0.6rem;">
-                        19 W&ouml;rter vom aktuellen Blatt, mit der deutschen &Uuml;bersetzung genau so, wie die
+                        24 W&ouml;rter vom aktuellen Blatt, mit der deutschen &Uuml;bersetzung genau so, wie die
                         Lehrerin sie vorgibt. Neue W&ouml;rter, die sie sp&auml;ter dazuschreibt, kommen hier unten
-                        in dieselbe Tabelle.
+                        in dieselbe Tabelle. Beim &#x1F50A; h&ouml;rst du das Wort dreimal Englisch, dreimal Deutsch,
+                        dann zweimal die russische Bedeutung.
                     </p>
                     <div id="weeklyVocabTable"></div>
                 </div>
@@ -1970,7 +1978,12 @@ var WEEKLY_VOCAB = [
  {en:"responsibilities", tr:"риспонсэби́лэтиз", de:"Verantwortlichkeit(en)", ru:"обязанности", def:"the duties or tasks that someone is expected to do as part of their job", ex:"&ldquo;Her responsibilities include answering emails and organizing meetings.&rdquo;"},
  {en:"opinion", tr:"эпи́ньен", de:"Meinung", ru:"мнение", def:"a personal view or judgement about something, not necessarily based on fact", ex:"&ldquo;In my opinion, this job would suit her perfectly.&rdquo;"},
  {en:"self-employed", tr:"сэлф-импло́йд", de:"selbstständig", ru:"самозанятый", def:"working for yourself rather than for an employer", ex:"&ldquo;My uncle is self-employed and runs his own bakery.&rdquo;"},
- {en:"cover letter", tr:"ка́вэ ле́тэ", de:"Anschreiben/Bewerbung", ru:"сопроводительное письмо", def:"a short letter sent with a CV, explaining why you are a good match for one specific job", ex:"&ldquo;A good cover letter explains why you want this job, not just any job.&rdquo;"}
+ {en:"cover letter", tr:"ка́вэ ле́тэ", de:"Anschreiben/Bewerbung", ru:"сопроводительное письмо", def:"a short letter sent with a CV, explaining why you are a good match for one specific job", ex:"&ldquo;A good cover letter explains why you want this job, not just any job.&rdquo;"},
+ {en:"necessary", tr:"нэ́сэсэри", de:"notwendig", ru:"необходимый, нужный", def:"needed in order to achieve a particular result; essential", ex:"&ldquo;It&rsquo;s necessary to submit your application before the deadline.&rdquo;"},
+ {en:"on time", tr:"он тайм", de:"pünktlich", ru:"вовремя, к сроку", def:"not late; arriving or happening at the expected or planned time", ex:"&ldquo;She always arrives on time for her shifts.&rdquo;"},
+ {en:"environment", tr:"инва́йрэнмэнт", de:"Umfeld/Umgebung", ru:"окружение, среда (напр. рабочая)", def:"the conditions and surroundings in which a person lives or works", ex:"&ldquo;She enjoys working in a friendly, supportive environment.&rdquo;"},
+ {en:"expectations", tr:"экспэктэ́йшнз", de:"Erwartungen", ru:"ожидания", def:"beliefs about what will happen or what someone should achieve", ex:"&ldquo;The manager explained her expectations for the new team members.&rdquo;"},
+ {en:"competition", tr:"компэти́шн", de:"Wettbewerb", ru:"конкуренция", def:"the situation where several people try to get the same thing", ex:"&ldquo;Online adverts have increased the competition for good jobs.&rdquo;"}
 ];
 
 (function () {
@@ -1980,7 +1993,8 @@ var WEEKLY_VOCAB = [
         '<table class="unit-table" style="margin-top:0.3rem; min-width:820px;">' +
         '<tr><th>Word <span style="color:#79b8ff">+ как читать</span></th><th>Deutsch</th><th>По-русски</th><th>What it means</th><th>Example</th></tr>';
     WEEKLY_VOCAB.forEach(function (v) {
-        html += '<tr><td class="kb-de">' + v.en + '<span class="vt-tr">[' + v.tr + ']</span></td>' +
+        html += '<tr><td class="kb-de">' + v.en + '<span class="vt-tr">[' + v.tr + ']</span>' +
+                '<button class="spk-btn wk-spk" data-w="' + v.en + '" title="Anhören: EN x3, DE x3, RU">&#x1F50A;</button></td>' +
                 '<td class="vt-de">' + v.de + '</td>' +
                 '<td>' + v.ru + '</td>' +
                 '<td>' + v.def + '</td>' +
@@ -1988,6 +2002,33 @@ var WEEKLY_VOCAB = [
     });
     html += '</table></div>';
     box.innerHTML = html;
+
+    var wkAudioEl = null, wkAudioBtn = null;
+    box.addEventListener('click', function (e) {
+        var btn = e.target.closest('.wk-spk');
+        if (!btn) { return; }
+        var data = (window.WEEKLY_AUDIO || {})[btn.dataset.w];
+        if (!data) { return; }
+        if (wkAudioBtn === btn && wkAudioEl && !wkAudioEl.paused) {
+            wkAudioEl.pause();
+            btn.classList.remove('playing');
+            return;
+        }
+        if (wkAudioBtn) { wkAudioBtn.classList.remove('playing'); }
+        if (!wkAudioEl) {
+            wkAudioEl = new Audio();
+            wkAudioEl.preload = 'none';
+            wkAudioEl.addEventListener('ended', function () { if (wkAudioBtn) { wkAudioBtn.classList.remove('playing'); } });
+        }
+        wkAudioBtn = btn;
+        if (wkAudioEl.getAttribute('data-src') !== data.src) {
+            wkAudioEl.setAttribute('data-src', data.src);
+            wkAudioEl.src = data.src;
+        }
+        var p = wkAudioEl.play();
+        if (p && p.catch) { p.catch(function () {}); }
+        btn.classList.add('playing');
+    });
 })();
 
 /* ===================== EN <-> DE TRAINER ===================== */
@@ -2173,6 +2214,7 @@ var SELBST_WEEKLY = WEEKLY_VOCAB.map(function (v) {
 renderSelbst('stListWeekly', SELBST_WEEKLY);
 
 </script>
+    <script src="audio/weekly-audio-cues.js" defer></script>
     <script src="js/nav-dropdown.js" defer></script>
 </body>
 </html>
