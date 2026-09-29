@@ -2,17 +2,19 @@
 // Offline neural drill-audio for englisch-egb.html's Weekly Vocabulary Check (#u1k).
 //
 // Reads WEEKLY_VOCAB straight out of the page, so the audio can never drift from
-// the word list. One .m4a per word, containing:
-//   [English]x3  ·  pause  ·  [Deutsch]x3  ·  pause  ·  [Russisch]  ·  pause  ·  [Russisch again]
-// (only 3 unique TTS clips are fetched per word -- the repeats reuse the same file).
+// the word list. ONE continuous track for the whole list (so it plays hands-free,
+// e.g. on a commute), with per-word cues so a single-word 🔊 button can also seek
+// into it. Each word inside the track says:
+//   [English]x3 · pause · [Deutsch]x2 · pause · [Russisch]x1 · pause · [What it means]x1 · pause · [English]x1
+// (only 4 unique TTS clips are fetched per word -- all repeats reuse the same file;
+// it ends by repeating the English word itself once more, as the final recap).
 //
 // Output:
-//   audio/wk__<slug>.m4a
-//   audio/weekly-audio-cues.js   -> window.WEEKLY_AUDIO = { "<en word>": {src, d} }
+//   audio/wk__all.m4a
+//   audio/weekly-audio-cues.js   -> window.WEEKLY_AUDIO = {src, d, w:[{en,t,e}, ...]}
 //
 // Usage:
-//   node tools/gen-weekly-audio.mjs                 # all words
-//   node tools/gen-weekly-audio.mjs necessary "on time"   # only these (match on .en)
+//   node tools/gen-weekly-audio.mjs                 # rebuild for all words in WEEKLY_VOCAB
 //   node tools/gen-weekly-audio.mjs --plan           # print what the voices will say
 //
 // Requires edge-tts (tools/edge_batch.py) and ffmpeg.
@@ -39,11 +41,10 @@ const BITRATE = '48k';
 const LEAD_IN = 0.3;
 const GAP_REPEAT = 0.6;   // between each of the 3 repeats of the same word
 const GAP_LANG = 0.9;     // between English block / German block / Russian meaning / Russian repeat
-const TAIL = 0.3;
+const GAP_WORD = 1.3;     // between one vocab word and the next
 const TRIM = 'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse,' +
              'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse';
 
-const args = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const PLAN_ONLY = process.argv.includes('--plan');
 
 // ---------- read WEEKLY_VOCAB out of the page ----------
@@ -60,8 +61,7 @@ function extractArray(html, name) {
 }
 const html = fs.readFileSync(PAGE, 'utf8');
 const DATA = extractArray(html, 'WEEKLY_VOCAB');
-const targets = args.length ? DATA.filter(v => args.includes(v.en)) : DATA;
-if (!targets.length) { console.error('no matching word'); process.exit(1); }
+if (!DATA.length) { console.error('WEEKLY_VOCAB is empty'); process.exit(1); }
 
 // ---------- what the voices actually say ----------
 function speakDe(raw) {
@@ -78,15 +78,17 @@ function speakRu(raw) {
     .replace(/\s{2,}/g, ' ').replace(/,\s*$/, '').trim();
 }
 const speakEn = raw => String(raw).trim();
+const speakDef = raw => String(raw).replace(/<[^>]*>/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
 if (PLAN_ONLY) {
-  targets.forEach(v => {
+  DATA.forEach(v => {
     console.log('\n### ' + v.en);
-    console.log('  EN x3  ' + speakEn(v.en));
-    console.log('  DE x3  ' + speakDe(v.de));
-    console.log('  RU x2  ' + speakRu(v.ru));
+    console.log('  EN  x3  ' + speakEn(v.en) + '   (+ x1 again at the end)');
+    console.log('  DE  x2  ' + speakDe(v.de));
+    console.log('  RU  x1  ' + speakRu(v.ru));
+    console.log('  DEF x1  ' + speakDef(v.def));
   });
-  console.log('\n' + targets.length + ' word(s)');
+  console.log('\n' + DATA.length + ' word(s), one continuous track');
   process.exit(0);
 }
 
@@ -126,21 +128,21 @@ async function pool(items, limit, worker) {
 }
 const execFileP = (cmd, a) => new Promise((res, rej) => execFile(cmd, a, { timeout: 60000 }, e => e ? rej(e) : res()));
 const idFor = (voice, text) => 'wk_' + crypto.createHash('md5').update(voice + '\n' + text).digest('hex').slice(0, 16);
-const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-// ---------- 1) collect clips (3 unique per word: EN, DE, RU) ----------
+// ---------- 1) collect clips (4 unique per word: EN, DE, RU, DEF) ----------
 fs.mkdirSync(MP3DIR, { recursive: true });
 fs.mkdirSync(WAVDIR, { recursive: true });
 fs.mkdirSync(OUTDIR, { recursive: true });
 
 const clips = new Map();  // id -> {id, voice, text}
-const plan = targets.map(v => {
-  const en = speakEn(v.en), de = speakDe(v.de), ru = speakRu(v.ru);
-  const idEn = idFor(VOICE_EN, en), idDe = idFor(VOICE_DE, de), idRu = idFor(VOICE_RU, ru);
+const plan = DATA.map(v => {
+  const en = speakEn(v.en), de = speakDe(v.de), ru = speakRu(v.ru), def = speakDef(v.def);
+  const idEn = idFor(VOICE_EN, en), idDe = idFor(VOICE_DE, de), idRu = idFor(VOICE_RU, ru), idDef = idFor(VOICE_EN, def);
   clips.set(idEn, { id: idEn, voice: VOICE_EN, text: en });
   clips.set(idDe, { id: idDe, voice: VOICE_DE, text: de });
   clips.set(idRu, { id: idRu, voice: VOICE_RU, text: ru });
-  return { en: v.en, idEn, idDe, idRu };
+  clips.set(idDef, { id: idDef, voice: VOICE_EN, text: def });
+  return { en: v.en, idEn, idDe, idRu, idDef };
 });
 
 const missing = [...clips.values()].filter(c => !fs.existsSync(path.join(WAVDIR, c.id + '.wav')));
@@ -161,45 +163,47 @@ if (toConv.length) {
   });
 }
 
-// ---------- 2) stitch one track per word ----------
-const out = {};
-for (const e of plan) {
-  const list = [];
-  let t = 0;
-  const push = f => { if (!f || !fs.existsSync(f)) return; list.push(f); t += wavDuration(f); };
-  const r3 = x => Math.round(x * 1000) / 1000;
+// ---------- 2) stitch ONE continuous track, remembering per-word cues ----------
+const list = [], cues = [];
+let t = 0;
+const push = f => { if (!f || !fs.existsSync(f)) return; list.push(f); t += wavDuration(f); };
+const r3 = x => Math.round(x * 1000) / 1000;
 
+push(silence(LEAD_IN));
+plan.forEach(e => {
+  const start = t;
   const enWav = path.join(WAVDIR, e.idEn + '.wav');
   const deWav = path.join(WAVDIR, e.idDe + '.wav');
   const ruWav = path.join(WAVDIR, e.idRu + '.wav');
+  const defWav = path.join(WAVDIR, e.idDef + '.wav');
 
-  push(silence(LEAD_IN));
   push(enWav); push(silence(GAP_REPEAT)); push(enWav); push(silence(GAP_REPEAT)); push(enWav);
   push(silence(GAP_LANG));
-  push(deWav); push(silence(GAP_REPEAT)); push(deWav); push(silence(GAP_REPEAT)); push(deWav);
+  push(deWav); push(silence(GAP_REPEAT)); push(deWav);
   push(silence(GAP_LANG));
   push(ruWav);
   push(silence(GAP_LANG));
-  push(ruWav);
-  push(silence(TAIL));
+  push(defWav);
+  push(silence(GAP_LANG));
+  push(enWav);
+  const end = t;
+  push(silence(GAP_WORD));
+  cues.push({ en: e.en, t: r3(start), e: r3(end) });
+});
 
-  const slug = slugify(e.en);
-  const listFile = path.join(CACHE, `_list_${slug}.txt`);
-  fs.writeFileSync(listFile, list.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'), 'utf8');
-  const m4a = path.join(OUTDIR, `wk__${slug}.m4a`);
-  execFileSync('ffmpeg', ['-f', 'concat', '-safe', '0', '-i', listFile,
-    '-c:a', 'aac', '-b:a', BITRATE, '-ac', '1', '-ar', String(SR), '-movflags', '+faststart', m4a, '-y', '-loglevel', 'error']);
-  out[e.en] = { src: `audio/wk__${slug}.m4a`, d: r3(t) };
-  console.log(`✓ ${e.en.padEnd(20)} ${String(Math.round(t)).padStart(3)}s  ${(fs.statSync(m4a).size / 1024).toFixed(0)} KB`);
-}
+const listFile = path.join(CACHE, `_list_all.txt`);
+fs.writeFileSync(listFile, list.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'), 'utf8');
+const m4a = path.join(OUTDIR, `wk__all.m4a`);
+execFileSync('ffmpeg', ['-f', 'concat', '-safe', '0', '-i', listFile,
+  '-c:a', 'aac', '-b:a', BITRATE, '-ac', '1', '-ar', String(SR), '-movflags', '+faststart', m4a, '-y', '-loglevel', 'error']);
+console.log(`✓ wk__all.m4a  ${cues.length} words  ${String(Math.round(t)).padStart(4)}s  ${(fs.statSync(m4a).size / 1048576).toFixed(2)} MB`);
 
-// ---------- 3) cue file (merge with words built in an earlier run) ----------
+// ---------- 3) drop stale per-word files from an earlier layout ----------
+fs.readdirSync(OUTDIR).forEach(f => {
+  if (/^wk__(?!all\.m4a$).*\.m4a$/.test(f)) { fs.unlinkSync(path.join(OUTDIR, f)); console.log('  (removed old per-word file ' + f + ')'); }
+});
+
+// ---------- 4) cue file ----------
 const cuesFile = path.join(OUTDIR, 'weekly-audio-cues.js');
-let merged = {};
-if (fs.existsSync(cuesFile)) {
-  try { merged = JSON.parse(fs.readFileSync(cuesFile, 'utf8').replace(/^window\.WEEKLY_AUDIO = /, '').replace(/;\s*$/, '')); }
-  catch (e) { merged = {}; }
-}
-Object.assign(merged, out);
-fs.writeFileSync(cuesFile, 'window.WEEKLY_AUDIO = ' + JSON.stringify(merged) + ';\n');
-console.log(`\nweekly-audio-cues.js: ${Object.keys(merged).length} word(s)`);
+fs.writeFileSync(cuesFile, 'window.WEEKLY_AUDIO = ' + JSON.stringify({ src: 'audio/wk__all.m4a', d: r3(t), w: cues }) + ';\n');
+console.log(`weekly-audio-cues.js written (${cues.length} words)`);
