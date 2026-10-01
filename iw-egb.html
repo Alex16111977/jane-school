@@ -238,6 +238,28 @@
     .kb-vs ul { margin:0.3rem 0 0; padding-left:1.05rem; }
     .kb-vs li { margin-bottom:0.28rem; }
     @media (max-width:600px) { .kb-vs { grid-template-columns:1fr; } }
+    /* ══ rf9 Audio: Dock unten, blockiert nichts ══ */
+    .spk-btn{display:inline-flex;align-items:center;justify-content:center;width:1.55rem;height:1.55rem;margin-left:.35rem;border-radius:50%;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.18);color:inherit;font-size:.78rem;cursor:pointer;vertical-align:middle;transition:background .15s,transform .15s;flex:none;line-height:1;}
+    .spk-btn:hover{background:rgba(56,189,248,.28);transform:scale(1.1);}
+    .spk-btn.playing{background:rgba(56,189,248,.45);animation:spkPulse 1s ease-in-out infinite;}
+    @keyframes spkPulse{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.55);}50%{box-shadow:0 0 0 7px rgba(56,189,248,0);}}
+    #rfVocab tr.playing td{background:rgba(56,189,248,0.08);}
+    .wka-playall{display:flex;align-items:center;gap:0.5rem;width:100%;margin-bottom:0.8rem;padding:0.6rem 1rem;border-radius:12px;border:1.5px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.1);color:#fff;font-family:inherit;font-size:0.92rem;font-weight:700;cursor:pointer;transition:background .15s;}
+    .wka-playall:hover{background:rgba(56,189,248,0.2);}
+    .wka-dock{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;flex-direction:column;font-family:inherit;padding-bottom:env(safe-area-inset-bottom,0);background:linear-gradient(160deg,#131c2b,#0b1119);border-top:1px solid rgba(56,189,248,0.45);box-shadow:0 -8px 26px rgba(0,0,0,0.5);}
+    .wka-dock.open{display:flex;}
+    body.wka-on{padding-bottom:88px;}
+    .wka-bar{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.7rem;}
+    .wka-btn{width:38px;height:38px;border-radius:50%;flex-shrink:0;border:1px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.1);color:#e8f4ff;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+    .wka-btn:hover{background:rgba(56,189,248,0.22);}
+    .wka-main{width:46px;height:46px;font-size:1.15rem;background:linear-gradient(135deg,#38bdf8,#7dd3fc);color:#04263a;border:none;}
+    .wka-info{flex:1;min-width:0;}
+    .wka-word{color:#fff;font-size:0.94rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .wka-sub{color:rgba(200,222,242,0.6);font-size:0.76rem;margin-top:0.08rem;}
+    .wka-close{background:none;border:none;color:rgba(200,215,235,0.6);font-size:1.5rem;line-height:1;cursor:pointer;flex-shrink:0;padding:0 0.3rem;}
+    .wka-close:hover{color:#fff;}
+    .wka-track{height:4px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden;margin:0 0.7rem 0.6rem;}
+    .wka-fill{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#7dd3fc);}
 </style>
 </head>
 <body class="dark-theme page-bg-image" style="background: transparent">
@@ -2470,8 +2492,10 @@
                 </div>
 
                 <div class="note-card">
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.6rem;">&#x1F3A7; Offline-Audio: jedes Wort auf Deutsch &rarr; Erkl&auml;rung auf Russisch &rarr; noch einmal auf Deutsch, mit kurzen Pausen dazwischen.</p>
+                    <button id="wkaPlayAll" class="wka-playall">&#x25B6;&#xFE0E; Alle 50 W&ouml;rter anh&ouml;ren &mdash; der Reihe nach, ohne klicken</button>
                     <div class="table-wrapper" style="overflow-x:auto">
-                    <table class="unit-table" style="margin-top:0.3rem; min-width:640px;">
+                    <table class="unit-table" id="rfVocab" style="margin-top:0.3rem; min-width:640px;">
                         <tr><th>Deutsch</th><th>Что это значит</th><th>Beispiel</th></tr>
                         <tr><td class="kb-de">die Aktie</td><td>доля в Grundkapital акционерного общества; купил акцию — тебе принадлежит кусочек фирмы</td><td>50.000 € Grundkapital = 50.000 Aktien по 1 €</td></tr>
                         <tr><td class="kb-de">der Aktionär / die Aktionärin</td><td>тот, кому принадлежат акции AG</td><td>Кто держит 100 акций Kraft&rsquo;s Brewery, тот акционер</td></tr>
@@ -3660,7 +3684,99 @@ makeTrainer('rz', RF, RITEMS, 'rf', RITEMS.length
     : '', 'Все пять правовых форм ты различаешь уверенно.');
 renderSelbst('stListRF', SELBST_RF);
 
+/* ===================== rf9 AUDIO: ein Track + Cues pro Wort (DE -> RU -> DE) ===================== */
+document.addEventListener('DOMContentLoaded', function () {
+    var dock = document.getElementById('wkaDock'), table = document.getElementById('rfVocab');
+    if (!dock || !table) { return; }
+    var rows = Array.prototype.slice.call(table.querySelectorAll('tr')).filter(function (tr) { return tr.querySelector('td'); });
+    rows.forEach(function (tr, i) {
+        var td = tr.querySelector('td'); if (!td) { return; }
+        var b = document.createElement('button');
+        b.className = 'spk-btn rf-spk'; b.dataset.i = i; b.title = 'Anhören: DE → RU → DE'; b.innerHTML = '&#x1F50A;';
+        td.appendChild(b);
+    });
+    var elWord = document.getElementById('wkaWord'), elSub = document.getElementById('wkaSub'),
+        elPlay = document.getElementById('wkaPlay'), elFill = document.getElementById('wkaFill');
+    var audioEl = null, idx = -1, open = false;
+    function data() { return window.RF9_AUDIO || null; }
+    function audio() {
+        var d = data(); if (!d) { return null; }
+        if (!audioEl) { audioEl = new Audio(); audioEl.preload = 'auto'; audioEl.src = d.src; }
+        return audioEl;
+    }
+    function openDock(i) {
+        var d = data(); if (!d || !d.w.length) { return; }
+        dock.classList.add('open'); document.body.classList.add('wka-on'); open = true;
+        seekTo(i || 0);
+    }
+    function closeDock() {
+        pause(); dock.classList.remove('open'); document.body.classList.remove('wka-on');
+        open = false; idx = -1; mark(-1);
+    }
+    function mark(i) {
+        rows.forEach(function (tr, k) {
+            tr.classList.toggle('playing', k === i);
+            var b = tr.querySelector('.rf-spk'); if (b) { b.classList.toggle('playing', k === i); }
+        });
+    }
+    function seekTo(i) {
+        var d = data(), a = audio(); if (!d || !a) { return; }
+        if (i < 0) { i = 0; }
+        if (i >= d.w.length) { pause(); return; }
+        idx = i;
+        var c = d.w[i];
+        var go = function () {
+            try { a.currentTime = c.t; } catch (e) {}
+            var p = a.play(); if (p && p.catch) { p.catch(function () { elPlay.innerHTML = '&#x25B6;'; }); }
+            elPlay.innerHTML = '&#x23F8;';
+        };
+        if (a.readyState >= 1) { go(); } else { a.addEventListener('loadedmetadata', go, { once: true }); }
+        elWord.textContent = c.de; elSub.textContent = (i + 1) + ' / ' + d.w.length; mark(i);
+    }
+    function pause() { if (audioEl) { try { audioEl.pause(); } catch (e) {} } elPlay.innerHTML = '&#x25B6;'; }
+    elPlay.addEventListener('click', function () {
+        if (!open || !audioEl) { return; }
+        if (audioEl.paused) { var p = audioEl.play(); if (p && p.catch) { p.catch(function () {}); } elPlay.innerHTML = '&#x23F8;'; } else { pause(); }
+    });
+    document.getElementById('wkaPrev').addEventListener('click', function () { seekTo(idx - 1); });
+    document.getElementById('wkaNext').addEventListener('click', function () { seekTo(idx + 1); });
+    document.getElementById('wkaClose').addEventListener('click', closeDock);
+    document.getElementById('wkaPlayAll').addEventListener('click', function () { openDock(0); });
+    table.addEventListener('click', function (e) {
+        var b = e.target.closest('.rf-spk'); if (!b) { return; }
+        var i = +b.dataset.i;
+        if (open && idx === i && audioEl && !audioEl.paused) { pause(); return; }
+        openDock(i);
+    });
+    window.addEventListener('hashchange', function () { if (location.hash !== '#rf9' && open) { closeDock(); } });
+    setInterval(function () {
+        var a = audioEl, d = data();
+        if (!a || !d || !open || idx < 0 || a.paused) { return; }
+        var c = d.w[idx];
+        if (a.currentTime >= c.e - 0.02) {
+            if (idx + 1 >= d.w.length) { if (a.currentTime >= d.d - 0.05 || a.ended) { pause(); } return; }
+            if (a.currentTime >= d.w[idx + 1].t) { idx++; c = d.w[idx]; elWord.textContent = c.de; elSub.textContent = (idx + 1) + ' / ' + d.w.length; mark(idx); }
+            return;
+        }
+        var span = Math.max(0.1, c.e - c.t);
+        elFill.style.width = Math.min(100, ((idx + (a.currentTime - c.t) / span) / d.w.length) * 100) + '%';
+    }, 100);
+});
 </script>
+    <div class="wka-dock" id="wkaDock">
+        <div class="wka-bar">
+            <button class="wka-btn" id="wkaPrev" title="Zur&uuml;ck">&#x23EE;</button>
+            <button class="wka-btn wka-main" id="wkaPlay" title="Play/Pause">&#x25B6;</button>
+            <button class="wka-btn" id="wkaNext" title="Weiter">&#x23ED;</button>
+            <div class="wka-info">
+                <div class="wka-word" id="wkaWord">&mdash;</div>
+                <div class="wka-sub" id="wkaSub"></div>
+            </div>
+            <button class="wka-close" id="wkaClose" title="Schlie&szlig;en">&times;</button>
+        </div>
+        <div class="wka-track"><div class="wka-fill" id="wkaFill"></div></div>
+    </div>
+    <script src="audio/rf9-audio-cues.js" defer></script>
     <script src="js/nav-dropdown.js" defer></script>
 </body>
 </html>
