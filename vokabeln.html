@@ -488,6 +488,19 @@
         .quiz-opt.wrong { background: rgba(248,81,73,0.15); border-color: #f85149; color: #f85149; }
         .quiz-opt.disabled { pointer-events: none; opacity: 0.6; }
         .quiz-progress { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+        .quiz-next-wrap { display: flex; justify-content: center; margin-top: 1rem; }
+        .quiz-next {
+            padding: 0.65rem 2.2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(121,184,255,0.5);
+            background: rgba(121,184,255,0.15);
+            color: #79b8ff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .quiz-next:hover { background: rgba(121,184,255,0.28); }
         .quiz-result {
             text-align: center;
             padding: 2rem;
@@ -6306,6 +6319,33 @@
             setTimeout(function() { renderVocab(); }, 400);
         }
 
+        // After an answer: right -> quick auto-advance; wrong -> stay on the question (the right option is
+        // highlighted) until the user presses "Weiter" / Enter / Space, so there is time to read it.
+        function nextAfterAnswer(grid, isOk, next, okDelay) {
+            if (isOk) { setTimeout(next, okDelay); return; }
+            var card = grid.querySelector('.quiz-card') || grid;
+            var wrap = document.createElement('div');
+            wrap.className = 'quiz-next-wrap';
+            var btn = document.createElement('button');
+            btn.className = 'quiz-next';
+            btn.textContent = 'Weiter →';
+            wrap.appendChild(btn);
+            card.appendChild(wrap);
+            var done = false;
+            function go() {
+                if (done) return;
+                done = true;
+                document.removeEventListener('keydown', onKey);
+                next();
+            }
+            function onKey(e) {
+                if (!document.body.contains(btn)) { document.removeEventListener('keydown', onKey); return; }
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+            }
+            btn.addEventListener('click', go);
+            document.addEventListener('keydown', onKey);
+        }
+
         // ===== MODE: QUIZ =====
         function renderQuiz(grid, data, lvl) {
             var questions = shuffle(data.slice());
@@ -6358,7 +6398,7 @@
                 }
                 recordLeitner(currentLevel, currentTopic, questions[qIdx], isOk);
                 qIdx++;
-                setTimeout(showQuestion, 800);
+                nextAfterAnswer(grid, isOk, showQuestion, 800);
             };
         }
 
@@ -6610,7 +6650,7 @@
                 }
                 recordLeitner(currentLevel, currentTopic, items[idx], isOk);
                 idx++;
-                setTimeout(showQ, 800);
+                nextAfterAnswer(grid, isOk, showQ, 800);
             };
         }
 
@@ -6677,7 +6717,7 @@
                 }
                 recordLeitner(currentLevel, currentTopic, items[idx], isOk);
                 idx++;
-                setTimeout(showQ, 900);
+                nextAfterAnswer(grid, isOk, showQ, 900);
             };
         }
 
@@ -6740,8 +6780,8 @@
                     grid.querySelectorAll('.quiz-opt').forEach(function(o) { if (stripHtml(o.dataset.answer) === stripHtml(correct)) o.classList.add('correct'); });
                     recordLeitner(currentLevel, currentTopic, pool[qIdx], false);
                     lives--;
-                    if (lives <= 0) { setTimeout(gameOver, 800); }
-                    else { qIdx++; setTimeout(showQ, 800); }
+                    if (lives <= 0) { nextAfterAnswer(grid, false, gameOver); }
+                    else { qIdx++; nextAfterAnswer(grid, false, showQ); }
                 }
             };
         }
@@ -6794,7 +6834,7 @@
                 }
                 recordLeitner(currentLevel, currentTopic, items[idx], isOk);
                 idx++;
-                setTimeout(showQ, 800);
+                nextAfterAnswer(grid, isOk, showQ, 800);
             };
         }
 
@@ -6805,8 +6845,10 @@
             var idx = 0, score = 0, total = items.length;
             var placed = [];
             var words = [];
+            var locked = false;
 
             function showQ() {
+                locked = false;
                 if (idx >= total) {
                     var pct = Math.round(score / total * 100);
                     grid.innerHTML = '<div class="quiz-area"><div class="quiz-card quiz-result">' +
@@ -6852,6 +6894,7 @@
             var shuffledRef = [];
 
             grid.onclick = function(e) {
+                if (locked) return;
                 // Click on chip to add to result
                 var chip = e.target.closest('.sentence-chip');
                 if (chip && !chip.classList.contains('used')) {
@@ -6867,7 +6910,8 @@
                     // Auto-check when all words placed
                     if (placed.length === currentWords.length) {
                         var fb = document.getElementById('sent-fb');
-                        if (placed.join(' ') === currentWords.join(' ')) {
+                        var sentOk = placed.join(' ') === currentWords.join(' ');
+                        if (sentOk) {
                             fb.textContent = '\u2705 Richtig!';
                             fb.className = 'type-feedback ok';
                             score++;
@@ -6876,7 +6920,8 @@
                             fb.className = 'type-feedback fail';
                         }
                         idx++;
-                        setTimeout(showQ, 1500);
+                        locked = true;
+                        nextAfterAnswer(grid, sentOk, showQ, 1500);
                     }
                 }
                 // Click on placed word to remove it
@@ -6984,7 +7029,7 @@
                 }
                 recordLeitner(currentLevel, cur.topic, cur.item, ok);
                 qIdx++;
-                setTimeout(showQ, 800);
+                nextAfterAnswer(grid, ok, showQ, 800);
             };
         }
 
@@ -7134,7 +7179,7 @@
                 }
                 recordLeitner(currentLevel, currentTopic, items[idx], ok);
                 idx++;
-                setTimeout(showQ, 900);
+                nextAfterAnswer(grid, ok, showQ, 900);
             };
         }
 
