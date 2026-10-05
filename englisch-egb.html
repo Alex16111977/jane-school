@@ -1094,6 +1094,11 @@
                         <b style="color:#fbbf24">deutsche &Uuml;bersetzung</b> &mdash; genau die, nach der im Unterricht gefragt wird.
                         Zum Abfragen gibt es weiter unten auf dieser Seite den <b>EN&nbsp;&rarr;&nbsp;DE&nbsp;Trainer</b>.
                     </p>
+                    <div class="jva-row" style="margin:0.7rem 0 0.2rem;">
+                        <button id="jvaPlayAll" class="wka-playall" type="button">&#x25B6;&#xFE0E; Alle W&ouml;rter anh&ouml;ren <span id="jvaAllDur" style="font-weight:500;opacity:0.75;"></span></button>
+                        <button id="jvaPlayExam" class="wka-playall" type="button">&#x1F3AF; Nur Pr&uuml;fungsw&ouml;rter anh&ouml;ren <span id="jvaExamDur" style="font-weight:500;opacity:0.75;"></span></button>
+                        <p style="font-size:0.8rem;color:rgba(230,230,235,0.5);margin:0 0 0.5rem;">Pro Wort: Englisch 3&times; &middot; Deutsch &middot; Russisch &middot; &laquo;What it means&raquo; auf Englisch &middot; zum Schluss das Wort noch einmal. Mit &#x1F50A; in jeder Zeile startest du direkt ab diesem Wort.</p>
+                    </div>
                     <div id="vocabTableJob"></div>
                 </div>
 
@@ -2990,8 +2995,9 @@ var JOB_VOCAB = [
     var html = '<div class="table-wrapper" style="overflow-x:auto">' +
         '<table class="unit-table" style="margin-top:0.5rem; min-width:880px;">' +
         '<tr><th>Word / phrase <span style="color:#79b8ff">+ как читать</span></th><th>Deutsch</th><th>По-русски</th><th>What it means</th><th>Example</th></tr>';
-    JOB_VOCAB.forEach(function (v) {
-        html += '<tr><td class="kb-de">' + v.en + '<span class="vt-tr">[' + v.tr + ']</span></td>' +
+    JOB_VOCAB.forEach(function (v, i) {
+        html += '<tr><td class="kb-de">' + v.en + '<span class="vt-tr">[' + v.tr + ']</span>' +
+                '<button class="spk-btn jv-spk" data-i="' + i + '" title="Anh&ouml;ren: EN x3, DE, RU, Bedeutung">&#x1F50A;</button></td>' +
                 '<td class="vt-de">' + v.de + '</td>' +
                 '<td>' + v.ru + '</td>' +
                 '<td>' + v.def + '</td>' +
@@ -3064,7 +3070,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!audioEl) { audioEl = new Audio(); audioEl.preload = 'auto'; }
         return audioEl;
     }
-    function data() { return window.WEEKLY_AUDIO || null; }
+    /* two sources share this dock: 'wk' = weekly check list (#u1k), 'jv' = whole vocabulary table (#u1d) */
+    var source = 'wk', examOnly = false, examSet = {};
+    function data() { return (source === 'jv' ? window.JOB_VOCAB_AUDIO : window.WEEKLY_AUDIO) || null; }
+    function buildExamSet() {
+        examSet = {};
+        (window.JOB_EXAM_EN ? window.JOB_EXAM_EN() : []).forEach(function (en) { examSet[en] = true; });
+    }
+    function isShown(i) {
+        if (source !== 'jv' || !examOnly) { return true; }
+        var d = data(); return !!(d && d.w[i] && examSet[d.w[i].raw]);
+    }
+    function step(i, dir) {
+        var d = data(); if (!d) { return i; }
+        while (i >= 0 && i < d.w.length && !isShown(i)) { i += dir; }
+        return i;
+    }
+    function shownCount() { var d = data(), n = 0; if (d) { for (var k = 0; k < d.w.length; k++) { if (isShown(k)) { n++; } } } return n; }
+    function shownPos(i) { var n = 0; for (var k = 0; k < i; k++) { if (isShown(k)) { n++; } } return n; }
     function loadTrack() {
         var d = data(); if (!d) { return null; }
         var a = audio();
@@ -3073,7 +3096,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var idx = -1, open = false;
-    function openDock(startIdx) {
+    function openDock(startIdx, which) {
+        if (which && which !== source) { source = which; idx = -1; }
         var d = data(); if (!d || !d.w || !d.w.length) { return; }
         dock.classList.add('open'); document.body.classList.add('wka-on');
         open = true;
@@ -3085,7 +3109,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var a = audioEl; if (a) { try { a.pause(); } catch (e) {} }
         dock.classList.remove('open'); document.body.classList.remove('wka-on');
         open = false; idx = -1;
-        document.querySelectorAll('.wk-spk.playing').forEach(function (b) { b.classList.remove('playing'); });
+        document.querySelectorAll('.spk-btn.playing').forEach(function (b) { b.classList.remove('playing'); });
     }
     function seekTo(i, play) {
         var d = data(); if (!d) { return; }
@@ -3107,9 +3131,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     function highlight(c, i, total) {
         elWord.textContent = c.en;
-        elSub.textContent = (i + 1) + ' / ' + total;
-        document.querySelectorAll('.wk-spk.playing').forEach(function (b) { b.classList.remove('playing'); });
-        var rowBtn = document.querySelector('.wk-spk[data-w="' + c.en.replace(/"/g, '\\"') + '"]');
+        if (source === 'jv' && examOnly) { elSub.textContent = (shownPos(i) + 1) + ' / ' + shownCount() + ' · Prüfungswörter'; }
+        else { elSub.textContent = (i + 1) + ' / ' + total + (source === 'jv' ? ' · Wortschatz' : ''); }
+        document.querySelectorAll('.spk-btn.playing').forEach(function (b) { b.classList.remove('playing'); });
+        var rowBtn = source === 'jv'
+            ? document.querySelector('.jv-spk[data-i="' + i + '"]')
+            : document.querySelector('.wk-spk[data-w="' + c.en.replace(/"/g, '\\"') + '"]');
         if (rowBtn) { rowBtn.classList.add('playing'); }
     }
     function pause() {
@@ -3122,21 +3149,59 @@ document.addEventListener('DOMContentLoaded', function () {
         if (a.paused) { var p = a.play(); if (p && p.catch) { p.catch(function () {}); } elPlay.innerHTML = '&#x23F8;'; }
         else { pause(); }
     });
-    document.getElementById('wkaPrev').addEventListener('click', function () { seekTo(idx - 1, true); });
-    document.getElementById('wkaNext').addEventListener('click', function () { seekTo(idx + 1, true); });
+    document.getElementById('wkaPrev').addEventListener('click', function () { seekTo(step(idx - 1, -1), true); });
+    document.getElementById('wkaNext').addEventListener('click', function () { seekTo(step(idx + 1, 1), true); });
     document.getElementById('wkaClose').addEventListener('click', closeDock);
-    if (playAllBtn) { playAllBtn.addEventListener('click', function () { openDock(0); }); }
+    if (playAllBtn) { playAllBtn.addEventListener('click', function () { examOnly = false; openDock(0, 'wk'); }); }
+
+    /* whole vocabulary table (#u1d): all words, or only the words that occur on the exam sheet */
+    var jvAll = document.getElementById('jvaPlayAll'), jvExam = document.getElementById('jvaPlayExam');
+    function labelJv() {
+        var d = window.JOB_VOCAB_AUDIO;
+        var row = document.querySelector('.jva-row');
+        if (!d || !d.w || !d.w.length) { if (row) { row.style.display = 'none'; } document.querySelectorAll('.jv-spk').forEach(function (b) { b.remove(); }); return; }
+        buildExamSet();
+        // rows added to JOB_VOCAB after the audio was built have no audio yet: no speaker button for them
+        document.querySelectorAll('.jv-spk').forEach(function (b) {
+            var i = parseInt(b.getAttribute('data-i'), 10), c = d.w[i];
+            if (!c || c.raw !== JOB_VOCAB[i].en) { b.remove(); }
+        });
+        var all = document.getElementById('jvaAllDur'), ex = document.getElementById('jvaExamDur');
+        if (all) { all.textContent = '(' + d.w.length + ' Wörter, ≈ ' + Math.round(d.d / 60) + ' min)'; }
+        if (ex) {
+            var n = 0, sec = 0;
+            d.w.forEach(function (c) { if (examSet[c.raw]) { n++; sec += (c.e - c.t) + 1.3; } });
+            ex.textContent = '(' + n + ' Wörter, ≈ ' + Math.round(sec / 60) + ' min)';
+        }
+    }
+    labelJv();
+    window.addEventListener('load', labelJv);
+    if (jvAll) { jvAll.addEventListener('click', function () { examOnly = false; openDock(0, 'jv'); }); }
+    if (jvExam) {
+        jvExam.addEventListener('click', function () {
+            source = 'jv'; examOnly = true; buildExamSet();
+            openDock(step(0, 1), 'jv');
+        });
+    }
 
     /* click a row's own 🔊: open the dock straight at that word */
     document.addEventListener('click', function (e) {
+        var jb = e.target.closest('.jv-spk');
+        if (jb) {
+            var ji = parseInt(jb.getAttribute('data-i'), 10);
+            if (open && source === 'jv' && idx === ji && audioEl && !audioEl.paused) { pause(); return; }
+            openDock(ji, 'jv');
+            return;
+        }
         var btn = e.target.closest('.wk-spk');
         if (!btn) { return; }
-        var d = data(); if (!d) { return; }
+        var d = window.WEEKLY_AUDIO; if (!d) { return; }
         var i = -1;
         for (var k = 0; k < d.w.length; k++) { if (d.w[k].en === btn.dataset.w) { i = k; break; } }
         if (i === -1) { return; }
-        if (open && idx === i && audioEl && !audioEl.paused) { pause(); return; }
-        openDock(i);
+        if (open && source === 'wk' && idx === i && audioEl && !audioEl.paused) { pause(); return; }
+        examOnly = false;
+        openDock(i, 'wk');
     });
 
     /* tick: word end -> next word, progress bar */
@@ -3144,9 +3209,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var a = audioEl, d = data();
         if (!a || !d || !open || idx < 0 || a.paused) { return; }
         var c = d.w[idx];
-        if (a.currentTime >= c.e - 0.02) { seekTo(idx + 1, true); return; }
+        if (a.currentTime >= c.e - 0.02) { seekTo(step(idx + 1, 1), true); return; }
         var span = Math.max(0.1, c.e - c.t);
-        elFill.style.width = Math.min(100, ((idx + (a.currentTime - c.t) / span) / d.w.length) * 100) + '%';
+        var pos = (source === 'jv' && examOnly) ? shownPos(idx) : idx, tot = (source === 'jv' && examOnly) ? shownCount() : d.w.length;
+        elFill.style.width = Math.min(100, ((pos + (a.currentTime - c.t) / span) / tot) * 100) + '%';
     }, 100);
 });
 
@@ -3192,6 +3258,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         return examCache;
     }
+    window.JOB_EXAM_EN = function () { return examWords().map(function (v) { return v.en; }); };
     function start(mix) {
         var pool = (examOnly && examWords().length) ? examWords() : JOB_VOCAB;
         queue = pool.slice();
@@ -3447,6 +3514,7 @@ renderSelbst('stListWeekly', SELBST_WEEKLY);
     </div>
     <audio id="eadAudioEl" preload="none"></audio>
     <script src="audio/egb-englisch-cues.js" defer></script>
+    <script src="audio/job-vocab-audio-cues.js" defer></script>
     <script>
     // Lesson audio player for the exam tab (u1m): two continuous tracks, prev/next by section, click-to-seek
     document.addEventListener('DOMContentLoaded', function () {
