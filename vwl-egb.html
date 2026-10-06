@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB VWL — Mein Geld, meine Entscheidung | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+<style>
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #egb-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #2a1600; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+    /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute; bottom: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4); font-size: 0.72rem; font-weight: 800; line-height: 1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: all 0.18s;
+        z-index: 3; flex-shrink: 0; padding: 0; font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    .plan-badge {
+        position: absolute; top: -8px; left: 8px; font-size: 0.6rem; font-weight: 800;
+        padding: 0.13rem 0.48rem; border-radius: 20px; white-space: nowrap; letter-spacing: 0.05em;
+        pointer-events: none; z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px; padding: 0.9rem 1.1rem; margin-bottom: 1.4rem;
+        display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.55); font-size: 0.8rem;
+        font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg { display: none; text-align: center; color: rgba(255,255,255,0.3);
+                      padding: 2.5rem 0; font-size: 0.9rem; line-height: 1.8; }
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+    /* ---- Ссылки на разборы на сайте ---- */
+    .sl { margin:0.75rem 0 0; padding:0.6rem 0.85rem; border-left:2px solid rgba(200,165,255,0.45);
+          background:rgba(200,165,255,0.06); border-radius:0 10px 10px 0;
+          font-size:0.845rem; color:rgba(230,230,235,0.62); line-height:1.8; }
+    .sl-t { display:block; color:rgba(230,230,235,0.85); font-weight:700; font-size:0.8rem;
+            letter-spacing:0.02em; margin-bottom:0.15rem; }
+    .sl a { color:#c8a5ff; text-decoration:none; border-bottom:1px dotted rgba(200,165,255,0.55); }
+    .sl a:hover { color:#fff; border-bottom-color:#fff; }
+
+    /* ---- Tabellen ---- */
+    .mt-wrap { overflow-x:auto; margin:0.8rem 0; }
+    .mt { width:100%; border-collapse:collapse; font-size:0.92rem; min-width:420px; }
+    .mt th, .mt td { border:1px solid rgba(255,255,255,0.14); padding:0.45rem 0.65rem; text-align:center; color:rgba(230,230,235,0.85); }
+    .mt th { background:rgba(255,255,255,0.07); color:#fff; font-weight:700; font-size:0.85rem; line-height:1.35; }
+    .mt td.l, .mt th.l { text-align:left; }
+    .mt tr.sum td { background:rgba(63,185,80,0.1); font-weight:700; color:#fff; }
+    .mt td.hl { background:rgba(251,191,36,0.14); color:#fbbf24; font-weight:800; }
+    .mt td.dim { color:rgba(230,230,235,0.45); }
+    .mt caption { caption-side:top; text-align:left; font-size:0.82rem; color:rgba(230,230,235,0.5);
+                  padding-bottom:0.35rem; }
+
+    /* ---- Rechenweg ---- */
+    .rw { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+          padding:0.75rem 0.95rem; margin:0.55rem 0; font-size:1rem; color:#fff; line-height:2; }
+    .rw .step { display:block; color:rgba(230,230,235,0.48); font-size:0.79rem; line-height:1.5;
+                margin-top:0.35rem; }
+    .rw .step:first-child { margin-top:0; }
+    .rw b { color:#fbbf24; }
+    .rw .erg { color:#86efac; font-weight:800; }
+
+    /* ---- Deutscher Satz zum Vorlesen ---- */
+    .dsatz { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.28); border-radius:9px;
+             padding:0.6rem 0.85rem; color:#fff; font-size:0.97rem; line-height:1.65; margin:0.5rem 0 0.15rem; }
+    .dsatz-ru { font-size:0.86rem; color:rgba(230,230,235,0.62); margin:0 0 0.9rem 0.25rem; line-height:1.6; }
+    .dsatz-ru b { color:#c8a5ff; font-weight:600; }
+
+    /* ---- Vertragsauszug ---- */
+    .vertrag { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.14); border-radius:10px;
+               padding:0.85rem 1rem; margin:0.7rem 0; font-size:0.92rem; color:rgba(230,230,235,0.85); line-height:1.75; }
+    .vertrag .vg-titel { color:#fbbf24; font-weight:800; font-size:0.88rem; margin-bottom:0.5rem; }
+    .vertrag .vg-p { color:#fff; font-weight:700; font-size:0.88rem; margin:0.6rem 0 0.15rem; }
+    .vertrag b { color:#fff; }
+
+    /* ---- Schritte ---- */
+    .schritte { list-style:none; padding:0; margin:0.6rem 0 0; counter-reset:sc; }
+    .schritte li { position:relative; padding:0.5rem 0 0.5rem 2.3rem; counter-increment:sc;
+                   font-size:0.93rem; color:rgba(230,230,235,0.8); line-height:1.65;
+                   border-bottom:1px dashed rgba(255,255,255,0.08); }
+    .schritte li:last-child { border-bottom:none; }
+    .schritte li::before { content:counter(sc); position:absolute; left:0; top:0.5rem;
+        width:1.55rem; height:1.55rem; border-radius:50%; background:rgba(245,158,11,0.18);
+        border:1px solid rgba(245,158,11,0.45); color:#fbbf24; font-size:0.8rem; font-weight:800;
+        display:flex; align-items:center; justify-content:center; }
+    .schritte li b { color:#fff; }
+
+    /* ---- Selbsttest ---- */
+    .st-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:9px;
+               padding:0.6rem 0.8rem; margin-bottom:0.45rem; cursor:pointer; transition:all .15s; }
+    .st-item:hover { border-color:var(--color-accent); }
+    .st-q { color:rgba(230,230,235,0.9); font-size:0.94rem; }
+    .st-a { display:none; margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.12);
+            color:#86efac; font-size:0.93rem; line-height:1.6; }
+    .st-item.open .st-a { display:block; }
+    .st-a b { color:#fff; }
+
+    /* ---- kleine Helfer ---- */
+    .kb-de { color:#fff; font-weight:600; }
+    .warn { background:rgba(248,113,113,0.09); border:1px solid rgba(248,113,113,0.3);
+            border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+            color:rgba(230,230,235,0.82); line-height:1.65; }
+    .warn b { color:#fca5a5; }
+    .gut { background:rgba(63,185,80,0.09); border:1px solid rgba(63,185,80,0.3);
+           border-radius:10px; padding:0.65rem 0.9rem; margin:0.7rem 0; font-size:0.9rem;
+           color:rgba(230,230,235,0.82); line-height:1.65; }
+    .gut b { color:#86efac; }
+    .sprech { background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.28);
+              border-radius:10px; padding:0.6rem 0.9rem; margin:0.6rem 0; font-size:0.88rem;
+              color:rgba(230,230,235,0.78); line-height:1.7; }
+    .sprech b { color:#93c5fd; }
+
+    /* ---- Wortschatz ---- */
+    .vt { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    .vt td { border-bottom:1px solid rgba(255,255,255,0.08); padding:0.45rem 0.55rem; vertical-align:top; }
+    .vt td.de { color:#fff; font-weight:600; width:42%; }
+    .vt td.ru { color:rgba(230,230,235,0.68); line-height:1.55; }
+    .vt tr:last-child td { border-bottom:none; }
+
+    /* ---- gelöst-Badge ---- */
+    .solved-badge { display:inline-flex; align-items:center; gap:0.35rem; background:rgba(63,185,80,0.16);
+                    border:1px solid rgba(63,185,80,0.4); color:#86efac; font-size:0.78rem; font-weight:800;
+                    padding:0.25rem 0.7rem; border-radius:20px; margin-bottom:0.7rem; }
+
+    /* ══ bwr9 Audio: Dock unten, blockiert nichts ══ */
+    .spk-btn{display:inline-flex;align-items:center;justify-content:center;width:1.55rem;height:1.55rem;margin-left:.35rem;border-radius:50%;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.18);color:inherit;font-size:.78rem;cursor:pointer;vertical-align:middle;transition:background .15s,transform .15s;flex:none;line-height:1;}
+    .spk-btn:hover{background:rgba(245,158,11,.28);transform:scale(1.1);}
+    .spk-btn.playing{background:rgba(245,158,11,.45);animation:spkPulse 1s ease-in-out infinite;}
+    @keyframes spkPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.55);}50%{box-shadow:0 0 0 7px rgba(245,158,11,0);}}
+    .vt tr.playing td{background:rgba(245,158,11,0.08);}
+    .wka-playall{display:flex;align-items:center;gap:0.5rem;width:100%;margin-bottom:0.8rem;padding:0.6rem 1rem;border-radius:12px;border:1.5px solid rgba(245,158,11,0.45);background:rgba(245,158,11,0.1);color:#fff;font-family:inherit;font-size:0.92rem;font-weight:700;cursor:pointer;transition:background .15s;}
+    .wka-playall:hover{background:rgba(245,158,11,0.2);}
+    .wka-dock{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;flex-direction:column;font-family:inherit;padding-bottom:env(safe-area-inset-bottom,0);background:linear-gradient(160deg,#1f1a12,#0f0c08);border-top:1px solid rgba(245,158,11,0.45);box-shadow:0 -8px 26px rgba(0,0,0,0.5);}
+    .wka-dock.open{display:flex;}
+    body.wka-on{padding-bottom:88px;}
+    .wka-bar{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.7rem;}
+    .wka-btn{width:38px;height:38px;border-radius:50%;flex-shrink:0;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.1);color:#fff4e0;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+    .wka-btn:hover{background:rgba(245,158,11,0.22);}
+    .wka-main{width:46px;height:46px;font-size:1.15rem;background:linear-gradient(135deg,#f59e0b,#fcd34d);color:#3a2604;border:none;}
+    .wka-info{flex:1;min-width:0;}
+    .wka-word{color:#fff;font-size:0.94rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .wka-sub{color:rgba(242,226,200,0.6);font-size:0.76rem;margin-top:0.08rem;}
+    .wka-close{background:none;border:none;color:rgba(235,220,200,0.6);font-size:1.5rem;line-height:1;cursor:pointer;flex-shrink:0;padding:0 0.3rem;}
+    .wka-close:hover{color:#fff;}
+    .wka-track{height:4px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden;margin:0 0.7rem 0.6rem;}
+    .wka-fill{height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#fcd34d);}
+
+    /* ---- VWL: Chat Karim & Samira ---- */
+    .vw-chat { display:flex; flex-direction:column; gap:0.6rem; margin:0.9rem 0; }
+    .vw-msg { max-width:90%; padding:0.55rem 0.85rem; border-radius:14px; font-size:0.94rem; line-height:1.55; }
+    .vw-msg .who { display:block; font-weight:800; font-size:0.74rem; letter-spacing:0.04em; margin-bottom:0.15rem; }
+    .vw-msg .de { color:#fff; }
+    .vw-msg .ru { display:block; margin-top:0.3rem; font-size:0.8rem; color:rgba(230,230,235,0.55); line-height:1.5; }
+    .vw-k { align-self:flex-start; background:rgba(96,165,250,0.12); border:1px solid rgba(96,165,250,0.35); border-top-left-radius:4px; }
+    .vw-k .who { color:#93c5fd; }
+    .vw-s { align-self:flex-end; background:rgba(244,114,182,0.11); border:1px solid rgba(244,114,182,0.35); border-top-right-radius:4px; }
+    .vw-s .who { color:#f9a8d4; }
+
+    /* ---- VWL: Aussagen / Situationen / Markierungen ---- */
+    .vw-q { border-left:3px solid rgba(96,165,250,0.6); background:rgba(96,165,250,0.07); border-radius:0 10px 10px 0;
+            padding:0.55rem 0.85rem; margin:0.6rem 0; color:#fff; font-size:0.97rem; line-height:1.6; font-style:italic; }
+    .vw-sit { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+              padding:0.6rem 0.85rem; margin:0.5rem 0; font-size:0.93rem; line-height:1.85; color:rgba(230,230,235,0.88); }
+    .vw-sit .sit-h { display:block; font-weight:800; color:#fff; font-size:0.8rem; letter-spacing:0.03em; margin-bottom:0.1rem; }
+    .vw-sit .ru { display:block; margin-top:0.25rem; font-size:0.8rem; color:rgba(230,230,235,0.5); line-height:1.5; }
+    mark.mw, mark.mg, mark.mk { border-radius:5px; padding:0.05rem 0.3rem; color:#fff; font-weight:600; }
+    mark.mw { background:rgba(251,191,36,0.28); }
+    mark.mg { background:rgba(56,189,248,0.26); }
+    mark.mk { background:rgba(63,185,80,0.3); }
+    .vw-leg { display:flex; flex-wrap:wrap; gap:0.5rem 1rem; font-size:0.82rem; color:rgba(230,230,235,0.7); margin:0.4rem 0 0.2rem; }
+    .vw-leg mark { font-weight:700; }
+
+    /* ---- VWL: Treppe Bedürfnis -> Bedarf -> Nachfrage ---- */
+    .vw-trio { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:0.4rem; align-items:stretch; margin:0.9rem 0; }
+    .vw-box { background:rgba(255,255,255,0.045); border:1.5px solid rgba(255,255,255,0.16); border-radius:12px;
+              padding:0.75rem 0.7rem; text-align:center; font-size:0.9rem; color:rgba(230,230,235,0.85); line-height:1.5; }
+    .vw-box h4 { margin:0 0 0.35rem; font-size:1.02rem; color:#fbbf24; }
+    .vw-box .vw-say { display:block; margin-top:0.45rem; padding:0.3rem 0.4rem; border-radius:8px; background:rgba(0,0,0,0.3);
+                      border:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:700; font-size:0.86rem; }
+    .vw-box .vw-sp { display:block; margin-top:0.35rem; font-size:0.78rem; color:rgba(230,230,235,0.55); font-style:italic; }
+    .vw-box.b1 { border-color:rgba(251,191,36,0.55); }
+    .vw-box.b2 { border-color:rgba(56,189,248,0.55); }
+    .vw-box.b2 h4 { color:#7dd3fc; }
+    .vw-box.b3 { border-color:rgba(63,185,80,0.6); }
+    .vw-box.b3 h4 { color:#86efac; }
+    .vw-plus { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0.2rem; text-align:center;
+               font-size:0.78rem; font-weight:700; color:#86efac; line-height:1.35; min-width:6.4rem; }
+    .vw-plus .ar { font-size:1.5rem; line-height:1; color:#fff; }
+    .vw-plus .ar-d { display:none; }
+    @media (max-width: 680px) {
+        .vw-trio { grid-template-columns:1fr; }
+        .vw-plus { min-width:0; flex-direction:row; justify-content:center; padding:0.1rem 0; }
+        .vw-plus .ar-r { display:none; }
+        .vw-plus .ar-d { display:inline; }
+    }
+
+    /* ---- VWL: Tabelle mit Haken ---- */
+    .mt td.ok { color:#86efac; font-weight:900; font-size:1.05rem; }
+    .mt td.no { color:rgba(230,230,235,0.3); }
+    .mt td.l b { color:#fff; }
+
+    /* ---- VWL: Rolle im Satz (Zugeständnis / Begründung / ...) ---- */
+    .vw-roles { display:grid; gap:0.4rem; margin:0.6rem 0; }
+    .vw-role { display:grid; grid-template-columns:7.4rem 1fr; gap:0.6rem; align-items:baseline; padding:0.45rem 0.7rem;
+               border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); font-size:0.9rem; line-height:1.55; }
+    .vw-role .lab { font-weight:800; font-size:0.76rem; letter-spacing:0.03em; text-transform:uppercase; }
+    .vw-role .de { color:#fff; }
+    .vw-role .ru { display:block; font-size:0.78rem; color:rgba(230,230,235,0.5); margin-top:0.1rem; }
+    .vw-role.r1 .lab { color:#fbbf24; }
+    .vw-role.r2 .lab { color:#7dd3fc; }
+    .vw-role.r3 .lab { color:#86efac; }
+    .vw-role.r4 .lab { color:#f9a8d4; }
+    @media (max-width: 560px) { .vw-role { grid-template-columns:1fr; gap:0.1rem; } }
+
+    /* ---- VWL: Lernbedarfsdiagnose ---- */
+    .dg-item { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:0.75rem 0.9rem; margin:0.7rem 0; }
+    .dg-q { color:#fff; font-size:0.96rem; line-height:1.55; font-style:italic; margin-bottom:0.55rem; }
+    .dg-n { display:inline-block; min-width:1.5rem; height:1.5rem; line-height:1.5rem; text-align:center; border-radius:50%; margin-right:0.5rem;
+            background:rgba(96,165,250,0.2); border:1px solid rgba(96,165,250,0.5); color:#93c5fd; font-style:normal; font-weight:800; font-size:0.8rem; }
+    .dg-btns { display:flex; flex-wrap:wrap; gap:0.4rem; }
+    .dg-btn { padding:0.35rem 0.8rem; border-radius:20px; border:1.5px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.05);
+              color:rgba(255,255,255,0.7); font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .dg-btn:hover { background:rgba(255,255,255,0.11); color:#fff; }
+    .dg-btn.on1 { background:rgba(63,185,80,0.2); border-color:rgba(63,185,80,0.6); color:#86efac; }
+    .dg-btn.on2 { background:rgba(251,191,36,0.18); border-color:rgba(251,191,36,0.6); color:#fcd34d; }
+    .dg-btn.on3 { background:rgba(248,113,113,0.17); border-color:rgba(248,113,113,0.55); color:#fca5a5; }
+    .dg-det { margin-top:0.6rem; }
+    .dg-det > summary { cursor:pointer; color:#c8a5ff; font-size:0.86rem; font-weight:700; list-style:none; }
+    .dg-det > summary::-webkit-details-marker { display:none; }
+    .dg-det > summary::before { content:'\25B8  '; }
+    .dg-det[open] > summary::before { content:'\25BE  '; }
+    .dg-sum { margin:0.8rem 0 0; padding:0.6rem 0.9rem; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+              font-size:0.9rem; color:rgba(230,230,235,0.85); line-height:1.6; }
+    .entwurf-tag { display:inline-block; font-size:0.72rem; font-weight:800; letter-spacing:0.04em; color:#fcd34d; background:rgba(251,191,36,0.14);
+                   border:1px solid rgba(251,191,36,0.4); padding:0.1rem 0.55rem; border-radius:20px; margin-bottom:0.3rem; }
+
+    /* ---- VWL: Fortschritt / Übung ---- */
+    .vw-prog { list-style:none; padding:0; margin:0.5rem 0 0; }
+    .vw-prog li { margin:0.3rem 0; }
+    .vw-prog label { cursor:pointer; color:rgba(230,230,235,0.88); font-size:0.93rem; }
+    .vw-prog input { margin-right:0.5rem; accent-color:#2dd4bf; width:1.05rem; height:1.05rem; vertical-align:-0.15rem; }
+    .vw-prog li.done label { color:#86efac; text-decoration:line-through; text-decoration-color:rgba(134,239,172,0.5); }
+    .tr-case { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:0.8rem 1rem; margin:0.7rem 0;
+               color:#fff; font-size:0.97rem; line-height:1.65; }
+    .tr-case small { display:block; color:rgba(230,230,235,0.5); font-size:0.76rem; margin-bottom:0.25rem; letter-spacing:0.03em; }
+    .tr-opts { display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.6rem 0; }
+    .tr-opt { padding:0.5rem 1.1rem; border-radius:50px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06);
+              color:#fff; font-weight:800; font-size:0.92rem; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .tr-opt:hover { background:rgba(255,255,255,0.13); }
+    .tr-opt.right { background:rgba(63,185,80,0.25); border-color:rgba(63,185,80,0.7); color:#bbf7d0; }
+    .tr-opt.wrong { background:rgba(248,113,113,0.2); border-color:rgba(248,113,113,0.6); color:#fecaca; }
+    .tr-opt[disabled] { cursor:default; }
+    .tr-fb { display:none; margin:0.5rem 0; padding:0.6rem 0.85rem; border-radius:10px; font-size:0.9rem; line-height:1.65; color:rgba(230,230,235,0.9); }
+    .tr-fb.show { display:block; }
+    .tr-fb.ok { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.35); }
+    .tr-fb.bad { background:rgba(248,113,113,0.09); border:1px solid rgba(248,113,113,0.35); }
+    .tr-bar { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tr-next { padding:0.4rem 1rem; border-radius:50px; border:1.5px solid rgba(45,212,191,0.5); background:rgba(45,212,191,0.12); color:#99f6e4;
+               font-weight:800; font-size:0.85rem; cursor:pointer; font-family:inherit; }
+    .tr-next:hover { background:rgba(45,212,191,0.22); }
+    .tr-next[hidden] { display:none; }
+
+    /* ---- VWL: Hinweis-Zeile ---- */
+    .vw-src { color:rgba(230,230,235,0.42); font-size:0.78rem; margin:0.5rem 0 0; }
+    .vw-hint { background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:0.6rem 0.9rem; margin:0.7rem 0;
+               font-size:0.86rem; color:rgba(230,230,235,0.78); line-height:1.65; }
+    .vw-hint b { color:#fcd34d; }
+
+    .vt th.vt-h { text-align:left; padding:1rem 0.55rem 0.35rem; color:#5eead4; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
+                  border-bottom:1px solid rgba(45,212,191,0.35); }
+    .vt tr:first-child th.vt-h { padding-top:0.3rem; }
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html" class="active">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-handelsschule.html">H&ouml;here Handelsschule</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">EGB VWL</span>
+        </nav>
+        <a href="deutsch-handelsschule.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zur&uuml;ck zur H&ouml;heren Handelsschule</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB VWL</h1>
+            <p class="page-subtitle">Volkswirtschaftslehre am Erich-Gutenberg-Berufskolleg &mdash; Aufgabe f&uuml;r Aufgabe &middot; <b>LS &bdquo;Mein Geld, meine Entscheidung.&ldquo;</b> &mdash; решение по-немецки, объяснение по-русски, <b>каждый шаг отдельно</b>.<br>Всё на странице &mdash; с реальных Arbeitsbl&auml;tter (16.09. и 20.09.26) и <b>&#x1F3A7; аудио-обзор</b>: что это за предмет и что нужно знать.</p>
+        </div>
+
+        <div id="egb-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="egb-search" placeholder="Thema suchen&hellip; z.B. Bedarf, Nachfrage, Karim" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="egb-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4DA; Aus dem VWL-Unterricht
+        </h2>
+        <p id="egb-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Jedes Arbeitsblatt &mdash; eigene Karte, jede Aufgabe mit L&ouml;sung und allen Schritten. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">VWL</span>
+            <h3 style="color:#5eead4;">Was ist das f&uuml;r ein Fach?</h3>
+            <span class="iw-sec-note">&Uuml;berblick &middot; Audio &middot; Wortschatz</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#v0" class="subject-card glass-card" data-lesson="v0" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(45,212,191,0.4);">
+                <span class="subject-icon">&#x1F9ED;</span>
+                <h3>&Uuml;berblick, Audio &amp; Wortschatz</h3>
+                <p>&#x1F3A7; VWL in wenigen Minuten: что это за предмет, что нужно знать для &bdquo;Mein Geld, meine Entscheidung.&ldquo; &mdash; и 45 W&ouml;rter DE &rarr; RU &rarr; DE</p>
+            </a>
+        </div>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">1</span>
+            <h3 style="color:#5eead4;">Mein Geld, meine Entscheidung.</h3>
+            <span class="iw-sec-note">Lernsituation &middot; Karim &amp; Samira &middot; 16.09. und 20.09.26</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#v1" class="subject-card glass-card" data-lesson="v1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(45,212,191,0.4);">
+                <span class="subject-icon">&#x1F45F;</span>
+                <h3>Einstieg: Karim &amp; Samira</h3>
+                <p>Das Chat-Szenario, die Lernbedarfsdiagnose (Kann ich Karim schon antworten?) und die Kriterien: Was macht eine gute Antwort aus? &mdash; с разбором по шагам</p>
+            </a>
+            <a href="#v2" class="subject-card glass-card" data-lesson="v2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(45,212,191,0.4);">
+                <span class="subject-icon">&#x1F6D2;</span>
+                <h3>Lernatelier 1: Warum kaufe ich?</h3>
+                <p>Bed&uuml;rfnis &rarr; Bedarf &rarr; Nachfrage: M2&ndash;M5 und Plus-Aufgabe, jeder Schritt erkl&auml;rt, plus &Uuml;bung mit 11 F&auml;llen</p>
+            </a>
+        </div>
+
+        </div><!-- /egb-hub -->
+
+        <div id="egb-lessons">
+
+        <!-- ================= v0 ================= -->
+        <div class="lesson" id="ls-v0">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F9ED;</span>
+                    <div>
+                        <h2>Das Fach VWL: &Uuml;berblick, Audio &amp; Wortschatz</h2>
+                        <p class="lesson-header-sub">Was ist VWL? &middot; Was musst du wissen? &middot; zum Anh&ouml;ren und zum Nachlesen</p>
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F3A7; Коротко о предмете — слушай или читай</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.75);line-height:1.7;margin:0 0 0.7rem;">
+                        Ниже шесть коротких блоков: что такое VWL, как устроена тема, что ты должна уметь объяснить, три слова первого Atelier,
+                        как выглядит хороший ответ и как решать задания. Нажми кнопку — аудио играет внизу, страницу можно листать.
+                    </p>
+                    <button id="ovPlay" class="wka-playall">&#x25B6;&#xFE0E; &Uuml;berblick anh&ouml;ren &mdash; sechs Abschnitte, ohne zu klicken</button>
+                    <p class="vw-src">Источник: листы VWL_Einstiegsszenario, Lernbedarfsdiagnose, VWL_Kriterien, VWL_Lernatelier_01 (EGB, Bildungsgang CBF, 16.09. и 20.09.26).
+                        Где это моё общее объяснение, а не слова с листа — сказано прямо в тексте.</p>
+                </div>
+
+                <div class="note-card" data-ov="1">
+                    <h3>1 · Что такое VWL</h3>
+                    <p>VWL — это Volkswirtschaftslehre, то есть наука об экономике целой страны. Не одной фирмы — этим занимается BWL, — а всего хозяйства сразу:
+                        домохозяйства, предприятия, государство и то, как их решения связаны между собой.</p>
+                    <p>Главная идея предмета — Knappheit, нехватка. Желаний много, а денег, времени и ресурсов мало, поэтому каждый всё время выбирает.
+                        Отсюда и название темы: «Mein Geld, meine Entscheidung» — «Мои деньги, моё решение».
+                        Это моё общее объяснение предмета, а не слова с листа.</p>
+                </div>
+
+                <div class="note-card" data-ov="2">
+                    <h3>2 · Как устроена тема</h3>
+                    <p>Школа — Erich-Gutenberg-Berufskolleg, предмет VWL, Bildungsgang CBF. Тема называется Lernsituation «Mein Geld, meine Entscheidung».
+                        Весь сюжет — про двух героев: Karim хочет купить новые Sneaker за 39,99 €, хотя старые ещё хорошие, а Samira задаёт ему неудобные вопросы.
+                        В конце ты будешь отвечать Karim в «Karim-Chat».</p>
+                    <p>Работа идёт в формате Lernatelier — это самостоятельные станции с материалами M1, M2 и так далее.
+                        M4 называется «Check dich selbst», проверь себя, а M5 — «Mach dich fit für Karim», подготовься к чату с Karim.
+                        Если трудно, берёшь Hilfekarte, карточку-подсказку. Если всё получается, есть Plus-Aufgabe — задание повышенной сложности.</p>
+                </div>
+
+                <div class="note-card" data-ov="3">
+                    <h3>3 · Пять фраз Karim — это то, что ты должна уметь объяснить</h3>
+                    <p>В листе Lernbedarfsdiagnose ты оцениваешь себя по пяти фразам Karim. Вот они, и о чём каждая.</p>
+                    <ul class="note-list">
+                        <li>Первая: «Ich will die Sneaker halt. Warum sollte ich mir darüber groß Gedanken machen?» Это тема первого Atelier: между «хочу» и «куплю» есть шаги.</li>
+                        <li>Вторая: «Wenn ich möglichst wenig bezahle, handle ich doch vernünftig.» Здесь вопрос: всегда ли дёшево значит разумно.</li>
+                        <li>Третья: «Bei meinem Kauf sind doch eigentlich nur ich und der Shop beteiligt.» Здесь вопрос: кто ещё участвует в покупке.</li>
+                        <li>Четвёртая: «Ich bezahle 40 €, bekomme meine Schuhe und fertig. Wen soll das sonst noch betreffen?» Здесь вопрос: на кого ещё влияет такое решение.</li>
+                        <li>Пятая: «Was soll mein Sneaker-Kauf bitte mit der ganzen Wirtschaft zu tun haben?» Здесь вопрос: как одна покупка связана со всей экономикой.</li>
+                    </ul>
+                    <p>Первую фразу вы уже разобрали в Lernatelier 1. По остальным четырём листов пока нет — я только называю, о чём они, по самим фразам.</p>
+                </div>
+
+                <div class="note-card" data-ov="4">
+                    <h3>4 · Lernatelier 1: три слова — Bedürfnis, Bedarf, Nachfrage</h3>
+                    <p>Это ядро первого ателье. Запомни лесенку: хочу, потом хочу и могу, потом делаю.</p>
+                    <ul class="note-list">
+                        <li>Bedürfnis — «хочу»: желание или нехватка, которую человек хочет устранить. Karim видит Sneaker у одноклассников и думает: «Solche Sneaker hätte ich auch gerne.»</li>
+                        <li>Bedarf — «хочу и могу»: желание направлено на конкретный товар, и у человека достаточно денег, Kaufkraft. Karim нашёл пару за 39,99 €, и у него есть 50 €.</li>
+                        <li>Nachfrage — «делаю»: потребность выходит на рынок, человек реально покупает. Karim кладёт кроссовки в корзину, заказывает и платит.</li>
+                    </ul>
+                    <p>Частая ловушка: если человек хочет конкретную вещь, но денег не хватает, это всё ещё Bedürfnis, а не Bedarf.
+                        Как у Karim с кроссовками за 180 €, когда у него только 20 €.</p>
+                </div>
+
+                <div class="note-card" data-ov="5">
+                    <h3>5 · Что такое хороший ответ Karim</h3>
+                    <p>Лист Kriterien говорит: хороший ответ, во-первых, идёт от слов Karim — ты отвечаешь именно на то, что он сказал.
+                        Во-вторых, объясняет понятно, с причиной. В-третьих, показывает разные стороны или последствия.</p>
+                    <p>Хорошим ответом не является: длинный ответ ради длины, много сложных терминов ради терминов и согласие со всем, что сказал Karim.</p>
+                    <p>Образец из листа: «Du entscheidest zwar selbst, ob du die Schuhe kaufst. Aber bei deinem Kauf sind noch andere beteiligt und deine Entscheidung kann auch Folgen für andere haben.
+                        Deshalb würde ich nicht sagen, dass sie nur dich betrifft.» Сначала признай, что в его словах верно — zwar. Потом возрази — aber. Потом сделай вывод — deshalb.</p>
+                </div>
+
+                <div class="note-card" data-ov="6">
+                    <h3>6 · Как решать задания: шесть шагов</h3>
+                    <ul class="note-list">
+                        <li>Первое. Прочитай задание и найди глагол-команду: kreuze an — отметь крестиком, ordne zu — сопоставь, markiere — выдели, ergänze — дополни, begründe — обоснуй.</li>
+                        <li>Второе. Найди в тексте факты и подчеркни их: чего человек хочет, есть ли конкретный товар, сколько у него денег, купил ли он.</li>
+                        <li>Третье. Задай три вопроса: хочет ли он чего-то? Есть ли конкретный товар и достаточно денег? Купил ли он на самом деле?</li>
+                        <li>Четвёртое. Напиши ответ целым предложением, с причиной: «…, weil …».</li>
+                        <li>Пятое. Проверь себя по Kriterien: ответила ли ты на сказанное, объяснила ли, показала ли стороны или последствия.</li>
+                        <li>Шестое. Если застряла, возьми Hilfekarte, а не пропускай задание.</li>
+                    </ul>
+                    <p>Все задания первого ателье на этой странице разобраны именно так, по шагам. Удачи!</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D6; Wortschatz: 45 W&ouml;rter zur Lernsituation</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.6rem;">&#x1F3A7; Offline-Audio: jedes Wort auf Deutsch &rarr; Erkl&auml;rung auf Russisch &rarr; noch einmal auf Deutsch, mit kurzen Pausen dazwischen.
+                        Alle W&ouml;rter stehen so oder &auml;hnlich auf den Arbeitsbl&auml;ttern.</p>
+                    <button id="wkaPlayAll" class="wka-playall">&#x25B6;&#xFE0E; Alle W&ouml;rter anh&ouml;ren &mdash; der Reihe nach, ohne klicken</button>
+                    <table class="vt" id="vwlVocab">
+                        <tr><th colspan="2" class="vt-h">Kernbegriffe</th></tr>
+                        <tr><td class="de">das Bed&uuml;rfnis, -se</td><td class="ru">«хочу»: желание или нехватка, которую человек хочет устранить (Hunger, Wunsch nach neuen Sneakern)</td></tr>
+                        <tr><td class="de">der Bedarf</td><td class="ru">«хочу и могу»: желание направлено на конкретный товар, и у человека достаточно денег, чтобы его купить; но он ещё не купил</td></tr>
+                        <tr><td class="de">die Nachfrage</td><td class="ru">спрос, «делаю»: потребность вышла на рынок, человек реально покупает или заказывает товар</td></tr>
+                        <tr><td class="de">die Kaufkraft</td><td class="ru">покупательная способность: сколько у человека денег, чтобы что-то купить</td></tr>
+                        <tr><td class="de">das Gut, die G&uuml;ter</td><td class="ru">благо, товар: то, что удовлетворяет потребность (Sneaker, Pizza)</td></tr>
+                        <tr><td class="de">der Mangel</td><td class="ru">нехватка, недостаток: то, чего человеку не хватает, например еды</td></tr>
+                        <tr><td class="de">einen Mangel beseitigen</td><td class="ru">устранить нехватку, например поесть, если голоден</td></tr>
+                        <tr><td class="de">die Kaufhandlung</td><td class="ru">акт покупки: реально заказать или купить и оплатить</td></tr>
+                        <tr><td class="de">am Markt wirksam werden</td><td class="ru">стать действенным на рынке: из желания превратиться в настоящую покупку</td></tr>
+                        <tr><td class="de">der Markt</td><td class="ru">рынок: место, где встречаются покупатели и продавцы; интернет-магазин тоже рынок</td></tr>
+                        <tr><td class="de">die Wirtschaft</td><td class="ru">экономика, хозяйство; о ней спрашивает Karim: mit der ganzen Wirtschaft</td></tr>
+                        <tr><td class="de">die Volkswirtschaftslehre (VWL)</td><td class="ru">наука об экономике страны в целом, в отличие от BWL, которая смотрит на одну фирму</td></tr>
+                        <tr><th colspan="2" class="vt-h">Aus dem Karim-Szenario</th></tr>
+                        <tr><td class="de">g&uuml;nstig</td><td class="ru">выгодный, недорогой; günstig ещё не значит sinnvoll, то есть дёшево не значит разумно</td></tr>
+                        <tr><td class="de">sinnvoll</td><td class="ru">разумный, имеющий смысл</td></tr>
+                        <tr><td class="de">vern&uuml;nftig handeln</td><td class="ru">действовать разумно</td></tr>
+                        <tr><td class="de">die Entscheidung, -en</td><td class="ru">решение; eine Entscheidung treffen — принять решение</td></tr>
+                        <tr><td class="de">jemanden betreffen</td><td class="ru">касаться кого-то, затрагивать его: Deine Entscheidung betrifft vielleicht nicht nur dich</td></tr>
+                        <tr><td class="de">beteiligt sein (an + Dat.)</td><td class="ru">участвовать в чём-то; die Beteiligten — участники</td></tr>
+                        <tr><td class="de">die Folge, -n</td><td class="ru">последствие; Folgen für andere — последствия для других людей</td></tr>
+                        <tr><td class="de">etwas zur Verf&uuml;gung haben</td><td class="ru">иметь что-то в распоряжении: Karim hat 50 € zur Verfügung</td></tr>
+                        <tr><td class="de">ein bestimmtes Gut</td><td class="ru">конкретный товар: не какие-нибудь кроссовки, а именно эта пара</td></tr>
+                        <tr><td class="de">gen&uuml;gend Geld</td><td class="ru">достаточно денег</td></tr>
+                        <tr><td class="de">der Warenkorb</td><td class="ru">корзина покупок в интернет-магазине</td></tr>
+                        <tr><td class="de">bestellen</td><td class="ru">заказывать; die Bestellung — заказ</td></tr>
+                        <tr><td class="de">bezahlen</td><td class="ru">платить, оплатить</td></tr>
+                        <tr><th colspan="2" class="vt-h">Anweisungen &amp; Antworten</th></tr>
+                        <tr><td class="de">ankreuzen</td><td class="ru">отметить крестиком: Kreuze an</td></tr>
+                        <tr><td class="de">zuordnen</td><td class="ru">сопоставить, отнести к чему-то: Ordne zu</td></tr>
+                        <tr><td class="de">markieren</td><td class="ru">выделить, отметить в тексте: Markiere</td></tr>
+                        <tr><td class="de">erg&auml;nzen</td><td class="ru">дополнить, вписать недостающее: Ergänze</td></tr>
+                        <tr><td class="de">ausf&uuml;llen / eintragen</td><td class="ru">заполнить, вписать: Fülle aus, Trage ein</td></tr>
+                        <tr><td class="de">begr&uuml;nden</td><td class="ru">обосновать: назвать причину, обычно со словом weil; Begründe</td></tr>
+                        <tr><td class="de">erkl&auml;ren</td><td class="ru">объяснить</td></tr>
+                        <tr><td class="de">formulieren</td><td class="ru">сформулировать, сказать своими словами</td></tr>
+                        <tr><td class="de">die Aussage, -n</td><td class="ru">высказывание, утверждение: Karims Aussage</td></tr>
+                        <tr><td class="de">eingehen auf + Akk.</td><td class="ru">откликнуться на сказанное, затронуть его: eine gute Antwort geht auf Karims Aussage ein</td></tr>
+                        <tr><td class="de">der Fachbegriff, -e</td><td class="ru">специальный термин, например Bedarf или Nachfrage</td></tr>
+                        <tr><td class="de">verst&auml;ndlich</td><td class="ru">понятный, доступный: eine gute Antwort begründet verständlich</td></tr>
+                        <tr><td class="de">zwar &hellip; aber</td><td class="ru">хотя, правда, но: признать правоту собеседника и возразить; Du entscheidest zwar selbst, aber …</td></tr>
+                        <tr><td class="de">deshalb</td><td class="ru">поэтому: вводит вывод; Deshalb würde ich nicht sagen …</td></tr>
+                        <tr><td class="de">der Satzstarter</td><td class="ru">начало предложения-подсказка, которое нужно продолжить</td></tr>
+                        <tr><th colspan="2" class="vt-h">Format des Unterrichts</th></tr>
+                        <tr><td class="de">das Lernatelier</td><td class="ru">формат работы: самостоятельные станции с материалами M1, M2 и так далее</td></tr>
+                        <tr><td class="de">die Hilfekarte</td><td class="ru">карточка-подсказка, если не получается</td></tr>
+                        <tr><td class="de">die Plus-Aufgabe</td><td class="ru">дополнительное задание повышенной сложности</td></tr>
+                        <tr><td class="de">die Lernbedarfsdiagnose</td><td class="ru">самодиагностика: что я уже умею и чему мне ещё нужно научиться</td></tr>
+                        <tr><td class="de">abhaken</td><td class="ru">отметить галочкой, что сделано</td></tr>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="deutsch-bwr.html">BWR &mdash; die sieben Handlungsfelder</a> — вкладка «Спрос и предложение»: Markt, Nachfrage, Nachfragemenge; вкладка «Основы BWL»: Wirtschaftskreislauf<br>
+                        <a href="deutsch-handelsschule.html">H&ouml;here Handelsschule</a> — словарь по школе: там уже есть Bedarf и Kaufkraft с примерами<br>
+                        <a href="deutsch-redemittel.html">Redemittel</a> — «Das stimmt zwar, aber …» и другие фразы для вежливого возражения (пригодятся для Karim-Chat)
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= v1 ================= -->
+        <div class="lesson" id="ls-v1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F45F;</span>
+                    <div>
+                        <h2>Einstieg: Karim &amp; Samira</h2>
+                        <p class="lesson-header-sub">Einstiegsszenario &middot; Lernbedarfsdiagnose &middot; Kriterien &mdash; 16.09.26</p>
+                    </div>
+                </div>
+
+                <!-- ============ Szenario ============ -->
+                <div class="iw-sec-head" style="margin:0.5rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">Szenario</span>
+                    <h3 style="color:#5eead4;">Der Chat: Was kostet ein Kauf wirklich?</h3>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; das Einstiegsszenario</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);line-height:1.7;margin:0 0 0.4rem;">
+                        Karim und Samira schreiben miteinander. Это история, вокруг которой построена вся тема. Под каждой репликой — перевод.
+                    </p>
+                    <div class="vw-chat">
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Hey Samira, hab gerade Sneaker für 39,99 € gefunden. Meine alten sind eigentlich noch völlig okay, aber die neuen tragen gerade voll viele und so günstig bekommt man die sonst nie.</span><span class="ru">Привет, Самира, только что нашёл кроссовки за 39,99 €. Мои старые вообще-то ещё вполне нормальные, но новые сейчас носят очень многие, и так дёшево их обычно не купишь.</span></div>
+                        <div class="vw-msg vw-s"><span class="who">Samira</span><span class="de">Hi Karim, wow, die sehen echt nice aus. Aber obwohl deine alten noch gut sind, kaufst du dir direkt neue?</span><span class="ru">Привет, Карим, ух ты, выглядят классно. Но хотя твои старые ещё хорошие, ты сразу покупаешь новые?</span></div>
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Warum nicht? Ich hab das Geld und die sind günstig.</span><span class="ru">А почему нет? У меня есть деньги, и они недорогие.</span></div>
+                        <div class="vw-msg vw-s"><span class="who">Samira</span><span class="de">Günstig heißt doch nicht automatisch, dass die Entscheidung sinnvoll ist.</span><span class="ru">Дёшево ещё не значит автоматически, что решение разумное.</span></div>
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Doch, eigentlich schon. Wenn ich möglichst wenig bezahle, handle ich doch vernünftig.</span><span class="ru">Да нет, как раз значит. Если я плачу как можно меньше, то я ведь действую разумно.</span></div>
+                        <div class="vw-msg vw-s"><span class="who">Samira</span><span class="de">Aber du kaufst sie doch auch, weil andere die gerade tragen.</span><span class="ru">Но ты ведь покупаешь их ещё и потому, что их сейчас носят другие.</span></div>
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Ja und? Ist doch trotzdem meine Entscheidung, ich finde die cool.</span><span class="ru">Ну и что? Это всё равно моё решение, мне они нравятся.</span></div>
+                        <div class="vw-msg vw-s"><span class="who">Samira</span><span class="de">Schon. Aber deine Entscheidung betrifft vielleicht nicht nur dich.</span><span class="ru">Да. Но твоё решение, возможно, касается не только тебя.</span></div>
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Wen denn bitte noch? Ich bezahle 40 €, bekomme meine Schuhe und fertig.</span><span class="ru">А кого ещё, скажи на милость? Я плачу 40 €, получаю свои кроссовки — и всё.</span></div>
+                        <div class="vw-msg vw-s"><span class="who">Samira</span><span class="de">So einfach ist das glaube ich nicht.</span><span class="ru">Я думаю, всё не так просто.</span></div>
+                        <div class="vw-msg vw-k"><span class="who">Karim</span><span class="de">Dann erklär mir mal: Was soll mein Sneaker-Kauf denn bitte mit wem anders zu tun haben?</span><span class="ru">Тогда объясни мне: какое отношение моя покупка кроссовок вообще имеет к кому-то другому?</span></div>
+                    </div>
+                    <p class="vw-src">Текст: лист «Einstiegsszenario», VWL, LS „Mein Geld, meine Entscheidung.“, 16.09.26.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F50E; Разбор по шагам: о чём спор?</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);line-height:1.7;margin:0 0 0.2rem;">
+                        Прежде чем отвечать Karim, надо понять, <b>что именно</b> он утверждает и что возражает Samira. Читаем чат по ролям:
+                    </p>
+                    <ol class="schritte">
+                        <li><b>Что делает Karim.</b> Он хочет купить новые Sneaker за 39,99 €, хотя старые «noch völlig okay». Его причины: цена
+                            («so günstig bekommt man die sonst nie»), мода («die tragen gerade voll viele») и «ich hab das Geld».</li>
+                        <li><b>Три возражения Samira.</b>
+                            (1) <i>„Günstig heißt doch nicht automatisch, dass die Entscheidung sinnvoll ist.“</i> — дёшево ещё не значит разумно.
+                            (2) <i>„Du kaufst sie doch auch, weil andere die gerade tragen.“</i> — ты покупаешь и потому, что так делают другие.
+                            (3) <i>„Deine Entscheidung betrifft vielleicht nicht nur dich.“</i> — решение может касаться не только тебя.</li>
+                        <li><b>Два аргумента Karim.</b>
+                            (1) <i>„Wenn ich möglichst wenig bezahle, handle ich doch vernünftig.“</i> — «дёшево = разумно».
+                            (2) <i>„Ich bezahle 40 €, bekomme meine Schuhe und fertig.“</i> — покупка касается только меня и магазина.</li>
+                        <li><b>Главный вопрос.</b> Последняя реплика Karim — <i>„Was soll mein Sneaker-Kauf denn bitte mit wem anders zu tun haben?“</i> —
+                            и есть вопрос всей Lernsituation: как покупка одного человека связана с другими людьми и с экономикой.</li>
+                    </ol>
+                    <div class="vw-hint"><b>Заметь:</b> Samira не говорит «ты не прав». Она задаёт вопросы и показывает, что в покупке есть то, чего Karim не учёл.
+                        Так же должен звучать и твой ответ в Karim-Chat — об этом третья карточка ниже («Kriterien»).</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#v0">Überblick, Audio &amp; Wortschatz</a> — все слова из чата с переводом и озвучкой (günstig, sinnvoll, vernünftig, betreffen, Entscheidung)<br>
+                        <a href="#v2">Lernatelier 1</a> — первое возражение Karim разобрано шаг за шагом
+                    </div>
+                </div>
+
+                <!-- ============ Diagnose ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">Diagnose</span>
+                    <h3 style="color:#5eead4;">Kann ich Karim schon antworten? &#x1F45F;</h3>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; die Lernbedarfsdiagnose</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.75);line-height:1.7;margin:0 0 0.5rem;">
+                        Karim ist von seiner Meinung ziemlich überzeugt. Aber könnten Sie ihm seine Aussagen schon gut erklären oder darauf antworten?
+                    </p>
+                    <div class="dsatz-ru" style="margin-bottom:0.4rem;">Это лист <b>самооценки</b>: <b>оценки нет и «правильно/неправильно» тоже нет</b>
+                        (в листе так и написано). Он нужен, чтобы понять, что ты уже умеешь, а где ещё нужны знания. Для каждой фразы Karim выбери:
+                        <b>●</b> могла бы объяснить уже сейчас · <b>◐</b> есть идея, но не уверена · <b>○</b> пока не смогла бы.
+                        Твой выбор сохраняется в браузере.</div>
+                    <div id="dgBox">
+                        <div class="dg-item" data-i="1">
+                            <div class="dg-q"><span class="dg-n">1</span>„Ich will die Sneaker halt. Warum sollte ich mir darüber groß Gedanken machen?“</div>
+                            <div class="dg-btns"><button class="dg-btn" data-v="1">● Das könnte ich ihm schon erklären</button><button class="dg-btn" data-v="2">◐ Idee, aber noch unsicher</button><button class="dg-btn" data-v="3">○ Noch nicht</button></div>
+                            <details class="dg-det"><summary>Как на это ответить — шаги и Entwurf</summary>
+                                <div class="dsatz-ru" style="margin-top:0.5rem;"><b>О чём фраза:</b> зачем думать, если просто хочется? Ответ: между «хочу» и «куплю» есть шаги — Bedürfnis → Bedarf → Nachfrage.
+                                    Это тема <a href="#v2" style="color:#c8a5ff;">Lernatelier 1</a>, там полный разбор (M5).</div>
+                                <ol class="schritte">
+                                    <li><b>Признай, что в его словах верно:</b> он действительно хочет эти Sneaker — это Bedürfnis.</li>
+                                    <li><b>Покажи следующий шаг:</b> Bedarf появляется, когда есть конкретная пара и достаточно денег (Kaufkraft).</li>
+                                    <li><b>Покажи последний шаг:</b> Nachfrage возникает, когда он реально заказывает и платит. До этого момента он ещё может решить иначе — поэтому подумать стоит.</li>
+                                </ol>
+                                <span class="entwurf-tag">ENTWURF</span>
+                                <div class="dsatz">„Karim, zwischen ‚Ich will etwas‘ und ‚Ich kaufe etwas‘ gibt es einen Unterschied. Zuerst hast du nur ein Bedürfnis. Daraus wird Bedarf, wenn du ein bestimmtes Paar ausgesucht hast und genug Geld dafür hast. Nachfrage entsteht erst, wenn du die Sneaker wirklich bestellst und bezahlst. Bis dahin kannst du noch überlegen, ob du sie überhaupt brauchst.“</div>
+                                <div class="dsatz-ru">Карим, между «хочу» и «куплю» есть разница. Сначала у тебя только Bedürfnis. Оно становится Bedarf, когда ты выбрал конкретную пару и у тебя хватает денег. Nachfrage появляется, только когда ты действительно заказываешь и платишь. До этого можешь ещё подумать, нужны ли они тебе на самом деле.</div>
+                            </details>
+                        </div>
+
+                        <div class="dg-item" data-i="2">
+                            <div class="dg-q"><span class="dg-n">2</span>„Wenn ich möglichst wenig bezahle, handle ich doch vernünftig.“</div>
+                            <div class="dg-btns"><button class="dg-btn" data-v="1">● Das könnte ich ihm schon erklären</button><button class="dg-btn" data-v="2">◐ Idee, aber noch unsicher</button><button class="dg-btn" data-v="3">○ Noch nicht</button></div>
+                            <details class="dg-det"><summary>Как на это ответить — шаги и Entwurf</summary>
+                                <div class="dsatz-ru" style="margin-top:0.5rem;"><b>О чём фраза:</b> дёшево — это всегда разумно? Нет: низкая цена ещё не делает решение разумным.</div>
+                                <ol class="schritte">
+                                    <li><b>Согласись с тем, что верно:</b> цена важна, и платить меньше — приятно.</li>
+                                    <li><b>Возрази:</b> дёшево — за что? Цена хороша, только если вещь тебе действительно нужна и стоит этих денег.</li>
+                                    <li><b>Приведи пример из чата:</b> старые кроссовки ещё хорошие — купив новые, Karim деньги не экономит, а тратит.</li>
+                                    <li><b>Сделай вывод:</b> низкая цена — один аргумент, но не единственный.</li>
+                                </ol>
+                                <span class="entwurf-tag">ENTWURF</span>
+                                <div class="dsatz">„Ein niedriger Preis ist ein gutes Argument, aber er reicht allein nicht aus. Vernünftig ist eine Entscheidung erst, wenn man das Gut wirklich braucht und der Preis zu dem passt, was man dafür bekommt. Deine alten Schuhe sind noch gut: Wenn du neue kaufst, sparst du kein Geld, sondern gibst welches aus.“</div>
+                                <div class="dsatz-ru">Низкая цена — хороший аргумент, но одной её мало. Решение разумно, если вещь действительно нужна, а цена соответствует тому, что получаешь. Твои старые кроссовки ещё хорошие: купив новые, ты не экономишь деньги, а тратишь их.</div>
+                                <div class="vw-hint"><b>Справка (не из листа):</b> в экономике у этой идеи есть имя — <i>ökonomisches Prinzip</i>: достичь цели с наименьшими затратами или получить максимум на имеющиеся деньги. Но сама цель (потребность) должна существовать — иначе «дёшево» ничего не решает. Если этот термин появится на уроке, ты его уже узнаешь.</div>
+                            </details>
+                        </div>
+
+                        <div class="dg-item" data-i="3">
+                            <div class="dg-q"><span class="dg-n">3</span>„Bei meinem Kauf sind doch eigentlich nur ich und der Shop beteiligt.“</div>
+                            <div class="dg-btns"><button class="dg-btn" data-v="1">● Das könnte ich ihm schon erklären</button><button class="dg-btn" data-v="2">◐ Idee, aber noch unsicher</button><button class="dg-btn" data-v="3">○ Noch nicht</button></div>
+                            <details class="dg-det"><summary>Как на это ответить — шаги и Entwurf</summary>
+                                <div class="dsatz-ru" style="margin-top:0.5rem;"><b>О чём фраза:</b> кто ещё участвует в покупке, кроме покупателя и магазина?</div>
+                                <ol class="schritte">
+                                    <li><b>Пройди путь кроссовок назад:</b> кто-то их произвёл (Hersteller), кто-то привёз (Transport, Lieferdienst).</li>
+                                    <li><b>Посмотри на оплату:</b> участвуют банк или платёжный сервис (Zahlungsdienst), а в цене есть Umsatzsteuer — значит, участвует и государство.</li>
+                                    <li><b>Сделай вывод:</b> за словами «я и магазин» стоит целая цепочка людей и организаций.</li>
+                                </ol>
+                                <span class="entwurf-tag">ENTWURF</span>
+                                <div class="dsatz">„Nicht ganz: Hinter dem Shop stehen noch viele andere. Jemand stellt die Sneaker her, jemand transportiert sie zu dir, und beim Bezahlen sind auch ein Zahlungsdienst und der Staat beteiligt, denn im Preis steckt Umsatzsteuer.“</div>
+                                <div class="dsatz-ru">Не совсем: за магазином стоят и другие. Кто-то производит кроссовки, кто-то доставляет их тебе, а при оплате участвуют платёжный сервис и государство, потому что в цену входит налог с оборота (Umsatzsteuer).</div>
+                                <div class="vw-hint"><b>Справка (не из листа):</b> в Германии налог входит в цену товара. Из 39,99 € при ставке 19 % примерно 6,38 € — это Umsatzsteuer.</div>
+                            </details>
+                        </div>
+
+                        <div class="dg-item" data-i="4">
+                            <div class="dg-q"><span class="dg-n">4</span>„Ich bezahle 40 €, bekomme meine Schuhe und fertig. Wen soll das sonst noch betreffen?“</div>
+                            <div class="dg-btns"><button class="dg-btn" data-v="1">● Das könnte ich ihm schon erklären</button><button class="dg-btn" data-v="2">◐ Idee, aber noch unsicher</button><button class="dg-btn" data-v="3">○ Noch nicht</button></div>
+                            <details class="dg-det"><summary>Как на это ответить — шаги и Entwurf</summary>
+                                <div class="dsatz-ru" style="margin-top:0.5rem;"><b>О чём фраза:</b> на кого ещё влияет покупка? Какие у неё последствия за пределами «я и мои кроссовки»?</div>
+                                <ol class="schritte">
+                                    <li><b>Проследи деньги:</b> 40 € не остаются у магазина — часть идёт производителю (из неё платят зарплаты), часть — государству как налог.</li>
+                                    <li><b>Подумай про спрос:</b> чем больше людей покупает такие Sneaker, тем больше их производят — а значит, тратится больше материалов и транспорта.</li>
+                                    <li><b>Подумай про самого Karim:</b> эти 40 € можно потратить только один раз — на что-то другое их уже не хватит.</li>
+                                    <li><b>Сделай вывод:</b> у покупки есть последствия для других.</li>
+                                </ol>
+                                <span class="entwurf-tag">ENTWURF</span>
+                                <div class="dsatz">„Dein Geld bleibt nicht beim Shop: Ein Teil geht an den Hersteller, daraus werden zum Beispiel Löhne bezahlt, und ein Teil geht als Steuer an den Staat. Außerdem zeigt dein Kauf, dass es eine Nachfrage nach diesen Sneakern gibt, und Firmen produzieren dann eher mehr davon. Das hat auch Folgen für die Umwelt.“</div>
+                                <div class="dsatz-ru">Твои деньги не остаются у магазина: часть идёт производителю, из неё, например, платят зарплаты, а часть уходит государству как налог. Кроме того, твоя покупка показывает, что на такие кроссовки есть спрос, и фирмы тогда производят их больше. Это влияет и на окружающую среду.</div>
+                            </details>
+                        </div>
+
+                        <div class="dg-item" data-i="5">
+                            <div class="dg-q"><span class="dg-n">5</span>„Was soll mein Sneaker-Kauf bitte mit der ganzen Wirtschaft zu tun haben?“</div>
+                            <div class="dg-btns"><button class="dg-btn" data-v="1">● Das könnte ich ihm schon erklären</button><button class="dg-btn" data-v="2">◐ Idee, aber noch unsicher</button><button class="dg-btn" data-v="3">○ Noch nicht</button></div>
+                            <details class="dg-det"><summary>Как на это ответить — шаги и Entwurf</summary>
+                                <div class="dsatz-ru" style="margin-top:0.5rem;"><b>О чём фраза:</b> как одна покупка связана со всей экономикой? Это идея круговорота — <i>Wirtschaftskreislauf</i>.</div>
+                                <ol class="schritte">
+                                    <li><b>Назови участников:</b> домохозяйства (как ты) покупают у предприятий; предприятия платят работникам зарплату; государство получает налоги.</li>
+                                    <li><b>Покажи круг:</b> деньги, которые ты заплатил, возвращаются к другим домохозяйствам как зарплата — и они тоже что-то покупают.</li>
+                                    <li><b>Покажи масштаб:</b> один человек — мало, но миллионы покупок вместе — это и есть Nachfrage, на которую реагируют фирмы и рабочие места.</li>
+                                </ol>
+                                <span class="entwurf-tag">ENTWURF</span>
+                                <div class="dsatz">„Dein Kauf ist ein kleiner Teil des Wirtschaftskreislaufs: Haushalte wie du kaufen bei Unternehmen, die Unternehmen zahlen ihren Beschäftigten Löhne, und mit diesem Geld kaufen wieder Haushalte etwas. Wenn viele Menschen wie du Sneaker kaufen, steigt die Nachfrage, und das merkt die ganze Wirtschaft.“</div>
+                                <div class="dsatz-ru">Твоя покупка — маленькая часть экономического круговорота: домохозяйства вроде тебя покупают у предприятий, предприятия платят своим работникам зарплату, и на эти деньги домохозяйства снова что-то покупают. Если много людей покупает такие кроссовки, спрос растёт, и это чувствует вся экономика.</div>
+                                <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                                    <a href="deutsch-bwr.html">BWR &mdash; Основы BWL</a> — Wirtschaftseinheiten und Wirtschaftskreislauf: схема круговорота домохозяйств и предприятий<br>
+                                    <a href="deutsch-bwr.html">BWR &mdash; Спрос и предложение</a> — как из Nachfrage и Angebot получается цена
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                    <div class="dg-sum" id="dgSum">Выбери уровень для каждой фразы — здесь появится итог.</div>
+                    <div class="vw-hint"><b>Честно о том, откуда это:</b> первую фразу вы уже разобрали в Lernatelier 1. По фразам 2–5 листов пока нет, поэтому <b>Entwurf</b> — моя заготовка по самим фразам
+                        и по общим знаниям, а не слова учителя. Когда пройдёте следующие Ateliers, сверим с тем, что скажет учитель, и поправим.</div>
+                    <p class="vw-src">Текст: лист «Lernbedarfsdiagnose», VWL, 16.09.26.</p>
+                </div>
+
+                <!-- ============ Kriterien ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">Kriterien</span>
+                    <h3 style="color:#5eead4;">Was macht eine gute Antwort an Karim aus?</h3>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; Aufgabe 1</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.75);line-height:1.7;margin:0 0 0.3rem;">Karim sagt:</p>
+                    <div class="vw-q">„Ich bezahle die Schuhe doch selbst. Also betrifft meine Entscheidung auch nur mich.“</div>
+                    <p style="font-size:0.9rem;color:#fff;margin:0.6rem 0 0.3rem;"><b>1. Welche Antwort bringt Karim eher zum Nachdenken?</b></p>
+                    <div class="vw-sit"><span class="sit-h">Antwort A</span>„Nein, das stimmt nicht. Dein Kauf betrifft auch andere.“</div>
+                    <div class="vw-sit"><span class="sit-h">Antwort B</span>„Du entscheidest zwar selbst, ob du die Schuhe kaufst. Aber bei deinem Kauf sind noch andere beteiligt und deine Entscheidung kann auch Folgen für andere haben. Deshalb würde ich nicht sagen, dass sie nur dich betrifft.“</div>
+                    <p class="vw-src">Текст: лист «Kriterien», VWL, 16.09.26.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; L&ouml;sung Aufgabe 1: Antwort B</h3>
+                    <ol class="schritte">
+                        <li><b>Пойми аргумент Karim.</b> Он говорит: «я плачу сам, значит, это касается только меня». Хороший ответ должен именно на это ответить.</li>
+                        <li><b>Проверь Antwort A.</b> «Nein, das stimmt nicht.» — это просто «нет»: она ничего не признаёт из слов Karim, не говорит <i>почему</i> и <i>кого</i> это касается.
+                            Karim легко ответит «Doch!» — и разговор остановится. Задуматься ему не о чем.</li>
+                        <li><b>Проверь Antwort B по частям</b> (см. разбор ниже): она сначала признаёт его правоту, потом называет причину, потом последствия и делает осторожный вывод.</li>
+                        <li><b>Сравни.</b> В B Karim получает конкретное, о чём можно подумать: «noch andere beteiligt», «Folgen für andere». И звучит она уважительно — «ich würde nicht sagen», а не «das stimmt nicht».</li>
+                    </ol>
+                    <div class="gut"><b>Ответ: Antwort B.</b> Она не просто спорит, а объясняет — поэтому Karim скорее задумается.</div>
+
+                    <h4 style="color:#fff;font-size:0.95rem;margin:1.1rem 0 0.2rem;">Разбор Antwort B по ролям</h4>
+                    <div class="vw-roles">
+                        <div class="vw-role r1"><span class="lab">1 Zugeständnis</span><span><span class="de">Du entscheidest zwar selbst, ob du die Schuhe kaufst.</span><span class="ru">Признаём то, что в его словах верно (<b>zwar</b>).</span></span></div>
+                        <div class="vw-role r2"><span class="lab">2 Beteiligte</span><span><span class="de">Aber bei deinem Kauf sind noch andere beteiligt</span><span class="ru">Возражаем (<b>aber</b>) — и называем первую причину: в покупке участвуют и другие.</span></span></div>
+                        <div class="vw-role r3"><span class="lab">3 Folgen</span><span><span class="de">und deine Entscheidung kann auch Folgen für andere haben.</span><span class="ru">Вторая причина: у решения бывают последствия для других.</span></span></div>
+                        <div class="vw-role r4"><span class="lab">4 Fazit</span><span><span class="de">Deshalb würde ich nicht sagen, dass sie nur dich betrifft.</span><span class="ru">Вывод (<b>deshalb</b>) — осторожно: «я бы не сказал(а)», а не «ты неправ».</span></span></div>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="deutsch-redemittel.html">Redemittel</a> — «Das stimmt zwar, aber …» и другие вежливые возражения<br>
+                        <a href="deutsch-adverbien.html">Adverbien</a> — zwar … aber, deshalb: что они значат и где стоит глагол
+                    </div>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; Aufgabe 2</h3>
+                    <p style="font-size:0.9rem;color:#fff;margin:0 0 0.3rem;"><b>2. Was gehört zu einer guten Antwort?</b></p>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);line-height:1.7;margin:0;">Kreuzen Sie die Aussagen an, die zu einer guten Antwort an Karim passen.
+                        <span style="color:rgba(230,230,235,0.5);">(Отметьте утверждения, которые подходят хорошему ответу Karim.)</span></p>
+                    <ul class="note-list" style="margin-top:0.5rem;">
+                        <li>☐ Sie geht auf Karims Aussage ein.</li>
+                        <li>☐ Sie begründet verständlich.</li>
+                        <li>☐ Sie ist möglichst lang.</li>
+                        <li>☐ Sie verwendet möglichst viele Fachbegriffe.</li>
+                        <li>☐ Sie zeigt verschiedene Seiten oder Folgen.</li>
+                        <li>☐ Sie stimmt Karim in allem zu.</li>
+                    </ul>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; L&ouml;sung Aufgabe 2: drei Kreuze</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);line-height:1.7;margin:0 0 0.2rem;">
+                        <b>Как решать:</b> проверь каждое утверждение вопросом «помогает ли это Кариму понять и задуматься?». Эталон — Antwort B из первой задачи.
+                    </p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Aussage</th><th>Kreuz?</th><th class="l">Почему</th></tr>
+                        <tr><td class="l">Sie geht auf Karims Aussage ein.</td><td class="ok">&#x2612;</td><td class="l">Да: ответ берёт слова Karim и отвечает именно на них («Du entscheidest zwar selbst …»). Ответ «в пустоту» не подходит.</td></tr>
+                        <tr><td class="l">Sie begründet verständlich.</td><td class="ok">&#x2612;</td><td class="l">Да: есть причина простыми словами — «noch andere beteiligt», «Folgen für andere». Без причины это просто мнение.</td></tr>
+                        <tr><td class="l">Sie ist möglichst lang.</td><td class="no">&#x2610;</td><td class="l">Нет: длина не критерий. Antwort B длиннее A не ради длины, а потому, что в ней есть причины.</td></tr>
+                        <tr><td class="l">Sie verwendet möglichst viele Fachbegriffe.</td><td class="no">&#x2610;</td><td class="l">Нет: термины нужны только тогда, когда они помогают объяснить (например, Bedarf или Nachfrage). Много терминов подряд Karim не поймёт.</td></tr>
+                        <tr><td class="l">Sie zeigt verschiedene Seiten oder Folgen.</td><td class="ok">&#x2612;</td><td class="l">Да: «zwar … aber» показывает две стороны, а «Folgen für andere» — последствия.</td></tr>
+                        <tr><td class="l">Sie stimmt Karim in allem zu.</td><td class="no">&#x2610;</td><td class="l">Нет: если согласиться со всем, ответа уже нет. Можно признать часть его правоты (zwar), но надо добавить другую сторону.</td></tr>
+                    </table>
+                    </div>
+                    <div class="gut"><b>Три галочки:</b> <b>geht ein</b> (отвечаю на его слова) · <b>begründet</b> (даю причину) · <b>zeigt Seiten/Folgen</b> (показываю другую сторону). Это и есть мерка для твоего Karim-Chat.</div>
+
+                    <h4 style="color:#fff;font-size:0.95rem;margin:1.1rem 0 0.4rem;">Готовые Bausteine для Karim-Chat <span style="font-weight:400;color:rgba(230,230,235,0.5);font-size:0.8rem;">(взяты из Antwort B)</span></h4>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Baustein</th><th class="l">Wozu</th></tr>
+                        <tr><td class="l">Du hast recht, dass … / Du entscheidest zwar selbst, …</td><td class="l">признать верное в его словах</td></tr>
+                        <tr><td class="l">Aber bei deinem Kauf sind noch andere beteiligt …</td><td class="l">возразить и назвать причину</td></tr>
+                        <tr><td class="l">… und deine Entscheidung kann auch Folgen für andere haben.</td><td class="l">показать последствия</td></tr>
+                        <tr><td class="l">Deshalb würde ich nicht sagen, dass …</td><td class="l">осторожный вывод</td></tr>
+                    </table>
+                    </div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="deutsch-nebensaetze.html">Nebensätze &amp; Komma</a> — dass, ob, weil: глагол уходит в конец (<i>dass sie nur dich betrifft</i>)<br>
+                        <a href="#v2">Lernatelier 1</a> — там ты пишешь свой первый ответ Karim (M5)
+                    </div>
+                    <p class="vw-src">Текст: лист «Kriterien», VWL, 16.09.26.</p>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- ================= v2 ================= -->
+        <div class="lesson" id="ls-v2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes">
+            <section class="note-section">
+                <div class="lesson-header-block">
+                    <span class="lesson-header-icon">&#x1F6D2;</span>
+                    <div>
+                        <h2>Lernatelier 1: Warum kaufe ich?</h2>
+                        <p class="lesson-header-sub">M1&ndash;M5 &amp; Plus-Aufgabe &middot; jeder Schritt erkl&auml;rt &middot; 20.09.26</p>
+                    </div>
+                </div>
+
+                <!-- ============ Schlüssel ============ -->
+                <div class="note-card highlight-card">
+                    <h3>&#x1F511; Ключ ко всему Atelier: три слова — три вопроса</h3>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.75);line-height:1.7;margin:0 0 0.2rem;">
+                        Всё Lernatelier 1 — про одну «лесенку». Запомни её — и каждое задание превратится в три вопроса. Дальше на странице я ссылаюсь на них: <b>Frage 1, 2, 3</b>.
+                    </p>
+                    <div class="vw-trio">
+                        <div class="vw-box b1"><h4>Bedürfnis</h4>Желание или нехватка<span class="vw-say">Ich will etwas.</span><span class="vw-sp">хочу</span></div>
+                        <div class="vw-plus"><span class="ar ar-r">&#10140;</span><span class="ar ar-d">&#11015;</span><span>+ bestimmtes Gut<br>+ genügend Geld</span></div>
+                        <div class="vw-box b2"><h4>Bedarf</h4>Желание + конкретный товар + хватает денег<span class="vw-say">Ich kann mir ein bestimmtes Gut kaufen.</span><span class="vw-sp">хочу и могу</span></div>
+                        <div class="vw-plus"><span class="ar ar-r">&#10140;</span><span class="ar ar-d">&#11015;</span><span>+ tatsächliche<br>Kaufhandlung</span></div>
+                        <div class="vw-box b3"><h4>Nachfrage</h4>Покупка реально совершена<span class="vw-say">Ich kaufe das Gut.</span><span class="vw-sp">делаю</span></div>
+                    </div>
+                    <div class="gut"><b>Формула:</b> Bedürfnis + bestimmtes Gut + genügend Geld (Kaufkraft) → <b>Bedarf</b> &nbsp;·&nbsp; Bedarf + tatsächliche Kaufhandlung am Markt → <b>Nachfrage</b></div>
+
+                    <h4 style="color:#fff;font-size:0.95rem;margin:1rem 0 0.1rem;">Так решается каждый случай — три вопроса по порядку</h4>
+                    <ol class="schritte">
+                        <li><b>Frage 1 — хочет ли человек чего-то?</b> (Wunsch oder Mangel). Если есть <i>только это</i> — это <b>Bedürfnis</b>.</li>
+                        <li><b>Frage 2 — есть ли конкретный товар И достаточно денег (Kaufkraft)?</b> Если оба «да», но покупки ещё нет — это <b>Bedarf</b>.
+                            Если не хватает хотя бы одного (товар не выбран или денег мало) — остаётся <b>Bedürfnis</b>.</li>
+                        <li><b>Frage 3 — человек реально заказал или купил и заплатил?</b> Если да — это <b>Nachfrage</b>.</li>
+                    </ol>
+
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Begriff</th><th class="l">Мерка</th><th class="l">Karim</th><th class="l">Samira</th></tr>
+                        <tr><td class="l"><b>Bedürfnis</b></td><td class="l">только «хочу»</td><td class="l">„Solche Sneaker hätte ich auch gerne.“</td><td class="l">Hunger nach dem Sport</td></tr>
+                        <tr><td class="l"><b>Bedarf</b></td><td class="l">хочу + конкретный товар + хватает денег</td><td class="l">Paar für 39,99 €, er hat 50 €</td><td class="l">Pizza für 8 €, sie hat 12 €</td></tr>
+                        <tr><td class="l"><b>Nachfrage</b></td><td class="l">реально куплено</td><td class="l">bestellt und bezahlt 39,99 €</td><td class="l">bestellt die Pizza und bezahlt</td></tr>
+                    </table>
+                    </div>
+                    <div class="warn"><b>Две ловушки.</b> (1) <b>Bedürfnis ≠ Bedarf:</b> даже если человек хочет конкретную вещь, но денег не хватает, это всё ещё Bedürfnis (так в Fall D: Sneaker за 180 €, а у Karim 20 €).
+                        (2) <b>Bedarf ≠ Nachfrage:</b> пока человек ничего не заказал и не заплатил, Nachfrage нет — кроссовки «только в корзине» ещё не покупка.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="deutsch-bwr.html">BWR &mdash; Спрос и предложение</a> — что такое Nachfrage на рынке: Nachfragemenge, Gesetz der Nachfrage<br>
+                        <a href="deutsch-handelsschule.html">Höhere Handelsschule</a> — Bedarf и Kaufkraft в словаре, с примерами<br>
+                        <a href="#v0">Überblick &amp; Wortschatz</a> — все слова этой страницы с озвучкой
+                    </div>
+                </div>
+
+                <!-- ============ M1 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">M1</span>
+                    <h3 style="color:#5eead4;">Atelierkarte: Warum kaufe ich?</h3>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; was auf der Karte steht</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);margin:0 0 0.2rem;">Karim:</p>
+                    <div class="vw-q">„Ich will die Sneaker halt. Warum sollte ich mir darüber groß Gedanken machen?“</div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.82);line-height:1.7;margin:0.5rem 0 0.2rem;"><b>Darum geht’s:</b> Zwischen „Ich will etwas“ und „Ich kaufe etwas“ passiert mehr, als man zunächst denkt.</p>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.82);line-height:1.7;margin:0 0 0.2rem;"><b>Leitfrage:</b> Wie wird aus einem Wunsch ein Kauf?</p>
+                    <div class="dsatz-ru">Между «хочу» и «куплю» происходит больше, чем кажется. Ведущий вопрос: <b>как из желания получается покупка?</b></div>
+                    <p style="font-size:0.9rem;color:#fff;margin:0.6rem 0 0.2rem;"><b>Das kannst du danach — nach diesem Atelier kannst du …</b></p>
+                    <ul class="note-list">
+                        <li>Bedürfnis, Bedarf und Nachfrage unterscheiden. <span style="color:rgba(230,230,235,0.5);">(различать три понятия)</span></li>
+                        <li>die drei Begriffe auf Karims Sneaker-Kauf anwenden. <span style="color:rgba(230,230,235,0.5);">(применять их к покупке Карима)</span></li>
+                        <li>die drei Begriffe an einem eigenen Beispiel erklären. <span style="color:rgba(230,230,235,0.5);">(объяснять их на своём примере)</span></li>
+                    </ul>
+                    <p style="font-size:0.9rem;color:#fff;margin:0.8rem 0 0.1rem;"><b>Mein Fortschritt im Atelier 1</b> <span style="font-weight:400;color:rgba(230,230,235,0.5);font-size:0.8rem;">— отмечай, что сделала (сохраняется в браузере)</span></p>
+                    <ul class="vw-prog" id="vwProg">
+                        <li><label><input type="checkbox" data-k="m2"> M2 Lernweg – Vom Wunsch zum Kauf</label></li>
+                        <li><label><input type="checkbox" data-k="m3"> M3 Zeig, dass du es verstanden hast</label></li>
+                        <li><label><input type="checkbox" data-k="m4"> M4 Check dich selbst</label></li>
+                        <li><label><input type="checkbox" data-k="m5"> M5 Mach dich fit für Karim</label></li>
+                        <li><label><input type="checkbox" data-k="p1"> P1 Plus-Aufgabe</label></li>
+                    </ul>
+                    <div class="vw-hint"><b>Hilfekarten.</b> В листе есть ссылки на Hilfekarte 1 (помощь с формулировками), 2 (помощь с картинкой) и 4 (помощь с ситуациями). В присланном PDF их нет — когда пришлёшь, добавлю сюда.
+                        Но все шаги ниже расписаны так, что подсказки не понадобятся.</div>
+                    <p class="vw-src">Текст: лист «VWL_Lernatelier_01», M1, 20.09.26.</p>
+                </div>
+
+                <!-- ============ M2 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">M2</span>
+                    <h3 style="color:#5eead4;">Lernweg: Vom Wunsch zum Kauf</h3>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; die drei Situationen</h3>
+                    <p style="font-size:0.88rem;color:rgba(230,230,235,0.7);margin:0 0 0.2rem;">Wie wird aus Karims Wunsch ein Kauf? Lies die drei Situationen.</p>
+                    <div class="vw-sit"><span class="sit-h">Situation 1</span>Karim sieht in der Schule neue Sneaker bei einigen Mitschülern. Seine alten Schuhe funktionieren noch. Trotzdem denkt er: „Solche Sneaker hätte ich auch gerne.“
+                        <span class="ru">Карим видит в школе новые кроссовки у нескольких одноклассников. Его старые ещё работают. Всё равно он думает: «Такие кроссовки и мне бы хотелось».</span></div>
+                    <div class="vw-sit"><span class="sit-h">Situation 2</span>Am Nachmittag findet Karim im Internet ein Paar, das ihm gefällt. Die Sneaker kosten 39,99 €. Karim hat 50 € zur Verfügung und möchte genau dieses Paar haben.
+                        <span class="ru">После обеда Карим находит в интернете пару, которая ему нравится. Кроссовки стоят 39,99 €. У Карима есть 50 €, и он хочет именно эту пару.</span></div>
+                    <div class="vw-sit"><span class="sit-h">Situation 3</span>Karim legt die Sneaker in den Warenkorb, bestellt sie und bezahlt 39,99 €.
+                        <span class="ru">Карим кладёт кроссовки в корзину, заказывает их и платит 39,99 €.</span></div>
+                    <p class="vw-src">Текст: лист «VWL_Lernatelier_01», M2, 20.09.26.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Aufgabe 1 &mdash; Was verändert sich von Situation 1 bis Situation 3?</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.2rem;">Kreuze an. <span style="color:rgba(230,230,235,0.45);">(Отметь крестиком, что в какой ситуации есть.)</span></p>
+                    <ol class="schritte">
+                        <li><b>Выпиши факты по ситуациям.</b> S1: видит кроссовки у других, «hätte ich auch gerne». S2: нашёл конкретную пару за 39,99 €, у него 50 €, хочет именно её. S3: кладёт в корзину, заказывает, платит.</li>
+                        <li><b>Строка «Karim möchte etwas».</b> Крестик во <b>всех трёх</b>: желание есть с самого начала и не пропадает (в S3 он ведь не заказал бы то, чего не хочет).</li>
+                        <li><b>Строка «Karim hat genügend Geld für ein bestimmtes Paar».</b> S1 — пусто: нет ни конкретной пары, ни слова про деньги. S2 — крестик: пара найдена (39,99 €), у Karim 50 €. S3 — крестик: он платит 39,99 €, значит, денег хватило.</li>
+                        <li><b>Строка «Karim kauft/bestellt die Sneaker».</b> Только S3: там «bestellt sie und bezahlt». В S2 он только нашёл пару и хочет её, но ничего не заказал.</li>
+                        <li><b>Вывод.</b> От S1 к S3 каждый раз добавляется один шаг: желание → + конкретный товар и деньги → + покупка. Это и есть ответ на «Was verändert sich?» — лесенка из ключа выше.</li>
+                    </ol>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">&nbsp;</th><th>Situation 1</th><th>Situation 2</th><th>Situation 3</th></tr>
+                        <tr><td class="l">Karim möchte etwas.</td><td class="ok">&#x2612;</td><td class="ok">&#x2612;</td><td class="ok">&#x2612;</td></tr>
+                        <tr><td class="l">Karim hat genügend Geld für ein bestimmtes Paar.</td><td class="no">&#x2610;</td><td class="ok">&#x2612;</td><td class="ok">&#x2612;</td></tr>
+                        <tr><td class="l">Karim kauft/bestellt die Sneaker.</td><td class="no">&#x2610;</td><td class="no">&#x2610;</td><td class="ok">&#x2612;</td></tr>
+                    </table>
+                    </div>
+                    <div class="vw-hint"><b>Про первую строку:</b> в S3 крестик логичен, потому что желание не исчезает. Если на уроке учитель отметил иначе (например, только S1 и S2) — ориентируйся на его ключ; главное — уметь объяснить «лесенку».</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Aufgabe 2 &mdash; Begriffe den Situationen zuordnen</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.4rem;">Lies die drei Erklärungen, ordne die Begriffe den Situationen zu. <span style="color:rgba(230,230,235,0.45);">(Прочитай три определения и сопоставь их с ситуациями.)</span></p>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Begriff</th><th class="l">Erklärung im Arbeitsblatt</th><th class="l">По-русски</th></tr>
+                        <tr><td class="l"><b>BEDÜRFNIS</b></td><td class="l">Ein Mensch empfindet einen Wunsch oder Mangel und möchte ihn beseitigen.</td><td class="l">человек чувствует желание или нехватку и хочет её устранить</td></tr>
+                        <tr><td class="l"><b>BEDARF</b></td><td class="l">Ein Bedürfnis richtet sich auf ein bestimmtes Gut und die Person hat genügend Kaufkraft, also Geld, um es zu kaufen.</td><td class="l">желание направлено на конкретный товар, и у человека достаточно денег (Kaufkraft), чтобы его купить</td></tr>
+                        <tr><td class="l"><b>NACHFRAGE</b></td><td class="l">Der Bedarf wird am Markt wirksam: Die Person kauft oder bestellt das Gut tatsächlich.</td><td class="l">потребность становится действенной на рынке: человек реально покупает или заказывает товар</td></tr>
+                    </table>
+                    </div>
+                    <ol class="schritte">
+                        <li><b>Ключевое слово каждого определения:</b> Bedürfnis — «Wunsch oder Mangel»; Bedarf — «bestimmtes Gut» + «genügend Kaufkraft»; Nachfrage — «kauft oder bestellt tatsächlich».</li>
+                        <li><b>Situation 1.</b> Frage 1: да, Karim хочет («hätte ich auch gerne»). Frage 2: нет — ни конкретной пары, ни денег в тексте нет. → <b>Bedürfnis</b>.</li>
+                        <li><b>Situation 2.</b> Frage 1: да. Frage 2: да — «genau dieses Paar» (39,99 €) и «50 € zur Verfügung». Frage 3: нет — он только нашёл пару. → <b>Bedarf</b>.</li>
+                        <li><b>Situation 3.</b> Frage 3: да — «bestellt sie und bezahlt». Bedarf стал реальной покупкой. → <b>Nachfrage</b>.</li>
+                    </ol>
+                    <div class="gut"><b>Antwort:</b> Situation 1: <b>Bedürfnis</b> &nbsp;·&nbsp; Situation 2: <b>Bedarf</b> &nbsp;·&nbsp; Situation 3: <b>Nachfrage</b></div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Aufgabe 3 &mdash; In den Situationen markieren</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.2rem;">Markiere in den Situationen: bei Bedürfnis den Wunsch, bei Bedarf das bestimmte Gut und das Geld, bei Nachfrage die tatsächliche Kaufhandlung.</p>
+                    <div class="vw-leg"><span><mark class="mw">Wunsch</mark> = Bedürfnis</span><span><mark class="mg">bestimmtes Gut + Geld</mark> = Bedarf</span><span><mark class="mk">tatsächliche Kaufhandlung</mark> = Nachfrage</span></div>
+                    <div class="vw-sit"><span class="sit-h">Situation 1 &rarr; Bedürfnis</span>Karim sieht in der Schule neue Sneaker bei einigen Mitschülern. Seine alten Schuhe funktionieren noch. Trotzdem denkt er: „<mark class="mw">Solche Sneaker hätte ich auch gerne.</mark>“</div>
+                    <div class="vw-sit"><span class="sit-h">Situation 2 &rarr; Bedarf</span>Am Nachmittag findet Karim im Internet <mark class="mg">ein Paar, das ihm gefällt</mark>. Die Sneaker kosten 39,99 €. <mark class="mg">Karim hat 50 € zur Verfügung</mark> und möchte <mark class="mg">genau dieses Paar</mark> haben.</div>
+                    <div class="vw-sit"><span class="sit-h">Situation 3 &rarr; Nachfrage</span>Karim legt die Sneaker in den Warenkorb, <mark class="mk">bestellt sie und bezahlt 39,99 €</mark>.</div>
+                    <ol class="schritte">
+                        <li><b>Situation 1 — ищем Wunsch.</b> Одно предложение: «Solche Sneaker hätte ich auch gerne». Остальное (старые туфли ещё работают) — фон, не желание.</li>
+                        <li><b>Situation 2 — ищем две вещи.</b> Конкретный товар: «ein Paar, das ihm gefällt» и «genau dieses Paar». Деньги: «Karim hat 50 € zur Verfügung». Обе вещи нужны вместе — иначе это не Bedarf.</li>
+                        <li><b>Situation 3 — ищем действие.</b> «bestellt sie und bezahlt 39,99 €». Только «in den Warenkorb legen» — ещё не покупка; покупка — это заказ и оплата.</li>
+                    </ol>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Aufgabe 4 &mdash; Das Bild „Vom Wunsch zum Kauf“ ausfüllen</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.3rem;">Fülle die leeren Felder im Bild aus. Begriffe: <i>Nachfrage, Bedürfnis, Bedarf, Ich will etwas, Ich kann mir ein bestimmtes Gut kaufen, Ich kaufe das Gut, bestimmtes Gut, genügend Geld, tatsächliche Kaufhandlung</i>.</p>
+                    <div class="dsatz-ru">Картинка в листе — комикс из трёх кадров с пустыми полями: <b>3 заголовка</b> (над кадрами), <b>3 подписи</b> (внизу кадров) и <b>3 слова на стрелках</b> между кадрами. Всего 9 полей — и в списке ровно 9 слов, каждое используется один раз.</div>
+                    <ol class="schritte">
+                        <li><b>Заголовки кадров.</b> Кадр 1: Karim мечтает («Die hätte ich gerne.») → <b>Bedürfnis</b>. Кадр 2: «Die will ich – und ich kann sie bezahlen.» → <b>Bedarf</b>. Кадр 3: «Ich kaufe sie.» → <b>Nachfrage</b>.</li>
+                        <li><b>Подписи внизу.</b> Это те же три ступени, сказанные коротко: кадр 1 — <b>Ich will etwas</b>; кадр 2 — <b>Ich kann mir ein bestimmtes Gut kaufen</b>; кадр 3 — <b>Ich kaufe das Gut</b>.</li>
+                        <li><b>Стрелка между 1 и 2 — что добавляется.</b> Чтобы из желания получился Bedarf, нужны две вещи: <b>bestimmtes Gut</b> и <b>genügend Geld</b> (в кадре 2 у Karim в руках пара и кошелёк).</li>
+                        <li><b>Стрелка между 2 и 3 — что добавляется.</b> Чтобы Bedarf стал Nachfrage, нужна <b>tatsächliche Kaufhandlung</b> (в кадре 3 — «Kauf erfolgreich!»).</li>
+                        <li><b>Проверка.</b> Девять слов расставлены, ни одно не лишнее: 3 термина + 3 подписи + 2 слова на первой стрелке + 1 на второй = 9.</li>
+                    </ol>
+                    <div class="vw-trio">
+                        <div class="vw-box b1"><h4>1. Bedürfnis</h4><span class="vw-sp">„Die hätte ich gerne.“</span><span class="vw-say">Ich will etwas</span></div>
+                        <div class="vw-plus"><span class="ar ar-r">&#10140;</span><span class="ar ar-d">&#11015;</span><span>+ bestimmtes Gut<br>+ genügend Geld</span></div>
+                        <div class="vw-box b2"><h4>2. Bedarf</h4><span class="vw-sp">„Die will ich – und ich kann sie bezahlen.“</span><span class="vw-say">Ich kann mir ein bestimmtes Gut kaufen</span></div>
+                        <div class="vw-plus"><span class="ar ar-r">&#10140;</span><span class="ar ar-d">&#11015;</span><span>+ tatsächliche<br>Kaufhandlung</span></div>
+                        <div class="vw-box b3"><h4>3. Nachfrage</h4><span class="vw-sp">„Ich kaufe sie.“</span><span class="vw-say">Ich kaufe das Gut</span></div>
+                    </div>
+                    <p class="vw-src">Это моя перерисовка решения: оригинальная картинка — в листе (М2, Aufgabe 4, Seite 4).</p>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="#v0">Wortschatz</a> — bestimmtes Gut, genügend Geld, Kaufhandlung, am Markt wirksam werden: с переводом и озвучкой
+                    </div>
+                </div>
+
+                <!-- ============ M3 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">M3</span>
+                    <h3 style="color:#5eead4;">Zeig, dass du es verstanden hast</h3>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Fälle A&ndash;D: Begriff + „Warum?“</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.3rem;">Ordne die Fälle den Begriffen Bedürfnis, Bedarf oder Nachfrage zu und begründe. <span style="color:rgba(230,230,235,0.45);">(Сопоставь случаи с понятиями и обоснуй.)</span></p>
+                    <div class="vw-hint"><b>Как строить «Warum?»:</b> «Begriff» + <b>weil/deshalb</b> + что есть и чего нет. Три готовые формулы (после <i>weil</i> глагол уходит в конец):<br>
+                        · <i>Das ist ein <b>Bedürfnis</b>, weil … einen Wunsch/Mangel hat, aber (noch) kein bestimmtes Gut im Blick hat / nicht genug Geld hat.</i><br>
+                        · <i>Das ist ein <b>Bedarf</b>, weil sich der Wunsch auf ein bestimmtes Gut richtet und … genügend Geld (Kaufkraft) hat.</i><br>
+                        · <i>Das ist <b>Nachfrage</b>, weil … das Gut tatsächlich bestellt/kauft und bezahlt.</i></div>
+
+                    <div class="iw-sec-head" style="margin:1.4rem 0 0.5rem;"><span class="iw-sec-badge" style="background:rgba(251,191,36,0.2); color:#fcd34d;">Fall A</span></div>
+                    <div class="vw-sit">Samira kommt nach dem Sport nach Hause und ist sehr hungrig.<span class="ru">Самира приходит домой после спорта и очень голодна.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1:</b> хочет ли она чего-то? Да — она голодна: это <i>Mangel</i>, нехватка.</li>
+                        <li><b>Frage 2:</b> есть ли конкретный товар и деньги? Нет — про еду или цену ничего не сказано. Значит, дальше не идём.</li>
+                    </ol>
+                    <div class="gut"><b>Begriff: Bedürfnis</b></div>
+                    <div class="dsatz">„Samira ist nach dem Sport sehr hungrig. Sie empfindet einen Mangel und möchte ihn beseitigen, aber es geht noch um kein bestimmtes Gut. Deshalb ist es ein Bedürfnis.“</div>
+                    <div class="dsatz-ru">Самира очень голодна после спорта. Она чувствует нехватку и хочет её устранить, но речь пока не о конкретном товаре. Поэтому это Bedürfnis.</div>
+
+                    <div class="iw-sec-head" style="margin:1.4rem 0 0.5rem;"><span class="iw-sec-badge" style="background:rgba(251,191,36,0.2); color:#fcd34d;">Fall B</span></div>
+                    <div class="vw-sit">Samira entscheidet sich für eine Pizza für 8 €. Sie hat 12 € dabei.<span class="ru">Самира решает взять пиццу за 8 €. У неё с собой 12 €.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1:</b> хочет? Да — хочет есть.</li>
+                        <li><b>Frage 2:</b> конкретный товар? Да — «eine Pizza für 8 €». Достаточно денег? Да — 12 € больше, чем 8 €. Оба «да».</li>
+                        <li><b>Frage 3:</b> купила? Нет — она только <i>entscheidet sich</i>, решает. Значит, ещё не Nachfrage.</li>
+                    </ol>
+                    <div class="gut"><b>Begriff: Bedarf</b></div>
+                    <div class="dsatz">„Samira hat sich für ein bestimmtes Gut entschieden, eine Pizza für 8 €, und sie hat mit 12 € genügend Geld. Gekauft hat sie noch nichts. Deshalb ist es ein Bedarf.“</div>
+                    <div class="dsatz-ru">Самира выбрала конкретный товар — пиццу за 8 € — и у неё с 12 € достаточно денег. Но пока она ничего не купила. Поэтому это Bedarf.</div>
+
+                    <div class="iw-sec-head" style="margin:1.4rem 0 0.5rem;"><span class="iw-sec-badge" style="background:rgba(251,191,36,0.2); color:#fcd34d;">Fall C</span></div>
+                    <div class="vw-sit">Samira bestellt die Pizza und bezahlt sie.<span class="ru">Самира заказывает пиццу и платит за неё.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1 и 2:</b> желание есть, товар и деньги есть (это тот же случай, что Fall B).</li>
+                        <li><b>Frage 3:</b> купила? Да — «bestellt und bezahlt». Это и есть <i>tatsächliche Kaufhandlung</i>.</li>
+                    </ol>
+                    <div class="gut"><b>Begriff: Nachfrage</b></div>
+                    <div class="dsatz">„Samira bestellt die Pizza und bezahlt sie. Sie kauft das Gut also tatsächlich, ihr Bedarf wird am Markt wirksam. Deshalb ist es Nachfrage.“</div>
+                    <div class="dsatz-ru">Самира заказывает пиццу и платит. То есть она действительно покупает товар: её Bedarf становится действенным на рынке. Поэтому это Nachfrage.</div>
+
+                    <div class="iw-sec-head" style="margin:1.4rem 0 0.5rem;"><span class="iw-sec-badge" style="background:rgba(251,191,36,0.2); color:#fcd34d;">Fall D</span></div>
+                    <div class="vw-sit">Karim hätte gerne Sneaker für 180 €. Er hat im Moment aber nur 20 € zur Verfügung.<span class="ru">Кариму хотелось бы кроссовки за 180 €. Но сейчас у него в распоряжении только 20 €.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1:</b> хочет? Да — «hätte gerne».</li>
+                        <li><b>Frage 2:</b> конкретный товар? Да — Sneaker за 180 €. Достаточно денег? <b>Нет</b> — у него только 20 €. Оба «да» не получаются — значит, Bedarf <i>не</i> получается.</li>
+                        <li><b>Вывод:</b> остаётся Bedürfnis. Bedarf появится, когда Karim накопит достаточно денег (или найдёт пару по карману).</li>
+                    </ol>
+                    <div class="gut"><b>Begriff: Bedürfnis</b> (не Bedarf!)</div>
+                    <div class="dsatz">„Karim hätte gerne bestimmte Sneaker für 180 €, hat aber nur 20 € zur Verfügung. Ihm fehlt die Kaufkraft, deshalb kann er sich das Gut nicht kaufen. Er hat also nur ein Bedürfnis, noch keinen Bedarf.“</div>
+                    <div class="dsatz-ru">Кариму хотелось бы конкретные кроссовки за 180 €, но у него только 20 €. Ему не хватает Kaufkraft, поэтому он не может себе их позволить. Значит, у него только Bedürfnis, а Bedarf ещё нет.</div>
+                    <div class="warn"><b>Самая частая ошибка здесь:</b> увидеть слова «bestimmte Sneaker» и сразу написать «Bedarf». Но Bedarf = конкретный товар <b>и</b> достаточно денег. Если денег нет — это Bedürfnis.</div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Mein eigenes Beispiel</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.3rem;">Denke dir ein eigenes Beispiel aus: Mein Bedürfnis · Mein Bedarf · Meine Nachfrage. <span style="color:rgba(230,230,235,0.45);">(Придумай свой пример: у каждой ступени своё предложение.)</span></p>
+                    <ol class="schritte">
+                        <li><b>Выбери вещь,</b> которую можно купить: велосипед, наушники, куртка.</li>
+                        <li><b>Bedürfnis</b> — только желание, без цены и модели.</li>
+                        <li><b>Bedarf</b> — теперь конкретная вещь + цена + «у меня хватает денег».</li>
+                        <li><b>Nachfrage</b> — ты реально покупаешь и платишь.</li>
+                        <li><b>Проверь</b> примером три вопроса: на каждой ступени добавляется ровно одно.</li>
+                    </ol>
+                    <span class="entwurf-tag">BEISPIEL (мой — у тебя может быть другой)</span>
+                    <div class="mt-wrap">
+                    <table class="mt">
+                        <tr><th class="l">Mein Bedürfnis</th><td class="l">Ich möchte schneller zur Schule kommen.</td></tr>
+                        <tr><th class="l">Mein Bedarf</th><td class="l">Ich möchte ein bestimmtes Fahrrad für 300 € und habe dafür 350 € gespart.</td></tr>
+                        <tr><th class="l">Meine Nachfrage</th><td class="l">Ich kaufe das Fahrrad im Fahrradgeschäft und bezahle es.</td></tr>
+                    </table>
+                    </div>
+                    <div class="dsatz-ru">Желание «быстрее добираться до школы» — это Bedürfnis (нет ни модели, ни цены). Конкретный велосипед за 300 € плюс 350 € накоплений — это Bedarf (товар и деньги есть, но покупки ещё нет). Покупка в магазине — Nachfrage.</div>
+                </div>
+
+                <!-- ============ M4 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">M4</span>
+                    <h3 style="color:#5eead4;">Check dich selbst: Lea und das Smartphone</h3>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Aufgaben 1&ndash;4 &mdash; ohne Hilfe, dann vergleichen</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.3rem;">Kannst du die drei Begriffe unterscheiden? Arbeite zunächst ohne Hilfe. <span style="color:rgba(230,230,235,0.45);">(Сначала реши сама, потом сравни.)</span></p>
+
+                    <div class="vw-sit"><span class="sit-h">1 &mdash; Was liegt vor?</span>Lea möchte unbedingt ein neues Smartphone. Ihr altes Gerät funktioniert noch. Geld für ein neues Smartphone hat sie momentan nicht.
+                        <span class="ru">Лея очень хочет новый смартфон. Её старый ещё работает. Денег на новый у неё сейчас нет.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1:</b> хочет? Да — «möchte unbedingt».</li>
+                        <li><b>Frage 2:</b> конкретный товар и деньги? Деньги — <b>нет</b> («Geld … hat sie momentan nicht»), да и конкретная модель не названа. Значит, Bedarf не получается.</li>
+                    </ol>
+                    <div class="gut"><b>1 → Bedürfnis</b> (желание есть, Kaufkraft нет)</div>
+
+                    <div class="vw-sit"><span class="sit-h">2 &mdash; Was liegt jetzt vor?</span>Zwei Monate später hat Lea 400 € gespart. Sie entscheidet sich für ein bestimmtes Smartphone für 350 €.
+                        <span class="ru">Через два месяца у Леи накоплено 400 €. Она выбирает конкретный смартфон за 350 €.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 1:</b> хочет? Да — желание никуда не делось.</li>
+                        <li><b>Frage 2:</b> конкретный товар? Да — «ein bestimmtes Smartphone für 350 €». Достаточно денег? Да — 400 € больше, чем 350 €.</li>
+                        <li><b>Frage 3:</b> купила? Нет — она только «entscheidet sich», решает.</li>
+                    </ol>
+                    <div class="gut"><b>2 → Bedarf</b></div>
+
+                    <div class="vw-sit"><span class="sit-h">3 &mdash; Was liegt jetzt vor?</span>Lea bestellt das Smartphone im Onlineshop.
+                        <span class="ru">Лея заказывает смартфон в интернет-магазине.</span></div>
+                    <ol class="schritte">
+                        <li><b>Frage 3:</b> купила? Да — «bestellt im Onlineshop». Заказ в интернет-магазине — уже реальное действие на рынке, то есть <i>tatsächliche Kaufhandlung</i>.</li>
+                    </ol>
+                    <div class="gut"><b>3 → Nachfrage</b></div>
+
+                    <div class="vw-sit"><span class="sit-h">4 &mdash; Ergänze</span>Bedürfnis + ______ → Bedarf &nbsp;·&nbsp; Bedarf + tatsächliches Handeln am Markt → ______</div>
+                    <ol class="schritte">
+                        <li><b>Первая строка.</b> Из Bedürfnis получается Bedarf, когда добавляются две вещи — конкретный товар и достаточно денег (стрелка 1→2 на картинке).</li>
+                        <li><b>Вторая строка.</b> Из Bedarf получается Nachfrage, когда человек реально действует на рынке — покупает.</li>
+                    </ol>
+                    <div class="gut"><b>Bedürfnis + bestimmtes Gut + genügend Geld (Kaufkraft) → Bedarf</b><br><b>Bedarf + tatsächliches Handeln am Markt → Nachfrage</b></div>
+                    <p class="vw-src">Текст: лист «VWL_Lernatelier_01», M4, 20.09.26.</p>
+                </div>
+
+                <!-- ============ M5 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#14b8a6,#5eead4); color:#042f2e;">M5</span>
+                    <h3 style="color:#5eead4;">Mach dich fit für Karim</h3>
+                </div>
+
+                <div class="note-card highlight-card">
+                    <h3>&#x1F4CB; Gegeben &mdash; Antwort für den Karim-Chat vorbereiten</h3>
+                    <div class="vw-q">„Ich will die Sneaker halt. Warum sollte ich mir darüber groß Gedanken machen?“</div>
+                    <p style="font-size:0.9rem;color:rgba(230,230,235,0.82);line-height:1.7;margin:0.4rem 0 0.2rem;">Du kennst jetzt drei neue VWL-Begriffe. Bereite eine kurze Antwort für deinen späteren Karim-Chat vor.</p>
+                    <p style="font-size:0.9rem;color:#fff;margin:0.5rem 0 0.2rem;"><b>Möglichkeit 1 — mit Satzstarter</b></p>
+                    <div class="dsatz" style="margin-top:0.2rem;">„Karim, zwischen etwas wollen und etwas kaufen gibt es einen Unterschied.<br>Zuerst ________.<br>Daraus wird Bedarf, wenn ________.<br>Nachfrage entsteht erst, wenn ________.“</div>
+                    <p style="font-size:0.9rem;color:#fff;margin:0.7rem 0 0.1rem;"><b>Möglichkeit 2 — ohne Satzstarter:</b> Formuliere deine Erklärung selbst. &nbsp;·&nbsp; <b>Mein wichtigster Fachbegriff für den Karim-Chat:</b> ______</p>
+                    <p class="vw-src">Текст: лист «VWL_Lernatelier_01», M5, 20.09.26.</p>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; M&ouml;glichkeit 1: die L&uuml;cken Schritt f&uuml;r Schritt</h3>
+                    <ol class="schritte">
+                        <li><b>Пойми конструкцию.</b> Три предложения = три ступени лесенки: «Zuerst» — Bedürfnis, «Daraus wird Bedarf, wenn …» — условия для Bedarf, «Nachfrage entsteht erst, wenn …» — условие для Nachfrage.</li>
+                        <li><b>Первая пустота после «Zuerst».</b> Нужно сказать про Bedürfnis. После «Zuerst» глагол стоит на <b>втором месте</b>: <i>Zuerst <b>entsteht</b> ein Bedürfnis: Du möchtest die Sneaker haben.</i></li>
+                        <li><b>Вторая пустота после «wenn».</b> Нужны два условия из Frage 2: конкретный товар <b>и</b> деньги. После «wenn» глагол уходит в <b>конец</b>: <i>wenn du ein bestimmtes Paar gefunden <b>hast</b> und genug Geld dafür <b>hast</b>.</i></li>
+                        <li><b>Третья пустота после «erst, wenn».</b> Условие Frage 3 — реальная покупка. Опять глагол в конце: <i>wenn du die Sneaker wirklich bestellst und <b>bezahlst</b>.</i></li>
+                        <li><b>Проверка:</b> в каждой части с «wenn» есть подлежащее <i>du</i>, а глагол стоит в самом конце? Все ли три ступени названы?</li>
+                    </ol>
+                    <div class="dsatz">„Karim, zwischen etwas wollen und etwas kaufen gibt es einen Unterschied. Zuerst entsteht ein Bedürfnis: Du möchtest die Sneaker haben. Daraus wird Bedarf, wenn du ein bestimmtes Paar gefunden hast und genug Geld dafür hast. Nachfrage entsteht erst, wenn du die Sneaker wirklich bestellst und bezahlst.“</div>
+                    <div class="dsatz-ru">Карим, между «хотеть» и «купить» есть разница. Сначала возникает Bedürfnis: ты хочешь эти кроссовки. Оно превращается в Bedarf, когда ты нашёл конкретную пару и у тебя хватает на неё денег. Nachfrage появляется, только когда ты действительно заказываешь и платишь.</div>
+                    <div class="warn"><b>Порядок слов:</b> в предложении с <b>wenn</b> спрягаемый глагол стоит в самом конце: <i>wenn du … hast</i> (не «wenn du hast …»). Если два глагола — оба в конце: <i>bestellst und bezahlst</i>.</div>
+                    <div class="sl"><span class="sl-t">&#x1F517; Wo das auf der Seite noch steht</span>
+                        <a href="deutsch-nebensaetze.html">Nebensätze &amp; Komma</a> — wenn, weil, dass: глагол в конце и запятая<br>
+                        <a href="deutsch-redemittel.html">Redemittel</a> — готовые фразы для объяснений и возражений
+                    </div>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x2705; M&ouml;glichkeit 2 &amp; „Mein wichtigster Fachbegriff“</h3>
+                    <ol class="schritte">
+                        <li><b>Отвечай на его слова.</b> Karim спросил «зачем мне об этом думать?». Значит, начало — про это: «du solltest dir schon Gedanken machen, denn …».</li>
+                        <li><b>Дай причину.</b> Между «Ich will» и «Ich kaufe» происходит больше, чем кажется — и дальше три ступени своими словами.</li>
+                        <li><b>Добавь вторую сторону</b> (Kriterien!): он решает сам — <i>zwar</i> — но с этим знанием решение будет осознаннее — <i>aber</i>.</li>
+                    </ol>
+                    <span class="entwurf-tag">BEISPIEL (мой — свой вариант может отличаться)</span>
+                    <div class="dsatz">„Karim, du solltest dir schon Gedanken machen, denn zwischen ‚Ich will etwas‘ und ‚Ich kaufe etwas‘ passiert mehr, als man denkt. Dein Wunsch ist zunächst nur ein Bedürfnis. Wenn du ein bestimmtes Paar gefunden hast und genug Geld dafür hast, ist es ein Bedarf. Erst wenn du die Sneaker wirklich bestellst, entsteht Nachfrage. Du entscheidest zwar selbst, aber du kannst bewusster entscheiden, wenn du den Unterschied kennst.“</div>
+                    <div class="dsatz-ru">Карим, тебе всё-таки стоит подумать: между «хочу» и «куплю» происходит больше, чем кажется. Твоё желание пока только Bedürfnis. Если ты нашёл конкретную пару и у тебя хватает денег, это Bedarf. Nachfrage возникает, только когда ты реально заказываешь. Ты, конечно, решаешь сам, но можешь решать осознаннее, если знаешь разницу.</div>
+                    <div class="gut"><b>Mein wichtigster Fachbegriff (предложение): Bedarf.</b> Он соединяет «хочу» и «куплю»: показывает, что одного желания мало — нужны ещё конкретный товар и деньги. Если объяснишь Bedarf, то Bedürfnis и Nachfrage объясняются сами. Любой из трёх терминов подойдёт, если ты объяснишь его правильно.</div>
+                </div>
+
+                <!-- ============ P1 ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#2a1600;">P1</span>
+                    <h3 style="color:#fbbf24;">Plus-Aufgabe: Bedarf ohne Nachfrage?</h3>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F4D8; Schon sicher? Dann denk weiter.</h3>
+                    <div class="vw-sit">Karim hat 70 €. Die Sneaker kosten 39,99 €. Karim entscheidet sich aber am Ende doch dagegen, sie zu bestellen.<br>
+                        <b>Kann Bedarf vorhanden sein, obwohl keine Nachfrage entsteht? Begründe.</b>
+                        <span class="ru">У Карима 70 €. Кроссовки стоят 39,99 €. Но в конце концов он всё же решает их не заказывать. Может ли быть Bedarf, хотя Nachfrage не возникает? Обоснуй.</span></div>
+                    <ol class="schritte">
+                        <li><b>Что дано.</b> 70 € у Karim и цена 39,99 € — денег хватает с запасом (Kaufkraft есть). Конкретные кроссовки названы («die Sneaker»). Желание подразумевается: Karim вообще рассматривал заказ.</li>
+                        <li><b>Frage 2.</b> Конкретный товар и достаточно денег — оба «да». Значит, <b>Bedarf есть</b>.</li>
+                        <li><b>Frage 3.</b> Заказал ли он? Нет — «entscheidet sich dagegen». Покупки нет (keine tatsächliche Kaufhandlung) — значит, <b>Nachfrage нет</b>.</li>
+                        <li><b>Вывод.</b> Да: <b>Bedarf может быть без Nachfrage</b>. Bedarf — это возможность и желание купить; Nachfrage возникает только если человек эту возможность реально использует.</li>
+                    </ol>
+                    <div class="gut"><b>Antwort: Ja.</b> Bedarf = Wunsch + bestimmtes Gut + genügend Geld. Nachfrage braucht zusätzlich die tatsächliche Kaufhandlung.</div>
+                    <div class="dsatz">„Ja, das ist möglich. Karim hat 70 € und die Sneaker kosten 39,99 €, er hat also genügend Geld für ein bestimmtes Gut. Damit liegt ein Bedarf vor. Nachfrage entsteht aber erst, wenn er die Sneaker tatsächlich bestellt. Wenn er sich dagegen entscheidet, gibt es keine Kaufhandlung und deshalb keine Nachfrage.“</div>
+                    <div class="dsatz-ru">Да, это возможно. У Карима 70 €, а кроссовки стоят 39,99 €, то есть денег на конкретный товар хватает. Значит, Bedarf есть. Но Nachfrage возникает, только если он реально закажет. Если он решает этого не делать, покупки нет, а значит, нет и Nachfrage.</div>
+                    <div class="vw-hint"><b>Почему он мог отказаться</b> (можно добавить в ответ): старые кроссовки ещё хорошие; он хочет сэкономить деньги; кроссовки раскупили; он ждёт скидку.
+                        <br><b>Тонкость:</b> если Karim передумал и вообще перестал хотеть эти кроссовки, то пропало и само Bedürfnis. Но в момент, когда у него были конкретная пара и достаточно денег, Bedarf существовал — об этом момент и вопрос.</div>
+                    <p class="vw-src">Текст: лист «VWL_Lernatelier_01», P1, 20.09.26.</p>
+                </div>
+
+                <!-- ============ Übung ============ -->
+                <div class="iw-sec-head" style="margin:2.4rem 0 0.8rem;">
+                    <span class="iw-sec-badge" style="background:linear-gradient(135deg,#a371f7,#c9b3ff); color:#0e0a1a;">Übung</span>
+                    <h3 style="color:#c9b3ff;">Bedürfnis, Bedarf oder Nachfrage?</h3>
+                </div>
+
+                <div class="note-card">
+                    <h3>&#x1F3AF; 11 F&auml;lle aus dem Atelier &mdash; Begriff w&auml;hlen</h3>
+                    <p style="font-size:0.86rem;color:rgba(230,230,235,0.65);margin:0 0 0.3rem;">Все случаи — из листа (S1–S3, Fall A–D, Lea, Plus-Aufgabe). Выбери термин: после ответа появится разбор по трём вопросам.</p>
+                    <div id="trBox"></div>
+                </div>
+
+                <div class="note-card tip-card">
+                    <span class="tip-icon">&#x1F393;</span>
+                    <div>
+                        <p>Diese Seite w&auml;chst mit &mdash; sobald Lernatelier 2 und weitere Materialien kommen, bekommen sie hier eigene Karten.
+                        Присылай следующие листы (и Hilfekarten) — добавлю с таким же пошаговым разбором.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        </div>
+
+        </div><!-- /egb-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Aufgabe ===================== */
+(function () {
+    var hub = document.getElementById('egb-hub');
+    var wrap = document.getElementById('egb-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB VWL | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('egb-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_vwl_egb_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('egb-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#egb-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        Object.keys(state).forEach(function (k) {
+            if (state[k] === 'week') { w++; } else if (state[k] === 'done') { d++; } else if (state[k] === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+
+
+/* ===================== Lernbedarfsdiagnose (v1): Selbsteinschätzung, gespeichert ===================== */
+(function () {
+    var KEY = 'neostudy_vwl_egb_diag';
+    var box = document.getElementById('dgBox');
+    if (!box) { return; }
+    var state;
+    try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { state = {}; }
+    var items = Array.prototype.slice.call(box.querySelectorAll('.dg-item'));
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    function render() {
+        var c = { 1: 0, 2: 0, 3: 0 };
+        items.forEach(function (it) {
+            var v = state[it.dataset.i] || null;
+            Array.prototype.forEach.call(it.querySelectorAll('.dg-btn'), function (b) {
+                b.className = 'dg-btn' + (b.dataset.v === v ? ' on' + v : '');
+            });
+            if (v) { c[v]++; }
+        });
+        var n = c[1] + c[2] + c[3];
+        document.getElementById('dgSum').innerHTML = n === 0
+            ? 'Выбери уровень для каждой фразы — здесь появится итог.'
+            : '● могла бы объяснить: <b>' + c[1] + '</b> &nbsp;·&nbsp; ◐ есть идея, но не уверена: <b>' + c[2] + '</b> &nbsp;·&nbsp; ○ пока нет: <b>' + c[3] + '</b> &nbsp;(отмечено ' + n + ' из ' + items.length + ')' +
+              (c[2] + c[3] > 0 ? '<br><span style="color:rgba(230,230,235,0.55);font-size:0.82rem;">Открой «Как на это ответить» у фраз с ◐ и ○ — там шаги и заготовка ответа.</span>' : '');
+    }
+    items.forEach(function (it) {
+        Array.prototype.forEach.call(it.querySelectorAll('.dg-btn'), function (b) {
+            b.addEventListener('click', function () {
+                var i = it.dataset.i;
+                if (state[i] === b.dataset.v) { delete state[i]; } else { state[i] = b.dataset.v; }
+                save(); render();
+                var det = it.querySelector('.dg-det');
+                if (det && (state[i] === '2' || state[i] === '3')) { det.open = true; }
+            });
+        });
+    });
+    render();
+})();
+
+/* ===================== Fortschritt im Atelier 1 (v2) ===================== */
+(function () {
+    var KEY = 'neostudy_vwl_egb_progress';
+    var list = document.getElementById('vwProg');
+    if (!list) { return; }
+    var state;
+    try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { state = {}; }
+    Array.prototype.forEach.call(list.querySelectorAll('input[type=checkbox]'), function (cb) {
+        var k = cb.getAttribute('data-k');
+        cb.checked = !!state[k];
+        cb.parentNode.parentNode.classList.toggle('done', cb.checked);
+        cb.addEventListener('change', function () {
+            state[k] = cb.checked;
+            cb.parentNode.parentNode.classList.toggle('done', cb.checked);
+            try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+        });
+    });
+})();
+
+/* ===================== Übung (v2): Bedürfnis, Bedarf oder Nachfrage? ===================== */
+(function () {
+    var box = document.getElementById('trBox');
+    if (!box) { return; }
+    var CASES = [
+        { s: 'Situation 1', t: 'Karim sieht in der Schule neue Sneaker bei einigen Mitschülern. Seine alten Schuhe funktionieren noch. Trotzdem denkt er: „Solche Sneaker hätte ich auch gerne.“',
+          a: 'Bedürfnis', w: '<b>Frage 1:</b> да, он хочет. <b>Frage 2:</b> нет — ни конкретной пары, ни денег не названо. Есть только желание → <b>Bedürfnis</b>.' },
+        { s: 'Situation 2', t: 'Am Nachmittag findet Karim im Internet ein Paar, das ihm gefällt. Die Sneaker kosten 39,99 €. Karim hat 50 € zur Verfügung und möchte genau dieses Paar haben.',
+          a: 'Bedarf', w: '<b>Frage 2:</b> да — «genau dieses Paar» за 39,99 € и 50 € в распоряжении (хватает). <b>Frage 3:</b> нет — он ещё не заказал → <b>Bedarf</b>.' },
+        { s: 'Situation 3', t: 'Karim legt die Sneaker in den Warenkorb, bestellt sie und bezahlt 39,99 €.',
+          a: 'Nachfrage', w: '<b>Frage 3:</b> да — «bestellt sie und bezahlt»: tatsächliche Kaufhandlung → <b>Nachfrage</b>.' },
+        { s: 'Fall A', t: 'Samira kommt nach dem Sport nach Hause und ist sehr hungrig.',
+          a: 'Bedürfnis', w: 'Самира голодна — это Mangel, нехватка. Конкретного товара и денег в тексте нет → <b>Bedürfnis</b>.' },
+        { s: 'Fall B', t: 'Samira entscheidet sich für eine Pizza für 8 €. Sie hat 12 € dabei.',
+          a: 'Bedarf', w: 'Конкретный товар есть (Pizza für 8 €) и денег хватает (12 € > 8 €), но она ещё ничего не купила → <b>Bedarf</b>.' },
+        { s: 'Fall C', t: 'Samira bestellt die Pizza und bezahlt sie.',
+          a: 'Nachfrage', w: 'Она заказала и заплатила — реальная покупка → <b>Nachfrage</b>.' },
+        { s: 'Fall D', t: 'Karim hätte gerne Sneaker für 180 €. Er hat im Moment aber nur 20 € zur Verfügung.',
+          a: 'Bedürfnis', w: 'Хочет конкретные Sneaker, но денег не хватает (20 € из 180 €) — нет Kaufkraft. Значит, <b>не Bedarf</b>, а <b>Bedürfnis</b>.' },
+        { s: 'M4 · 1', t: 'Lea möchte unbedingt ein neues Smartphone. Ihr altes Gerät funktioniert noch. Geld für ein neues Smartphone hat sie momentan nicht.',
+          a: 'Bedürfnis', w: 'Желание есть, но денег сейчас нет — Kaufkraft отсутствует → <b>Bedürfnis</b>.' },
+        { s: 'M4 · 2', t: 'Zwei Monate später hat Lea 400 € gespart. Sie entscheidet sich für ein bestimmtes Smartphone für 350 €.',
+          a: 'Bedarf', w: 'Конкретный смартфон за 350 € и накоплено 400 € (хватает), но она ещё не купила → <b>Bedarf</b>.' },
+        { s: 'M4 · 3', t: 'Lea bestellt das Smartphone im Onlineshop.',
+          a: 'Nachfrage', w: 'Заказ в интернет-магазине — реальное действие на рынке → <b>Nachfrage</b>.' },
+        { s: 'Plus-Aufgabe', t: 'Karim hat 70 €. Die Sneaker kosten 39,99 €. Am Ende entscheidet er sich aber dagegen, sie zu bestellen. Was liegt vor?',
+          a: 'Bedarf', w: 'Конкретный товар и достаточно денег → <b>Bedarf</b> есть. Но он не заказал → Nachfrage не возникает. Поэтому ответ на вопрос листа: да, <b>Bedarf без Nachfrage</b> возможен.' }
+    ];
+    var order = [], pos = 0, score = 0, answered = false;
+    function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    function start() { order = shuffle(CASES.map(function (c, i) { return i; })); pos = 0; score = 0; show(); }
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function show() {
+        answered = false;
+        if (pos >= order.length) {
+            box.innerHTML = '<div class="tr-case"><small>Fertig</small>Ergebnis: <b>' + score + ' / ' + order.length + '</b> ' +
+                (score === order.length ? '— alles richtig! ✓' : '— schau die Fälle an, bei denen es nicht geklappt hat, und probiere noch einmal.') +
+                '</div><div class="tr-opts"><button class="tr-next" id="trAgain">Nochmal mischen</button></div>';
+            document.getElementById('trAgain').addEventListener('click', start);
+            return;
+        }
+        var c = CASES[order[pos]];
+        box.innerHTML = '<div class="tr-bar"><span>Fall ' + (pos + 1) + ' von ' + order.length + '</span><span>Richtig: ' + score + '</span></div>' +
+            '<div class="tr-case"><small>' + esc(c.s) + '</small>' + esc(c.t) + '</div>' +
+            '<div class="tr-opts"><button class="tr-opt" data-a="Bedürfnis">Bedürfnis</button><button class="tr-opt" data-a="Bedarf">Bedarf</button><button class="tr-opt" data-a="Nachfrage">Nachfrage</button></div>' +
+            '<div class="tr-fb" id="trFb"></div><button class="tr-next" id="trNext" hidden>Weiter &rarr;</button>';
+        Array.prototype.forEach.call(box.querySelectorAll('.tr-opt'), function (b) {
+            b.addEventListener('click', function () {
+                if (answered) { return; }
+                answered = true;
+                var ok = b.dataset.a === c.a;
+                if (ok) { score++; }
+                Array.prototype.forEach.call(box.querySelectorAll('.tr-opt'), function (x) {
+                    x.disabled = true;
+                    if (x.dataset.a === c.a) { x.classList.add('right'); } else if (x === b) { x.classList.add('wrong'); }
+                });
+                var fb = document.getElementById('trFb');
+                fb.className = 'tr-fb show ' + (ok ? 'ok' : 'bad');
+                fb.innerHTML = (ok ? '✓ <b>Richtig.</b> ' : '✗ <b>Nicht ganz — richtig ist ' + c.a + '.</b> ') + c.w;
+                var nx = document.getElementById('trNext');
+                nx.hidden = false;
+                nx.textContent = pos + 1 >= order.length ? 'Ergebnis ansehen →' : 'Weiter →';
+            });
+        });
+        document.getElementById('trNext').addEventListener('click', function () { pos++; show(); });
+    }
+    start();
+})();
+
+/* ===================== AUDIO (v0): Überblick (ein Track, 6 Abschnitte) + Wortschatz (DE -> RU -> DE) ===================== */
+document.addEventListener('DOMContentLoaded', function () {
+    var dock = document.getElementById('wkaDock'), table = document.getElementById('vwlVocab');
+    if (!dock) { return; }
+    var rows = table ? Array.prototype.slice.call(table.querySelectorAll('tr')).filter(function (tr) { return tr.querySelector('td'); }) : [];
+    rows.forEach(function (tr, i) {
+        var td = tr.querySelector('td.de'); if (!td) { return; }
+        var b = document.createElement('button');
+        b.className = 'spk-btn vwl-spk'; b.dataset.i = i; b.title = 'Anhören: DE → RU → DE'; b.innerHTML = '&#x1F50A;';
+        td.appendChild(b);
+    });
+    var elWord = document.getElementById('wkaWord'), elSub = document.getElementById('wkaSub'),
+        elPlay = document.getElementById('wkaPlay'), elFill = document.getElementById('wkaFill');
+    var which = 'voc', audios = {}, idx = -1, open = false;
+    function dataOf(w) { return w === 'ov' ? window.VWL_OV_AUDIO : window.VWL0_AUDIO; }
+    function data() { return dataOf(which) || null; }
+    function audio() {
+        var d = data(); if (!d) { return null; }
+        if (!audios[which]) { audios[which] = new Audio(); audios[which].preload = 'auto'; audios[which].src = d.src; }
+        return audios[which];
+    }
+    function cur() { return audios[which] || null; }
+    function label(i) {
+        var d = data();
+        return (which === 'ov' ? 'Überblick · Abschnitt ' : 'Wortschatz · ') + (i + 1) + ' / ' + d.w.length;
+    }
+    function openDock(w, i) {
+        var d = dataOf(w); if (!d || !d.w.length) { return; }
+        if (w !== which) {
+            Object.keys(audios).forEach(function (k) { try { audios[k].pause(); } catch (e) {} });
+            which = w; idx = -1; mark(-1); elFill.style.width = '0%';
+        }
+        dock.classList.add('open'); document.body.classList.add('wka-on'); open = true;
+        seekTo(i || 0);
+    }
+    function closeDock() {
+        pause(); dock.classList.remove('open'); document.body.classList.remove('wka-on');
+        open = false; idx = -1; mark(-1);
+    }
+    function mark(i) {
+        rows.forEach(function (tr, k) {
+            var on = which === 'voc' && k === i;
+            tr.classList.toggle('playing', on);
+            var b = tr.querySelector('.vwl-spk'); if (b) { b.classList.toggle('playing', on); }
+        });
+    }
+    function seekTo(i) {
+        var d = data(), a = audio(); if (!d || !a) { return; }
+        if (i < 0) { i = 0; }
+        if (i >= d.w.length) { pause(); return; }
+        idx = i;
+        var c = d.w[i];
+        var go = function () {
+            try { a.currentTime = c.t; } catch (e) {}
+            var p = a.play(); if (p && p.catch) { p.catch(function () { elPlay.innerHTML = '&#x25B6;'; }); }
+            elPlay.innerHTML = '&#x23F8;';
+        };
+        if (a.readyState >= 1) { go(); } else { a.addEventListener('loadedmetadata', go, { once: true }); }
+        elWord.textContent = c.de; elSub.textContent = label(i); mark(i);
+    }
+    function pause() { var a = cur(); if (a) { try { a.pause(); } catch (e) {} } elPlay.innerHTML = '&#x25B6;'; }
+    elPlay.addEventListener('click', function () {
+        var a = cur(); if (!open || !a) { return; }
+        if (a.paused) { var p = a.play(); if (p && p.catch) { p.catch(function () {}); } elPlay.innerHTML = '&#x23F8;'; } else { pause(); }
+    });
+    document.getElementById('wkaPrev').addEventListener('click', function () { seekTo(idx - 1); });
+    document.getElementById('wkaNext').addEventListener('click', function () { seekTo(idx + 1); });
+    document.getElementById('wkaClose').addEventListener('click', closeDock);
+    var ovBtn = document.getElementById('ovPlay'), allBtn = document.getElementById('wkaPlayAll');
+    if (ovBtn) { ovBtn.addEventListener('click', function () { openDock('ov', 0); }); }
+    if (allBtn) { allBtn.addEventListener('click', function () { openDock('voc', 0); }); }
+    if (table) {
+        table.addEventListener('click', function (e) {
+            var b = e.target.closest('.vwl-spk'); if (!b) { return; }
+            var i = +b.dataset.i, a = cur();
+            if (open && which === 'voc' && idx === i && a && !a.paused) { pause(); return; }
+            openDock('voc', i);
+        });
+    }
+    window.addEventListener('hashchange', function () { if (location.hash !== '#v0' && open) { closeDock(); } });
+    setInterval(function () {
+        var a = cur(), d = data();
+        if (!a || !d || !open || idx < 0 || a.paused) { return; }
+        var c = d.w[idx];
+        if (a.currentTime >= c.e - 0.02) {
+            if (idx + 1 >= d.w.length) { if (a.currentTime >= d.d - 0.05 || a.ended) { pause(); } return; }
+            if (a.currentTime >= d.w[idx + 1].t) { idx++; c = d.w[idx]; elWord.textContent = c.de; elSub.textContent = label(idx); mark(idx); }
+            return;
+        }
+        var span = Math.max(0.1, c.e - c.t);
+        elFill.style.width = Math.min(100, ((idx + (a.currentTime - c.t) / span) / d.w.length) * 100) + '%';
+    }, 100);
+});
+</script>
+    <div class="wka-dock" id="wkaDock">
+        <div class="wka-bar">
+            <button class="wka-btn" id="wkaPrev" title="Zur&uuml;ck">&#x23EE;</button>
+            <button class="wka-btn wka-main" id="wkaPlay" title="Play/Pause">&#x25B6;</button>
+            <button class="wka-btn" id="wkaNext" title="Weiter">&#x23ED;</button>
+            <div class="wka-info">
+                <div class="wka-word" id="wkaWord">&mdash;</div>
+                <div class="wka-sub" id="wkaSub"></div>
+            </div>
+            <button class="wka-close" id="wkaClose" title="Schlie&szlig;en">&times;</button>
+        </div>
+        <div class="wka-track"><div class="wka-fill" id="wkaFill"></div></div>
+    </div>
+    <script src="audio/vwl-overview-cues.js" defer></script>
+    <script src="audio/vwl0-audio-cues.js" defer></script>
+    <script src="js/nav-dropdown.js" defer></script>
+</body>
+</html>

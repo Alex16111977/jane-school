@@ -43,6 +43,7 @@ const GAP_RUN = 0.15;   // between Russian and German runs inside one explanatio
 const TARGETS = {
   bwr9: { page: 'bwr-egb.html', table: 'bwrVocab', global: 'BWR9_AUDIO' },
   rf9:  { page: 'iw-egb.html',  table: 'rfVocab',  global: 'RF9_AUDIO' },
+  vwl0: { page: 'vwl-egb.html', table: 'vwlVocab', global: 'VWL0_AUDIO' },
 };
 const TRIM = 'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse,' +
              'silenceremove=start_periods=1:start_silence=0.03:start_threshold=-40dB:detection=peak,areverse';
