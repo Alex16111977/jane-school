@@ -2,9 +2,13 @@
 // Generate "listen to this lesson" audio for englisch-egb.html, tab u1m "Preparation for the First Exam"
 // (everything EXCEPT the "Plan auf 2 Tage" card, #exam-plan).
 //
-// The tab is split into two continuous tracks (one .m4a each, plus cue data for a bottom dock player):
-//   u1m-guides : header, "Worum es geht", and the three guide cards (Mediation, Comment, Grammatik)
-//   u1m-sheet  : the solved exam sheet, parts 1-7, plus the closing checklist
+// The tab is split into three continuous tracks (one .m4a each, plus cue data for a bottom dock player):
+//   u1m-guides    : header, "Worum es geht", and the guide cards (Mediation + its constructions and DE->EN vocabulary,
+//                   Comment, Grammatik)
+//   u1m-bausteine : Anhang, first half: how to use the bank, Introduction / Conclusion templates, constructions, word budget
+//   u1m-bank      : Anhang, second half: the 28 argument-bank topics (2 PRO + 2 CONTRA, each as Claim / Reason / Example /
+//                   Result, long + short version)
+// The solved exam sheet (parts 1-7: tasks with answers) is deliberately NOT narrated - the student does not want it.
 //
 // Three languages are mixed on this page: English (exam content), German (explanations from the
 // sheet, the German job ad) and Russian (the guides). Cyrillic is split off by script. English and
@@ -14,11 +18,11 @@
 // Tables are read with per-table templates (the letters of a matching exercise mean nothing in audio).
 //
 // Usage:
-//   node tools/gen-egb-englisch-audio.mjs                 # both tracks
+//   node tools/gen-egb-englisch-audio.mjs                 # all three tracks
 //   node tools/gen-egb-englisch-audio.mjs u1m-guides       # one track
 //   node tools/gen-egb-englisch-audio.mjs --force
 //   node tools/gen-egb-englisch-audio.mjs --dry
-//   node tools/gen-egb-englisch-audio.mjs --plan u1m-sheet # print units with language tags, no TTS
+//   node tools/gen-egb-englisch-audio.mjs --plan u1m-bank  # print units with language tags, no TTS
 //
 // Requires edge-tts (via tools/edge_batch.py) and ffmpeg.
 // Voices: en-US-AvaMultilingualNeural, de-DE-KatjaNeural, ru-RU-SvetlanaNeural
@@ -56,9 +60,12 @@ const LESSON_ID = 'u1m';
 const SKIP_CARD_IDS = ['exam-plan'];
 const SPLIT_AFTER_CARD_ID = 'guide-grammar';
 const TRACKS = [
-  { id: 'u1m-guides', title: 'Anleitungen & Grammatik' },
-  { id: 'u1m-sheet', title: 'Prüfungsblatt: Teil 1–7' },
+  { id: 'u1m-guides', title: 'Anleitungen, Mediation-Wortschatz & Grammatik' },
+  { id: 'u1m-bausteine', title: 'Bausteine: Introduction, Conclusion, Konstruktionen' },
+  { id: 'u1m-bank', title: 'Argument-Bank: 28 Themen' },
 ];
+const BAUSTEINE_IDS = ['bank-head', 'bank-howto', 'bank-intro-tpl', 'bank-concl-tpl', 'bank-args-cons', 'bank-budget'];
+const isBankTopic = id => /^bank-t\d+$/.test(id || '');
 
 // ---------- entities ----------
 const NAMED_ENT = {
@@ -264,7 +271,7 @@ function toRuns(text, hint) {
     else runs.push({ lang: p.lang, text: p.text });
     runs[runs.length - 1].lastAtom = p.atom;
   }
-  return runs.map(r => ({ lang: r.lang, text: speechClean(r.text) })).filter(r => /[a-zA-ZäöüßÄÖÜéЀ-ӿ]/.test(r.text));
+  return runs.map(r => ({ lang: r.lang, text: speechClean(r.text).replace(/^[,;:\s]+/, '') })).filter(r => /[a-zA-ZäöüßÄÖÜéЀ-ӿ]/.test(r.text));
 }
 
 // ---------- normalise this page's components into <p> tags ----------
@@ -283,6 +290,13 @@ function frItem(inner, kind) {
 function normalize(html) {
   let h = html;
   h = removeBlocksByClass(h, 'sl');
+  // argument bank: "3 · Title — question" -> "Topic 3: Title. Question"; "(28 words)" counters and the topic-chip row are not read
+  h = h.replace(/<h3 class="bk-h">\s*(\d+)\s*(?:·|&middot;)\s*([\s\S]*?)<span class="bk-q">\s*(?:—|&mdash;)\s*([\s\S]*?)<\/span>\s*<\/h3>/gi,
+    (m, n, t, q) => `<h3>Topic ${n}: ${cleanWs(t)}. ${cleanWs(q)}</h3>`);
+  h = h.replace(/<span class="bk-n">[\s\S]*?<\/span>/gi, '');
+  h = h.replace(/<span class="[^"]*\bbk-role\b[^"]*">[\s\S]*?<\/span>/gi, '');          // Claim / Reason / Example / Result pills in front of every step
+  h = h.replace(/<h4 class="bk-sub">\s*Themen\s*<\/h4>/gi, '');
+  h = replaceBlocksByClass(h, 'bk-lab', inner => `<p>${cleanWs(stripTags(inner)).replace(/^((?:PRO|CONTRA) \d)\s+/, '$1: ')}.</p>`);
   h = h.replace(/<summary[^>]*>([\s\S]*?)<\/summary>/gi, (m, t) => `<p>${t}</p>`).replace(/<\/?details[^>]*>/gi, '');
   h = replaceBlocksByClass(h, 'f', inner => frItem(inner, 'f'));
   h = replaceBlocksByClass(h, 'r', inner => frItem(inner, 'r'));
@@ -295,10 +309,10 @@ function cellsOf(rowHtml) {
   return [...rowHtml.matchAll(/<t([dh])([^>]*)>([\s\S]*?)<\/t[dh]>/gi)].map(m => ({
     th: m[1].toLowerCase() === 'h',
     colspan: (/colspan="?(\d+)/.exec(m[2]) || [0, 1])[1] * 1,
-    text: cleanWs(stripTags(m[3])),
+    text: cleanWs(stripTags(m[3].replace(/<br\s*\/?>/gi, ' ; '))),
   }));
 }
-const P = (t, h) => ({ t, h });
+const P = (t, h, g) => ({ t, h, g });                  // g: seconds of silence before this piece (recall pause)
 // hint cells look like "Köln → Cologne (...)" or "bearbeiten ≠ edit; здесь = answer": the term before the sign is German
 function hintPieces(text) {
   const m = /^([^→=≠А-Яа-яЁё]+?)\s*([→=≠])\s*(.*)$/.exec(text) || /^([^→=≠А-Яа-яЁё]+?)\s+(?=[А-Яа-яЁё])(.*)$/.exec(text);
@@ -331,6 +345,9 @@ function tableUnits(tableHtml) {
     else if (/^роль\|предложение/.test(J)) pieces = [P(`${c[0]}.`), P(c[1], 'en'), P(`Фраза: ${c[2]}`, 'en')];
     else if (/^зачем\|слова/.test(J)) pieces = [P(`${c[0]}: ${c[1]}`)];
     else if (/^тема \/ сторона/.test(J)) pieces = [P(`${c[0]}:`), P(c[1], 'en')];
+    else if (/^deutsch\|english$/.test(J)) pieces = [P(c[0], 'de'), P(c[1], 'en', 1.0)];
+    else if (/^(platz|schritt)\|konstruktionen$/.test(J)) pieces = [P(`${c[0]}:`), P(c[1], 'en')];
+    else if (/^teil\|aufbau$/.test(J)) pieces = [P(`${c[0]}:`), P(c[1], 'en')];
     else if (!headers.length && c.length === 2) pieces = [P(`${c[0]} ${c[1]}`, 'en')];
     else pieces = [P(c.join(', '))];
     units.push(pieces);
@@ -374,10 +391,11 @@ function headerBlockToUnit(blockHtml) {
 function unitRuns(unit) {
   const runs = [];
   for (const p of unit) {
-    for (const r of toRuns(p.t, p.h)) {
+    toRuns(p.t, p.h).forEach((r, k) => {
       const prev = runs[runs.length - 1];
-      if (prev && prev.lang === r.lang) prev.text += ' ' + r.text; else runs.push({ ...r });
-    }
+      if (prev && prev.lang === r.lang && !(k === 0 && p.g)) prev.text += ' ' + r.text;
+      else runs.push({ ...r, gapBefore: k === 0 ? p.g : undefined });
+    });
   }
   return runs;
 }
@@ -404,7 +422,7 @@ function extractChunks(html) {
       const h2m = /<h2[^>]*>([\s\S]*?)<\/h2>/i.exec(b.html);
       label = h2m ? cleanWs(stripTags(h2m[1])) : 'Start';
     } else {
-      label = speechClean(units[0].map(p => p.t).join(' ')).replace(/\.$/, '').slice(0, 70);
+      label = speechClean(units[0].map(p => p.t).join(' ')).replace(/\.$/, '').replace(/^(Topic \d+: [^.?!]*)[.?!].*$/, '$1').replace(/^[,;:\s]+/, '').slice(0, 70);
     }
     chunks.push({ id, kind: isHeader ? 'header' : 'card', units, label });
   }
@@ -413,7 +431,16 @@ function extractChunks(html) {
 function splitTracks(chunks) {
   const idx = chunks.findIndex(c => c.id === SPLIT_AFTER_CARD_ID);
   if (idx < 0) throw new Error('split card not found: ' + SPLIT_AFTER_CARD_ID);
-  return { 'u1m-guides': chunks.slice(0, idx + 1), 'u1m-sheet': chunks.slice(idx + 1) };
+  const rest = chunks.slice(idx + 1);
+  const bausteine = rest.filter(c => BAUSTEINE_IDS.includes(c.id));
+  const bank = rest.filter(c => isBankTopic(c.id));
+  if (bausteine.length !== BAUSTEINE_IDS.length) throw new Error('missing Anhang card(s): found ' + bausteine.map(c => c.id).join(','));
+  if (bank.length !== 28) throw new Error('expected 28 bank topics, found ' + bank.length);
+  return {
+    'u1m-guides': chunks.slice(0, idx + 1),
+    'u1m-bausteine': bausteine,
+    'u1m-bank': bank,
+  };
 }
 
 // ---------- WAV helpers ----------
@@ -466,7 +493,7 @@ function planChunks(chunks) {
         let gap;
         if (firstInChunk && ri === 0) gap = firstChunk ? 0 : GAP_CHUNK;
         else if (ri === 0) gap = GAP_UNIT;
-        else gap = GAP_RUN;
+        else gap = run.gapBefore ?? GAP_RUN;
         plan.push({ id: idFor(voice, run.text), voice, lang: run.lang, text: run.text, gap });
         firstInChunk = false;
       });
@@ -507,7 +534,8 @@ const dry = args.includes('--dry');
 const planIdx = args.indexOf('--plan');
 const cIdx = args.indexOf('--concurrency');
 const CONCURRENCY = cIdx >= 0 ? parseInt(args[cIdx + 1], 10) : 16;
-const named = args.filter(a => !a.startsWith('--') && a !== args[planIdx + 1] && a !== args[cIdx + 1]);
+const optVals = new Set([planIdx, cIdx].filter(i => i >= 0).map(i => args[i + 1]));   // values of --plan / --concurrency, not track names
+const named = args.filter(a => !a.startsWith('--') && !optVals.has(a));
 const wanted = planIdx >= 0 ? [args[planIdx + 1]] : (named.length ? named : TRACKS.map(t => t.id));
 const html = fs.readFileSync(HTML_FILE, 'utf8');
 const tracks = splitTracks(extractChunks(html));
@@ -572,6 +600,7 @@ if (fs.existsSync(cuesPath)) {
   const m = /window\.EGB_ENGLISCH_AUDIO\s*=\s*(\{[\s\S]*\});?\s*$/.exec(fs.readFileSync(cuesPath, 'utf8'));
   if (m) { try { existing = JSON.parse(m[1]); } catch (e) { existing = {}; } }
 }
+for (const id of Object.keys(existing)) if (!TRACKS.some(t => t.id === id)) delete existing[id];   // tracks that no longer exist
 for (const id of Object.keys(results)) {
   const meta = TRACKS.find(t => t.id === id);
   existing[id] = { src: `audio/egb-englisch-${id}.m4a`, d: results[id].total, title: meta ? meta.title : id, c: results[id].cues };
