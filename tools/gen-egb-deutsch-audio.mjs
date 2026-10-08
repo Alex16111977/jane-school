@@ -411,7 +411,8 @@ const dry = args.includes('--dry');
 const planIdx = args.indexOf('--plan');
 const cIdx = args.indexOf('--concurrency');
 const CONCURRENCY = cIdx >= 0 ? parseInt(args[cIdx + 1], 10) : 16;
-const idArgs = args.filter(a => !a.startsWith('--') && a !== args[planIdx + 1] && a !== args[cIdx + 1]);
+const optVals = new Set([planIdx, cIdx].filter(i => i >= 0).map(i => args[i + 1]));   // values of --plan / --concurrency, not lesson ids
+const idArgs = args.filter(a => !a.startsWith('--') && !optVals.has(a));
 const targets = (planIdx >= 0 ? [args[planIdx + 1]] : (idArgs.length ? idArgs : LESSON_IDS))
   .filter(s => LESSON_IDS.includes(s) || console.log(`unknown lesson id: ${s}`));
 
