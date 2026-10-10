@@ -90,6 +90,37 @@
     .st-dd-icon { display: inline-flex; align-items: center; justify-content: center;
         width: 32px; height: 32px; border-radius: 999px; flex-shrink: 0; }
 
+    /* ── Разговор с ИИ ── */
+    .ai-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: var(--space-3);
+        margin: var(--space-4) 0 0; padding: 0; list-style: none; counter-reset: aistep; }
+    .ai-steps li { counter-increment: aistep; display: flex; gap: var(--space-3); align-items: flex-start; font-size: 14px;
+        background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-4); box-shadow: 0 2px 10px rgba(90, 66, 44, 0.08); }
+    .ai-steps li::before { content: counter(aistep); flex-shrink: 0; width: 30px; height: 30px; border-radius: 999px; display: flex;
+        align-items: center; justify-content: center; background: var(--color-accent); color: var(--color-bg); font-family: var(--font-heading); font-weight: 800; }
+    .ai-note { margin: var(--space-3) 0 0; font-size: 13px; color: color-mix(in srgb, var(--color-text) 65%, transparent); }
+    .ai-form { margin-top: var(--space-4); gap: var(--space-3); }
+    .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: var(--space-3); }
+    .ai-field label { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--color-accent-800); margin-bottom: 4px; }
+    .ai-field input, .ai-field select, .ai-field textarea { width: 100%; font: inherit; font-size: 14px; padding: 9px 12px;
+        border: 1px solid var(--color-divider); border-radius: var(--radius-sm); background: #fff; color: var(--color-text); }
+    .ai-field textarea { resize: vertical; min-height: 84px; }
+    .ai-field input:focus, .ai-field select:focus, .ai-field textarea:focus { outline: 2px solid var(--color-accent-200); border-color: var(--color-accent); }
+    .ai-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr)); gap: var(--space-4); margin-top: var(--space-4); align-items: start; }
+    .ai-pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.6 'Nunito', -apple-system, 'Segoe UI', sans-serif;
+        background: var(--color-bg); border: 1px solid var(--color-divider); border-radius: var(--radius-sm); padding: 12px 14px; max-height: 320px; overflow: auto; }
+    mark.ai-tok { background: var(--color-accent-200); color: var(--color-accent-800); border-radius: 4px; padding: 0 3px; font-weight: 800; }
+    .ai-btn { cursor: pointer; border: 1px solid var(--color-accent); border-radius: 999px; padding: 9px 20px; font: 800 13px 'Nunito', sans-serif;
+        background: var(--color-accent); color: #fff; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; }
+    .ai-btn:hover { background: var(--color-accent-700); }
+    .ai-btn.ok { background: var(--color-accent-2); border-color: var(--color-accent-2); }
+    .ai-btn.ghost { background: transparent; color: var(--color-accent-700); }
+    .ai-btn.ghost:hover { background: var(--color-accent-100); }
+    .ai-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .ai-chip { cursor: pointer; font: 700 13px 'Nunito', sans-serif; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--color-accent-200);
+        background: var(--color-accent-100); color: var(--color-accent-800); transition: background 0.2s; }
+    .ai-chip:hover { background: var(--color-accent-200); }
+    .ai-chip.ok { background: var(--color-accent-2-100); border-color: var(--color-accent-2-200); color: var(--color-accent-2-800); }
+
     @media (max-width: 640px) {
         .grid-2 { grid-template-columns: 1fr !important; }
     }
@@ -129,6 +160,7 @@
       <span class="tag tag-accent">✦ study smarter, not harder</span>
       <h1 style="margin-top:var(--space-3);font-size:clamp(2.4rem,5vw,3.6rem);color:var(--color-text);">Как учиться</h1>
       <p style="font-style:italic;font-size:17px;color:color-mix(in srgb, var(--color-text) 60%, transparent);margin:0;">не учись больше — учись правильно</p>
+      <p style="margin:var(--space-3) 0 0;"><a href="#ki" style="font-weight:800;text-decoration:none;">💬 Новое: разговор с ИИ — готовые промпты ↓</a></p>
     </div>
   </header>
 
@@ -349,6 +381,107 @@
       </div>
     </section>
 
+    <!-- ══ AI PRACTICE ══ -->
+    <section id="ki" style="margin-bottom:var(--space-8);">
+      <span class="tag tag-accent-2">Практика</span>
+      <h2 style="margin-top:var(--space-2);">Разговор с ИИ: готовые промпты</h2>
+      <p style="margin-top:var(--space-4);color:color-mix(in srgb, var(--color-text) 75%, transparent);max-width:70ch;">Сайт даёт слова и правила, а в разговоре с ИИ ты сама пишешь и говоришь — и он поправляет. Промпт — это готовая инструкция: вставляешь её в чат, и ИИ ведёт тебя по нужному сценарию (беседа со словами с сайта, проверка текста, пробная контрольная).</p>
+
+      <ol class="ai-steps">
+        <li><span><b>Открой обычный чат</b> — например Claude (claude.ai или приложение на телефоне, там может быть и голосовой режим) или любой другой ИИ-чат.</span></li>
+        <li><span><b>Заполни поля ниже</b>: язык, уровень, тема. Слова возьми с любой страницы сайта — выдели список и скопируй (Ctrl/Cmd + C).</span></li>
+        <li><span><b>Нажми «Скопировать»</b> у нужного промпта, вставь его в чат — и просто отвечай.</span></li>
+      </ol>
+      <p class="ai-note">Личное (адрес, телефон, пароли) в чат не вставляй. Поля сохраняются только в твоём браузере.</p>
+
+      <div class="card elev-sm ai-form">
+        <div class="card-title">Мои данные для промптов</div>
+        <p class="card-body">Заполни один раз — подставится во все промпты ниже. Что оставишь пустым, останется в [скобках]: это можно дописать уже в чате.</p>
+        <div class="ai-grid">
+          <div class="ai-field"><label for="ai-lang">ЯЗЫК</label>
+            <select id="ai-lang"><option value="de">Немецкий</option><option value="en">Английский</option></select></div>
+          <div class="ai-field"><label for="ai-level">МОЙ УРОВЕНЬ</label>
+            <select id="ai-level"><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select></div>
+        </div>
+        <div class="ai-field"><label for="ai-topic">ТЕМА РАЗГОВОРА</label>
+          <input id="ai-topic" type="text" autocomplete="off" placeholder="например: Arbeitstag im Büro, Bewerbung, Kundengespräch"></div>
+        <div class="ai-field"><label for="ai-words">МОИ СЛОВА (С ЛЮБОЙ СТРАНИЦЫ САЙТА)</label>
+          <textarea id="ai-words" rows="4" placeholder="Вставь сюда 10–15 слов — по одному на строку или через запятую"></textarea></div>
+        <div class="ai-field"><label for="ai-text">МОЙ ТЕКСТ (ДЛЯ ПРОВЕРКИ)</label>
+          <textarea id="ai-text" rows="4" placeholder="Вставь сюда текст, который хочешь проверить"></textarea></div>
+        <div class="ai-grid">
+          <div class="ai-field"><label for="ai-ai">РОЛЬ ИИ В ИГРЕ</label>
+            <input id="ai-ai" type="text" autocomplete="off" placeholder="начальница / клиент"></div>
+          <div class="ai-field"><label for="ai-me">МОЯ РОЛЬ</label>
+            <input id="ai-me" type="text" autocomplete="off" placeholder="стажёрка"></div>
+          <div class="ai-field"><label for="ai-sit">СИТУАЦИЯ</label>
+            <input id="ai-sit" type="text" autocomplete="off" placeholder="я забыла отправить письмо клиенту"></div>
+        </div>
+        <div><button type="button" class="ai-btn ghost" id="ai-clear">Очистить поля</button></div>
+      </div>
+
+      <div class="ai-cards">
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>
+          <div class="card-title">Беседа со словами с сайта</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Говорю</span>
+          <p class="card-body">ИИ ведёт разговор и сам вставляет твои слова, ты отвечаешь, он коротко исправляет ошибки и в конце подводит итог.</p>
+          <pre class="ai-pre" id="ai-pre-words"></pre>
+          <div><button type="button" class="ai-btn" data-copy="words"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Скопировать</button></div>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span>
+          <div class="card-title">Новая контрольная по Kommunikation</div>
+          <span class="tag tag-accent" style="width:fit-content;">Школа · Deutsch</span>
+          <p class="card-body">Каждый раз новая ситуация и диалог, как на настоящей контрольной. Ты пишешь анализ — ИИ оценивает его по блокам и по форме.</p>
+          <pre class="ai-pre" id="ai-pre-exam"></pre>
+          <div><button type="button" class="ai-btn" data-copy="exam"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Скопировать</button></div>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <div class="card-title">Ролевая игра: разговор на работе</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Говорю</span>
+          <p class="card-body">Ты — стажёрка, ИИ — начальница или клиент. Слово «СТОП» — и он выходит из роли и разбирает ваш диалог.</p>
+          <pre class="ai-pre" id="ai-pre-role"></pre>
+          <div><button type="button" class="ai-btn" data-copy="role"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Скопировать</button></div>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-100);color:var(--color-accent-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></span>
+          <div class="card-title">Проверь мой текст</div>
+          <span class="tag tag-accent" style="width:fit-content;">Пишу</span>
+          <p class="card-body">Исправленный текст, таблица «было → стало → правило» и упражнения на твои самые частые ошибки.</p>
+          <pre class="ai-pre" id="ai-pre-fix"></pre>
+          <div><button type="button" class="ai-btn" data-copy="fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Скопировать</button></div>
+        </div>
+
+        <div class="card elev-sm st-card">
+          <span class="st-dd-icon" style="background:var(--color-accent-2-100);color:var(--color-accent-2-700);width:38px;height:38px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+          <div class="card-title">Спроси меня по словам</div>
+          <span class="tag tag-accent-2" style="width:fit-content;">Слова</span>
+          <p class="card-body">ИИ спрашивает слова по одному: перевод, обратный перевод, предложение. Трудные слова возвращает позже.</p>
+          <pre class="ai-pre" id="ai-pre-quiz"></pre>
+          <div><button type="button" class="ai-btn" data-copy="quiz"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Скопировать</button></div>
+        </div>
+
+      </div>
+
+      <div class="card elev-sm" style="margin-top:var(--space-4);">
+        <div class="card-title">Быстрые фразы для чата</div>
+        <p class="card-body">Нажми на фразу — она скопируется. Вставь её в чат, когда нужно.</p>
+        <div class="ai-chips">
+          <button type="button" class="ai-chip" data-text="Пиши проще, уровень A2.">Пиши проще</button>
+          <button type="button" class="ai-chip" data-text="Объясни, пожалуйста, по-русски.">Объясни по-русски</button>
+          <button type="button" class="ai-chip" data-text="Исправь ошибки в моей последней реплике и продолжай разговор.">Исправь и продолжай</button>
+          <button type="button" class="ai-chip" data-text="Отвечай короче: одно-два предложения.">Отвечай короче</button>
+          <button type="button" class="ai-chip" data-text="Сделай итог: новые слова из нашего разговора и мои 3 самые частые ошибки с объяснением по-русски.">Итог разговора</button>
+        </div>
+      </div>
+    </section>
+
     <!-- ══ TEST PLAN ══ -->
     <section style="margin-bottom:var(--space-8);">
       <span class="tag tag-accent">План</span>
@@ -411,6 +544,131 @@
   </div>
 </div>
 
+    <script>
+    /* Разговор с ИИ: поля подставляются в готовые промпты, «Скопировать» кладёт готовый текст в буфер */
+    (function () {
+        var KEY = 'neostudy_ai_prompts';
+        var F = { lang: 'de', level: 'B1', topic: '', words: '', text: '', ai: '', me: '', sit: '' };
+        try {
+            var saved = JSON.parse(localStorage.getItem(KEY));
+            if (saved) { Object.keys(F).forEach(function (k) { if (typeof saved[k] === 'string') { F[k] = saved[k]; } }); }
+        } catch (e) {}
+        function save() { try { localStorage.setItem(KEY, JSON.stringify(F)); } catch (e) {} }
+
+        var LANG = {
+            de: { adv: 'по-немецки', gen: 'немецкого', adj: 'немецкое', art: ' с артиклем',
+                  after: 'разбери наш диалог по моделям из Kommunikation: Eisbergmodell, Vier-Seiten-Modell, Axiome von Watzlawick — с цитатами из нашего диалога. Потом отдельно разбери мои ошибки.' },
+            en: { adv: 'по-английски', gen: 'английского', adj: 'английское', art: '',
+                  after: 'разбери мои ошибки и подскажи, как сказать естественнее — с цитатами из нашего диалога.' }
+        };
+        var TOK = { 'УРОВЕНЬ': 'level', 'ТЕМА': 'topic', 'СЛОВА': 'words', 'ТЕКСТ': 'text', 'РОЛЬ ИИ': 'ai', 'МОЯ РОЛЬ': 'me', 'СИТУАЦИЯ': 'sit' };
+        var TPL = {
+            words: [
+                'Давай поговорим {adv}. Мой уровень: [УРОВЕНЬ]. Тема: [ТЕМА].',
+                'Вот слова, которые я сейчас учу:',
+                '[СЛОВА]',
+                'Правила:',
+                '1) Ты пишешь только {adv}, короткими простыми предложениями.',
+                '2) Задавай мне ОДИН вопрос за раз и жди ответа.',
+                '3) Вставляй мои слова в разговор, а я буду использовать их в ответах.',
+                '4) После каждого моего ответа сначала исправь ошибки одной строкой («было → стало»), потом продолжай разговор.',
+                '5) Через 10 реплик остановись и напиши: какие слова я использовала, какие нет, и мои 3 самые частые ошибки — с объяснением по-русски.'
+            ].join('\n'),
+            exam: [
+                'Ты — мой учитель немецкого (Höhere Handelsschule, тема Kommunikation). Придумай новую контрольную по образцу настоящей:',
+                '— Ausgangssituation (3–4 предложения) и описание картинки (Mimik, Gestik, Körperhaltung двух людей);',
+                '— диалог из 10–12 реплик с ремарками (жесты, тон голоса).',
+                'Потом жди. Я напишу анализ связным текстом в таком порядке: Einleitung, Situationsbeschreibung, Überleitung, Eisbergmodell, 1. und 5. Axiom von Watzlawick, nonverbale/paraverbale Kommunikation, Vier-Ebenen-Modell von Schulz von Thun.',
+                'Когда пришлю текст, оцени: за содержание до 70 баллов (по блокам), за форму до 30 (структура, язык, Konjunktiv I, орфография, запятые, грамматика). Покажи итоговую оценку и объясни по-русски, что исправить.'
+            ].join('\n'),
+            role: [
+                'Ролевая игра {adv}. Ты — [РОЛЬ ИИ], я — [МОЯ РОЛЬ]. Ситуация: [СИТУАЦИЯ].',
+                'Говори по одной короткой реплике и жди моего ответа. Я отвечаю {adv}.',
+                'Когда я напишу «СТОП», выйди из роли и {after}'
+            ].join('\n'),
+            fix: [
+                'Ты — добрый, но внимательный учитель {gen} языка. Вот мой текст:',
+                '[ТЕКСТ]',
+                '1) Покажи исправленный текст: сохрани мои мысли и слова, меняй только ошибки.',
+                '2) Сделай таблицу: было → стало → правило (по-русски).',
+                '3) Раздели ошибки на группы: орфография, запятые и пунктуация, грамматика.',
+                '4) Дай 3 коротких упражнения на мои самые частые ошибки.'
+            ].join('\n'),
+            quiz: [
+                'Проверь мои слова ({gen} языка):',
+                '[СЛОВА]',
+                'Спрашивай по одному: то {adj} слово (я перевожу на русский), то русское (я называю {adj} слово{art}), то «составь предложение с этим словом». После каждого ответа скажи, верно или нет; если нет — правильный вариант и короткий пример. Трудные слова возвращай позже. После 10 слов покажи результат и список слов для повторения.'
+            ].join('\n')
+        };
+
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        var TOKEN_RE = /(\[(?:УРОВЕНЬ|ТЕМА|СЛОВА|ТЕКСТ|РОЛЬ ИИ|МОЯ РОЛЬ|СИТУАЦИЯ)\])/;
+        // html=true: для показа (пустые поля подсвечены), html=false: чистый текст для копирования
+        function fill(tpl, html) {
+            var L = LANG[F.lang] || LANG.de;
+            var t = tpl.replace(/\{(adv|gen|adj|art|after)\}/g, function (m, k) { return L[k]; });
+            return t.split(TOKEN_RE).map(function (p) {
+                var m = /^\[(.+)\]$/.exec(p);
+                if (m && TOK[m[1]]) {
+                    var v = (F[TOK[m[1]]] || '').trim();
+                    if (v) { return html ? esc(v) : v; }
+                    return html ? '<mark class="ai-tok">' + esc(p) + '</mark>' : p;
+                }
+                return html ? esc(p) : p;
+            }).join('');
+        }
+        function render() {
+            Object.keys(TPL).forEach(function (k) {
+                var el = document.getElementById('ai-pre-' + k);
+                if (el) { el.innerHTML = fill(TPL[k], true); }
+            });
+        }
+
+        function copyText(text, btn, okText) {
+            var old = btn.innerHTML;
+            function done() {
+                btn.classList.add('ok'); btn.textContent = okText || 'Скопировано ✓';
+                setTimeout(function () { btn.classList.remove('ok'); btn.innerHTML = old; }, 1600);
+            }
+            function legacy() {
+                var ta = document.createElement('textarea');
+                ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                var ok = false;
+                try { ok = document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+                if (ok) { done(); } else { window.prompt('Скопируй текст (Ctrl/Cmd + C):', text); }
+            }
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, legacy); } else { legacy(); }
+        }
+
+        var IDS = { 'ai-lang': 'lang', 'ai-level': 'level', 'ai-topic': 'topic', 'ai-words': 'words', 'ai-text': 'text', 'ai-ai': 'ai', 'ai-me': 'me', 'ai-sit': 'sit' };
+        Object.keys(IDS).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) { return; }
+            el.value = F[IDS[id]];
+            if (!el.value && el.tagName === 'SELECT') { el.selectedIndex = 0; F[IDS[id]] = el.value; }
+            var on = function () { F[IDS[id]] = el.value; save(); render(); };
+            el.addEventListener('input', on);
+            el.addEventListener('change', on);
+        });
+        var clear = document.getElementById('ai-clear');
+        if (clear) {
+            clear.addEventListener('click', function () {
+                ['topic', 'words', 'text', 'ai', 'me', 'sit'].forEach(function (k) { F[k] = ''; });
+                Object.keys(IDS).forEach(function (id) { var el = document.getElementById(id); if (el && el.tagName !== 'SELECT') { el.value = ''; } });
+                save(); render();
+            });
+        }
+        Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (btn) {
+            btn.addEventListener('click', function () { copyText(fill(TPL[btn.getAttribute('data-copy')], false), btn); });
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('.ai-chip'), function (chip) {
+            chip.addEventListener('click', function () { copyText(chip.getAttribute('data-text'), chip, 'Скопировано ✓'); });
+        });
+        render();
+    })();
+    </script>
     <script src="js/nav-dropdown.js" defer></script>
 </body>
 </html>
