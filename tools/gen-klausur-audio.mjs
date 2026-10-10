@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Offline neural audio for deutsch-egb.html, lesson kt3 (Übungsklausur Kommunikation): a short Russian intro + the order of the text,
+// the 17 phrases of the teacher's sheet to repeat aloud (DE · RU · DE · pause; 5 groups = 5 cues),
 // then the model solution of Klausur A read by the German voice paragraph by paragraph (each with a short Russian pointer),
 // a Konjunktiv-I speaking drill and a last checklist. ONE continuous track with one cue per block, so the lesson dock
 // (the same one that plays the other EGB Deutsch lessons) can step through the blocks with prev/next.
@@ -101,8 +102,8 @@ function clean(raw) {
     .replace(/\.{2,}/g, '.').replace(/,{2,}/g, ',').replace(/\s{2,}/g, ' ').replace(/^[,;:\s]+/, '').trim();
 }
 function terminate(t) { return /[.!?:]$/.test(t) ? t : t + '.'; }
-function runsOf(raw, defaultLang) {
-  const s = terminate(clean(raw));
+function runsOf(raw, defaultLang, term = true) {   // term=false: leave the end open (a phrase that goes on after "dass …")
+  const s = term ? terminate(clean(raw)) : clean(raw);
   const runs = [];
   let cur = null;
   for (const tok of s.split(/(\s+)/)) {
@@ -123,7 +124,7 @@ const words = t => t.split(/\s+/).filter(Boolean).length;
 
 // ---------- the audio-only texts ----------
 const INTRO = [
-  'Контрольная по Kommunikation. Ты прислала Übungsklausur учителя: это образец, и в понедельник будет похожая. Сначала я расскажу, как она устроена, потом ты услышишь образец текста.',
+  'Контрольная по Kommunikation. Ты прислала Übungsklausur учителя: это образец, и в понедельник будет похожая. Сначала я расскажу, как она устроена, потом ты повторишь формулировки учителя, и только после этого услышишь образец текста.',
   'Первое: Ausgangssituation. Короткая вводная: кто, где и что случилось.',
   'Второе: Aufgabe eins, картинка. Нужно описать Mimik, Gestik и Körperhaltung обоих людей и объяснить, что это говорит о ситуации.',
   'Третье: Aufgabe zwei, диалог. Его нужно разобрать одним связным текстом, не пунктами. Для этого есть четыре инструмента: Eisbergmodell; verbale, nonverbale und paraverbale Kommunikation; erstes und fünftes Axiom von Watzlawick; и Vier-Ebenen-Modell von Schulz von Thun.',
@@ -133,8 +134,42 @@ const ORDER = [
   'Порядок текста в Aufgabe zwei, как в Erwartungshorizont учителя.',
   'Раз: Einleitung, два предложения, три балла. Два: Situationsbeschreibung, пересказ своими словами, десять баллов. Три: Überleitung, одно предложение-мостик, два балла. Четыре: Eisbergmodell, десять баллов. Пять: erstes und fünftes Axiom, десять баллов. Шесть: nonverbale und paraverbale Kommunikation, пять баллов. Семь: Vier-Ebenen-Modell, двадцать баллов. И в конце, если останется время, короткий Schluss.',
   'В Aufgabe eins порядок такой: сначала картинка в целом, потом Frau Keller, потом Jonas, потом вывод.',
-  'Теперь послушай образец. Это мой текст по Erwartungshorizont. На контрольной можно писать короче, главное, чтобы были все пункты.',
 ];
+// The teacher's sheet (17 phrases), spoken: German · translation · German again · pause to repeat aloud. The "…" gaps of the sheet are filled
+// with an example term and "/" alternatives are joined with "oder", because the voice cannot say a gap or a slash.
+const PHRASE_INTRO = 'Теперь формулировки учителя, семнадцать фраз с его листа. Я говорю фразу по-немецки, потом даю перевод и снова говорю по-немецки. После этого пауза: повтори вслух. Именно этими фразами написан образец дальше.';
+const PHRASE_GROUPS = [
+  { label: 'Formulierungen 1/5: Einstieg', ru: 'Первая группа: вступление.', items: [
+    ['Das vorliegende Material zeigt oder veranschaulicht', 'Представленный материал показывает или иллюстрирует'],
+    ['Auf der Abbildung ist zu erkennen, dass', 'На изображении видно, что'],
+    ['Betrachtet man die Darstellung, fällt zunächst auf, dass', 'Если посмотреть на изображение, сначала бросается в глаза, что'],
+  ] },
+  { label: 'Formulierungen 2/5: Beschreiben', ru: 'Вторая группа: описание людей и поведения.', items: [
+    ['Hinsichtlich der Körperhaltung, der Mimik oder der Gestik lässt sich beobachten, dass', 'Что касается позы, мимики или жестов, можно заметить, что'],
+    ['Die Person nimmt eine dominante, untergeordnete oder defensive Haltung ein, indem sie', 'Человек занимает доминирующую, подчинённую или оборонительную позицию, тем что'],
+    ['Auffällig ist zudem das nonverbale Verhalten, das sich in der Körperhaltung äußert', 'Бросается в глаза также невербальное поведение, которое проявляется в позе'],
+  ] },
+  { label: 'Formulierungen 3/5: Schlüsse ziehen', ru: 'Третья группа: выводы.', items: [
+    ['Daraus lässt sich für die vorliegende Situation schließen, dass', 'Из этого для данной ситуации можно сделать вывод, что'],
+    ['Dieses Verhalten lässt vermuten, dass die Person', 'Это поведение позволяет предположить, что человек'],
+    ['Die nonverbalen Signale spiegeln wider, dass', 'Невербальные сигналы отражают то, что'],
+    ['Als Fazit der Beobachtung lässt sich festhalten, dass', 'В итоге наблюдения можно констатировать, что'],
+  ] },
+  { label: 'Formulierungen 4/5: Modelle einführen', ru: 'Четвёртая группа: переход к моделям.', items: [
+    ['Betrachtet man diesen Sachverhalt vor dem Hintergrund des Modells von Schulz von Thun, wird deutlich, dass', 'Если рассматривать это положение дел в свете модели, становится ясно, что'],
+    ['Um die Kommunikation näher zu untersuchen, lässt sich das Konzept von Watzlawick heranziehen', 'Чтобы подробнее исследовать коммуникацию, можно привлечь концепцию'],
+    ['Bezogen auf die theoretischen Grundlagen zeigt sich hier', 'Применительно к теоретическим основам здесь видно'],
+  ] },
+  { label: 'Formulierungen 5/5: Modelle anwenden', ru: 'Пятая группа: применение моделей.', items: [
+    ['Auf der sachlichen oder rationalen Ebene zeigt sich, dass', 'На предметном или рациональном уровне видно, что'],
+    ['Im Gegensatz dazu verdeutlicht die emotionale oder unbewusste Ebene, dass', 'В противоположность этому эмоциональный или бессознательный уровень показывает, что'],
+    ['Gemäß dem Prinzip oder Axiom von Watzlawick lässt sich ableiten, dass', 'Согласно принципу или аксиоме можно вывести, что'],
+    ['Die kommunikative Struktur verläuft hierbei primär symmetrisch oder komplementär, da', 'Коммуникативная структура здесь развивается преимущественно симметрично или комплементарно, так как'],
+  ] },
+];
+const PHRASE_GAP = 1.0;        // DE · gap · RU · gap · DE
+const PHRASE_PAUSE = 4.5;      // time to say the phrase aloud
+const AFTER_PHRASES = 'Теперь послушай образец. Это мой текст по Erwartungshorizont, написанный этими же фразами и простыми словами. На контрольной можно писать короче, главное, чтобы были все пункты.';
 const DRILL_INTRO = 'Redewiedergabe. Когда ты пересказываешь слова человека, глагол ставится в Konjunktiv eins. Повторяй каждое предложение вслух после паузы.';
 const DRILL = [
   'Frau Keller wirft Jonas vor, er habe die Folien nicht selbst kontrolliert.',
@@ -157,6 +192,19 @@ function buildBlocks(model) {
   const say = (steps, raw, lang, gapAfter = GAP_SENT) => { steps.push({ runs: runsOf(raw, lang), gap: gapAfter }); };
   { const s = []; INTRO.forEach(t => say(s, t, 'ru')); blocks.push({ label: 'Так устроена контрольная', steps: s }); }
   { const s = []; ORDER.forEach(t => say(s, t, 'ru')); blocks.push({ label: 'Порядок текста', steps: s }); }
+  PHRASE_GROUPS.forEach((g, gi) => {
+    const s = [];
+    if (gi === 0) { say(s, PHRASE_INTRO, 'ru', GAP_AFTER_LABEL); }
+    say(s, g.ru, 'ru', GAP_AFTER_LABEL);
+    g.items.forEach(([de, ru]) => {
+      s.push({ runs: runsOf(de, 'de', false), gap: PHRASE_GAP });
+      s.push({ runs: runsOf(ru, 'ru', false), gap: PHRASE_GAP });
+      s.push({ runs: runsOf(de, 'de', false), gap: 0 });
+      s.push({ pause: PHRASE_PAUSE });
+    });
+    if (gi === PHRASE_GROUPS.length - 1) { say(s, AFTER_PHRASES, 'ru', 0); }
+    blocks.push({ label: g.label, steps: s });
+  });
   model.forEach(it => {
     const s = [];
     if (it.first) { say(s, HEAD_SAY[it.head], 'de', GAP_AFTER_LABEL); }
@@ -277,6 +325,6 @@ if (fs.existsSync(cuesPath)) {
   const m = /window\.EGB_DEUTSCH_AUDIO\s*=\s*(\{[\s\S]*\});?\s*$/.exec(fs.readFileSync(cuesPath, 'utf8'));
   if (m) { try { existing = JSON.parse(m[1]); } catch (e) { existing = {}; } }
 }
-existing.kt3 = { src: 'audio/egb-deutsch-kt3.m4a', d: r3(t), title: 'Übungsklausur: Aufbau & Musterlösung (Klausur A)', c: cues };
+existing.kt3 = { src: 'audio/egb-deutsch-kt3.m4a', d: r3(t), title: 'Übungsklausur: Aufbau, Formulierungen & Musterlösung (A)', c: cues };
 fs.writeFileSync(cuesPath, 'window.EGB_DEUTSCH_AUDIO = ' + JSON.stringify(existing) + ';\n');
 console.log(`✓ egb-deutsch-kt3.m4a  ${blocks.length} blocks  ${Math.round(t)}s (${(t / 60).toFixed(1)} min)  ${(fs.statSync(m4a).size / 1048576).toFixed(2)} MB  + cues merged (${Object.keys(existing).length} lessons)`);
