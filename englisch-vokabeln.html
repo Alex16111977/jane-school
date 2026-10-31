@@ -3323,7 +3323,6 @@
                 ['to stigmatise', 'стигматизировать', 'stigmatisieren', 'Навешивать позорный ярлык на людей или группу', 'Former prisoners are often stigmatised even after serving their time.', 'ту сти́гмэтайз'],
                 ['systemic racism', 'системный расизм', 'systemischer Rassismus', 'Расизм, встроенный в институты общества', 'Protests have brought attention to systemic racism in policing.', 'систэ́мик рэ́йсизм'],
                 ['to perpetrate (a crime)', 'совершить (преступление)', 'ver&uuml;ben, begehen', 'Формальный синоним to commit', 'The attack was perpetrated by an extremist group.', 'ту пё́:питрэйт'],
-                ['to rehabilitate (offenders)', 'реабилитировать (правонарушителей)', 'resozialisieren', 'Помогать преступникам начать жизнь заново', 'Programmes that rehabilitate offenders reduce recidivism.', 'ту риэхэби́литэйт'],
                 ['grassroots movement', 'движение снизу', 'die Basisbewegung', 'Движение, начатое обычными людьми', 'Grassroots movements have driven major social change.', 'гра:сру́:тс му́:вмэнт']
             ],
 
@@ -3706,6 +3705,26 @@
             p[key] = { known: known, ts: Date.now() };
             localStorage.setItem('neo_envocab_progress', JSON.stringify(p));
         }
+
+        // One-time clean-up: exact duplicate cards were removed from some decks. "gelernt" marks are stored per deck + card index,
+        // so they are moved along (marks of the removed cards are dropped). Leitner data is keyed by the word itself and needs nothing.
+        (function () {
+            var DONE = 'neo_envocab_dedup_v1', REMOVED = { 'c1:crime': [10] };
+            try {
+                if (localStorage.getItem(DONE)) { return; }
+                var p = JSON.parse(localStorage.getItem('neo_envocab_progress') || '{}'), q = {};
+                Object.keys(p).forEach(function (k) {
+                    var m = /^(.*):(\d+)$/.exec(k), idx, shift = 0, dropped = false;
+                    if (m && REMOVED[m[1]]) {
+                        idx = +m[2];
+                        REMOVED[m[1]].forEach(function (r) { if (idx === r) { dropped = true; } else if (idx > r) { shift++; } });
+                        if (!dropped) { q[m[1] + ':' + (idx - shift)] = p[k]; }
+                    } else { q[k] = p[k]; }
+                });
+                localStorage.setItem('neo_envocab_progress', JSON.stringify(q));
+                localStorage.setItem(DONE, '1');
+            } catch (e) { /* storage not available */ }
+        })();
         function getKnownCount(data) {
             var p = getProgress();
             var key = currentLevel + ':' + currentTopic;
