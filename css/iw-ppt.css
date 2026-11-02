@@ -1,0 +1,218 @@
+/* PowerPoint-Klassenarbeit (iw-egb.html, Karten pp1 / pp2 / pp3). Daten: js/iw-ppt-*.js · Logik: js/iw-ppt.js */
+.pp-root { --pp-o: #fb923c; --pp-o-soft: rgba(251,146,60,0.13); --pp-o-line: rgba(251,146,60,0.38); --pp-ok: #86efac; --pp-warn: #fcd34d; --pp-bad: #fca5a5; }
+.pp-root h3.pp-h { margin: 1.6rem 0 0.5rem; font-size: 1.05rem; color: #fff; }
+.pp-root h3.pp-h:first-child { margin-top: 0.3rem; }
+.pp-root p, .pp-root li { line-height: 1.62; }
+.pp-lead { font-size: 0.93rem; color: rgba(230,230,235,0.78); margin: 0 0 0.9rem; line-height: 1.65; }
+.pp-small { font-size: 0.82rem; color: rgba(230,230,235,0.6); line-height: 1.55; }
+.pp-de { color: #fff; font-weight: 600; }
+.pp-mine { display: inline-block; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #c8a5ff; border: 1px solid rgba(200,165,255,0.45); border-radius: 20px; padding: 0 0.5rem; margin-left: 0.4rem; vertical-align: middle; white-space: nowrap; }
+.pp-teacher { display: inline-block; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #86efac; border: 1px solid rgba(134,239,172,0.45); border-radius: 20px; padding: 0 0.5rem; margin-left: 0.4rem; vertical-align: middle; white-space: nowrap; }
+
+/* ---------- boxes ---------- */
+.pp-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.9rem 1.1rem; margin: 0 0 1rem; }
+.pp-box > :last-child { margin-bottom: 0; }
+.pp-box h4 { margin: 0 0 0.45rem; font-size: 0.98rem; color: #fff; }
+.pp-box.warn { background: rgba(251,191,36,0.07); border-color: rgba(251,191,36,0.4); }
+.pp-box.good { background: rgba(63,185,80,0.08); border-color: rgba(63,185,80,0.35); }
+.pp-box.bad { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.38); }
+.pp-box.info { background: rgba(121,184,255,0.07); border-color: rgba(121,184,255,0.35); }
+.pp-box.orange { background: var(--pp-o-soft); border-color: var(--pp-o-line); }
+.pp-box ul, .pp-box ol { margin: 0.3rem 0 0.4rem; padding-left: 1.25rem; font-size: 0.92rem; color: rgba(240,240,245,0.9); }
+.pp-box li { margin-bottom: 0.25rem; }
+.pp-box p { margin: 0.3rem 0; font-size: 0.92rem; color: rgba(240,240,245,0.9); }
+.pp-orig { border-left: 3px solid #86efac; background: rgba(63,185,80,0.06); border-radius: 0 10px 10px 0; padding: 0.7rem 0.95rem; font-size: 0.93rem; line-height: 1.7; color: #fff; margin: 0.3rem 0 0.8rem; }
+.pp-orig em { color: rgba(230,230,235,0.55); font-style: normal; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 0.25rem; font-weight: 700; }
+.pp-sit { white-space: pre-line; }
+
+/* ---------- stats tiles ---------- */
+.pp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 0.6rem; margin: 0.5rem 0 1rem; }
+.pp-stat { background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.7rem 0.6rem; text-align: center; }
+.pp-stat b { display: block; font-size: 1.45rem; color: #fff; line-height: 1.2; }
+.pp-stat span { font-size: 0.76rem; color: rgba(230,230,235,0.62); line-height: 1.35; display: block; margin-top: 0.15rem; }
+.pp-stat.no b { color: #fca5a5; }
+.pp-stat.yes b { color: #86efac; }
+
+/* ---------- UI path chips ---------- */
+.pp-path { line-height: 2.05; margin: 0.15rem 0; font-size: 0.9rem; color: rgba(240,240,245,0.9); }
+.pp-seg { display: inline-block; padding: 0.04rem 0.5rem; border-radius: 7px; background: var(--pp-o-soft); border: 1px solid var(--pp-o-line); color: #ffd9b8; font-weight: 700; font-size: 0.82rem; margin: 0.05rem 0; white-space: normal; }
+.pp-arr { color: rgba(251,146,60,0.75); font-weight: 800; margin: 0 0.18rem; }
+.pp-key { display: inline-block; padding: 0 0.4rem; border-radius: 5px; border: 1px solid rgba(255,255,255,0.28); border-bottom-width: 2px; background: rgba(255,255,255,0.07); color: #fff; font-size: 0.8rem; font-weight: 700; }
+
+/* ---------- Notenschlüssel / calculators ---------- */
+.pp-tablewrap { overflow-x: auto; margin: 0.4rem 0 0.7rem; }
+.pp-nt { border-collapse: collapse; font-size: 0.82rem; min-width: 100%; }
+.pp-nt th, .pp-nt td { border: 1px solid rgba(255,255,255,0.14); padding: 0.28rem 0.5rem; text-align: center; white-space: nowrap; }
+.pp-nt th { background: rgba(251,146,60,0.14); color: #fff; font-weight: 700; }
+.pp-nt td.hit, .pp-nt th.hit { background: rgba(63,185,80,0.28); color: #fff; font-weight: 800; }
+.pp-calc { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0 0.2rem; }
+.pp-calc input[type=number], .pp-in { width: 5.2rem; padding: 0.4rem 0.55rem; border-radius: 8px; background: #1f1f2a; color: #fff; border: 1px solid rgba(251,146,60,0.5); font-size: 0.95rem; font-family: inherit; }
+.pp-in.wide { width: 100%; max-width: 15rem; }
+.pp-calc output { font-weight: 800; color: #fcd34d; font-size: 1.05rem; }
+
+/* ---------- time plan ---------- */
+.pp-time { display: flex; border-radius: 10px; overflow: hidden; margin: 0.5rem 0 0.3rem; border: 1px solid rgba(255,255,255,0.14); }
+.pp-time i { display: block; font-style: normal; font-size: 0.66rem; font-weight: 800; color: #1a1100; text-align: center; padding: 0.38rem 0; border-right: 1px solid rgba(0,0,0,0.25); overflow: hidden; white-space: nowrap; }
+.pp-time i:last-child { border-right: 0; }
+.pp-steps { counter-reset: ppst; list-style: none; padding: 0; margin: 0.6rem 0 0; }
+.pp-steps li { counter-increment: ppst; display: flex; gap: 0.7rem; align-items: baseline; padding: 0.45rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 0.92rem; color: rgba(240,240,245,0.9); }
+.pp-steps li:last-child { border-bottom: 0; }
+.pp-steps li::before { content: counter(ppst); flex: 0 0 1.55rem; height: 1.55rem; line-height: 1.55rem; border-radius: 50%; background: var(--pp-o-soft); border: 1px solid var(--pp-o-line); color: #ffd9b8; font-size: 0.78rem; font-weight: 800; text-align: center; }
+.pp-steps li > div { flex: 1; }
+.pp-steps .pp-min { flex: 0 0 auto; font-size: 0.76rem; font-weight: 800; color: #fcd34d; border: 1px solid rgba(251,191,36,0.4); border-radius: 20px; padding: 0 0.5rem; white-space: nowrap; }
+
+/* ---------- Kann-Liste ---------- */
+.pp-prog { display: flex; align-items: center; gap: 0.7rem; margin: 0.4rem 0 0.9rem; flex-wrap: wrap; }
+.pp-bar { flex: 1 1 10rem; height: 9px; border-radius: 99px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.pp-bar > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #fb923c, #86efac); transition: width .25s; }
+.pp-prog b { color: #fff; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+.pp-filter { display: flex; gap: 0.45rem; flex-wrap: wrap; margin: 0.2rem 0 0.9rem; }
+.pp-chip { padding: 0.3rem 0.85rem; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.pp-chip:hover { background: rgba(255,255,255,0.11); color: #fff; }
+.pp-chip.on { background: var(--pp-o-soft); border-color: var(--pp-o-line); color: #ffd9b8; }
+.pp-kg { margin: 1.3rem 0 0.4rem; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.pp-kg h4 { margin: 0; font-size: 0.95rem; color: #fdba74; text-transform: uppercase; letter-spacing: 0.05em; }
+.pp-kg small { color: rgba(230,230,235,0.55); font-size: 0.78rem; }
+.pp-ki { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.035); margin: 0 0 0.5rem; overflow: hidden; }
+.pp-ki.s2 { border-color: rgba(63,185,80,0.4); }
+.pp-ki.s1 { border-color: rgba(251,191,36,0.45); }
+.pp-ki-h { display: flex; gap: 0.65rem; align-items: flex-start; padding: 0.6rem 0.75rem; cursor: pointer; }
+.pp-ki-h:hover { background: rgba(255,255,255,0.04); }
+.pp-st { flex: 0 0 auto; width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid rgba(255,255,255,0.28); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.45); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; padding: 0; margin-top: 0.05rem; }
+.pp-st[data-s="1"] { background: rgba(251,191,36,0.22); border-color: #fbbf24; color: #fcd34d; }
+.pp-st[data-s="2"] { background: rgba(63,185,80,0.28); border-color: #3fb950; color: #86efac; }
+.pp-kn { flex: 0 0 auto; font-size: 0.74rem; font-weight: 800; color: #fdba74; min-width: 2.1rem; margin-top: 0.25rem; }
+.pp-kt { flex: 1; font-size: 0.93rem; color: #fff; line-height: 1.5; }
+.pp-kt small { display: block; color: rgba(230,230,235,0.6); font-size: 0.82rem; font-weight: 400; margin-top: 0.12rem; }
+.pp-kv { flex: 0 0 auto; color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-top: 0.2rem; transition: transform .15s; }
+.pp-ki.open .pp-kv { transform: rotate(90deg); }
+.pp-ki-b { display: none; padding: 0.15rem 0.9rem 0.85rem 3.7rem; border-top: 1px dashed rgba(255,255,255,0.1); }
+.pp-ki.open .pp-ki-b { display: block; }
+.pp-ki-b .pp-lab { display: block; margin: 0.65rem 0 0.1rem; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(230,230,235,0.5); }
+.pp-ki-b p { margin: 0.15rem 0; font-size: 0.9rem; color: rgba(240,240,245,0.88); }
+.pp-ki-b .pp-trap { color: #fca5a5; }
+.pp-ki-b .pp-drill { color: #86efac; }
+.pp-tags { margin-top: 0.5rem; display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; font-size: 0.76rem; color: rgba(230,230,235,0.55); }
+.pp-tag { border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 0 0.5rem; color: rgba(230,230,235,0.8); font-size: 0.74rem; font-weight: 700; }
+@media (max-width: 600px) { .pp-ki-b { padding-left: 0.9rem; } }
+
+/* ---------- traps ---------- */
+.pp-trap-card { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.65rem 0.8rem; border-radius: 11px; border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); margin-bottom: 0.5rem; }
+.pp-trap-card > b { flex: 0 0 1.7rem; height: 1.7rem; line-height: 1.7rem; text-align: center; border-radius: 50%; background: rgba(248,113,113,0.22); color: #fecaca; font-size: 0.8rem; }
+.pp-trap-card div { font-size: 0.9rem; color: rgba(240,240,245,0.9); line-height: 1.58; }
+.pp-trap-card div strong { color: #fff; display: block; margin-bottom: 0.1rem; }
+
+/* ---------- plan ---------- */
+.pp-day { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.035); margin-bottom: 0.55rem; padding: 0.6rem 0.85rem; }
+.pp-day.today { border-color: var(--pp-o); background: var(--pp-o-soft); }
+.pp-day.done { opacity: 0.6; }
+.pp-day h4 { margin: 0 0 0.3rem; font-size: 0.93rem; color: #fff; display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.pp-day h4 small { color: rgba(230,230,235,0.55); font-size: 0.76rem; font-weight: 600; }
+.pp-day label { display: flex; gap: 0.55rem; align-items: flex-start; font-size: 0.89rem; color: rgba(240,240,245,0.88); padding: 0.18rem 0; cursor: pointer; line-height: 1.5; }
+.pp-day input[type=checkbox], .pp-eh input[type=checkbox] { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin-top: 0.22rem; accent-color: #fb923c; cursor: pointer; }
+.pp-count { font-weight: 800; color: #fcd34d; font-size: 0.95rem; }
+
+/* ---------- tasks (pp2) ---------- */
+.pp-timer { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin: 0.3rem 0 0.2rem; }
+.pp-clock { font-variant-numeric: tabular-nums; font-weight: 900; font-size: 1.9rem; color: #fff; min-width: 6.2rem; letter-spacing: 0.02em; }
+.pp-clock.low { color: #fcd34d; }
+.pp-clock.zero { color: #f87171; }
+.pp-btn { background: var(--color-accent); color: #1a0a12; border: none; border-radius: 8px; padding: 0.5rem 1.05rem; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.pp-btn:hover { background: var(--color-accent-hover); }
+.pp-btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(230,230,235,0.85); font-weight: 500; }
+.pp-btn.ghost:hover { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); }
+.pp-btn.danger { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.08); color: #fca5a5; }
+.pp-score { position: sticky; top: 0.4rem; z-index: 20; display: flex; gap: 0.9rem; align-items: center; flex-wrap: wrap; padding: 0.55rem 0.9rem; border-radius: 12px; border: 1px solid var(--pp-o-line); background: rgba(24,18,12,0.94); backdrop-filter: blur(6px); margin: 0.6rem 0 1rem; }
+.pp-score b { color: #fff; font-variant-numeric: tabular-nums; }
+.pp-score .big { font-size: 1.25rem; color: #fdba74; font-weight: 900; }
+.pp-score .note { font-size: 1.15rem; font-weight: 900; color: #86efac; }
+.pp-score .pp-bar { flex: 1 1 8rem; }
+.pp-task { border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; background: rgba(255,255,255,0.035); margin: 0 0 0.6rem; overflow: hidden; }
+.pp-task.full { border-color: rgba(63,185,80,0.45); }
+.pp-task-h { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.9rem; cursor: pointer; flex-wrap: wrap; }
+.pp-task-h:hover { background: rgba(255,255,255,0.04); }
+.pp-tn { flex: 0 0 auto; width: 2.1rem; height: 2.1rem; line-height: 2.1rem; text-align: center; border-radius: 50%; background: var(--pp-o-soft); border: 1px solid var(--pp-o-line); color: #ffd9b8; font-weight: 900; font-size: 0.9rem; }
+.pp-task.full .pp-tn { background: rgba(63,185,80,0.25); border-color: #3fb950; color: #86efac; }
+.pp-tt { flex: 1 1 10rem; font-weight: 800; color: #fff; font-size: 0.97rem; line-height: 1.35; }
+.pp-tt small { display: block; font-weight: 500; color: rgba(230,230,235,0.55); font-size: 0.76rem; }
+.pp-tp { flex: 0 0 auto; font-size: 0.78rem; font-weight: 800; color: #fcd34d; border: 1px solid rgba(251,191,36,0.4); border-radius: 20px; padding: 0.04rem 0.6rem; font-variant-numeric: tabular-nums; }
+.pp-tm { flex: 0 0 auto; font-size: 0.74rem; color: rgba(230,230,235,0.55); }
+.pp-task-b { display: none; padding: 0.2rem 1rem 1rem; border-top: 1px dashed rgba(255,255,255,0.1); }
+.pp-task.open .pp-task-b { display: block; }
+.pp-task-b h5 { margin: 1rem 0 0.35rem; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: #fdba74; }
+.pp-task-b ul, .pp-task-b ol { margin: 0.2rem 0 0.4rem; padding-left: 1.3rem; font-size: 0.92rem; color: rgba(240,240,245,0.9); }
+.pp-task-b li { margin-bottom: 0.3rem; line-height: 1.6; }
+.pp-sol li b, .pp-box li b { color: #fff; }
+.pp-eh { list-style: none; padding: 0 !important; margin: 0.3rem 0 !important; }
+.pp-eh li { display: flex; gap: 0.55rem; align-items: flex-start; padding: 0.4rem 0.6rem; border-radius: 9px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 0.3rem !important; cursor: pointer; }
+.pp-eh li.on { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.4); }
+.pp-eh li span.t { flex: 1; }
+.pp-eh li span.p { flex: 0 0 auto; font-size: 0.76rem; font-weight: 800; color: #fcd34d; font-variant-numeric: tabular-nums; }
+.pp-res { margin-top: 1rem; padding: 0.9rem 1.1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
+.pp-res ul { margin: 0.3rem 0 0; padding-left: 1.2rem; font-size: 0.88rem; color: rgba(240,240,245,0.85); }
+.pp-res li { margin-bottom: 0.2rem; }
+.pp-kchips { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.2rem; }
+
+/* ---------- mock-ups ---------- */
+.pp-mock { margin: 0.7rem 0 0.4rem; }
+.pp-mock svg { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: #fff; }
+.pp-mock figcaption { font-size: 0.78rem; color: rgba(230,230,235,0.58); margin-top: 0.35rem; line-height: 1.5; }
+.pp-mock-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.7rem; }
+.pp-mt { font-family: Calibri, Carlito, "Segoe UI", "Helvetica Neue", Arial, sans-serif; line-height: 1.16; overflow: hidden; overflow-wrap: anywhere; box-sizing: border-box; }
+.pp-mt b { font-weight: 700; }
+.pp-icons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0 0.6rem; }
+.pp-icons figure { margin: 0; width: 5.1rem; text-align: center; padding: 0.4rem 0.2rem; border-radius: 10px; background: #fff; border: 2px solid transparent; }
+.pp-icons figure.use { border-color: #3fb950; background: #effaf0; }
+.pp-icons img { width: 2.3rem; height: 2.3rem; display: block; margin: 0 auto; }
+.pp-icons figcaption { font-size: 0.68rem; color: #333; margin-top: 0.15rem; font-weight: 700; line-height: 1.2; }
+.pp-swatches { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.4rem 0 0.2rem; }
+.pp-sw { width: 5.2rem; text-align: center; font-size: 0.66rem; color: rgba(230,230,235,0.8); line-height: 1.25; }
+.pp-sw i { display: block; height: 1.7rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.35); margin-bottom: 0.15rem; }
+.pp-anim { font-size: 0.86rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.16); background: #25252f; overflow: hidden; }
+.pp-anim div { display: flex; gap: 0.6rem; align-items: center; padding: 0.4rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.08); color: #fff; }
+.pp-anim div:last-child { border-bottom: 0; }
+.pp-anim div i { font-style: normal; color: #86efac; font-weight: 800; flex: 0 0 1.2rem; }
+.pp-anim div u { text-decoration: none; margin-left: auto; font-size: 0.74rem; color: rgba(230,230,235,0.55); }
+.pp-anim.bad div i { color: #fca5a5; }
+.pp-anim .hd { background: rgba(255,255,255,0.06); font-weight: 800; font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(230,230,235,0.7); }
+.pp-mini { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 0.3rem 0; }
+.pp-mini th, .pp-mini td { border: 1px solid rgba(255,255,255,0.14); padding: 0.35rem 0.55rem; text-align: left; vertical-align: top; }
+.pp-mini th { background: rgba(251,146,60,0.14); color: #fff; font-weight: 700; }
+.pp-mini td:first-child { color: #fff; font-weight: 600; white-space: nowrap; }
+.pp-order { counter-reset: ord; list-style: none; padding: 0; margin: 0.4rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.3rem 1rem; }
+.pp-order li { counter-increment: ord; font-size: 0.88rem; color: rgba(240,240,245,0.9); padding: 0.2rem 0; display: flex; gap: 0.5rem; align-items: baseline; }
+.pp-order li::before { content: counter(ord); flex: 0 0 1.5rem; text-align: right; font-weight: 800; color: #fdba74; font-variant-numeric: tabular-nums; }
+.pp-order li.mv { color: #fff; font-weight: 700; }
+.pp-order li.mv::after { content: "↕ verschoben"; margin-left: 0.4rem; font-size: 0.68rem; font-weight: 800; color: #fcd34d; border: 1px solid rgba(251,191,36,0.45); border-radius: 20px; padding: 0 0.4rem; }
+.pp-order li.del { color: rgba(230,230,235,0.5); text-decoration: line-through; }
+.pp-order li.del::after { content: "löschen"; text-decoration: none; display: inline-block; margin-left: 0.4rem; font-size: 0.68rem; font-weight: 800; color: #fca5a5; }
+
+/* ---------- pp3: inner tabs, quiz, vocab ---------- */
+.pp-tabs { display: flex; gap: 0.45rem; flex-wrap: wrap; margin: 0.3rem 0 1.1rem; }
+.pp-tab { padding: 0.45rem 0.95rem; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.75); font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: inherit; }
+.pp-tab:hover { background: rgba(255,255,255,0.1); }
+.pp-tab.on { background: var(--pp-o-soft); border-color: var(--pp-o); color: #ffd9b8; }
+.pp-pane[hidden] { display: none; }
+.pp-qmeta { display: flex; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; font-size: 0.8rem; color: rgba(230,230,235,0.6); margin-bottom: 0.4rem; }
+.pp-qtopic { color: #fdba74; font-weight: 700; }
+.pp-qfb { margin-top: 0.85rem; font-size: 0.92rem; line-height: 1.6; min-height: 1.4rem; color: rgba(230,230,235,0.85); }
+.pp-qfb .why { display: block; margin-top: 0.35rem; padding-left: 0.7rem; border-left: 2px solid rgba(200,165,255,0.45); color: rgba(230,230,235,0.78); font-size: 0.87rem; }
+.pp-qfb b { color: #fff; }
+.pp-opt { white-space: normal; line-height: 1.45; }
+.pp-vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.5rem; margin-top: 0.6rem; }
+.pp-vi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 10px; padding: 0.55rem 0.8rem; }
+.pp-vi .d { color: #fff; font-weight: 700; font-size: 0.93rem; }
+.pp-vi .r { color: rgba(230,230,235,0.7); font-size: 0.84rem; margin-top: 0.12rem; }
+.pp-vi .w { color: rgba(251,146,60,0.9); font-size: 0.78rem; margin-top: 0.18rem; }
+.pp-vcat { color: #86efac; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin: 1.1rem 0 0.1rem; }
+.pp-sl { margin: 1rem 0 0; padding: 0.6rem 0.85rem; border-left: 2px solid rgba(200,165,255,0.45); font-size: 0.86rem; line-height: 1.75; color: rgba(230,230,235,0.78); }
+.pp-sl .t { display: block; color: rgba(230,230,235,0.85); font-weight: 700; font-size: 0.8rem; margin-bottom: 0.1rem; }
+.pp-sl a { color: #c8a5ff; text-decoration: none; border-bottom: 1px dotted rgba(200,165,255,0.55); }
+.pp-sl a:hover { color: #fff; border-bottom-color: #fff; }
+
+/* ---------- Audio (Dock-Stile .wka-* und .spk-btn kommen aus iw-egb.html) ---------- */
+.pp-ki.playing { box-shadow: inset 3px 0 0 #38bdf8; background: rgba(56,189,248,0.06); }
+.pp-vi.playing { border-color: rgba(56,189,248,0.6); background: rgba(56,189,248,0.08); }
+.pp-kv { font-size: 1rem; }
+.pp-root .wka-playall { margin: 0.2rem 0 0.9rem; text-align: left; }
+.pp-ki-h .spk-btn { margin-left: 0; margin-top: 0.1rem; }
