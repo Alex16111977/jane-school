@@ -1,0 +1,340 @@
+/* ============================================================
+   EGB BWR — Abschnitt 3: Campagnoli (Inventur · Inventar · Bilanz)
+   kleine Portionen · Bilder · Geschichten · "Warum?"
+   Klassen-Präfix: ci-
+   ============================================================ */
+
+/* ---------- Fortschritt (wird per JS eingefügt) ---------- */
+.ci-prog { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; margin:0 0 1rem; padding:.55rem .8rem;
+           border:1px solid rgba(34,211,238,.28); border-radius:12px; background:rgba(34,211,238,.06);
+           font-size:.85rem; color:rgba(230,230,235,.75); }
+.ci-prog b { color:#67e8f9; }
+.ci-prog-bar { flex:1 1 120px; height:7px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; }
+.ci-prog-bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#22d3ee,#86efac); transition:width .35s; }
+.ci-prog button { font:inherit; font-size:.76rem; color:rgba(230,230,235,.6); background:none; cursor:pointer;
+                  border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:.15rem .6rem; }
+.ci-prog button:hover { color:#fff; border-color:rgba(255,255,255,.4); }
+
+/* ---------- Portionen ---------- */
+.ci-p { border:1px solid rgba(255,255,255,.11); border-radius:14px; background:rgba(255,255,255,.035);
+        margin:0 0 .75rem; overflow:hidden; transition:border-color .2s; }
+.ci-p-h { display:flex; align-items:center; gap:.65rem; padding:.62rem .85rem; cursor:pointer; user-select:none;
+          -webkit-tap-highlight-color:transparent; }
+.ci-p-h:hover { background:rgba(255,255,255,.04); }
+.ci-p-n { flex:none; width:1.75rem; height:1.75rem; border-radius:50%; display:flex; align-items:center; justify-content:center;
+          font-weight:900; font-size:.82rem; color:#67e8f9; background:rgba(34,211,238,.16); border:1.5px solid rgba(34,211,238,.5); }
+.ci-p-t { flex:1; min-width:0; }
+.ci-p-t b { display:block; color:#fff; font-size:.98rem; line-height:1.35; }
+.ci-p-t span { display:block; color:rgba(230,230,235,.55); font-size:.8rem; line-height:1.4; margin-top:.05rem; }
+.ci-p-min { flex:none; color:rgba(230,230,235,.4); font-size:.74rem; white-space:nowrap; }
+.ci-p-chev { flex:none; color:rgba(230,230,235,.45); font-size:.8rem; transition:transform .2s; }
+.ci-p.open .ci-p-chev { transform:rotate(90deg); }
+.ci-p-b { padding:.15rem .95rem 1rem; }
+.ci-js .ci-p-b { display:none; }
+.ci-js .ci-p.open .ci-p-b { display:block; }
+.ci-p.done { border-color:rgba(63,185,80,.45); }
+.ci-p.done .ci-p-n { color:#86efac; background:rgba(63,185,80,.22); border-color:rgba(63,185,80,.6); }
+.ci-ok { display:flex; align-items:center; justify-content:center; gap:.45rem; width:100%; margin-top:.9rem; padding:.55rem .9rem;
+         border-radius:11px; border:1.5px solid rgba(63,185,80,.45); background:rgba(63,185,80,.1); color:#86efac;
+         font:inherit; font-weight:800; font-size:.9rem; cursor:pointer; }
+.ci-ok:hover { background:rgba(63,185,80,.2); }
+.ci-p.done .ci-ok { border-style:dashed; color:rgba(230,230,235,.6); border-color:rgba(255,255,255,.25); background:none; }
+.ci-allopen { font:inherit; font-size:.76rem; color:rgba(230,230,235,.6); background:none; cursor:pointer;
+              border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:.15rem .6rem; }
+
+/* ---------- Kästen ---------- */
+.ci-why, .ci-key, .ci-trap, .ci-mine, .ci-ex { border-radius:10px; padding:.6rem .85rem; margin:.7rem 0; font-size:.9rem; line-height:1.65; color:rgba(230,230,235,.85); }
+.ci-why b, .ci-key b, .ci-trap b, .ci-mine b, .ci-ex b { color:#fff; }
+.ci-why::before, .ci-key::before, .ci-trap::before, .ci-mine::before, .ci-ex::before { display:block; font-weight:900; font-size:.74rem; letter-spacing:.04em; margin-bottom:.15rem; }
+.ci-why  { background:rgba(96,165,250,.09);  border:1px solid rgba(96,165,250,.32); }  .ci-why::before  { content:"💡 Warum?"; color:#93c5fd; }
+.ci-key  { background:rgba(251,191,36,.09);  border:1px solid rgba(251,191,36,.4); }   .ci-key::before  { content:"🔑 Merke"; color:#fbbf24; }
+.ci-trap { background:rgba(248,113,113,.09); border:1px solid rgba(248,113,113,.38); } .ci-trap::before { content:"⚠ Falle"; color:#fca5a5; }
+.ci-mine { background:rgba(167,139,250,.09); border:1px solid rgba(167,139,250,.35); } .ci-mine::before { content:"🧪 Моё наблюдение — этого нет в задании"; color:#c4b5fd; }
+.ci-ex   { background:rgba(63,185,80,.08);   border:1px solid rgba(63,185,80,.3); }    .ci-ex::before   { content:"🧩 Beispiel"; color:#86efac; }
+.ci-why .ru, .ci-key .ru, .ci-trap .ru, .ci-mine .ru, .ci-ex .ru { display:block; color:rgba(230,230,235,.62); font-size:.85rem; margin-top:.2rem; }
+.ci-src { font-size:.75rem; color:rgba(230,230,235,.42); margin:.55rem 0 0; line-height:1.5; }
+.ci-big { font-size:1.35rem; font-weight:900; color:#86efac; font-variant-numeric:tabular-nums; }
+
+/* ---------- Geschichte: Bildfolge ---------- */
+.ci-story { display:grid; grid-template-columns:repeat(3,1fr); gap:.55rem; margin:.5rem 0; }
+.ci-pan { position:relative; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:.75rem .55rem .55rem;
+          background:rgba(255,255,255,.04); text-align:center; }
+.ci-pan i { display:block; font-style:normal; font-size:1.9rem; line-height:1.2; }
+.ci-pan b { display:block; color:#fff; font-size:.84rem; line-height:1.35; margin:.2rem 0 .1rem; }
+.ci-pan span { display:block; color:rgba(230,230,235,.6); font-size:.74rem; line-height:1.4; }
+.ci-pan em { position:absolute; top:.3rem; left:.5rem; font-style:normal; font-size:.68rem; font-weight:900; color:#67e8f9; }
+@media (max-width:640px) { .ci-story { grid-template-columns:repeat(2,1fr); } }
+
+.ci-2col { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin:.6rem 0; }
+@media (max-width:640px) { .ci-2col { grid-template-columns:1fr; } }
+.ci-opt, .ci-way { border-radius:11px; padding:.6rem .8rem; font-size:.88rem; line-height:1.55; color:rgba(230,230,235,.82); border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); }
+.ci-opt b, .ci-way b { color:#fff; }
+.ci-opt.no  { border-color:rgba(248,113,113,.4); background:rgba(248,113,113,.07); }
+.ci-opt.yes { border-color:rgba(63,185,80,.45);  background:rgba(63,185,80,.08); }
+.ci-way i { font-style:normal; font-size:1.5rem; display:block; }
+.ci-way span { display:block; font-size:.82rem; color:rgba(230,230,235,.65); }
+
+/* ---------- Balken (Vermögen = Eigenkapital + Schulden) ---------- */
+.ci-bar { display:flex; height:2.7rem; border-radius:10px; overflow:hidden; margin:.5rem 0 .25rem; border:1px solid rgba(255,255,255,.22); }
+.ci-bar > div { display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:800; color:#0b1220; text-align:center; line-height:1.15; padding:0 .3rem; }
+.ci-bar .g { background:linear-gradient(135deg,#6ee7b7,#86efac); }
+.ci-bar .o { background:linear-gradient(135deg,#fdba74,#fb923c); }
+.ci-bar .y { background:linear-gradient(135deg,#fde68a,#fcd34d); }
+.ci-bar .b { background:linear-gradient(135deg,#67e8f9,#38bdf8); }
+.ci-bar-l { display:flex; font-size:.74rem; color:rgba(230,230,235,.62); }
+.ci-bar-l > div { text-align:center; padding:0 .2rem; }
+
+/* ---------- Rechenstreifen, Formeln ---------- */
+.ci-calc { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .5rem; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1);
+           border-radius:10px; padding:.55rem .8rem; margin:.55rem 0; font-size:.98rem; color:#fff; font-variant-numeric:tabular-nums; }
+.ci-calc b { color:#86efac; }
+.ci-calc .op { color:#fbbf24; font-weight:900; }
+.ci-calc .mut { color:rgba(230,230,235,.5); font-size:.8rem; }
+.ci-c { background:rgba(0,0,0,.38); border:1px solid rgba(255,255,255,.14); border-radius:6px; padding:.04rem .4rem;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.8rem; color:#93c5fd; white-space:nowrap; }
+
+/* ---------- Excel-Nachbau ---------- */
+.ci-xlw { overflow-x:auto; margin:.6rem 0; border-radius:8px; }
+.ci-xl { width:100%; min-width:380px; border-collapse:collapse; font-size:.88rem; font-variant-numeric:tabular-nums; }
+.ci-xl th, .ci-xl td { border:1px solid rgba(255,255,255,.18); padding:.3rem .55rem; color:rgba(240,240,245,.92); text-align:left; vertical-align:middle; }
+.ci-xl th { background:rgba(255,255,255,.1); color:#fff; font-size:.76rem; font-weight:800; }
+.ci-xl td.r { text-align:center; width:2.2rem; color:rgba(230,230,235,.45); background:rgba(255,255,255,.05); font-size:.74rem; }
+.ci-xl td.n { text-align:right; white-space:nowrap; }
+.ci-xl td.fx { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.74rem; color:#93c5fd; white-space:nowrap; }
+.ci-xl td.it { font-style:italic; }
+.ci-xl tr.y td:not(.r) { background:rgba(255,245,120,.13); }
+.ci-xl tr.g td:not(.r) { background:rgba(150,210,110,.15); }
+.ci-xl tr.o td:not(.r) { background:rgba(251,160,100,.17); }
+.ci-xl tr.b td:not(.r) { background:rgba(96,165,250,.14); }
+.ci-xl tr.gr td:not(.r) { background:rgba(255,255,255,.14); color:#fff; font-weight:800; }
+.ci-xl tr.sum td { font-weight:800; color:#fff; border-top:2px solid rgba(255,255,255,.45); }
+.ci-xl td.hl  { background:rgba(251,191,36,.3) !important; color:#fff; font-weight:800; }
+.ci-xl td.bad { background:rgba(248,113,113,.24) !important; }
+.ci-xl td.ok  { background:rgba(63,185,80,.24) !important; }
+.ci-xl td.sub { padding-left:1.4rem; }
+
+/* ---------- Bargeld ---------- */
+.ci-cash { margin:.6rem 0; display:grid; gap:.4rem; }
+.ci-cr { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08);
+         border-radius:9px; padding:.35rem .55rem; }
+.ci-chips { display:flex; gap:.25rem; flex-wrap:wrap; align-items:center; }
+.ci-eq { color:rgba(230,230,235,.85); font-size:.9rem; margin-left:auto; font-variant-numeric:tabular-nums; }
+.ci-eq b { color:#86efac; }
+.ci-note { display:inline-block; min-width:3.1rem; padding:.3rem .4rem; border-radius:5px; font-weight:900; font-size:.8rem; text-align:center;
+           color:#fff; border:1px solid rgba(255,255,255,.4); text-shadow:0 1px 2px rgba(0,0,0,.4); }
+.ci-note.n10  { background:linear-gradient(135deg,#a63a55,#d9808f); }
+.ci-note.n20  { background:linear-gradient(135deg,#2b7bb5,#79bfe9); }
+.ci-note.n100 { background:linear-gradient(135deg,#3f8a22,#9bd45f); }
+.ci-coin { display:inline-flex; width:2.3rem; height:2.3rem; border-radius:50%; align-items:center; justify-content:center; font-weight:900;
+           font-size:.62rem; color:#3a2c00; border:1px solid rgba(0,0,0,.35); }
+.ci-coin.c2  { background:radial-gradient(circle at 50% 50%,#d8dde2 0 42%,#d9b44a 44%); }
+.ci-coin.c50 { background:#d9b44a; }
+
+/* ---------- Belege (Mini-Rechnungen) ---------- */
+.ci-inv { border:1px solid rgba(255,255,255,.16); border-radius:10px; background:rgba(255,255,255,.04); padding:.55rem .75rem;
+          font-size:.83rem; line-height:1.6; color:rgba(230,230,235,.8); font-variant-numeric:tabular-nums; }
+.ci-inv-h { display:flex; justify-content:space-between; gap:.5rem; flex-wrap:wrap; color:#fff; font-weight:700; border-bottom:1px dashed rgba(255,255,255,.2);
+            padding-bottom:.25rem; margin-bottom:.25rem; }
+.ci-inv-t { margin-top:.3rem; padding-top:.3rem; border-top:1px solid rgba(255,255,255,.22); color:#fff; }
+.ci-inv-t b { color:#86efac; }
+.ci-inv .bad { color:#fca5a5; }
+.ci-inv .pick { background:rgba(251,191,36,.28); border-radius:4px; padding:0 .25rem; color:#fff; font-weight:800; }
+.ci-flow { display:flex; align-items:center; justify-content:center; gap:.5rem; flex-wrap:wrap; margin:.55rem 0; padding:.5rem .7rem; border-radius:10px;
+           font-size:.88rem; color:#fff; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.035); }
+.ci-flow .in  { color:#86efac; font-weight:800; }
+.ci-flow .out { color:#fdba74; font-weight:800; }
+
+/* ---------- Treppe: fest -> flüssig ---------- */
+.ci-stair { margin:.6rem 0; display:grid; gap:.32rem; }
+.ci-st { display:grid; grid-template-columns:minmax(9rem,40%) 1fr; align-items:center; gap:.6rem; font-size:.84rem; color:rgba(230,230,235,.9); }
+.ci-st i { display:block; height:1.15rem; border-radius:6px; width:var(--w); min-width:.9rem; background:linear-gradient(90deg,#bfdbfe,#22d3ee); }
+.ci-st.a i { background:linear-gradient(90deg,#c7d2fe,#93c5fd); }
+.ci-st.u i { background:linear-gradient(90deg,#a5f3fc,#22d3ee); }
+.ci-ends { display:flex; justify-content:space-between; font-size:.74rem; color:rgba(230,230,235,.55); margin:.1rem 0 .3rem; }
+.ci-tag { display:inline-block; font-size:.68rem; font-weight:800; padding:.02rem .45rem; border-radius:20px; margin-right:.3rem; vertical-align:middle; }
+.ci-tag.y { background:rgba(255,245,120,.22); color:#fde68a; border:1px solid rgba(255,245,120,.5); }
+.ci-tag.g { background:rgba(150,210,110,.22); color:#bef264; border:1px solid rgba(150,210,110,.5); }
+.ci-tag.o { background:rgba(251,160,100,.22); color:#fdba74; border:1px solid rgba(251,160,100,.5); }
+.ci-tag.b { background:rgba(96,165,250,.22); color:#93c5fd; border:1px solid rgba(96,165,250,.5); }
+
+/* ---------- Gliederungsbaum ---------- */
+.ci-tree { margin:.5rem 0; font-size:.9rem; line-height:1.55; }
+.ci-tree ul { list-style:none; margin:.2rem 0 .2rem .85rem; padding:0 0 0 .8rem; border-left:2px solid rgba(255,255,255,.16); }
+.ci-tree li { margin:.2rem 0; color:rgba(230,230,235,.86); }
+.ci-tree li > b { color:#fff; }
+.ci-tree .ru { color:rgba(230,230,235,.55); font-size:.8rem; }
+
+/* ---------- Rechne selbst ---------- */
+.ci-q { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; padding:.45rem .65rem; border:1px solid rgba(255,255,255,.1); border-radius:10px;
+        background:rgba(255,255,255,.035); margin:.4rem 0; font-size:.92rem; color:#fff; }
+.ci-q > span:first-child { flex:1 1 12rem; }
+.ci-q input { width:9.5rem; padding:.32rem .55rem; border-radius:8px; border:1.5px solid rgba(255,255,255,.22); background:rgba(0,0,0,.3);
+              color:#fff; font:inherit; font-variant-numeric:tabular-nums; }
+.ci-q input:focus { outline:none; border-color:#22d3ee; }
+.ci-q button { font:inherit; font-weight:800; font-size:.85rem; padding:.3rem .8rem; border-radius:8px; cursor:pointer; color:#0b1220;
+               border:none; background:linear-gradient(135deg,#67e8f9,#22d3ee); }
+.ci-q button:hover { filter:brightness(1.1); }
+.ci-fb { flex-basis:100%; font-size:.84rem; color:rgba(230,230,235,.75); line-height:1.5; }
+.ci-q.ok input  { border-color:#4ade80; }  .ci-q.ok .ci-fb  { color:#86efac; }
+.ci-q.bad input { border-color:#f87171; }  .ci-q.bad .ci-fb { color:#fca5a5; }
+
+/* ---------- Merkkarten ---------- */
+.ci-deck-top { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; font-size:.84rem; color:rgba(230,230,235,.7); margin:.2rem 0 .5rem; }
+.ci-deck-top button, .ci-deck-btns button { font:inherit; font-size:.82rem; font-weight:700; padding:.3rem .8rem; border-radius:20px; cursor:pointer;
+        color:#fff; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.18); }
+.ci-deck-top button:hover, .ci-deck-btns button:hover { background:rgba(255,255,255,.14); }
+.ci-card { min-height:9.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:.4rem;
+           padding:1rem 1.1rem; border-radius:14px; cursor:pointer; color:#fff; line-height:1.55;
+           border:1.5px solid rgba(34,211,238,.42); background:rgba(34,211,238,.07); }
+.ci-card .ci-card-q { font-size:1.05rem; font-weight:800; }
+.ci-card .ci-card-hint { font-size:.74rem; color:rgba(230,230,235,.45); }
+.ci-card.flip { border-color:rgba(63,185,80,.5); background:rgba(63,185,80,.09); }
+.ci-card .ci-card-a { font-size:.95rem; }
+.ci-card .ci-card-a b { color:#86efac; }
+.ci-card .ci-card-w { font-size:.84rem; color:rgba(230,230,235,.7); }
+.ci-deck-btns { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin:.6rem 0 .2rem; }
+.ci-deck-btns .know { border-color:rgba(63,185,80,.5); color:#86efac; }
+.ci-deck-btns .again { border-color:rgba(248,113,113,.5); color:#fca5a5; }
+
+/* ---------- Fehlerjagd ---------- */
+.ci-fj { border:1px solid rgba(255,255,255,.1); border-radius:10px; background:rgba(255,255,255,.03); margin:.4rem 0; overflow:hidden; }
+.ci-fj > summary { cursor:pointer; padding:.5rem .8rem; font-size:.9rem; color:#fff; list-style:none; }
+.ci-fj > summary::-webkit-details-marker { display:none; }
+.ci-fj > summary::before { content:"🔎 "; }
+.ci-fj[open] { border-color:rgba(63,185,80,.4); }
+.ci-fj .ci-fj-a { padding:.1rem .85rem .65rem; font-size:.88rem; line-height:1.6; color:rgba(230,230,235,.85); }
+.ci-fj .ci-fj-a b { color:#86efac; }
+
+/* ---------- Spickzettel ---------- */
+.ci-sp { display:grid; grid-template-columns:repeat(2,1fr); gap:.55rem; margin:.5rem 0; }
+.ci-sp > div { border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(255,255,255,.04); padding:.65rem .8rem; font-size:.88rem; line-height:1.55; color:rgba(230,230,235,.85); }
+.ci-sp > div i { font-style:normal; font-size:1.35rem; display:block; }
+.ci-sp > div b { color:#fff; }
+.ci-sp > div .ru { display:block; color:rgba(230,230,235,.58); font-size:.8rem; }
+@media (max-width:640px) { .ci-sp { grid-template-columns:1fr; } }
+
+/* ---------- SVG-Bilder ---------- */
+.ci-svg { display:block; width:100%; max-width:520px; height:auto; margin:.6rem auto; }
+.ci-svg text { font-family:inherit; }
+.ci-cap { text-align:center; font-size:.78rem; color:rgba(230,230,235,.5); margin:-.2rem 0 .4rem; }
+
+/* ---------- Vergleichstabelle ---------- */
+.ci-cmp { width:100%; border-collapse:collapse; font-size:.88rem; margin:.5rem 0; }
+.ci-cmp th, .ci-cmp td { border:1px solid rgba(255,255,255,.14); padding:.42rem .6rem; vertical-align:top; color:rgba(230,230,235,.86); }
+.ci-cmp th { background:rgba(255,255,255,.07); color:#fff; font-size:.82rem; text-align:left; }
+.ci-cmp td:first-child { color:#fff; font-weight:700; width:24%; }
+
+/* ---------- Vokabel-Audio-Dock (nutzt .wka-*, nur Zusatz) ---------- */
+#ciVocab tr.playing td { background:rgba(34,211,238,.1); }
+.ci-spk.playing { background:rgba(34,211,238,.45); animation:spkPulse 1s ease-in-out infinite; }
+.ci-spk:hover { background:rgba(34,211,238,.3); }
+
+/* ---------- Bilanz als Waage (zwei Spalten, Höhe nach Betrag) ---------- */
+.ci-scale { display:flex; gap:.5rem; align-items:stretch; margin:.7rem 0; }
+.ci-col { flex:1; min-width:0; display:flex; flex-direction:column; }
+.ci-col-h { text-align:center; font-weight:900; color:#fff; font-size:.85rem; letter-spacing:.05em; margin-bottom:.25rem; }
+.ci-col-b { display:flex; flex-direction:column; height:270px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.25); }
+.ci-col-b > div { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:.8rem; font-weight:800;
+                  color:#0b1220; line-height:1.3; padding:.2rem .3rem; }
+.ci-col-b > div span { font-size:.68rem; font-weight:600; opacity:.8; }
+.ci-col-f { font-size:.74rem; color:rgba(230,230,235,.65); text-align:center; margin-top:.3rem; line-height:1.4; }
+.ci-eqsign { align-self:center; font-size:1.8rem; font-weight:900; color:#fbbf24; }
+
+/* ============ weitere Bausteine (Deutsch/Inhaltsangabe u. a.) ============ */
+/* Multiple-Choice */
+.ci-mc { padding:.55rem .7rem; border:1px solid rgba(255,255,255,.1); border-radius:10px; background:rgba(255,255,255,.035); margin:.45rem 0; }
+.ci-mc-q { color:#fff; font-size:.92rem; line-height:1.55; margin-bottom:.4rem; }
+.ci-mc-o { display:flex; gap:.4rem; flex-wrap:wrap; }
+.ci-mc-o button { font:inherit; font-size:.84rem; font-weight:700; padding:.3rem .75rem; border-radius:20px; cursor:pointer; color:#fff;
+                  background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.2); }
+.ci-mc-o button:hover { background:rgba(255,255,255,.15); }
+.ci-mc-o button.ok  { background:rgba(63,185,80,.25); border-color:#4ade80; color:#bbf7d0; }
+.ci-mc-o button.bad { background:rgba(248,113,113,.2); border-color:#f87171; color:#fecaca; }
+.ci-mc .ci-fb.okc { color:#86efac; } .ci-mc .ci-fb.badc { color:#fca5a5; }
+.ci-mc .ci-fb { margin-top:.35rem; font-size:.84rem; line-height:1.5; }
+
+/* Schreibfeld */
+.ci-write { margin:.6rem 0; }
+.ci-write textarea { width:100%; box-sizing:border-box; padding:.7rem .85rem; border-radius:10px; border:1.5px solid rgba(255,255,255,.2);
+                     background:rgba(0,0,0,.3); color:#fff; font:inherit; font-size:.95rem; line-height:1.65; resize:vertical; }
+.ci-write textarea:focus { outline:none; border-color:#a78bfa; }
+.ci-write-n { font-size:.8rem; color:rgba(230,230,235,.55); margin-top:.25rem; }
+.ci-write-n.low { color:#fbbf24; } .ci-write-n.ok { color:#86efac; } .ci-write-n.high { color:#fca5a5; }
+
+/* Checkliste */
+ul.ci-check { list-style:none; margin:.5rem 0 0; padding:0; }
+ul.ci-check li { display:flex; gap:.6rem; align-items:flex-start; padding:.4rem .65rem; margin:.25rem 0; border:1px solid rgba(255,255,255,.1);
+                 border-radius:9px; background:rgba(255,255,255,.03); cursor:pointer; font-size:.9rem; line-height:1.5; color:rgba(230,230,235,.88); }
+ul.ci-check li::before { content:"☐"; color:rgba(230,230,235,.5); font-size:1.05rem; line-height:1.3; }
+ul.ci-check li.on { border-color:rgba(63,185,80,.5); background:rgba(63,185,80,.08); }
+ul.ci-check li.on::before { content:"☑"; color:#86efac; }
+.ci-check-n { font-size:.8rem; color:rgba(230,230,235,.6); margin:.3rem 0 .6rem; }
+.ci-check-n.all { color:#86efac; font-weight:800; }
+
+/* Timer */
+.ci-timer { display:flex; align-items:center; gap:.6rem; margin:.5rem 0; }
+.ci-timer-t { font-size:1.6rem; font-weight:900; color:#fff; font-variant-numeric:tabular-nums; min-width:6.5rem; }
+.ci-timer button { font:inherit; font-size:.85rem; font-weight:700; padding:.3rem .85rem; border-radius:20px; cursor:pointer; color:#fff;
+                   background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.2); }
+.ci-timer button:hover { background:rgba(255,255,255,.16); }
+
+/* Punkte -> Note */
+.ci-grade { margin:.6rem 0; padding:.7rem .85rem; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(255,255,255,.035); }
+.ci-grade-in { display:flex; gap:.6rem; flex-wrap:wrap; }
+.ci-grade-in label { display:flex; flex-direction:column; gap:.2rem; font-size:.78rem; color:rgba(230,230,235,.65); }
+.ci-grade-in input { width:5.5rem; padding:.3rem .5rem; border-radius:8px; border:1.5px solid rgba(255,255,255,.22); background:rgba(0,0,0,.3); color:#fff; font:inherit; }
+.ci-grade-out { margin-top:.55rem; font-size:.95rem; color:rgba(230,230,235,.85); }
+.ci-note-big { font-size:1.3rem; color:#fbbf24; }
+
+/* Schlagwort-Chips (Basissatz-Bausteine, Verben des Sagens …) */
+.ci-chips2 { display:flex; flex-wrap:wrap; gap:.35rem; margin:.5rem 0; }
+.ci-chip { display:inline-block; padding:.2rem .65rem; border-radius:20px; font-size:.84rem; font-weight:700; color:#fff; border:1.5px solid rgba(255,255,255,.25); background:rgba(255,255,255,.06); }
+.ci-chip.c1 { border-color:rgba(96,165,250,.7);  background:rgba(96,165,250,.14); }
+.ci-chip.c2 { border-color:rgba(251,191,36,.7);  background:rgba(251,191,36,.14); }
+.ci-chip.c3 { border-color:rgba(74,222,128,.7);  background:rgba(74,222,128,.14); }
+.ci-chip.c4 { border-color:rgba(244,114,182,.7); background:rgba(244,114,182,.14); }
+.ci-chip.c5 { border-color:rgba(167,139,250,.7); background:rgba(167,139,250,.14); }
+.ci-chip.c6 { border-color:rgba(251,146,60,.7);  background:rgba(251,146,60,.14); }
+
+/* Musterlösung (aufklappbar) und deutscher Mustertext */
+details.ci-model { margin:.7rem 0; border:1px solid rgba(251,191,36,.45); border-radius:11px; background:rgba(251,191,36,.06); overflow:hidden; }
+details.ci-model > summary { cursor:pointer; padding:.55rem .9rem; font-weight:800; color:#fbbf24; font-size:.9rem; list-style:none; }
+details.ci-model > summary::-webkit-details-marker { display:none; }
+details.ci-model > summary::before { content:"▶ "; font-size:.75rem; }
+details.ci-model[open] > summary::before { content:"▼ "; }
+.ci-model-b { padding:.2rem .95rem .85rem; color:#fff; font-size:.94rem; line-height:1.8; }
+.ci-model-b p { margin:.45rem 0; color:#fff; font-size:.94rem; }
+.ci-model-b mark { background:rgba(251,191,36,.28); color:#fff; padding:0 .15rem; border-radius:3px; }
+.ci-model-b .ci-wc { display:block; margin-top:.4rem; font-size:.76rem; color:rgba(230,230,235,.5); }
+
+/* Original-Textauszug (ruhiger Zitatkasten) */
+.ci-text { border-left:3px solid rgba(167,139,250,.6); background:rgba(167,139,250,.06); border-radius:0 9px 9px 0; padding:.55rem .85rem; margin:.6rem 0;
+           font-size:.88rem; line-height:1.7; color:rgba(230,230,235,.85); }
+.ci-text .ln { color:rgba(230,230,235,.4); font-size:.72rem; margin-right:.3rem; }
+.ci-text mark { background:rgba(250,204,21,.28); color:#fff; padding:0 .1rem; border-radius:3px; }
+
+/* Variante: eigene Lösung/Muster (nicht Schlüssel des Lehrers) */
+.ci-mine.sol::before { content:"🧪 Моё решение — образец, а не ключ учителя"; }
+.ci-mine.fix::before { content:"🧪 Моя поправка / пометка"; }
+
+/* Vokabel-Tabelle (DE | RU) für Seiten, die .vt nicht selbst definieren */
+.ci-root .vt { width:100%; border-collapse:collapse; font-size:.9rem; }
+.ci-root .vt td { border-bottom:1px solid rgba(255,255,255,.08); padding:.45rem .55rem; vertical-align:top; }
+.ci-root .vt td.de { color:#fff; font-weight:600; width:42%; }
+.ci-root .vt td.ru { color:rgba(230,230,235,.68); line-height:1.55; }
+.ci-root .vt tr:last-child td { border-bottom:none; }
+
+/* Basis-Bausteine, die nicht jede Seite selbst definiert (auf .ci-root begrenzt, gleiche Optik wie in bwr-egb.html) */
+.ci-root .dsatz { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.28); border-radius:9px;
+                  padding:0.6rem 0.85rem; color:#fff; font-size:0.97rem; line-height:1.65; margin:0.5rem 0 0.15rem; }
+.ci-root .dsatz-ru { font-size:0.86rem; color:rgba(230,230,235,0.62); margin:0 0 0.9rem 0.25rem; line-height:1.6; }
+.ci-root .dsatz-ru b { color:#c8a5ff; font-weight:600; }
+.ci-root .schritte { list-style:none; padding:0; margin:0.6rem 0 0; counter-reset:sc; }
+.ci-root .schritte li { position:relative; padding:0.5rem 0 0.5rem 2.3rem; counter-increment:sc; font-size:0.93rem;
+                        color:rgba(230,230,235,0.8); line-height:1.65; border-bottom:1px dashed rgba(255,255,255,0.08); }
+.ci-root .schritte li:last-child { border-bottom:none; }
+.ci-root .schritte li::before { content:counter(sc); position:absolute; left:0; top:0.5rem; width:1.55rem; height:1.55rem; border-radius:50%;
+                                background:rgba(167,139,250,0.2); border:1px solid rgba(167,139,250,0.5); color:#c4b5fd; font-size:0.8rem;
+                                font-weight:800; display:flex; align-items:center; justify-content:center; }
+.ci-root .schritte li b { color:#fff; }
+.ci-root .mt-wrap { overflow-x:auto; margin:0.8rem 0; }
