@@ -311,6 +311,20 @@
         Array.prototype.forEach.call(document.querySelectorAll('.ci-root .st-item'), function (e) {
             e.addEventListener('click', function () { e.classList.toggle('open'); });
         });
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest && e.target.closest('.ci-copy');
+            if (!btn) { return; }
+            var t = document.querySelector(btn.getAttribute('data-copy'));
+            if (!t) { return; }
+            function done() { var o = btn.textContent; btn.textContent = '✓ kopiert'; setTimeout(function () { btn.textContent = o; }, 1500); }
+            function fallback() {
+                var r = document.createRange(); r.selectNodeContents(t);
+                var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+                try { document.execCommand('copy'); } catch (x) {}
+                s.removeAllRanges(); done();
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t.textContent).then(done, fallback); } else { fallback(); }
+        });
     }
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
