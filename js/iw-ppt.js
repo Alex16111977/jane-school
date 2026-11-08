@@ -294,7 +294,7 @@
       '<div class="pp-calc"><label for="pp-date">Datum der Klassenarbeit:</label><input type="date" id="pp-date" class="pp-in" style="width:auto"><span class="pp-count" id="pp-left"></span></div><div id="pp-planmsg"></div><div id="pp-plan"></div></div>';
 
     h += '<div class="note-card"><h3>💾 Dateiname (Aufgabe 14)</h3>' + P.fileGen('p1') +
-      '<div class="pp-sl"><span class="t">🔗 Siehe auch</span><a href="study-tips.html">Как учиться</a> — приёмы запоминания: активное воспроизведение и интервальное повторение подходят и для «где кликнуть?»<br><a href="iw-egb.html#rf1">EGB Informationswirtschaft</a> — остальные темы IW</div></div>';
+      '<div class="pp-sl"><span class="t">🔗 Siehe auch</span><a href="study-tips.html">Как учиться</a> — приёмы запоминания: активное воспроизведение и интервальное повторение подходят и для «где кликнуть?»</div></div>';
 
     h += '</section>';
     root.innerHTML = h;
