@@ -21,7 +21,7 @@
   function fmt(s) {
     return String(s)
       .replace(/\{\{([^}]+)\}\}/g, function (_, p) { return pathHtml(p); })
-      .replace(/\[\[([^\]]+)\]\]/g, '<span class="pp-key">$1</span>')
+      .replace(/\[\[([^\]]+)\]\]/g, function (_, k) { return '<span class="pp-key">' + (k === 'Umschalt' ? '⇧ Umschalt' : k) + '</span>'; })
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   }
   function head(icon, title, sub) {
@@ -116,6 +116,11 @@
       h += '<h5>Was in der Datei steht <span class="pp-mine">nachgeprüft</span></h5><ul>' + t.state.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>';
     }
     h += '<h5>So geht’s <span class="pp-mine">Lösungsweg</span></h5><ol class="pp-sol">' + t.steps.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ol>';
+    if (t.show && P.SHOW && P.SHOW[t.show]) {   /* Kadры zuerst (wie «Начни здесь» in Karte 1); dieselben Schritte als Text nur zum Aufklappen */
+      h = h.slice(0, h.lastIndexOf('<h5>So geht’s')) + '<h5>Покажу в PowerPoint <span class="pp-mine">моё · схема</span></h5>' + P.showHtml(t.show) +
+        '<p class="pp-small">Кадры — схема ленты и окон по Microsoft 365 (немецкий) и справке Microsoft, не скриншот: в твоей версии расположение может чуть отличаться. ' + (P.SHOW[t.show].foot || 'Слайды на миниатюрах — твои (размеры из файла).') + '</p>' +
+        '<details class="pp-txt"><summary>Те же шаги текстом</summary><ol class="pp-sol">' + t.steps.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ol></details>';
+    }
     if (t.mock) {
       var figs = t.mock.map(function (id) {
         return '<figure class="pp-mock">' + P.mocks[id]() + '<figcaption>' + (P.mockCap[id] || '') + '</figcaption></figure>';
@@ -125,12 +130,16 @@
         h += '<div class="pp-box info"><h4>📝 Notizen (Ansicht → Notizen)</h4><p class="pp-small" style="margin:0">' + P.mockNotes[t.mock[0]] + '</p></div>';
       }
     }
+    if (t.steps2) {   // zweiter Lösungsweg unter dem Bild (z. B. „so entsteht der Look im Bild“)
+      h += '<h5>' + t.steps2.t + ' <span class="pp-mine">моё</span></h5><ol class="pp-sol">' + t.steps2.s.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ol>' +
+        (t.steps2.note ? '<p class="pp-small">' + fmt(t.steps2.note) + '</p>' : '');
+    }
     if (t.html && P.extras[t.html]) { h += P.extras[t.html](); }
     if (t.traps && t.traps.length) {
       h += '<h5>Typische Fallen</h5><ul>' + t.traps.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>';
     }
     h += '<h5>Erwartungshorizont — Selbstkontrolle <span class="pp-mine">abgeleitet aus dem Aufgabentext</span></h5>' + ehBlock(opt.set, t, ti, opt.state) +
-      '<p class="pp-small">Haken setzen, was in <b>deiner</b> Datei wirklich so ist (nicht „müsste“). Die Aufteilung der Punkte innerhalb der Aufgabe ist meine Schätzung — die Summe pro Aufgabe ist die des Lehrers.</p>';
+      '<p class="pp-small">Haken setzen, was in <b>deiner</b> Datei wirklich so ist (nicht „müsste“). ' + (opt.mine ? 'Punkte und Aufteilung sind meine Schätzung (kein Erwartungshorizont des Lehrers).' : 'Die Aufteilung der Punkte innerhalb der Aufgabe ist meine Schätzung — die Summe pro Aufgabe ist die des Lehrers.') + '</p>';
     if (t.kann && t.kann.length) {
       h += '<h5>Dazu in Karte 1</h5><div class="pp-kchips">' + t.kann.map(function (id) {
         var k = kannById(id); return k ? '<span class="pp-tag" title="' + plain(k.de).replace(/"/g, '') + '">' + kLabel(k) + ' · ' + plain(k.ru).split(/[.:—]/)[0].slice(0, 46) + '</span>' : '';
@@ -270,7 +279,7 @@
       '<div class="pp-box info"><h4>«Bewertet wird, ob Ihre Präsentation die beschriebene Wirkung erreicht»</h4><p>Оценивается <b>результат</b>: достигает ли слайд описанного эффекта — читается с первого взгляда, логотип не конкурирует с заголовком, анимация не отвлекает. «Häufig sind mehrere Lösungswege möglich» — путь может быть любым. Поэтому в каждом задании сначала найди <b>слова про эффект</b> (список — в карточке 3, вкладка «Aufgabenwörter»).</p></div>' +
       '<div class="pp-box warn"><h4>Kann-Liste ≠ вся контрольная</h4><p>В Kann-Liste учителя <b>нет</b> нескольких вещей, которые в пробной контрольной были: <b>Notizen</b>, <b>Logo в Folienmaster / Layout</b>, <b>Foliennummer</b>, <b>Schriftarten ersetzen</b>, <b>Speichern unter / Dateiname</b>, <b>Ansichten и показ слайдов</b> (проверка анимации и ссылок). Они добавлены ниже как <b>X1–X9</b> — готовься и к ним.</p></div>' +
       '<div class="pp-box orange"><h4>Где тренироваться</h4><p>В настоящем <b>десктопном PowerPoint</b> с <b>немецким интерфейсом</b> — как в школе (все названия кнопок на этом сайте немецкие). Если дома Mac: <b>Strg → ⌘ (Cmd)</b>, <b>Alt → ⌥ (Option)</b>; вкладки те же, но часть кнопок стоит иначе. <b>PowerPoint в браузере</b> умеет не всё (например, «Schriftarten ersetzen» там нет по данным Microsoft) — для подготовки не подходит. Проверь язык интерфейса: Datei → Optionen → Sprache.</p></div>' +
-      '<div class="pp-box"><h4>Честно о том, чего я не знаю</h4><p>Настоящего Erwartungshorizont учителя у меня нет. «EH» в карточке 2 я вывела из текста заданий; <b>сумма баллов за задание — его</b>, разбивка внутри задания — моя оценка. Настоящая Klassenarbeit, скорее всего, будет про другую фирму и с другими слайдами, но с <b>теми же типами задач</b> (Kann-Liste).</p></div></div>';
+      '<div class="pp-box"><h4>Честно о том, чего я не знаю</h4><p>Настоящего Erwartungshorizont учителя у меня нет. «EH» в карточке 2 я вывела из текста заданий; <b>сумма баллов за задание — его</b>, разбивка внутри задания — моя оценка. Настоящая Klassenarbeit, скорее всего, будет про другую фирму и с другими слайдами, но с <b>теми же типами задач</b> (Kann-Liste).</p><p>Названия кнопок зависят от версии PowerPoint: в Microsoft 365 это «<b>Formfüllung</b>», в старых версиях — «<b>Fülleffekt</b>» (одна и та же кнопка). На сайте я чаще пишу «Fülleffekt» — ищи у себя любое из двух.</p></div></div>';
 
     h += '<div class="note-card"><h3>🎓 Notenschlüssel (Aufgabenblatt, CBF)</h3><div class="pp-tablewrap"><table class="pp-nt" id="pp-nt"><tr><th>ab %</th>' + P.NOTEN.map(function (n) { return '<td>' + n[0] + '</td>'; }).join('') + '</tr><tr><th>Note</th>' + P.NOTEN.map(function (n) { return '<td>' + noteLabel(n[1]) + '</td>'; }).join('') + '</tr></table></div>' +
       '<div class="pp-calc"><label for="pp-calc-in">Punkte (von 100):</label><input type="number" id="pp-calc-in" min="0" max="100" step="0.5" placeholder="z. B. 78"><output id="pp-calc-out" for="pp-calc-in">—</output></div>' +
@@ -314,6 +323,7 @@
     }).join('');
     $$('[data-audio]', root).forEach(function (b) { b.addEventListener('click', function () { PPTAudio.play(b.getAttribute('data-audio'), 0); }); });
     bindKann(root); bindPlan(root); bindFileGen(root);
+    if (P.bindStart) { P.bindShow(root); P.bindStart(root); }   // js/iw-ppt-show.js: «Начни здесь» + кадры ленты + справочник сворачивается
   }
 
   /* ------------------------------------------------------------------ Kann-Liste */
@@ -325,7 +335,12 @@
       P.KANN.filter(function (k) { return k.g === g.id; }).forEach(function (k) {
         var s = state[k.id] || 0;
         out += '<div class="pp-ki s' + s + '" data-id="' + k.id + '"><div class="pp-ki-h"><button class="pp-st" data-s="' + s + '" title="Wie sicher bist du?" aria-label="Selbsteinschätzung">' + ['○', '◐', '✓'][s] + '</button><span class="pp-kn">' + kLabel(k) + '</span><div class="pp-kt">' + k.de + '<small>' + k.ru + '</small></div>' + (k.id === 'x9' ? '' : '<button class="spk-btn pp-spk" data-k="' + k.id + '" title="Anhören: Aufgabe → Pause → Antwort" aria-label="Anhören">🔊</button>') + '<span class="pp-kv">▸</span></div><div class="pp-ki-b">';
+        if (k.viz && P.extras && P.extras[k.viz]) { out += P.extras[k.viz](); }
         if (k.how && k.how.length) { out += '<span class="pp-lab">Wo klicke ich?</span>' + k.how.map(pathHtml).join('<br>'); }
+        if (k.steps && k.steps.length) {
+          out += k.steps.map(function (g) { return '<span class="pp-lab">' + g.t + '</span><ol class="pp-kol">' + g.s.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ol>'; }).join('') +
+            (k.steps_note ? '<p class="pp-small">' + fmt(k.steps_note) + '</p>' : '');
+        }
         if (k.tips && k.tips.length) { out += '<span class="pp-lab">Wichtig</span>' + k.tips.map(function (x) { return '<p>' + fmt(x) + '</p>'; }).join(''); }
         if (k.drill) { out += '<span class="pp-lab">Mini-Übung (2–3 Min.) <span class="pp-mine">моё</span></span><p class="pp-drill">' + fmt(k.drill) + '</p>'; }
         if (k.trap) { out += '<span class="pp-lab">Falle</span><p class="pp-trap">' + fmt(k.trap) + '</p>'; }
@@ -412,6 +427,7 @@
       '<div class="note-card"><h3>📝 Die 14 Aufgaben (100 Punkte)</h3><p class="pp-lead">Klick auf eine Aufgabe, um sie zu öffnen. Reihenfolge der Bearbeitung ist frei — Empfehlung steht in Karte 1.</p><div id="pp-tasksA"></div></div></section>';
     makeTimer($('#pp-timerA', root), 'neostudy_pp_timerA', 90 * 60, { plan: true });
     ppA = mountTasks($('#pp-tasksA', root), 'a', P.TASKS, 'neostudy_pp_eh_a', { mine: false });
+    if (P.bindShow) { P.bindShow(root); }   // кадры ленты внутри заданий (js/iw-ppt-lu-a.js)
     bindFileGen(root);
   }
   P.gotoTask = function (n) {
@@ -447,6 +463,7 @@
     /* B */
     makeTimer($('#pp-timerB', root), 'neostudy_pp_timerB', 60 * 60, {});
     mountTasks($('#pp-tasksB', root), 'b', P.B.tasks, 'neostudy_pp_eh_b', { mine: true });
+    if (P.bindShow) { P.bindShow(root); }   // кадры ленты внутри заданий B (js/iw-ppt-lu-b.js)
     /* vocab (Cue-Index im Audio = laufende Nummer + 1, Cue 0 ist die Einführung) */
     var gi = 0; P.VOCAB.forEach(function (g) { g[1].forEach(function (v) { v.gi = gi++; }); });
     function vocab(q) {
@@ -524,10 +541,40 @@
     chips(); build();
   }
 
+  /* ================================================================== pp5 — Übung an der eigenen Präsentation „Schulbeginn“ (Daten: js/iw-ppt-own.js) */
+  var ppC = null;
+  function renderPP5() {
+    var root = $('#pp5-root'); if (!root || !P.OWN) { return; }
+    var O = P.OWN;
+    function go(id) { return '<span class="pp-go" data-goto="' + id + '" title="Aufgabe ' + id + ' öffnen">' + id + '</span>'; }
+    root.innerHTML = '<section class="note-section">' + head('🛠️', 'Твоя презентация «Schulbeginn»: тренировка', 'Файл разобран по содержимому · ' + O.tasks.length + ' заданий на навыки с контрольной · улучшаем настоящую презентацию') +
+      '<div class="note-card"><h3>▶ Как работать</h3><ol class="pp-steps" style="margin-top:.2rem">' +
+      '<li><div>Открой свой файл <span class="pp-de">' + O.file + '</span> и <b>сразу</b> сохрани копию через «Speichern unter» (имя — генератор ниже). Оригинал не трогай.</div></li>' +
+      '<li><div>Начни с пяти ★-заданий: ' + O.star.map(go).join(' ') + '. Это те же навыки, что дают больше всего баллов на контрольной: Ausrichten, Schrift, Farben, Gruppieren, Bilder. Остальные — по дням.</div></li>' +
+      '<li><div>Задание открывается кликом: текст «как у учителя», что в файле, картинки/кадры, шаги. Делай <b>в PowerPoint</b>, а не здесь.</div></li>' +
+      '<li><div>Потом отметь галочками только то, что реально есть в <b>твоём</b> файле. Внизу — баллы и оценка по Notenschlüssel.</div></li></ol>' +
+      P.fileGen('c') + '</div>' +
+      '<div class="note-card"><h3>🔍 Что найдено в твоём файле</h3><p class="pp-lead">Всё это <b>прочитано из самого файла</b>: позиции, шрифты, цвета, число объектов. Каждая строка — и «улучшение презентации», и задание.</p>' +
+      '<div class="pp-tablewrap"><table class="pp-mini pp-find"><tr><th>Что в файле</th><th>Чем мешает</th><th>Задание</th></tr>' +
+      O.find.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td class="go">' + r[2].map(go).join('') + '</td></tr>'; }).join('') + '</table></div>' +
+      '<div class="pp-good">✅ <b>Уже хорошо:</b> заметки докладчика на всех 12 слайдах (58–819 знаков), ясная структура «4 шага», контрастный светлый фон, единая полоска. Это не трогаем.</div></div>' +
+      '<div class="note-card"><h3>⏱️ Режим «★-задания за 50 минут»</h3><p class="pp-lead">Когда сделала все пять ★ по одному разу — повтори их на таймере с чистой копии файла.</p><div id="pp-timerC"></div></div>' +
+      '<div class="note-card"><h3>📝 ' + O.tasks.length + ' заданий (' + O.tasks.reduce(function (a, t) { return a + t.pts; }, 0) + ' баллов)</h3><p class="pp-lead">Порядок свободный; ★ — самые важные. Клик по заданию открывает его.</p><div id="pp-tasksC"></div></div>' +
+      '<div class="note-card"><h3>⚠️ Что здесь не проверено</h3><ul class="pp-small" style="margin:.2rem 0 0 1.1rem">' +
+      '<li>PowerPoint на этом компьютере нет: названия кнопок взяты из справки Microsoft и по памяти, в твоей версии они могут слегка отличаться.</li>' +
+      '<li>Как файл выглядит у тебя на экране, зависит от программы. Заголовки и слайд 11 проверь глазами.</li>' +
+      '<li>Задания, баллы и картинки «Danach» — мои: образца учителя для этого файла нет. Настоящая контрольная будет на другом файле, с теми же типами задач.</li></ul></div></section>';
+    makeTimer($('#pp-timerC', root), 'neostudy_pp_timerC', 50 * 60, {});
+    ppC = mountTasks($('#pp-tasksC', root), 'c', O.tasks, 'neostudy_pp_eh_c', { mine: true });
+    bindFileGen(root);
+    if (P.bindShow) { P.bindShow(root); }
+    root.addEventListener('click', function (e) { var g = e.target.closest('[data-goto]'); if (g && ppC) { ppC.open(g.getAttribute('data-goto')); } });
+  }
+
   /* ------------------------------------------------------------------ init */
   function init() {
-    renderPP1(); renderPP2(); renderPP3();
-    var m = /^#(pp[123])$/.exec(location.hash || '');       /* the page router ran before the content existed → set the tab title now */
+    renderPP1(); renderPP2(); renderPP3(); renderPP5();
+    var m = /^#(pp[1235])$/.exec(location.hash || '');       /* the page router ran before the content existed → set the tab title now */
     if (m) { var h2 = $('#ls-' + m[1] + ' h2'); if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; } }
   }
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }

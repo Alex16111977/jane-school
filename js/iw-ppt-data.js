@@ -255,9 +255,27 @@ P.KANN = [
  { id: 'x6', g: 'gx', n: 'X6', tasks: [3, 7, 10], extra: true,
    de: 'Designfarben / RGB-Werte (Corporate Design)',
    ru: 'Брать цвета только из «Designfarben» темы; если нужного нет — вводить RGB вручную.',
-   how: ['Farbmenü → Designfarben (oberste Reihe)', 'Farbmenü → Weitere Farben… → Benutzerdefiniert → Rot / Grün / Blau', 'Fülleffekt → Pipette'],
-   tips: ['В теме LUMIO верхний ряд слева направо: Weiß · Anthrazit · Hellgrau · Petrol · Bernstein · Petrol hell · (три вспомогательных оттенка). Petrol = 15/61/62, Petrol hell = 30/107/108, Anthrazit = 43/45/47, Bernstein = 242/169/0, Hellgrau = 238/242/241.'],
-   drill: 'Нарисуй фигуру, покрась в Petrol через Designfarben, потом ту же через RGB 15/61/62 — сравни, цвет должен совпасть.' },
+   viz: 'colors',
+   how: ['Farbmenü → Designfarben (oberste Reihe)', 'Farbmenü → Weitere Farben… → Benutzerdefiniert → Rot / Grün / Blau', 'Formfüllung (в старых версиях Fülleffekt) → Pipette'],
+   steps: [
+     { t: 'Шаг за шагом · способ 1 — из палитры (по умолчанию делай так) <span class="pp-mine">моё</span>', s: [
+       'Щёлкни по фигуре — вокруг неё появится рамка с кружками.',
+       'Вверху в ленте открой вкладку **Formformat** (она видна, пока фигура выделена), там группа **Formenarten**.',
+       'Нажми на маленькую стрелку **▾** справа от кнопки **Formfüllung**. В старых версиях PowerPoint эта кнопка называется **Fülleffekt** — это одна и та же кнопка.',
+       'В окне найди заголовок **Designfarben**. Под ним сетка квадратиков — смотри только на **самый верхний ряд**: **Petrol — 4-й квадрат слева** (очень тёмный бирюзовый). Щёлкни по нему — фигура покрашена.'] },
+     { t: 'Способ 2 — вписать числа RGB (если нужного цвета в верхнем ряду нет, а числа даны в задании или на слайде CD)', s: [
+       'Шаги 1–3 те же: фигура выделена → Formformat → стрелка **▾** у Formfüllung.',
+       'В самом низу окна нажми **Weitere Füllfarben…**.',
+       'В окошке «Farben» открой вкладку **Benutzerdefiniert** и проверь, что в списке «Farbmodell» стоит **RGB**.',
+       'Впиши в поля: **Rot** 15 · **Grün** 61 · **Blau** 62 → **OK**.'] },
+     { t: 'Способ 3 — Pipette (взять цвет с готового объекта на слайде)', s: [
+       'Выдели фигуру, которую красишь → Formformat → стрелка **▾** у Formfüllung → **Pipette**: курсор станет пипеткой.',
+       'Щёлкни по объекту нужного цвета — фигура получит точно такой же цвет.'] }
+   ],
+   steps_note: 'Для **текста** всё то же самое, только кнопка — **Start → Schriftfarbe ▾** (буква A с цветной полоской), а строка внизу называется «Weitere Farben…». Названия кнопок сверены с инструкцией Microsoft, но руками в PowerPoint я их не проверяла — подпись на твоём экране может чуть отличаться.',
+   tips: ['**«Farbmenü»** в цепочках выше — моё слово для выпадающей палитры цветов (такой подписи в программе нет). Она открывается стрелкой ▾ у **Formfüllung** (фигура), **Schriftfarbe** (текст) или **Formkontur** (рамка). Вверху в ней «Designfarben» (цвета фирмы), ниже «Standardfarben» (обычные яркие, не фирменные).',
+     '**Зачем Designfarben:** цвет из верхнего ряда = цвет фирмы, значит ты в Corporate Design. В Probeklausur Kontakt-Kreise и столбцы диаграммы стоят в стандартных синем и зелёном Office, а не в цветах LUMIO — это ошибки, их надо перекрасить.'],
+   drill: 'Нарисуй фигуру ({{Einfügen → Formen}}), покрась её в Petrol способом 1; вторую такую же — способом 2 (15 / 61 / 62). Поставь рядом: цвет должен быть одинаковым.' },
  { id: 'x7', g: 'gx', n: 'X7', tasks: [14], extra: true,
    de: 'Speichern unter / Dateiname',
    ru: 'Сохранить как .pptx с точным именем в нужной папке — и сделать это сразу в начале.',

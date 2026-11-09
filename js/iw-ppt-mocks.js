@@ -76,7 +76,7 @@ window.PPT = window.PPT || {};
       var a = chrome('01 | Über uns', 'Über uns', { logo: 1, num: 3 });
       rows.forEach(function (r, i) {
         var y = 4.45 + i * 2.05;
-        a.push({ t: 'txt', x: 1.52, y: y, w: 6.5, h: 1.9, html: r[0], pt: 16, b: 1, color: C.petrol2, va: 'm' });
+        a.push({ t: 'txt', x: 1.52, y: y, w: 6.5, h: 1.9, html: r[0], pt: 18, b: 1, color: C.petrol2, va: 'm' });
         a.push({ t: 'txt', x: 8.2, y: y, w: 13.6, h: 1.9, html: r[1], pt: 18, color: C.anth, va: 'm' });
         a.push({ t: 'line', x1: 1.52, y1: y + 1.98, x2: 21.8, y2: y + 1.98, color: C.acc6, sw: 0.05 });
       });
@@ -198,6 +198,23 @@ window.PPT = window.PPT || {};
 
   /* ----------------------------------------------------------- HTML-Hilfen pro Aufgabe */
   P.extras = {
+    colors: function () {   // Kann-Karte X6: Palette der Datei + RGB als Rezept
+      var T = [['#FFFFFF', 'Weiß', 'Hintergrund 1', '255/255/255'], ['#2B2D2F', 'Anthrazit', 'Text 1', '43/45/47'], ['#EEF2F1', 'Hellgrau', 'Hintergrund 2', '238/242/241'], ['#0F3D3E', 'Petrol', 'Text 2', '15/61/62'], ['#F2A900', 'Bernstein', 'Akzent 1', '242/169/0'], ['#1E6B6C', 'Petrol hell', 'Akzent 2', '30/107/108'], ['#5FA3A3', 'Akzent 3', 'Zusatz', ''], ['#8A9696', 'Akzent 4', 'Zusatz', ''], ['#F7CF66', 'Akzent 5', 'Zusatz', ''], ['#C7D3D2', 'Akzent 6', 'Zusatz', '']];
+      var sw = T.map(function (c, i) {
+        return '<div class="pp-sw' + (i > 5 ? ' x' : '') + '" style="width:4.7rem"><i style="background:' + c[0] + '"></i><b>' + c[1] + '</b><br>' + c[2] + (c[3] ? '<br>' + c[3] : '') + '</div>';
+      }).join('');
+      var R = [['#0F3D3E', 'Petrol', [15, 61, 62], 'почти нет красного, чуть зелёного и синего → тёмный бирюзовый'], ['#F2A900', 'Bernstein', [242, 169, 0], 'красного и зелёного много, синего нет → янтарно-жёлтый'], ['#EEF2F1', 'Hellgrau', [238, 242, 241], 'всего почти на максимуме → почти белый']];
+      var BN = ['Rot', 'Grün', 'Blau'], BC = ['#ef4444', '#22c55e', '#3b82f6'];
+      var rgb = R.map(function (c) {
+        return '<div class="pp-rgbc"><div class="hd"><i style="background:' + c[0] + '"></i><b>' + c[1] + '</b><span>' + c[2].join(' / ') + '</span></div>' +
+          c[2].map(function (v, j) {
+            return '<div class="bar"><span>' + BN[j] + '</span><span class="tr"><span class="fl" style="width:' + Math.max(1.5, v / 255 * 100).toFixed(1) + '%;background:' + BC[j] + '"></span></span><em>' + v + '</em></div>';
+          }).join('') + '<p>' + c[3] + '</p></div>';
+      }).join('');
+      return '<span class="pp-lab">So liegt die oberste Reihe im Farbmenü <span class="pp-mine">nachgeprüft</span></span><div class="pp-swatches">' + sw + '</div>' +
+        '<p class="pp-small">Палитра файла LUMIO, 10 цветов слева направо. В меню ниже идут ещё ряды оттенков — они не нужны, берём <b>верхний ряд</b>. Первые 6 — фирменные (на слайде CD даны RGB для пяти из них), Akzent 3–6 — запасные.</p>' +
+        '<span class="pp-lab">RGB = рецепт цвета: Rot · Grün · Blau, каждое от 0 до 255 <span class="pp-mine">моё</span></span><div class="pp-rgb">' + rgb + '</div>';
+    },
     icons: function () {
       var L = [['truck', 'Lieferwagen'], ['bulb', 'Glühbirne', 1], ['euro', 'Euro'], ['medal', 'Medaille'], ['handshake', 'Handschlag', 1], ['clock', 'Uhr'], ['heart', 'Herz mit Puls'], ['leaf', 'Blatt', 1]];
       return '<h5>Das Material (Folie 16) — nur drei Piktogramme passen</h5><div class="pp-icons">' + L.map(function (x) {
