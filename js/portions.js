@@ -96,9 +96,12 @@
     function parseNum(s) {
         s = String(s).replace(/[€\s]/g, '');
         if (!s) { return NaN; }
+        var neg = false;   /* Vorzeichen: −276.000 / -276000 / +4.000 */
+        if (/^[-−–]/.test(s)) { neg = true; s = s.slice(1); } else if (s.charAt(0) === '+') { s = s.slice(1); }
         if (s.indexOf(',') > -1) { s = s.replace(/\./g, '').replace(',', '.'); }
         else if (/^\d{1,3}(\.\d{3})+$/.test(s)) { s = s.replace(/\./g, ''); }
-        return parseFloat(s);
+        var v = parseFloat(s);
+        return neg ? -v : v;
     }
     function fmt(n) {
         return n.toLocaleString('de-DE', { minimumFractionDigits: (Math.round(n * 100) % 100 ? 2 : 0), maximumFractionDigits: 2 });
