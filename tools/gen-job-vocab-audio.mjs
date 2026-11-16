@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Offline neural drill-audio for the vocabulary table of englisch-egb.html (#u1d, JOB_VOCAB).
+// Offline neural drill-audio for the vocabulary table of englisch-egb-archiv.html (#u1d, JOB_VOCAB).
 //
 // Reads JOB_VOCAB straight out of the page, so the audio cannot drift from the word list.
 // ONE continuous track for the whole list (hands-free listening), with per-word cues so a
@@ -28,7 +28,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PAGE = path.join(ROOT, 'englisch-egb.html');
+const PAGE = path.join(ROOT, 'englisch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-job-vocab-audio-cache');
 const MP3DIR = path.join(CACHE, 'mp3');

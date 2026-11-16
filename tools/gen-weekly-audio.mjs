@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Offline neural drill-audio for englisch-egb.html's Weekly Vocabulary Check (#u1k).
+// Offline neural drill-audio for englisch-egb-archiv.html's Weekly Vocabulary Check (#u1k).
 //
 // Reads WEEKLY_VOCAB straight out of the page, so the audio can never drift from
 // the word list. ONE continuous track for the whole list (so it plays hands-free,
@@ -27,7 +27,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PAGE = path.join(ROOT, 'englisch-egb.html');
+const PAGE = path.join(ROOT, 'englisch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-weekly-audio-cache');
 const MP3DIR = path.join(CACHE, 'mp3');

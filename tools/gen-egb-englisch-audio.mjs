@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate "listen to this lesson" audio for englisch-egb.html, tab u1m "Preparation for the First Exam"
+// Generate "listen to this lesson" audio for englisch-egb-archiv.html, tab u1m "Preparation for the First Exam"
 // (everything EXCEPT the "Plan auf 2 Tage" card, #exam-plan).
 //
 // The tab is split into three continuous tracks (one .m4a each, plus cue data for a bottom dock player):
@@ -36,7 +36,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const HTML_FILE = path.join(ROOT, 'englisch-egb.html');
+const HTML_FILE = path.join(ROOT, 'englisch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-egb-englisch-audio-cache');
 const MP3DIR = path.join(CACHE, 'mp3');
