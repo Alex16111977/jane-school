@@ -120,7 +120,7 @@
                 } else {
                     tries++;
                     q.classList.add('bad');
-                    fb.textContent = tries < 2 ? '✗ noch nicht — rechne noch einmal.' : '✗ Lösung: ' + fmt(ans) + (why ? ' — ' + why : '');
+                    fb.textContent = tries < 2 ? '✗ noch nicht — ' + (q.getAttribute('data-hint') || 'rechne noch einmal.') : '✗ Lösung: ' + fmt(ans) + (why ? ' — ' + why : '');
                 }
             }
             btn.addEventListener('click', check);
@@ -143,7 +143,7 @@
                         fb.className = 'ci-fb okc';
                     } else {
                         b.classList.add('bad');
-                        fb.textContent = '✗ nicht ganz — überleg noch einmal.';
+                        fb.textContent = '✗ ' + (mc.getAttribute('data-w' + i) || 'nicht ganz — überleg noch einmal.');
                         fb.className = 'ci-fb badc';
                     }
                 });
