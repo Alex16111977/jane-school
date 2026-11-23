@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generate "listen to this lesson" audio for deutsch-egb.html (EGB Deutsch, Thema 1 Kommunikation).
+// Generate "listen to this lesson" audio for deutsch-egb-archiv.html (EGB Deutsch, Thema 1 Kommunikation).
 // One continuous .m4a per lesson card (kl1, k1, k4, k5, k6, k8, k9, k11, k29, k30, k13, k14,
 // k16, k18, k20, k23, k25, k28), not many small files -- plus cue data (chunk start times, in
 // seconds) for a bottom dock player with prev/next-chunk navigation.
@@ -44,7 +44,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const HTML_FILE = path.join(ROOT, 'deutsch-egb.html');
+const HTML_FILE = path.join(ROOT, 'deutsch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-egb-deutsch-audio-cache');
 const MP3DIR = path.join(CACHE, 'mp3');

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Offline neural "Hör-Training" for deutsch-egb.html, lesson kt1 (Kontrolle am Montag): 12 exam questions on the
+// Offline neural "Hör-Training" for deutsch-egb-archiv.html, lesson kt1 (Kontrolle am Montag): 12 exam questions on the
 // Kann-Liste "Kommunikation", each followed by a thinking pause and the model answer, read by the German voice,
 // then one short Russian tip. ONE continuous track with one cue per question, so the lesson dock (the same one that
 // plays the other EGB Deutsch lessons) can step through the questions with prev/next.
 //
-// Source: #kannDrill .kd-det blocks of deutsch-egb.html (summary = short title, .kd-q question, .kd-a answer, .kd-tip tip).
+// Source: #kannDrill .kd-det blocks of deutsch-egb-archiv.html (summary = short title, .kd-q question, .kd-a answer, .kd-tip tip).
 //
 // Output:
 //   audio/egb-deutsch-kt1.m4a
@@ -24,7 +24,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PAGE = path.join(ROOT, 'deutsch-egb.html');
+const PAGE = path.join(ROOT, 'deutsch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-kann-audio-cache');
 const MP3DIR = path.join(CACHE, 'mp3');

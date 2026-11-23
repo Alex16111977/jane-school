@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Offline neural audio for deutsch-egb.html, lesson kt3 (Übungsklausur Kommunikation): a short Russian intro + the order of the text,
+// Offline neural audio for deutsch-egb-archiv.html, lesson kt3 (Übungsklausur Kommunikation): a short Russian intro + the order of the text,
 // the 17 phrases of the teacher's sheet to repeat aloud (DE · RU · DE · pause; 5 groups = 5 cues),
 // then the model solution of Klausur A read by the German voice paragraph by paragraph (each with a short Russian pointer),
 // a Konjunktiv-I speaking drill and a last checklist. ONE continuous track with one cue per block, so the lesson dock
 // (the same one that plays the other EGB Deutsch lessons) can step through the blocks with prev/next.
 //
-// Source: <!--KLMODEL-A--> … <!--/KLMODEL-A--> in deutsch-egb.html (.kl-mh headings, .kl-mp paragraphs: data-say, data-pts, .kl-mt text, .kl-mru tip).
+// Source: <!--KLMODEL-A--> … <!--/KLMODEL-A--> in deutsch-egb-archiv.html (.kl-mh headings, .kl-mp paragraphs: data-say, data-pts, .kl-mt text, .kl-mru tip).
 // The intro / order / drill / checklist texts only exist here (they are audio-only).
 //
 // Output:
@@ -26,7 +26,7 @@ import { execFileSync, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PAGE = path.join(ROOT, 'deutsch-egb.html');
+const PAGE = path.join(ROOT, 'deutsch-egb-archiv.html');
 const OUTDIR = path.join(ROOT, 'audio');
 const CACHE = path.join(os.tmpdir(), 'jane-school-kann-audio-cache');   // shared with gen-kann-audio.mjs (clip ids are content hashes)
 const MP3DIR = path.join(CACHE, 'mp3');
