@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGB Informationswirtschaft Archiv — PowerPoint-Klassenarbeit | NeoStudy</title>
+    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/englisch.css?v=10">
+    <link rel="stylesheet" href="css/iw-ppt.css?v=3">
+    <link rel="stylesheet" href="css/iw-ppt-show.css?v=5">
+<style>
+
+    /* ---- Hub (Karten) und Lektionsansicht ---- */
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    #iw-hub.hidden { display: none; }
+    .iw-back {
+        display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-accent);
+        font-size: 0.95rem; text-decoration: none; margin: 0 0 1rem; padding: 0.4rem 0.9rem;
+        border: 1px solid rgba(255,255,255,0.14); border-radius: 50px; background: rgba(255,255,255,0.04);
+        transition: all .15s; font-family: inherit; cursor: pointer;
+    }
+    .iw-back:hover { background: rgba(255,255,255,0.09); border-color: var(--color-accent); }
+    .iw-sec-head { display: flex; align-items: center; gap: 0.7rem; margin: 1.6rem 0 0.7rem; flex-wrap: wrap; }
+    .iw-sec-badge { color: #0a1a0e; font-weight: 900; font-size: 0.78rem; padding: 0.3rem 0.8rem;
+                    border-radius: 50px; letter-spacing: 0.08em; }
+    .iw-sec-head h3 { margin: 0; font-size: 1.05rem; }
+    .iw-sec-note { color: rgba(230,230,235,0.5); font-size: 0.82rem; margin-left: auto; }
+
+        /* Plan toggle button inside each card */
+    .plan-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.72rem;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        z-index: 3;
+        flex-shrink: 0;
+        padding: 0;
+        font-family: inherit;
+    }
+    .plan-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: #fff; transform: scale(1.1); }
+
+    /* Card states */
+    a.subject-card[data-plan="week"] { border-color: rgba(245,158,11,0.65) !important; background: rgba(245,158,11,0.07) !important; }
+    a.subject-card[data-plan="week"] .plan-btn { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.6); color: #fbbf24; }
+    a.subject-card[data-plan="done"] { border-color: rgba(63,185,80,0.5) !important; background: rgba(63,185,80,0.05) !important; opacity: 0.72; }
+    a.subject-card[data-plan="done"] .plan-btn { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.5); color: #86efac; }
+    a.subject-card[data-plan="later"] { border-color: rgba(163,113,247,0.5) !important; background: rgba(163,113,247,0.05) !important; }
+    a.subject-card[data-plan="later"] .plan-btn { background: rgba(163,113,247,0.22); border-color: rgba(163,113,247,0.5); color: #c9b3ff; }
+
+    /* Badge on card */
+    .plan-badge {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.13rem 0.48rem;
+        border-radius: 20px;
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+        pointer-events: none;
+        z-index: 4;
+    }
+    .plan-badge-week  { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #1a1100; }
+    .plan-badge-done  { background: linear-gradient(135deg,#3fb950,#86efac); color: #0a1a0e; }
+    .plan-badge-later { background: linear-gradient(135deg,#a371f7,#c9b3ff); color: #0e0a1a; }
+
+    /* Dashboard */
+    .plan-dashboard {
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid rgba(255,255,255,0.09);
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .plan-stats { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .plan-stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+    .plan-stat-num { font-weight: 900; font-size: 1.1rem; }
+    .plan-stat-label { color: rgba(230,230,235,0.5); font-size: 0.8rem; }
+    .plan-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.1); }
+
+    .plan-filter-btns { display: flex; gap: 0.45rem; margin-left: auto; flex-wrap: wrap; }
+    .pf-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1.5px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: inherit;
+    }
+    .pf-btn:hover, .pf-btn.pf-active { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .pf-btn.pf-active-week { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+    .pf-btn.pf-active-done { background: rgba(63,185,80,0.14); border-color: rgba(63,185,80,0.45); color: #86efac; }
+    .pf-btn.pf-active-later { background: rgba(163,113,247,0.14); border-color: rgba(163,113,247,0.45); color: #c9b3ff; }
+
+    .plan-empty-msg {
+        display: none;
+        text-align: center;
+        color: rgba(255,255,255,0.3);
+        padding: 2.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+    a.subject-card.plan-hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        .plan-filter-btns { margin-left: 0; }
+        .plan-divider { display: none; }
+    }
+
+
+    /* ---- Trainer / Quiz (PowerPoint-Karten) ---- */
+    .tz-box { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.1rem; }
+    .tz-prompt { font-size:1.05rem; color:#fff; line-height:1.55; text-align:center; margin:0.3rem 0 0.2rem; }
+    .tz-from { text-align:center; color:rgba(230,230,235,0.55); font-size:0.83rem; margin-bottom:1rem; }
+    .tz-opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.45rem; }
+    .tz-opt { background:rgba(255,255,255,0.045); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+              padding:0.55rem 0.7rem; color:rgba(230,230,235,0.85); font-size:0.87rem; cursor:pointer;
+              font-family:inherit; text-align:left; transition:all .15s; }
+    .tz-opt:hover:not(:disabled) { border-color:var(--color-accent); background:rgba(255,255,255,0.08); }
+    .tz-opt:disabled { cursor:default; opacity:0.75; }
+    .tz-opt.ok { border-color:var(--color-green); background:rgba(63,185,80,0.14); color:#86efac; }
+    .tz-opt.no { border-color:#f85149; background:rgba(248,81,73,0.12); color:#ff9d97; }
+    .tz-fb { margin-top:0.85rem; font-size:0.92rem; line-height:1.55; min-height:1.4rem; color:rgba(230,230,235,0.8); }
+    .tz-fb b { color:#fff; }
+    .tz-actions { display:flex; gap:0.5rem; margin-top:0.9rem; flex-wrap:wrap; justify-content:center; }
+    .tz-btn { background:var(--color-accent); color:#1a0a12; border:none; border-radius:8px; padding:0.55rem 1.15rem;
+              font-size:0.92rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .tz-btn:hover { background:var(--color-accent-hover); }
+    .tz-btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:rgba(230,230,235,0.8); font-weight:500; }
+    .tz-stats { display:flex; gap:1.2rem; justify-content:center; margin-top:0.9rem; font-size:0.85rem; color:rgba(230,230,235,0.6); }
+    .tz-stats b { color:#fff; }
+
+    /* ══ Audio-Dock unten (PowerPoint-Karten), blockiert nichts ══ */
+    .spk-btn{display:inline-flex;align-items:center;justify-content:center;width:1.55rem;height:1.55rem;margin-left:.35rem;border-radius:50%;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.18);color:inherit;font-size:.78rem;cursor:pointer;vertical-align:middle;transition:background .15s,transform .15s;flex:none;line-height:1;}
+    .spk-btn:hover{background:rgba(56,189,248,.28);transform:scale(1.1);}
+    .spk-btn.playing{background:rgba(56,189,248,.45);animation:spkPulse 1s ease-in-out infinite;}
+    @keyframes spkPulse{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.55);}50%{box-shadow:0 0 0 7px rgba(56,189,248,0);}}
+    .wka-playall{display:flex;align-items:center;gap:0.5rem;width:100%;margin-bottom:0.8rem;padding:0.6rem 1rem;border-radius:12px;border:1.5px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.1);color:#fff;font-family:inherit;font-size:0.92rem;font-weight:700;cursor:pointer;transition:background .15s;}
+    .wka-playall:hover{background:rgba(56,189,248,0.2);}
+    .wka-dock{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;flex-direction:column;font-family:inherit;padding-bottom:env(safe-area-inset-bottom,0);background:linear-gradient(160deg,#131c2b,#0b1119);border-top:1px solid rgba(56,189,248,0.45);box-shadow:0 -8px 26px rgba(0,0,0,0.5);}
+    .wka-dock.open{display:flex;}
+    body.wka-on{padding-bottom:88px;}
+    .wka-bar{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.7rem;}
+    .wka-btn{width:38px;height:38px;border-radius:50%;flex-shrink:0;border:1px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.1);color:#e8f4ff;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+    .wka-btn:hover{background:rgba(56,189,248,0.22);}
+    .wka-main{width:46px;height:46px;font-size:1.15rem;background:linear-gradient(135deg,#38bdf8,#7dd3fc);color:#04263a;border:none;}
+    .wka-info{flex:1;min-width:0;}
+    .wka-word{color:#fff;font-size:0.94rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .wka-sub{color:rgba(200,222,242,0.6);font-size:0.76rem;margin-top:0.08rem;}
+    .wka-close{background:none;border:none;color:rgba(200,215,235,0.6);font-size:1.5rem;line-height:1;cursor:pointer;flex-shrink:0;padding:0 0.3rem;}
+    .wka-close:hover{color:#fff;}
+    .wka-track{height:4px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden;margin:0 0.7rem 0.6rem;}
+    .wka-fill{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#7dd3fc);}
+</style>
+</head>
+<body class="dark-theme page-bg-image" style="background: transparent">
+    <div style="position:fixed;inset:0;z-index:0;pointer-events:none">
+        <img src="img/blackpink2.jpeg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top">
+        <div style="position:absolute;inset:0;background:rgba(10,10,20,0.86)"></div>
+    </div>
+    <nav class="navbar navbar-transparent">
+        <a href="index.html" class="logo">NeoStudy</a>
+        <div class="nav-links">
+            <a href="index.html">Startseite</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn active" tabindex="0">Fächer ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="mathe.html">Mathematik</a>
+                    <a href="egb.html" class="active">EGB</a>
+                </div>
+            </div>
+            <a href="englisch.html">Englisch</a>
+            <a href="deutsch.html">Deutsch</a>
+            <div class="nav-dd">
+                <span class="nav-dd-btn" tabindex="0">Vokabeln ▾</span>
+                <div class="nav-dd-menu">
+                    <a href="vokabeln.html">Vokabeln</a>
+                    <a href="englisch-vokabeln.html">Vocabulary</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content page-with-bg">
+        <nav class="breadcrumbs">
+            <a href="index.html">Startseite</a>
+            <span class="separator">&#8250;</span>
+            <a href="deutsch-handelsschule.html">Höhere Handelsschule</a>
+            <span class="separator">&#8250;</span>
+            <a href="iw-egb.html">EGB Informationswirtschaft</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Archiv</span>
+        </nav>
+        <a href="iw-egb.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--color-accent);font-size:0.95rem;margin-bottom:0.5rem;text-decoration:none;">&#8592; Zurück zu EGB Informationswirtschaft</a>
+
+        <div class="page-header" style="text-align:left; padding-top:1rem">
+            <h1>EGB Informationswirtschaft &mdash; Archiv</h1>
+            <p class="page-subtitle">Abgeschlossene Themen aus dem IW-Unterricht am Erich-Gutenberg-Berufskolleg &mdash; <b>PowerPoint-Klassenarbeit</b> (Lernsituation 01): 5 Karten, alles bleibt erhalten.<br>Aktuelles Thema: <a href="iw-egb.html">LS 2 &middot; Die Organisation der Fly Bike Werke</a> &mdash; объяснения по-русски, термины по-немецки</p>
+        </div>
+
+        <div id="iw-hub">
+
+        <!-- ===== Suchleiste ===== -->
+        <div style="margin:0.5rem 0 1.5rem;">
+            <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.45;pointer-events:none;">&#x1F50D;</span>
+                <input type="text" id="iw-search" placeholder="Thema suchen&hellip; z.B. Folienmaster, SmartArt, Animation" autocomplete="off" spellcheck="false" class="search-input" style="padding-left:2.8rem;padding-right:2.8rem;">
+                <button id="search-clear" title="L&ouml;schen" style="position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;opacity:0;color:rgba(255,255,255,0.45);transition:opacity 0.15s;padding:0.2rem 0.4rem;" aria-label="Suche l&ouml;schen">&#x2715;</button>
+            </div>
+            <div id="search-no-results" hidden style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem 0;font-size:0.9rem;">
+                Nichts gefunden f&uuml;r &bdquo;<span id="search-query-display"></span>&ldquo; &mdash; versuch ein anderes Wort
+            </div>
+        </div>
+
+        <h2 id="iw-h2" style="color:#fff; font-size:1.05rem; font-weight:700; margin:1.5rem 0 0.5rem 0; padding-bottom:0.45rem; border-bottom:1px solid rgba(255,255,255,0.1); letter-spacing:0.02em;">
+            &#x1F4E6; Abgeschlossene Themen aus dem IW-Unterricht
+        </h2>
+        <p id="iw-desc" style="color:rgba(230,230,235,0.65); font-size:0.88rem; margin:0 0 1.4rem;">
+            Каждый урок &mdash; отдельная карточка. Нажми <strong>+</strong> в углу карточки, чтобы поставить её в
+            <strong style="color:#fbbf24;">Diese Woche</strong>, отметить <strong style="color:#86efac;">Erledigt</strong>
+            или отложить на <strong style="color:#c9b3ff;">Sp&auml;ter</strong>.
+        </p>
+
+        <div class="iw-sec-head">
+            <span class="iw-sec-badge" style="background:linear-gradient(135deg,#fb923c,#fdba74);">PPT</span>
+            <h3 style="color:#fdba74;">PowerPoint &mdash; Klassenarbeit</h3>
+            <span class="iw-sec-note">5 Karten &middot; Lernsituation 01 &bdquo;Modellunternehmen vorstellen&ldquo; &middot; praktische Pr&uuml;fung am PC</span>
+        </div>
+        <div class="subjects" style="justify-content:flex-start; max-width:100%;">
+            <a href="#pp1" class="subject-card glass-card" data-lesson="pp1" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,146,60,0.45);">
+                <span class="subject-icon">&#x1F3AF;</span>
+                <h3>PowerPoint-Klausur: Plan &amp; Kann-Liste</h3>
+                <p>Что проверят (90 минут, 14 заданий, 100 баллов), Notenschlüssel, порядок работы, 27 Kann-Punkte + 9 «скрытых» (Zuschneiden, SmartArt, Animationen, Hyperlinks, Folienmaster, Foliennummer …) с путями в меню по-немецки и мини-упражнениями, 12 ловушек, план по дням, озвучка</p>
+            </a>
+            <a href="#pp5" class="subject-card glass-card" data-lesson="pp5" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,146,60,0.45);">
+                <span class="subject-icon">&#x1F6E0;&#xFE0F;</span>
+                <h3>Твоя презентация &laquo;Schulbeginn&raquo;: тренировка</h3>
+                <p>Файл разобран по содержимому: что в нём не так (12 копий полоски, напечатанные номера и маркеры, Aptos, цвета без палитры, неровные края). 14 заданий на навыки с контрольной &mdash; Ausrichten, Schrift, Farben, Gruppieren, Bilder, Master, SmartArt, Tabelle, Links &mdash; с шагами, картинками и баллами</p>
+            </a>
+            <a href="#pp4" class="subject-card glass-card" data-lesson="pp4" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,146,60,0.45);">
+                <span class="subject-icon">&#x1F4CC;</span>
+                <h3>Шпаргалка: что запомнить из Probeklausur</h3>
+                <p>7 главных вещей, правила и оценка, порядок работы, 14 заданий в одну строку, 12 ловушек, слова эффекта, 5 путей в меню — основа листа A4; режим «проверь себя» и печать</p>
+            </a>
+            <a href="#pp2" class="subject-card glass-card" data-lesson="pp2" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,146,60,0.45);">
+                <span class="subject-icon">&#x1F9EA;</span>
+                <h3>Probeklausur LUMIO &mdash; 14 Aufgaben</h3>
+                <p>Оригинальные задания учителя, что реально лежит в файле, решение по шагам с примерами-картинками, Erwartungshorizont с галочками → оценка, таймер на 90 минут</p>
+            </a>
+            <a href="#pp3" class="subject-card glass-card" data-lesson="pp3" style="cursor:pointer; text-decoration:none; color:inherit; border-color:rgba(251,146,60,0.45);">
+                <span class="subject-icon">&#x1F3CB;&#xFE0F;</span>
+                <h3>Trainer &amp; zweite Arbeit</h3>
+                <p>Квиз «Wo klicke ich?» (65 ситуаций), Aufgabenwörter и «Wirkungswörter» из заданий учителя, вторая работа B на 60 минут, словарь PowerPoint на 84 слова</p>
+            </a>
+        </div>
+
+        </div><!-- /iw-hub -->
+
+        <div id="iw-lessons">
+
+        <!-- ==================== POWERPOINT-KLASSENARBEIT (pp1–pp3): Inhalt kommt aus js/iw-ppt*.js ==================== -->
+        <div class="lesson" id="ls-pp1">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes pp-root" id="pp1-root"></div>
+        </div>
+
+        <div class="lesson" id="ls-pp2">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes pp-root" id="pp2-root"></div>
+        </div>
+
+        <div class="lesson" id="ls-pp3">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes pp-root" id="pp3-root"></div>
+        </div>
+
+        <div class="lesson" id="ls-pp4">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes pp-root" id="pp4-root"></div>
+        </div>
+
+        <div class="lesson" id="ls-pp5">
+        <button class="iw-back" data-back="1">&#8592; Zur&uuml;ck zur &Uuml;bersicht</button>
+        <div class="zp-notes pp-root" id="pp5-root"></div>
+        </div>
+
+        </div><!-- /iw-lessons -->
+
+    </div>
+
+    <footer class="footer-dark" style="position:relative;z-index:1">
+        <p>NeoStudy &copy; 2026</p>
+    </footer>
+
+<script>
+/* ===================== ROUTER: Karten <-> Lektion ===================== */
+(function () {
+    var hub = document.getElementById('iw-hub');
+    var wrap = document.getElementById('iw-lessons');
+    var lessons = Array.prototype.slice.call(document.querySelectorAll('.lesson'));
+
+    function showHub() {
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        hub.classList.remove('hidden');
+        document.title = 'EGB Informationswirtschaft Archiv | NeoStudy';
+    }
+    function openLesson(id) {
+        var el = document.getElementById('ls-' + id);
+        if (!el) { showHub(); return; }
+        lessons.forEach(function (l) { l.classList.remove('active'); });
+        el.classList.add('active');
+        hub.classList.add('hidden');
+        var h2 = el.querySelector('h2');
+        if (h2) { document.title = h2.textContent.trim() + ' | NeoStudy'; }
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function route() {
+        var id = (location.hash || '').replace(/^#/, '');
+        if (id && document.getElementById('ls-' + id)) { openLesson(id); } else { showHub(); }
+    }
+
+    document.querySelectorAll('a.subject-card[data-lesson]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.target.closest('.plan-btn')) { return; }
+            e.preventDefault();
+            location.hash = a.dataset.lesson;
+            route();
+        });
+    });
+    wrap.querySelectorAll('[data-back]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (location.hash) { location.hash = ''; }
+            showHub();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+    });
+    window.addEventListener('hashchange', route);
+    route();
+})();
+
+/* ===================== SUCHE ===================== */
+(function () {
+    var input = document.getElementById('iw-search');
+    if (!input) { return; }
+    var clearBtn = document.getElementById('search-clear');
+    var noRes = document.getElementById('search-no-results');
+    var qOut = document.getElementById('search-query-display');
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#iw-hub .subjects'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#iw-hub .subject-card'));
+
+    function norm(t) {
+        return t.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+    }
+    function showAll() {
+        cards.forEach(function (c) { c.style.display = ''; });
+        grids.forEach(function (g) {
+            g.style.display = '';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = 'flex'; }
+        });
+        noRes.hidden = true;
+        clearBtn.style.opacity = '0';
+    }
+    function search(raw) {
+        if (!raw.trim()) { showAll(); return; }
+        clearBtn.style.opacity = '1';
+        var q = norm(raw), any = false;
+        cards.forEach(function (c) {
+            var h3 = c.querySelector('h3'), p = c.querySelector('p');
+            var txt = norm((h3 ? h3.textContent : '') + ' ' + (p ? p.textContent : ''));
+            var hit = txt.indexOf(q) !== -1;
+            c.style.display = hit ? '' : 'none';
+            if (hit) { any = true; }
+        });
+        grids.forEach(function (g) {
+            var vis = Array.prototype.slice.call(g.querySelectorAll('.subject-card')).some(function (c) { return c.style.display !== 'none'; });
+            g.style.display = vis ? '' : 'none';
+            var h = g.previousElementSibling;
+            if (h && h.classList.contains('iw-sec-head')) { h.style.display = vis ? 'flex' : 'none'; }
+        });
+        noRes.hidden = any;
+        if (!any) { qOut.textContent = raw; }
+    }
+    input.addEventListener('input', function () { search(this.value); });
+    clearBtn.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+})();
+
+/* ===================== PLAN: Diese Woche / Erledigt / Später ===================== */
+(function () {
+    var KEY = 'neostudy_iw_plan';
+    var CYCLE = [null, 'week', 'done', 'later'];
+    var ICONS = { week: '📅', done: '✓', later: '🔖' };
+    var LABELS = { week: 'Diese Woche', done: 'Erledigt', later: 'Später' };
+    var TIPS = { week: 'Als erledigt markieren →', done: 'Auf "Später" setzen →', later: 'Markierung entfernen →' };
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+    var state = load(), filter = 'all';
+
+    var dash = document.createElement('div');
+    dash.className = 'plan-dashboard';
+    dash.id = 'plan-dashboard';
+    dash.innerHTML =
+        '<div class="plan-stats">' +
+            '<div class="plan-stat"><span style="font-size:1rem;">📅</span>' +
+                '<span class="plan-stat-num" id="pn-week" style="color:#fbbf24;">0</span>' +
+                '<span class="plan-stat-label">Diese Woche</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">✓</span>' +
+                '<span class="plan-stat-num" id="pn-done" style="color:#86efac;">0</span>' +
+                '<span class="plan-stat-label">Erledigt</span></div>' +
+            '<div class="plan-divider"></div>' +
+            '<div class="plan-stat"><span style="font-size:1rem;">🔖</span>' +
+                '<span class="plan-stat-num" id="pn-later" style="color:#c9b3ff;">0</span>' +
+                '<span class="plan-stat-label">Später</span></div>' +
+        '</div>' +
+        '<div class="plan-filter-btns">' +
+            '<button class="pf-btn pf-active" data-f="all">Alle</button>' +
+            '<button class="pf-btn" data-f="week">📅 Diese Woche</button>' +
+            '<button class="pf-btn" data-f="done">✓ Erledigt</button>' +
+            '<button class="pf-btn" data-f="later">🔖 Später</button>' +
+        '</div>';
+
+    var searchWrap = document.getElementById('iw-search').closest('div').parentElement;
+    searchWrap.parentNode.insertBefore(dash, searchWrap.nextSibling);
+
+    var emptyMsg = document.createElement('div');
+    emptyMsg.className = 'plan-empty-msg';
+    emptyMsg.id = 'plan-empty';
+    emptyMsg.innerHTML = 'Noch keine Karten hier.<br><span style="font-size:0.8rem;opacity:0.6;">Klick das <strong>+</strong> auf einer Karte, um sie einzusortieren.</span>';
+    dash.parentNode.insertBefore(emptyMsg, dash.nextSibling);
+
+    dash.querySelectorAll('.pf-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filter = this.dataset.f;
+            dash.querySelectorAll('.pf-btn').forEach(function (b) { b.className = 'pf-btn'; });
+            this.classList.add('pf-active');
+            if (filter !== 'all') { this.classList.add('pf-active-' + filter); }
+            applyFilter();
+        });
+    });
+
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#iw-hub a.subject-card'));
+    cards.forEach(function (card) {
+        card.style.position = 'relative';
+        var href = card.getAttribute('href');
+        var btn = document.createElement('button');
+        btn.className = 'plan-btn';
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cur = state[href] || null;
+            var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+            if (next === null) { delete state[href]; } else { state[href] = next; }
+            save(state);
+            renderCard(card, href);
+            updateCounts();
+            applyFilter();
+        });
+        card.appendChild(btn);
+        renderCard(card, href);
+    });
+
+    function renderCard(card, href) {
+        var s = state[href] || null;
+        card.setAttribute('data-plan', s || '');
+        var btn = card.querySelector('.plan-btn');
+        if (btn) {
+            btn.textContent = s ? ICONS[s] : '+';
+            btn.title = s ? TIPS[s] : 'Diese Woche / Erledigt / Später';
+        }
+        var old = card.querySelector('.plan-badge');
+        if (old) { old.remove(); }
+        if (s) {
+            var badge = document.createElement('span');
+            badge.className = 'plan-badge plan-badge-' + s;
+            badge.textContent = LABELS[s];
+            card.appendChild(badge);
+        }
+    }
+    function updateCounts() {
+        var w = 0, d = 0, l = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')];
+            if (s === 'week') { w++; } else if (s === 'done') { d++; } else if (s === 'later') { l++; }
+        });
+        document.getElementById('pn-week').textContent = w;
+        document.getElementById('pn-done').textContent = d;
+        document.getElementById('pn-later').textContent = l;
+    }
+    function applyFilter() {
+        var visible = 0;
+        cards.forEach(function (card) {
+            var s = state[card.getAttribute('href')] || null;
+            var hide = filter !== 'all' && s !== filter;
+            card.classList.toggle('plan-hidden', hide);
+            if (!hide) { visible++; }
+        });
+        emptyMsg.style.display = (filter !== 'all' && visible === 0) ? 'block' : 'none';
+    }
+    updateCounts();
+    applyFilter();
+})();
+</script>
+    <script src="js/nav-dropdown.js" defer></script>
+    <script src="js/iw-ppt-data.js?v=3" defer></script>
+    <script src="js/iw-ppt-tasks.js?v=2" defer></script>
+    <script src="js/iw-ppt-quiz.js?v=1" defer></script>
+    <script src="js/iw-ppt-mocks.js?v=3" defer></script>
+    <script src="js/iw-ppt-show.js?v=7" defer></script>
+    <script src="js/iw-ppt-own-show.js?v=2" defer></script>
+    <script src="js/iw-ppt-lu-show.js?v=3" defer></script>
+    <script src="js/iw-ppt-lu-a.js?v=2" defer></script>
+    <script src="js/iw-ppt-lu-b.js?v=1" defer></script>
+    <script src="js/iw-ppt-cheat.js?v=1" defer></script>
+    <script src="js/iw-ppt-own.js?v=4" defer></script>
+    <script src="js/iw-ppt.js?v=9" defer></script>
+</body>
+</html>
